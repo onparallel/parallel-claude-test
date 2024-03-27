@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
-import { sortBy } from "remeda";
+import { isDefined, pick, sortBy } from "remeda";
 import {
   ProfileStatusValues,
   ProfileTypeFieldPermissionTypeValues,
@@ -92,7 +92,8 @@ export const ProfileTypeField = objectType({
       },
     });
     t.jsonObject("options", {
-      resolve: async (o) => await mapProfileTypeFieldOptions(o.type, o.options),
+      resolve: async (o) =>
+        await mapProfileTypeFieldOptions(o.type, o.options, (type, id) => toGlobalId(type, id)),
     });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
@@ -229,7 +230,12 @@ export const ProfileFieldResponse = interfaceType({
     });
     t.nullable.field("createdBy", {
       type: "User",
-      resolve: async (root, _, ctx) => await ctx.users.loadUser(root.created_by_user_id),
+      resolve: async (root, _, ctx) => {
+        if (!isDefined(root.created_by_user_id)) {
+          return null;
+        }
+        return await ctx.users.loadUser(root.created_by_user_id);
+      },
     });
     t.nullable.datetime("expiresAt", {
       description: "Expiration datetime of the value, considering organization's timezone.",
@@ -329,6 +335,22 @@ export const ProfileFieldValue = objectType({
     t.implements("ProfileFieldResponse");
     t.nullable.jsonObject("content", {
       resolve: (root, _, ctx) => {
+        if (root.type === "BACKGROUND_CHECK") {
+          return {
+            query: isDefined(root.content.query)
+              ? pick(root.content.query, ["name", "date", "type"])
+              : null,
+            search: isDefined(root.content.search)
+              ? pick(root.content.search, ["totalCount", "createdAt"])
+              : null,
+            entity: isDefined(root.content.entity)
+              ? {
+                  ...pick(root.content.entity, ["id", "type", "name", "createdAt"]),
+                  properties: pick(root.content.entity.properties, ["topics"]),
+                }
+              : null,
+          };
+        }
         return root.content;
       },
     });

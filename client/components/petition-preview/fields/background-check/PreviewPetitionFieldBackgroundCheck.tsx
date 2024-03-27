@@ -32,6 +32,7 @@ import {
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useInterval } from "@parallel/utils/useInterval";
@@ -46,7 +47,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
 } from "../../../recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { useBackgroundCheckEntityTypeSelectOptions } from "./BackgroundCheckEntityTypeSelect";
 
 export interface PreviewPetitionFieldBackgroundCheckProps
   extends Omit<
@@ -114,6 +114,11 @@ export function PreviewPetitionFieldBackgroundCheck({
     async function handleDeletePetitionReply({ replyId }: { replyId: string }) {
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await onDeleteReply(replyId);
+
+      if (browserTabRef.current) {
+        browserTabRef.current.close();
+        setState("IDLE");
+      }
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
     [onDeleteReply],
@@ -136,16 +141,14 @@ export function PreviewPetitionFieldBackgroundCheck({
   useEffect(() => {
     const handleRouteChange = () => {
       if (isDefined(browserTabRef.current)) {
-        browserTabRef.current.postMessage("close", browserTabRef.current.origin);
+        browserTabRef.current.close();
       }
     };
 
     router.events.on("routeChangeStart", handleRouteChange);
 
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [router]);
+    return () => router.events.off("routeChangeStart", handleRouteChange);
+  }, []);
 
   useWindowEvent(
     "message",
@@ -396,10 +399,7 @@ export function KYCResearchFieldReplyProfile({
   isViewDisabled,
 }: KYCResearchFieldReplyProfileProps) {
   const intl = useIntl();
-  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
-  const entityTypeLabel = entityTypeOptions.find(
-    (option) => option.value === reply.content?.query?.type,
-  )?.label;
+  const entityTypeLabel = getEntityTypeLabel(intl, reply.content?.query?.type);
 
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>

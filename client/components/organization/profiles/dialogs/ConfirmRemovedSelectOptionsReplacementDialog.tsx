@@ -15,7 +15,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { OptionProps, SingleValueProps, components } from "react-select";
 
-type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions["SELECT"]["values"]>;
+type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
 interface ConfirmUpdateProfileTypeSelectFieldDialogProps {
   currentOptions: SelectOptionValue[];

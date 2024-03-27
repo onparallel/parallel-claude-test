@@ -1808,6 +1808,7 @@ export interface NexusGenFieldTypes {
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
+    copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -4258,6 +4259,7 @@ export interface NexusGenFieldTypeNames {
     closePetition: "Petition";
     closeProfile: "Profile";
     completePetition: "Petition";
+    copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createAddPetitionPermissionTask: "Task";
     createAzureOpenAiIntegration: "SupportMethodResponse";
@@ -6337,6 +6339,14 @@ export interface NexusGenArgTypes {
       additionalSigners?: NexusGenInputs["PublicPetitionSignerDataInput"][] | null; // [PublicPetitionSignerDataInput!]
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    copyBackgroundCheckReplyToProfileFieldValue: {
+      // args
+      expiryDate?: NexusGenScalars["Date"] | null; // Date
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     copyFileReplyToProfileFieldFile: {
       // args

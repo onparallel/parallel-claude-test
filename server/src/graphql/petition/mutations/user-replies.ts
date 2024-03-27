@@ -15,6 +15,7 @@ import { InvalidCredentialsError } from "../../../integrations/GenericIntegratio
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { random } from "../../../util/token";
 import { SUCCESS } from "../../helpers/Success";
 import { authenticateAnd, chain, not } from "../../helpers/authorize";
@@ -25,7 +26,12 @@ import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import { authenticateBackgroundCheckToken } from "../../integrations/authorizers";
-import { parseBackgroundCheckToken } from "../../integrations/utils";
+import {
+  BackgroundCheckPetitionParams,
+  BackgroundCheckProfileParams,
+  NumericParams,
+  parseBackgroundCheckToken,
+} from "../../integrations/utils";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -664,11 +670,11 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
     entityId: stringArg(),
   },
   resolve: async (_, args, ctx) => {
-    try {
-      const params = parseBackgroundCheckToken(args.token);
-
+    async function petitionParamsResolver(
+      entityId: string | null,
+      params: NumericParams<BackgroundCheckPetitionParams>,
+    ) {
       const petition = await ctx.petitions.loadPetition(params.petitionId);
-
       if (petition?.status === "CLOSED") {
         throw new ForbiddenError("The petition is closed and does not accept new replies");
       }
@@ -695,8 +701,8 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         throw new ForbiddenError("FORBIDDEN");
       }
 
-      const entity = isDefined(args.entityId)
-        ? await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id)
+      const entity = isDefined(entityId)
+        ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
         : null;
 
       await ctx.petitions.updatePetitionFieldRepliesContent(
@@ -709,6 +715,93 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         ],
         ctx.user!,
       );
+    }
+
+    async function profileParamsResolver(
+      entityId: string | null,
+      params: NumericParams<BackgroundCheckProfileParams>,
+    ) {
+      const profile = await ctx.profiles.loadProfile(params.profileId);
+
+      if (profile!.status !== "OPEN") {
+        throw new ForbiddenError(
+          `The profile is ${profile!.status} and does not accept new replies`,
+        );
+      }
+
+      const effectivePermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+        userId: ctx.user!.id,
+        profileTypeFieldId: params.profileTypeFieldId,
+      });
+
+      if (!isAtLeast(effectivePermission, "WRITE")) {
+        throw new ForbiddenError("User does not have WRITE permission on this field");
+      }
+
+      const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(
+        params.profileId,
+      );
+
+      const pfv = profileFieldValues.find(
+        (pfv) =>
+          pfv.type === "BACKGROUND_CHECK" &&
+          pfv.profile_type_field_id === params.profileTypeFieldId &&
+          isDefined(pfv.content.query),
+      );
+
+      if (!isDefined(pfv)) {
+        throw new ApolloError(`Can't find BACKGROUND_CHECK profile field value`, "REPLY_NOT_FOUND");
+      }
+
+      const entity = isDefined(entityId)
+        ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
+        : null;
+
+      const {
+        currentValues: [currentValue],
+        previousValues: [previousValue],
+      } = await ctx.profiles.updateProfileFieldValue(
+        params.profileId,
+        [
+          {
+            profileTypeFieldId: params.profileTypeFieldId,
+            type: "BACKGROUND_CHECK",
+            content: { ...pfv.content, entity },
+          },
+        ],
+        ctx.user!.id,
+      );
+
+      const profileTypeField = await ctx.profiles.loadProfileTypeField(params.profileTypeFieldId);
+      await ctx.profiles.createProfileUpdatedEvents(
+        params.profileId,
+        [
+          {
+            org_id: ctx.user!.org_id,
+            profile_id: params.profileId,
+            type: "PROFILE_FIELD_VALUE_UPDATED",
+            data: {
+              user_id: ctx.user!.id,
+              current_profile_field_value_id: currentValue?.id ?? null,
+              previous_profile_field_value_id: previousValue?.id ?? null,
+              profile_type_field_id: params.profileTypeFieldId,
+              alias: profileTypeField?.alias ?? null,
+            },
+          },
+        ],
+        ctx.user!,
+      );
+    }
+
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      if ("petitionId" in params) {
+        await petitionParamsResolver(args.entityId ?? null, params);
+      } else if ("profileId" in params) {
+        await profileParamsResolver(args.entityId ?? null, params);
+      }
+
       return SUCCESS;
     } catch (error) {
       if (error instanceof Error) {

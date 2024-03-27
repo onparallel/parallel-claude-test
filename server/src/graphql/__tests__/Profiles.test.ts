@@ -8,10 +8,12 @@ import {
   Organization,
   Petition,
   PetitionFieldReply,
+  PetitionFieldType,
   Profile,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
+  ProfileTypeFieldPermission,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -151,7 +153,7 @@ describe("GraphQL/Profiles", () => {
     profileType0Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[0].id,
-      7,
+      8,
       (i) =>
         [
           {
@@ -221,6 +223,25 @@ describe("GraphQL/Profiles", () => {
                 },
               ],
               showOptionsWithColors: true,
+            },
+          },
+          {
+            name: json({ en: "Gender", es: "Género" }),
+            type: "SELECT" as const,
+            alias: "GENDER",
+            is_expirable: false,
+            permission: "WRITE" as const,
+            options: {
+              values: [
+                {
+                  label: { en: "Male", es: "Hombre" },
+                  value: "M",
+                },
+                {
+                  label: { en: "Female", es: "Mujer" },
+                  value: "F",
+                },
+              ],
             },
           },
         ][i],
@@ -297,7 +318,7 @@ describe("GraphQL/Profiles", () => {
     profileType3Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[3].id,
-      3,
+      4,
       (i) =>
         [
           {
@@ -318,6 +339,33 @@ describe("GraphQL/Profiles", () => {
             type: "TEXT" as const,
             is_expirable: true,
             expiry_alert_ahead_time: null,
+          },
+          {
+            name: json({ en: "Risk", es: "Riesgo" }),
+            type: "SELECT" as const,
+            alias: "RISK",
+            is_expirable: false,
+            permission: "WRITE" as const,
+            options: {
+              values: [
+                {
+                  id: "1",
+                  label: { en: "Low", es: "Bajo" },
+                  value: "low",
+                },
+                {
+                  id: "2",
+                  label: { en: "Medium", es: "Medio" },
+                  value: "medium",
+                },
+                {
+                  id: "3",
+                  label: { en: "High", es: "Alto" },
+                  value: "high",
+                },
+              ],
+              showOptionsWithColors: true,
+            },
           },
         ][i],
     );
@@ -521,6 +569,25 @@ describe("GraphQL/Profiles", () => {
             files: null,
             value: null,
           },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[7].id),
+              isExpirable: false,
+              isUsedInProfileName: false,
+              name: { en: "Gender", es: "Género" },
+              options: {
+                values: [
+                  { label: { en: "Male", es: "Hombre" }, value: "M" },
+                  {
+                    label: { en: "Female", es: "Mujer" },
+                    value: "F",
+                  },
+                ],
+              },
+            },
+            files: null,
+            value: null,
+          },
         ],
         events: {
           items: [
@@ -696,6 +763,14 @@ describe("GraphQL/Profiles", () => {
           {
             field: {
               id: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              myPermission: "WRITE",
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[7].id),
               myPermission: "WRITE",
             },
             files: null,
@@ -989,6 +1064,10 @@ describe("GraphQL/Profiles", () => {
               alias: "RISK",
               myPermission: "WRITE",
             },
+            {
+              alias: "GENDER",
+              myPermission: "WRITE",
+            },
           ],
         },
       });
@@ -1060,6 +1139,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "RISK",
+              myPermission: "READ",
+            },
+            {
+              alias: "GENDER",
               myPermission: "READ",
             },
           ],
@@ -1151,6 +1234,10 @@ describe("GraphQL/Profiles", () => {
               alias: "RISK",
               myPermission: "HIDDEN",
             },
+            {
+              alias: "GENDER",
+              myPermission: "HIDDEN",
+            },
           ],
         },
       });
@@ -1231,6 +1318,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "RISK",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "GENDER",
               myPermission: "HIDDEN",
             },
           ],
@@ -1344,6 +1435,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "RISK",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "GENDER",
               myPermission: "HIDDEN",
             },
           ],
@@ -2344,6 +2439,239 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
+    it("fails when creating a BACKGROUND_CHECK field with invalid monitoring frequency", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "FIXED",
+                  frequency: "1_DAY",
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field with a non-SELECT field in variable search frequency", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id), // TEXT field
+                  options: [{ value: "abc", frequency: "5_YEARS" }],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field with a SELECT field of another profileType in variable search frequency", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[3].id), // SELECT field of another profile_type
+                  options: [
+                    { value: "low", frequency: "5_YEARS" },
+                    { value: "medium", frequency: "5_YEARS" },
+                    { value: "high", frequency: "5_YEARS" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field with an invalid variable search frequency value", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+                  options: [
+                    { value: "unknown", frequency: "5_YEARS" },
+                    { value: "medium", frequency: "5_YEARS" },
+                    { value: "high", frequency: "5_YEARS" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field with incomplete values on variable search frequency", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+                  options: [
+                    { value: "medium", frequency: "5_YEARS" },
+                    { value: "high", frequency: "5_YEARS" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field and activationCondition field is not SELECT", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "FIXED",
+                  frequency: "5_YEARS",
+                },
+                activationCondition: {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id), // TEXT type
+                  values: ["abc"],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a BACKGROUND_CHECK field and activationCondition field values are invalid", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            name: { en: "Background Check" },
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                searchFrequency: {
+                  type: "FIXED",
+                  frequency: "5_YEARS",
+                },
+                activationCondition: {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+                  values: ["medium", "higherrrrr"],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("fails when creating a field with alias starting with p_", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -2394,16 +2722,27 @@ describe("GraphQL/Profiles", () => {
   describe("updateProfileTypeField", () => {
     let profileTypeField: ProfileTypeField;
     let profileTypeField2: ProfileTypeField;
+    let selectProfileTypeField: ProfileTypeField;
+    let backgroundCheckProfileTypeField: ProfileTypeField;
     let profileTypeField3: ProfileTypeField;
     let selectWithStandardOptions: ProfileTypeField;
 
     beforeEach(async () => {
-      [profileTypeField, profileTypeField2, profileTypeField3] =
-        await mocks.createRandomProfileTypeFields(organization.id, profileTypes[1].id, 3, (i) => ({
+      [
+        profileTypeField,
+        profileTypeField2,
+        profileTypeField3,
+        selectProfileTypeField,
+        backgroundCheckProfileTypeField,
+      ] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileTypes[1].id,
+        5,
+        (i) => ({
           is_expirable: true,
           expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
           alias: i === 0 ? "alias" : null,
-          type: ["TEXT", "TEXT", "SELECT"][i] as ProfileTypeFieldType,
+          type: ["TEXT", "TEXT", "SELECT", "SELECT", "BACKGROUND_CHECK"][i] as ProfileTypeFieldType,
           options:
             i === 2
               ? {
@@ -2412,8 +2751,26 @@ describe("GraphQL/Profiles", () => {
                     { value: "ES", label: { es: "España", en: "Spain" } },
                   ],
                 }
-              : {},
-        }));
+              : i === 3
+                ? {
+                    values: [
+                      {
+                        label: { en: "Low", es: "Bajo" },
+                        value: "low",
+                      },
+                      {
+                        label: { en: "Medium", es: "Medio" },
+                        value: "medium",
+                      },
+                      {
+                        label: { en: "High", es: "Alto" },
+                        value: "high",
+                      },
+                    ],
+                  }
+                : {},
+        }),
+      );
 
       [selectWithStandardOptions] = await mocks.createRandomProfileTypeFields(
         organization.id,
@@ -2421,12 +2778,15 @@ describe("GraphQL/Profiles", () => {
         1,
         () => ({
           type: "SELECT",
-          alias: "p_standard",
+          alias: "p_standard_options",
           options: {
             values: [
-              { value: "option_1", label: { es: "Opción 1", en: "Option 1" }, isStandard: true },
-              { value: "option_2", label: { es: "Opción 2", en: "Option 2" }, isStandard: true },
-              { value: "A", label: { es: "A", en: "A" } },
+              { value: "option_1", label: { en: "Option 1", es: "Opción 1" }, isStandard: true },
+              { value: "option_2", label: { en: "Option 2", es: "Opción 2" }, isStandard: true },
+              {
+                value: "option_3_nostandard",
+                label: { en: "Option 3", es: "Opción 3" },
+              },
             ],
           },
         }),
@@ -2687,6 +3047,14 @@ describe("GraphQL/Profiles", () => {
           },
           {
             field: { id: toGlobalId("ProfileTypeField", profileTypeField3.id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", selectProfileTypeField.id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id) },
             value: null,
           },
           {
@@ -3165,7 +3533,7 @@ describe("GraphQL/Profiles", () => {
       await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
-          content: { value: "A" },
+          content: { value: "option_3_nostandard" },
         },
       ]);
 
@@ -3206,7 +3574,7 @@ describe("GraphQL/Profiles", () => {
       await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
-          content: { value: "A" },
+          content: { value: "option_3_nostandard" },
         },
       ]);
 
@@ -3237,7 +3605,7 @@ describe("GraphQL/Profiles", () => {
                 { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
               ],
             },
-            substitutions: [{ old: "A", new: "option_1" }],
+            substitutions: [{ old: "option_3_nostandard", new: "option_1" }],
           },
         },
       );
@@ -3257,7 +3625,7 @@ describe("GraphQL/Profiles", () => {
       await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
-          content: { value: "A" },
+          content: { value: "option_3_nostandard" },
         },
       ]);
 
@@ -3288,12 +3656,294 @@ describe("GraphQL/Profiles", () => {
                 { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
               ],
             },
-            substitutions: [{ old: "A", new: "unknown" }],
+            substitutions: [{ old: "option_3_nostandard", new: "unknown" }],
           },
         },
       );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("fails if trying to update a profile type field that is being used in monitoring rules", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: { type: "FIXED", frequency: "5_YEARS" },
+              activationCondition: {
+                profileTypeFieldId: selectProfileTypeField.id,
+                values: ["high"],
+              },
+            },
+          },
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              isExpirable
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectProfileTypeField.id),
+          data: { isExpirable: false },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to disable monitoring from a BACKGROUND_CHECK field but there are profiles with active monitoring - no activationCondition", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: {
+                type: "FIXED",
+                frequency: "5_YEARS",
+              },
+            },
+          },
+        });
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+          data: {
+            options: {
+              monitoring: null,
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR", {
+        profileIds: [toGlobalId("Profile", profile.id)],
+      });
+
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to disable monitoring from a BACKGROUND_CHECK field but there are profiles with active monitoring - with activationCondition", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: {
+                type: "FIXED",
+                frequency: "5_YEARS",
+              },
+              activationCondition: {
+                profileTypeFieldId: selectProfileTypeField.id,
+                values: ["high"],
+              },
+            },
+          },
+        });
+
+      const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 2);
+
+      await mocks.knex.from("profile_field_value").insert({
+        content: { value: "high" },
+        created_by_user_id: sessionUser.id,
+        profile_id: profiles[1].id,
+        profile_type_field_id: selectProfileTypeField.id,
+        type: "SELECT",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+          data: {
+            options: {
+              monitoring: null,
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR", {
+        profileIds: [toGlobalId("Profile", profiles[1].id)],
+      });
+
+      expect(data).toBeNull();
+    });
+
+    it("allows to disable monitoring rules if no profile has active monitoring on the field - no profiles with monitoring", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: {
+                type: "FIXED",
+                frequency: "5_YEARS",
+              },
+              activationCondition: {
+                profileTypeFieldId: selectProfileTypeField.id,
+                values: ["high"],
+              },
+            },
+          },
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+          data: {
+            options: {
+              monitoring: null,
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+        options: {
+          monitoring: null,
+        },
+      });
+    });
+
+    it("allows to disable monitoring rules if no profile has active monitoring on the field - activationCondition doesn't match", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: {
+                type: "FIXED",
+                frequency: "5_YEARS",
+              },
+              activationCondition: {
+                profileTypeFieldId: selectProfileTypeField.id,
+                values: ["high"],
+              },
+            },
+          },
+        });
+
+      const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 2);
+
+      await mocks.knex.from("profile_field_value").insert({
+        content: { value: "medium" },
+        created_by_user_id: sessionUser.id,
+        profile_id: profiles[1].id,
+        profile_type_field_id: selectProfileTypeField.id,
+        type: "SELECT",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+          data: {
+            options: {
+              monitoring: null,
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id),
+        options: {
+          monitoring: null,
+        },
+      });
     });
   });
 
@@ -3514,6 +4164,40 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to delete a profile type field that is being used in monitoring rules", async () => {
+      await mocks.createRandomProfileTypeFields(organization.id, profileTypes[0].id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        options: {
+          monitoring: {
+            activationCondition: {
+              profileTypeFieldId: profileType0Fields[7].id,
+              values: ["M"],
+            },
+          },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[7].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE");
       expect(data).toBeNull();
     });
   });
@@ -6395,6 +7079,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "GENDER",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -6505,6 +7195,12 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "RISK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "GENDER",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
             permissions: [],
@@ -6629,6 +7325,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "GENDER",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -6749,6 +7451,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "GENDER",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -6858,6 +7566,12 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "RISK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "GENDER",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
             permissions: [],
@@ -7279,6 +7993,198 @@ describe("GraphQL/Profiles", () => {
         status: "CLOSED",
         deletion_scheduled_at: null,
         closed_at: closedAtDate,
+      });
+    });
+  });
+
+  describe("copyBackgroundCheckReplyToProfileFieldValue", () => {
+    let petition: Petition;
+    let textReply: PetitionFieldReply;
+    let backgroundCheckReply: PetitionFieldReply;
+
+    let profile: Profile;
+    let profileTypeField: ProfileTypeField;
+    let profileTypeFieldPermission: ProfileTypeFieldPermission;
+
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const petitionFields = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: ["TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+      }));
+
+      [textReply] = await mocks.createRandomTextReply(petitionFields[0].id, undefined, 1, () => ({
+        user_id: sessionUser.id,
+      }));
+      [backgroundCheckReply] = await mocks.createRandomTextReply(
+        petitionFields[1].id,
+        undefined,
+        1,
+        () => ({
+          user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              items: [],
+              totalCount: 0,
+              createdAt: new Date().toISOString(),
+            },
+            entity: {
+              id: "Q7747",
+              name: "Vladimir Vladimirovich PUTIN",
+              type: "Person",
+              properties: {},
+              createdAt: new Date().toISOString(),
+            },
+          },
+        }),
+      );
+
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      [profileTypeField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        1,
+        () => ({
+          type: "BACKGROUND_CHECK",
+          permission: "HIDDEN",
+        }),
+      );
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+
+      [profileTypeFieldPermission] = await mocks.knex
+        .from("profile_type_field_permission")
+        .insert({
+          permission: "WRITE",
+          user_id: sessionUser.id,
+          profile_type_field_id: profileTypeField.id,
+        })
+        .returning("*");
+    });
+
+    it("fails if user does not have WRITE permission on the profile type field", async () => {
+      await mocks.knex
+        .from("profile_type_field_permission")
+        .where("id", profileTypeFieldPermission.id)
+        .update({ permission: "READ" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyBackgroundCheckReplyToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", backgroundCheckReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails if target reply is not BACKGROUND_CHECK", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyBackgroundCheckReplyToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", textReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_FIELD_TYPE_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("copies BACKGROUND_CHECK reply to profile", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyBackgroundCheckReplyToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", backgroundCheckReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.copyBackgroundCheckReplyToProfileFieldValue).toEqual({
+        id: expect.any(String),
+        content: {
+          query: {
+            name: "Vladimir Putin",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 0,
+            createdAt: expect.any(String),
+          },
+          entity: {
+            id: "Q7747",
+            name: "Vladimir Vladimirovich PUTIN",
+            type: "Person",
+            properties: {},
+            createdAt: expect.any(String),
+          },
+        },
       });
     });
   });

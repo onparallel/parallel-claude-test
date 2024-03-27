@@ -3,6 +3,7 @@ import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { isDefined, uniq } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
 import {
+  mapProfileTypeFieldOptions,
   profileTypeFieldSelectValues,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
@@ -53,13 +54,23 @@ export function validProfileNamePattern<
 export function validProfileTypeFieldOptions<
   TypeName extends string,
   FieldName extends string,
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
   TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>,
->(dataArg: TDataArg, argName: string) {
+>(profileTypeIdArg: TProfileTypeId, dataArg: TDataArg, argName: string) {
   return (async (_, args, ctx, info) => {
+    const profileTypeId = args[profileTypeIdArg] as unknown as number;
     const data = args[dataArg] as unknown as NexusGenInputs["CreateProfileTypeFieldInput"];
     if (isDefined(data.options)) {
       try {
-        validateProfileTypeFieldOptions(data.type, data.options);
+        const options = await mapProfileTypeFieldOptions(
+          data.type,
+          data.options,
+          (type, id) => fromGlobalId(id, type).id,
+        );
+        await validateProfileTypeFieldOptions(data.type, options, {
+          profileTypeId,
+          loadProfileTypeField: ctx.profiles.loadProfileTypeField,
+        });
       } catch (e) {
         if (e instanceof Error) {
           throw new ArgValidationError(info, argName, e.message);

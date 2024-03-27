@@ -10,7 +10,6 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckReplaceReplyDialog";
 import { usePreviewPetitionFieldBackgroundCheckSaveSearchDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckSaveSearchDialog";
-import { useBackgroundCheckEntityTypeSelectOptions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
@@ -21,6 +20,7 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
@@ -69,8 +69,7 @@ function BackgroundCheckFieldSearchResults({
   const isReadOnly = query.readonly === "true";
   const isTemplate = query.template === "true";
 
-  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
-  const entityTypeLabel = entityTypeOptions.find((option) => option.value === type)?.label;
+  const entityTypeLabel = getEntityTypeLabel(intl, type);
 
   const { data, loading, error } = useQuery(
     BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
@@ -102,8 +101,6 @@ function BackgroundCheckFieldSearchResults({
     (e) => {
       if (e.data.event === "info-updated") {
         setSavedEntityIds(e.data.entityIds);
-      } else if (e.data === "close") {
-        window.close();
       }
     },
     [],

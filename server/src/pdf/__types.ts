@@ -784,6 +784,7 @@ export type Mutation = {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
+  copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
    *
@@ -1309,6 +1310,14 @@ export type MutationcompletePetitionArgs = {
   additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcopyBackgroundCheckReplyToProfileFieldValueArgs = {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationcopyFileReplyToProfileFieldFileArgs = {
@@ -4267,6 +4276,7 @@ export type ProfileTypeFieldPermission = {
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType =
+  | "BACKGROUND_CHECK"
   | "DATE"
   | "FILE"
   | "NUMBER"

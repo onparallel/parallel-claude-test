@@ -42,6 +42,7 @@
     "worker:anonymizer": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/anonymizer.ts",
     "worker:old-notifications": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/old-notifications.ts",
     "worker:expiring-properties": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/expiring-properties.ts",
+    "worker:background-check-monitor": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-monitor.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
     "storybook": "concurrently \"yarn storybook:server\" \"yarn storybook:client\"",
     "storybook:server": "SERVER_STORIES_PORT=5000 ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --transpile-only --respawn",

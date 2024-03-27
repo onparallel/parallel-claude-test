@@ -88,6 +88,7 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   SHORT_TEXT: ["SHORT_TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
   TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
   SELECT: ["SELECT", "CHECKBOX"],
+  BACKGROUND_CHECK: ["BACKGROUND_CHECK"],
 };
 
 function normalize(alias: string) {
@@ -157,19 +158,21 @@ export const ProfileForm = Object.assign(
 
     const fieldsWithIndices = useAllFieldsWithIndices(petitionFields ?? []);
 
+    // with property.field.type === "BACKGROUND_CHECK" we don't need to check for alias
     const propertiesWithSuggestedFields = useMemo(
       () =>
         properties.map(
           (property) =>
             [
               property,
-              isDefined(property.field.alias)
+              isDefined(property.field.alias) || property.field.type === "BACKGROUND_CHECK"
                 ? fieldsWithIndices.filter(
                     ([pf]) =>
                       SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(pf.type) &&
-                      isDefined(pf.alias) &&
-                      (normalize(pf.alias).includes(normalize(property.field.alias!)) ||
-                        normalize(property.field.alias!).includes(normalize(pf.alias))),
+                      (property.field.type === "BACKGROUND_CHECK" ||
+                        (isDefined(pf.alias) &&
+                          (normalize(pf.alias).includes(normalize(property.field.alias!)) ||
+                            normalize(property.field.alias!).includes(normalize(pf.alias))))),
                   )
                 : [],
             ] as const,
@@ -197,25 +200,38 @@ export const ProfileForm = Object.assign(
               await updateProfileFieldValue({
                 variables: {
                   profileId: profile.id,
-                  fields: fields.map(({ content, profileTypeFieldId, expiryDate }) => {
-                    const prop = profile.properties?.find(
-                      (prop) => prop.field.id === profileTypeFieldId,
-                    );
+                  fields: fields
+                    .map(({ type, content, profileTypeFieldId, expiryDate }) => {
+                      const prop = profile.properties?.find(
+                        (prop) => prop.field.id === profileTypeFieldId,
+                      );
 
-                    const useValueAsExpiryDate =
-                      prop?.field.type === "DATE" && prop?.field.options?.useReplyAsExpiryDate;
+                      const useValueAsExpiryDate =
+                        prop?.field.type === "DATE" && prop?.field.options?.useReplyAsExpiryDate;
 
-                    return {
-                      profileTypeFieldId,
-                      content: content?.value ? content : null,
-                      expiryDate:
-                        content?.value && prop?.field.isExpirable
-                          ? useValueAsExpiryDate
-                            ? content?.value || null
-                            : expiryDate || null
-                          : undefined,
-                    };
-                  }),
+                      if (type === "BACKGROUND_CHECK") {
+                        if ((content?.search || content?.entity) && prop?.field.isExpirable) {
+                          // BACKGROUND_CHECK can only update expiryDate through this mutation
+                          return {
+                            profileTypeFieldId,
+                            expiryDate: expiryDate || null,
+                          };
+                        }
+                        return null;
+                      } else {
+                        return {
+                          profileTypeFieldId,
+                          content: content?.value ? content : null,
+                          expiryDate:
+                            content?.value && prop?.field.isExpirable
+                              ? useValueAsExpiryDate
+                                ? content?.value || null
+                                : expiryDate || null
+                              : undefined,
+                        };
+                      }
+                    })
+                    .filter(isDefined),
                 },
               });
             }
@@ -441,6 +457,9 @@ export const ProfileForm = Object.assign(
                   clearErrors={clearErrors}
                   fieldsWithIndices={suggestedFields}
                   isDisabled={field.myPermission === "READ" || status !== "OPEN"}
+                  onRefetch={onRefetch}
+                  petitionId={petitionId}
+                  properties={properties}
                 />
               );
             })}
@@ -537,10 +556,12 @@ export const ProfileForm = Object.assign(
             value {
               ...ProfileForm_ProfileFieldValue
             }
+            ...ProfileField_ProfileFieldProperty
           }
           ${this.ProfileTypeField}
           ${this.ProfileFieldFile}
           ${this.ProfileFieldValue}
+          ${ProfileField.fragments.ProfileFieldProperty}
         `;
       },
       get Profile() {

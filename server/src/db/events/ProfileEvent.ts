@@ -6,7 +6,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     user_id: number;
   };
   PROFILE_FIELD_VALUE_UPDATED: {
-    user_id: number;
+    user_id: number | null; // null means value was updated by monitor cron
     profile_type_field_id: number;
     current_profile_field_value_id: number | null;
     previous_profile_field_value_id: number | null;
@@ -25,7 +25,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     alias: string | null;
   };
   PROFILE_FIELD_EXPIRY_UPDATED: {
-    user_id: number;
+    user_id: number | null; // null means value was updated by monitor cron
     profile_type_field_id: number;
     expiry_date: string | null;
     alias: string | null;

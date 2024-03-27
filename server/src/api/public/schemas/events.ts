@@ -921,8 +921,9 @@ const ProfileEventSchemas = {
     description: "The expiry date of a field has been updated.",
     properties: {
       userId: {
-        description: "The ID of the user that updated the expiry",
-        type: "string",
+        type: ["string", "null"],
+        description:
+          "The ID of the user that updated the expiry. If null, expiry was updated automatically by monitoring rules.",
         example: toGlobalId("User", 1),
       },
       profileTypeFieldId: {
@@ -997,8 +998,9 @@ const ProfileEventSchemas = {
     description: "The value of a field has been updated.",
     properties: {
       userId: {
-        description: "The ID of the user that updated the value",
-        type: "string",
+        type: ["string", "null"],
+        description:
+          "The ID of the user that updated the value. If null, value was updated automatically by monitoring rules.",
         example: toGlobalId("User", 1),
       },
       profileTypeFieldId: {

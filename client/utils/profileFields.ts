@@ -7,13 +7,20 @@ import {
   FieldSelectIcon,
   FieldShortTextIcon,
   FieldTextIcon,
+  ShortSearchIcon,
 } from "@parallel/chakra/icons";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileFieldBackgroundCheckSettings } from "@parallel/components/organization/profiles/settings/ProfileFieldBackgroundCheckSettings";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { IntlShape } from "react-intl";
 import { Maybe } from "./types";
 
-export interface ProfileTypeFieldOptions {
+export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
+  FILE: {};
+  NUMBER: {};
+  PHONE: {};
+  SHORT_TEXT: {};
+  TEXT: {};
   DATE: {
     useReplyAsExpiryDate?: Maybe<boolean>;
   };
@@ -27,7 +34,8 @@ export interface ProfileTypeFieldOptions {
     showOptionsWithColors?: Maybe<boolean>;
     standardList?: Maybe<string>;
   };
-}
+  BACKGROUND_CHECK: ProfileFieldBackgroundCheckSettings;
+}[TType];
 
 export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
   SHORT_TEXT: {
@@ -92,6 +100,15 @@ export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
       }),
     icon: FieldSelectIcon,
     color: "pink.400",
+  },
+  BACKGROUND_CHECK: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-background-check",
+        defaultMessage: "Background check",
+      }),
+    icon: ShortSearchIcon,
+    color: "green.700",
   },
 } as Record<
   ProfileTypeFieldType,

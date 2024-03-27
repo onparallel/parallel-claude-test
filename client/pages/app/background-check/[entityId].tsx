@@ -13,7 +13,6 @@ import { BackgroundCheckEntityDetailsPersonBasic } from "@parallel/components/pe
 import { BackgroundCheckEntityDetailsPersonOverview } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsPersonOverview";
 import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsRelationships";
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
-import { useBackgroundCheckEntityTypeSelectOptions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragment,
@@ -23,6 +22,7 @@ import {
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { useBackgroundCheckProfileDownloadTask } from "@parallel/utils/tasks/useBackgroundCheckProfileDownloadTask";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
@@ -60,8 +60,7 @@ function BackgroundCheckProfileDetails({
   const isReadOnly = query.readonly === "true";
   const isTemplate = query.template === "true";
 
-  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
-  const entityTypeLabel = entityTypeOptions.find((option) => option.value === type)?.label;
+  const entityTypeLabel = getEntityTypeLabel(intl, type);
 
   const { data, loading, error } = useQuery(
     BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
@@ -106,8 +105,6 @@ function BackgroundCheckProfileDetails({
     (e) => {
       if (e.data.event === "info-updated") {
         setSavedEntityIds(e.data.entityIds);
-      } else if (e.data === "close") {
-        window.close();
       }
     },
     [entityId],

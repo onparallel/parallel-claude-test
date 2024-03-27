@@ -213,6 +213,14 @@
           "append_dimensions": {
             "Process": "parallel-expiring-properties-cron"
           }
+        },
+        {
+          "pid_file": "/var/run/parallel-background-check-monitor-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-background-check-monitor-cron"
+          }
         }
       ]
     }

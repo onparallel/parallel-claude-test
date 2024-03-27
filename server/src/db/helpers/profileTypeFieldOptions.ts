@@ -3,9 +3,20 @@ import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
+import { difference, isDefined, uniq } from "remeda";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
-import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
-import { isDefined } from "remeda";
+import { ProfileTypeField, ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
+
+const SEARCH_FREQUENCY = [
+  "5_YEARS",
+  "3_YEARS",
+  "2_YEARS",
+  "1_YEARS",
+  "9_MONTHS",
+  "6_MONTHS",
+  "3_MONTHS",
+  "1_MONTHS",
+] as const;
 
 const SCHEMAS = {
   TEXT: {
@@ -72,13 +83,87 @@ const SCHEMAS = {
       },
     },
   },
+  BACKGROUND_CHECK: {
+    type: "object",
+    additionalProperties: false,
+    required: [],
+    properties: {
+      monitoring: {
+        type: ["object", "null"],
+        required: ["searchFrequency"],
+        additionalProperties: false,
+        properties: {
+          activationCondition: {
+            type: ["object", "null"],
+            required: ["profileTypeFieldId", "values"],
+            properties: {
+              profileTypeFieldId: { type: "number" },
+              values: {
+                type: "array",
+                minItems: 1,
+                items: {
+                  type: "string",
+                },
+              },
+            },
+          },
+          searchFrequency: {
+            type: "object",
+            oneOf: [
+              {
+                type: "object",
+                required: ["type", "frequency"],
+                additionalProperties: false,
+                properties: {
+                  type: { type: "string", const: "FIXED" },
+                  frequency: {
+                    type: "string",
+                    enum: SEARCH_FREQUENCY,
+                  },
+                },
+              },
+              {
+                type: "object",
+                required: ["type", "profileTypeFieldId", "options"],
+                additionalProperties: false,
+                properties: {
+                  type: { type: "string", const: "VARIABLE" },
+                  profileTypeFieldId: { type: "number" },
+                  options: {
+                    type: "array",
+                    minItems: 1,
+                    items: {
+                      type: "object",
+                      required: ["frequency", "value"],
+                      additionalProperties: false,
+                      properties: {
+                        frequency: { type: "string", enum: SEARCH_FREQUENCY },
+                        value: { type: "string" },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
 } as const;
 
 export type ProfileTypeFieldOptions = {
   [K in keyof typeof SCHEMAS]: FromSchema<(typeof SCHEMAS)[K]>;
 };
 
-export function validateProfileTypeFieldOptions(type: ProfileTypeFieldType, options: any) {
+export async function validateProfileTypeFieldOptions(
+  type: ProfileTypeFieldType,
+  options: any,
+  ctx: {
+    profileTypeId: number;
+    loadProfileTypeField: (id: number) => Promise<ProfileTypeField | null>;
+  },
+) {
   const ajv = new Ajv();
   addFormats(ajv, ["date-time"]);
 
@@ -86,9 +171,65 @@ export function validateProfileTypeFieldOptions(type: ProfileTypeFieldType, opti
   if (!valid) {
     throw new Error(ajv.errorsText());
   }
+
+  // make sure user has access to the referenced profileTypeFields in BACKGROUND_CHECK options
+  if (type === "BACKGROUND_CHECK") {
+    const opts = options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
+    if (isDefined(opts.monitoring?.activationCondition?.profileTypeFieldId)) {
+      const profileTypeField = await ctx.loadProfileTypeField(
+        opts.monitoring.activationCondition.profileTypeFieldId,
+      );
+      if (
+        !profileTypeField ||
+        profileTypeField.type !== "SELECT" ||
+        profileTypeField.profile_type_id !== ctx.profileTypeId
+      ) {
+        throw new Error("Invalid profileTypeFieldId");
+      }
+
+      // make sure every value in activation conditions is a valid option on SELECT field
+      const selectValues = uniq(
+        (profileTypeField.options as ProfileTypeFieldOptions["SELECT"]).values.map((v) => v.value),
+      );
+      if (
+        !uniq(opts.monitoring.activationCondition.values).every((activationValue) =>
+          selectValues.includes(activationValue),
+        )
+      ) {
+        throw new Error("Invalid activation values");
+      }
+    }
+
+    if (opts.monitoring?.searchFrequency.type === "VARIABLE") {
+      const profileTypeField = await ctx.loadProfileTypeField(
+        opts.monitoring.searchFrequency.profileTypeFieldId,
+      );
+      if (
+        !profileTypeField ||
+        profileTypeField.type !== "SELECT" ||
+        profileTypeField.profile_type_id !== ctx.profileTypeId
+      ) {
+        throw new Error("Invalid profileTypeFieldId");
+      }
+
+      // every SELECT value has to be set on variable searchFrequency options
+      const selectValues = uniq(
+        (profileTypeField.options as ProfileTypeFieldOptions["SELECT"]).values.map((v) => v.value),
+      );
+      const searchFrequencyValues = uniq(
+        opts.monitoring.searchFrequency.options.map((o) => o.value),
+      );
+      if (
+        selectValues.length !== searchFrequencyValues.length ||
+        difference(selectValues, searchFrequencyValues).length !== 0
+      ) {
+        throw new Error("Invalid variable searchFrequency options");
+      }
+    }
+  }
 }
 
-export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType) {
+export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType): any {
   if (type === "DATE") {
     return { useReplyAsExpiryDate: false };
   }
@@ -170,12 +311,37 @@ export async function profileTypeFieldSelectValues(
   return options.values;
 }
 
-export async function mapProfileTypeFieldOptions(type: ProfileTypeFieldType, options: any) {
-  if (type === "SELECT") {
-    return {
-      ...options,
-      values: await profileTypeFieldSelectValues(options),
-    };
+export async function mapProfileTypeFieldOptions(
+  type: ProfileTypeFieldType,
+  options: any,
+  globalIdMap: (type: string, id: any) => any,
+) {
+  const _options =
+    type === "SELECT"
+      ? {
+          ...options,
+          values: await profileTypeFieldSelectValues(options),
+        }
+      : options;
+  // create a copy of options object to not alter data by reference
+  return JSON.parse(JSON.stringify(_options), (key, value) => {
+    if (key === "profileTypeFieldId") {
+      return globalIdMap("ProfileTypeField", value);
+    }
+
+    return value;
+  });
+}
+
+export function optionsIncludeProfileTypeFieldId(options: any, ids: number[]) {
+  try {
+    JSON.parse(JSON.stringify(options), (key, value) => {
+      if (key === "profileTypeFieldId" && typeof value === "number" && ids.includes(value)) {
+        throw new Error();
+      }
+    });
+    return false;
+  } catch {
+    return true;
   }
-  return options;
 }

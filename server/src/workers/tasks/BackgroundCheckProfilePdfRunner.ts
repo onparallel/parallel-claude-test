@@ -13,20 +13,33 @@ export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHEC
 
     const params = parseBackgroundCheckToken(token);
 
-    const replies = await this.ctx.petitions.loadRepliesForField(params.fieldId);
+    let replyContent: any = null;
+    if ("petitionId" in params) {
+      const replies = await this.ctx.petitions.loadRepliesForField(params.fieldId);
+      replyContent = replies.find(
+        (r) =>
+          r.type === "BACKGROUND_CHECK" &&
+          r.content.entity?.id === entityId &&
+          r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
+      )?.content;
+    } else if ("profileId" in params) {
+      const profileFieldValues = await this.ctx.profiles.loadProfileFieldValuesByProfileId(
+        params.profileId,
+      );
 
-    const reply = replies.find(
-      (r) =>
-        r.type === "BACKGROUND_CHECK" &&
-        r.content.entity?.id === entityId &&
-        r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
-    );
+      replyContent = profileFieldValues.find(
+        (pfv) =>
+          pfv.type === "BACKGROUND_CHECK" &&
+          pfv.profile_type_field_id === params.profileTypeFieldId &&
+          pfv.content.entity?.id === entityId,
+      )?.content;
+    }
 
-    const props = isDefined(reply)
+    const props = isDefined(replyContent)
       ? {
-          entity: reply.content.entity,
-          query: reply.content.query,
-          search: reply.content.search,
+          entity: replyContent.entity,
+          query: replyContent.query,
+          search: replyContent.search,
         }
       : {
           entity: await this.ctx.backgroundCheck.entityProfileDetails(entityId, this.task.user_id),

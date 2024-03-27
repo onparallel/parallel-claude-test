@@ -1,20 +1,25 @@
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 
-interface BackgroundCheckPetitionParams {
+export interface BackgroundCheckPetitionParams {
   petitionId: string;
   fieldId: string;
   parentReplyId?: string;
 }
 
-type BackgroundCheckParams = BackgroundCheckPetitionParams;
+export interface BackgroundCheckProfileParams {
+  profileId: string;
+  profileTypeFieldId: string;
+}
 
-type NumericParams<T> = {
+type BackgroundCheckParams = BackgroundCheckPetitionParams | BackgroundCheckProfileParams;
+
+export type NumericParams<T> = {
   [K in keyof T]: number;
 };
 
 export function parseBackgroundCheckToken(token: string): NumericParams<BackgroundCheckParams> {
   const parsed = JSON.parse(Buffer.from(token, "base64").toString());
-  if (isPetitionToken(parsed)) {
+  if (isPetitionToken(parsed) || isProfileToken(parsed)) {
     return toNumericIds(parsed);
   } else {
     throw new Error("Invalid token");
@@ -36,5 +41,14 @@ function isPetitionToken(token: any): token is BackgroundCheckPetitionParams {
     (typeof token.parentReplyId === "undefined" ||
       (typeof token.parentReplyId === "string" &&
         isGlobalId(token.parentReplyId, "PetitionFieldReply")))
+  );
+}
+
+function isProfileToken(token: any): token is BackgroundCheckProfileParams {
+  return (
+    typeof token.profileId === "string" &&
+    isGlobalId(token.profileId, "Profile") &&
+    typeof token.profileTypeFieldId === "string" &&
+    isGlobalId(token.profileTypeFieldId, "ProfileTypeField")
   );
 }

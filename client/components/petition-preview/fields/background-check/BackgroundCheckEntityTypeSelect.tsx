@@ -38,7 +38,7 @@ export const BackgroundCheckEntityTypeSelect = forwardRef<
   );
 });
 
-export const useBackgroundCheckEntityTypeSelectOptions = () => {
+const useBackgroundCheckEntityTypeSelectOptions = () => {
   return useSimpleSelectOptions(
     (intl: IntlShape) => [
       {

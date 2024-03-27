@@ -60,6 +60,31 @@
     "context": "Activate your Parallel account"
   },
   {
+    "term": "background-check-monitoring-changes-email.company",
+    "definition": "Compañía",
+    "context": "Company"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.person",
+    "definition": "Persona",
+    "context": "Person"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.search",
+    "definition": "Búsqueda",
+    "context": "Search"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.subject",
+    "definition": "Ha habido cambios en tus entidades/búsquedas guardadas",
+    "context": "There have been changes to your saved entities/searches"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.text",
+    "definition": "Hemos detectado cambios o nuevos resultados en tus entidades/búsquedas guardadas.",
+    "context": "We have detected changes or new results in your saved entities/searches."
+  },
+  {
     "term": "closing-thanks.regards",
     "definition": "{tone, select, INFORMAL{Saludos.} other{Reciba un cordial saludo.}}",
     "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
@@ -850,16 +875,6 @@
     "context": "Follow the link below link to access."
   },
   {
-    "term": "profiles-expiring-properties.footer-message-1",
-    "definition": "Este correo incluye notificaciones a las que estás suscrito.",
-    "context": "This email includes notifications to which you are subscribed."
-  },
-  {
-    "term": "profiles-expiring-properties.footer-message-2",
-    "definition": "🔔 Si este mensaje ha acabado en tu bandeja de promociones o spam, hazle click y arrástralo a tu bandeja principal para asegurarte de no perderte los próximos.",
-    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
-  },
-  {
     "term": "profiles-expiring-properties.showing-active-alerts-count",
     "definition": "Mostrando {count}/{totalCount} de alarmas activas",
     "context": "Showing {count}/{totalCount} of active alarms"
@@ -1133,6 +1148,16 @@
     "term": "signature-worker.signed",
     "definition": "firmado",
     "context": "signed"
+  },
+  {
+    "term": "subscription-email.footer-message-1",
+    "definition": "Este correo incluye notificaciones a las que estás suscrito.",
+    "context": "This email includes notifications to which you are subscribed."
+  },
+  {
+    "term": "subscription-email.footer-message-2",
+    "definition": "🔔 Si este mensaje ha acabado en tu bandeja de promociones o spam, hazle click y arrástralo a tu bandeja principal para asegurarte de no perderte los próximos.",
+    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
   },
   {
     "term": "text-replies-excel-worksheet.field",

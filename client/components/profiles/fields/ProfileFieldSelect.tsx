@@ -23,7 +23,7 @@ interface ProfileFieldSelectProps
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions["SELECT"]["values"]>;
+type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
 export function ProfileFieldSelect({
   index,
@@ -97,7 +97,7 @@ export function ProfileFieldSelectInner({
 }: ProfileFieldSelectInnerProps) {
   const intl = useIntl();
 
-  const { values, showOptionsWithColors } = field.options as ProfileTypeFieldOptions["SELECT"];
+  const { values, showOptionsWithColors } = field.options as ProfileTypeFieldOptions<"SELECT">;
 
   const rsProps = useReactSelectProps({
     ...props,

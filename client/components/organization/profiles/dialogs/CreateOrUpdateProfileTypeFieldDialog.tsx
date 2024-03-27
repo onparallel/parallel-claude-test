@@ -3,6 +3,7 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
+  AlertProps,
   Box,
   Button,
   Center,
@@ -13,47 +14,32 @@ import {
   FormLabel,
   HStack,
   Input,
-  Radio,
-  RadioGroup,
   Stack,
   Switch,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react";
-import { DeleteIcon, DragHandleIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
-import {
-  isValidLocalizableUserText,
-  localizableUserTextRender,
-} from "@parallel/components/common/LocalizableUserTextRender";
+import { isValidLocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
-import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
 import {
   CreateProfileTypeFieldInput,
+  ProfileTypeFieldType,
+  UserLocale,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
+  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment,
   useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { generateExcel } from "@parallel/utils/generateExcel";
-import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
+import { getReferencedInBackgroundCheck } from "@parallel/utils/getFieldsReferencedInBackgroundCheck";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
-import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
-import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
-import { UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
 import {
   ExpirationOption,
@@ -61,56 +47,72 @@ import {
   expirationToDuration,
   useExpirationOptions,
 } from "@parallel/utils/useExpirationOptions";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
-import ASCIIFolder from "fold-to-ascii";
-import { Reorder, useDragControls } from "framer-motion";
 import { nanoid } from "nanoid";
-import { KeyboardEvent, useCallback } from "react";
-import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
-import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isDefined, omit, pick, times, zip } from "remeda";
+import { useCallback } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, omit, pick } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
+import { ProfileFieldBackgroundCheckSettings } from "../settings/ProfileFieldBackgroundCheckSettings";
+import {
+  ProfileFieldSelectSettings,
+  SelectOptionValue,
+} from "../settings/ProfileFieldSelectSettings";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
 
-interface CreateOrUpdateProfileTypeFieldDialogProps {
-  profileTypeId: string;
-  profileTypeField?: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
+export interface CreateOrUpdateProfileTypeFieldDialogProps {
+  profileType: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment;
+  profileTypeField?:
+    | useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment
+    | CreateProfileTypeFieldInput;
+  disableFieldTypeSelect?: boolean;
 }
 
-type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions["SELECT"]["values"]>;
-
-interface SelectOptionValueData extends SelectOptionValue {
-  id: string;
-  existing?: boolean;
-}
-
-interface CreateOrUpdateProfileTypeFieldDialogData
+export interface CreateOrUpdateProfileTypeFieldDialogData<TType extends ProfileTypeFieldType = any>
   extends Omit<CreateProfileTypeFieldInput, "expiryAlertAheadTime" | "options"> {
   expiryAlertAheadTime: ExpirationOption;
-  options: {
-    useReplyAsExpiryDate?: boolean;
-    showOptionsWithColors?: boolean;
-    values?: SelectOptionValueData[];
-    standardList?: string | null;
-    listingType?: "CUSTOM" | "STANDARD";
-  };
+  options: TType extends "SELECT"
+    ? ProfileTypeFieldOptions<TType> & {
+        listingType: "STANDARD" | "CUSTOM";
+        values: (ProfileTypeFieldOptions<TType>["values"][number] & { id: string })[];
+      }
+    : ProfileTypeFieldOptions<TType>;
 }
 
-const DEFAULT_TAG_COLOR = "#E2E8F0";
-
 function CreateOrUpdateProfileTypeFieldDialog({
-  profileTypeId,
+  profileType,
   profileTypeField,
+  disableFieldTypeSelect,
   ...props
-}: DialogProps<CreateOrUpdateProfileTypeFieldDialogProps>) {
+}: DialogProps<
+  CreateOrUpdateProfileTypeFieldDialogProps,
+  { profileTypeField: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment }
+>) {
   const intl = useIntl();
 
-  const isUpdating = isDefined(profileTypeField);
-  const isStandard = profileTypeField?.isStandard ?? false;
+  const isUpdating = isDefined(profileTypeField) && "id" in profileTypeField;
+  const hasBackgroundCheck = useHasBackgroundCheck();
+  const isStandard = isUpdating ? profileTypeField!.isStandard : false;
 
-  const initialSelectOptions = useConstant(() => {
+  const referencedIn =
+    isUpdating && profileTypeField.type === "SELECT"
+      ? getReferencedInBackgroundCheck({
+          profileTypeFields: profileType.fields,
+          profileTypeFieldId: profileTypeField.id,
+        })
+      : [];
+
+  const referencedPropertiesNames = referencedIn
+    .map((field) => field.name[intl.locale as UserLocale])
+    .filter(isDefined);
+
+  const isDisabled = referencedIn.length > 0;
+
+  const intialOptions = useConstant(() => {
     if (profileTypeField?.type === "SELECT") {
-      const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
+      const options = profileTypeField.options as ProfileTypeFieldOptions<"SELECT">;
 
       return {
         ...options,
@@ -125,10 +127,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
               }))
             : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
       };
+    } else if (profileTypeField?.type === "BACKGROUND_CHECK") {
+      const options = profileTypeField.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
+      return {
+        hasMonitoring: isDefined(options.monitoring),
+        monitoring: options.monitoring ?? {
+          searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
+        },
+      };
     }
   }) as CreateOrUpdateProfileTypeFieldDialogData["options"];
 
-  const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
+  const form = useForm<CreateOrUpdateProfileTypeFieldDialogData<any>>({
     mode: "onSubmit",
     defaultValues: {
       name: profileTypeField?.name ?? { [intl.locale]: "" },
@@ -136,8 +146,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
       alias: profileTypeField?.alias ?? "",
       isExpirable: profileTypeField?.isExpirable ?? false,
       options:
-        profileTypeField?.type === "SELECT"
-          ? initialSelectOptions
+        profileTypeField?.type === "SELECT" || profileTypeField?.type === "BACKGROUND_CHECK"
+          ? intialOptions
           : profileTypeField?.options ?? {},
       expiryAlertAheadTime:
         isDefined(profileTypeField) &&
@@ -226,32 +236,36 @@ function CreateOrUpdateProfileTypeFieldDialog({
   }
 
   const updateProfileTypeField = useUpdateProfileTypeFieldWithForce();
+  const showConfirmDisableMonitoringDialog = useConfirmDisableMonitoringDialog();
 
   return (
     <ConfirmDialog
       {...props}
       initialFocusRef={useSetFocusRef(setFocus, "name")}
+      hasCloseButton
       closeOnEsc
       closeOnOverlayClick={false}
       size={selectedType === "SELECT" ? "3xl" : "lg"}
       content={{
         as: "form",
-        onSubmit: handleSubmit(async (data) => {
+        onSubmit: handleSubmit(async (formData) => {
+          let profileField = {} as useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
+
           try {
             const dirtyFieldsKeys = Object.keys(
               omit(dirtyFields, ["type"]),
             ) as (keyof CreateOrUpdateProfileTypeFieldDialogData)[];
-            const dirtyData = pick(data, dirtyFieldsKeys);
+            const dirtyData = pick(formData, dirtyFieldsKeys);
 
             const expiryAlertAheadTime =
-              data.isExpirable && data.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
-                ? expirationToDuration(data.expiryAlertAheadTime)
+              formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
+                ? expirationToDuration(formData.expiryAlertAheadTime)
                 : null;
 
             if (isUpdating) {
-              if (data.type === "SELECT") {
+              if (formData.type === "SELECT") {
                 const hasStandardList =
-                  data.options.listingType === "STANDARD" && data.options.standardList;
+                  formData.options.listingType === "STANDARD" && formData.options.standardList;
 
                 const options = isDefined(dirtyData.options)
                   ? {
@@ -259,18 +273,20 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       standardList: hasStandardList ? dirtyData.options.standardList : null,
                       values: hasStandardList
                         ? []
-                        : dirtyData.options.values!.map(omit(["id", "existing"])),
+                        : dirtyData.options.values!.map((value: any) =>
+                            omit(value, ["id", "existing"]),
+                          ),
                     }
                   : undefined;
                 try {
                   await updateProfileTypeField({
                     variables: {
-                      profileTypeId,
+                      profileTypeId: profileType.id,
                       profileTypeFieldId: profileTypeField.id,
                       data: {
                         ...(isStandard ? {} : dirtyData),
                         options,
-                        isExpirable: data.isExpirable,
+                        isExpirable: formData.isExpirable,
                         expiryAlertAheadTime,
                       },
                     },
@@ -292,12 +308,12 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
                     await updateProfileTypeField({
                       variables: {
-                        profileTypeId,
+                        profileTypeId: profileType.id,
                         profileTypeFieldId: profileTypeField.id,
                         data: {
                           ...(isStandard ? {} : dirtyData),
                           options,
-                          isExpirable: data.isExpirable,
+                          isExpirable: formData.isExpirable,
                           expiryAlertAheadTime,
                           substitutions: optionValuesToUpdate,
                         },
@@ -308,49 +324,95 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   }
                 }
               } else {
-                await updateProfileTypeField({
-                  variables: {
-                    profileTypeId,
-                    profileTypeFieldId: profileTypeField.id,
-                    data: {
-                      ...dirtyData,
-                      options:
-                        data.type === "DATE" ? pick(data.options, ["useReplyAsExpiryDate"]) : {},
-                      isExpirable: data.isExpirable,
-                      expiryAlertAheadTime,
+                try {
+                  await updateProfileTypeField({
+                    variables: {
+                      profileTypeId: profileType.id,
+                      profileTypeFieldId: profileTypeField.id,
+                      data: {
+                        ...dirtyData,
+                        options:
+                          formData.type === "DATE"
+                            ? pick(formData.options, ["useReplyAsExpiryDate"])
+                            : formData.type === "BACKGROUND_CHECK"
+                              ? formData.options.hasMonitoring
+                                ? pick(formData.options, ["monitoring"])
+                                : { monitoring: null }
+                              : {},
+                        isExpirable: formData.isExpirable,
+                        expiryAlertAheadTime,
+                      },
                     },
-                  },
-                });
+                  });
+                } catch (error) {
+                  if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
+                    try {
+                      const profileIds = error.graphQLErrors[0]?.extensions?.profileIds as string[];
+                      await showConfirmDisableMonitoringDialog({
+                        profileCount: profileIds?.length ?? 1,
+                      });
+                      await updateProfileTypeField({
+                        variables: {
+                          profileTypeId: profileType.id,
+                          profileTypeFieldId: profileTypeField.id,
+                          data: {
+                            ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
+                            alias: formData.alias || null,
+                            expiryAlertAheadTime,
+                            options:
+                              formData.type === "DATE"
+                                ? pick(formData.options, ["useReplyAsExpiryDate"])
+                                : formData.type === "BACKGROUND_CHECK"
+                                  ? formData.options.hasMonitoring
+                                    ? pick(formData.options, ["monitoring"])
+                                    : { monitoring: null }
+                                  : {},
+                          },
+                          force: true,
+                        },
+                      });
+                    } catch {}
+                  }
+                }
               }
             } else {
               const hasStandardList =
-                data.options.listingType === "STANDARD" && data.options.standardList;
+                formData.options.listingType === "STANDARD" && formData.options.standardList;
               const options =
-                data.type === "SELECT"
+                formData.type === "SELECT"
                   ? {
-                      showOptionsWithColors: data.options.showOptionsWithColors ?? false,
-                      standardList: hasStandardList ? data.options.standardList : null,
+                      showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
+                      standardList: hasStandardList ? formData.options.standardList : null,
                       values: hasStandardList
                         ? []
-                        : data.options.values!.map(omit(["id", "existing"])),
+                        : formData.options.values!.map((value: any) =>
+                            omit(value, ["id", "existing"]),
+                          ),
                     }
-                  : data.type === "DATE"
-                    ? pick(data.options, ["useReplyAsExpiryDate"])
-                    : {};
-              await createProfileTypeField({
+                  : formData.type === "DATE"
+                    ? pick(formData.options, ["useReplyAsExpiryDate"])
+                    : formData.type === "BACKGROUND_CHECK"
+                      ? formData.options.hasMonitoring
+                        ? pick(formData.options, ["monitoring"])
+                        : { monitoring: null }
+                      : {};
+              const { data } = await createProfileTypeField({
                 variables: {
-                  profileTypeId,
+                  profileTypeId: profileType.id,
                   data: {
-                    ...omit(data, ["expiryAlertAheadTime", "alias"]),
-                    alias: data.alias || null,
+                    ...omit(formData, ["expiryAlertAheadTime", "alias"]),
+                    alias: formData.alias || null,
                     options,
                     expiryAlertAheadTime,
                   },
                 },
               });
+              if (data?.createProfileTypeField) {
+                profileField = data!.createProfileTypeField;
+              }
             }
 
-            props.onResolve();
+            props.onResolve({ profileTypeField: profileField });
           } catch (e) {
             if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
               setError("alias", { type: "unavailable" });
@@ -384,7 +446,13 @@ function CreateOrUpdateProfileTypeFieldDialog({
               </AlertDescription>
             </Alert>
           ) : null}
-          <FormControl isInvalid={!!errors.name} isDisabled={isStandard}>
+          {!hasBackgroundCheck && selectedType === "BACKGROUND_CHECK" ? (
+            <RestrictedPetitionFieldAlert fieldType="BACKGROUND_CHECK" />
+          ) : null}
+          {referencedIn.length ? (
+            <PropertyReferencedAlert propertyNames={referencedPropertiesNames} />
+          ) : null}
+          <FormControl isInvalid={!!errors.name} isDisabled={isDisabled}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.property-name"
@@ -413,7 +481,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.type} isDisabled={isUpdating}>
+          <FormControl isInvalid={!!errors.type} isDisabled={isUpdating || isDisabled}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.type-of-property"
@@ -427,6 +495,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               render={({ field: { onChange, ...field } }) => (
                 <ProfileTypeFieldTypeSelect
                   {...field}
+                  isDisabled={disableFieldTypeSelect}
                   onChange={(value) => {
                     onChange(value!);
                     setValue(
@@ -437,7 +506,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           ? { values: [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }] }
                           : {},
                     );
-                    setTimeout(() => setFocus("options.values.0.label"));
+                    if (value === "SELECT") {
+                      setTimeout(() => setFocus("options.values.0.label"));
+                    }
                   }}
                 />
               )}
@@ -449,7 +520,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.alias} isDisabled={isStandard}>
+          <FormControl isInvalid={!!errors.alias} isDisabled={isStandard || isDisabled}>
             <FormLabel display="flex" alignItems="center" fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.unique-identifier"
@@ -500,12 +571,19 @@ function CreateOrUpdateProfileTypeFieldDialog({
           <FormProvider {...form}>
             {selectedType === "SELECT" ? (
               <ProfileFieldSelectSettings
-                isDisabled={isStandard || values?.some((v) => v.isStandard)}
+                isStandard={isStandard || values?.some((v: any) => v.isStandard)}
+                isDisabled={isDisabled || referencedIn.length > 0}
+              />
+            ) : null}
+            {selectedType === "BACKGROUND_CHECK" ? (
+              <ProfileFieldBackgroundCheckSettings
+                profileType={profileType}
+                isDisabled={isDisabled}
               />
             ) : null}
           </FormProvider>
           <Stack spacing={2}>
-            <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
+            <FormControl as={HStack} isInvalid={!!errors.isExpirable} isDisabled={isDisabled}>
               <Stack flex={1} spacing={1}>
                 <FormLabel margin={0}>
                   <FormattedMessage
@@ -527,8 +605,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {isExpirable ? (
               <>
                 {selectedType === "DATE" ? (
-                  <FormControl>
-                    <Checkbox {...register("options.useReplyAsExpiryDate")}>
+                  <FormControl isDisabled={isDisabled}>
+                    <Checkbox colorScheme="primary" {...register("options.useReplyAsExpiryDate")}>
                       <FormattedMessage
                         id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
                         defaultMessage="Use reply as expiry date"
@@ -536,7 +614,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     </Checkbox>
                   </FormControl>
                 ) : null}
-                <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
+                <FormControl
+                  as={HStack}
+                  isInvalid={!!errors.expiryAlertAheadTime}
+                  isDisabled={isDisabled}
+                >
                   <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
                     <FormattedMessage
                       id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
@@ -570,477 +652,6 @@ function CreateOrUpdateProfileTypeFieldDialog({
   );
 }
 
-function ProfileFieldSelectSettings({ isDisabled }: { isDisabled?: boolean }) {
-  const intl = useIntl();
-
-  const {
-    control,
-    register,
-    watch,
-    setFocus,
-    getValues,
-    formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
-
-  const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
-    name: "options.values",
-    keyName: "key",
-    control,
-    rules: { required: true, minLength: 1, maxLength: 1000 },
-    shouldUnregister: true,
-  });
-
-  const handleRemoveOption = useCallback((index: number) => {
-    remove(index);
-  }, []);
-
-  const showOptionsWithColors = watch("options.showOptionsWithColors");
-  const listingType = watch("options.listingType");
-  const name = watch("name");
-
-  const showImportSelectOptionsDialog = useImportSelectOptionsDialog();
-  const handleImportOptions = async () => {
-    try {
-      const values = getValues("options.values");
-      await showImportSelectOptionsDialog({
-        hasOptions: values ? values.length > 0 : false,
-        onDownloadEmptyOptions: async () => {
-          await generateValueLabelExcel(intl, {
-            fileName: sanitizeFilenameWithSuffix(
-              intl.formatMessage({
-                id: "component.import-options-settings-row.default-file-name",
-                defaultMessage: "options",
-              }),
-              ".xlsx",
-            ),
-            values: [],
-            labels: [],
-          });
-        },
-        onDownloadExistingOptions: async () => {
-          const values = getValues("options.values");
-          await generateValueLabelExcel(intl, {
-            fileName: sanitizeFilenameWithSuffix(
-              localizableUserTextRender({
-                value: name,
-                intl,
-                default: intl.formatMessage({
-                  id: "component.import-options-settings-row.default-file-name",
-                  defaultMessage: "options",
-                }),
-              }),
-              ".xlsx",
-            ),
-            values: values?.map((field) => field.value) ?? [],
-            labels: values?.map((field) => field.label) ?? [],
-          });
-        },
-        onExcelDrop: async (file) => {
-          const options = await parseProfileSelectOptionsFromExcel(file);
-          if (options.length > 0) {
-            replace(
-              options.map(({ label, value }) => ({
-                id: nanoid(),
-                label,
-                value,
-                color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
-              })),
-            );
-          } else {
-            // show empty inputs when uploaded file is empty
-            replace([{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }]);
-          }
-        },
-      });
-    } catch {}
-  };
-
-  return (
-    <Stack spacing={4}>
-      <FormControl>
-        <FormLabel fontWeight={400}>
-          <FormattedMessage
-            id="component.create-or-update-property-dialog.type-of-options"
-            defaultMessage="Options:"
-          />
-        </FormLabel>
-        <Controller
-          name="options.listingType"
-          defaultValue="CUSTOM"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <RadioGroup
-              onChange={(value) => onChange(value)}
-              value={value}
-              as={HStack}
-              spacing={2}
-              isDisabled={isDisabled}
-            >
-              <Radio value="CUSTOM">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.custom-list"
-                  defaultMessage="Custom list"
-                />
-              </Radio>
-              <Radio value="STANDARD">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.standard-list"
-                  defaultMessage="Standard list"
-                />
-              </Radio>
-            </RadioGroup>
-          )}
-        />
-      </FormControl>
-      {listingType === "STANDARD" ? (
-        <FormControl isInvalid={!!errors.options?.standardList} isDisabled={isDisabled}>
-          <Controller
-            name="options.standardList"
-            rules={{
-              required: true,
-            }}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Box>
-                <StandardListSelect onChange={(value) => onChange(value)} value={value ?? null} />
-              </Box>
-            )}
-          />
-        </FormControl>
-      ) : (
-        <>
-          <FormControl as={HStack} spacing={0}>
-            <Checkbox {...register("options.showOptionsWithColors")}>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.enable-colored-options"
-                defaultMessage="Enable colored options"
-              />
-            </Checkbox>
-            <HelpPopover>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.enable-colored-options-help"
-                defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
-              />
-            </HelpPopover>
-          </FormControl>
-          <Box maxHeight="360px" overflowY="auto">
-            <Table variant="unstyled">
-              <Thead>
-                <Tr>
-                  <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
-                    <FormattedMessage
-                      id="component.create-or-update-property-dialog.options-label"
-                      defaultMessage="Label"
-                    />
-                  </Th>
-                  <Th paddingInline={1} paddingBlock={2} width="50%">
-                    <FormattedMessage
-                      id="component.create-or-update-property-dialog.options-value-label"
-                      defaultMessage="Internal value"
-                    />
-                    <HelpPopover position="relative" top="-1px">
-                      <Text>
-                        <FormattedMessage
-                          id="component.create-or-update-property-dialog.options-value-label-help"
-                          defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
-                        />
-                      </Text>
-                    </HelpPopover>
-                  </Th>
-                  {showOptionsWithColors ? (
-                    <Th paddingInline={1} paddingBlock={2} minWidth="158px">
-                      <FormattedMessage
-                        id="component.manage-tags-dialog.color-label"
-                        defaultMessage="Color"
-                      />
-                    </Th>
-                  ) : null}
-                  <Th paddingInline={1} paddingBlock={2}></Th>
-                </Tr>
-              </Thead>
-              <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
-                {fields.map((field, index) => {
-                  return (
-                    <ProfileFieldSelectOption
-                      key={field.id}
-                      index={index}
-                      field={field}
-                      fields={fields}
-                      onRemove={handleRemoveOption}
-                      canRemoveOption={fields.length > 1}
-                      showOptionsWithColors={showOptionsWithColors ?? false}
-                    />
-                  );
-                })}
-              </Reorder.Group>
-            </Table>
-          </Box>
-          <HStack>
-            <Button
-              leftIcon={<PlusCircleIcon />}
-              variant="outline"
-              isDisabled={fields.length >= 1000}
-              onClick={() => {
-                append({
-                  id: nanoid(),
-                  label: { [intl.locale]: "" },
-                  value: "",
-                  color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
-                });
-                setTimeout(() => setFocus(`options.values.${fields.length}.label`));
-              }}
-            >
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.add-option-button"
-                defaultMessage="Add option"
-              />
-            </Button>
-            <Button variant="outline" onClick={handleImportOptions}>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.import-options-button"
-                defaultMessage="Import options..."
-              />
-            </Button>
-          </HStack>
-        </>
-      )}
-    </Stack>
-  );
-}
-
-function ProfileFieldSelectOption({
-  index,
-  field,
-  fields,
-  onRemove,
-  canRemoveOption,
-  showOptionsWithColors,
-}: {
-  index: number;
-  field: SelectOptionValueData;
-  fields: SelectOptionValueData[];
-  onRemove: (index: number) => void;
-  canRemoveOption: boolean;
-  showOptionsWithColors: boolean;
-}) {
-  const intl = useIntl();
-  const isUpdating = field.existing ?? false;
-  const isDisabled = field.isStandard ?? false;
-  const {
-    control,
-    formState: { errors, touchedFields },
-    register,
-    setValue,
-    setFocus,
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
-
-  const controls = useDragControls();
-
-  const onKeyDownHandler =
-    (property: "label" | "value") => (event: KeyboardEvent<HTMLInputElement>) => {
-      switch (event.key) {
-        case "ArrowDown":
-          if (index < fields.length - 1) {
-            event.preventDefault();
-            setFocus(`options.values.${index + 1}.${property}`);
-          }
-          break;
-        case "ArrowUp":
-          if (index > 0) {
-            event.preventDefault();
-            setFocus(`options.values.${index - 1}.${property}`);
-          }
-          break;
-        case "ArrowLeft": {
-          const input = event.target as HTMLInputElement;
-          if (
-            input.selectionStart === input.selectionEnd &&
-            input.selectionStart === 0 &&
-            property === "value"
-          ) {
-            event.preventDefault();
-            setFocus(`options.values.${index}.label`);
-          }
-          break;
-        }
-        case "ArrowRight": {
-          const input = event.target as HTMLInputElement;
-          if (
-            input.selectionStart === input.selectionEnd &&
-            input.selectionStart === input.value.length &&
-            property === "label"
-          ) {
-            event.preventDefault();
-            setFocus(`options.values.${index}.value`);
-          }
-          break;
-        }
-      }
-    };
-
-  return (
-    <Reorder.Item
-      as={Tr as any}
-      value={field}
-      dragListener={false}
-      dragControls={controls}
-      {...{
-        _hover: {
-          ".drag-handle": {
-            opacity: 1,
-          },
-        },
-        backgroundColor: "white",
-        position: "relative",
-      }}
-    >
-      <FormControl
-        as={Td}
-        verticalAlign="top"
-        paddingInlineEnd={1}
-        paddingBlock={2}
-        width="50%"
-        isInvalid={!!errors.options?.values?.[index]?.label}
-        isDisabled={isDisabled}
-      >
-        <Box
-          className="drag-handle"
-          position="absolute"
-          top="50%"
-          left={0}
-          paddingInline={1}
-          height="38px"
-          transform="translateY(-50%)"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          cursor="grab"
-          color="gray.400"
-          opacity={0}
-          _hover={{ color: "gray.700" }}
-          aria-label={intl.formatMessage({
-            id: "generic.drag-to-sort",
-            defaultMessage: "Drag to sort",
-          })}
-          onPointerDown={(e) => controls.start(e)}
-        >
-          <DragHandleIcon role="presentation" pointerEvents="none" boxSize={3} />
-        </Box>
-        <Controller
-          name={`options.values.${index}.label` as const}
-          control={control}
-          rules={{
-            required: true,
-            validate: {
-              isValidLocalizableUserText,
-            },
-          }}
-          render={({ field: { ref, onChange, ...field } }) => (
-            <LocalizableUserTextInput
-              {...field}
-              inputRef={ref}
-              inputProps={{
-                onKeyDown: onKeyDownHandler("label"),
-              }}
-              onChange={(value) => {
-                onChange(value);
-
-                if (!isUpdating && !touchedFields.options?.values?.[index]?.value) {
-                  const alias = localizableUserTextRender({
-                    value,
-                    intl,
-                    default: "",
-                  });
-                  setValue(
-                    `options.values.${index}.value`,
-                    ASCIIFolder.foldReplacing(alias.trim().toLowerCase()) // replace all non ASCII chars with their ASCII equivalent
-                      .replace(/\s/g, "_") // replace spaces with _
-                      .slice(0, 50), // max 50 chars
-                  );
-                }
-              }}
-            />
-          )}
-        />
-        <FormErrorMessage>
-          <FormattedMessage
-            id="generic.required-field-error"
-            defaultMessage="The field is required"
-          />
-        </FormErrorMessage>
-      </FormControl>
-      <FormControl
-        as={Td}
-        verticalAlign="top"
-        paddingInline={1}
-        paddingBlock={2}
-        width="50%"
-        isInvalid={!!errors.options?.values?.[index]?.value}
-        isDisabled={isUpdating || isDisabled}
-      >
-        <Input
-          {...register(`options.values.${index}.value` as const, {
-            required: true,
-            pattern: REFERENCE_REGEX,
-            maxLength: 50,
-
-            validate: {
-              isAvailable: (value, { options }) => {
-                return !options.values?.some(({ value: v }, i) => v === value && i < index);
-              },
-            },
-          })}
-          onKeyDown={onKeyDownHandler("value")}
-          maxLength={50}
-        />
-        <FormErrorMessage>
-          {errors?.options?.values?.[index]?.value?.type === "isAvailable" ? (
-            <FormattedMessage
-              id="component.create-or-update-property-dialog.unique-identifier-alredy-exists"
-              defaultMessage="This identifier is already in use"
-            />
-          ) : (
-            <FormattedMessage
-              id="component.create-or-update-property-dialog.options-alias-error"
-              defaultMessage="The field is required and only accepts up to {max} letters, numbers or _"
-              values={{ max: 50 }}
-            />
-          )}
-        </FormErrorMessage>
-      </FormControl>
-      {showOptionsWithColors ? (
-        <FormControl
-          as={Td}
-          verticalAlign="top"
-          paddingInline={1}
-          paddingBlock={2}
-          minWidth="158px"
-        >
-          <Controller
-            name={`options.values.${index}.color` as const}
-            control={control}
-            rules={{ required: showOptionsWithColors }}
-            defaultValue={DEFAULT_TAG_COLOR}
-            render={({ field }) => <TagColorSelect {...field} value={field.value ?? null} />}
-          />
-        </FormControl>
-      ) : null}
-      <Td verticalAlign="top" paddingInline={1} paddingBlock={2}>
-        <IconButtonWithTooltip
-          isDisabled={!canRemoveOption || isDisabled}
-          onClick={() => onRemove(index)}
-          icon={<DeleteIcon />}
-          variant="outline"
-          label={intl.formatMessage({
-            id: "component.create-or-update-property-dialog.remove-option-button",
-            defaultMessage: "Remove option",
-          })}
-        />
-      </Td>
-    </Reorder.Item>
-  );
-}
-
 export function useCreateOrUpdateProfileTypeFieldDialog() {
   return useDialog(CreateOrUpdateProfileTypeFieldDialog);
 }
@@ -1057,7 +668,19 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
       expiryAlertAheadTime
       options
       isStandard
+      ...getReferencedInBackgroundCheck_ProfileTypeField
     }
+    ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
+  `,
+  ProfileType: gql`
+    fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
+      id
+      fields {
+        ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
+      }
+      ...ProfileFieldBackgroundCheckSettings_ProfileType
+    }
+    ${ProfileFieldBackgroundCheckSettings.fragments.ProfileType}
   `,
 };
 
@@ -1093,56 +716,68 @@ const _mutations = [
   `,
 ];
 
-async function generateValueLabelExcel(
-  intl: IntlShape,
-  {
-    fileName,
-    values,
-    labels,
-  }: {
-    fileName: string;
-    values: SelectOptionValue["value"][];
-    labels: SelectOptionValue["label"][];
+interface PropertyReferencedAlertProps extends AlertProps {
+  propertyNames: string[];
+}
+
+const PropertyReferencedAlert = chakraForwardRef<"div", PropertyReferencedAlertProps>(
+  function PropertyReferencedAlert({ propertyNames, ...props }, ref) {
+    const intl = useIntl();
+    return (
+      <Alert status="warning" rounded="md" paddingX={4} paddingY={2} ref={ref} {...props}>
+        <AlertIcon color="yellow.500" />
+        <HStack spacing={4} width="100%">
+          <Box flex="1">
+            <FormattedMessage
+              id="component.property-referenced-alert.referenced-in"
+              defaultMessage="This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
+              values={{
+                properties: intl.formatList(propertyNames.map((name, i) => <b key={i}>{name}</b>)),
+                count: propertyNames.length,
+              }}
+            />
+          </Box>
+        </HStack>
+      </Alert>
+    );
   },
-) {
-  return await generateExcel({
-    fileName,
-    columns: [
-      {
-        key: "value",
-        cell: {
-          value: intl.formatMessage({
-            id: "util.generate-value-label-excel.header-value",
-            defaultMessage: "Internal value",
-          }),
-          fontWeight: "bold",
-        },
-      },
-      {
-        key: "label_en",
-        cell: {
-          value: intl.formatMessage({
-            id: "util.generate-value-label-excel.header-label-english",
-            defaultMessage: "Label (English)",
-          }),
-          fontWeight: "bold",
-        },
-      },
-      {
-        key: "label_es",
-        cell: {
-          value: intl.formatMessage({
-            id: "util.generate-value-label-excel.header-label-spanish",
-            defaultMessage: "Label (Spanish)",
-          }),
-          fontWeight: "bold",
-        },
-      },
-    ],
-    rows: zip(values, labels ?? times(values.length, () => null)).map(([value, label]) => ({
-      value,
-      label_es: label?.es ?? null,
-      label_en: label?.en ?? null,
-    })),
-  });
+);
+
+function useConfirmDisableMonitoringDialog() {
+  const showDialog = useConfirmDeleteDialog();
+  const intl = useIntl();
+  return useCallback(async ({ profileCount }: { profileCount: number }) => {
+    return await showDialog({
+      size: "lg",
+      header: (
+        <FormattedMessage
+          id="component.use-confirm-disable-monitoring-dialog.header"
+          defaultMessage="Deactivate ongoing monitoring"
+        />
+      ),
+      description: (
+        <Text>
+          <FormattedMessage
+            id="component.use-confirm-disable-monitoring-dialog.description"
+            defaultMessage="There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?"
+            values={{
+              profileCount,
+            }}
+          />
+        </Text>
+      ),
+      confirmation: intl.formatMessage({
+        id: "component.use-confirm-disable-monitoring-dialog.confirm",
+        defaultMessage: "confirm",
+      }),
+      confirm: (
+        <Button colorScheme="red" type="submit">
+          <FormattedMessage
+            id="component.use-confirm-disable-monitoring-dialog.deactivate"
+            defaultMessage="Deactivate"
+          />
+        </Button>
+      ),
+    });
+  }, []);
 }

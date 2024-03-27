@@ -14,6 +14,7 @@ import {
   PetitionRepliesFieldReply_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
@@ -33,7 +34,6 @@ import { UserOrContactReference } from "../petition-activity/UserOrContactRefere
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
-import { useBackgroundCheckEntityTypeSelectOptions } from "../petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -152,10 +152,7 @@ export function PetitionRepliesFieldReply({
     }
   };
 
-  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
-  const entityTypeLabel = entityTypeOptions.find(
-    (option) => option.value === reply.content?.query?.type,
-  )?.label;
+  const entityTypeLabel = getEntityTypeLabel(intl, reply.content?.query?.type);
 
   return (
     <HStack>

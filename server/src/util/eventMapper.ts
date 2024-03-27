@@ -398,7 +398,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_FIELD_EXPIRY_UPDATED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         expiryDate: event.data.expiry_date,
         alias: event.data.alias,
@@ -422,7 +422,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_FIELD_VALUE_UPDATED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         alias: event.data.alias,
       };

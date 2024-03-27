@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   AspectRatio,
-  Badge,
   Box,
   HStack,
   Heading,
@@ -23,6 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { difference } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
+import { PaidBadge } from "../common/PaidBadge";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
@@ -230,14 +230,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 <Heading as="h2" size="sm">
                   <PetitionFieldTypeText as={"span" as any} type={activeType} />
                 </Heading>
-                {showPaidBadge ? (
-                  <Badge colorScheme="blue" textTransform="uppercase">
-                    <FormattedMessage
-                      id="component.petition-field-type-select-dropdown.paid-badge"
-                      defaultMessage="Paid"
-                    />
-                  </Badge>
-                ) : null}
+                {showPaidBadge ? <PaidBadge /> : null}
               </HStack>
 
               <Box fontSize="sm" id={`field-description-${activeType}`}>

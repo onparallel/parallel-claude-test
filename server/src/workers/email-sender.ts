@@ -1,6 +1,7 @@
 import pMap from "p-map";
 import { unMaybeArray } from "../util/arrays";
 import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
+import { backgroundCheckMonitoringChanges } from "./emails/background-check-monitoring-changes";
 import { commentsContactNotification } from "./emails/comments-contact-notification";
 import { commentsUserNotification } from "./emails/comments-user-notification";
 import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
@@ -22,8 +23,8 @@ import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
 import { transferParallels } from "./emails/transfer-parallels";
-import { createQueueWorker } from "./helpers/createQueueWorker";
 import { RateLimitGuard } from "./helpers/RateLimitGuard";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -48,6 +49,7 @@ const builders = {
   "from-database": sendFromDatabase,
   "transfer-parallels": transferParallels,
   "profiles-expiring-properties": profilesExpiringProperties,
+  "background-check-monitoring-changes": backgroundCheckMonitoringChanges,
 };
 
 export type EmailType = keyof typeof builders;

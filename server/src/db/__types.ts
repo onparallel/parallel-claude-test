@@ -414,7 +414,8 @@ export type ProfileTypeFieldType =
   | "DATE"
   | "PHONE"
   | "NUMBER"
-  | "SELECT";
+  | "SELECT"
+  | "BACKGROUND_CHECK";
 
 export const ProfileTypeFieldTypeValues = [
   "TEXT",
@@ -424,6 +425,7 @@ export const ProfileTypeFieldTypeValues = [
   "PHONE",
   "NUMBER",
   "SELECT",
+  "BACKGROUND_CHECK",
 ] as ProfileTypeFieldType[];
 
 export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";
@@ -1789,7 +1791,7 @@ export interface ProfileFieldValue {
   type: ProfileTypeFieldType; // profile_type_field_type
   content: any; // jsonb
   expiry_date: Maybe<string>; // date
-  created_by_user_id: number; // int4
+  created_by_user_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   removed_at: Maybe<Date>; // timestamptz
   removed_by_user_id: Maybe<number>; // int4
@@ -1802,6 +1804,7 @@ export type CreateProfileFieldValue = PartialProps<
   Omit<ProfileFieldValue, "id">,
   | "content"
   | "expiry_date"
+  | "created_by_user_id"
   | "created_at"
   | "removed_at"
   | "removed_by_user_id"

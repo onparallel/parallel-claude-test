@@ -1,0 +1,75 @@
+{
+  "title": "App Emails",
+  "stories": [
+    {
+      "name": "Background Check Monitoring Changes",
+      "parameters": {
+        "server": {
+          "id": "emails/app/BackgroundCheckMonitoringChanges"
+        }
+      },
+      "args": {
+        "userName": "Derek",
+        "properties": [
+          {
+            "profileId": "A",
+            "profileTypeFieldId": "A",
+            "content": {
+              "entity": {
+                "type": "Person",
+                "name": "Vladimir Vladimirovich Putin"
+              }
+            }
+          },
+          {
+            "profileId": "B",
+            "profileTypeFieldId": "B",
+            "content": {
+              "query": {
+                "name": "Martin Martín Rivas",
+                "date": "04-01-1950"
+              }
+            }
+          },
+          {
+            "profileId": "C",
+            "profileTypeFieldId": "C",
+            "content": {
+              "query": {
+                "name": "Valdimir Putin"
+              }
+            }
+          },
+          {
+            "profileId": "D",
+            "profileTypeFieldId": "D",
+            "content": {
+              "entity": {
+                "type": "Company",
+                "name": "Deutsche Bank"
+              }
+            }
+          }
+        ],
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "http://localhost",
+        "logoUrl": "http://localhost/static/emails/logo-bg-check.png",
+        "logoAlt": "Parallel",
+        "theme": {
+          "color": "#f75959",
+          "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
+          "preferredTone": "FORMAL"
+        }
+      },
+      "argTypes": {
+        "userName": { "control": { "type": "text" } },
+        "properties": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } },
+        "theme": { "control": { "type": "object" } }
+      }
+    }
+  ]
+}

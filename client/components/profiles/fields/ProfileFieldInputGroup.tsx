@@ -57,6 +57,7 @@ export function ProfileFieldInputGroup({
         {children}
         {(browserName === "Firefox" && field.type === "DATE") ||
         field.type === "SELECT" ||
+        field.type === "BACKGROUND_CHECK" ||
         isDisabled ? null : (
           <InputRightElement pointerEvents="none">
             <Flex className="edit-icon" opacity={0} transitionDuration="normal" color="gray.600">

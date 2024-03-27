@@ -9,6 +9,7 @@ import {
 import {
   ProfileField_PetitionFieldFragment,
   ProfileField_ProfileFieldFileFragment,
+  ProfileField_ProfileFieldPropertyFragment,
   ProfileField_ProfileFieldValueFragment,
   ProfileField_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
@@ -17,7 +18,9 @@ import { discriminator } from "@parallel/utils/discriminator";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { useSupportedUserLocales } from "@parallel/utils/locales";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { unMaybeArray } from "@parallel/utils/types";
 import usePrevious from "@react-hook/previous";
 import { Duration, isPast, sub } from "date-fns";
@@ -36,17 +39,16 @@ import { isDefined, noop } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
+import { ProfileFieldBackgroundCheck } from "./ProfileFieldBackgroundCheck";
 import { ProfileFieldDate } from "./ProfileFieldDate";
 import { ProfileFieldExpirationButton } from "./ProfileFieldExpirationButton";
 import { ProfileFieldFileAction, ProfileFieldFileUpload } from "./ProfileFieldFileUpload";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 import { ProfileFieldNumber } from "./ProfileFieldNumber";
 import { ProfileFieldPhone } from "./ProfileFieldPhone";
+import { ProfileFieldSelect } from "./ProfileFieldSelect";
 import { ProfileFieldShortText } from "./ProfileFieldShortText";
 import { ProfileFieldText } from "./ProfileFieldText";
-import { ProfileFieldSelect } from "./ProfileFieldSelect";
-import { useSupportedUserLocales } from "@parallel/utils/locales";
-import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 
 export interface ProfileFieldProps {
   index: number;
@@ -55,20 +57,25 @@ export interface ProfileFieldProps {
   setValue: UseFormSetValue<ProfileFormData>;
   clearErrors: UseFormClearErrors<ProfileFormData>;
   setError: UseFormSetError<ProfileFormData>;
+  onRefetch: () => void;
   profileId: string;
   field: ProfileField_ProfileTypeFieldFragment;
   value?: ProfileField_ProfileFieldValueFragment | null;
   files?: ProfileField_ProfileFieldFileFragment[] | null;
   fieldsWithIndices: [ProfileField_PetitionFieldFragment, PetitionFieldIndex][];
   isDisabled?: boolean;
+  petitionId?: string;
+  properties: ProfileField_ProfileFieldPropertyFragment[];
 }
 
 export function ProfileField(props: ProfileFieldProps) {
   const intl = useIntl();
   const { index, field, files, control, setValue, fieldsWithIndices } = props;
   const { dirtyFields, errors } = useFormState({ control });
-  const fieldValue = useWatch({ control, name: `fields.${index}` });
+  const isDirty = !!dirtyFields?.fields?.[index];
+  const isInvalid = !!errors.fields?.[index];
 
+  const fieldValue = useWatch({ control, name: `fields.${index}` });
   const expiryDate = fieldValue?.expiryDate;
   const content = fieldValue?.content;
 
@@ -80,9 +87,6 @@ export function ProfileField(props: ProfileFieldProps) {
       setShowSuggestions(false);
     }
   }, [fieldHasValue]);
-
-  const isDirty = !!dirtyFields?.fields?.[index];
-  const isInvalid = !!errors.fields?.[index];
 
   const handleSetExpiryDate = (value: string | null) => {
     if (
@@ -118,11 +122,20 @@ export function ProfileField(props: ProfileFieldProps) {
     content?.value?.length > 0
   ) {
     fieldIsEmpty = false;
+  } else if (
+    field.type === "BACKGROUND_CHECK" &&
+    (isDefined(content?.search) || isDefined(content?.entity))
+  ) {
+    fieldIsEmpty = false;
   }
   const locales = useSupportedUserLocales();
 
   const needsExpirationDialog =
     field.isExpirable && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate);
+
+  const bgCheckSuggestions = fieldsWithIndices.filter(([petitionField]) => {
+    return petitionField.type === "BACKGROUND_CHECK";
+  });
   const suggestions = fieldsWithIndices.flatMap(([petitionField, fieldIndex]) => {
     return petitionField.replies
       .filter((reply) => {
@@ -134,7 +147,7 @@ export function ProfileField(props: ProfileFieldProps) {
         } else if (field.type === "SELECT") {
           // Match by label or value, check all locales
 
-          const options = field.options as ProfileTypeFieldOptions["SELECT"];
+          const options = field.options as ProfileTypeFieldOptions<"SELECT">;
           return (
             isDefined(reply.content.value) &&
             options.values.some(({ label, value }) => {
@@ -240,7 +253,7 @@ export function ProfileField(props: ProfileFieldProps) {
                 : petitionField.type === "SELECT"
                   ? {
                       text: reply.content.value,
-                      value: (field.options as ProfileTypeFieldOptions["SELECT"]).values.filter(
+                      value: (field.options as ProfileTypeFieldOptions<"SELECT">).values.filter(
                         ({ label, value }) => {
                           return (
                             locales.some(({ key }) => {
@@ -266,7 +279,9 @@ export function ProfileField(props: ProfileFieldProps) {
                           : (reply.content.value as string),
                     ).map((text) => ({ text, value: text })),
           )
-            .filter(({ value }) => content?.value !== value)
+            .filter(({ value }) => {
+              return content?.value !== value;
+            })
             .map(({ value, text }, i) => {
               return (
                 <ProfileFieldSuggestion
@@ -363,6 +378,14 @@ export function ProfileField(props: ProfileFieldProps) {
           <ProfileFieldShortText {...commonProps} />
         ) : field.type === "SELECT" ? (
           <ProfileFieldSelect {...commonProps} control={control} />
+        ) : field.type === "BACKGROUND_CHECK" ? (
+          <ProfileFieldBackgroundCheck
+            {...commonProps}
+            profileId={props.profileId}
+            onRefreshField={props.onRefetch}
+            fieldsWithIndices={bgCheckSuggestions}
+            petitionId={props.petitionId}
+          />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
           <HStack marginTop={1} marginLeft={1} color="gray.700" spacing={1.5}>
@@ -393,6 +416,24 @@ export function ProfileField(props: ProfileFieldProps) {
 }
 
 ProfileField.fragments = {
+  get ProfileFieldProperty() {
+    return gql`
+      fragment ProfileField_ProfileFieldProperty on ProfileFieldProperty {
+        field {
+          ...ProfileField_ProfileTypeField
+        }
+        files {
+          ...ProfileField_ProfileFieldFile
+        }
+        value {
+          ...ProfileField_ProfileFieldValue
+        }
+      }
+      ${this.ProfileTypeField}
+      ${this.ProfileFieldFile}
+      ${this.ProfileFieldValue}
+    `;
+  },
   get ProfileTypeField() {
     return gql`
       fragment ProfileField_ProfileTypeField on ProfileTypeField {

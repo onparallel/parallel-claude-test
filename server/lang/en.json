@@ -60,6 +60,31 @@
     "context": "Activate your Parallel account"
   },
   {
+    "term": "background-check-monitoring-changes-email.company",
+    "definition": "Company",
+    "context": "Company"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.person",
+    "definition": "Person",
+    "context": "Person"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.search",
+    "definition": "Search",
+    "context": "Search"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.subject",
+    "definition": "There have been changes to your saved entities/searches",
+    "context": "There have been changes to your saved entities/searches"
+  },
+  {
+    "term": "background-check-monitoring-changes-email.text",
+    "definition": "We have detected changes or new results in your saved entities/searches.",
+    "context": "We have detected changes or new results in your saved entities/searches."
+  },
+  {
     "term": "closing-thanks.regards",
     "definition": "{tone, select, INFORMAL{Regards.} other{Best regards.}}",
     "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
@@ -850,16 +875,6 @@
     "context": "Follow the link below link to access."
   },
   {
-    "term": "profiles-expiring-properties.footer-message-1",
-    "definition": "This email includes notifications to which you are subscribed.",
-    "context": "This email includes notifications to which you are subscribed."
-  },
-  {
-    "term": "profiles-expiring-properties.footer-message-2",
-    "definition": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones.",
-    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
-  },
-  {
     "term": "profiles-expiring-properties.showing-active-alerts-count",
     "definition": "Showing {count}/{totalCount} of active alarms",
     "context": "Showing {count}/{totalCount} of active alarms"
@@ -1133,6 +1148,16 @@
     "term": "signature-worker.signed",
     "definition": "signed",
     "context": "signed"
+  },
+  {
+    "term": "subscription-email.footer-message-1",
+    "definition": "This email includes notifications to which you are subscribed.",
+    "context": "This email includes notifications to which you are subscribed."
+  },
+  {
+    "term": "subscription-email.footer-message-2",
+    "definition": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones.",
+    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
   },
   {
     "term": "text-replies-excel-worksheet.field",

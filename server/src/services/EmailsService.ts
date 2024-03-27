@@ -88,6 +88,10 @@ export interface IEmailsService {
     userId: number,
     payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">,
   ): Promise<void>;
+  sendBackgroundCheckMonitoringChangesEmail(
+    userId: number,
+    profileFieldValues: { profileId: number; profileTypeFieldId: number }[],
+  ): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -355,6 +359,20 @@ export class EmailsService implements IEmailsService {
       id: this.buildQueueId("ProfilesExpiringProperties", userId),
       userId,
       ...payload,
+    });
+  }
+
+  async sendBackgroundCheckMonitoringChangesEmail(
+    userId: number,
+    profileFieldValues: { profileId: number; profileTypeFieldId: number }[],
+  ) {
+    return await this.enqueueEmail("background-check-monitoring-changes", {
+      id: this.buildQueueId("BackgroundCheckMonitoringChanges", [
+        userId,
+        ...profileFieldValues.map((pfv) => `${pfv.profileId}-${pfv.profileTypeFieldId}`),
+      ]),
+      userId,
+      profileFieldValues,
     });
   }
 

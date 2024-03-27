@@ -15,6 +15,7 @@ import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
+import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFieldOptions";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
   predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
@@ -315,5 +316,34 @@ export function profileHasStatus<
 
     const profiles = await ctx.profiles.loadProfile(profileIds);
     return profiles.every((p) => isDefined(p) && validStatuses.includes(p.status));
+  };
+}
+
+export function profileTypeFieldIsNotUsedInMonitoringRules<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  profileTypeIDArg: TProfileTypeId,
+  profileTypeFieldIdArg: TProfileTypeFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileTypeId = args[profileTypeIDArg] as unknown as number;
+    const profileTypeFieldIds = unMaybeArray(
+      args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
+    );
+    const usedInProfileTypeFields = (
+      await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
+    ).filter((ptf) => optionsIncludeProfileTypeFieldId(ptf.options, profileTypeFieldIds));
+
+    if (usedInProfileTypeFields.filter((ptf) => ptf.type === "BACKGROUND_CHECK").length > 0) {
+      throw new ApolloError(
+        "This field is being used in a BACKGROUND_CHECK monitoring rule.",
+        "FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE",
+      );
+    }
+
+    return true;
   };
 }

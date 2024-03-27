@@ -133,13 +133,13 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
             </Button>
             <MjmlText align="center" fontSize="12px" color="#4A5568">
               <FormattedMessage
-                id="profiles-expiring-properties.footer-message-1"
+                id="subscription-email.footer-message-1"
                 defaultMessage="This email includes notifications to which you are subscribed."
               />
             </MjmlText>
             <MjmlText align="center" fontSize="12px" color="#4A5568">
               <FormattedMessage
-                id="profiles-expiring-properties.footer-message-2"
+                id="subscription-email.footer-message-2"
                 defaultMessage="🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
               />
             </MjmlText>

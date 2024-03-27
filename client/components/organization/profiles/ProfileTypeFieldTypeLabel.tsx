@@ -1,7 +1,9 @@
 import { Box, Icon, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { PaidBadge } from "@parallel/components/common/PaidBadge";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useIntl } from "react-intl";
 
 interface ProfileTypeFieldTypeLabelProps {
@@ -12,6 +14,9 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
   function ProfileTypeFieldTypeLabel({ type, ...props }, ref) {
     const intl = useIntl();
     const { label, color, icon } = PROFILE_TYPE_FIELD_CONFIG[type];
+
+    const hasBackgroundCheck = useHasBackgroundCheck();
+
     return (
       <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
         <Box
@@ -27,6 +32,7 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
         <Text whiteSpace="nowrap" as="div" flex="1" marginLeft={2}>
           {label(intl)}
         </Text>
+        {!hasBackgroundCheck && type === "BACKGROUND_CHECK" ? <PaidBadge marginLeft={2} /> : null}
       </Box>
     );
   },

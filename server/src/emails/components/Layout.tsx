@@ -1,4 +1,5 @@
 import {
+  IMjmlImageProps,
   Mjml,
   MjmlAll,
   MjmlAttributes,
@@ -39,6 +40,7 @@ export interface LayoutProps {
   removeLinks?: boolean;
   theme: BrandTheme;
   head?: ReactNode;
+  logoProps?: IMjmlImageProps;
   children?: ReactNode;
 }
 
@@ -64,6 +66,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
   removeParallelBranding,
   removeLinks,
   head,
+  logoProps = {},
 }) {
   const { locale } = useIntl();
   const utm = new URLSearchParams({
@@ -106,7 +109,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
         {/* Header */}
         <MjmlSection>
           <MjmlColumn>
-            <MjmlImage alt={logoAlt} width="200px" src={logoUrl} />
+            <MjmlImage alt={logoAlt} width="200px" src={logoUrl} {...logoProps} />
           </MjmlColumn>
         </MjmlSection>
 

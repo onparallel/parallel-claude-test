@@ -1360,6 +1360,26 @@
     "context": "Reactivate contact access"
   },
   {
+    "term": "component.confirm-remove-entity-dialog.body-with-monitoring",
+    "definition": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?",
+    "context": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?"
+  },
+  {
+    "term": "component.confirm-remove-entity-dialog.body-without-monitoring",
+    "definition": "If you proceed, the saved entity will be deleted. Are you sure you want to remove this entity?",
+    "context": "If you proceed, the saved entity will be deleted. Are you sure you want to remove this entity?"
+  },
+  {
+    "term": "component.confirm-remove-entity-dialog.header",
+    "definition": "Remove entity",
+    "context": "Remove entity"
+  },
+  {
+    "term": "component.confirm-remove-entity-dialog.remove",
+    "definition": "Remove",
+    "context": "Remove"
+  },
+  {
     "term": "component.confirm-remove-member-dialog.body",
     "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to parallels shared with the team.",
     "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to parallels shared with the team."
@@ -1538,6 +1558,26 @@
     "term": "component.confirm-unlink-field-dialog.header",
     "definition": "Remove field from group",
     "context": "Remove field from group"
+  },
+  {
+    "term": "component.confirm-update-entity-dialog.body",
+    "definition": "This property supports only one response. If you add a new entity, the previous one will be deleted. Are you sure you want to modify this answer?",
+    "context": "This property supports only one response. If you add a new entity, the previous one will be deleted. Are you sure you want to modify this answer?"
+  },
+  {
+    "term": "component.confirm-update-entity-dialog.body-with-monitoring",
+    "definition": "If you continue, the saved entity will be discarded, deleting both the monitoring and the stored version history, if any. Are you sure you want to discard this entity?",
+    "context": "If you continue, the saved entity will be discarded, deleting both the monitoring and the stored version history, if any. Are you sure you want to discard this entity?"
+  },
+  {
+    "term": "component.confirm-update-entity-dialog.header",
+    "definition": "Modify reply",
+    "context": "Modify reply"
+  },
+  {
+    "term": "component.confirm-update-entity-dialog.yes-modify",
+    "definition": "Yes, modify",
+    "context": "Yes, modify"
   },
   {
     "term": "component.confirm-update-profile-type-select-field-dialog.remove-option-body",
@@ -4215,6 +4255,11 @@
     "context": "Time"
   },
   {
+    "term": "component.paid-badge.text",
+    "definition": "Paid",
+    "context": "Paid"
+  },
+  {
     "term": "component.password-restrict-petition.body",
     "definition": "This parallel is protected. Enter the password to unlock it.",
     "context": "This parallel is protected. Enter the password to unlock it."
@@ -5088,11 +5133,6 @@
     "term": "component.petition-field-type-select-dropdown.number",
     "definition": "Allow the recipient to respond with numbers only.",
     "context": "Allow the recipient to respond with numbers only."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.paid-badge",
-    "definition": "Paid",
-    "context": "Paid"
   },
   {
     "term": "component.petition-field-type-select-dropdown.phone",
@@ -6485,6 +6525,126 @@
     "context": "Generating PDF file..."
   },
   {
+    "term": "component.profile-field-background-check-settings.activate-when",
+    "definition": "Activate when",
+    "context": "Activate when"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.activation-conditions-help",
+    "definition": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer.",
+    "context": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
+  },
+  {
+    "term": "component.profile-field-background-check-settings.activation-conditions-label",
+    "definition": "Add activation conditions",
+    "context": "Add activation conditions"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.business-relationship",
+    "definition": "Business relationship",
+    "context": "Business relationship"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.fixed-search-frequency",
+    "definition": "Fixed",
+    "context": "Fixed"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.is-one-of",
+    "definition": "is one of",
+    "context": "is one of"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.monitoring-description",
+    "definition": "Monitor search results to detect relevant changes.",
+    "context": "Monitor search results to detect relevant changes."
+  },
+  {
+    "term": "component.profile-field-background-check-settings.monitoring-label",
+    "definition": "Ongoing Monitoring",
+    "context": "Ongoing Monitoring"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.risk-level",
+    "definition": "Risk level",
+    "context": "Risk level"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.search-frequency-help",
+    "definition": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk.",
+    "context": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+  },
+  {
+    "term": "component.profile-field-background-check-settings.search-frequency-label",
+    "definition": "Search frequency",
+    "context": "Search frequency"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.select-frequency",
+    "definition": "Choose a frequency",
+    "context": "Choose a frequency"
+  },
+  {
+    "term": "component.profile-field-background-check-settings.variable-search-frequency",
+    "definition": "Based on options",
+    "context": "Based on options"
+  },
+  {
+    "term": "component.profile-field-background-check.active-monitoring",
+    "definition": "Active monitoring",
+    "context": "Active monitoring"
+  },
+  {
+    "term": "component.profile-field-background-check.last-updated-on",
+    "definition": "Last updated on {date}",
+    "context": "Last updated on {date}"
+  },
+  {
+    "term": "component.profile-field-background-check.modify-search",
+    "definition": "Modify search",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.profile-field-background-check.preview-pdf",
+    "definition": "Preview PDF",
+    "context": "Preview PDF"
+  },
+  {
+    "term": "component.profile-field-background-check.remove-entity",
+    "definition": "Remove entity",
+    "context": "Remove entity"
+  },
+  {
+    "term": "component.profile-field-background-check.remove-search",
+    "definition": "Remove search",
+    "context": "Remove search"
+  },
+  {
+    "term": "component.profile-field-background-check.results-monitored-x-months",
+    "definition": "The results are monitored every {count, plural, =1 {month} other {# months}}.",
+    "context": "The results are monitored every {count, plural, =1 {month} other {# months}}."
+  },
+  {
+    "term": "component.profile-field-background-check.results-monitored-x-years",
+    "definition": "The results are monitored every {count, plural, =1 {year} other {# years}}.",
+    "context": "The results are monitored every {count, plural, =1 {year} other {# years}}."
+  },
+  {
+    "term": "component.profile-field-background-check.run-background-check",
+    "definition": "Run background check",
+    "context": "Run background check"
+  },
+  {
+    "term": "component.profile-field-background-check.saved-on",
+    "definition": "Saved on {date}",
+    "context": "Saved on {date}"
+  },
+  {
+    "term": "component.profile-field-background-check.wait-perform-search",
+    "definition": "Please wait while we run the background check...",
+    "context": "Please wait while we run the background check..."
+  },
+  {
     "term": "component.profile-field-file-upload.invalid-attachment-message.file-too-large",
     "definition": "Only attachments of up to {size} are allowed.",
     "context": "Only attachments of up to {size} are allowed."
@@ -6725,6 +6885,21 @@
     "context": "Unarchive profile type"
   },
   {
+    "term": "component.profile-type-referenced-monitoring-dialog.body",
+    "definition": "This property is used for monitoring in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}.",
+    "context": "This property is used for monitoring in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}."
+  },
+  {
+    "term": "component.profile-type-referenced-monitoring-dialog.body-multiple-selection",
+    "definition": "Some selected property is used for monitoring in a {propertyType} property. To continue, please update the configuration first.",
+    "context": "Some selected property is used for monitoring in a {propertyType} property. To continue, please update the configuration first."
+  },
+  {
+    "term": "component.profile-type-referenced-monitoring-dialog.header",
+    "definition": "Property used for ongoing monitoring",
+    "context": "Property used for ongoing monitoring"
+  },
+  {
     "term": "component.profile-type-select.placeholder",
     "definition": "Select {isMulti, select, true{profiles types} other {a profile type}}",
     "context": "Select {isMulti, select, true{profiles types} other {a profile type}}"
@@ -6823,6 +6998,11 @@
     "term": "component.profiles-contact-us-dialog.upgrade-plan-support-message",
     "definition": "Hi, I would like more information about upgrading my plan to access Profiles and Alerts",
     "context": "Hi, I would like more information about upgrading my plan to access Profiles and Alerts"
+  },
+  {
+    "term": "component.property-referenced-alert.referenced-in",
+    "definition": "This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration.",
+    "context": "This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
   },
   {
     "term": "component.property-used-in-pattern-dialog.body",
@@ -9310,6 +9490,26 @@
     "context": "Delete {count, plural, =1 {property} other {# properties}}"
   },
   {
+    "term": "component.use-confirm-disable-monitoring-dialog.confirm",
+    "definition": "confirm",
+    "context": "confirm"
+  },
+  {
+    "term": "component.use-confirm-disable-monitoring-dialog.deactivate",
+    "definition": "Deactivate",
+    "context": "Deactivate"
+  },
+  {
+    "term": "component.use-confirm-disable-monitoring-dialog.description",
+    "definition": "There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?",
+    "context": "There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?"
+  },
+  {
+    "term": "component.use-confirm-disable-monitoring-dialog.header",
+    "definition": "Deactivate ongoing monitoring",
+    "context": "Deactivate ongoing monitoring"
+  },
+  {
     "term": "component.use-confirm-permanently-delete-profile-dialog.description",
     "definition": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it.",
     "context": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
@@ -10600,6 +10800,11 @@
     "context": "{count, plural, =1 {1 member} other {# members}}"
   },
   {
+    "term": "generic.n-months",
+    "definition": "{count, plural, =1 {1 month} other {# months}}",
+    "context": "{count, plural, =1 {1 month} other {# months}}"
+  },
+  {
     "term": "generic.n-months-after",
     "definition": "{count, plural, =1 {1 month} other {# months}} after",
     "context": "{count, plural, =1 {1 month} other {# months}} after"
@@ -10623,6 +10828,11 @@
     "term": "generic.n-results",
     "definition": "{count, plural,=0{No results} =1 {1 result} other {# results}}",
     "context": "{count, plural,=0{No results} =1 {1 result} other {# results}}"
+  },
+  {
+    "term": "generic.n-years",
+    "definition": "{count, plural, =1 {1 year} other {# years}}",
+    "context": "{count, plural, =1 {1 year} other {# years}}"
   },
   {
     "term": "generic.name",
@@ -10873,6 +11083,11 @@
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.profile-type-field-type-background-check",
+    "definition": "Background check",
+    "context": "Background check"
   },
   {
     "term": "generic.profile-type-field-type-date",
@@ -11348,6 +11563,11 @@
     "term": "generic.users",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "generic.x-results",
+    "definition": "{count, plural, =0 {No results} =1 {1 result} other {# results}}",
+    "context": "{count, plural, =0 {No results} =1 {1 result} other {# results}}"
   },
   {
     "term": "generic.yes",
@@ -15243,6 +15463,16 @@
     "term": "util.generate-value-label-excel.header-value",
     "definition": "Internal value",
     "context": "Internal value"
+  },
+  {
+    "term": "util.get-entity-type-label.company",
+    "definition": "Companies",
+    "context": "Companies"
+  },
+  {
+    "term": "util.get-entity-type-label.person",
+    "definition": "Individuals",
+    "context": "Individuals"
   },
   {
     "term": "util.get-open-sanctions-relationship.board-member",

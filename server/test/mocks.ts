@@ -102,6 +102,7 @@ export class MockAnalyticsService implements IAnalyticsService {
 
 @injectable()
 export class MockEmailsService implements IEmailsService {
+  async sendBackgroundCheckMonitoringChangesEmail() {}
   async sendAppSumoActivateAccountEmail() {}
   async sendPetitionMessageEmail() {}
   async sendPetitionReminderEmail() {}
@@ -212,24 +213,52 @@ export class MockDowJonesClient implements IDowJonesClient {
 @injectable()
 export class MockBackgroundCheckService implements IBackgroundCheckService {
   async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
-    return {
-      totalCount: 2,
-      items: [
-        {
-          id: "Q7747",
-          type: "Person",
-          name: "Vladimir Vladimirovich PUTIN",
-          properties: {},
-        },
-        {
-          id: "rupep-company-718",
-          type: "Company",
-          name: "Putin Consulting LLC",
-          properties: {},
-        },
-      ],
-      createdAt: new Date(),
-    };
+    if (query.type === "PERSON") {
+      return {
+        totalCount: 1,
+        items: [
+          {
+            id: "Q7747",
+            type: "Person",
+            name: "Vladimir Vladimirovich PUTIN",
+            properties: {},
+          },
+        ],
+        createdAt: new Date(),
+      };
+    } else if (query.type === "COMPANY") {
+      return {
+        totalCount: 1,
+        items: [
+          {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+        ],
+        createdAt: new Date(),
+      };
+    } else {
+      return {
+        totalCount: 2,
+        items: [
+          {
+            id: "Q7747",
+            type: "Person",
+            name: "Vladimir Vladimirovich PUTIN",
+            properties: {},
+          },
+          {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+        ],
+        createdAt: new Date(),
+      };
+    }
   }
   async entityProfileDetails(entityId: string, userId: number): Promise<EntityDetailsResponse> {
     if (entityId !== "Q7747") {

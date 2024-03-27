@@ -6,6 +6,7 @@ import { isPast, sub } from "date-fns";
 import { isDefined } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 
 interface ProfileFieldDateProps
   extends ProfileFieldProps,
@@ -29,6 +30,8 @@ export function ProfileFieldDate({
     isDefined(field.expiryAlertAheadTime) &&
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
+  const { useReplyAsExpiryDate } = field.options as ProfileTypeFieldOptions<"DATE">;
+
   return (
     <ProfileFieldInputGroup
       {...props}
@@ -40,7 +43,7 @@ export function ProfileFieldDate({
         <DateInput
           {...register(`fields.${index}.content.value`)}
           borderColor="transparent"
-          color={field.options?.useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
+          color={!!useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
           onBlur={(e) => {
             if (e.target.value) {
               showExpiryDateDialog({});

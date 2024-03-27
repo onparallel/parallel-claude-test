@@ -975,6 +975,13 @@ type Mutation {
     message: String
     petitionId: GID!
   ): Petition!
+  copyBackgroundCheckReplyToProfileFieldValue(
+    expiryDate: Date
+    petitionId: GID!
+    profileId: GID!
+    profileTypeFieldId: GID!
+    replyId: GID!
+  ): ProfileFieldValue!
   copyFileReplyToProfileFieldFile(
     expiryDate: Date
     fileReplyIds: [GID!]!
@@ -5456,6 +5463,7 @@ enum ProfileTypeFieldPermissionType {
 }
 
 enum ProfileTypeFieldType {
+  BACKGROUND_CHECK
   DATE
   FILE
   NUMBER

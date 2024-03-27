@@ -3,61 +3,76 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
+  Box,
+  BoxProps,
+  Button,
   ButtonProps,
+  Center,
+  Checkbox,
+  Divider,
   Flex,
-  Heading,
   HStack,
+  Heading,
   MenuDivider,
   MenuItem,
   MenuList,
+  Stack,
+  Text,
   useToast,
 } from "@chakra-ui/react";
-import { ArchiveIcon, CopyIcon, DeleteIcon, EditSimpleIcon, EyeIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  AddIcon,
+  ArchiveIcon,
+  CopyIcon,
+  DeleteIcon,
+  DragHandleIcon,
+  EditIcon,
+  EditSimpleIcon,
+  EyeIcon,
+} from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Card } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
   LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WhenPermission } from "@parallel/components/common/WhenPermission";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
+import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
 import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
+import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
+import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
+import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
+import { useProfileTypeFieldReferencedMonitoringDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedMonitoringDialog";
 import {
+  OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_cloneProfileTypeDocument,
   OrganizationProfileType_deleteProfileTypeFieldDocument,
   OrganizationProfileType_profileTypeDocument,
-  OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_updateProfileTypeDocument,
   OrganizationProfileType_updateProfileTypeFieldDocument,
   OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
   OrganizationProfileType_updateProfileTypeFieldPositionsDocument,
   OrganizationProfileType_userDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
-import { UnwrapPromise } from "@parallel/utils/types";
-import { FormattedMessage, useIntl } from "react-intl";
-
-import { Box, BoxProps, Button, Center, Checkbox, Divider, Stack, Text } from "@chakra-ui/react";
-import { AddIcon, DragHandleIcon, EditIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Card } from "@parallel/components/common/Card";
-import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
-import { WhenPermission } from "@parallel/components/common/WhenPermission";
-import { withPermission } from "@parallel/components/common/withPermission";
-import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
-import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
-import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
-import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
-import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
-import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { getKey, KeyProp } from "@parallel/utils/keyProp";
+import { getReferencedInBackgroundCheck } from "@parallel/utils/getFieldsReferencedInBackgroundCheck";
+import { KeyProp, getKey } from "@parallel/utils/keyProp";
 import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
+import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
 import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSelection, useSelectionState } from "@parallel/utils/useSelectionState";
@@ -73,6 +88,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { identity, noop } from "remeda";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
@@ -200,7 +216,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const handleAddNewProperty = async () => {
     try {
       await showCreateOrUpdateProfileTypeFieldDialog({
-        profileTypeId,
+        profileType,
       });
       refetch();
     } catch {}
@@ -211,6 +227,8 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   );
   const showUsedInPattern = useProfileTypeFieldsInPatternDialog();
   const showConfirmDeleteProfileTypeFieldDialog = useConfirmDeleteProfileTypeFieldDialog();
+  const showProfileTypeFieldReferencedMonitoringDialog =
+    useProfileTypeFieldReferencedMonitoringDialog();
   const handleDeleteProperty = async (profileTypeFieldIds: string[]) => {
     try {
       await deleteProfileTypeField({
@@ -246,6 +264,17 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               profileTypeFieldIds,
               force: true,
             },
+          });
+        } catch {}
+      } else if (isApolloError(e, "FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE")) {
+        try {
+          const properties = getReferencedInBackgroundCheck({
+            profileTypeFields: profileType.fields,
+            profileTypeFieldId: profileTypeFieldIds[0],
+          });
+          await showProfileTypeFieldReferencedMonitoringDialog({
+            properties,
+            profileTypeFieldIds,
           });
         } catch {}
       }
@@ -304,9 +333,12 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
         }
       } else {
         await showCreateOrUpdateProfileTypeFieldDialog({
-          profileTypeId,
+          profileType,
           profileTypeField: fields[0],
         });
+      }
+      if (fields.length === 1 && fields[0].type === "BACKGROUND_CHECK") {
+        refetch();
       }
     } catch {}
   };
@@ -868,11 +900,15 @@ const _fragments = {
         ...useUpdateProfileTypeFieldDialog_ProfileTypeField
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         ...ProfileTypeSettings_ProfileTypeField
+        ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
+        ...getReferencedInBackgroundCheck_ProfileTypeField
       }
       ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
       ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileTypeField}
+      ${useProfileTypeFieldReferencedMonitoringDialog.fragments.ProfileTypeField}
+      ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {

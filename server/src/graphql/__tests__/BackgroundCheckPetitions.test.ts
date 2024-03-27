@@ -11,7 +11,7 @@ import {
 import { toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
-describe("Background Check", () => {
+describe("Background Check - Petitions", () => {
   let mocks: Mocks;
   let testClient: TestClient;
   let container: Container;
@@ -250,7 +250,7 @@ describe("Background Check", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.backgroundCheckEntitySearch).toEqual({ totalCount: 2 });
+      expect(data?.backgroundCheckEntitySearch).toEqual({ totalCount: 1 });
 
       expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
         name: "Vladimir Putin",
@@ -274,14 +274,8 @@ describe("Background Check", () => {
             type: "COMPANY",
           },
           search: {
-            totalCount: 2,
+            totalCount: 1,
             items: [
-              {
-                id: "Q7747",
-                type: "Person",
-                name: "Vladimir Vladimirovich PUTIN",
-                properties: {},
-              },
               {
                 id: "rupep-company-718",
                 type: "Company",

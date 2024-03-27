@@ -13,6 +13,7 @@ import {
   sortBy,
   times,
   uniq,
+  zip,
 } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
@@ -25,8 +26,6 @@ import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
   CreateProfileEvent,
-  CreateProfileFieldFile,
-  CreateProfileFieldValue,
   CreateProfileType,
   CreateProfileTypeField,
   Organization,
@@ -51,7 +50,10 @@ import {
   ProfileUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
-import { profileTypeFieldSelectValues } from "../helpers/profileTypeFieldOptions";
+import {
+  ProfileTypeFieldOptions,
+  profileTypeFieldSelectValues,
+} from "../helpers/profileTypeFieldOptions";
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
@@ -837,14 +839,24 @@ export class ProfileRepository extends BaseRepository {
 
   async updateProfileFieldValue(
     profileId: number,
-    fields: {
+    _fields: {
       profileTypeFieldId: number;
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiryDate?: string | null;
     }[],
-    userId: number,
+    userId: number | null,
   ) {
+    //ignore fields that have no content and no expiry date
+    const fields = _fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
+    if (fields.length === 0) {
+      return {
+        profile: await this.loadProfile.raw(profileId),
+        previousValues: [],
+        currentValues: [],
+      };
+    }
+
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
       const previousValues = await this.from("profile_field_value", t)
@@ -858,7 +870,8 @@ export class ProfileRepository extends BaseRepository {
         .update({ removed_at: this.now(), removed_by_user_id: userId })
         .returning("*");
       const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-      const fieldsWithContent = fields.filter((f) => isDefined(f.content));
+      // fields with undefined content will grab new content from previous values, as it may update only its expiry date
+      const fieldsWithContent = fields.filter((f) => f.content !== null);
       const currentValues =
         fieldsWithContent.length > 0
           ? await this.insert(
@@ -867,7 +880,10 @@ export class ProfileRepository extends BaseRepository {
                 profile_id: profileId,
                 profile_type_field_id: f.profileTypeFieldId,
                 type: f.type,
-                content: f.content,
+                content:
+                  f.content !== undefined
+                    ? f.content
+                    : previousByPtfId[f.profileTypeFieldId]?.content,
                 created_by_user_id: userId,
                 ...(f.expiryDate !== undefined
                   ? { expiry_date: f.expiryDate }
@@ -940,28 +956,28 @@ export class ProfileRepository extends BaseRepository {
     return count > 0;
   }
 
-  async updateProfileFieldValuesByProfileTypeFieldId(
+  async removeProfileFieldValuesExpiryDateByProfileTypeFieldId(
     profileTypeFieldId: number,
-    data: Partial<CreateProfileFieldValue>,
     t?: Knex.Transaction,
   ) {
-    await this.from("profile_field_value", t)
+    return await this.from("profile_field_value", t)
       .where("profile_type_field_id", profileTypeFieldId)
       .whereNull("deleted_at")
       .whereNull("removed_at")
-      .update(data);
+      .whereNotNull("expiry_date")
+      .update({ expiry_date: null }, "*");
   }
 
-  async updateProfileFieldFilesByProfileTypeFieldId(
+  async removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
     profileTypeFieldId: number,
-    data: Partial<CreateProfileFieldFile>,
     t?: Knex.Transaction,
   ) {
-    await this.from("profile_field_file", t)
+    return await this.from("profile_field_file", t)
       .where("profile_type_field_id", profileTypeFieldId)
       .whereNull("deleted_at")
       .whereNull("removed_at")
-      .update(data);
+      .whereNotNull("expiry_date")
+      .update({ expiry_date: null }, "*");
   }
 
   async createProfileFieldFiles(
@@ -1079,9 +1095,10 @@ export class ProfileRepository extends BaseRepository {
       | ProfileFieldFileRemovedEvent<true>
       | ProfileFieldValueUpdatedEvent<true>
     >,
-    user: User,
+    user: User | null,
     t?: Knex.Transaction,
   ) {
+    const profile = (await this.loadProfile(profileId))!;
     const [profileUpdatedEvent] = await this.raw<ProfileUpdatedEvent | null>(
       /* sql */ `
        with cte as (
@@ -1092,13 +1109,14 @@ export class ProfileRepository extends BaseRepository {
       select * from cte where _rank = 1
       and type = 'PROFILE_UPDATED'
       `,
-      [profileId],
+      [profile.id],
       t,
     );
 
     await this.createEvent(events, t);
 
     if (
+      user &&
       profileUpdatedEvent &&
       profileUpdatedEvent.data.user_id === user.id &&
       differenceInSeconds(new Date(), profileUpdatedEvent.created_at) <
@@ -1115,10 +1133,10 @@ export class ProfileRepository extends BaseRepository {
       await this.createEventWithDelay(
         {
           type: "PROFILE_UPDATED",
-          profile_id: profileId,
-          org_id: user.org_id,
+          profile_id: profile.id,
+          org_id: profile.org_id,
           data: {
-            user_id: user.id,
+            user_id: user?.id ?? null,
           },
         },
         this.PROFILE_UPDATED_EVENT_DELAY_SECONDS,
@@ -1709,8 +1727,13 @@ export class ProfileRepository extends BaseRepository {
             .update({
               anonymized_at: this.now(),
               content: this.knex.raw(/* sql */ `
-            content || jsonb_build_object('value', null)
-          `),
+                case "type"
+                  when 'BACKGROUND_CHECK' then 
+                    content || jsonb_build_object('query', null, 'search', null, 'entity', null)
+                  else 
+                    content || jsonb_build_object('value', null)
+                  end
+              `),
             });
         },
         { chunkSize: 200, concurrency: 5 },
@@ -1775,7 +1798,7 @@ export class ProfileRepository extends BaseRepository {
     return mapToObj(rows, (r) => [r.value, r.count]);
   }
 
-  async updateProfileFieldValueContentByProfileFieldTypeId(
+  async updateProfileFieldValueContentByProfileTypeFieldId(
     profileTypeFieldId: number,
     data: {
       old: string;
@@ -1850,5 +1873,161 @@ export class ProfileRepository extends BaseRepository {
         user_id: userId,
       })),
     );
+  }
+
+  async getProfileIdsWithActiveMonitoringByProfileTypeFieldId(profileTypeFieldId: number) {
+    const [profileTypeField] = await this.from("profile_type_field")
+      .where({
+        id: profileTypeFieldId,
+        type: "BACKGROUND_CHECK",
+        deleted_at: null,
+      })
+      .whereRaw(/*sql*/ `options->>'monitoring' is not null`)
+      .select("*");
+
+    if (!profileTypeField) {
+      return [];
+    }
+
+    const { monitoring } = profileTypeField.options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
+
+    const profiles = await this.from("profile")
+      .where({
+        status: "OPEN",
+        profile_type_id: profileTypeField.profile_type_id,
+        deleted_at: null,
+        anonymized_at: null,
+        closed_at: null,
+      })
+      .select("*");
+
+    if (profiles.length === 0) {
+      return [];
+    }
+
+    if (!isDefined(monitoring?.activationCondition)) {
+      // if no activation conditions are provided, return all profiles as every profile will have active monitoring
+      return profiles.map((p) => p.id);
+    }
+
+    // for each profile, get its SELECT values that meets the activation conditions
+    const profileFieldValues: { profile_id: number }[] = await this.from("profile_field_value")
+      .where({
+        removed_at: null,
+        deleted_at: null,
+        profile_type_field_id: monitoring.activationCondition.profileTypeFieldId,
+        type: "SELECT",
+      })
+      .whereIn(
+        "profile_id",
+        profiles.map((p) => p.id),
+      )
+      .whereRaw(/* sql */ `content->>'value' in ?`, [
+        this.sqlIn(monitoring.activationCondition.values),
+      ])
+      .select(this.knex.raw("distinct on (profile_id) profile_id"));
+
+    return profileFieldValues.map((pfv) => pfv.profile_id);
+  }
+
+  /**
+   * @returns every OPEN profile with at least 1 replied BACKGROUND_CHECK field with monitoring rules
+   */
+  private async getProfilesWithBackgroundCheckMonitoringRules(orgId: number) {
+    return await this.raw<Profile>(
+      /* sql */ `
+      select distinct on (p.id) p.*
+      from profile p
+      join profile_field_value pfv 
+        on pfv.profile_id = p.id
+        and pfv.type = 'BACKGROUND_CHECK'
+        and pfv.removed_at is null
+        and pfv.deleted_at is null
+      join profile_type_field ptf 
+        on ptf.id = pfv.profile_type_field_id 
+        and ptf.type = 'BACKGROUND_CHECK' 
+        and ptf."options"->>'monitoring' is not null
+        and ptf.deleted_at is null
+      where
+        p.status = 'OPEN'
+        and p.org_id = ?
+        and p.deleted_at is null;
+    `,
+      [orgId],
+    );
+  }
+
+  async getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
+    orgId: number,
+    requiresRefresh: (
+      pfv: ProfileFieldValue,
+      monitoring: ProfileTypeFieldOptions["BACKGROUND_CHECK"]["monitoring"],
+      selectPfvs: ProfileFieldValue[],
+    ) => boolean,
+  ) {
+    const profiles = await this.getProfilesWithBackgroundCheckMonitoringRules(orgId);
+
+    const result: ProfileFieldValue[] = [];
+
+    for (const profile of profiles) {
+      const profileFieldValues = await this.from("profile_field_value")
+        .where({ profile_id: profile.id, removed_at: null, deleted_at: null })
+        .whereIn("type", ["BACKGROUND_CHECK", "SELECT"])
+        .select("*");
+
+      const [backgroundCheckPfvs, selectPfvs] = partition(
+        profileFieldValues,
+        (pfv) => pfv.type === "BACKGROUND_CHECK",
+      );
+
+      const backgroundCheckPtfs = await this.loadProfileTypeField(
+        backgroundCheckPfvs.map((pfv) => pfv.profile_type_field_id),
+      );
+
+      for (const [pfv, ptf] of zip(backgroundCheckPfvs, backgroundCheckPtfs)) {
+        const options = ptf?.options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
+
+        if (requiresRefresh(pfv, options.monitoring, selectPfvs)) {
+          result.push(pfv);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  async getSubscribedUsersWithReadPermissions(
+    pfvs: Pick<ProfileFieldValue, "profile_id" | "profile_type_field_id">[],
+  ) {
+    const results: Record<string, { profileId: number; profileTypeFieldId: number }[]> = {};
+
+    const profileIds = uniq(pfvs.map((pfv) => pfv.profile_id));
+    const profileSubscriptions = (await this.loadProfileSubscribers(profileIds)).flat();
+
+    for (const [userId, subscriptions] of Object.entries(
+      groupBy(profileSubscriptions, (s) => s.user_id),
+    )) {
+      const userProfiles = subscriptions.map((s) => s.profile_id);
+
+      const userProfileTypeFieldValues = pfvs
+        .filter((pfv) => userProfiles.includes(pfv.profile_id))
+        .map((pfv) => ({
+          userId: parseInt(userId),
+          profileTypeFieldId: pfv.profile_type_field_id,
+          profileId: pfv.profile_id,
+        }));
+
+      const userEffectivePermissions = await this.loadProfileTypeFieldUserEffectivePermission(
+        userProfileTypeFieldValues,
+      );
+
+      const userPfvs = zip(userProfileTypeFieldValues, userEffectivePermissions)
+        .filter(([_, permission]) => isAtLeast(permission, "READ"))
+        .map(([pfv]) => pfv);
+
+      results[userId] = userPfvs.map(pick(["profileId", "profileTypeFieldId"]));
+    }
+
+    return results;
   }
 }

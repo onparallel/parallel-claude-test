@@ -92,7 +92,7 @@ export async function removeProfileTypeFieldType(knex: Knex, fieldName: string) 
   await knex.from("profile_type_field").whereIn("id", fieldIds).delete();
 
   if (fieldIds.length > 0) {
-    await knex
+    const events = await knex
       .from("profile_event")
       .whereIn("type", [
         "PROFILE_FIELD_VALUE_UPDATED",
@@ -103,7 +103,25 @@ export async function removeProfileTypeFieldType(knex: Knex, fieldName: string) 
       .whereRaw(/* sql */ `("data"->>'profile_type_field_id')::int in ?`, [
         knex.raw(...sqlIn(fieldIds, "int")),
       ])
-      .delete();
+      .select("*");
+
+    if (events.length > 0) {
+      await knex
+        .from("user_profile_event_log")
+        .whereIn(
+          "profile_event_id",
+          events.map((e) => e.id),
+        )
+        .delete();
+
+      await knex
+        .from("profile_event")
+        .whereIn(
+          "id",
+          events.map((e) => e.id),
+        )
+        .delete();
+    }
   }
 
   const { rows } = await knex.raw<{

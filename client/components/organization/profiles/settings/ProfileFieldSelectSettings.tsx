@@ -1,0 +1,597 @@
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  Input,
+  Radio,
+  RadioGroup,
+  Stack,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import { DeleteIcon, DragHandleIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
+import {
+  isValidLocalizableUserText,
+  localizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
+import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
+import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
+import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
+import { generateExcel } from "@parallel/utils/generateExcel";
+import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
+import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
+import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
+import { UnwrapArray } from "@parallel/utils/types";
+import { REFERENCE_REGEX } from "@parallel/utils/validation";
+import ASCIIFolder from "fold-to-ascii";
+import { Reorder, useDragControls } from "framer-motion";
+import { nanoid } from "nanoid";
+import { KeyboardEvent, useCallback } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { times, zip } from "remeda";
+import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+
+const DEFAULT_TAG_COLOR = "#E2E8F0";
+
+export type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
+
+export interface SelectOptionValueData extends SelectOptionValue {
+  id: string;
+  existing?: boolean;
+}
+
+export function ProfileFieldSelectSettings({
+  isDisabled,
+  isStandard,
+}: {
+  isDisabled?: boolean;
+  isStandard?: boolean;
+}) {
+  const intl = useIntl();
+
+  const {
+    control,
+    register,
+    watch,
+    setFocus,
+    getValues,
+    formState: { errors },
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"SELECT">>();
+
+  const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
+    name: "options.values",
+    keyName: "key",
+    control,
+    rules: { required: true, minLength: 1, maxLength: 1000 },
+    shouldUnregister: true,
+  });
+
+  const handleRemoveOption = useCallback((index: number) => {
+    remove(index);
+  }, []);
+
+  const showOptionsWithColors = watch("options.showOptionsWithColors");
+  const listingType = watch("options.listingType");
+  const name = watch("name");
+
+  const showImportSelectOptionsDialog = useImportSelectOptionsDialog();
+  const handleImportOptions = async () => {
+    try {
+      const values = getValues("options.values");
+      await showImportSelectOptionsDialog({
+        hasOptions: values ? values.length > 0 : false,
+        onDownloadEmptyOptions: async () => {
+          await generateValueLabelExcel(intl, {
+            fileName: sanitizeFilenameWithSuffix(
+              intl.formatMessage({
+                id: "component.import-options-settings-row.default-file-name",
+                defaultMessage: "options",
+              }),
+              ".xlsx",
+            ),
+            values: [],
+            labels: [],
+          });
+        },
+        onDownloadExistingOptions: async () => {
+          const values = getValues("options.values");
+          await generateValueLabelExcel(intl, {
+            fileName: sanitizeFilenameWithSuffix(
+              localizableUserTextRender({
+                value: name,
+                intl,
+                default: intl.formatMessage({
+                  id: "component.import-options-settings-row.default-file-name",
+                  defaultMessage: "options",
+                }),
+              }),
+              ".xlsx",
+            ),
+            values: values?.map((field) => field.value) ?? [],
+            labels: values?.map((field) => field.label) ?? [],
+          });
+        },
+        onExcelDrop: async (file) => {
+          const options = await parseProfileSelectOptionsFromExcel(file);
+          if (options.length > 0) {
+            replace(
+              options.map(({ label, value }) => ({
+                id: nanoid(),
+                label,
+                value,
+                color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+              })),
+            );
+          } else {
+            // show empty inputs when uploaded file is empty
+            replace([{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }]);
+          }
+        },
+      });
+    } catch {}
+  };
+
+  return (
+    <Stack spacing={4}>
+      <FormControl>
+        <FormLabel fontWeight={400}>
+          <FormattedMessage
+            id="component.create-or-update-property-dialog.type-of-options"
+            defaultMessage="Options:"
+          />
+        </FormLabel>
+        <Controller
+          name="options.listingType"
+          defaultValue="CUSTOM"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup
+              onChange={(value) => onChange(value)}
+              value={value}
+              as={HStack}
+              spacing={2}
+              isDisabled={isDisabled || isStandard}
+            >
+              <Radio value="CUSTOM">
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.custom-list"
+                  defaultMessage="Custom list"
+                />
+              </Radio>
+              <Radio value="STANDARD">
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.standard-list"
+                  defaultMessage="Standard list"
+                />
+              </Radio>
+            </RadioGroup>
+          )}
+        />
+      </FormControl>
+      {listingType === "STANDARD" ? (
+        <FormControl
+          isInvalid={!!errors.options?.standardList}
+          isDisabled={isDisabled || isStandard}
+        >
+          <Controller
+            name="options.standardList"
+            rules={{
+              required: true,
+            }}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Box>
+                <StandardListSelect onChange={(value) => onChange(value)} value={value ?? null} />
+              </Box>
+            )}
+          />
+        </FormControl>
+      ) : (
+        <>
+          <FormControl as={HStack} spacing={0} isDisabled={isDisabled}>
+            <Checkbox {...register("options.showOptionsWithColors")}>
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.enable-colored-options"
+                defaultMessage="Enable colored options"
+              />
+            </Checkbox>
+            <HelpPopover>
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.enable-colored-options-help"
+                defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
+              />
+            </HelpPopover>
+          </FormControl>
+          <Box maxHeight="360px" overflowY="auto">
+            <Table variant="unstyled">
+              <Thead>
+                <Tr>
+                  <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.options-label"
+                      defaultMessage="Label"
+                    />
+                  </Th>
+                  <Th paddingInline={1} paddingBlock={2} width="50%">
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.options-value-label"
+                      defaultMessage="Internal value"
+                    />
+                    <HelpPopover position="relative" top="-1px">
+                      <Text>
+                        <FormattedMessage
+                          id="component.create-or-update-property-dialog.options-value-label-help"
+                          defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
+                        />
+                      </Text>
+                    </HelpPopover>
+                  </Th>
+                  {showOptionsWithColors ? (
+                    <Th paddingInline={1} paddingBlock={2} minWidth="158px">
+                      <FormattedMessage
+                        id="component.manage-tags-dialog.color-label"
+                        defaultMessage="Color"
+                      />
+                    </Th>
+                  ) : null}
+                  <Th paddingInline={1} paddingBlock={2}></Th>
+                </Tr>
+              </Thead>
+              <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
+                {fields.map((field, index) => {
+                  return (
+                    <ProfileFieldSelectOption
+                      key={field.id}
+                      index={index}
+                      field={field}
+                      fields={fields}
+                      onRemove={handleRemoveOption}
+                      canRemoveOption={fields.length > 1}
+                      isDisabled={isDisabled}
+                      showOptionsWithColors={showOptionsWithColors ?? false}
+                    />
+                  );
+                })}
+              </Reorder.Group>
+            </Table>
+          </Box>
+          <HStack>
+            <Button
+              leftIcon={<PlusCircleIcon />}
+              variant="outline"
+              isDisabled={fields.length >= 1000 || isDisabled}
+              onClick={() => {
+                append({
+                  id: nanoid(),
+                  label: { [intl.locale]: "" },
+                  value: "",
+                  color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+                });
+                setTimeout(() => setFocus(`options.values.${fields.length}.label`));
+              }}
+            >
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.add-option-button"
+                defaultMessage="Add option"
+              />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleImportOptions}
+              isDisabled={isDisabled || isStandard}
+            >
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.import-options-button"
+                defaultMessage="Import options..."
+              />
+            </Button>
+          </HStack>
+        </>
+      )}
+    </Stack>
+  );
+}
+
+function ProfileFieldSelectOption({
+  index,
+  field,
+  fields,
+  onRemove,
+  canRemoveOption,
+  showOptionsWithColors,
+  isDisabled,
+}: {
+  index: number;
+  field: SelectOptionValueData;
+  fields: SelectOptionValueData[];
+  onRemove: (index: number) => void;
+  canRemoveOption: boolean;
+  showOptionsWithColors: boolean;
+  isDisabled?: boolean;
+}) {
+  const intl = useIntl();
+  const isUpdating = field.existing ?? false;
+  const isOptionDisabled = isDisabled || (field.isStandard ?? false);
+  const {
+    control,
+    formState: { errors, touchedFields },
+    register,
+    setValue,
+    setFocus,
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"SELECT">>();
+
+  const controls = useDragControls();
+
+  const onKeyDownHandler =
+    (property: "label" | "value") => (event: KeyboardEvent<HTMLInputElement>) => {
+      switch (event.key) {
+        case "ArrowDown":
+          if (index < fields.length - 1) {
+            event.preventDefault();
+            setFocus(`options.values.${index + 1}.${property}`);
+          }
+          break;
+        case "ArrowUp":
+          if (index > 0) {
+            event.preventDefault();
+            setFocus(`options.values.${index - 1}.${property}`);
+          }
+          break;
+        case "ArrowLeft": {
+          const input = event.target as HTMLInputElement;
+          if (
+            input.selectionStart === input.selectionEnd &&
+            input.selectionStart === 0 &&
+            property === "value"
+          ) {
+            event.preventDefault();
+            setFocus(`options.values.${index}.label`);
+          }
+          break;
+        }
+        case "ArrowRight": {
+          const input = event.target as HTMLInputElement;
+          if (
+            input.selectionStart === input.selectionEnd &&
+            input.selectionStart === input.value.length &&
+            property === "label"
+          ) {
+            event.preventDefault();
+            setFocus(`options.values.${index}.value`);
+          }
+          break;
+        }
+      }
+    };
+
+  return (
+    <Reorder.Item
+      as={Tr as any}
+      value={field}
+      dragListener={false}
+      dragControls={controls}
+      {...{
+        _hover: {
+          ".drag-handle": {
+            opacity: 1,
+          },
+        },
+        backgroundColor: "white",
+        position: "relative",
+      }}
+    >
+      <FormControl
+        as={Td}
+        verticalAlign="top"
+        paddingInlineEnd={1}
+        paddingBlock={2}
+        width="50%"
+        isInvalid={!!errors.options?.values?.[index]?.label}
+        isDisabled={isOptionDisabled}
+      >
+        <Box
+          className="drag-handle"
+          position="absolute"
+          top="50%"
+          left={0}
+          paddingInline={1}
+          height="38px"
+          transform="translateY(-50%)"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          cursor="grab"
+          color="gray.400"
+          opacity={0}
+          _hover={{ color: "gray.700" }}
+          aria-label={intl.formatMessage({
+            id: "generic.drag-to-sort",
+            defaultMessage: "Drag to sort",
+          })}
+          onPointerDown={(e) => controls.start(e)}
+        >
+          <DragHandleIcon role="presentation" pointerEvents="none" boxSize={3} />
+        </Box>
+        <Controller
+          name={`options.values.${index}.label` as const}
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              isValidLocalizableUserText,
+            },
+          }}
+          render={({ field: { ref, onChange, ...field } }) => (
+            <LocalizableUserTextInput
+              {...field}
+              inputRef={ref}
+              inputProps={{
+                onKeyDown: onKeyDownHandler("label"),
+              }}
+              onChange={(value) => {
+                onChange(value);
+
+                if (!isUpdating && !touchedFields.options?.values?.[index]?.value) {
+                  const alias = localizableUserTextRender({
+                    value,
+                    intl,
+                    default: "",
+                  });
+                  setValue(
+                    `options.values.${index}.value`,
+                    ASCIIFolder.foldReplacing(alias.trim().toLowerCase()) // replace all non ASCII chars with their ASCII equivalent
+                      .replace(/\s/g, "_") // replace spaces with _
+                      .slice(0, 50), // max 50 chars
+                  );
+                }
+              }}
+            />
+          )}
+        />
+        <FormErrorMessage>
+          <FormattedMessage
+            id="generic.required-field-error"
+            defaultMessage="The field is required"
+          />
+        </FormErrorMessage>
+      </FormControl>
+      <FormControl
+        as={Td}
+        verticalAlign="top"
+        paddingInline={1}
+        paddingBlock={2}
+        width="50%"
+        isInvalid={!!errors.options?.values?.[index]?.value}
+        isDisabled={isUpdating || isOptionDisabled}
+      >
+        <Input
+          {...register(`options.values.${index}.value` as const, {
+            required: true,
+            pattern: REFERENCE_REGEX,
+            maxLength: 50,
+
+            validate: {
+              isAvailable: (value, { options }) => {
+                return !options.values?.some(({ value: v }, i) => v === value && i < index);
+              },
+            },
+          })}
+          onKeyDown={onKeyDownHandler("value")}
+          maxLength={50}
+        />
+        <FormErrorMessage>
+          {errors?.options?.values?.[index]?.value?.type === "isAvailable" ? (
+            <FormattedMessage
+              id="component.create-or-update-property-dialog.unique-identifier-alredy-exists"
+              defaultMessage="This identifier is already in use"
+            />
+          ) : (
+            <FormattedMessage
+              id="component.create-or-update-property-dialog.options-alias-error"
+              defaultMessage="The field is required and only accepts up to {max} letters, numbers or _"
+              values={{ max: 50 }}
+            />
+          )}
+        </FormErrorMessage>
+      </FormControl>
+      {showOptionsWithColors ? (
+        <FormControl
+          as={Td}
+          verticalAlign="top"
+          paddingInline={1}
+          paddingBlock={2}
+          minWidth="158px"
+          isDisabled={isOptionDisabled}
+        >
+          <Controller
+            name={`options.values.${index}.color` as const}
+            control={control}
+            rules={{ required: showOptionsWithColors }}
+            defaultValue={DEFAULT_TAG_COLOR}
+            render={({ field }) => <TagColorSelect {...field} value={field.value ?? null} />}
+          />
+        </FormControl>
+      ) : null}
+      <Td verticalAlign="top" paddingInline={1} paddingBlock={2}>
+        <IconButtonWithTooltip
+          isDisabled={!canRemoveOption || isOptionDisabled}
+          onClick={() => onRemove(index)}
+          icon={<DeleteIcon />}
+          variant="outline"
+          label={intl.formatMessage({
+            id: "component.create-or-update-property-dialog.remove-option-button",
+            defaultMessage: "Remove option",
+          })}
+        />
+      </Td>
+    </Reorder.Item>
+  );
+}
+
+async function generateValueLabelExcel(
+  intl: IntlShape,
+  {
+    fileName,
+    values,
+    labels,
+  }: {
+    fileName: string;
+    values: SelectOptionValue["value"][];
+    labels: SelectOptionValue["label"][];
+  },
+) {
+  return await generateExcel({
+    fileName,
+    columns: [
+      {
+        key: "value",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-value",
+            defaultMessage: "Internal value",
+          }),
+          fontWeight: "bold",
+        },
+      },
+      {
+        key: "label_en",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-label-english",
+            defaultMessage: "Label (English)",
+          }),
+          fontWeight: "bold",
+        },
+      },
+      {
+        key: "label_es",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-label-spanish",
+            defaultMessage: "Label (Spanish)",
+          }),
+          fontWeight: "bold",
+        },
+      },
+    ],
+    rows: zip(values, labels ?? times(values.length, () => null)).map(([value, label]) => ({
+      value,
+      label_es: label?.es ?? null,
+      label_en: label?.en ?? null,
+    })),
+  });
+}

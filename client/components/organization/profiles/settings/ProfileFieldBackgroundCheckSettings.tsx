@@ -1,0 +1,632 @@
+import { gql } from "@apollo/client";
+import {
+  Box,
+  Center,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  HStack,
+  Stack,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import {
+  LocalizableUserTextRender,
+  localizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
+import {
+  SimpleOption,
+  SimpleSelect,
+  useSimpleSelectOptions,
+} from "@parallel/components/common/SimpleSelect";
+import {
+  CreateProfileTypeFieldInput,
+  ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment,
+  ProfileFieldBackgroundCheckSettings_ProfileTypeFragment,
+} from "@parallel/graphql/__types";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
+import { useEffect, useState } from "react";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import {
+  CreateOrUpdateProfileTypeFieldDialogData,
+  useCreateOrUpdateProfileTypeFieldDialog,
+} from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { Maybe } from "@parallel/utils/types";
+import { isDefined } from "remeda";
+
+type FrequencyFixedOption =
+  | "5_YEARS"
+  | "3_YEARS"
+  | "2_YEARS"
+  | "1_YEARS"
+  | "9_MONTHS"
+  | "6_MONTHS"
+  | "3_MONTHS"
+  | "1_MONTHS";
+
+export interface ProfileFieldBackgroundCheckSettings {
+  hasMonitoring?: boolean;
+  monitoring?: Maybe<{
+    activationCondition?: Maybe<{
+      profileTypeFieldId: string;
+      values: string[];
+    }>;
+    searchFrequency:
+      | {
+          type: "FIXED";
+          frequency: FrequencyFixedOption;
+        }
+      | {
+          type: "VARIABLE";
+          profileTypeFieldId: string;
+          options: {
+            frequency: FrequencyFixedOption;
+            value: string;
+          }[];
+        };
+  }>;
+}
+
+const SUGESTED_BUSINESS_RELATIONSHIP = {
+  type: "SELECT",
+  name: {
+    es: "Relación de negocio",
+    en: "Business relationship",
+  },
+  options: {
+    values: [
+      {
+        label: {
+          es: "Relación continuada",
+          en: "Ongoing relationship",
+        },
+        color: "#E2E8F0",
+        value: "relationship",
+      },
+      {
+        label: {
+          es: "Transacción puntual",
+          en: "One-time transaction",
+        },
+        color: "#E2E8F0",
+        value: "transaction",
+      },
+    ],
+  },
+} as CreateProfileTypeFieldInput;
+
+const SUGGESTED_RISK_LEVEL = {
+  type: "SELECT",
+  name: {
+    es: "Nivel de riesgo",
+    en: "Risk level",
+  },
+  options: {
+    showOptionsWithColors: true,
+    values: [
+      {
+        color: "#D5E7DE",
+        label: {
+          es: "Riesgo bajo",
+          en: "Low risk",
+        },
+        value: "low_risk",
+      },
+      {
+        color: "#FEEBC8",
+        label: {
+          es: "Riesgo medio",
+          en: "Medium risk",
+        },
+        value: "medium_risk",
+      },
+      {
+        color: "#FED7D7",
+        label: {
+          es: "Riesgo alto",
+          en: "High risk",
+        },
+        value: "high_risk",
+      },
+      {
+        color: "#E2E8F0",
+        label: {
+          es: "Riesgo muy alto",
+          en: "Very high risk",
+        },
+        value: "very_high_risk",
+      },
+    ],
+  },
+} as CreateProfileTypeFieldInput;
+
+export function ProfileFieldBackgroundCheckSettings({
+  profileType,
+  isDisabled,
+}: {
+  profileType: ProfileFieldBackgroundCheckSettings_ProfileTypeFragment;
+  isDisabled?: boolean;
+}) {
+  const intl = useIntl();
+
+  const [profileTypeFields, setProfileTypeFields] = useState(profileType.fields);
+
+  const {
+    register,
+    watch,
+    control,
+    formState: { errors },
+    setValue,
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"BACKGROUND_CHECK">>();
+  const hasMonitoring = watch("options.hasMonitoring");
+  const monitoring = watch("options.monitoring");
+  const hasActivationCondition = isDefined(monitoring?.activationCondition);
+
+  function handleActivationConditionChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setValue(
+      "options.monitoring.activationCondition",
+      event.target.checked
+        ? {
+            profileTypeFieldId: profileTypeFields.find((f) => f.type === "SELECT")?.id ?? "",
+            values: [],
+          }
+        : null,
+    );
+  }
+
+  const conditionalField = profileTypeFields.find(
+    (f) => f.id === monitoring?.activationCondition?.profileTypeFieldId,
+  );
+
+  const conditionalFieldOptions = useSimpleSelectOptions(
+    (intl) => {
+      if (!conditionalField) {
+        return [];
+      }
+      return (conditionalField!.options as ProfileTypeFieldOptions<"SELECT">).values.map(
+        ({ label, value }) => ({
+          label: localizableUserTextRender({
+            value: label,
+            intl,
+            default: intl.formatMessage({
+              id: "generic.unnamed-profile-type-field",
+              defaultMessage: "Unnamed property",
+            }),
+          }),
+          value,
+        }),
+      );
+    },
+    [conditionalField?.id],
+  );
+
+  const searchFrequencyProfileField = profileTypeFields.find(
+    (f) =>
+      f.id ===
+      (monitoring?.searchFrequency.type === "VARIABLE"
+        ? monitoring.searchFrequency.profileTypeFieldId
+        : null),
+  );
+
+  const searchFrequencyTypes = useSimpleSelectOptions(
+    (intl) => [
+      {
+        label: intl.formatMessage({
+          id: "component.profile-field-background-check-settings.fixed-search-frequency",
+          defaultMessage: "Fixed",
+        }),
+        value: "FIXED",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.profile-field-background-check-settings.variable-search-frequency",
+          defaultMessage: "Based on options",
+        }),
+        value: "VARIABLE",
+      },
+    ],
+    [],
+  );
+
+  const searchFrequencyFixedOptions = useSimpleSelectOptions<FrequencyFixedOption>(
+    (intl) => [
+      ...([5, 3, 2, 1] as const).map((count) => ({
+        value: `${count}_YEARS` as const,
+        label: intl.formatMessage(
+          {
+            id: "generic.n-years",
+            defaultMessage: "{count, plural, =1 {1 year} other {# years}}",
+          },
+          { count },
+        ),
+      })),
+      ...([9, 6, 3, 1] as const).map((count) => ({
+        value: `${count}_MONTHS` as const,
+        label: intl.formatMessage(
+          {
+            id: "generic.n-months",
+            defaultMessage: "{count, plural, =1 {1 month} other {# months}}",
+          },
+          { count },
+        ),
+      })),
+    ],
+    [],
+  );
+
+  const showCreateOrUpdateProfileTypeFieldDialog = useCreateOrUpdateProfileTypeFieldDialog();
+
+  const getDefaultSelectProfileField = (name: string) =>
+    ({
+      type: "SELECT",
+      name: {
+        [intl.locale]: name,
+      },
+      options: {
+        values: [{ color: "#E2E8F0", label: { [intl.locale]: "" }, value: "" }],
+        showOptionsWithColors: false,
+      },
+    }) as CreateProfileTypeFieldInput;
+
+  return (
+    <Stack spacing={4}>
+      <FormControl as={HStack} isDisabled={isDisabled}>
+        <Stack flex={1} spacing={1}>
+          <FormLabel margin={0}>
+            <FormattedMessage
+              id="component.profile-field-background-check-settings.monitoring-label"
+              defaultMessage="Ongoing Monitoring"
+            />
+          </FormLabel>
+          <FormHelperText margin={0}>
+            <FormattedMessage
+              id="component.profile-field-background-check-settings.monitoring-description"
+              defaultMessage="Monitor search results to detect relevant changes."
+            />
+          </FormHelperText>
+        </Stack>
+        <Center>
+          <Switch {...register("options.hasMonitoring")} />
+        </Center>
+      </FormControl>
+      {hasMonitoring ? (
+        <>
+          <Stack>
+            <FormControl isDisabled={isDisabled}>
+              <Checkbox
+                colorScheme="primary"
+                onChange={handleActivationConditionChange}
+                isChecked={hasActivationCondition}
+              >
+                <HStack alignItems="center" spacing={0}>
+                  <FormattedMessage
+                    id="component.profile-field-background-check-settings.activation-conditions-label"
+                    defaultMessage="Add activation conditions"
+                  />
+                  <HelpPopover>
+                    <FormattedMessage
+                      id="component.profile-field-background-check-settings.activation-conditions-help"
+                      defaultMessage="Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
+                    />
+                  </HelpPopover>
+                </HStack>
+              </Checkbox>
+            </FormControl>
+            {hasActivationCondition ? (
+              <Stack background="gray.100" paddingX={3} paddingY={2}>
+                <HStack>
+                  <Text as="span" whiteSpace="nowrap">
+                    <FormattedMessage
+                      id="component.profile-field-background-check-settings.activate-when"
+                      defaultMessage="Activate when"
+                    />
+                  </Text>
+                  <FormControl
+                    isInvalid={
+                      !!errors.options?.monitoring?.activationCondition?.profileTypeFieldId
+                    }
+                    isDisabled={isDisabled}
+                  >
+                    <Controller
+                      name="options.monitoring.activationCondition.profileTypeFieldId"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <ProfileTypeFieldSelect
+                          filterFields={(f) => f.type === "SELECT"}
+                          onCreateProperty={async (name, isSuggested) => {
+                            try {
+                              const { profileTypeField } =
+                                await showCreateOrUpdateProfileTypeFieldDialog({
+                                  profileType: profileType as any,
+                                  profileTypeField: isSuggested
+                                    ? SUGESTED_BUSINESS_RELATIONSHIP
+                                    : getDefaultSelectProfileField(name),
+                                  disableFieldTypeSelect: true,
+                                });
+                              setProfileTypeFields((profileTypeFields) => [
+                                ...profileTypeFields,
+                                profileTypeField,
+                              ]);
+                              onChange(profileTypeField.id);
+                            } catch {}
+                          }}
+                          suggestedPropertyName={intl.formatMessage({
+                            id: "component.profile-field-background-check-settings.business-relationship",
+                            defaultMessage: "Business relationship",
+                          })}
+                          fields={profileTypeFields}
+                          value={profileTypeFields.find((f) => f.id === value) ?? null}
+                          onChange={(field) => {
+                            onChange(field?.id ?? null);
+                          }}
+                        />
+                      )}
+                    />
+                  </FormControl>
+                </HStack>
+                <HStack>
+                  <Text as="span" whiteSpace="nowrap">
+                    <FormattedMessage
+                      id="component.profile-field-background-check-settings.is-one-of"
+                      defaultMessage="is one of"
+                    />
+                  </Text>
+                  <Box flex="1" minW={0}>
+                    <FormControl
+                      isDisabled={conditionalFieldOptions.length === 0 || isDisabled}
+                      isInvalid={
+                        !!errors.options?.monitoring?.activationCondition?.values &&
+                        conditionalFieldOptions.length > 0
+                      }
+                    >
+                      <Controller
+                        name="options.monitoring.activationCondition.values"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <SimpleSelect
+                            options={conditionalFieldOptions}
+                            isMulti
+                            placeholder={intl.formatMessage({
+                              id: "generic.select-an-option",
+                              defaultMessage: "Select an option",
+                            })}
+                            {...field}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Box>
+                </HStack>
+              </Stack>
+            ) : null}
+          </Stack>
+          <Stack>
+            <HStack align="flex-end">
+              <FormControl
+                isInvalid={!!errors.options?.monitoring?.searchFrequency?.type}
+                isDisabled={isDisabled}
+              >
+                <Flex alignItems="center" marginBottom={2}>
+                  <FormLabel fontWeight={400} margin={0}>
+                    <FormattedMessage
+                      id="component.profile-field-background-check-settings.search-frequency-label"
+                      defaultMessage="Search frequency"
+                    />
+                  </FormLabel>
+                  <HelpPopover>
+                    <FormattedMessage
+                      id="component.profile-field-background-check-settings.search-frequency-help"
+                      defaultMessage="Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+                    />
+                  </HelpPopover>
+                </Flex>
+                <Controller
+                  name="options.monitoring.searchFrequency.type"
+                  defaultValue="FIXED"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => <SimpleSelect options={searchFrequencyTypes} {...field} />}
+                />
+              </FormControl>
+              {monitoring?.searchFrequency.type !== "VARIABLE" ? (
+                <FormControl
+                  isInvalid={!!(errors.options?.monitoring?.searchFrequency as any)?.frequency}
+                  isDisabled={isDisabled}
+                >
+                  <Controller
+                    name="options.monitoring.searchFrequency.frequency"
+                    defaultValue="3_YEARS"
+                    control={control}
+                    rules={{ required: true }}
+                    shouldUnregister={true}
+                    render={({ field }) => (
+                      <SimpleSelect
+                        {...field}
+                        options={searchFrequencyFixedOptions}
+                        value={field.value ?? null}
+                      />
+                    )}
+                  />
+                </FormControl>
+              ) : null}
+            </HStack>
+            {monitoring?.searchFrequency.type === "VARIABLE" ? (
+              <>
+                <FormControl
+                  isInvalid={
+                    !!(errors.options?.monitoring?.searchFrequency as any)?.profileTypeFieldId
+                  }
+                  isDisabled={isDisabled}
+                >
+                  <Controller
+                    name="options.monitoring.searchFrequency.profileTypeFieldId"
+                    control={control}
+                    rules={{ required: true }}
+                    shouldUnregister={true}
+                    render={({ field: { value, onChange } }) => (
+                      <ProfileTypeFieldSelect
+                        filterFields={(f) => f.type === "SELECT"}
+                        onCreateProperty={async (name, isSuggested) => {
+                          try {
+                            const { profileTypeField } =
+                              await showCreateOrUpdateProfileTypeFieldDialog({
+                                profileType: profileType as any,
+                                profileTypeField: isSuggested
+                                  ? SUGGESTED_RISK_LEVEL
+                                  : getDefaultSelectProfileField(name),
+                                disableFieldTypeSelect: true,
+                              });
+                            setProfileTypeFields((profileTypeFields) => [
+                              ...profileTypeFields,
+                              profileTypeField,
+                            ]);
+                            onChange(profileTypeField.id);
+                          } catch {}
+                        }}
+                        suggestedPropertyName={intl.formatMessage({
+                          id: "component.profile-field-background-check-settings.risk-level",
+                          defaultMessage: "Risk level",
+                        })}
+                        fields={profileTypeFields}
+                        value={profileTypeFields.find((f) => f.id === value) ?? null}
+                        onChange={(field) => {
+                          onChange(field?.id ?? null);
+                        }}
+                      />
+                    )}
+                  />
+                </FormControl>
+                {searchFrequencyProfileField ? (
+                  <SearchFrequencyOptions
+                    searchFrequencyProfileField={searchFrequencyProfileField}
+                    searchFrequencyFixedOptions={searchFrequencyFixedOptions}
+                    isDisabled={isDisabled}
+                  />
+                ) : null}
+              </>
+            ) : null}
+          </Stack>
+        </>
+      ) : null}
+    </Stack>
+  );
+}
+
+function SearchFrequencyOptions({
+  searchFrequencyProfileField,
+  searchFrequencyFixedOptions,
+  isDisabled,
+}: {
+  searchFrequencyProfileField: ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment;
+  searchFrequencyFixedOptions: SimpleOption<FrequencyFixedOption>[];
+  isDisabled?: boolean;
+}) {
+  const intl = useIntl();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"BACKGROUND_CHECK">>();
+
+  const { fields: searchFrequencyOptions, replace } = useFieldArray({
+    name: "options.monitoring.searchFrequency.options",
+    control,
+    shouldUnregister: true,
+  });
+
+  useEffect(() => {
+    if (searchFrequencyProfileField) {
+      replace(
+        (searchFrequencyProfileField.options as ProfileTypeFieldOptions<"SELECT">).values.map(
+          ({ value }) => ({
+            value,
+            frequency:
+              searchFrequencyOptions.find((f) => f.value === value)?.frequency ?? "1_MONTHS",
+          }),
+        ),
+      );
+    }
+  }, [searchFrequencyProfileField?.id]);
+
+  if (!searchFrequencyOptions.length) return null;
+
+  return (
+    <Stack background="gray.100" paddingX={3} paddingY={2}>
+      {searchFrequencyOptions.map(({ id, value }, index) => {
+        const { label } =
+          (searchFrequencyProfileField?.options as ProfileTypeFieldOptions<"SELECT">)?.values.find(
+            (f) => f.value === value,
+          ) ?? {};
+
+        if (!label) return null;
+
+        return (
+          <FormControl
+            key={id}
+            isInvalid={
+              !!(errors.options?.monitoring?.searchFrequency as any)?.options?.[index]?.frequency
+            }
+            isDisabled={isDisabled}
+          >
+            <HStack>
+              <FormLabel fontWeight={400} margin={0} flex="1" noOfLines={3}>
+                <LocalizableUserTextRender
+                  value={label}
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile-type-field",
+                    defaultMessage: "Unnamed property",
+                  })}
+                />
+                :
+              </FormLabel>
+              <Box flex="2">
+                <Controller
+                  name={`options.monitoring.searchFrequency.options.${index}.frequency`}
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <SimpleSelect
+                      options={searchFrequencyFixedOptions}
+                      placeholder={intl.formatMessage({
+                        id: "component.profile-field-background-check-settings.select-frequency",
+                        defaultMessage: "Choose a frequency",
+                      })}
+                      {...field}
+                    />
+                  )}
+                />
+              </Box>
+            </HStack>
+          </FormControl>
+        );
+      })}
+    </Stack>
+  );
+}
+
+ProfileFieldBackgroundCheckSettings.fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      options
+      ...ProfileTypeFieldSelect_ProfileTypeField
+    }
+    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
+  `,
+  ProfileType: gql`
+    fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
+      id
+      fields {
+        ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+      }
+    }
+  `,
+};

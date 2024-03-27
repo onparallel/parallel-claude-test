@@ -1,7 +1,9 @@
 import { Container, inject, injectable } from "inversify";
+import { isDefined } from "remeda";
 import { Readable } from "stream";
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
 import { IPrinter, PRINTER } from "./Printer";
+import { IRedis, REDIS } from "./Redis";
 import {
   BACKGROUND_CHECK_CLIENT,
   EntityDetailsResponse,
@@ -9,7 +11,6 @@ import {
   EntitySearchResponse,
   IBackgroundCheckClient,
 } from "./background-check-clients/BackgroundCheckClient";
-import { IRedis, REDIS } from "./Redis";
 
 interface EntityDetailsPdfResponse {
   mime_type: string;
@@ -18,7 +19,7 @@ interface EntityDetailsPdfResponse {
 
 export interface IBackgroundCheckService {
   entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse>;
-  entityProfileDetails(entityId: string, userId: number): Promise<EntityDetailsResponse>;
+  entityProfileDetails(entityId: string, userId?: number): Promise<EntityDetailsResponse>;
   entityProfileDetailsPdf(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
@@ -46,7 +47,11 @@ export class BackgroundCheckService implements IBackgroundCheckService {
     return await this.getClient().entitySearch(query);
   }
 
-  async entityProfileDetails(entityId: string, userId: number): Promise<EntityDetailsResponse> {
+  async entityProfileDetails(entityId: string, userId?: number): Promise<EntityDetailsResponse> {
+    if (!isDefined(userId)) {
+      return await this.getClient().entityProfileDetails(entityId);
+    }
+
     // look inside Redis cache before making the API call
     const redisKey = `BackgroundCheck:${userId}:${entityId}`;
     const redisCached = await this.redis.get(redisKey);

@@ -139,6 +139,9 @@ export function buildConfig() {
       "expiring-properties": {
         rule: process.env.WORKERS_EXPIRING_PROPERTIES_RULE!,
       },
+      "background-check-monitor": {
+        rule: process.env.WORKERS_BACKGROUND_CHECK_MONITOR_RULE!,
+      },
     },
     imageProxy: {
       secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,

@@ -843,6 +843,7 @@ export interface Mutation {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
+  copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
    *
@@ -1368,6 +1369,14 @@ export interface MutationcompletePetitionArgs {
   additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationcopyBackgroundCheckReplyToProfileFieldValueArgs {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }
 
 export interface MutationcopyFileReplyToProfileFieldFileArgs {
@@ -4420,6 +4429,7 @@ export interface ProfileTypeFieldPermission {
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType =
+  | "BACKGROUND_CHECK"
   | "DATE"
   | "FILE"
   | "NUMBER"
@@ -5928,6 +5938,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -6981,6 +6992,7 @@ export type AdminSettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7021,6 +7033,7 @@ export type AppLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7094,6 +7107,7 @@ export type DevelopersLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7163,6 +7177,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7383,6 +7398,7 @@ export type PetitionLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7423,6 +7439,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7463,6 +7480,7 @@ export type SidebarLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7504,6 +7522,7 @@ export type UserGroupLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -7607,6 +7626,7 @@ export type UserSettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -8663,6 +8683,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -8721,6 +8742,22 @@ export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
   isStandard: boolean;
+};
+
+export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+    alias?: string | null;
+    options: { [key: string]: any };
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
+    isStandard: boolean;
+  }>;
 };
 
 export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutationVariables =
@@ -8876,6 +8913,26 @@ export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   id: string;
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
+};
+
+export type ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+};
+
+export type ProfileFieldBackgroundCheckSettings_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+  }>;
 };
 
 export type PetitionAccessTable_PetitionFragment = {
@@ -19651,10 +19708,10 @@ export type ProfileDrawer_profileQuery = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -19873,10 +19930,10 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     expiryDate?: string | null;
     file?: {
       __typename?: "FileUpload";
-      contentType: string;
       filename: string;
-      isComplete: boolean;
+      contentType: string;
       size: number;
+      isComplete: boolean;
     } | null;
   }> | null;
   value?: {
@@ -19919,10 +19976,10 @@ export type ProfileForm_ProfileFragment = {
       expiryDate?: string | null;
       file?: {
         __typename?: "FileUpload";
-        contentType: string;
         filename: string;
-        isComplete: boolean;
+        contentType: string;
         size: number;
+        isComplete: boolean;
       } | null;
     }> | null;
     value?: {
@@ -20025,10 +20082,10 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -20093,10 +20150,10 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -20444,6 +20501,42 @@ export type useProfileSubscribersDialog_unsubscribeFromProfileMutation = {
   }>;
 };
 
+export type useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+};
+
+export type ProfileField_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
+    options: { [key: string]: any };
+  };
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    expiryDate?: string | null;
+    file?: {
+      __typename?: "FileUpload";
+      contentType: string;
+      filename: string;
+      isComplete: boolean;
+      size: number;
+    } | null;
+  }> | null;
+  value?: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    content?: { [key: string]: any } | null;
+  } | null;
+};
+
 export type ProfileField_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
@@ -20485,6 +20578,28 @@ export type ProfileField_PetitionFieldFragment = {
     isAnonymized: boolean;
     content: { [key: string]: any };
   }>;
+};
+
+export type ProfileFieldBackgroundCheck_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type ProfileFieldBackgroundCheck_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { __typename?: "Profile"; id: string };
+};
+
+export type ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables =
+  Exact<{
+    profileId: Scalars["GID"]["input"];
+    profileTypeFieldId: Scalars["GID"]["input"];
+    petitionId: Scalars["GID"]["input"];
+    replyId: Scalars["GID"]["input"];
+    expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  }>;
+
+export type ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation = {
+  copyBackgroundCheckReplyToProfileFieldValue: { __typename?: "ProfileFieldValue"; id: string };
 };
 
 export type ProfileFieldFileUpload_ProfileFieldFileFragment = {
@@ -22682,6 +22797,7 @@ export type Admin_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -22741,6 +22857,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -22874,6 +22991,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -23121,6 +23239,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -23260,6 +23379,7 @@ export type AdminOrganizations_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -23329,6 +23449,7 @@ export type AdminSupportMethods_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -23415,6 +23536,7 @@ export type Alerts_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24206,6 +24328,7 @@ export type Contact_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24372,6 +24495,7 @@ export type Contacts_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24449,6 +24573,7 @@ export type OrganizationBranding_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasRemovedParallelBranding: boolean;
     hasRecipientLangCA: boolean;
@@ -24528,6 +24653,7 @@ export type OrganizationCompliance_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasAutoAnonymize: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24586,6 +24712,7 @@ export type OrganizationGeneral_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasCustomHost: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24753,6 +24880,7 @@ export type OrganizationGroup_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -24833,6 +24961,7 @@ export type PermissionsGroup_userQuery = {
     hasProfilesAccess: boolean;
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
+    hasBackgroundCheck: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25034,6 +25163,7 @@ export type OrganizationGroups_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25076,6 +25206,7 @@ export type OrganizationSettings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25233,6 +25364,7 @@ export type IntegrationsSignature_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasDocusignSandbox: boolean;
     organization: {
@@ -25430,6 +25562,7 @@ export type OrganizationProfileType_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25823,6 +25956,7 @@ export type OrganizationProfileTypes_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25934,6 +26068,7 @@ export type OrganizationUsage_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -26112,6 +26247,7 @@ export type OrganizationUsers_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasGhostLogin: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -27095,6 +27231,7 @@ export type PetitionActivity_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -28530,6 +28667,7 @@ export type PetitionActivity_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -29175,6 +29313,7 @@ export type PetitionCompose_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
@@ -29188,7 +29327,6 @@ export type PetitionCompose_QueryFragment = {
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
-    hasBackgroundCheck: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30483,6 +30621,7 @@ export type PetitionCompose_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
@@ -30496,7 +30635,6 @@ export type PetitionCompose_userQuery = {
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
-    hasBackgroundCheck: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31178,6 +31316,7 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -31221,6 +31360,7 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -32711,9 +32851,9 @@ export type PetitionPreview_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
-    hasBackgroundCheck: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -34991,9 +35131,9 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
-    hasBackgroundCheck: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -36834,6 +36974,7 @@ export type PetitionReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
+    hasBackgroundCheck: boolean;
     hasExportCuatrecasas: boolean;
     hasSummaryAccess: boolean;
     hasPetitionSignature: boolean;
@@ -37621,6 +37762,7 @@ export type Petitions_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -38179,6 +38321,7 @@ export type NewPetition_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
@@ -38390,10 +38533,10 @@ export type ProfileDetail_ProfileFragment = {
       expiryDate?: string | null;
       file?: {
         __typename?: "FileUpload";
-        contentType: string;
         filename: string;
-        isComplete: boolean;
+        contentType: string;
         size: number;
+        isComplete: boolean;
       } | null;
     }> | null;
     value?: {
@@ -38424,6 +38567,7 @@ export type ProfileDetail_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -38503,10 +38647,10 @@ export type ProfileDetail_profileQuery = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -38571,10 +38715,10 @@ export type ProfileDetail_subscribeToProfileMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -38639,10 +38783,10 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          contentType: string;
           filename: string;
-          isComplete: boolean;
+          contentType: string;
           size: number;
+          isComplete: boolean;
         } | null;
       }> | null;
       value?: {
@@ -38734,6 +38878,7 @@ export type Profiles_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -38908,6 +39053,7 @@ export type Reports_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -38956,6 +39102,7 @@ export type Overview_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39004,6 +39151,7 @@ export type ReportsReplies_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39052,6 +39200,7 @@ export type ReportsTemplates_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39094,6 +39243,7 @@ export type Account_QueryFragment = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -39177,6 +39327,7 @@ export type Account_userQuery = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -39493,6 +39644,7 @@ export type Subscriptions_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39567,6 +39719,7 @@ export type Tokens_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39609,6 +39762,7 @@ export type Settings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39659,6 +39813,7 @@ export type Security_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -41606,6 +41761,14 @@ export type filterPetitionFields_PetitionFieldFragment = {
   }>;
 };
 
+export type getReferencedInBackgroundCheck_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+  name: { [locale in UserLocale]?: string };
+};
+
 export type getPetitionSignatureEnvironment_PetitionFragment = {
   __typename?: "Petition";
   currentSignatureRequest?: {
@@ -43084,6 +43247,12 @@ export type useGetPetitionPages_PetitionBaseFragment =
   | useGetPetitionPages_PetitionBase_Petition_Fragment
   | useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment;
 
+export type useHasBackgroundCheck_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useHasBackgroundCheck_MeQuery = {
+  me: { __typename?: "User"; hasBackgroundCheck: boolean };
+};
+
 export type useHasPermission_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useHasPermission_MeQuery = { me: { __typename?: "User"; permissions: Array<string> } };
@@ -44391,6 +44560,7 @@ export const AppLayout_QueryFragmentDoc = gql`
         name
         petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
       }
+      hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     }
     realMe {
       id
@@ -45068,6 +45238,69 @@ export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfilesLayout_QueryFragment, unknown>;
+export const getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc = gql`
+  fragment getReferencedInBackgroundCheck_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+    name
+  }
+` as unknown as DocumentNode<getReferencedInBackgroundCheck_ProfileTypeFieldFragment, unknown>;
+export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+    alias
+    options
+    isExpirable
+    expiryAlertAheadTime
+    options
+    isStandard
+    ...getReferencedInBackgroundCheck_ProfileTypeField
+  }
+  ${getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
+  unknown
+>;
+export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+  }
+` as unknown as DocumentNode<ProfileTypeFieldSelect_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+    options
+    ...ProfileTypeFieldSelect_ProfileTypeField
+  }
+  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldBackgroundCheckSettings_ProfileTypeFragmentDoc = gql`
+  fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
+    id
+    fields {
+      ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+    }
+  }
+  ${ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFieldBackgroundCheckSettings_ProfileTypeFragment, unknown>;
+export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragmentDoc = gql`
+  fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
+    id
+    fields {
+      ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
+    }
+    ...ProfileFieldBackgroundCheckSettings_ProfileType
+  }
+  ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
+  ${ProfileFieldBackgroundCheckSettings_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
     offset
@@ -46195,13 +46428,6 @@ export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithField
   CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragment,
   unknown
 >;
-export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
-    id
-    name
-    type
-  }
-` as unknown as DocumentNode<ProfileTypeFieldSelect_ProfileTypeFieldFragment, unknown>;
 export const CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFieldFragmentDoc = gql`
   fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
     id
@@ -46797,22 +47023,6 @@ export const useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
   }
 ` as unknown as DocumentNode<useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment, unknown>;
-export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
-  fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
-    id
-    name
-    type
-    alias
-    options
-    isExpirable
-    expiryAlertAheadTime
-    options
-    isStandard
-  }
-` as unknown as DocumentNode<
-  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
-  unknown
->;
 export const ProfileTypeSettings_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileTypeField on ProfileTypeField {
     id
@@ -46821,6 +47031,15 @@ export const ProfileTypeSettings_ProfileTypeFieldFragmentDoc = gql`
     defaultPermission
   }
 ` as unknown as DocumentNode<ProfileTypeSettings_ProfileTypeFieldFragment, unknown>;
+export const useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField on ProfileTypeField {
+    id
+    name
+  }
+` as unknown as DocumentNode<
+  useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment,
+  unknown
+>;
 export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
     id
@@ -46831,11 +47050,15 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
     ...useUpdateProfileTypeFieldDialog_ProfileTypeField
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     ...ProfileTypeSettings_ProfileTypeField
+    ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
+    ...getReferencedInBackgroundCheck_ProfileTypeField
   }
   ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
   ${useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
+  ${useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragmentDoc}
+  ${getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFieldFragment, unknown>;
 export const ProfileTypeSettings_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileType on ProfileType {
@@ -50943,6 +51166,22 @@ export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
   }
   ${ProfileField_ProfileFieldValueFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
+export const ProfileField_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileField_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfileField_ProfileTypeField
+    }
+    files {
+      ...ProfileField_ProfileFieldFile
+    }
+    value {
+      ...ProfileField_ProfileFieldValue
+    }
+  }
+  ${ProfileField_ProfileTypeFieldFragmentDoc}
+  ${ProfileField_ProfileFieldFileFragmentDoc}
+  ${ProfileField_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<ProfileField_ProfileFieldPropertyFragment, unknown>;
 export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
   fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -50954,10 +51193,12 @@ export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
     value {
       ...ProfileForm_ProfileFieldValue
     }
+    ...ProfileField_ProfileFieldProperty
   }
   ${ProfileForm_ProfileTypeFieldFragmentDoc}
   ${ProfileForm_ProfileFieldFileFragmentDoc}
   ${ProfileForm_ProfileFieldValueFragmentDoc}
+  ${ProfileField_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
 export const ProfileForm_ProfileFragmentDoc = gql`
   fragment ProfileForm_Profile on Profile {
@@ -54233,6 +54474,41 @@ export const useProfileSubscribersDialog_unsubscribeFromProfileDocument = gql`
 ` as unknown as DocumentNode<
   useProfileSubscribersDialog_unsubscribeFromProfileMutation,
   useProfileSubscribersDialog_unsubscribeFromProfileMutationVariables
+>;
+export const ProfileFieldBackgroundCheck_updateProfileFieldValueDocument = gql`
+  mutation ProfileFieldBackgroundCheck_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFieldBackgroundCheck_updateProfileFieldValueMutation,
+  ProfileFieldBackgroundCheck_updateProfileFieldValueMutationVariables
+>;
+export const ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument = gql`
+  mutation ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $petitionId: GID!
+    $replyId: GID!
+    $expiryDate: Date
+  ) {
+    copyBackgroundCheckReplyToProfileFieldValue(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      petitionId: $petitionId
+      replyId: $replyId
+      expiryDate: $expiryDate
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation,
+  ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables
 >;
 export const ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument = gql`
   mutation ProfileFieldFileUpload_profileFieldFileDownloadLink(
@@ -58241,6 +58517,13 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
   useGetDefaultMentionables_permissionsQueryQuery,
   useGetDefaultMentionables_permissionsQueryQueryVariables
 >;
+export const useHasBackgroundCheck_MeDocument = gql`
+  query useHasBackgroundCheck_Me {
+    me {
+      hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+    }
+  }
+` as unknown as DocumentNode<useHasBackgroundCheck_MeQuery, useHasBackgroundCheck_MeQueryVariables>;
 export const useHasPermission_MeDocument = gql`
   query useHasPermission_Me {
     me {

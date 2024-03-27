@@ -327,6 +327,7 @@ export const AppLayout = Object.assign(
               name
               petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
             }
+            hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
           }
           realMe {
             id

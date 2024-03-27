@@ -6,12 +6,18 @@ import {
   EntitySearchResponse,
 } from "../../services/background-check-clients/BackgroundCheckClient";
 import { toGlobalId } from "../../util/globalId";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { dateArg, datetimeArg } from "../helpers/scalars/DateTime";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 import { authenticateBackgroundCheckToken } from "./authorizers";
-import { parseBackgroundCheckToken } from "./utils";
+import {
+  BackgroundCheckPetitionParams,
+  BackgroundCheckProfileParams,
+  NumericParams,
+  parseBackgroundCheckToken,
+} from "./utils";
 
 /** @deprecated */
 export const queries = queryField((t) => {
@@ -197,15 +203,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
     }),
   },
   resolve: async (_, args, ctx) => {
-    try {
-      const params = parseBackgroundCheckToken(args.token);
-
-      const query = {
-        name: args.name,
-        date: args.date ?? null,
-        type: args.type ?? null,
-      };
-
+    async function petitionParamsResolver(
+      query: any,
+      params: NumericParams<BackgroundCheckPetitionParams>,
+    ) {
       const petition = await ctx.petitions.loadPetition(params.petitionId);
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
 
@@ -295,6 +296,107 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       }
 
       return search;
+    }
+
+    async function profileParamsResolver(
+      query: any,
+      params: NumericParams<BackgroundCheckProfileParams>,
+    ) {
+      const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(
+        params.profileId,
+      );
+
+      // look for a pfv that matches search criteria
+      const profileFieldValue = profileFieldValues.find(
+        (v) =>
+          v.profile_type_field_id === params.profileTypeFieldId &&
+          v.type === "BACKGROUND_CHECK" &&
+          isDefined(v.content.search),
+      );
+
+      if (
+        isDefined(profileFieldValue) &&
+        profileFieldValue.content.query.name === query.name &&
+        profileFieldValue.content.query.date === query.date &&
+        profileFieldValue.content.query.type === query.type
+      ) {
+        // i found a pfv and it matches the search criteria, return it
+        return profileFieldValue.content.search as EntitySearchResponse;
+      }
+
+      const profile = await ctx.profiles.loadProfile(params.profileId);
+      if (profile!.status !== "OPEN") {
+        throw new ForbiddenError(
+          `The profile is ${profile!.status} and does not accept new replies`,
+        );
+      }
+
+      const effectivePermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+        userId: ctx.user!.id,
+        profileTypeFieldId: params.profileTypeFieldId,
+      });
+
+      if (!isAtLeast(effectivePermission, "WRITE")) {
+        throw new ForbiddenError("User does not have WRITE permission on this field");
+      }
+
+      const search = await ctx.backgroundCheck.entitySearch(query);
+
+      // create or update the profile field value
+      const {
+        currentValues: [currentValue],
+        previousValues: [previousValue],
+      } = await ctx.profiles.updateProfileFieldValue(
+        params.profileId,
+        [
+          {
+            type: "BACKGROUND_CHECK",
+            profileTypeFieldId: params.profileTypeFieldId,
+            content: { query, search, entity: null },
+          },
+        ],
+        ctx.user!.id,
+      );
+
+      const profileTypeField = await ctx.profiles.loadProfileTypeField(params.profileTypeFieldId);
+      await ctx.profiles.createProfileUpdatedEvents(
+        params.profileId,
+        [
+          {
+            org_id: ctx.user!.org_id,
+            profile_id: params.profileId,
+            type: "PROFILE_FIELD_VALUE_UPDATED",
+            data: {
+              user_id: ctx.user!.id,
+              current_profile_field_value_id: currentValue?.id ?? null,
+              previous_profile_field_value_id: previousValue?.id ?? null,
+              profile_type_field_id: params.profileTypeFieldId,
+              alias: profileTypeField?.alias ?? null,
+            },
+          },
+        ],
+        ctx.user!,
+      );
+
+      return search;
+    }
+
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      const query = {
+        name: args.name,
+        date: args.date ?? null,
+        type: args.type ?? null,
+      };
+
+      if ("petitionId" in params) {
+        return await petitionParamsResolver(query, params);
+      } else if ("profileId" in params) {
+        return await profileParamsResolver(query, params);
+      } else {
+        return null as never;
+      }
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "PETITION_SEND_LIMIT_REACHED") {
@@ -323,16 +425,17 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
     entityId: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
-    try {
-      const params = parseBackgroundCheckToken(args.token);
-
+    async function petitionParamsResolver(
+      entityId: string,
+      params: NumericParams<BackgroundCheckPetitionParams>,
+    ) {
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
 
       // look for a reply in the field that matches the provided entity
       const reply = fieldReplies.find(
         (r) =>
           r.type === "BACKGROUND_CHECK" &&
-          r.content.entity?.id === args.entityId &&
+          r.content.entity?.id === entityId &&
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
 
@@ -341,7 +444,43 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         return reply.content.entity as EntityDetailsResponse;
       }
 
-      return await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id);
+      return await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id);
+    }
+
+    async function profileParamsResolver(
+      entityId: string,
+      params: NumericParams<BackgroundCheckProfileParams>,
+    ) {
+      const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(
+        params.profileId,
+      );
+
+      // look for a pfv that matches the provided entity
+      const profileFieldValue = profileFieldValues.find(
+        (v) =>
+          v.profile_type_field_id === params.profileTypeFieldId &&
+          v.type === "BACKGROUND_CHECK" &&
+          v.content.entity?.id === entityId,
+      );
+
+      if (isDefined(profileFieldValue)) {
+        // i found a pfv and it matches the entity, return it
+        return profileFieldValue.content.entity as EntityDetailsResponse;
+      }
+
+      return await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id);
+    }
+
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      if ("petitionId" in params) {
+        return await petitionParamsResolver(args.entityId, params);
+      } else if ("profileId" in params) {
+        return await profileParamsResolver(args.entityId, params);
+      } else {
+        return null as never;
+      }
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "PROFILE_NOT_FOUND") {
