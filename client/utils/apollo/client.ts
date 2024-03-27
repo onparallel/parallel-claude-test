@@ -212,6 +212,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 }
               },
             },
+            signatureConfig: { merge: true },
           },
         },
         PetitionBaseMini: {
@@ -229,7 +230,6 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
           fields: {
             accesses: { merge: mergeArraysBy(["id"]) },
             emailBody: { merge: false },
-            signatureConfig: { merge: true },
             events: {
               keyArgs: ["id"],
               merge(existing, incoming, { readField, variables }) {
