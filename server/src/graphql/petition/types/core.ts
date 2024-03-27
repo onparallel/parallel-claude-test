@@ -669,7 +669,6 @@ export const PetitionField = objectType({
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
-      resolve: ({ multiple, type }) => multiple || type === "FIELD_GROUP",
     });
     t.boolean("isFixed", {
       description: "Determines if the field can be moved or deleted.",

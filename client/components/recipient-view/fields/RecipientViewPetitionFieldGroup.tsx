@@ -433,6 +433,7 @@ export function RecipientViewPetitionFieldGroupCard({
 }: RecipientViewPetitionFieldGroupCardProps) {
   const intl = useIntl();
   const tone = useTone();
+  const showGroupNumber = field.multiple || field.replies.length > 1;
   return (
     <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
       <HStack minHeight="32px">
@@ -441,8 +442,8 @@ export function RecipientViewPetitionFieldGroupCard({
             intl.formatMessage({
               id: "generic.group-name-fallback-reply",
               defaultMessage: "Reply",
-            })}{" "}
-          {index + 1}
+            })}
+          {showGroupNumber ? ` ${index + 1}` : ""}
         </Text>
         {isDefined(onRemoveReply) ? (
           <ConfimationPopover
@@ -457,7 +458,7 @@ export function RecipientViewPetitionFieldGroupCard({
                       id: "generic.group-name-fallback-reply",
                       defaultMessage: "Reply",
                     })
-                  } ${index + 1}`,
+                  }${showGroupNumber ? ` ${index + 1}` : ""}`,
                   tone,
                 }}
               />
@@ -559,6 +560,10 @@ RecipientViewPetitionFieldGroupCard.fragments = {
       id
       options
       optional
+      multiple
+      replies {
+        id
+      }
     }
   `,
   PublicPetitionField: gql`
@@ -566,6 +571,10 @@ RecipientViewPetitionFieldGroupCard.fragments = {
       id
       options
       optional
+      multiple
+      replies {
+        id
+      }
     }
   `,
 };

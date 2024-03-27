@@ -377,7 +377,6 @@ export const PublicPetitionField = objectType({
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
-      resolve: ({ multiple, type }) => multiple || type === "FIELD_GROUP",
     });
     t.boolean("isInternal", {
       description: "Determines if the field is visible by the recipients.",

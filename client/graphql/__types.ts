@@ -18077,6 +18077,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   title?: string | null;
+  multiple: boolean;
   description?: string | null;
   optional: boolean;
   options: { [key: string]: any };
@@ -22094,6 +22095,8 @@ export type RecipientViewPetitionFieldGroupCard_PetitionFieldFragment = {
   id: string;
   options: { [key: string]: any };
   optional: boolean;
+  multiple: boolean;
+  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
 };
 
 export type RecipientViewPetitionFieldGroupCard_PublicPetitionFieldFragment = {
@@ -22101,6 +22104,8 @@ export type RecipientViewPetitionFieldGroupCard_PublicPetitionFieldFragment = {
   id: string;
   options: { [key: string]: any };
   optional: boolean;
+  multiple: boolean;
+  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
 };
 
 export type RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment = {
@@ -35208,10 +35213,10 @@ export type PetitionReplies_PetitionFragment = {
     options: { [key: string]: any };
     optional: boolean;
     title?: string | null;
+    multiple: boolean;
     description?: string | null;
     alias?: string | null;
     hasCommentsEnabled: boolean;
-    multiple: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     previewReplies: Array<{
@@ -35638,6 +35643,7 @@ export type PetitionReplies_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   title?: string | null;
+  multiple: boolean;
   description?: string | null;
   optional: boolean;
   options: { [key: string]: any };
@@ -35961,10 +35967,10 @@ export type PetitionReplies_closePetitionMutation = {
       options: { [key: string]: any };
       optional: boolean;
       title?: string | null;
+      multiple: boolean;
       description?: string | null;
       alias?: string | null;
       hasCommentsEnabled: boolean;
-      multiple: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       previewReplies: Array<{
@@ -36429,10 +36435,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       options: { [key: string]: any };
       optional: boolean;
       title?: string | null;
+      multiple: boolean;
       description?: string | null;
       alias?: string | null;
       hasCommentsEnabled: boolean;
-      multiple: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       previewReplies: Array<{
@@ -37065,10 +37071,10 @@ export type PetitionReplies_petitionQuery = {
           options: { [key: string]: any };
           optional: boolean;
           title?: string | null;
+          multiple: boolean;
           description?: string | null;
           alias?: string | null;
           hasCommentsEnabled: boolean;
-          multiple: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           previewReplies: Array<{
@@ -46386,6 +46392,10 @@ export const RecipientViewPetitionFieldGroupCard_PetitionFieldFragmentDoc = gql`
     id
     options
     optional
+    multiple
+    replies {
+      id
+    }
   }
 ` as unknown as DocumentNode<RecipientViewPetitionFieldGroupCard_PetitionFieldFragment, unknown>;
 export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc =
@@ -50426,6 +50436,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     id
     type
     title
+    multiple
     description
     optional
     options
@@ -51548,6 +51559,10 @@ export const RecipientViewPetitionFieldGroupCard_PublicPetitionFieldFragmentDoc 
     id
     options
     optional
+    multiple
+    replies {
+      id
+    }
   }
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldGroupCard_PublicPetitionFieldFragment,

@@ -326,7 +326,7 @@ export const PetitionRepliesField = Object.assign(
                           id: "generic.group-name-fallback-reply",
                           defaultMessage: "Reply",
                         })
-                      } ${index + 1}`}
+                      }${field.multiple || field.replies.length > 1 ? ` ${index + 1}` : ""}`}
                     </Text>
                   </HStack>
                   <Stack spacing={3}>
@@ -625,6 +625,7 @@ export const PetitionRepliesField = Object.assign(
           id
           type
           title
+          multiple
           description
           optional
           options

@@ -106,7 +106,6 @@ export const PetitionComposeFieldSettings = Object.assign(
         "ES_TAX_DOCUMENTS",
         "DOW_JONES_KYC",
         "BACKGROUND_CHECK",
-        "FIELD_GROUP",
       ].includes(field.type);
 
       const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
