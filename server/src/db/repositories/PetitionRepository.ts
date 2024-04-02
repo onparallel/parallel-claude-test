@@ -4770,7 +4770,7 @@ export class PetitionRepository extends BaseRepository {
       q
         .whereNull("deleted_at")
         .whereNull("from_user_group_id")
-        .orderByRaw("type asc, user_group_id nulls first, created_at"),
+        .orderByRaw("type asc, user_group_id nulls first, created_at, id"),
   );
 
   readonly loadDirectlyAssignedUserPetitionPermissionsByUserId = this.buildLoadMultipleBy(
