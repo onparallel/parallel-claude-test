@@ -44,7 +44,7 @@ async function main() {
             if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
                 console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
                 if (!dryRun) {
-                    const name = instance.Tags.find((t) => t.Key === "Name");
+                    const name = instance.Tags.find((t) => t.Key === "Name").Value;
                     const alarms = await cw
                         .send(new client_cloudwatch_1.DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
                         .then((r) => r.MetricAlarms);
