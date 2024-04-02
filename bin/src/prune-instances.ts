@@ -61,7 +61,10 @@ async function main() {
           const alarms = await cw
             .send(new DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
             .then((r) => r.MetricAlarms!);
-          await cw.send(new DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName!) }));
+          if (alarms.length) {
+            console.log(`Deleting intance alarms ${alarms.map((a) => a.AlarmName!).join(", ")}`);
+            await cw.send(new DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName!) }));
+          }
           await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));
         }
       } else if (instanceState === "running") {
