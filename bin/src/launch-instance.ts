@@ -19,6 +19,7 @@ import yargs from "yargs";
 import { run } from "./utils/run";
 import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
 import { wait, waitFor } from "./utils/wait";
+import { CloudWatchClient, PutMetricAlarmCommand } from "@aws-sdk/client-cloudwatch";
 
 type Environment = "staging" | "production";
 
@@ -52,6 +53,7 @@ const NUM_INSTANCES = {
 };
 
 const ec2 = new EC2Client({});
+const cw = new CloudWatchClient({});
 
 async function main() {
   const { commit: _commit, env } = await yargs
@@ -172,6 +174,27 @@ async function main() {
       console.log(chalk`Uploading install script to {bold ${instanceId}}.`);
       await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
       await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
+      for (const alarm of [
+        // CPU over 40% for 5 consecutive minutes
+        { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 40.0 },
+        // CPU over 80% for 1 minute
+        { Period: 60, EvaluationPeriods: 1, DatapointsToAlarm: 1, Threshold: 80.0 },
+      ])
+        await cw.send(
+          new PutMetricAlarmCommand({
+            AlarmName: `${name}-cpu-${alarm.DatapointsToAlarm}m`,
+            MetricName: "CPUUtilization",
+            Namespace: "AWS/EC2",
+            Statistic: "Average",
+            Dimensions: [{ Name: "InstanceId", Value: instanceId }],
+            ComparisonOperator: "GreaterThanThreshold",
+            TreatMissingData: "missing",
+            ActionsEnabled: true,
+            OKActions: [],
+            AlarmActions: ["arn:aws:sns:eu-central-1:749273139513:ops-alarms"],
+            ...alarm,
+          }),
+        );
     },
     { concurrency: 4 },
   );

@@ -11,11 +11,17 @@ import {
 import chalk from "chalk";
 import yargs from "yargs";
 import { run } from "./utils/run";
+import {
+  CloudWatchClient,
+  DeleteAlarmsCommand,
+  DescribeAlarmsCommand,
+} from "@aws-sdk/client-cloudwatch";
 
 type Environment = "staging" | "production";
 
 const ec2 = new EC2Client({});
 const elb = new ElasticLoadBalancingClient({});
+const cw = new CloudWatchClient({});
 
 async function main() {
   const { env, "dry-run": dryRun } = await yargs
@@ -51,6 +57,11 @@ async function main() {
       if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
         console.log(chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
         if (!dryRun) {
+          const name = instance.Tags!.find((t) => t.Key === "Name")!;
+          const alarms = await cw
+            .send(new DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
+            .then((r) => r.MetricAlarms!);
+          await cw.send(new DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName!) }));
           await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));
         }
       } else if (instanceState === "running") {

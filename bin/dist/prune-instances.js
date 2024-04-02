@@ -8,8 +8,10 @@ const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-ba
 const chalk_1 = __importDefault(require("chalk"));
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
+const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
+const cw = new client_cloudwatch_1.CloudWatchClient({});
 async function main() {
     var _a, _b;
     const { env, "dry-run": dryRun } = await yargs_1.default
@@ -42,6 +44,11 @@ async function main() {
             if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
                 console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
                 if (!dryRun) {
+                    const name = instance.Tags.find((t) => t.Key === "Name");
+                    const alarms = await cw
+                        .send(new client_cloudwatch_1.DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
+                        .then((r) => r.MetricAlarms);
+                    await cw.send(new client_cloudwatch_1.DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName) }));
                     await ec2.send(new client_ec2_1.TerminateInstancesCommand({ InstanceIds: [instanceId] }));
                 }
             }

@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.515.0",
+    "@aws-sdk/client-cloudwatch": "^3.546.0",
     "@aws-sdk/client-ec2": "^3.515.0",
     "@aws-sdk/client-elastic-load-balancing": "^3.515.0",
     "@aws-sdk/client-iam": "^3.515.0",
