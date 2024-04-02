@@ -125,6 +125,7 @@ async function main() {
                   {
                     ResourceType: ResourceType.instance,
                     Tags: [
+                      { Key: "App", Value: "server" },
                       { Key: "Name", Value: name },
                       { Key: "Release", Value: commit },
                       { Key: "Environment", Value: env },

@@ -104,6 +104,7 @@ async function main() {
                             {
                                 ResourceType: client_ec2_1.ResourceType.instance,
                                 Tags: [
+                                    { Key: "App", Value: "server" },
                                     { Key: "Name", Value: name },
                                     { Key: "Release", Value: commit },
                                     { Key: "Environment", Value: env },
