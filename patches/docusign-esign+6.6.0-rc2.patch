@@ -1,0 +1,38 @@
+sdiff --git a/node_modules/docusign-esign/src/ApiClient.js b/node_modules/docusign-esign/src/ApiClient.js
+index bf3d53b..6bb3d73 100644
+--- a/node_modules/docusign-esign/src/ApiClient.js
++++ b/node_modules/docusign-esign/src/ApiClient.js
+@@ -685,13 +685,13 @@
+         request
+           .then((response) => {
+             try {
+-              let streamData;
++              const streamData = [];
+               if (requestConfig.headers["Accept"] === "application/pdf") {
+                 response.data.on("data", (chunks) => {
+-                  streamData += chunks;
++                  streamData.push(chunks);
+                 });
+                 response.data.on("end", () => {
+-                  resolve(streamData);
++                  resolve(Buffer.concat(streamData));
+                 });
+               } else {
+                 data = _this.deserialize(response, returnType);
+@@ -709,13 +709,13 @@
+       request
+         .then((response) => {
+           try {
+-            let streamData;
++            const streamData = [];
+             if (requestConfig.headers["Accept"] === "application/pdf") {
+               response.data.on("data", (chunks) => {
+-                streamData += chunks;
++                streamData.push(chunks);
+               });
+               response.data.on("end", () => {
+-                callback(null, streamData, response);
++                callback(null, Buffer.concat(streamData), response);
+               });
+             } else {
+               data = _this.deserialize(response, returnType);

@@ -1,8 +1,9 @@
-import { AccountsApi, ApiClient, Envelope, EnvelopeDefinition, EnvelopesApi } from "docusign-esign";
+import { ApiClient, Envelope, EnvelopeDefinition, EnvelopesApi } from "docusign-esign";
 import stringify from "fast-safe-stringify";
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
+import { CONFIG, Config } from "../../config";
 import {
   DocusignIntegration,
   DocusignIntegrationContext,
@@ -19,7 +20,6 @@ import {
   SignatureOptions,
   SignatureResponse,
 } from "./SignatureClient";
-import { CONFIG, Config } from "../../config";
 
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];
@@ -38,17 +38,17 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   private isAccessTokenExpiredError(error: any) {
-    return (error as any)?.status === 401;
+    return error?.response?.status === 401;
   }
 
   private isAccountSuspendedError(error: any) {
     const jsonError = safeJsonParse(error?.response?.text);
-    return (error as any)?.status === 400 && jsonError?.errorCode === "ACCOUNT_HAS_BEEN_SUSPENDED";
+    return error?.response?.status === 400 && jsonError?.errorCode === "ACCOUNT_HAS_BEEN_SUSPENDED";
   }
 
   private async withDocusignSdk<TResult>(
     handler: (
-      apis: { envelopes: EnvelopesApi; accounts: AccountsApi },
+      apis: { envelopes: EnvelopesApi },
       context: DocusignIntegrationContext & { userAccountId: string },
     ) => Promise<TResult>,
   ): Promise<TResult> {
@@ -69,7 +69,6 @@ export class DocuSignClient implements ISignatureClient {
           return await handler(
             {
               envelopes: new EnvelopesApi(client),
-              accounts: new AccountsApi(client),
             },
             { ...context, userAccountId: defaultAccount.accountId },
           );
