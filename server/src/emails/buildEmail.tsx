@@ -3,6 +3,7 @@ import { ComponentType, createElement } from "react";
 import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
 import { ContactLocale, UserLocale } from "../db/__types";
 import { loadMessages } from "../util/loadMessages";
+import htmlnano from "htmlnano";
 
 export interface EmailOptions {
   locale: ContactLocale | UserLocale;
@@ -33,7 +34,7 @@ export async function buildEmail<T extends {}>(
     <IntlProvider {...intlProps}>{createElement<T>(email.html, props)}</IntlProvider>,
     {
       keepComments: false,
-      minify: true,
+      minify: false,
       validationLevel: "skip",
     },
   );
@@ -41,5 +42,6 @@ export async function buildEmail<T extends {}>(
   const text = email.text(props, intl);
   const subject = email.subject(props, intl);
   const from = email.from(props, intl);
-  return { html, text, subject, from };
+  const minified = await htmlnano.process(html, { minifyCss: false }, htmlnano.presets.safe);
+  return { html: minified.html, text, subject, from };
 }

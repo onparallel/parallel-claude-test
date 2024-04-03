@@ -108,6 +108,7 @@
     "graphql-scalars": "^1.22.4",
     "graphql-tag": "^2.12.6",
     "graphql-upload": "^15.0.2",
+    "htmlnano": "^2.1.0",
     "hyphen": "^1.10.4",
     "iban": "^0.0.14",
     "inversify": "^6.0.2",
