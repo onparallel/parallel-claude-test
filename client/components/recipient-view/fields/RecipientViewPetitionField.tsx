@@ -44,6 +44,7 @@ import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText
 import { useCreateFileUploadReply } from "./clientMutations";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { pick } from "remeda";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -75,21 +76,24 @@ export function RecipientViewPetitionField({
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   );
-  const handleDownloadAttachment = async function (attachmentId: string) {
-    await withError(
-      openNewWindow(async () => {
-        const { data } = await publicPetitionFieldAttachmentDownloadLink({
-          variables: {
-            keycode: props.keycode,
-            fieldId: props.field.id,
-            attachmentId,
-          },
-        });
-        const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
-        return url!;
-      }),
-    );
-  };
+  const handleDownloadAttachment = useMemoFactory(
+    (fieldId: string) => async (attachmentId: string) => {
+      await withError(
+        openNewWindow(async () => {
+          const { data } = await publicPetitionFieldAttachmentDownloadLink({
+            variables: {
+              keycode: props.keycode,
+              fieldId,
+              attachmentId,
+            },
+          });
+          const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
+          return url!;
+        }),
+      );
+    },
+    [props.keycode],
+  );
 
   const showFieldComments = usePetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
@@ -256,7 +260,7 @@ export function RecipientViewPetitionField({
 
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
-    onDownloadAttachment: handleDownloadAttachment,
+    onDownloadAttachment: handleDownloadAttachment(props.field.id),
     onDeleteReply: handleDeletePetitionFieldReply,
     onUpdateReply: handleUpdatePetitionFieldReply,
     onCreateReply: handleCreatePetitionFieldReply,
@@ -266,7 +270,7 @@ export function RecipientViewPetitionField({
     return (
       <RecipientViewPetitionFieldHeading
         field={props.field}
-        onDownloadAttachment={handleDownloadAttachment}
+        onDownloadAttachment={handleDownloadAttachment(props.field.id)}
         onCommentsButtonClick={handleCommentsButtonClick}
       />
     );
@@ -275,6 +279,7 @@ export function RecipientViewPetitionField({
       <RecipientViewPetitionFieldGroup
         {...props}
         {...commonProps}
+        onDownloadAttachment={handleDownloadAttachment}
         onRefreshField={handleRefreshAsyncField}
         onCreateFileReply={handleCreateFileUploadReply}
         onDownloadFileUploadReply={handleDownloadFileUploadReply}

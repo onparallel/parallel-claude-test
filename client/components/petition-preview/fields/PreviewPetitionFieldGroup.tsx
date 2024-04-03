@@ -41,7 +41,7 @@ import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewP
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "field"
+    "children" | "showAddNewReply" | "onAddNewReply" | "field" | "onDownloadAttachment"
   > {
   user: PreviewPetitionFieldGroup_UserFragment;
   field: PreviewPetitionFieldGroup_PetitionFieldFragment;
@@ -75,6 +75,7 @@ export interface PreviewPetitionFieldGroupProps
   showErrors: boolean;
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
+  onDownloadAttachment: (fieldId: string) => (attachmentId: string) => Promise<void>;
 }
 
 export function PreviewPetitionFieldGroup({
@@ -113,7 +114,7 @@ export function PreviewPetitionFieldGroup({
       <RecipientViewPetitionFieldGroupLayout
         field={field}
         onCommentsButtonClick={onCommentsButtonClick}
-        onDownloadAttachment={onDownloadAttachment}
+        onDownloadAttachment={onDownloadAttachment(field.id)}
         onAddNewGroup={
           isDisabled || (petition.__typename === "Petition" ? petition.status === "CLOSED" : false)
             ? undefined
@@ -159,7 +160,7 @@ export function PreviewPetitionFieldGroup({
                       }
                       isDisabled={isDisabled}
                       isCacheOnly={isCacheOnly}
-                      onDownloadAttachment={onDownloadAttachment}
+                      onDownloadAttachment={onDownloadAttachment(field.id)}
                       onDeleteReply={onDeleteReply}
                       onUpdateReply={onUpdateReply}
                       onCreateReply={onCreateReply}

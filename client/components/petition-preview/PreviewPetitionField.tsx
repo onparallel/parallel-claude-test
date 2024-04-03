@@ -49,6 +49,7 @@ import {
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -98,21 +99,24 @@ export function PreviewPetitionField({
   const [petitionFieldAttachmentDownloadLink] = useMutation(
     PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   );
-  const handleDownloadAttachment = async function (attachmentId: string) {
-    await withError(
-      openNewWindow(async () => {
-        const { data } = await petitionFieldAttachmentDownloadLink({
-          variables: {
-            petitionId,
-            fieldId,
-            attachmentId,
-          },
-        });
-        const { url } = data!.petitionFieldAttachmentDownloadLink;
-        return url!;
-      }),
-    );
-  };
+  const handleDownloadAttachment = useMemoFactory(
+    (fieldId: string) => async (attachmentId: string) => {
+      await withError(
+        openNewWindow(async () => {
+          const { data } = await petitionFieldAttachmentDownloadLink({
+            variables: {
+              petitionId,
+              fieldId,
+              attachmentId,
+            },
+          });
+          const { url } = data!.petitionFieldAttachmentDownloadLink;
+          return url!;
+        }),
+      );
+    },
+    [petitionId],
+  );
 
   const showFieldComments = usePreviewPetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
@@ -263,7 +267,7 @@ export function PreviewPetitionField({
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
     onCommentsButtonClick: handleCommentsButtonClick,
-    onDownloadAttachment: handleDownloadAttachment,
+    onDownloadAttachment: handleDownloadAttachment(field.id),
     onDeleteReply: handleDeletePetitionReply,
     onUpdateReply: handleUpdatePetitionFieldReply,
     onCreateReply: handleCreatePetitionFieldReply,
@@ -274,7 +278,7 @@ export function PreviewPetitionField({
     return (
       <RecipientViewPetitionFieldHeading
         field={field}
-        onDownloadAttachment={handleDownloadAttachment}
+        onDownloadAttachment={handleDownloadAttachment(field.id)}
         onCommentsButtonClick={handleCommentsButtonClick}
       />
     );
@@ -284,6 +288,7 @@ export function PreviewPetitionField({
         {...props}
         {...commonProps}
         user={user}
+        onDownloadAttachment={handleDownloadAttachment}
         onCreateFileReply={handleCreateFileUploadReply}
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onRefreshField={handleRefreshAsyncField}

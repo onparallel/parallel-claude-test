@@ -94,11 +94,11 @@ export const PetitionRepliesField = Object.assign(
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
     );
-    const handleAttachmentClick = async function (attachmentId: string) {
+    const handleAttachmentClick = (fieldId: string) => async (attachmentId: string) => {
       await withError(
         openNewWindow(async () => {
           const { data } = await petitionFieldAttachmentDownloadLink({
-            variables: { petitionId: petition.id, fieldId: field.id, attachmentId },
+            variables: { petitionId: petition.id, fieldId, attachmentId },
           });
           const { url } = data!.petitionFieldAttachmentDownloadLink;
           return url!;
@@ -191,7 +191,7 @@ export const PetitionRepliesField = Object.assign(
             <Box paddingY={1}>
               <PetitionRepliesFieldAttachments
                 attachments={field.attachments}
-                onAttachmentClick={handleAttachmentClick}
+                onAttachmentClick={handleAttachmentClick(field.id)}
               />
             </Box>
           ) : null}
@@ -300,7 +300,7 @@ export const PetitionRepliesField = Object.assign(
               <Box marginTop={2} paddingY={1}>
                 <PetitionRepliesFieldAttachments
                   attachments={field.attachments}
-                  onAttachmentClick={handleAttachmentClick}
+                  onAttachmentClick={handleAttachmentClick(field.id)}
                 />
               </Box>
             ) : null}
@@ -404,7 +404,7 @@ export const PetitionRepliesField = Object.assign(
                                   <Box marginTop={2} paddingY={1}>
                                     <PetitionRepliesFieldAttachments
                                       attachments={x.field.attachments}
-                                      onAttachmentClick={handleAttachmentClick}
+                                      onAttachmentClick={handleAttachmentClick(x.field.id)}
                                     />
                                   </Box>
                                 ) : null}
@@ -561,7 +561,7 @@ export const PetitionRepliesField = Object.assign(
               <Box marginTop={2} paddingY={1}>
                 <PetitionRepliesFieldAttachments
                   attachments={field.attachments}
-                  onAttachmentClick={handleAttachmentClick}
+                  onAttachmentClick={handleAttachmentClick(field.id)}
                 />
               </Box>
             ) : null}

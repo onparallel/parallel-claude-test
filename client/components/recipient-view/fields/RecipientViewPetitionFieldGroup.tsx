@@ -44,7 +44,7 @@ import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPet
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "field"
+    "children" | "showAddNewReply" | "onAddNewReply" | "field" | "onDownloadAttachment"
   > {
   field: RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment;
   isDisabled: boolean;
@@ -73,6 +73,7 @@ export interface RecipientViewPetitionFieldGroupProps
   petition: RecipientViewPetitionFieldGroup_PublicPetitionFragment;
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
+  onDownloadAttachment: (fieldId: string) => (attachmentId: string) => Promise<void>;
 }
 
 export function RecipientViewPetitionFieldGroup({
@@ -103,7 +104,7 @@ export function RecipientViewPetitionFieldGroup({
     <RecipientViewPetitionFieldGroupLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
-      onDownloadAttachment={onDownloadAttachment}
+      onDownloadAttachment={onDownloadAttachment(field.id)}
       onAddNewGroup={isDisabled || petition.status === "CLOSED" ? undefined : handleAddReply}
     >
       {zip(field.replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
@@ -135,7 +136,7 @@ export function RecipientViewPetitionFieldGroup({
                       )
                     }
                     isDisabled={isDisabled}
-                    onDownloadAttachment={onDownloadAttachment}
+                    onDownloadAttachment={onDownloadAttachment(field.id)}
                     onDeleteReply={onDeleteReply}
                     onUpdateReply={onUpdateReply}
                     onCreateReply={onCreateReply}
