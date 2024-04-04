@@ -3703,7 +3703,7 @@ export interface PetitionPermission {
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
-  petition: Petition;
+  petition: PetitionBase;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 }
@@ -4044,7 +4044,7 @@ export interface PetitionUserGroupPermission extends PetitionPermission, Timesta
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
-  petition: Petition;
+  petition: PetitionBase;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 }
@@ -4075,7 +4075,7 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
-  petition: Petition;
+  petition: PetitionBase;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
   /** The user linked to the permission */
@@ -11451,7 +11451,9 @@ export type PetitionSharingModal_petitionsSharingInfoQuery = {
             localizableName: { [locale in UserLocale]?: string };
             type: UserGroupType;
           };
-          petition: { __typename?: "Petition"; id: string };
+          petition:
+            | { __typename?: "Petition"; id: string }
+            | { __typename?: "PetitionTemplate"; id: string };
         }
       | {
           __typename?: "PetitionUserPermission";
@@ -11466,7 +11468,9 @@ export type PetitionSharingModal_petitionsSharingInfoQuery = {
             initials?: string | null;
             status: UserStatus;
           };
-          petition: { __typename?: "Petition"; id: string };
+          petition:
+            | { __typename?: "Petition"; id: string }
+            | { __typename?: "PetitionTemplate"; id: string };
         }
     >;
     firstPetitionEffectivePermissions: Array<{

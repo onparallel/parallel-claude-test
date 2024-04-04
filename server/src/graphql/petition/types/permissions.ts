@@ -29,7 +29,7 @@ export const PetitionPermission = interfaceType({
   definition(t) {
     t.implements("Timestamps");
     t.field("petition", {
-      type: "Petition",
+      type: "PetitionBase",
       description: "The petition linked to the permission.",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadPetition(root.petition_id))!;

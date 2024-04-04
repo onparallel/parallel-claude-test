@@ -2692,7 +2692,7 @@ export interface NexusGenFieldTypes {
     group: NexusGenRootTypes["UserGroup"]; // UserGroup!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PetitionUserPermission: {
@@ -2700,7 +2700,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     user: NexusGenRootTypes["User"]; // User!
   };
@@ -3714,7 +3714,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PetitionUserNotification: {
@@ -5143,7 +5143,7 @@ export interface NexusGenFieldTypeNames {
     group: "UserGroup";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
-    petition: "Petition";
+    petition: "PetitionBase";
     updatedAt: "DateTime";
   };
   PetitionUserPermission: {
@@ -5151,7 +5151,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
-    petition: "Petition";
+    petition: "PetitionBase";
     updatedAt: "DateTime";
     user: "User";
   };
@@ -6165,7 +6165,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
-    petition: "Petition";
+    petition: "PetitionBase";
     updatedAt: "DateTime";
   };
   PetitionUserNotification: {

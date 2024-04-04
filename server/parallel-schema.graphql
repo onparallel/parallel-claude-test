@@ -4451,7 +4451,7 @@ interface PetitionPermission implements Timestamps {
   """
   The petition linked to the permission.
   """
-  petition: Petition!
+  petition: PetitionBase!
 
   """
   Time when the resource was last updated.
@@ -4998,7 +4998,7 @@ type PetitionUserGroupPermission implements PetitionPermission & Timestamps {
   """
   The petition linked to the permission.
   """
-  petition: Petition!
+  petition: PetitionBase!
 
   """
   Time when the resource was last updated.
@@ -5047,7 +5047,7 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   """
   The petition linked to the permission.
   """
-  petition: Petition!
+  petition: PetitionBase!
 
   """
   Time when the resource was last updated.

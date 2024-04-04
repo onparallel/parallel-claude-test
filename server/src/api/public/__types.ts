@@ -3590,7 +3590,7 @@ export type PetitionPermission = {
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
-  petition: Petition;
+  petition: PetitionBase;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 };
@@ -3918,7 +3918,7 @@ export type PetitionUserGroupPermission = PetitionPermission &
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
-    petition: Petition;
+    petition: PetitionBase;
     /** Time when the resource was last updated. */
     updatedAt: Scalars["DateTime"]["output"];
   };
@@ -3949,7 +3949,7 @@ export type PetitionUserPermission = PetitionPermission &
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
-    petition: Petition;
+    petition: PetitionBase;
     /** Time when the resource was last updated. */
     updatedAt: Scalars["DateTime"]["output"];
     /** The user linked to the permission */
