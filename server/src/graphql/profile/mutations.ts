@@ -354,7 +354,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     if (args.data.alias !== undefined) {
-      updateData.alias = args.data.alias;
+      updateData.alias = args.data.alias || null; // empty string should nullify the alias
     }
     if (isDefined(args.data.isExpirable)) {
       updateData.is_expirable = args.data.isExpirable;

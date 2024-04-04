@@ -143,7 +143,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
     defaultValues: {
       name: profileTypeField?.name ?? { [intl.locale]: "" },
       type: profileTypeField?.type ?? "SHORT_TEXT",
-      alias: profileTypeField?.alias ?? "",
+      alias: profileTypeField?.alias ?? null,
       isExpirable: profileTypeField?.isExpirable ?? false,
       options:
         profileTypeField?.type === "SELECT" || profileTypeField?.type === "BACKGROUND_CHECK"
@@ -285,6 +285,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       profileTypeFieldId: profileTypeField.id,
                       data: {
                         ...(isStandard ? {} : dirtyData),
+                        ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
                         options,
                         isExpirable: formData.isExpirable,
                         expiryAlertAheadTime,
@@ -312,6 +313,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                         profileTypeFieldId: profileTypeField.id,
                         data: {
                           ...(isStandard ? {} : dirtyData),
+                          ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
                           options,
                           isExpirable: formData.isExpirable,
                           expiryAlertAheadTime,
@@ -331,6 +333,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       profileTypeFieldId: profileTypeField.id,
                       data: {
                         ...dirtyData,
+                        ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
                         options:
                           formData.type === "DATE"
                             ? pick(formData.options, ["useReplyAsExpiryDate"])
