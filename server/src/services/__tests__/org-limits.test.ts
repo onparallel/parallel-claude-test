@@ -1,12 +1,12 @@
+import { subMonths } from "date-fns";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { KNEX } from "../../db/knex";
+import { OrganizationUsageDetails } from "../../db/repositories/OrganizationRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { deleteAllData } from "../../util/knexUtils";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "../OrgLimitsService";
-import { subMonths } from "date-fns";
-import { OrganizationUsageDetails } from "../../db/repositories/OrganizationRepository";
 
 describe("OrgLimitsService", () => {
   let container: Container;
@@ -50,7 +50,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -100,7 +100,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -151,7 +151,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 13);
+      const startDate = subMonths(await mocks.nowUTC(), 13);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -201,7 +201,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -251,7 +251,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -290,7 +290,7 @@ describe("OrgLimitsService", () => {
         usage_details: {}, // no renewal
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert([
         {
           org_id: organization.id,
@@ -375,7 +375,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = subMonths(await mocks.nowUTC(), 1);
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -461,7 +461,7 @@ describe("OrgLimitsService", () => {
         usage_details: orgUsageDetails[i],
       }));
 
-      const baseDate = new Date();
+      const baseDate = await mocks.nowUTC();
 
       await mocks.knex.from("organization_usage_limit").insert([
         {
