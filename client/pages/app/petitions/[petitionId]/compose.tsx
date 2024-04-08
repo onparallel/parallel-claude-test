@@ -1,7 +1,6 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { CalculatorIcon, ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
-import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SupportButton } from "@parallel/components/common/SupportButton";
@@ -18,7 +17,6 @@ import {
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
-import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
@@ -1044,181 +1042,162 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             />
           ) : null
         }
-        subHeader={
-          <>
-            {displayPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-            ) : null}
-            {petition?.__typename === "Petition" &&
-            ["COMPLETED", "CLOSED"].includes(petition.status) &&
-            !petition.isAnonymized ? (
-              <PetitionCompletedAlert />
-            ) : null}
-          </>
+        hasRightPane
+        isRightPaneActive={Boolean(activeFieldId)}
+        rightPane={
+          activeField ? (
+            <PetitionComposeFieldSettings
+              id={`compose-petition-field-settings-${activeField.id}`}
+              data-testid="compose-petition-field-settings"
+              data-field-id={activeField.id}
+              petition={petition}
+              key={activeField.id}
+              field={activeField}
+              fieldIndex={activeFieldWithIndex![1]}
+              onFieldEdit={handleFieldEdit}
+              onFieldTypeChange={handleFieldTypeChange}
+              onClose={handleSettingsClose}
+              isReadOnly={isReadOnly}
+              user={me}
+              {...extendFlexColumn}
+            />
+          ) : (
+            <Tabs
+              variant="enclosed"
+              {...extendFlexColumn}
+              overflow="hidden"
+              index={tabIndex}
+              onChange={handleTabsChange}
+            >
+              <TabList marginX="-1px" marginTop="-1px" flex="none">
+                <Tab padding={4} lineHeight={5} fontWeight="bold">
+                  <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
+                  <FormattedMessage id="generic.contents" defaultMessage="Contents" />
+                </Tab>
+                <Tab
+                  data-action="petition-settings"
+                  className="petition-settings"
+                  padding={4}
+                  lineHeight={5}
+                  fontWeight="bold"
+                >
+                  <SettingsIcon fontSize="16px" marginRight={2} aria-hidden="true" />
+                  <FormattedMessage
+                    id="page.compose.petition-settings-header"
+                    defaultMessage="Settings"
+                  />
+                </Tab>
+                <Tab
+                  data-action="petition-settings"
+                  className="petition-settings"
+                  padding={4}
+                  lineHeight={5}
+                  fontWeight="bold"
+                >
+                  <CalculatorIcon fontSize="16px" marginRight={2} aria-hidden="true" />
+                  <FormattedMessage
+                    id="page.compose.petition-variables-header"
+                    defaultMessage="Variables"
+                  />
+                </Tab>
+              </TabList>
+              <TabPanels {...extendFlexColumn}>
+                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
+                  <PetitionComposeContents
+                    fieldsWithIndices={allFieldsWithIndices as any}
+                    onFieldClick={handleIndexFieldClick}
+                    onFieldEdit={handleFieldEdit}
+                    isReadOnly={isReadOnly}
+                  />
+                </TabPanel>
+                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
+                  <PetitionSettings
+                    user={me}
+                    petition={petition}
+                    onUpdatePetition={handleUpdatePetition}
+                    validPetitionFields={validPetitionFields}
+                    onRefetch={() => refetch({ id: petitionId })}
+                  />
+                </TabPanel>
+                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
+                  <PetitionComposeVariables
+                    petition={petition}
+                    allFieldsWithIndices={allFieldsWithIndices as any}
+                    isReadOnly={isReadOnly}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          )
         }
       >
-        <TwoPaneLayout
+        <Box position="sticky" top={0} zIndex={2}>
+          {displayPetitionLimitReachedAlert ? (
+            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
+          ) : null}
+          {petition?.__typename === "Petition" &&
+          ["COMPLETED", "CLOSED"].includes(petition.status) &&
+          !petition.isAnonymized ? (
+            <PetitionCompletedAlert />
+          ) : null}
+        </Box>
+        <Box
+          padding={4}
+          zIndex={1}
           backgroundColor={petition.__typename === "PetitionTemplate" ? "primary.50" : undefined}
-          top={4}
-          isSidePaneActive={Boolean(activeFieldId)}
-          sidePane={
-            <Flex
-              direction="column"
-              paddingX={4}
-              paddingLeft={{ lg: 0 }}
-              maxHeight={{
-                base: "calc(100vh - 188px)",
-                sm: "calc(100vh - 122px)",
-                md: "calc(100vh - 82px)",
-              }}
-              paddingBottom={{ base: 4, sm: "80px" }}
-            >
-              {activeField ? (
-                <PetitionComposeFieldSettings
-                  id={`compose-petition-field-settings-${activeField.id}`}
-                  data-testid="compose-petition-field-settings"
-                  data-field-id={activeField.id}
-                  petition={petition}
-                  key={activeField.id}
-                  field={activeField}
-                  fieldIndex={activeFieldWithIndex![1]}
-                  onFieldEdit={handleFieldEdit}
-                  onFieldTypeChange={handleFieldTypeChange}
-                  onClose={handleSettingsClose}
-                  isReadOnly={isReadOnly}
-                  user={me}
-                  {...extendFlexColumn}
-                />
-              ) : (
-                <Card {...extendFlexColumn}>
-                  <Tabs
-                    variant="enclosed"
-                    {...extendFlexColumn}
-                    index={tabIndex}
-                    onChange={handleTabsChange}
-                  >
-                    <TabList marginX="-1px" marginTop="-1px" flex="none">
-                      <Tab padding={4} lineHeight={5} fontWeight="bold">
-                        <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
-                        <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-                      </Tab>
-                      <Tab
-                        data-action="petition-settings"
-                        className="petition-settings"
-                        padding={4}
-                        lineHeight={5}
-                        fontWeight="bold"
-                      >
-                        <SettingsIcon fontSize="16px" marginRight={2} aria-hidden="true" />
-                        <FormattedMessage
-                          id="page.compose.petition-settings-header"
-                          defaultMessage="Settings"
-                        />
-                      </Tab>
-                      <Tab
-                        data-action="petition-settings"
-                        className="petition-settings"
-                        padding={4}
-                        lineHeight={5}
-                        fontWeight="bold"
-                      >
-                        <CalculatorIcon fontSize="16px" marginRight={2} aria-hidden="true" />
-                        <FormattedMessage
-                          id="page.compose.petition-variables-header"
-                          defaultMessage="Variables"
-                        />
-                      </Tab>
-                    </TabList>
-                    <TabPanels {...extendFlexColumn}>
-                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                        <PetitionComposeContents
-                          fieldsWithIndices={allFieldsWithIndices as any}
-                          onFieldClick={handleIndexFieldClick}
-                          onFieldEdit={handleFieldEdit}
-                          isReadOnly={isReadOnly}
-                        />
-                      </TabPanel>
-                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                        <PetitionSettings
-                          user={me}
-                          petition={petition}
-                          onUpdatePetition={handleUpdatePetition}
-                          validPetitionFields={validPetitionFields}
-                          onRefetch={() => refetch({ id: petitionId })}
-                        />
-                      </TabPanel>
-                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                        <PetitionComposeVariables
-                          petition={petition}
-                          allFieldsWithIndices={allFieldsWithIndices as any}
-                          isReadOnly={isReadOnly}
-                        />
-                      </TabPanel>
-                    </TabPanels>
-                  </Tabs>
-                </Card>
-              )}
-            </Flex>
-          }
         >
-          <Box padding={4}>
-            <PetitionComposeFieldList
-              showErrors={showErrors}
-              user={me}
-              petition={petition}
-              activeFieldId={activeFieldId}
-              onAddField={handleAddField}
-              onCloneField={handleCloneField}
-              onDeleteField={handleDeleteField}
-              onUpdateFieldPositions={handleUpdateFieldPositions}
-              onFieldEdit={handleFieldEdit}
-              onFieldSettingsClick={handleFieldSettingsClick}
-              onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
-              onLinkField={handleLinkField}
-              onUnlinkField={handleUnlinkField}
+          <PetitionComposeFieldList
+            showErrors={showErrors}
+            user={me}
+            petition={petition}
+            activeFieldId={activeFieldId}
+            onAddField={handleAddField}
+            onCloneField={handleCloneField}
+            onDeleteField={handleDeleteField}
+            onUpdateFieldPositions={handleUpdateFieldPositions}
+            onFieldEdit={handleFieldEdit}
+            onFieldSettingsClick={handleFieldSettingsClick}
+            onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
+            onLinkField={handleLinkField}
+            onUnlinkField={handleUnlinkField}
+            isReadOnly={isReadOnly}
+          />
+          {petition.isDocumentGenerationEnabled ? (
+            <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
+          ) : null}
+
+          {petition.__typename === "PetitionTemplate" ? (
+            <PetitionTemplateDescriptionEdit
+              petitionId={petition.id}
+              marginTop="4"
+              description={petition.description}
+              onUpdatePetition={handleUpdatePetition}
               isReadOnly={isReadOnly}
             />
-            {petition.isDocumentGenerationEnabled ? (
-              <PetitionComposeAttachments
-                petition={petition}
-                isReadOnly={isReadOnly}
-                marginTop="4"
-              />
-            ) : null}
+          ) : null}
 
-            {petition.__typename === "PetitionTemplate" ? (
-              <PetitionTemplateDescriptionEdit
-                petitionId={petition.id}
-                marginTop="4"
-                description={petition.description}
-                onUpdatePetition={handleUpdatePetition}
-                isReadOnly={isReadOnly}
-              />
-            ) : null}
-
-            {petition.__typename === "Petition" && petition.accesses.length > 0 ? (
-              <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
-                <Text>
-                  <FormattedMessage
-                    id="page.compose.petition-already-sent"
-                    defaultMessage="This parallel has already been sent."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="page.compose.send-from-activity"
-                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-                    values={{
-                      a: (chunks: any) => (
-                        <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
-                      ),
-                    }}
-                  />
-                </Text>
-              </Box>
-            ) : null}
-          </Box>
-        </TwoPaneLayout>
+          {petition.__typename === "Petition" && petition.accesses.length > 0 ? (
+            <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
+              <Text>
+                <FormattedMessage
+                  id="page.compose.petition-already-sent"
+                  defaultMessage="This parallel has already been sent."
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="page.compose.send-from-activity"
+                  defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                  values={{
+                    a: (chunks: any) => (
+                      <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
+                    ),
+                  }}
+                />
+              </Text>
+            </Box>
+          ) : null}
+        </Box>
       </PetitionLayout>
     </ToneProvider>
   );

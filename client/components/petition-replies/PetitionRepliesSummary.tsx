@@ -96,7 +96,7 @@ export const PetitionRepliesSummary = Object.assign(
     };
 
     return (
-      <Stack padding={4} spacing={4} paddingBottom={!isLoading && summary ? 0 : 4}>
+      <Stack padding={4} paddingBottom={0} spacing={4} flex="1">
         {!user.hasSummaryAccess ? (
           <>
             <Stack textAlign="center" align="center">
@@ -132,7 +132,7 @@ export const PetitionRepliesSummary = Object.assign(
             </Box>
           </>
         ) : isLoading ? (
-          <Center padding={4}>
+          <Center padding={4} height="100%">
             <Spinner
               thickness="4px"
               speed="0.65s"

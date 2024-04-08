@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Center, Spinner, useToast } from "@chakra-ui/react";
+import { Box, Center, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -444,60 +444,61 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
-      subHeader={
-        displayPetitionLimitReachedAlert ? (
-          <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-        ) : null
-      }
     >
-      {petition.isInteractionWithRecipientsEnabled ? (
-        <PetitionAccessesTable
-          id="petition-accesses"
-          margin={4}
-          petition={petition}
-          onSendReminders={handleSendReminders}
-          onAddPetitionAccess={handleNextClick({ redirect: false })}
-          onReactivateAccess={handleReactivateAccess}
-          onDeactivateAccess={handleDeactivateAccess}
-          onConfigureReminders={handleConfigureReminders}
-          onPetitionSend={handleNextClick({ redirect: true })}
-        />
-      ) : null}
-
-      {me.hasProfilesAccess ? (
-        <Box margin={4}>
-          <PetitionProfilesTable
-            petition={petition}
-            onAddProfile={handleAddProfileToPetition}
-            onRemoveProfile={handleDisassociateProfileFromPetition}
-          />
-        </Box>
-      ) : null}
-      <Box margin={4}>
-        <InfiniteScroll
-          dataLength={events.items.length}
-          next={handleLoadMore}
-          hasMore={events.items.length < events.totalCount}
-          loader={
-            <Center height="100px" width="100%" zIndex="1">
-              <Spinner
-                thickness="2px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="gray.600"
-                size="xl"
-              />
-            </Center>
-          }
-          scrollableTarget="petition-layout-body"
-        >
-          <PetitionActivityTimeline
-            id="petition-activity-timeline"
-            userId={me.id}
-            events={events.items}
-          />
-        </InfiniteScroll>
+      <Box position="sticky" top={0} zIndex={2}>
+        {displayPetitionLimitReachedAlert ? (
+          <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
+        ) : null}
       </Box>
+      <Stack padding={4} spacing={4} zIndex={1}>
+        {petition.isInteractionWithRecipientsEnabled ? (
+          <PetitionAccessesTable
+            id="petition-accesses"
+            petition={petition}
+            onSendReminders={handleSendReminders}
+            onAddPetitionAccess={handleNextClick({ redirect: false })}
+            onReactivateAccess={handleReactivateAccess}
+            onDeactivateAccess={handleDeactivateAccess}
+            onConfigureReminders={handleConfigureReminders}
+            onPetitionSend={handleNextClick({ redirect: true })}
+          />
+        ) : null}
+
+        {me.hasProfilesAccess ? (
+          <Box>
+            <PetitionProfilesTable
+              petition={petition}
+              onAddProfile={handleAddProfileToPetition}
+              onRemoveProfile={handleDisassociateProfileFromPetition}
+            />
+          </Box>
+        ) : null}
+        <Box>
+          <InfiniteScroll
+            dataLength={events.items.length}
+            next={handleLoadMore}
+            hasMore={events.items.length < events.totalCount}
+            loader={
+              <Center height="100px" width="100%" zIndex="1">
+                <Spinner
+                  thickness="2px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="gray.600"
+                  size="xl"
+                />
+              </Center>
+            }
+            scrollableTarget="petition-layout-body"
+          >
+            <PetitionActivityTimeline
+              id="petition-activity-timeline"
+              userId={me.id}
+              events={events.items}
+            />
+          </InfiniteScroll>
+        </Box>
+      </Stack>
     </PetitionLayout>
   );
 }

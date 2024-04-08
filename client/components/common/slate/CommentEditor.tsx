@@ -207,7 +207,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             ...inputStyles,
             "[data-slate-editor]": {
               outline: "none",
-              minHeight: "40px !important",
+              minHeight: "80px !important",
               paddingX: 3,
               paddingY: 2,
               maxHeight: "250px",

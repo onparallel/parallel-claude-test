@@ -345,6 +345,9 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                 petition={petition}
                 onFinalize={handleFinalize}
                 zIndex={2}
+                position="sticky"
+                bottom={0}
+                width="100%"
               />
             )}
           </Flex>

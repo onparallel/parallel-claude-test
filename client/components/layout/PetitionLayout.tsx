@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, chakra } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Box, Flex, chakra } from "@chakra-ui/react";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
@@ -13,12 +12,15 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { Focusable } from "@parallel/utils/types";
 import { useStateSlice } from "@parallel/utils/useStateSlice";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentType,
   Dispatch,
+  PropsWithChildren,
   ReactNode,
   RefObject,
   SetStateAction,
@@ -33,9 +35,6 @@ import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
-import { Focusable } from "@parallel/utils/types";
-import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import useResizeObserver from "@react-hook/resize-observer";
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
 export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
@@ -44,178 +43,204 @@ export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: PetitionSection;
   headerActions?: ReactNode;
-  subHeader?: ReactNode;
   drawer?: ReactNode;
   drawerInitialFocusRef?: RefObject<Focusable>;
   onRefetch?: () => void;
+  hasRightPane?: boolean;
+  isRightPaneActive?: boolean;
+  rightPane?: ReactNode;
 }
 
-export const PetitionLayout = Object.assign(
-  chakraForwardRef<"div", PetitionLayoutProps>(function PetitionLayout(
-    {
-      me,
-      realMe,
-      petition,
-      section,
-      onUpdatePetition,
-      headerActions,
-      children,
-      subHeader,
-      drawer,
-      drawerInitialFocusRef,
-      onRefetch,
-      ...props
-    },
-    ref,
-  ) {
-    const intl = useIntl();
-    const title = useMemo(
-      () =>
-        petition.__typename === "Petition"
-          ? (
-              {
-                compose: intl.formatMessage({
-                  id: "petition.header.compose-tab",
-                  defaultMessage: "Compose",
-                }),
-                messages: intl.formatMessage({
-                  id: "petition.header.messages-tab",
-                  defaultMessage: "Messages",
-                }),
-                preview: intl.formatMessage({
-                  id: "petition.header.preview-tab",
-                  defaultMessage: "Input",
-                }),
-                replies: intl.formatMessage({
-                  id: "petition.header.replies-tab",
-                  defaultMessage: "Review",
-                }),
-                activity: intl.formatMessage({
-                  id: "petition.header.activity-tab",
-                  defaultMessage: "Activity",
-                }),
-              } as Record<PetitionHeaderProps["section"], string>
-            )[section!]
-          : intl.formatMessage({
-              id: "generic.template",
-              defaultMessage: "Template",
-            }),
-      [section, intl.locale],
-    );
+export function PetitionLayout({
+  me,
+  realMe,
+  petition,
+  section,
+  onUpdatePetition,
+  headerActions,
+  children,
+  drawer,
+  drawerInitialFocusRef,
+  onRefetch,
+  isRightPaneActive,
+  rightPane,
+  hasRightPane,
+}: PropsWithChildren<PetitionLayoutProps>) {
+  const intl = useIntl();
+  const title = useMemo(
+    () =>
+      petition.__typename === "Petition"
+        ? (
+            {
+              compose: intl.formatMessage({
+                id: "petition.header.compose-tab",
+                defaultMessage: "Compose",
+              }),
+              messages: intl.formatMessage({
+                id: "petition.header.messages-tab",
+                defaultMessage: "Messages",
+              }),
+              preview: intl.formatMessage({
+                id: "petition.header.preview-tab",
+                defaultMessage: "Input",
+              }),
+              replies: intl.formatMessage({
+                id: "petition.header.replies-tab",
+                defaultMessage: "Review",
+              }),
+              activity: intl.formatMessage({
+                id: "petition.header.activity-tab",
+                defaultMessage: "Activity",
+              }),
+            } as Record<PetitionHeaderProps["section"], string>
+          )[section!]
+        : intl.formatMessage({
+            id: "generic.template",
+            defaultMessage: "Template",
+          }),
+    [section, intl.locale],
+  );
 
-    const headerRef = useRef<PetitionHeaderInstance>(null);
+  const headerRef = useRef<PetitionHeaderInstance>(null);
 
-    const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
+  const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
 
-    useTempQueryParam("new", () => {
-      setTimeout(() => {
-        if (!isDefined(petition.name)) {
-          headerRef.current?.focusName();
-        }
-      });
-      setShouldConfirmNavigation(true);
-    });
-
-    useConfirmDiscardDraftDialog(petition);
-
-    const drawerIsOpenRef = useUpdatingRef(isDefined(drawer));
-    const bodyRef = useRef<HTMLDivElement>(null);
-    const [bodyScrollbarWidth, setBodyScrollbarWidth] = useState(0);
-    useResizeObserver(bodyRef, ({ target }) => {
-      if (bodyRef.current) {
-        const width = bodyRef.current!.offsetWidth - bodyRef.current!.clientWidth;
-        if (bodyScrollbarWidth !== width) {
-          setBodyScrollbarWidth(width);
-        }
+  useTempQueryParam("new", () => {
+    setTimeout(() => {
+      if (!isDefined(petition.name)) {
+        headerRef.current?.focusName();
       }
     });
+    setShouldConfirmNavigation(true);
+  });
 
-    return (
-      <AppLayout
-        ref={ref}
-        title={`${
-          petition!.name ||
-          (petition.__typename === "Petition"
-            ? intl.formatMessage({
-                id: "generic.unnamed-parallel",
-                defaultMessage: "Unnamed parallel",
-              })
-            : intl.formatMessage({
-                id: "generic.unnamed-template",
-                defaultMessage: "Unnamed template",
-              }))
-        } - ${title}`}
+  useConfirmDiscardDraftDialog(petition);
+
+  const drawerIsOpenRef = useUpdatingRef(isDefined(drawer));
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [drawerIsShown, setDrawerIsShown] = useState(false);
+
+  return (
+    <AppLayout
+      title={`${
+        petition!.name ||
+        (petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.unnamed-parallel",
+              defaultMessage: "Unnamed parallel",
+            })
+          : intl.formatMessage({
+              id: "generic.unnamed-template",
+              defaultMessage: "Unnamed template",
+            }))
+      } - ${title}`}
+      me={me}
+      realMe={realMe}
+      position="relative"
+    >
+      <PetitionHeader
+        ref={headerRef}
+        petition={petition}
         me={me}
-        realMe={realMe}
-        position="relative"
-      >
-        <PetitionHeader
-          ref={headerRef}
-          petition={petition}
-          me={me}
-          onUpdatePetition={onUpdatePetition}
-          onRefetch={onRefetch}
-          section={section!}
-          actions={headerActions}
-        />
-        {subHeader ? <Box>{subHeader}</Box> : null}
-        <Box ref={bodyRef} flex="1" overflow="auto" {...props} id="petition-layout-body">
+        onUpdatePetition={onUpdatePetition}
+        onRefetch={onRefetch}
+        section={section!}
+        actions={headerActions}
+      />
+      <Flex ref={bodyRef} flex="1" minHeight={0}>
+        <Flex
+          flex="1"
+          minWidth={0}
+          display={{ base: isRightPaneActive ? "none" : "flex", lg: "flex" }}
+          flexDirection="column"
+          overflow="auto"
+          id="petition-layout-body"
+        >
           {children}
-        </Box>
-        <AnimatePresence>
-          {drawer ? (
+        </Flex>
+        {hasRightPane ? (
+          <Box
+            as="section"
+            width={{ base: "100%", lg: "390px" }}
+            backgroundColor="white"
+            display={{ base: isRightPaneActive ? "flex" : "none", lg: "flex" }}
+            borderLeft={{ base: "none", lg: "1px solid" }}
+            borderLeftColor={{ base: "none", lg: "gray.200" }}
+            flexDirection="column"
+          >
+            {drawerIsShown ? null : rightPane}
+          </Box>
+        ) : null}
+      </Flex>
+      <AnimatePresence>
+        {drawer ? (
+          // this creates a "window" with overflow hidden so no weird scrollbars appear
+          <Box
+            position="absolute"
+            width={{ base: "full", lg: "390px" }}
+            top={{ base: "105px", lg: "66px" }}
+            bottom={0}
+            right={0}
+            zIndex={1}
+            overflow="hidden"
+          >
             <MotionSection
               borderLeft={{ base: "none", lg: "1px solid" }}
               borderColor={{ base: "none", lg: "gray.200" }}
-              position="absolute"
               boxShadow={{ base: "none", lg: "short" }}
-              width={{ base: "full", lg: `${495 + bodyScrollbarWidth}px` }}
-              top={{ base: "105px", lg: "66px" }}
-              bottom={0}
-              right={0}
-              zIndex={1}
+              position="absolute"
+              height="100%"
+              width="100%"
+              top={0}
               initial={{ x: "100%" }}
               animate={{ x: 0, transition: { type: "spring", bounce: 0, duration: 0.2 } }}
               exit={{
                 x: "100%",
                 transition: { type: "spring", bounce: 0, duration: 0.2 },
               }}
-              onAnimationComplete={() => {
+              onAnimationComplete={({ x }: any) => {
                 if (drawerIsOpenRef.current) {
                   drawerInitialFocusRef?.current?.focus();
+                }
+                if (x === 0) {
+                  setDrawerIsShown(true);
+                }
+              }}
+              onAnimationStart={({ x }: any) => {
+                if (x === "100%") {
+                  setDrawerIsShown(false);
                 }
               }}
             >
               {drawer}
             </MotionSection>
-          ) : null}
-        </AnimatePresence>
-      </AppLayout>
-    );
-  }),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment PetitionLayout_PetitionBase on PetitionBase {
-          id
-          name
-          ...useConfirmDiscardDraftDialog_PetitionBase
-          ...PetitionHeader_PetitionBase
-        }
-        ${useConfirmDiscardDraftDialog.fragments.PetitionBase}
-        ${PetitionHeader.fragments.PetitionBase}
-      `,
-      Query: gql`
-        fragment PetitionLayout_Query on Query {
-          ...AppLayout_Query
-          ...PetitionHeader_Query
-        }
-        ${AppLayout.fragments.Query}
-        ${PetitionHeader.fragments.Query}
-      `,
-    },
-  },
-);
+          </Box>
+        ) : null}
+      </AnimatePresence>
+    </AppLayout>
+  );
+}
+
+PetitionLayout.fragments = {
+  PetitionBase: gql`
+    fragment PetitionLayout_PetitionBase on PetitionBase {
+      id
+      name
+      ...useConfirmDiscardDraftDialog_PetitionBase
+      ...PetitionHeader_PetitionBase
+    }
+    ${useConfirmDiscardDraftDialog.fragments.PetitionBase}
+    ${PetitionHeader.fragments.PetitionBase}
+  `,
+  Query: gql`
+    fragment PetitionLayout_Query on Query {
+      ...AppLayout_Query
+      ...PetitionHeader_Query
+    }
+    ${AppLayout.fragments.Query}
+    ${PetitionHeader.fragments.Query}
+  `,
+};
 
 const MotionSection = chakra(motion.section);
 

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
+import { CloseableCardHeader } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   PetitionComposeFieldSettings_PetitionBaseFragment,
@@ -22,6 +22,7 @@ import { PetitionComposeDynamicSelectFieldSettings } from "./fields/PetitionComp
 import { PetitionComposeFieldGroupSettings } from "./fields/PetitionComposeFieldGroupSettings";
 import { PetitionComposeHeadingSettings } from "./fields/PetitionComposeHeadingSettings";
 import { PetitionComposeNumberSettings } from "./fields/PetitionComposeNumberSettings";
+import { PetitionComposeSelectSettings } from "./fields/PetitionComposeSelectSettings";
 import { PetitionComposeShortTextSettings } from "./fields/PetitionComposeShortTextSettings";
 import { AllowCommentSettingsRow } from "./rows/AllowCommentSettingsRow";
 import { AllowMultipleFilesSettingsRow } from "./rows/AllowMultipleFilesSettingsRow";
@@ -33,7 +34,6 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
-import { PetitionComposeSelectSettings } from "./fields/PetitionComposeSelectSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petition: PetitionComposeFieldSettings_PetitionBaseFragment;
@@ -123,7 +123,7 @@ export const PetitionComposeFieldSettings = Object.assign(
       const SettingsComponent = COMPONENTS[field.type] ?? EmptySettings;
 
       return (
-        <Card ref={ref} display="flex" flexDirection="column" {...props}>
+        <Box ref={ref} display="flex" flexDirection="column" {...props}>
           <CloseableCardHeader onClose={onClose}>
             <Text as="span" noOfLines={1} wordBreak="break-all">
               <Text as="span">{`${fieldIndex}. `}</Text>
@@ -137,7 +137,15 @@ export const PetitionComposeFieldSettings = Object.assign(
             </Text>
           </CloseableCardHeader>
 
-          <Stack as="section" padding={4} spacing={5} flex={1} minHeight={0} overflow="auto">
+          <Stack
+            as="section"
+            padding={4}
+            paddingBottom="80px"
+            spacing={5}
+            flex={1}
+            minHeight={0}
+            overflow="auto"
+          >
             <Stack>
               {canChangeFieldType ? (
                 <Box>
@@ -289,7 +297,7 @@ export const PetitionComposeFieldSettings = Object.assign(
               </SettingsRowGroup>
             )}
           </Stack>
-        </Card>
+        </Box>
       );
     },
   ),

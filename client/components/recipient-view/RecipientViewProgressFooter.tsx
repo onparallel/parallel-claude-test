@@ -102,23 +102,16 @@ export const RecipientViewProgressFooter = Object.assign(
 
     const isCompleted = petition.status === "COMPLETED";
     return (
-      <Box
+      <Flex
         ref={ref}
         as="section"
         backgroundColor="white"
         boxShadow="short"
-        display="flex"
         borderTop="1px solid"
         borderTopColor="gray.200"
-        width="100%"
         paddingY={2}
         paddingX={{ base: 2, sm: 4 }}
-        flexDirection="row"
         alignItems="center"
-        position="sticky"
-        bottom={0}
-        borderRadius={0}
-        borderX="none"
         {...props}
       >
         <Heading as="h3" fontSize="md" fontWeight="normal" data-testid="recipient-view-progress">
@@ -196,7 +189,7 @@ export const RecipientViewProgressFooter = Object.assign(
             </PopoverBody>
           </PopoverContent>
         </Popover>
-      </Box>
+      </Flex>
     );
   }),
   {

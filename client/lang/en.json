@@ -4335,6 +4335,11 @@
     "context": "Comments"
   },
   {
+    "term": "component.petition-comments-and-notes-editor.ctrl-enter-help",
+    "definition": "Ctrl + enter to send",
+    "context": "Ctrl + enter to send"
+  },
+  {
     "term": "component.petition-comments-and-notes-editor.note-placeholder",
     "definition": "Type @ to mention other users",
     "context": "Type @ to mention other users"

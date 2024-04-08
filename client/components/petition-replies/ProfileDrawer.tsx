@@ -64,7 +64,7 @@ export const ProfileDrawer = Object.assign(
         <HStack
           borderBottom="1px solid"
           borderColor="gray.200"
-          height="57px"
+          height="53px"
           alignItems="center"
           paddingY={2}
           paddingX={4}

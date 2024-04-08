@@ -1,4 +1,4 @@
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
@@ -72,8 +72,8 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   async function handleSubmitClick() {
     if (!isEmptyCommentEditorValue(draft)) {
       try {
-        await onSubmit(draft, tabIsNotes);
         editorRef.current?.clear();
+        await onSubmit(draft, tabIsNotes);
       } catch {}
     }
   }
@@ -129,28 +129,40 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
           </HelpPopover>
         </RadioTab>
       </RadioTabList>
-      <HStack padding={2} backgroundColor={tabIsNotes ? "yellow.100" : undefined}>
-        <CommentEditor
-          id={`comment-editor-${id}`}
-          ref={editorRef}
-          placeholder={
-            tabIsNotes
-              ? intl.formatMessage({
-                  id: "component.petition-comments-and-notes-editor.note-placeholder",
-                  defaultMessage: "Type @ to mention other users",
-                })
-              : intl.formatMessage({
-                  id: "component.petition-comments-and-notes-editor.comment-placeholder",
-                  defaultMessage: "Write a comment",
-                })
-          }
-          value={draft}
-          isDisabled={isDisabled}
-          onKeyDown={handleKeyDown}
-          onChange={setDraft}
-          defaultMentionables={defaultMentionables}
-          onSearchMentionables={onSearchMentionables}
-        />
+      <HStack
+        padding={2}
+        backgroundColor={tabIsNotes ? "yellow.100" : undefined}
+        alignItems="flex-start"
+      >
+        <Stack flex={1} spacing={1}>
+          <CommentEditor
+            id={`comment-editor-${id}`}
+            ref={editorRef}
+            placeholder={
+              tabIsNotes
+                ? intl.formatMessage({
+                    id: "component.petition-comments-and-notes-editor.note-placeholder",
+                    defaultMessage: "Type @ to mention other users",
+                  })
+                : intl.formatMessage({
+                    id: "component.petition-comments-and-notes-editor.comment-placeholder",
+                    defaultMessage: "Write a comment",
+                  })
+            }
+            value={draft}
+            isDisabled={isDisabled}
+            onKeyDown={handleKeyDown}
+            onChange={setDraft}
+            defaultMentionables={defaultMentionables}
+            onSearchMentionables={onSearchMentionables}
+          />
+          <Text fontSize="sm" color="gray.600">
+            <FormattedMessage
+              id="component.petition-comments-and-notes-editor.ctrl-enter-help"
+              defaultMessage="Ctrl + enter to send"
+            />
+          </Text>
+        </Stack>
         <Box>
           <Button
             colorScheme="primary"

@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
@@ -64,13 +64,14 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       petition={petition}
       onUpdatePetition={updatePetition}
       section="messages"
-      backgroundColor="primary.50"
     >
-      <Stack spacing={4} padding={4} maxWidth="container.md" margin="auto">
-        <PetitionTemplateRequestMessageCard {...cardCommonProps} user={me} />
-        <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
-        <PetitionTemplateClosingMessageCard {...cardCommonProps} />
-      </Stack>
+      <Box paddingX={4} backgroundColor="primary.50">
+        <Stack spacing={4} paddingY={4} maxWidth="container.md" margin="auto">
+          <PetitionTemplateRequestMessageCard {...cardCommonProps} user={me} />
+          <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
+          <PetitionTemplateClosingMessageCard {...cardCommonProps} />
+        </Stack>
+      </Box>
     </PetitionLayout>
   );
 }

@@ -83,7 +83,7 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 
@@ -162,9 +162,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const fieldsWithLogic = pages[currentPage - 1];
 
+  const pageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const layoutBody = document.getElementById("petition-layout-body");
-    if (layoutBody) layoutBody.scrollTop = 0;
+    pageRef.current!.scrollTop = 0;
   }, [currentPage]);
 
   const goToSection = useGoToPetitionSection();
@@ -467,100 +467,101 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             />
           ) : null
         }
-        subHeader={
-          <>
-            {!isPetition ? (
-              <Alert status="info" paddingY={0}>
-                <AlertIcon />
-                <Text flex={1} paddingY={3}>
-                  <FormattedMessage
-                    id="page.preview.template-only-cache-alert"
-                    defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
-                    values={{
-                      button: (
-                        <FormattedMessage
-                          id="generic.create-petition"
-                          defaultMessage="Create parallel"
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-                {showGeneratePrefilledPublicLinkButton ? (
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    marginLeft={2}
-                    onClick={() => handleGeneratePrefilledPublicLinkClick()}
-                  >
-                    <FormattedMessage
-                      id="page.preview.generate-prefilled-link"
-                      defaultMessage="Generate prefilled link"
-                    />
-                  </Button>
-                ) : null}
-              </Alert>
-            ) : null}
-            {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
-              <PetitionPreviewSignatureReviewAlert />
-            ) : null}
-            {displayPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-            ) : null}
-            {showPetitionCompletedAlert ? <PetitionCompletedAlert /> : null}
-            {showRefreshRepliesAlert ? (
-              <RecipientViewRefreshRepliesAlert
-                onRefetch={async () => {
-                  await refetch();
-                  setShowRefreshRepliesAlert(false);
-                }}
-              />
-            ) : null}
-          </>
-        }
       >
-        <Flex
-          backgroundColor="primary.50"
-          minHeight="100%"
-          flexDirection="column"
-          alignItems="center"
-          className="with-organization-brand-theme"
+        <Box>
+          {!isPetition ? (
+            <Alert status="info" paddingY={0}>
+              <AlertIcon />
+              <Text flex={1} paddingY={3}>
+                <FormattedMessage
+                  id="page.preview.template-only-cache-alert"
+                  defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
+                  values={{
+                    button: (
+                      <FormattedMessage
+                        id="generic.create-petition"
+                        defaultMessage="Create parallel"
+                      />
+                    ),
+                  }}
+                />
+              </Text>
+              {showGeneratePrefilledPublicLinkButton ? (
+                <Button
+                  size="sm"
+                  colorScheme="blue"
+                  marginLeft={2}
+                  onClick={() => handleGeneratePrefilledPublicLinkClick()}
+                >
+                  <FormattedMessage
+                    id="page.preview.generate-prefilled-link"
+                    defaultMessage="Generate prefilled link"
+                  />
+                </Button>
+              ) : null}
+            </Alert>
+          ) : null}
+          {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
+            <PetitionPreviewSignatureReviewAlert />
+          ) : null}
+          {displayPetitionLimitReachedAlert ? (
+            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
+          ) : null}
+          {showPetitionCompletedAlert ? <PetitionCompletedAlert /> : null}
+          {showRefreshRepliesAlert ? (
+            <RecipientViewRefreshRepliesAlert
+              onRefetch={async () => {
+                await refetch();
+                setShowRefreshRepliesAlert(false);
+              }}
+            />
+          ) : null}
+        </Box>
+        <OverrideWithOrganizationTheme
+          cssVarsRoot=".with-organization-brand-theme"
+          brandTheme={me.organization.brandTheme}
         >
-          <OverrideWithOrganizationTheme
-            cssVarsRoot=".with-organization-brand-theme"
-            brandTheme={me.organization.brandTheme}
+          <Box
+            ref={pageRef}
+            flex={1}
+            paddingX={4}
+            backgroundColor="primary.50"
+            className="with-organization-brand-theme"
+            position="relative"
+            overflow="auto"
           >
             <Flex
-              flex="1"
-              flexDirection={{ base: "column", [breakpoint]: "row" }}
               width="100%"
+              margin="auto"
               maxWidth="container.lg"
-              paddingY={6}
-              paddingX={4}
               fontFamily="body"
+              gap={4}
               zIndex={1}
+              position="relative"
             >
               <Box
-                flex={{ base: 0, [breakpoint]: 1 }}
+                flex={1}
+                paddingY={6}
                 minWidth={0}
-                marginRight={{ base: 0, [breakpoint]: 4 }}
-                marginBottom={4}
                 display={{ base: "none", [breakpoint]: "block" }}
+                position="sticky"
+                height="100%"
+                top={0}
               >
-                <Stack
-                  spacing={4}
-                  position={{ base: "relative", [breakpoint]: "sticky" }}
-                  top={{ base: 0, [breakpoint]: 6 }}
-                >
-                  <RecipientViewContentsCard
-                    currentPage={currentPage}
-                    petition={petition}
-                    maxHeight="calc(100vh - 10.5rem)"
-                    usePreviewReplies={!isPetition}
-                  />
-                </Stack>
+                <RecipientViewContentsCard
+                  currentPage={currentPage}
+                  petition={petition}
+                  maxHeight="calc(100vh - 10.5rem)"
+                  usePreviewReplies={!isPetition}
+                />
               </Box>
-              <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
+              <Flex
+                data-section="preview-fields"
+                paddingY={6}
+                flexDirection="column"
+                flex="2"
+                minWidth={0}
+              >
                 <Stack spacing={4} key={0}>
                   <LiquidScopeProvider
                     petition={petition}
@@ -658,31 +659,29 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     })}
                   </LiquidScopeProvider>
                 </Stack>
-                <Spacer />
+                <Spacer minHeight={8} />
                 {pages.length > 1 ? (
-                  <RecipientViewPagination
-                    marginTop={8}
-                    currentPage={currentPage}
-                    pageCount={pageCount}
-                  />
+                  <RecipientViewPagination currentPage={currentPage} pageCount={pageCount} />
                 ) : null}
               </Flex>
             </Flex>
-          </OverrideWithOrganizationTheme>
-          {isPetition && petition.status !== "CLOSED" && (
-            <RecipientViewProgressFooter
-              petition={petition}
-              onFinalize={handleFinalize}
-              isDisabled={
-                displayPetitionLimitReachedAlert ||
-                petition.isAnonymized ||
-                myEffectivePermission === "READ"
-              }
-              fontFamily="body"
-              zIndex={2}
-            />
-          )}
-        </Flex>
+          </Box>
+        </OverrideWithOrganizationTheme>
+        {isPetition && petition.status !== "CLOSED" && (
+          <RecipientViewProgressFooter
+            petition={petition}
+            onFinalize={handleFinalize}
+            isDisabled={
+              displayPetitionLimitReachedAlert ||
+              petition.isAnonymized ||
+              myEffectivePermission === "READ"
+            }
+            fontFamily="body"
+            position="sticky"
+            bottom={0}
+            zIndex={2}
+          />
+        )}
       </PetitionLayout>
     </ToneProvider>
   );

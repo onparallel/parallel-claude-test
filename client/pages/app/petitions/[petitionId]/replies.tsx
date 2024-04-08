@@ -2,7 +2,6 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
-  Flex,
   HStack,
   Heading,
   Stack,
@@ -25,8 +24,6 @@ import {
   SparklesIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
-import { Card } from "@parallel/components/common/Card";
-import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
@@ -45,7 +42,6 @@ import {
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
-import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
@@ -118,7 +114,6 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { withMetadata } from "@parallel/utils/withMetadata";
-import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -533,111 +528,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
-      subHeader={
-        <>
-          {displayPetitionLimitReachedAlert ? (
-            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-          ) : null}
-          <HStack paddingX={4} paddingY={2}>
-            <IconButtonWithTooltip
-              display={{ base: "none", md: "inline" }}
-              onClick={() => refetch()}
-              icon={<RepeatIcon />}
-              placement="bottom"
-              variant="outline"
-              label={intl.formatMessage({
-                id: "generic.reload-data",
-                defaultMessage: "Reload",
-              })}
-            />
-            {petition.status === "CLOSED" ||
-            petition.isAnonymized ||
-            myEffectivePermission === "READ" ? null : (
-              <Button
-                data-action="close-petition"
-                colorScheme="green"
-                leftIcon={<CheckIcon />}
-                onClick={handleClosePetition}
-              >
-                <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-                  <FormattedMessage
-                    id="page.replies.finalize-petition-button"
-                    defaultMessage="Close parallel"
-                  />
-                </Text>
-              </Button>
-            )}
-            {petition.status !== "CLOSED" ||
-            petition.accesses.length === 0 ||
-            petition.isAnonymized ||
-            myEffectivePermission === "READ" ? null : (
-              <Button
-                colorScheme="blue"
-                leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-                onClick={async () => {
-                  try {
-                    await handleFinishPetition({ requiredMessage: true });
-                  } catch {}
-                }}
-              >
-                <FormattedMessage
-                  id="page.replies.notify-petition-reviewed-button"
-                  defaultMessage="Notify that it is correct"
-                />
-              </Button>
-            )}
-            {me.hasProfilesAccess &&
-            ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
-              petition.profiles.length > 0) ? (
-              <ResponsiveButtonIcon
-                data-action="associate-profile"
-                colorScheme="primary"
-                icon={<ProfilesIcon />}
-                onClick={() =>
-                  petition.profiles.length
-                    ? setQueryState({
-                        comments: null,
-                        profile: petition.profiles.at(-1)!.id,
-                      })
-                    : handleAssociateProfile()
-                }
-                label={
-                  petition.profiles.length
-                    ? intl.formatMessage({
-                        id: "page.replies.open-profile-button",
-                        defaultMessage: "Open profile",
-                      })
-                    : intl.formatMessage({
-                        id: "page.replies.associate-profile-button",
-                        defaultMessage: "Associate profile",
-                      })
-                }
-              />
-            ) : null}
-            {showDownloadAll && !petition.isAnonymized ? (
-              <ResponsiveButtonIcon
-                icon={<DownloadIcon fontSize="lg" display="block" />}
-                onClick={handleDownloadAllClick}
-                label={intl.formatMessage({
-                  id: "page.replies.export-replies",
-                  defaultMessage: "Export replies",
-                })}
-              />
-            ) : null}
-            {petition.isDocumentGenerationEnabled && !petition.isAnonymized ? (
-              <ResponsiveButtonIcon
-                icon={<FilePdfIcon fontSize="lg" display="block" />}
-                onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
-                label={intl.formatMessage({
-                  id: "page.petition-replies.export-pdf",
-                  defaultMessage: "Export to PDF",
-                })}
-              />
-            ) : null}
-          </HStack>
-          <Divider />
-        </>
-      }
       drawer={
         profileId ? (
           <ProfileDrawer
@@ -654,121 +544,195 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         ) : null
       }
       drawerInitialFocusRef={drawerInitialRef}
-    >
-      <TwoPaneLayout
-        top={4}
-        isSidePaneActive={Boolean(activeFieldId)}
-        sidePane={
-          <AnimatePresence>
-            {profileId ? null : (
-              <Flex
-                as={motion.div}
-                exit={{ opacity: 1, transition: { delay: 0.2, duration: 0 } }}
-                direction="column"
-                paddingX={4}
-                paddingLeft={{ lg: 0 }}
-                maxHeight={{
-                  base: "calc(100vh - 244px)",
-                  sm: "calc(100vh - 178px)",
-                  md: "calc(100vh - 138px)",
-                }}
-                paddingBottom={{ base: 4, sm: "80px" }}
+      hasRightPane
+      isRightPaneActive={Boolean(activeFieldId)}
+      rightPane={
+        activeFieldId && !!activeField ? (
+          <PetitionRepliesFieldComments
+            key={activeFieldId}
+            petition={petition}
+            field={activeField}
+            isDisabled={petition.isAnonymized}
+            onClose={() => setActiveFieldId(null)}
+            onAddComment={handleAddComment}
+            onUpdateComment={handleUpdateComment}
+            onDeleteComment={handleDeleteComment}
+            onMarkAsUnread={handleMarkAsUnread}
+            onlyReadPermission={myEffectivePermission === "READ"}
+          />
+        ) : (
+          <Tabs variant="enclosed" overflow="hidden" {...extendFlexColumn}>
+            <TabList marginX="-1px" marginTop="-1px" flex="none">
+              <Tab padding={4} lineHeight={5} fontWeight="bold">
+                <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
+                <FormattedMessage id="generic.contents" defaultMessage="Contents" />
+              </Tab>
+              <Tab padding={4} lineHeight={5} fontWeight="bold">
+                <SparklesIcon fontSize="18px" marginRight={2} role="presentation" />
+                <FormattedMessage
+                  id="page.replies.summary-header"
+                  defaultMessage="Analyze with Mike"
+                />
+                <HelpPopover>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="page.replies.summary-header-help"
+                      defaultMessage="Mike AI analyzes the replies to extract conclusions."
+                    />
+                  </Text>
+                </HelpPopover>
+              </Tab>
+            </TabList>
+            <TabPanels {...extendFlexColumn}>
+              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="64px">
+                <HStack padding={4} paddingTop={3} paddingBottom={0} justify="space-between">
+                  <Heading fontWeight={500} fontSize="xl">
+                    <FormattedMessage
+                      id="page.replies.list-of-contents"
+                      defaultMessage="List of contents"
+                    />
+                  </Heading>
+                  <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
+                </HStack>
+                <PetitionRepliesContents
+                  fieldsWithIndices={fieldsWithIndices}
+                  filter={filter}
+                  fieldLogic={fieldLogic}
+                  onFieldClick={handlePetitionContentsFieldClick}
+                  signatureStatus={
+                    petition.isDocumentGenerationEnabled ? petitionSignatureStatus : undefined
+                  }
+                  signatureEnvironment={petitionSignatureEnvironment}
+                  onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                  onVariablesClick={
+                    petition.variables.length ? handlePetitionContentsVariablesClick : undefined
+                  }
+                />
+              </TabPanel>
+              <TabPanel
+                {...extendFlexColumn}
+                padding={0}
+                overflow="auto"
+                position="relative"
+                paddingBottom="64px"
               >
-                {activeFieldId && !!activeField ? (
-                  <PetitionRepliesFieldComments
-                    key={activeFieldId}
-                    petition={petition}
-                    field={activeField}
-                    isDisabled={petition.isAnonymized}
-                    onClose={() => setActiveFieldId(null)}
-                    onAddComment={handleAddComment}
-                    onUpdateComment={handleUpdateComment}
-                    onDeleteComment={handleDeleteComment}
-                    onMarkAsUnread={handleMarkAsUnread}
-                    onlyReadPermission={myEffectivePermission === "READ"}
-                    {...extendFlexColumn}
-                  />
-                ) : (
-                  <Card {...extendFlexColumn}>
-                    <Tabs variant="enclosed" {...extendFlexColumn}>
-                      <TabList marginX="-1px" marginTop="-1px" flex="none">
-                        <Tab padding={4} lineHeight={5} fontWeight="bold">
-                          <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
-                          <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-                        </Tab>
-                        <Tab padding={4} lineHeight={5} fontWeight="bold">
-                          <SparklesIcon fontSize="18px" marginRight={2} role="presentation" />
-                          <FormattedMessage
-                            id="page.replies.summary-header"
-                            defaultMessage="Analyze with Mike"
-                          />
-                          <HelpPopover>
-                            <Text fontSize="sm">
-                              <FormattedMessage
-                                id="page.replies.summary-header-help"
-                                defaultMessage="Mike AI analyzes the replies to extract conclusions."
-                              />
-                            </Text>
-                          </HelpPopover>
-                        </Tab>
-                      </TabList>
-                      <TabPanels {...extendFlexColumn}>
-                        <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                          <HStack
-                            padding={4}
-                            paddingTop={3}
-                            paddingBottom={0}
-                            justify="space-between"
-                          >
-                            <Heading fontWeight={500} fontSize="xl">
-                              <FormattedMessage
-                                id="page.replies.list-of-contents"
-                                defaultMessage="List of contents"
-                              />
-                            </Heading>
-                            <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
-                          </HStack>
-                          <PetitionRepliesContents
-                            fieldsWithIndices={fieldsWithIndices}
-                            filter={filter}
-                            fieldLogic={fieldLogic}
-                            onFieldClick={handlePetitionContentsFieldClick}
-                            signatureStatus={
-                              petition.isDocumentGenerationEnabled
-                                ? petitionSignatureStatus
-                                : undefined
-                            }
-                            signatureEnvironment={petitionSignatureEnvironment}
-                            onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                            onVariablesClick={
-                              petition.variables.length
-                                ? handlePetitionContentsVariablesClick
-                                : undefined
-                            }
-                          />
-                        </TabPanel>
-                        <TabPanel
-                          {...extendFlexColumn}
-                          padding={0}
-                          overflow="auto"
-                          position="relative"
-                        >
-                          <PetitionRepliesSummary
-                            petition={petition}
-                            user={me}
-                            onRefetch={refetch}
-                          />
-                        </TabPanel>
-                      </TabPanels>
-                    </Tabs>
-                  </Card>
-                )}
-              </Flex>
-            )}
-          </AnimatePresence>
-        }
+                <PetitionRepliesSummary petition={petition} user={me} onRefetch={refetch} />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        )
+      }
+    >
+      <HStack
+        paddingX={4}
+        backgroundColor="white"
+        height="53px"
+        borderBottom="1px solid"
+        borderBottomColor="gray.200"
       >
-        <Box padding={4}>
+        <IconButtonWithTooltip
+          display={{ base: "none", md: "inline" }}
+          onClick={() => refetch()}
+          icon={<RepeatIcon />}
+          placement="bottom"
+          variant="outline"
+          label={intl.formatMessage({
+            id: "generic.reload-data",
+            defaultMessage: "Reload",
+          })}
+        />
+        {petition.status === "CLOSED" ||
+        petition.isAnonymized ||
+        myEffectivePermission === "READ" ? null : (
+          <Button
+            data-action="close-petition"
+            colorScheme="green"
+            leftIcon={<CheckIcon />}
+            onClick={handleClosePetition}
+          >
+            <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+              <FormattedMessage
+                id="page.replies.finalize-petition-button"
+                defaultMessage="Close parallel"
+              />
+            </Text>
+          </Button>
+        )}
+        {petition.status !== "CLOSED" ||
+        petition.accesses.length === 0 ||
+        petition.isAnonymized ||
+        myEffectivePermission === "READ" ? null : (
+          <Button
+            colorScheme="blue"
+            leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
+            onClick={async () => {
+              try {
+                await handleFinishPetition({ requiredMessage: true });
+              } catch {}
+            }}
+          >
+            <FormattedMessage
+              id="page.replies.notify-petition-reviewed-button"
+              defaultMessage="Notify that it is correct"
+            />
+          </Button>
+        )}
+        {me.hasProfilesAccess &&
+        ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
+          petition.profiles.length > 0) ? (
+          <ResponsiveButtonIcon
+            data-action="associate-profile"
+            colorScheme="primary"
+            icon={<ProfilesIcon />}
+            onClick={() =>
+              petition.profiles.length
+                ? setQueryState({
+                    comments: null,
+                    profile: petition.profiles.at(-1)!.id,
+                  })
+                : handleAssociateProfile()
+            }
+            label={
+              petition.profiles.length
+                ? intl.formatMessage({
+                    id: "page.replies.open-profile-button",
+                    defaultMessage: "Open profile",
+                  })
+                : intl.formatMessage({
+                    id: "page.replies.associate-profile-button",
+                    defaultMessage: "Associate profile",
+                  })
+            }
+          />
+        ) : null}
+        {showDownloadAll && !petition.isAnonymized ? (
+          <ResponsiveButtonIcon
+            icon={<DownloadIcon fontSize="lg" display="block" />}
+            onClick={handleDownloadAllClick}
+            label={intl.formatMessage({
+              id: "page.replies.export-replies",
+              defaultMessage: "Export replies",
+            })}
+          />
+        ) : null}
+        {petition.isDocumentGenerationEnabled && !petition.isAnonymized ? (
+          <ResponsiveButtonIcon
+            icon={<FilePdfIcon fontSize="lg" display="block" />}
+            onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
+            label={intl.formatMessage({
+              id: "page.petition-replies.export-pdf",
+              defaultMessage: "Export to PDF",
+            })}
+          />
+        ) : null}
+      </HStack>
+      <Box flex={1} overflow="auto" minHeight={0}>
+        <Box position="sticky" top={0} zIndex={2}>
+          {displayPetitionLimitReachedAlert ? (
+            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
+          ) : null}
+        </Box>
+        <Box padding={4} zIndex={1}>
           {petition.isDocumentGenerationEnabled ? (
             <PetitionSignaturesCard
               ref={signaturesRef as any}
@@ -827,7 +791,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </LiquidScopeProvider>
           </Stack>
         </Box>
-      </TwoPaneLayout>
+      </Box>
     </PetitionLayout>
   );
 }
