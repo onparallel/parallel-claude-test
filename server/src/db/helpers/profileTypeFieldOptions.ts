@@ -204,7 +204,11 @@ export async function validateProfileTypeFieldOptions(
 
       // make sure every value in activation conditions is a valid option on SELECT field
       const selectValues = uniq(
-        (profileTypeField.options as ProfileTypeFieldOptions["SELECT"]).values.map((v) => v.value),
+        (
+          await profileTypeFieldSelectValues(
+            profileTypeField.options as ProfileTypeFieldOptions["SELECT"],
+          )
+        ).map((v) => v.value),
       );
       if (
         !uniq(opts.monitoring.activationCondition.values).every((activationValue) =>
@@ -229,7 +233,11 @@ export async function validateProfileTypeFieldOptions(
 
       // every SELECT value has to be set on variable searchFrequency options
       const selectValues = uniq(
-        (profileTypeField.options as ProfileTypeFieldOptions["SELECT"]).values.map((v) => v.value),
+        (
+          await profileTypeFieldSelectValues(
+            profileTypeField.options as ProfileTypeFieldOptions["SELECT"],
+          )
+        ).map((v) => v.value),
       );
       const searchFrequencyValues = uniq(
         opts.monitoring.searchFrequency.options.map((o) => o.value),

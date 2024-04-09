@@ -265,6 +265,11 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
         (type, id) => fromGlobalId(id, type).id,
       );
 
+      // mapper fills SELECT field values when passing a standardList, but we don't want to store every value in DB
+      if (isDefined(options.standardList)) {
+        options.values = [];
+      }
+
       const [profileTypeField] = await ctx.profiles.createProfileTypeField(
         args.profileTypeId,
         {
