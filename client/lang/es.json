@@ -6685,6 +6685,11 @@
     "context": "Select an option"
   },
   {
+    "term": "component.profile-field-short-text-settings.format",
+    "definition": "Formato",
+    "context": "Format"
+  },
+  {
     "term": "component.profile-field-suggestion.popover",
     "definition": "Respuesta sugerida de:",
     "context": "Suggested reply from:"

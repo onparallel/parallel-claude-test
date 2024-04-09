@@ -15,14 +15,18 @@ export function ProfileFieldText({
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
-  ...props
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldTextProps) {
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
+      showSuggestionsButton={showSuggestionsButton}
+      areSuggestionsVisible={areSuggestionsVisible}
+      onToggleSuggestions={onToggleSuggestions}
     >
       <GrowingTextarea
         borderColor="transparent"

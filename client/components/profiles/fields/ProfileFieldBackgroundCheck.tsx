@@ -380,7 +380,6 @@ export function ProfileFieldBackgroundCheck({
 
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}

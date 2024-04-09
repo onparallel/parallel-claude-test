@@ -44,7 +44,6 @@ import {
   CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   CreateProfileFieldValue_updateProfileFieldValueDocument,
   CreateProfile_createProfileDocument,
-  CreateProfile_updateProfileFieldValueDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
@@ -3666,25 +3665,12 @@ api
           mutation CreateProfile_createProfile(
             $profileTypeId: GID!
             $subscribe: Boolean
+            $fields: [UpdateProfileFieldValueInput!]
             $includeFields: Boolean!
             $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
-            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
-              ...Profile
-            }
-          }
-          ${ProfileFragment}
-        `,
-        gql`
-          mutation CreateProfile_updateProfileFieldValue(
-            $profileId: GID!
-            $fields: [UpdateProfileFieldValueInput!]!
-            $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
-            $includeSubscribers: Boolean!
-          ) {
-            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
               ...Profile
             }
           }
@@ -3696,27 +3682,21 @@ api
         const result = await client.request(CreateProfile_createProfileDocument, {
           profileTypeId: body.profileTypeId,
           subscribe: body.subscribe,
+          fields: body.fields,
           ...getProfileIncludesFromQuery(query),
         });
         assert("id" in result.createProfile);
 
-        if (!isDefined(body.fields)) {
-          return Created(mapProfile(result.createProfile));
-        }
-
-        const updatedProfileResult = await client.request(
-          CreateProfile_updateProfileFieldValueDocument,
-          {
-            profileId: result.createProfile.id,
-            fields: body.fields,
-            ...getProfileIncludesFromQuery(query),
-          },
-        );
-
-        return Created(mapProfile(updatedProfileResult.updateProfileFieldValue));
+        return Created(mapProfile(result.createProfile));
       } catch (error) {
         if (containsGraphQLError(error, "EXPIRY_ON_NON_EXPIRABLE_FIELD")) {
           throw new BadRequestError("You can't set an expiry date on a non-expirable field");
+        }
+        if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+          throw new BadRequestError(
+            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
+            { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
+          );
         }
         throw error;
       }
@@ -4191,16 +4171,25 @@ api
           throw new BadRequestError(`Invalid value for field. Expected a string.`);
         }
 
-        await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
-          profileId: params.profileId,
-          fields: [
-            {
-              profileTypeFieldId: params.profileTypeFieldId,
-              content: { value: body.value },
-              expiryDate: body.expiryDate,
-            },
-          ],
-        });
+        try {
+          await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
+            profileId: params.profileId,
+            fields: [
+              {
+                profileTypeFieldId: params.profileTypeFieldId,
+                content: { value: body.value },
+                expiryDate: body.expiryDate,
+              },
+            ],
+          });
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+            throw new BadRequestError(
+              error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
+            );
+          }
+          throw error;
+        }
       }
 
       const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {

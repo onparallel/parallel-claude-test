@@ -33,14 +33,18 @@ export function ProfileFieldSelect({
   isDisabled,
   showExpiryDateDialog,
   control,
-  ...props
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldSelectProps) {
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
+      showSuggestionsButton={showSuggestionsButton}
+      areSuggestionsVisible={areSuggestionsVisible}
+      onToggleSuggestions={onToggleSuggestions}
     >
       <Box width="100%">
         <Controller

@@ -21,7 +21,9 @@ export function ProfileFieldDate({
   register,
   isDisabled,
   showExpiryDateDialog,
-  ...props
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldDateProps) {
   const { browserName } = useMetadata();
 
@@ -34,10 +36,12 @@ export function ProfileFieldDate({
 
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
+      showSuggestionsButton={showSuggestionsButton}
+      areSuggestionsVisible={areSuggestionsVisible}
+      onToggleSuggestions={onToggleSuggestions}
     >
       <Flex flex="1" position="relative">
         <DateInput

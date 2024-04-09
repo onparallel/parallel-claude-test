@@ -1,14 +1,12 @@
-import { isValid as validIban } from "iban";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { difference, isDefined } from "remeda";
-import { validCIF, validDNI, validNIE } from "spain-id";
 import { PetitionField } from "../db/__types";
 import { selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
-import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { isGlobalId } from "./globalId";
 import { isValidDate, isValidDatetime, isValidTimezone } from "./time";
 import { Maybe } from "./types";
+import { validateShortTextFormat } from "./validateShortTextFormat";
 
 export class ValidateReplyContentError extends Error {
   constructor(
@@ -273,20 +271,5 @@ export async function validateReplyContent(
     }
     default:
       throw new Error(`Invalid field type '${field.type}'.`);
-  }
-}
-
-async function validateShortTextFormat(value: string, format: string) {
-  switch (format) {
-    case "EMAIL":
-      return EMAIL_REGEX.test(value);
-    case "ES_DNI":
-      return validDNI(value) || validNIE(value);
-    case "ES_NIF":
-      return validCIF(value);
-    case "IBAN":
-      return validIban(value);
-    default:
-      return true;
   }
 }

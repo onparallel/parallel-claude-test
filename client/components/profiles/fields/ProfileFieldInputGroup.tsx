@@ -7,7 +7,7 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { ProfileFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useMetadata } from "@parallel/utils/withMetadata";
-import { isPast, sub, Duration } from "date-fns";
+import { Duration, isPast, sub } from "date-fns";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -54,7 +54,8 @@ export function ProfileFieldInputGroup({
           },
         }}
       >
-        {children}
+        <Box flex="1">{children}</Box>
+
         {(browserName === "Firefox" && field.type === "DATE") ||
         field.type === "SELECT" ||
         field.type === "BACKGROUND_CHECK" ||

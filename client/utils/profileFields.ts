@@ -19,7 +19,7 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
   FILE: {};
   NUMBER: {};
   PHONE: {};
-  SHORT_TEXT: {};
+  SHORT_TEXT: { format?: Maybe<string> };
   TEXT: {};
   DATE: {
     useReplyAsExpiryDate?: Maybe<boolean>;

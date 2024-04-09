@@ -19,14 +19,18 @@ export function ProfileFieldPhone({
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
-  ...props
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldPhoneProps) {
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
+      showSuggestionsButton={showSuggestionsButton}
+      areSuggestionsVisible={areSuggestionsVisible}
+      onToggleSuggestions={onToggleSuggestions}
     >
       <Controller
         name={`fields.${index}.content.value`}

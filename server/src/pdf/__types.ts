@@ -1508,6 +1508,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 };
 
 export type MutationcreateProfileArgs = {
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput>>;
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };

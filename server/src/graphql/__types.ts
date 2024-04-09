@@ -6537,6 +6537,7 @@ export interface NexusGenArgTypes {
     };
     createProfile: {
       // args
+      fields?: NexusGenInputs["UpdateProfileFieldValueInput"][] | null; // [UpdateProfileFieldValueInput!]
       profileTypeId: NexusGenScalars["GID"]; // GID!
       subscribe?: boolean | null; // Boolean
     };

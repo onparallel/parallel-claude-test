@@ -61,6 +61,7 @@ import {
   SelectOptionValue,
 } from "../settings/ProfileFieldSelectSettings";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
+import { ProfileFieldShortTextSettings } from "../settings/ProfileFieldShortTextSettings";
 
 export interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileType: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment;
@@ -381,24 +382,35 @@ function CreateOrUpdateProfileTypeFieldDialog({
             } else {
               const hasStandardList =
                 formData.options.listingType === "STANDARD" && formData.options.standardList;
-              const options =
-                formData.type === "SELECT"
-                  ? {
-                      showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
-                      standardList: hasStandardList ? formData.options.standardList : null,
-                      values: hasStandardList
-                        ? []
-                        : formData.options.values!.map((value: any) =>
-                            omit(value, ["id", "existing"]),
-                          ),
-                    }
-                  : formData.type === "DATE"
-                    ? pick(formData.options, ["useReplyAsExpiryDate"])
-                    : formData.type === "BACKGROUND_CHECK"
-                      ? formData.options.hasMonitoring
-                        ? pick(formData.options, ["monitoring"])
-                        : { monitoring: null }
-                      : {};
+
+              let options = {};
+              switch (formData.type) {
+                case "SELECT":
+                  options = {
+                    showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
+                    standardList: hasStandardList ? formData.options.standardList : null,
+                    values: hasStandardList
+                      ? []
+                      : formData.options.values!.map((value: any) =>
+                          omit(value, ["id", "existing"]),
+                        ),
+                  };
+                  break;
+                case "DATE":
+                  options = pick(formData.options, ["useReplyAsExpiryDate"]);
+                  break;
+                case "BACKGROUND_CHECK":
+                  options = formData.options.hasMonitoring
+                    ? pick(formData.options, ["monitoring"])
+                    : { monitoring: null };
+                  break;
+                case "SHORT_TEXT":
+                  options = pick(formData.options, ["format"]);
+                  break;
+                default:
+                  break;
+              }
+
               const { data } = await createProfileTypeField({
                 variables: {
                   profileTypeId: profileType.id,
@@ -572,6 +584,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
           </FormControl>
 
           <FormProvider {...form}>
+            {selectedType === "SHORT_TEXT" ? (
+              <ProfileFieldShortTextSettings isDisabled={isUpdating || isDisabled} />
+            ) : null}
             {selectedType === "SELECT" ? (
               <ProfileFieldSelectSettings
                 isStandard={isStandard || values?.some((v: any) => v.isStandard)}

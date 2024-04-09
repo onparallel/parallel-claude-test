@@ -1,28 +1,15 @@
-import {
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormErrorMessageProps,
-  HStack,
-  Input,
-  List,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Center, Flex, FormControl, HStack, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
-import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { ShortTextFormat, useShortTextFormats } from "@parallel/utils/useShortTextFormats";
+import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -31,11 +18,9 @@ import {
   MouseEvent,
   forwardRef,
   useEffect,
-  useImperativeHandle,
   useRef,
   useState,
 } from "react";
-import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
@@ -45,6 +30,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -239,7 +225,7 @@ export function RecipientViewPetitionFieldShortText({
         setShowNewReply(false);
       }
     },
-    onValueChange: (value: string) => {
+    onChange: (value: string) => {
       if (isInvalidReply[field.id] && format?.validate && format.validate(value)) {
         handleInvalidReply(field.id, false);
       }
@@ -408,7 +394,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
         onDelete();
       }
     },
-    onValueChange: (value) => {
+    onChange: (value: string) => {
       if (isInvalid && format?.validate && format.validate(value)) {
         onInvalid(false);
       }
@@ -466,63 +452,5 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
       </HStack>
       {isInvalid && isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
     </FormControl>
-  );
-});
-
-interface ShortTextInput {
-  onValueChange: (value: string) => void;
-  format?: Maybe<ShortTextFormat>;
-}
-
-const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function ShortTextInput(
-  { format, onValueChange, ...props },
-  ref,
-) {
-  const inputRef = useRef<any>(null);
-  useImperativeHandle(
-    ref,
-    () => {
-      if (format?.type === "MASK") {
-        return inputRef.current?.element;
-      } else {
-        return inputRef.current;
-      }
-    },
-    [format?.type],
-  );
-  return (
-    <Input
-      ref={inputRef}
-      {...(format?.type === "MASK"
-        ? {
-            as: IMaskInput,
-            ...format.maskProps,
-            onAccept: (value: string) => {
-              onValueChange(value);
-            },
-          }
-        : {
-            onChange: (e) => onValueChange(e.target.value),
-          })}
-      {...format?.inputProps}
-      {...props}
-    />
-  );
-});
-
-const FormatFormErrorMessage = chakraForwardRef<
-  "div",
-  Omit<FormErrorMessageProps, "children"> & {
-    format: ShortTextFormat;
-  }
->(function FormatFormErrorMessage({ format, ...props }, ref) {
-  return (
-    <FormErrorMessage ref={ref} {...props}>
-      <FormattedMessage
-        id="component.recipient-view-petition-field-short-text.format-error"
-        defaultMessage="Please, enter a valid {format}."
-        values={{ format: format.label }}
-      />
-    </FormErrorMessage>
   );
 });

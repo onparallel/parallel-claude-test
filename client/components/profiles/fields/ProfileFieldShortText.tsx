@@ -1,4 +1,8 @@
-import { Input } from "@chakra-ui/react";
+import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
+import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
+import { Controller } from "react-hook-form";
+import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
@@ -11,30 +15,72 @@ interface ProfileFieldShortTextProps
 export function ProfileFieldShortText({
   index,
   field,
-  register,
+  control,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
-  ...props
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldShortTextProps) {
+  const intl = useIntl();
+  const formats = useShortTextFormats();
+  const format = isDefined(field.options.format)
+    ? formats.find((f) => f.value === field.options.format)
+    : null;
+
   return (
     <ProfileFieldInputGroup
-      {...props}
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
+      showSuggestionsButton={showSuggestionsButton}
+      areSuggestionsVisible={areSuggestionsVisible}
+      onToggleSuggestions={onToggleSuggestions}
     >
-      <Input
-        borderColor="transparent"
-        maxLength={1_000}
-        {...register(`fields.${index}.content.value`)}
-        onBlur={(e) => {
-          if (e.target.value) {
-            showExpiryDateDialog({});
-          }
+      <Controller
+        name={`fields.${index}.content.value`}
+        control={control}
+        rules={{
+          validate: (value) => {
+            return isDefined(format) && value?.length ? format.validate?.(value) ?? true : true;
+          },
         }}
-        isDisabled={isDisabled}
+        render={({ field: { onChange, value, ...rest } }) => {
+          return (
+            <ShortTextInput
+              value={value ?? ""}
+              borderColor="transparent"
+              placeholder={
+                isDefined(format)
+                  ? intl.formatMessage(
+                      {
+                        id: "generic.for-example",
+                        defaultMessage: "E.g. {example}",
+                      },
+                      {
+                        example: format.example,
+                      },
+                    )
+                  : undefined
+              }
+              maxLength={1_000}
+              onChange={(_value) => {
+                onChange(_value);
+              }}
+              {...rest}
+              onBlur={(e) => {
+                if (e.target.value) {
+                  showExpiryDateDialog({});
+                }
+              }}
+              format={format}
+            />
+          );
+        }}
       />
+
+      {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
     </ProfileFieldInputGroup>
   );
 }

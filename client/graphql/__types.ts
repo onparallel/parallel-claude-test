@@ -1567,6 +1567,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 }
 
 export interface MutationcreateProfileArgs {
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput>>;
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
@@ -10928,41 +10929,6 @@ export type AssociateProfileToPetitionDialog_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
-  };
-};
-
-export type AssociateProfileToPetitionDialog_createProfileMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type AssociateProfileToPetitionDialog_createProfileMutation = {
-  createProfile: {
-    __typename?: "Profile";
-    id: string;
-    name: string;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
-  };
-};
-
-export type AssociateProfileToPetitionDialog_updateProfileFieldValueMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
-}>;
-
-export type AssociateProfileToPetitionDialog_updateProfileFieldValueMutation = {
-  updateProfileFieldValue: {
-    __typename?: "Profile";
-    id: string;
-    name: string;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
   };
 };
 
@@ -20429,6 +20395,24 @@ export type useCreateProfileDialog_profileTypeQuery = {
       options: { [key: string]: any };
       isExpirable: boolean;
     }>;
+  };
+};
+
+export type useCreateProfileDialog_createProfileMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
+}>;
+
+export type useCreateProfileDialog_createProfileMutation = {
+  createProfile: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
   };
 };
 
@@ -38983,69 +38967,6 @@ export type Profiles_profilesQuery = {
   };
 };
 
-export type Profiles_createProfileMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type Profiles_createProfileMutation = {
-  createProfile: {
-    __typename?: "Profile";
-    id: string;
-    name: string;
-    status: ProfileStatus;
-    createdAt: string;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
-    subscribers: Array<{
-      __typename?: "ProfileSubscription";
-      id: string;
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        email: string;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
-    }>;
-  };
-};
-
-export type Profiles_updateProfileFieldValueMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
-}>;
-
-export type Profiles_updateProfileFieldValueMutation = {
-  updateProfileFieldValue: {
-    __typename?: "Profile";
-    id: string;
-    name: string;
-    status: ProfileStatus;
-    createdAt: string;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
-    subscribers: Array<{
-      __typename?: "ProfileSubscription";
-      id: string;
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        email: string;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
-    }>;
-  };
-};
-
 export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Reports_userQuery = {
@@ -53011,31 +52932,6 @@ export const TimelineMessageScheduledEvent_cancelScheduledMessageDocument = gql`
   TimelineMessageScheduledEvent_cancelScheduledMessageMutation,
   TimelineMessageScheduledEvent_cancelScheduledMessageMutationVariables
 >;
-export const AssociateProfileToPetitionDialog_createProfileDocument = gql`
-  mutation AssociateProfileToPetitionDialog_createProfile($profileTypeId: GID!) {
-    createProfile(profileTypeId: $profileTypeId, subscribe: true) {
-      ...AssociateProfileToPetitionDialog_Profile
-    }
-  }
-  ${AssociateProfileToPetitionDialog_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  AssociateProfileToPetitionDialog_createProfileMutation,
-  AssociateProfileToPetitionDialog_createProfileMutationVariables
->;
-export const AssociateProfileToPetitionDialog_updateProfileFieldValueDocument = gql`
-  mutation AssociateProfileToPetitionDialog_updateProfileFieldValue(
-    $profileId: GID!
-    $fields: [UpdateProfileFieldValueInput!]!
-  ) {
-    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-      ...AssociateProfileToPetitionDialog_Profile
-    }
-  }
-  ${AssociateProfileToPetitionDialog_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  AssociateProfileToPetitionDialog_updateProfileFieldValueMutation,
-  AssociateProfileToPetitionDialog_updateProfileFieldValueMutationVariables
->;
 export const CreateFolderDialog_petitionsDocument = gql`
   query CreateFolderDialog_petitions(
     $offset: Int!
@@ -54468,6 +54364,20 @@ export const useCreateProfileDialog_profileTypeDocument = gql`
 ` as unknown as DocumentNode<
   useCreateProfileDialog_profileTypeQuery,
   useCreateProfileDialog_profileTypeQueryVariables
+>;
+export const useCreateProfileDialog_createProfileDocument = gql`
+  mutation useCreateProfileDialog_createProfile(
+    $profileTypeId: GID!
+    $fields: [UpdateProfileFieldValueInput!]
+  ) {
+    createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
+      ...ProfileSelect_Profile
+    }
+  }
+  ${ProfileSelect_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateProfileDialog_createProfileMutation,
+  useCreateProfileDialog_createProfileMutationVariables
 >;
 export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
   mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
@@ -57216,31 +57126,6 @@ export const Profiles_profilesDocument = gql`
   }
   ${Profiles_ProfilePaginationFragmentDoc}
 ` as unknown as DocumentNode<Profiles_profilesQuery, Profiles_profilesQueryVariables>;
-export const Profiles_createProfileDocument = gql`
-  mutation Profiles_createProfile($profileTypeId: GID!) {
-    createProfile(profileTypeId: $profileTypeId, subscribe: true) {
-      ...Profiles_Profile
-    }
-  }
-  ${Profiles_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  Profiles_createProfileMutation,
-  Profiles_createProfileMutationVariables
->;
-export const Profiles_updateProfileFieldValueDocument = gql`
-  mutation Profiles_updateProfileFieldValue(
-    $profileId: GID!
-    $fields: [UpdateProfileFieldValueInput!]!
-  ) {
-    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-      ...Profiles_Profile
-    }
-  }
-  ${Profiles_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  Profiles_updateProfileFieldValueMutation,
-  Profiles_updateProfileFieldValueMutationVariables
->;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query

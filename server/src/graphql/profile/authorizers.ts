@@ -123,13 +123,19 @@ export function profileTypeFieldBelongsToProfileType<
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
   TProfileTypeId extends Arg<TypeName, FieldName, number>,
 >(
-  profileTypeFieldIdArg: TProfileTypeFieldId,
+  profileTypeFieldIdArg:
+    | TProfileTypeFieldId
+    | ((args: core.ArgsValue<TypeName, FieldName>) => number[]),
   profileTypeIdArg: TProfileTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
+      const profileTypeFieldIds = uniq(
+        unMaybeArray(
+          (typeof profileTypeFieldIdArg === "function"
+            ? (profileTypeFieldIdArg as any)(args)
+            : (args as any)[profileTypeFieldIdArg]) as MaybeArray<number>,
+        ),
       );
       const profileTypeId = args[profileTypeIdArg] as unknown as number;
 

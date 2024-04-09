@@ -1,23 +1,29 @@
-import { gql, useQuery } from "@apollo/client";
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileSelect } from "@parallel/components/common/ProfileSelect";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
+import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   UpdateProfileFieldValueInput,
+  ProfileSelect_ProfileFragment,
+  useCreateProfileDialog_createProfileDocument,
   useCreateProfileDialog_profileTypeDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance } from "react-select";
 import { isDefined } from "remeda";
 import { ProfileFieldSelectInner } from "../fields/ProfileFieldSelect";
 
 interface CreateProfileDialogResult {
-  profileTypeId: string;
-  fieldValues: UpdateProfileFieldValueInput[];
+  profile: ProfileSelect_ProfileFragment;
+  hasValues: boolean;
 }
 
 function CreateProfileDialog({
@@ -28,15 +34,16 @@ function CreateProfileDialog({
   { defaultProfileTypeId?: string | null; suggestedName?: string },
   CreateProfileDialogResult
 >) {
+  const intl = useIntl();
   const selectRef = useRef<SelectInstance>(null);
 
   const {
     control,
     formState: { errors },
-    register,
     watch,
     handleSubmit,
     setFocus,
+    setError,
   } = useForm<{ profileTypeId: string | null; fieldValues: UpdateProfileFieldValueInput[] }>({
     defaultValues: {
       profileTypeId: defaultProfileTypeId ?? null,
@@ -77,6 +84,10 @@ function CreateProfileDialog({
     }
   }, [profileTypeData]);
 
+  const formats = useShortTextFormats();
+
+  const [createProfile, { loading }] = useMutation(useCreateProfileDialog_createProfileDocument);
+
   return (
     <ConfirmDialog
       {...props}
@@ -84,11 +95,34 @@ function CreateProfileDialog({
       size="md"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ profileTypeId, fieldValues }) => {
-          props.onResolve({
-            profileTypeId: profileTypeId!,
-            fieldValues: fieldValues.filter((f) => f.content?.value.trim() !== ""),
-          });
+        onSubmit: handleSubmit(async ({ profileTypeId, fieldValues }) => {
+          try {
+            const profile = await createProfile({
+              variables: {
+                profileTypeId: profileTypeId!,
+                fields: fieldValues,
+              },
+            });
+            props.onResolve({
+              profile: profile.data!.createProfile,
+              hasValues: fieldValues.length > 0,
+            });
+          } catch (error) {
+            if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+              const aggregatedErrors =
+                (error.graphQLErrors[0].extensions.aggregatedErrors as {
+                  profileTypeFieldId: string;
+                  code: string;
+                }[]) ?? [];
+
+              for (const err of aggregatedErrors) {
+                const index = fieldValues.findIndex(
+                  (f) => f.profileTypeFieldId === err.profileTypeFieldId,
+                );
+                setError(`fieldValues.${index}.content.value`, { type: "validate" });
+              }
+            }
+          }
         }),
       }}
       initialFocusRef={selectRef}
@@ -133,16 +167,57 @@ function CreateProfileDialog({
             .filter((f) => f.isUsedInProfileName)
             .map((field) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
+              const format = isDefined(field.options.format)
+                ? formats.find((f) => f.value === field.options.format)
+                : null;
+
               return (
-                <FormControl key={field.id}>
+                <FormControl
+                  key={field.id}
+                  isInvalid={!!errors.fieldValues?.[index]?.content?.value}
+                >
                   <FormLabel fontWeight={400}>
                     <LocalizableUserTextRender value={field.name} default="" />
                   </FormLabel>
                   {field.type === "SHORT_TEXT" ? (
-                    <Input
-                      {...register(`fieldValues.${index}.content.value`)}
-                      isDisabled={field.myPermission !== "WRITE"}
-                    />
+                    <>
+                      <Controller
+                        name={`fieldValues.${index}.content.value`}
+                        control={control}
+                        rules={{
+                          validate: (value) => {
+                            return isDefined(format) && value?.length
+                              ? format.validate?.(value) ?? true
+                              : true;
+                          },
+                        }}
+                        render={({ field: { value, onChange, onBlur } }) => {
+                          return (
+                            <ShortTextInput
+                              value={value ?? ""}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              disabled={field.myPermission !== "WRITE"}
+                              format={format}
+                              placeholder={
+                                isDefined(format)
+                                  ? intl.formatMessage(
+                                      {
+                                        id: "generic.for-example",
+                                        defaultMessage: "E.g. {example}",
+                                      },
+                                      {
+                                        example: format.example,
+                                      },
+                                    )
+                                  : undefined
+                              }
+                            />
+                          );
+                        }}
+                      />
+                      {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+                    </>
                   ) : (
                     <Controller
                       name={`fieldValues.${index}.content.value`}
@@ -165,7 +240,7 @@ function CreateProfileDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorScheme="primary" type="submit" isLoading={loading}>
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }
@@ -217,5 +292,19 @@ const _queries = [
       }
     }
     ${_fragments.ProfileType}
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation useCreateProfileDialog_createProfile(
+      $profileTypeId: GID!
+      $fields: [UpdateProfileFieldValueInput!]
+    ) {
+      createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
+        ...ProfileSelect_Profile
+      }
+    }
+    ${ProfileSelect.fragments.Profile}
   `,
 ];

@@ -1508,6 +1508,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 };
 
 export type MutationcreateProfileArgs = {
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput>>;
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
@@ -8955,6 +8956,7 @@ export type GetProfiles_profilesQuery = {
 export type CreateProfile_createProfileMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
   includeFields: Scalars["Boolean"]["input"];
   includeFieldsByAlias: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
@@ -8962,77 +8964,6 @@ export type CreateProfile_createProfileMutationVariables = Exact<{
 
 export type CreateProfile_createProfileMutation = {
   createProfile: {
-    id: string;
-    name: string;
-    status: ProfileStatus;
-    createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
-    properties?: Array<{
-      field: {
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      };
-      value: {
-        id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
-        createdAt: string;
-      } | null;
-      files: Array<{
-        id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
-    }>;
-    propertiesByAlias: Array<{
-      field: {
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      };
-      value: {
-        id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
-        createdAt: string;
-      } | null;
-      files: Array<{
-        id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
-    }>;
-    subscribers?: Array<{
-      user: {
-        id: string;
-        email: string;
-        fullName: string | null;
-        firstName: string | null;
-        lastName: string | null;
-      };
-    }>;
-  };
-};
-
-export type CreateProfile_updateProfileFieldValueMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
-  includeFields: Scalars["Boolean"]["input"];
-  includeFieldsByAlias: Scalars["Boolean"]["input"];
-  includeSubscribers: Scalars["Boolean"]["input"];
-}>;
-
-export type CreateProfile_updateProfileFieldValueMutation = {
-  updateProfileFieldValue: {
     id: string;
     name: string;
     status: ProfileStatus;
@@ -11453,11 +11384,12 @@ export const CreateProfile_createProfileDocument = gql`
   mutation CreateProfile_createProfile(
     $profileTypeId: GID!
     $subscribe: Boolean
+    $fields: [UpdateProfileFieldValueInput!]
     $includeFields: Boolean!
     $includeFieldsByAlias: Boolean!
     $includeSubscribers: Boolean!
   ) {
-    createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+    createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
       ...Profile
     }
   }
@@ -11465,23 +11397,6 @@ export const CreateProfile_createProfileDocument = gql`
 ` as unknown as DocumentNode<
   CreateProfile_createProfileMutation,
   CreateProfile_createProfileMutationVariables
->;
-export const CreateProfile_updateProfileFieldValueDocument = gql`
-  mutation CreateProfile_updateProfileFieldValue(
-    $profileId: GID!
-    $fields: [UpdateProfileFieldValueInput!]!
-    $includeFields: Boolean!
-    $includeFieldsByAlias: Boolean!
-    $includeSubscribers: Boolean!
-  ) {
-    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-      ...Profile
-    }
-  }
-  ${ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  CreateProfile_updateProfileFieldValueMutation,
-  CreateProfile_updateProfileFieldValueMutationVariables
 >;
 export const GetProfile_profileDocument = gql`
   query GetProfile_profile(

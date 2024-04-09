@@ -221,11 +221,11 @@ export const ProfileForm = Object.assign(
                       } else {
                         return {
                           profileTypeFieldId,
-                          content: content?.value ? content : null,
+                          content: isDefined(content?.value) ? content : null,
                           expiryDate:
                             content?.value && prop?.field.isExpirable
                               ? useValueAsExpiryDate
-                                ? content?.value || null
+                                ? content?.value ?? null
                                 : expiryDate || null
                               : undefined,
                         };
@@ -429,7 +429,7 @@ export const ProfileForm = Object.assign(
             editedFieldsCount={editedFieldsCount}
             isSubmitting={formState.isSubmitting}
             hasErrors={Object.keys(formState.errors).length !== 0}
-            onCancel={() => reset()}
+            onCancel={() => reset(buildFormDefaultValue(properties))}
           />
         ) : null}
         <Stack

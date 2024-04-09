@@ -39,7 +39,7 @@ import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
-import { authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
+import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -364,6 +364,14 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     if (isDefined(args.data.options)) {
+      if (profileTypeField.type === "SHORT_TEXT" && args.data.options.format !== undefined) {
+        throw new ArgValidationError(
+          info,
+          "data.options.format",
+          "Cannot change the format of a SHORT_TEXT field.",
+        );
+      }
+
       const options = await mapProfileTypeFieldOptions(
         profileTypeField.type,
         { ...profileTypeField.options, ...args.data.options },
@@ -739,12 +747,98 @@ export const createProfile = mutationField("createProfile", {
     contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     not(profileTypeIsArchived("profileTypeId")),
+    ifArgDefined(
+      "fields",
+      and(
+        userHasPermissionOnProfileTypeField(
+          (args) => args.fields!.map((f) => f.profileTypeFieldId),
+          "WRITE",
+        ),
+        profileTypeFieldBelongsToProfileType(
+          (args) => args.fields!.map((f) => f.profileTypeFieldId),
+          "profileTypeId",
+        ),
+      ),
+    ),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     subscribe: booleanArg({ description: "Subscribe the context user to profile notifications" }),
+    fields: list(nonNull("UpdateProfileFieldValueInput")),
   },
   resolve: async (_, args, ctx) => {
+    const profileTypeFields =
+      isDefined(args.fields) && args.fields.length > 0
+        ? await ctx.profiles.loadProfileTypeField(args.fields.map((f) => f.profileTypeFieldId))
+        : [];
+
+    const aggregatedErrors: { profileTypeFieldId: string; code: string; message: string }[] = [];
+    const fields = await pMap(
+      args.fields ?? [],
+      async (field) => {
+        const profileTypeField = profileTypeFields.find(
+          (ptf) => ptf!.id === field.profileTypeFieldId,
+        )!;
+
+        if (profileTypeField.type === "FILE" || profileTypeField.type === "BACKGROUND_CHECK") {
+          throw new ApolloError(
+            `Cannot create a profile with a field of type ${profileTypeField.type}`,
+          );
+        }
+
+        if (field.expiryDate !== undefined && !profileTypeField.is_expirable) {
+          throw new ApolloError(
+            `Can't set expiry on a non expirable field`,
+            "EXPIRY_ON_NON_EXPIRABLE_FIELD",
+          );
+        }
+        if (field.expiryDate !== undefined && !isDefined(field.content)) {
+          throw new ApolloError(
+            `Can't set expiry on a field with no value`,
+            "EXPIRY_ON_NONEXISTING_VALUE",
+          );
+        }
+
+        if (isDefined(field.content)) {
+          try {
+            // validate fields content before creating the profile.
+            // this way we can avoid creating the profile if the content is invalid
+            await validateProfileFieldValue(profileTypeField, field.content);
+          } catch (e) {
+            if (e instanceof Error) {
+              aggregatedErrors.push({
+                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
+                code: "INVALID_PROFILE_FIELD_VALUE",
+                message: e.message,
+              });
+            }
+          }
+        }
+
+        return {
+          ...field,
+          type: profileTypeField.type,
+          alias: profileTypeField.alias,
+          expiryDate: field.expiryDate
+            ? // priorize expiryDate argument if set
+              field.expiryDate
+            : // else, check option useReplyAsExpiryDate for DATE replies
+              profileTypeField.type === "DATE" &&
+                profileTypeField.options.useReplyAsExpiryDate &&
+                isDefined(field.content?.value)
+              ? (field.content!.value as string)
+              : null,
+        };
+      },
+      { concurrency: 1 },
+    );
+
+    if (aggregatedErrors.length > 0) {
+      throw new ApolloError("Invalid profile field value", "INVALID_PROFILE_FIELD_VALUE", {
+        aggregatedErrors,
+      });
+    }
+
     const profile = await ctx.profiles.createProfile(
       { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
       ctx.user!.id,
@@ -756,6 +850,53 @@ export const createProfile = mutationField("createProfile", {
         [ctx.user!.id],
         `User:${ctx.user!.id}}`,
       );
+    }
+
+    if (fields.length > 0) {
+      const { currentValues, profile: updatedProfile } = await ctx.profiles.updateProfileFieldValue(
+        profile.id,
+        fields,
+        ctx.user!.id,
+      );
+
+      const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
+
+      const newEventsData = fields.flatMap((f) => {
+        const current = currentByPtfId[f.profileTypeFieldId];
+        return [
+          {
+            org_id: ctx.user!.org_id,
+            profile_id: profile.id,
+            type: "PROFILE_FIELD_VALUE_UPDATED",
+            data: {
+              user_id: ctx.user!.id,
+              profile_type_field_id: f.profileTypeFieldId,
+              current_profile_field_value_id: current.id,
+              previous_profile_field_value_id: null,
+              alias: f.alias,
+            },
+          } satisfies ProfileFieldValueUpdatedEvent<true>,
+          isDefined(f.expiryDate)
+            ? ({
+                org_id: ctx.user!.org_id,
+                profile_id: profile.id,
+                type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: f.profileTypeFieldId,
+                  expiry_date: current.expiry_date,
+                  alias: f.alias,
+                },
+              } satisfies ProfileFieldExpiryUpdatedEvent<true>)
+            : null,
+        ].filter(isDefined);
+      });
+
+      if (newEventsData.length > 0) {
+        await ctx.profiles.createProfileUpdatedEvents(profile.id, newEventsData, ctx.user!);
+      }
+
+      return updatedProfile!;
     }
 
     return profile;
@@ -831,7 +972,11 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     if (
       !isDefined(profile) ||
       profileTypeFields.some(
-        (p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id || p.type === "FILE",
+        (p) =>
+          !isDefined(p) ||
+          p.profile_type_id !== profile!.profile_type_id ||
+          p.type === "FILE" ||
+          p.type === "BACKGROUND_CHECK",
       )
     ) {
       throw new ForbiddenError("Not authorized");
@@ -857,7 +1002,11 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       async (field) => {
         const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
 
-        if (isDefined(field.content)) {
+        if (
+          isDefined(field.content) &&
+          field.content.value !== null &&
+          field.content.value !== ""
+        ) {
           try {
             await validateProfileFieldValue(profileTypeField, field.content);
           } catch (e) {

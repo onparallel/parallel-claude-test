@@ -13,6 +13,7 @@ import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { isValidDate } from "../../util/time";
 import { Maybe } from "../../util/types";
+import { validateShortTextFormat } from "../../util/validateShortTextFormat";
 import { NexusGenInputs } from "../__types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
@@ -107,6 +108,11 @@ export async function validateProfileFieldValue(
       return;
     }
     case "SHORT_TEXT": {
+      if (isDefined(field.options.format)) {
+        if (!(await validateShortTextFormat(content.value, field.options.format))) {
+          throw new Error(`Value is not valid according to format ${field.options.format}.`);
+        }
+      }
       const valid = ajv.validate(stringValueSchema(MAX_SHORT_TEXT_SIZE), content);
       if (!valid) {
         throw new Error(ajv.errorsText());

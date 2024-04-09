@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -48,11 +48,9 @@ import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialo
 import {
   ProfileStatus,
   Profiles_ProfileFragment,
-  Profiles_createProfileDocument,
   Profiles_profileTypeDocument,
   Profiles_profileTypesDocument,
   Profiles_profilesDocument,
-  Profiles_updateProfileFieldValueDocument,
   Profiles_userDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
@@ -161,26 +159,15 @@ function Profiles() {
 
   const columns = useProfileTableColumns(status);
 
-  const [createProfile] = useMutation(Profiles_createProfileDocument);
-  const [updateProfileFieldValue] = useMutation(Profiles_updateProfileFieldValueDocument);
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
     try {
-      const { profileTypeId, fieldValues } = await showCreateProfileDialog({});
-      const { data } = await createProfile({
-        variables: {
-          profileTypeId,
-        },
-      });
-
-      if (isDefined(data)) {
-        await updateProfileFieldValue({
-          variables: {
-            profileId: data!.createProfile.id,
-            fields: fieldValues,
-          },
-        });
-        navigate(`/app/profiles/${data.createProfile.id}`);
+      const {
+        hasValues,
+        profile: { id },
+      } = await showCreateProfileDialog({});
+      if (hasValues) {
+        navigate(`/app/profiles/${id}`);
       }
     } catch {}
   };
@@ -865,28 +852,6 @@ const _queries = [
       }
     }
     ${_fragments.ProfilePagination}
-  `,
-];
-
-const _mutations = [
-  gql`
-    mutation Profiles_createProfile($profileTypeId: GID!) {
-      createProfile(profileTypeId: $profileTypeId, subscribe: true) {
-        ...Profiles_Profile
-      }
-    }
-    ${_fragments.Profile}
-  `,
-  gql`
-    mutation Profiles_updateProfileFieldValue(
-      $profileId: GID!
-      $fields: [UpdateProfileFieldValueInput!]!
-    ) {
-      updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-        ...Profiles_Profile
-      }
-    }
-    ${_fragments.Profile}
   `,
 ];
 

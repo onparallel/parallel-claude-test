@@ -324,6 +324,7 @@ export function ProfileField(props: ProfileFieldProps) {
         key={field.id}
         listStyleType="none"
         isInvalid={isInvalid}
+        isDisabled={props.isDisabled}
         _hover={{
           "& .edit-visibility": {
             display: "flex",

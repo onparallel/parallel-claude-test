@@ -1272,6 +1272,7 @@ type Mutation {
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
   createProfile(
+    fields: [UpdateProfileFieldValueInput!]
     profileTypeId: GID!
 
     """
