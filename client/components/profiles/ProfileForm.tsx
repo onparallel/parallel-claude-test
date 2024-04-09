@@ -13,7 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
+import { ExternalLinkIcon, EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -50,6 +50,7 @@ import { useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
+import { Link } from "../common/Link";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 
 export interface ProfileFormData {
@@ -63,6 +64,7 @@ interface ProfileFormProps {
   petitionId?: string;
   onRecover?: () => void;
   onRefetch: () => MaybePromise<void>;
+  includeLinkToProfile?: boolean;
 }
 
 function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
@@ -97,7 +99,16 @@ function normalize(alias: string) {
 
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    { profile, onRefetch, overlapsIntercomBadge, petitionFields, petitionId, onRecover, ...props },
+    {
+      profile,
+      onRefetch,
+      overlapsIntercomBadge,
+      petitionFields,
+      petitionId,
+      onRecover,
+      includeLinkToProfile,
+      ...props
+    },
     ref,
   ) {
     const intl = useIntl();
@@ -365,7 +376,7 @@ export const ProfileForm = Object.assign(
           minHeight="65px"
           justifyContent="center"
         >
-          <HStack alignItems="baseline">
+          <HStack alignItems="center">
             <OverflownText
               as="h2"
               fontSize="xl"
@@ -392,6 +403,11 @@ export const ProfileForm = Object.assign(
                   defaultMessage="Deleted"
                 />
               </Badge>
+            ) : null}
+            {includeLinkToProfile ? (
+              <Link href={`/app/profiles/${profile.id}`} display="flex">
+                <ExternalLinkIcon fontSize="lg" />
+              </Link>
             ) : null}
           </HStack>
           <HStack

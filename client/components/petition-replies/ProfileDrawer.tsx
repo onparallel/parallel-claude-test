@@ -99,6 +99,7 @@ export const ProfileDrawer = Object.assign(
             minHeight={0}
             petitionFields={petitionFields}
             petitionId={petitionId}
+            includeLinkToProfile
           />
         ) : null}
       </Flex>
