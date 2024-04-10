@@ -225,8 +225,8 @@ import {
   UserWithOrg,
 } from "./schemas/core";
 import { PetitionEvent, ProfileEvent } from "./schemas/events";
+import { assert } from "../../util/assert";
 
-function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
 
 export function publicApi(container: Container) {

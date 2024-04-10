@@ -1,14 +1,13 @@
 import { partition } from "remeda";
-import { MaybeArray, Prettify } from "../types";
+import { assert } from "../assert";
 import { discriminator } from "../discriminator";
+import { MaybeArray, Prettify } from "../types";
 
 export function assertTypename<
   T extends { __typename?: string },
   Typename extends T["__typename"] & string,
 >(value: T, typename: Typename): asserts value is T & { __typename: Typename } {
-  if (value.__typename !== typename) {
-    throw new Error("Invalid typename");
-  }
+  assert(value.__typename === typename, "Invalid typename");
 }
 
 export function isTypename<
@@ -22,9 +21,10 @@ export function assertTypenameArray<
   T extends { __typename?: string },
   Typename extends T["__typename"] & string,
 >(value: T[], typename: Typename): asserts value is (T & { __typename: Typename })[] {
-  if (value.some((v) => v.__typename !== typename)) {
-    throw new Error("Invalid typename");
-  }
+  assert(
+    value.every((v) => v.__typename === typename),
+    "Invalid typename",
+  );
 }
 
 export function partitionOnTypename<

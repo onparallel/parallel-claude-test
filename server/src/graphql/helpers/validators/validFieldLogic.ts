@@ -4,6 +4,7 @@ import { isDefined } from "remeda";
 import { PetitionField } from "../../../db/__types";
 import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
 import { PetitionVariable } from "../../../db/repositories/PetitionRepository";
+import { assert } from "../../../util/assert";
 import {
   PetitionFieldLogic,
   PetitionFieldLogicCondition,
@@ -168,13 +169,7 @@ const PETITION_FIELD_LOGIC_SCHEMA = {
   },
 };
 
-function assert(predicate: boolean, errorMessage: string): asserts predicate {
-  if (!predicate) {
-    throw new Error(errorMessage);
-  }
-}
-
-function assertOneOf<T>(value: T, options: T[], errorMessage: string) {
+function assertOneOf<T>(value: any, options: T[], errorMessage?: string): asserts value is T {
   assert(options.includes(value), errorMessage);
 }
 
@@ -266,7 +261,7 @@ export async function validateFieldLogic<
             "LESS_THAN_OR_EQUAL",
             "GREATER_THAN",
             "GREATER_THAN_OR_EQUAL",
-          ],
+          ] as const,
           `Invalid operator ${c.operator} for modifier ${c.modifier}`,
         );
         assert(
@@ -277,7 +272,7 @@ export async function validateFieldLogic<
         if (referencedField.type === "TEXT" || referencedField.type === "SHORT_TEXT") {
           assertOneOf(
             c.operator,
-            ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"],
+            ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"] as const,
             `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
           );
 
@@ -299,7 +294,14 @@ export async function validateFieldLogic<
               : getDynamicSelectValues(referencedField.options.values, c.column!);
           assertOneOf(
             c.operator,
-            ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF", "IS_IN_LIST", "NOT_IS_IN_LIST"],
+            [
+              "EQUAL",
+              "NOT_EQUAL",
+              "IS_ONE_OF",
+              "NOT_IS_ONE_OF",
+              "IS_IN_LIST",
+              "NOT_IS_IN_LIST",
+            ] as const,
             `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
           );
           assert(
@@ -333,7 +335,7 @@ export async function validateFieldLogic<
           "GREATER_THAN_OR_EQUAL",
           "LESS_THAN",
           "LESS_THAN_OR_EQUAL",
-        ],
+        ] as const,
         `Invalid operator ${c.operator} for variable condition ${index}`,
       );
 
