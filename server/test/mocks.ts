@@ -42,7 +42,6 @@ export class MockAuth implements IAuth {
   async signUpUser(): Promise<string> {
     return random(10);
   }
-  async deleteUser() {}
   async resendVerificationCode() {}
   async resetUserPassword() {}
   async validateRequestAuthentication(req: IncomingMessage) {

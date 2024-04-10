@@ -1,6 +1,5 @@
 import {
   AdminCreateUserCommand,
-  AdminDeleteUserCommand,
   AdminGetUserCommand,
   AdminInitiateAuthCommand,
   AdminRespondToAuthChallengeCommand,
@@ -55,10 +54,10 @@ import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
+import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
 import { ILogger, LOGGER } from "./Logger";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IRedis, REDIS } from "./Redis";
-import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -98,7 +97,6 @@ export interface IAuth {
       locale: UserLocale;
     },
   ): Promise<string>;
-  deleteUser(email: string): Promise<void>;
   resendVerificationCode(
     email: string,
     clientMetadata: {
@@ -224,15 +222,6 @@ export class Auth implements IAuth {
     );
 
     return res.UserSub!;
-  }
-
-  async deleteUser(email: string) {
-    await this.cognitoIdP.send(
-      new AdminDeleteUserCommand({
-        Username: email,
-        UserPoolId: this.config.cognito.defaultPoolId,
-      }),
-    );
   }
 
   async resendVerificationCode(

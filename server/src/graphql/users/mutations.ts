@@ -10,7 +10,6 @@ import pMap from "p-map";
 import { difference, groupBy, isDefined, partition, uniq, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
@@ -450,64 +449,72 @@ export const signUp = mutationField("signUp", {
     const tierKey = licenseCode?.details.parallel_tier ?? "FREE";
 
     const email = args.email.trim().toLowerCase();
-    const [error, cognitoId] = await withError(
-      ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
-        locale: args.locale,
-      }),
-    );
-    if (error) {
-      await withError(ctx.auth.deleteUser(email));
-      throw error;
-    }
 
-    let logoFile: Maybe<PublicFileUpload> = null;
-    if (args.organizationLogo) {
-      const { mimetype, createReadStream } = await args.organizationLogo;
-      const filename = random(16);
-      const path = `uploads/${filename}`;
-      const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
-      logoFile = await ctx.files.createPublicFile(
+    try {
+      const cognitoId = await ctx.auth.signUpUser(
+        email,
+        args.password,
+        args.firstName,
+        args.lastName,
         {
-          path,
-          filename,
-          content_type: mimetype,
-          size: res["ContentLength"]!.toString(),
+          locale: args.locale,
+        },
+      );
+
+      let logoFile: Maybe<PublicFileUpload> = null;
+      if (args.organizationLogo) {
+        const { mimetype, createReadStream } = await args.organizationLogo;
+        const filename = random(16);
+        const path = `uploads/${filename}`;
+        const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
+        logoFile = await ctx.files.createPublicFile(
+          {
+            path,
+            filename,
+            content_type: mimetype,
+            size: res["ContentLength"]!.toString(),
+          },
+          `UserSignUp:${args.email}`,
+        );
+      }
+
+      const { user } = await ctx.accountSetup.createOrganization(
+        tierKey,
+        {
+          name: args.organizationName,
+          status: source !== "self-service" ? "ACTIVE" : "DEMO",
+          logo_public_file_id: logoFile?.id ?? null,
+          appsumo_license:
+            licenseCode && licenseCode.source === "AppSumo"
+              ? {
+                  ...licenseCode.details,
+                  events: [licenseCode.details],
+                }
+              : null,
+        },
+        {
+          cognito_id: cognitoId!,
+          email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+          details: {
+            source,
+            industry: args.industry,
+            role: args.role,
+            position: args.position,
+          },
+          preferred_locale: args.locale,
         },
         `UserSignUp:${args.email}`,
       );
+
+      return user;
+    } catch (error) {
+      throw new ApolloError(
+        error instanceof Error ? error.message : "Error creating user",
+        "SIGNUP_ERROR",
+      );
     }
-
-    const { user } = await ctx.accountSetup.createOrganization(
-      tierKey,
-      {
-        name: args.organizationName,
-        status: source !== "self-service" ? "ACTIVE" : "DEMO",
-        logo_public_file_id: logoFile?.id ?? null,
-        appsumo_license:
-          licenseCode && licenseCode.source === "AppSumo"
-            ? {
-                ...licenseCode.details,
-                events: [licenseCode.details],
-              }
-            : null,
-      },
-      {
-        cognito_id: cognitoId!,
-        email,
-        first_name: args.firstName,
-        last_name: args.lastName,
-        details: {
-          source,
-          industry: args.industry,
-          role: args.role,
-          position: args.position,
-        },
-        preferred_locale: args.locale,
-      },
-      `UserSignUp:${args.email}`,
-    );
-
-    return user;
   },
 });
 
