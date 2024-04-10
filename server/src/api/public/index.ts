@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
+import { Container } from "inversify";
 import { outdent } from "outdent";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
@@ -228,101 +229,104 @@ import { PetitionEvent, ProfileEvent } from "./schemas/events";
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
 
-export const api = new RestApi({
-  openapi: "3.0.2",
-  info: {
-    title: "Parallel API",
-    description,
-    version: "1.0.0",
-    contact: {
-      name: "API Support",
-      email: "devs@onparallel.com",
-      url: "https://www.onparallel.com/developers/api",
-    },
-    "x-logo": {
-      url: "https://static.onparallel.com/static/emails/logo.png",
-      altText: "Parallel",
-      href: "https://www.onparallel.com",
-    },
-  },
-  servers: [
-    {
-      url: "https://www.onparallel.com/api/v1",
-      description: "Production server",
-    },
-  ],
-  security: [{ API_TOKEN: [] }],
-  components: {
-    securitySchemes: {
-      API_TOKEN: {
-        type: "http",
-        scheme: "bearer",
+export function publicApi(container: Container) {
+  const api = new RestApi({
+    openapi: "3.0.2",
+    info: {
+      title: "Parallel API",
+      description,
+      version: "1.0.0",
+      contact: {
+        name: "API Support",
+        email: "devs@onparallel.com",
+        url: "https://www.onparallel.com/developers/api",
+      },
+      "x-logo": {
+        url: "https://static.onparallel.com/static/emails/logo.png",
+        altText: "Parallel",
+        href: "https://www.onparallel.com",
       },
     },
-    schemas: {
-      PetitionEvent: PetitionEvent as any,
+    servers: [
+      {
+        url: "https://www.onparallel.com/api/v1",
+        description: "Production server",
+      },
+    ],
+    security: [{ API_TOKEN: [] }],
+    components: {
+      securitySchemes: {
+        API_TOKEN: {
+          type: "http",
+          scheme: "bearer",
+        },
+      },
+      schemas: {
+        PetitionEvent: PetitionEvent as any,
+      },
     },
-  },
-  "x-tagGroups": [
-    {
-      name: "Endpoints",
-      tags: [
-        "Parallels",
-        "Parallel replies",
-        "Parallel recipients",
-        "Signatures",
-        "Parallel Sharing",
-        "Templates",
-        "Tags",
-        "Contacts",
-        "Users",
-        "Subscriptions",
-        "Profiles",
-      ],
-    },
-  ],
-  tags: [
-    {
-      name: "Parallels",
-      description: "Parallels are the main entities in Parallel",
-    },
-    {
-      name: "Parallel replies",
-      description: "See the replies to your parallels",
-    },
-    {
-      name: "Parallel recipients",
-      description: "See to whom your parallels have been sent to",
-    },
-    {
-      name: "Signatures",
-      description:
-        "Request a digital signature on your parallels with our eSignature integrations.",
-    },
-    {
-      name: "Parallel Sharing",
-      description: "Share your parallels with members of your organization for collaborative work",
-    },
-    {
-      name: "Templates",
-      description: "Use templates to quickly create new parallels for repetitive workflows",
-    },
-    {
-      name: "Tags",
-      description: "Use tags to organize your templates and parallels so you can find them faster",
-    },
-    {
-      name: "Contacts",
-      description: "Contacts are the entities that represent the recipients of parallels",
-    },
+    "x-tagGroups": [
+      {
+        name: "Endpoints",
+        tags: [
+          "Parallels",
+          "Parallel replies",
+          "Parallel recipients",
+          "Signatures",
+          "Parallel Sharing",
+          "Templates",
+          "Tags",
+          "Contacts",
+          "Users",
+          "Subscriptions",
+          "Profiles",
+        ],
+      },
+    ],
+    tags: [
+      {
+        name: "Parallels",
+        description: "Parallels are the main entities in Parallel",
+      },
+      {
+        name: "Parallel replies",
+        description: "See the replies to your parallels",
+      },
+      {
+        name: "Parallel recipients",
+        description: "See to whom your parallels have been sent to",
+      },
+      {
+        name: "Signatures",
+        description:
+          "Request a digital signature on your parallels with our eSignature integrations.",
+      },
+      {
+        name: "Parallel Sharing",
+        description:
+          "Share your parallels with members of your organization for collaborative work",
+      },
+      {
+        name: "Templates",
+        description: "Use templates to quickly create new parallels for repetitive workflows",
+      },
+      {
+        name: "Tags",
+        description:
+          "Use tags to organize your templates and parallels so you can find them faster",
+      },
+      {
+        name: "Contacts",
+        description: "Contacts are the entities that represent the recipients of parallels",
+      },
 
-    {
-      name: "Users",
-      description: "Users are members of your organization",
-    },
-    {
-      name: "Subscriptions",
-      description: outdent`
+      {
+        name: "Users",
+        description: "Users are members of your organization",
+      },
+      {
+        name: "Subscriptions",
+        description: outdent`
         Subscribe to our events to get real time updates on your parallels and profiles.
 
         Here's a list of all possible events:
@@ -332,47 +336,47 @@ export const api = new RestApi({
         ## Profile Events
         ${ProfileEvent.description}
       `,
+      },
+      {
+        name: "Profiles",
+        description: "Profiles allow you to store all your relevant information",
+      },
+    ],
+    context: ({ req }) => {
+      const authorization = req.header("authorization");
+      if (!authorization) {
+        throw new UnauthorizedError("API token is missing");
+      }
+      req.requestId = randomUUID();
+      return {
+        client: new GraphQLClient("http://localhost/graphql", {
+          headers: {
+            authorization,
+            "api-request-id": req.requestId,
+            "User-Agent": "parallel-api",
+          },
+        }),
+      };
     },
-    {
-      name: "Profiles",
-      description: "Profiles allow you to store all your relevant information",
+    errorHandler: (error: Error) => {
+      if (containsGraphQLError(error, "UNAUTHENTICATED")) {
+        throw new UnauthorizedError("API token is invalid");
+      } else if (containsGraphQLError(error, "FORBIDDEN")) {
+        throw new ForbiddenError("You don't have access to this resource");
+      } else if (containsGraphQLError(error, "BAD_USER_INPUT")) {
+        // malformed gql request
+        throw new BadRequestError(error.response.errors?.[0].message ?? "Bad user input");
+      }
+      console.log(stringify(error));
+      throw error;
     },
-  ],
-  context: ({ req }) => {
-    const authorization = req.header("authorization");
-    if (!authorization) {
-      throw new UnauthorizedError("API token is missing");
-    }
-    req.requestId = randomUUID();
-    return {
-      client: new GraphQLClient("http://localhost/graphql", {
-        headers: {
-          authorization,
-          "api-request-id": req.requestId,
-          "User-Agent": "parallel-api",
-        },
-      }),
-    };
-  },
-  errorHandler: (error: Error) => {
-    if (containsGraphQLError(error, "UNAUTHENTICATED")) {
-      throw new UnauthorizedError("API token is invalid");
-    } else if (containsGraphQLError(error, "FORBIDDEN")) {
-      throw new ForbiddenError("You don't have access to this resource");
-    } else if (containsGraphQLError(error, "BAD_USER_INPUT")) {
-      // malformed gql request
-      throw new BadRequestError(error.response.errors?.[0].message ?? "Bad user input");
-    }
-    console.log(stringify(error));
-    throw error;
-  },
-});
+  });
 
-function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: boolean } = {}) {
-  return {
-    include: enumParam({
-      schemaTitle: "PetitionIncludeInResponse",
-      description: outdent`
+  function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: boolean } = {}) {
+    return {
+      include: enumParam({
+        schemaTitle: "PetitionIncludeInResponse",
+        description: outdent`
         Include optional fields in the response:
         - \`recipients\`: List of the recipients the parallel has been sent to.
         - \`fields\`: A list of fields of the parallel and their replies.
@@ -388,726 +392,649 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         }
         - \`variablesResult\`: An array with the result of the defined variables of the parallel.
       `,
+        array: true,
+        required: false,
+        values: [
+          "recipients",
+          "fields",
+          "tags",
+          "replies",
+          "progress",
+          "signers",
+          "signatures",
+          ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
+          "variablesResult",
+        ],
+      }),
+    };
+  }
+
+  function getPetitionIncludesFromQuery<
+    Q extends {
+      include: ReturnType<typeof petitionIncludeParam>["include"] extends RestParameter<infer T>
+        ? T
+        : never;
+    },
+  >(query: Q) {
+    return {
+      includeFields: query.include?.includes("fields") ?? false,
+      includeReplies: query.include?.includes("replies") ?? false,
+      includeRecipients: query.include?.includes("recipients") ?? false,
+      includeTags: query.include?.includes("tags") ?? false,
+      includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
+      includeProgress: query.include?.includes("progress") ?? false,
+      includeSigners: query.include?.includes("signers") ?? false,
+      includeSignatureRequests: query.include?.includes("signatures") ?? false,
+      includeVariablesResult: query.include?.includes("variablesResult") ?? false,
+    };
+  }
+
+  const templateIncludeParam = {
+    include: enumParam({
+      schemaTitle: "TemplateIncludeInResponse",
+      description: "Include optional fields in the response",
       array: true,
       required: false,
-      values: [
-        "recipients",
-        "fields",
-        "tags",
-        "replies",
-        "progress",
-        "signers",
-        "signatures",
-        ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
-        "variablesResult",
-      ],
+      values: ["fields", "tags"],
     }),
   };
-}
 
-function getPetitionIncludesFromQuery<
-  Q extends {
-    include: ReturnType<typeof petitionIncludeParam>["include"] extends RestParameter<infer T>
-      ? T
-      : never;
-  },
->(query: Q) {
-  return {
-    includeFields: query.include?.includes("fields") ?? false,
-    includeReplies: query.include?.includes("replies") ?? false,
-    includeRecipients: query.include?.includes("recipients") ?? false,
-    includeTags: query.include?.includes("tags") ?? false,
-    includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
-    includeProgress: query.include?.includes("progress") ?? false,
-    includeSigners: query.include?.includes("signers") ?? false,
-    includeSignatureRequests: query.include?.includes("signatures") ?? false,
-    includeVariablesResult: query.include?.includes("variablesResult") ?? false,
+  const profileIncludeParam = {
+    include: enumParam({
+      schemaTitle: "ProfileIncludeInResponse",
+      description: "Include optional fields in the response",
+      array: true,
+      required: false,
+      values: ["fields", "fieldsByAlias", "subscribers"],
+    }),
   };
-}
 
-const templateIncludeParam = {
-  include: enumParam({
-    schemaTitle: "TemplateIncludeInResponse",
-    description: "Include optional fields in the response",
-    array: true,
-    required: false,
-    values: ["fields", "tags"],
-  }),
-};
+  function getProfileIncludesFromQuery<
+    Q extends {
+      include: (typeof profileIncludeParam)["include"] extends RestParameter<infer T> ? T : never;
+    },
+  >(query: Q) {
+    return {
+      includeFields: query.include?.includes("fields") ?? false,
+      includeFieldsByAlias: query.include?.includes("fieldsByAlias") ?? false,
+      includeSubscribers: query.include?.includes("subscribers") ?? false,
+    };
+  }
 
-const profileIncludeParam = {
-  include: enumParam({
-    schemaTitle: "ProfileIncludeInResponse",
-    description: "Include optional fields in the response",
-    array: true,
-    required: false,
-    values: ["fields", "fieldsByAlias", "subscribers"],
-  }),
-};
+  const petitionId = idParam({
+    type: "Petition",
+    description: "The ID of the parallel",
+  });
+  const replyId = idParam({
+    type: "PetitionFieldReply",
+    description: "The ID of the reply",
+  });
+  const fieldId = idParam({
+    type: "PetitionField",
+    description: "The ID of the parallel field",
+  });
+  const userId = idParam({
+    type: "User",
+    description: "The ID of the user",
+  });
+  const userGroupId = idParam({
+    type: "UserGroup",
+    description: "The ID of the user group",
+  });
+  const templateId = idParam({
+    type: "Petition",
+    description: "The ID of the template",
+  });
+  const subscriptionId = idParam({
+    type: ["PetitionEventSubscription", "ProfileEventSubscription"],
+    description: "The ID of the subscription",
+  });
+  const signatureId = idParam({
+    type: "PetitionSignatureRequest",
+    description: "The ID of the signature request",
+  });
+  const accessId = idParam({
+    type: "PetitionAccess",
+    description: "The ID of the parallel access",
+  });
+  const profileId = idParam({
+    type: "Profile",
+    description: "The ID of the profile",
+  });
+  const profileTypeFieldId = idParam({
+    type: "ProfileTypeField",
+    description: "The ID of the profile type field",
+  });
 
-function getProfileIncludesFromQuery<
-  Q extends {
-    include: (typeof profileIncludeParam)["include"] extends RestParameter<infer T> ? T : never;
-  },
->(query: Q) {
-  return {
-    includeFields: query.include?.includes("fields") ?? false,
-    includeFieldsByAlias: query.include?.includes("fieldsByAlias") ?? false,
-    includeSubscribers: query.include?.includes("subscribers") ?? false,
-  };
-}
-
-const petitionId = idParam({
-  type: "Petition",
-  description: "The ID of the parallel",
-});
-const replyId = idParam({
-  type: "PetitionFieldReply",
-  description: "The ID of the reply",
-});
-const fieldId = idParam({
-  type: "PetitionField",
-  description: "The ID of the parallel field",
-});
-const userId = idParam({
-  type: "User",
-  description: "The ID of the user",
-});
-const userGroupId = idParam({
-  type: "UserGroup",
-  description: "The ID of the user group",
-});
-const templateId = idParam({
-  type: "Petition",
-  description: "The ID of the template",
-});
-const subscriptionId = idParam({
-  type: ["PetitionEventSubscription", "ProfileEventSubscription"],
-  description: "The ID of the subscription",
-});
-const signatureId = idParam({
-  type: "PetitionSignatureRequest",
-  description: "The ID of the signature request",
-});
-const accessId = idParam({
-  type: "PetitionAccess",
-  description: "The ID of the parallel access",
-});
-const profileId = idParam({
-  type: "Profile",
-  description: "The ID of the profile",
-});
-const profileTypeFieldId = idParam({
-  type: "ProfileTypeField",
-  description: "The ID of the profile type field",
-});
-
-api.path("/me").get(
-  {
-    operationId: "GetMe",
-    summary: "Get user info",
-    description: outdent`
+  api.path("/me").get(
+    {
+      operationId: "GetMe",
+      summary: "Get user info",
+      description: outdent`
     Get the information for the user who owns the token.
   `,
-    responses: {
-      200: SuccessResponse(UserWithOrg),
+      responses: {
+        200: SuccessResponse(UserWithOrg),
+      },
+      tags: ["Users"],
     },
-    tags: ["Users"],
-  },
-  async ({ client }) => {
-    const _query = gql`
-      query GetMe_user {
-        me {
-          ...User
-          organization {
-            ...Organization
+    async ({ client }) => {
+      const _query = gql`
+        query GetMe_user {
+          me {
+            ...User
+            organization {
+              ...Organization
+            }
           }
         }
-      }
-      ${UserFragmentDoc}
-      ${OrganizationFragmentDoc}
-    `;
-    const result = await client.request(GetMe_userDocument);
-    return Ok(result.me);
-  },
-);
+        ${UserFragmentDoc}
+        ${OrganizationFragmentDoc}
+      `;
+      const result = await client.request(GetMe_userDocument);
+      return Ok(result.me);
+    },
+  );
 
-api.path("/tags").get(
-  {
-    operationId: "GetTags",
-    summary: "Get tags list",
-    description: outdent`
+  api.path("/tags").get(
+    {
+      operationId: "GetTags",
+      summary: "Get tags list",
+      description: outdent`
       Returns a paginated list of all tags in the organization.
     `,
-    responses: {
-      200: SuccessResponse(PaginatedTags),
-    },
-    query: {
-      ...paginationParams(),
-      search: stringParam({
-        description: "Search tags by name",
-        required: false,
-      }),
-    },
-    tags: ["Tags"],
-  },
-  async ({ client, query }) => {
-    const _query = gql`
-      query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {
-        tags(offset: $offset, limit: $limit, search: $search) {
-          items {
-            ...Tag
-          }
-          totalCount
-        }
-      }
-      ${TagFragmentDoc}
-    `;
-    const result = await client.request(GetTags_tagsDocument, query);
-    const { items, totalCount } = result.tags;
-    return Ok({ items: items.map((t) => t.name), totalCount });
-  },
-);
-
-api
-  .path("/petitions")
-  .get(
-    {
-      operationId: "GetPetitions",
-      summary: "Get parallels list",
-      description: outdent`
-        Returns a paginated list of all parallels the user has access to.
-      `,
+      responses: {
+        200: SuccessResponse(PaginatedTags),
+      },
       query: {
         ...paginationParams(),
-        ...sortByParam(["createdAt", "name"]),
         search: stringParam({
-          description: "Search criteria to find relevant parallels",
+          description: "Search tags by name",
           required: false,
         }),
-        status: enumParam({
-          description: "Optionally filter parallels by their status",
-          required: false,
-          values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] as const,
-        }),
-        tags: stringParam({
-          description: "List of tags to filter by",
-          example: "todo,assigned",
-          required: false,
-          array: true,
-        }),
-        fromTemplateId: stringParam({
-          description: "List of template IDs used to create the parallels",
-          example: [toGlobalId("Petition", 101), toGlobalId("Petition", 57)].join(","),
-          required: false,
-          array: true,
-        }),
-        ...petitionIncludeParam(),
       },
-      responses: {
-        200: SuccessResponse(PaginatedPetitions),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-      },
-      tags: ["Parallels"],
+      tags: ["Tags"],
     },
     async ({ client, query }) => {
-      let tags: PetitionTagFilter | undefined = undefined;
-      if (isDefined(query.tags)) {
-        try {
-          tags = await buildTagsFilter(client, query.tags);
-        } catch (e) {
-          if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
-            return Ok({ totalCount: 0, items: [] });
-          }
-        }
-      }
-
       const _query = gql`
-        query GetPetitions_petitions(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $status: [PetitionStatus!]
-          $tags: PetitionTagFilter
-          $sortBy: [QueryPetitions_OrderBy!]
-          $includeRecipients: Boolean!
-          $includeFields: Boolean!
-          $includeTags: Boolean!
-          $includeRecipientUrl: Boolean!
-          $includeReplies: Boolean!
-          $includeProgress: Boolean!
-          $includeSigners: Boolean!
-          $includeVariablesResult: Boolean!
-          $includeSignatureRequests: Boolean!
-          $fromTemplateId: [GID!]
-        ) {
-          petitions(
-            offset: $offset
-            limit: $limit
-            sortBy: $sortBy
-            search: $search
-            filters: {
-              status: $status
-              type: PETITION
-              tags: $tags
-              fromTemplateId: $fromTemplateId
-            }
-          ) {
+        query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {
+          tags(offset: $offset, limit: $limit, search: $search) {
             items {
-              ...Petition
+              ...Tag
             }
             totalCount
           }
         }
-        ${PetitionFragment}
+        ${TagFragmentDoc}
       `;
-      try {
-        const result = await client.request(GetPetitions_petitionsDocument, {
-          ...pick(query, ["offset", "limit", "search", "status", "fromTemplateId", "sortBy"]),
-          tags,
-          ...getPetitionIncludesFromQuery(query),
-        });
-        const { items, totalCount } = result.petitions;
-        assertType<PetitionFragmentType[]>(items);
-        return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
-      } catch (error) {
-        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          if (error.response.errors?.[0].extensions.argName === "filters.fromTemplateId") {
-            throw new ForbiddenError("Invalid fromTemplateId");
-          }
-        }
-        throw error;
-      }
-    },
-  )
-  .post(
-    {
-      operationId: "CreatePetition",
-      summary: "Create parallel",
-      description: outdent`Create a new parallel based on a template.`,
-      body: JsonBody(CreatePetition),
-      query: {
-        ...petitionIncludeParam(),
-      },
-      responses: { 201: SuccessResponse(Petition) },
-      tags: ["Parallels"],
-    },
-    async ({ client, body, query }) => {
-      const _mutation = gql`
-        mutation CreatePetition_petition(
-          $name: String
-          $templateId: GID
-          $includeRecipients: Boolean!
-          $includeFields: Boolean!
-          $includeTags: Boolean!
-          $includeRecipientUrl: Boolean!
-          $includeReplies: Boolean!
-          $includeProgress: Boolean!
-          $includeSigners: Boolean!
-          $includeVariablesResult: Boolean!
-          $includeSignatureRequests: Boolean!
-        ) {
-          createPetition(name: $name, petitionId: $templateId) {
-            ...Petition
-          }
-        }
-        ${PetitionFragment}
-      `;
-      const result = await client.request(CreatePetition_petitionDocument, {
-        ...body,
-        ...getPetitionIncludesFromQuery(query),
-      });
-      assert("id" in result.createPetition);
-      return Created(mapPetition(result.createPetition));
+      const result = await client.request(GetTags_tagsDocument, query);
+      const { items, totalCount } = result.tags;
+      return Ok({ items: items.map((t) => t.name), totalCount });
     },
   );
 
-api
-  .path("/petitions/:petitionId", { params: { petitionId } })
-  .get(
-    {
-      operationId: "GetPetition",
-      summary: "Get parallel",
-      description: outdent`
-        Returns the specified parallel.
+  api
+    .path("/petitions")
+    .get(
+      {
+        operationId: "GetPetitions",
+        summary: "Get parallels list",
+        description: outdent`
+        Returns a paginated list of all parallels the user has access to.
       `,
-      query: {
-        ...petitionIncludeParam(),
+        query: {
+          ...paginationParams(),
+          ...sortByParam(["createdAt", "name"]),
+          search: stringParam({
+            description: "Search criteria to find relevant parallels",
+            required: false,
+          }),
+          status: enumParam({
+            description: "Optionally filter parallels by their status",
+            required: false,
+            values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] as const,
+          }),
+          tags: stringParam({
+            description: "List of tags to filter by",
+            example: "todo,assigned",
+            required: false,
+            array: true,
+          }),
+          fromTemplateId: stringParam({
+            description: "List of template IDs used to create the parallels",
+            example: [toGlobalId("Petition", 101), toGlobalId("Petition", 57)].join(","),
+            required: false,
+            array: true,
+          }),
+          ...petitionIncludeParam(),
+        },
+        responses: {
+          200: SuccessResponse(PaginatedPetitions),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+        tags: ["Parallels"],
       },
-      responses: { 200: SuccessResponse(Petition) },
-      tags: ["Parallels"],
-    },
-    async ({ client, params, query }) => {
-      const _query = gql`
-        query GetPetition_petition(
-          $petitionId: GID!
-          $includeRecipients: Boolean!
-          $includeFields: Boolean!
-          $includeTags: Boolean!
-          $includeRecipientUrl: Boolean!
-          $includeReplies: Boolean!
-          $includeProgress: Boolean!
-          $includeSigners: Boolean!
-          $includeVariablesResult: Boolean!
-          $includeSignatureRequests: Boolean!
-        ) {
-          petition(id: $petitionId) {
-            ...Petition
-          }
-        }
-        ${PetitionFragment}
-      `;
-      const result = await client.request(GetPetition_petitionDocument, {
-        petitionId: params.petitionId,
-        ...getPetitionIncludesFromQuery(query),
-      });
-      assert("id" in result.petition!);
-      return Ok(mapPetition(result.petition!));
-    },
-  )
-  .put(
-    {
-      operationId: "UpdatePetition",
-      summary: "Update parallel",
-      description: outdent`
-        Update the specified parallel.
-      `,
-      body: JsonBody(UpdatePetition),
-      query: {
-        ...petitionIncludeParam(),
-      },
-      responses: {
-        200: SuccessResponse(Petition),
-        400: ErrorResponse({ description: "Invalid request body" }),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-        409: ErrorResponse({
-          description: "Cannot update signers on a petition without a signature configuration",
-        }),
-      },
-      tags: ["Parallels"],
-    },
-    async ({ client, params, body, query }) => {
-      const _query = gql`
-        query UpdatePetition_petition($petitionId: GID!) {
-          petition(id: $petitionId) {
-            signatureConfig {
-              allowAdditionalSigners
-              integration {
-                id
-              }
-              review
-              timezone
-              title
-              signingMode
-              instructions
-              minSigners
+      async ({ client, query }) => {
+        let tags: PetitionTagFilter | undefined = undefined;
+        if (isDefined(query.tags)) {
+          try {
+            tags = await buildTagsFilter(client, query.tags);
+          } catch (e) {
+            if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
+              return Ok({ totalCount: 0, items: [] });
             }
           }
         }
-      `;
-      const _mutation = gql`
-        mutation UpdatePetition_updatePetition(
-          $petitionId: GID!
-          $data: UpdatePetitionInput!
-          $includeRecipients: Boolean!
-          $includeFields: Boolean!
-          $includeTags: Boolean!
-          $includeRecipientUrl: Boolean!
-          $includeReplies: Boolean!
-          $includeProgress: Boolean!
-          $includeSigners: Boolean!
-          $includeVariablesResult: Boolean!
-          $includeSignatureRequests: Boolean!
-        ) {
-          updatePetition(petitionId: $petitionId, data: $data) {
-            ...Petition
+
+        const _query = gql`
+          query GetPetitions_petitions(
+            $offset: Int!
+            $limit: Int!
+            $search: String
+            $status: [PetitionStatus!]
+            $tags: PetitionTagFilter
+            $sortBy: [QueryPetitions_OrderBy!]
+            $includeRecipients: Boolean!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+            $includeRecipientUrl: Boolean!
+            $includeReplies: Boolean!
+            $includeProgress: Boolean!
+            $includeSigners: Boolean!
+            $includeVariablesResult: Boolean!
+            $includeSignatureRequests: Boolean!
+            $fromTemplateId: [GID!]
+          ) {
+            petitions(
+              offset: $offset
+              limit: $limit
+              sortBy: $sortBy
+              search: $search
+              filters: {
+                status: $status
+                type: PETITION
+                tags: $tags
+                fromTemplateId: $fromTemplateId
+              }
+            ) {
+              items {
+                ...Petition
+              }
+              totalCount
+            }
           }
+          ${PetitionFragment}
+        `;
+        try {
+          const result = await client.request(GetPetitions_petitionsDocument, {
+            ...pick(query, ["offset", "limit", "search", "status", "fromTemplateId", "sortBy"]),
+            tags,
+            ...getPetitionIncludesFromQuery(query),
+          });
+          const { items, totalCount } = result.petitions;
+          assertType<PetitionFragmentType[]>(items);
+          return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            if (error.response.errors?.[0].extensions.argName === "filters.fromTemplateId") {
+              throw new ForbiddenError("Invalid fromTemplateId");
+            }
+          }
+          throw error;
         }
-        ${PetitionFragment}
-      `;
-
-      const inputData: UpdatePetitionInput = omit(body, ["signers"]);
-      if (isDefined(body.signers)) {
-        const queryResult = await client.request(UpdatePetition_petitionDocument, {
-          petitionId: params.petitionId,
-        });
-
-        if (!isDefined(queryResult.petition!.signatureConfig)) {
-          throw new ConflictError(
-            "Cannot update signers on a petition without a signature configuration",
-          );
-        }
-
-        inputData.signatureConfig = {
-          ...omit(queryResult.petition!.signatureConfig!, ["integration"]),
-          orgIntegrationId: queryResult.petition!.signatureConfig!.integration!.id,
-          signersInfo: body.signers,
-        };
-      } else if (body.signers === null) {
-        inputData.signatureConfig = null;
-      }
-
-      try {
-        const result = await client.request(UpdatePetition_updatePetitionDocument, {
-          petitionId: params.petitionId,
-          data: inputData,
+      },
+    )
+    .post(
+      {
+        operationId: "CreatePetition",
+        summary: "Create parallel",
+        description: outdent`Create a new parallel based on a template.`,
+        body: JsonBody(CreatePetition),
+        query: {
+          ...petitionIncludeParam(),
+        },
+        responses: { 201: SuccessResponse(Petition) },
+        tags: ["Parallels"],
+      },
+      async ({ client, body, query }) => {
+        const _mutation = gql`
+          mutation CreatePetition_petition(
+            $name: String
+            $templateId: GID
+            $includeRecipients: Boolean!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+            $includeRecipientUrl: Boolean!
+            $includeReplies: Boolean!
+            $includeProgress: Boolean!
+            $includeSigners: Boolean!
+            $includeVariablesResult: Boolean!
+            $includeSignatureRequests: Boolean!
+          ) {
+            createPetition(name: $name, petitionId: $templateId) {
+              ...Petition
+            }
+          }
+          ${PetitionFragment}
+        `;
+        const result = await client.request(CreatePetition_petitionDocument, {
+          ...body,
           ...getPetitionIncludesFromQuery(query),
         });
-        assert("id" in result.updatePetition!);
-        return Ok(mapPetition(result.updatePetition!));
-      } catch (error) {
-        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          throw new BadRequestError(error.response.errors?.[0]?.message ?? "ARG_VALIDATION_ERROR");
+        assert("id" in result.createPetition);
+        return Created(mapPetition(result.createPetition));
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId", { params: { petitionId } })
+    .get(
+      {
+        operationId: "GetPetition",
+        summary: "Get parallel",
+        description: outdent`
+        Returns the specified parallel.
+      `,
+        query: {
+          ...petitionIncludeParam(),
+        },
+        responses: { 200: SuccessResponse(Petition) },
+        tags: ["Parallels"],
+      },
+      async ({ client, params, query }) => {
+        const _query = gql`
+          query GetPetition_petition(
+            $petitionId: GID!
+            $includeRecipients: Boolean!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+            $includeRecipientUrl: Boolean!
+            $includeReplies: Boolean!
+            $includeProgress: Boolean!
+            $includeSigners: Boolean!
+            $includeVariablesResult: Boolean!
+            $includeSignatureRequests: Boolean!
+          ) {
+            petition(id: $petitionId) {
+              ...Petition
+            }
+          }
+          ${PetitionFragment}
+        `;
+        const result = await client.request(GetPetition_petitionDocument, {
+          petitionId: params.petitionId,
+          ...getPetitionIncludesFromQuery(query),
+        });
+        assert("id" in result.petition!);
+        return Ok(mapPetition(result.petition!));
+      },
+    )
+    .put(
+      {
+        operationId: "UpdatePetition",
+        summary: "Update parallel",
+        description: outdent`
+        Update the specified parallel.
+      `,
+        body: JsonBody(UpdatePetition),
+        query: {
+          ...petitionIncludeParam(),
+        },
+        responses: {
+          200: SuccessResponse(Petition),
+          400: ErrorResponse({ description: "Invalid request body" }),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+          409: ErrorResponse({
+            description: "Cannot update signers on a petition without a signature configuration",
+          }),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params, body, query }) => {
+        const _query = gql`
+          query UpdatePetition_petition($petitionId: GID!) {
+            petition(id: $petitionId) {
+              signatureConfig {
+                allowAdditionalSigners
+                integration {
+                  id
+                }
+                review
+                timezone
+                title
+                signingMode
+                instructions
+                minSigners
+              }
+            }
+          }
+        `;
+        const _mutation = gql`
+          mutation UpdatePetition_updatePetition(
+            $petitionId: GID!
+            $data: UpdatePetitionInput!
+            $includeRecipients: Boolean!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+            $includeRecipientUrl: Boolean!
+            $includeReplies: Boolean!
+            $includeProgress: Boolean!
+            $includeSigners: Boolean!
+            $includeVariablesResult: Boolean!
+            $includeSignatureRequests: Boolean!
+          ) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              ...Petition
+            }
+          }
+          ${PetitionFragment}
+        `;
+
+        const inputData: UpdatePetitionInput = omit(body, ["signers"]);
+        if (isDefined(body.signers)) {
+          const queryResult = await client.request(UpdatePetition_petitionDocument, {
+            petitionId: params.petitionId,
+          });
+
+          if (!isDefined(queryResult.petition!.signatureConfig)) {
+            throw new ConflictError(
+              "Cannot update signers on a petition without a signature configuration",
+            );
+          }
+
+          inputData.signatureConfig = {
+            ...omit(queryResult.petition!.signatureConfig!, ["integration"]),
+            orgIntegrationId: queryResult.petition!.signatureConfig!.integration!.id,
+            signersInfo: body.signers,
+          };
+        } else if (body.signers === null) {
+          inputData.signatureConfig = null;
         }
 
-        throw error;
-      }
-    },
-  )
-  .delete(
-    {
-      operationId: "DeletePetition",
-      summary: "Delete parallel",
-      query: {
-        force: booleanParam({
-          required: false,
-          description: outdent`
+        try {
+          const result = await client.request(UpdatePetition_updatePetitionDocument, {
+            petitionId: params.petitionId,
+            data: inputData,
+            ...getPetitionIncludesFromQuery(query),
+          });
+          assert("id" in result.updatePetition!);
+          return Ok(mapPetition(result.updatePetition!));
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError(
+              error.response.errors?.[0]?.message ?? "ARG_VALIDATION_ERROR",
+            );
+          }
+
+          throw error;
+        }
+      },
+    )
+    .delete(
+      {
+        operationId: "DeletePetition",
+        summary: "Delete parallel",
+        query: {
+          force: booleanParam({
+            required: false,
+            description: outdent`
             If the parallel is shared with other users this method will fail
             unless passing \`true\` to this parameter
           `,
-        }),
-      },
-      description: outdent`
+          }),
+        },
+        description: outdent`
         Delete the specified parallel.
 
         If the parallel is shared with other users this method will fail unless
         passing \`true\` to the \`force\` parameter"
       `,
+        responses: {
+          204: SuccessResponse(),
+          400: ErrorResponse({
+            description:
+              "The parallel is being shared with another user. Set force=true to delete.",
+          }),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params, query }) => {
+        try {
+          const _mutation = gql`
+            mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
+              deletePetitions(ids: [$petitionId], force: $force)
+            }
+          `;
+          await client.request(DeletePetition_deletePetitionsDocument, {
+            petitionId: params.petitionId,
+            force: query.force ?? false,
+          });
+          return NoContent();
+        } catch (error) {
+          if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
+            throw new BadRequestError(
+              "The parallel is being shared with another user. Set force=true to delete.",
+            );
+          }
+          throw error;
+        }
+      },
+    );
+
+  api.path("/petitions/:petitionId/close", { params: { petitionId } }).post(
+    {
+      operationId: "ClosePetition",
+      summary: "Closes a parallel",
+      description: "Close a parallel",
+      query: {
+        ...petitionIncludeParam(),
+      },
       responses: {
-        204: SuccessResponse(),
-        400: ErrorResponse({
-          description: "The parallel is being shared with another user. Set force=true to delete.",
-        }),
+        200: SuccessResponse(Petition),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
       },
       tags: ["Parallels"],
     },
     async ({ client, params, query }) => {
-      try {
-        const _mutation = gql`
-          mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
-            deletePetitions(ids: [$petitionId], force: $force)
+      const _mutation = gql`
+        mutation ClosePetition_closePetition(
+          $petitionId: GID!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+        ) {
+          closePetition(petitionId: $petitionId) {
+            ...Petition
           }
-        `;
-        await client.request(DeletePetition_deletePetitionsDocument, {
-          petitionId: params.petitionId,
-          force: query.force ?? false,
-        });
-        return NoContent();
-      } catch (error) {
-        if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
-          throw new BadRequestError(
-            "The parallel is being shared with another user. Set force=true to delete.",
-          );
         }
+        ${PetitionFragment}
+      `;
+
+      const result = await client.request(ClosePetition_closePetitionDocument, {
+        petitionId: params.petitionId,
+        ...getPetitionIncludesFromQuery(query),
+      });
+
+      assert("id" in result.closePetition!);
+      return Ok(mapPetition(result.closePetition!));
+    },
+  );
+
+  api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
+    {
+      operationId: "ReopenPetition",
+      summary: "Reopen a parallel",
+      description: "Reopen a closed or completed parallel",
+      query: {
+        ...petitionIncludeParam(),
+      },
+      responses: {
+        200: SuccessResponse(Petition),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+        409: ErrorResponse({ description: "The parallel is not closed or completed" }),
+      },
+      tags: ["Parallels"],
+    },
+    async ({ client, params, query }) => {
+      const _mutation = gql`
+        mutation ReopenPetition_reopenPetition(
+          $petitionId: GID!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+        ) {
+          reopenPetition(petitionId: $petitionId) {
+            ...Petition
+          }
+        }
+        ${PetitionFragment}
+      `;
+
+      try {
+        const result = await client.request(ReopenPetition_reopenPetitionDocument, {
+          petitionId: params.petitionId,
+          ...getPetitionIncludesFromQuery(query),
+        });
+
+        assert("id" in result.reopenPetition!);
+        return Ok(mapPetition(result.reopenPetition!));
+      } catch (error) {
+        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+          throw new ConflictError("The parallel is not closed or completed");
+        }
+
         throw error;
       }
     },
   );
 
-api.path("/petitions/:petitionId/close", { params: { petitionId } }).post(
-  {
-    operationId: "ClosePetition",
-    summary: "Closes a parallel",
-    description: "Close a parallel",
-    query: {
-      ...petitionIncludeParam(),
-    },
-    responses: {
-      200: SuccessResponse(Petition),
-      403: ErrorResponse({ description: "You don't have access to this resource" }),
-    },
-    tags: ["Parallels"],
-  },
-  async ({ client, params, query }) => {
-    const _mutation = gql`
-      mutation ClosePetition_closePetition(
-        $petitionId: GID!
-        $includeRecipients: Boolean!
-        $includeFields: Boolean!
-        $includeTags: Boolean!
-        $includeRecipientUrl: Boolean!
-        $includeReplies: Boolean!
-        $includeProgress: Boolean!
-        $includeSigners: Boolean!
-        $includeVariablesResult: Boolean!
-        $includeSignatureRequests: Boolean!
-      ) {
-        closePetition(petitionId: $petitionId) {
-          ...Petition
-        }
-      }
-      ${PetitionFragment}
-    `;
-
-    const result = await client.request(ClosePetition_closePetitionDocument, {
-      petitionId: params.petitionId,
-      ...getPetitionIncludesFromQuery(query),
-    });
-
-    assert("id" in result.closePetition!);
-    return Ok(mapPetition(result.closePetition!));
-  },
-);
-
-api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
-  {
-    operationId: "ReopenPetition",
-    summary: "Reopen a parallel",
-    description: "Reopen a closed or completed parallel",
-    query: {
-      ...petitionIncludeParam(),
-    },
-    responses: {
-      200: SuccessResponse(Petition),
-      403: ErrorResponse({ description: "You don't have access to this resource" }),
-      409: ErrorResponse({ description: "The parallel is not closed or completed" }),
-    },
-    tags: ["Parallels"],
-  },
-  async ({ client, params, query }) => {
-    const _mutation = gql`
-      mutation ReopenPetition_reopenPetition(
-        $petitionId: GID!
-        $includeRecipients: Boolean!
-        $includeFields: Boolean!
-        $includeTags: Boolean!
-        $includeRecipientUrl: Boolean!
-        $includeReplies: Boolean!
-        $includeProgress: Boolean!
-        $includeSigners: Boolean!
-        $includeVariablesResult: Boolean!
-        $includeSignatureRequests: Boolean!
-      ) {
-        reopenPetition(petitionId: $petitionId) {
-          ...Petition
-        }
-      }
-      ${PetitionFragment}
-    `;
-
-    try {
-      const result = await client.request(ReopenPetition_reopenPetitionDocument, {
-        petitionId: params.petitionId,
-        ...getPetitionIncludesFromQuery(query),
-      });
-
-      assert("id" in result.reopenPetition!);
-      return Ok(mapPetition(result.reopenPetition!));
-    } catch (error) {
-      if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
-        throw new ConflictError("The parallel is not closed or completed");
-      }
-
-      throw error;
-    }
-  },
-);
-
-api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
-  {
-    operationId: "TagPetition",
-    summary: "Tag a parallel",
-    description: "Tag a parallel with the specified label",
-    query: {
-      ...petitionIncludeParam(),
-    },
-    body: JsonBody(TagPetition),
-    responses: { 201: SuccessResponse(Petition) },
-    tags: ["Tags"],
-  },
-  async ({ client, params, body, query }) => {
-    const _query = gql`
-      query TagPetition_tagsByName($search: String!) {
-        tagsByName(offset: 0, limit: 1, search: [$search]) {
-          items {
-            ...Tag
-          }
-        }
-      }
-      ${PetitionTagFragment}
-    `;
-    const queryResult = await client.request(TagPetition_tagsByNameDocument, { search: body.name });
-    // must have a 100% match on the result
-    let tagId = queryResult.tagsByName.items[0]?.id;
-
-    if (!isDefined(tagId)) {
-      const _mutation = gql`
-        mutation TagPetition_createTag($name: String!, $color: String!) {
-          createTag(name: $name, color: $color) {
-            ...Tag
-          }
-        }
-        ${PetitionTagFragment}
-      `;
-
-      const createTagResult = await client.request(TagPetition_createTagDocument, {
-        name: body.name,
-        color: "#E2E8F0",
-      });
-
-      tagId = createTagResult.createTag!.id;
-    }
-
-    const _mutation = gql`
-      mutation TagPetition_tagPetition(
-        $petitionId: GID!
-        $tagId: GID!
-        $includeRecipients: Boolean!
-        $includeFields: Boolean!
-        $includeTags: Boolean!
-        $includeRecipientUrl: Boolean!
-        $includeReplies: Boolean!
-        $includeProgress: Boolean!
-        $includeSigners: Boolean!
-        $includeVariablesResult: Boolean!
-        $includeSignatureRequests: Boolean!
-      ) {
-        tagPetition(petitionId: $petitionId, tagId: $tagId) {
-          ...Petition
-        }
-      }
-      ${PetitionFragment}
-    `;
-    const tagResult = await client.request(TagPetition_tagPetitionDocument, {
-      petitionId: params.petitionId,
-      tagId: tagId!,
-      ...getPetitionIncludesFromQuery(query),
-      includeTags: true,
-    });
-    assert("id" in tagResult.tagPetition!);
-    return Created(mapPetition(tagResult.tagPetition!));
-  },
-);
-
-api
-  .path("/petitions/:petitionId/tags/:name", {
-    params: { petitionId, name: stringParam({ description: "The name of the tag to remove" }) },
-  })
-  .delete(
+  api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
     {
-      operationId: "UntagPetition",
-      summary: "Untag a parallel",
-      description: "Untag a parallel with the specified tag name",
-      responses: {
-        204: SuccessResponse(),
-        404: ErrorResponse({ description: "Tag name not found" }),
+      operationId: "TagPetition",
+      summary: "Tag a parallel",
+      description: "Tag a parallel with the specified label",
+      query: {
+        ...petitionIncludeParam(),
       },
-
+      body: JsonBody(TagPetition),
+      responses: { 201: SuccessResponse(Petition) },
       tags: ["Tags"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, body, query }) => {
       const _query = gql`
-        query UntagPetition_tagsByName($search: String!) {
+        query TagPetition_tagsByName($search: String!) {
           tagsByName(offset: 0, limit: 1, search: [$search]) {
             items {
               ...Tag
@@ -1117,66 +1044,148 @@ api
         ${PetitionTagFragment}
       `;
       const queryResult = await client.request(TagPetition_tagsByNameDocument, {
-        search: params.name,
+        search: body.name,
       });
-      const tagId = queryResult.tagsByName.items[0]?.id;
+      // must have a 100% match on the result
+      let tagId = queryResult.tagsByName.items[0]?.id;
 
       if (!isDefined(tagId)) {
-        throw new ResourceNotFoundError(`Label '${params.name}' not found`);
+        const _mutation = gql`
+          mutation TagPetition_createTag($name: String!, $color: String!) {
+            createTag(name: $name, color: $color) {
+              ...Tag
+            }
+          }
+          ${PetitionTagFragment}
+        `;
+
+        const createTagResult = await client.request(TagPetition_createTagDocument, {
+          name: body.name,
+          color: "#E2E8F0",
+        });
+
+        tagId = createTagResult.createTag!.id;
       }
 
       const _mutation = gql`
-        mutation UntagPetition_untagPetition($petitionId: GID!, $tagId: GID!) {
-          untagPetition(petitionId: $petitionId, tagId: $tagId) {
-            id
+        mutation TagPetition_tagPetition(
+          $petitionId: GID!
+          $tagId: GID!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+        ) {
+          tagPetition(petitionId: $petitionId, tagId: $tagId) {
+            ...Petition
           }
         }
+        ${PetitionFragment}
       `;
-
-      await client.request(UntagPetition_untagPetitionDocument, {
+      const tagResult = await client.request(TagPetition_tagPetitionDocument, {
         petitionId: params.petitionId,
-        tagId,
+        tagId: tagId!,
+        ...getPetitionIncludesFromQuery(query),
+        includeTags: true,
       });
-
-      return NoContent();
+      assert("id" in tagResult.tagPetition!);
+      return Created(mapPetition(tagResult.tagPetition!));
     },
   );
 
-api
-  .path("/petitions/:petitionId/properties", {
-    params: { petitionId },
-  })
-  .get(
-    {
-      operationId: "ReadPetitionCustomProperties",
-      summary: "Get parallel custom properties",
-      description: "Returns a key-value object with the custom properties of the parallel",
-      responses: {
-        200: SuccessResponse(PetitionCustomProperties),
-      },
-      tags: ["Parallels"],
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query ReadPetitionCustomProperties($petitionId: GID!) {
-          petition(id: $petitionId) {
-            id
-            customProperties
-          }
-        }
-      `;
-      const result = await client.request(ReadPetitionCustomPropertiesDocument, {
-        petitionId: params.petitionId,
-      });
+  api
+    .path("/petitions/:petitionId/tags/:name", {
+      params: { petitionId, name: stringParam({ description: "The name of the tag to remove" }) },
+    })
+    .delete(
+      {
+        operationId: "UntagPetition",
+        summary: "Untag a parallel",
+        description: "Untag a parallel with the specified tag name",
+        responses: {
+          204: SuccessResponse(),
+          404: ErrorResponse({ description: "Tag name not found" }),
+        },
 
-      return Ok(result.petition!.customProperties);
-    },
-  )
-  .post(
-    {
-      operationId: "CreateOrUpdatePetitionCustomProperty",
-      summary: "Create or update parallel custom property",
-      description: outdent`
+        tags: ["Tags"],
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query UntagPetition_tagsByName($search: String!) {
+            tagsByName(offset: 0, limit: 1, search: [$search]) {
+              items {
+                ...Tag
+              }
+            }
+          }
+          ${PetitionTagFragment}
+        `;
+        const queryResult = await client.request(TagPetition_tagsByNameDocument, {
+          search: params.name,
+        });
+        const tagId = queryResult.tagsByName.items[0]?.id;
+
+        if (!isDefined(tagId)) {
+          throw new ResourceNotFoundError(`Label '${params.name}' not found`);
+        }
+
+        const _mutation = gql`
+          mutation UntagPetition_untagPetition($petitionId: GID!, $tagId: GID!) {
+            untagPetition(petitionId: $petitionId, tagId: $tagId) {
+              id
+            }
+          }
+        `;
+
+        await client.request(UntagPetition_untagPetitionDocument, {
+          petitionId: params.petitionId,
+          tagId,
+        });
+
+        return NoContent();
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/properties", {
+      params: { petitionId },
+    })
+    .get(
+      {
+        operationId: "ReadPetitionCustomProperties",
+        summary: "Get parallel custom properties",
+        description: "Returns a key-value object with the custom properties of the parallel",
+        responses: {
+          200: SuccessResponse(PetitionCustomProperties),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query ReadPetitionCustomProperties($petitionId: GID!) {
+            petition(id: $petitionId) {
+              id
+              customProperties
+            }
+          }
+        `;
+        const result = await client.request(ReadPetitionCustomPropertiesDocument, {
+          petitionId: params.petitionId,
+        });
+
+        return Ok(result.petition!.customProperties);
+      },
+    )
+    .post(
+      {
+        operationId: "CreateOrUpdatePetitionCustomProperty",
+        summary: "Create or update parallel custom property",
+        description: outdent`
         Creates or updates a custom property on the parallel.
 
         If the provided key already exists as a property, its value is overwritten.
@@ -1184,83 +1193,83 @@ api
 
         The parallel can have up to 20 different properties.
       `,
-      body: JsonBody(CreateOrUpdatePetitionCustomProperty),
-      responses: {
-        200: SuccessResponse(PetitionCustomProperties),
-        409: ErrorResponse({
-          description: "You reached the maximum limit of custom properties on the parallel",
-        }),
+        body: JsonBody(CreateOrUpdatePetitionCustomProperty),
+        responses: {
+          200: SuccessResponse(PetitionCustomProperties),
+          409: ErrorResponse({
+            description: "You reached the maximum limit of custom properties on the parallel",
+          }),
+        },
+        tags: ["Parallels"],
       },
-      tags: ["Parallels"],
-    },
-    async ({ client, body, params }) => {
-      try {
+      async ({ client, body, params }) => {
+        try {
+          const _mutation = gql`
+            mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
+              $petitionId: GID!
+              $key: String!
+              $value: String
+            ) {
+              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+                customProperties
+              }
+            }
+          `;
+          const result = await client.request(
+            CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+            { petitionId: params.petitionId, key: body.key, value: body.value },
+          );
+          return Ok(result.modifyPetitionCustomProperty.customProperties);
+        } catch (error) {
+          if (containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")) {
+            throw new ConflictError(
+              "You reached the maximum limit of custom properties on the parallel.",
+            );
+          }
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/properties/:key", {
+      params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
+    })
+    .delete(
+      {
+        operationId: "DeletePetitionCustomProperty",
+        summary: "Deletes parallel custom property",
+        description: outdent`
+        Removes the provided key from the custom properties of the parallel.
+      `,
+        responses: { 204: SuccessResponse() },
+        tags: ["Parallels"],
+      },
+      async ({ client, params }) => {
         const _mutation = gql`
-          mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
+          mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
             $petitionId: GID!
             $key: String!
-            $value: String
           ) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              customProperties
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
+              id
             }
           }
         `;
-        const result = await client.request(
-          CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-          { petitionId: params.petitionId, key: body.key, value: body.value },
+        await client.request(
+          DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+          params,
         );
-        return Ok(result.modifyPetitionCustomProperty.customProperties);
-      } catch (error) {
-        if (containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")) {
-          throw new ConflictError(
-            "You reached the maximum limit of custom properties on the parallel.",
-          );
-        }
-        throw error;
-      }
-    },
-  );
 
-api
-  .path("/petitions/:petitionId/properties/:key", {
-    params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
-  })
-  .delete(
+        return NoContent();
+      },
+    );
+
+  api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
     {
-      operationId: "DeletePetitionCustomProperty",
-      summary: "Deletes parallel custom property",
+      operationId: "SendPetition",
+      summary: "Send parallel",
       description: outdent`
-        Removes the provided key from the custom properties of the parallel.
-      `,
-      responses: { 204: SuccessResponse() },
-      tags: ["Parallels"],
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
-          $petitionId: GID!
-          $key: String!
-        ) {
-          modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
-            id
-          }
-        }
-      `;
-      await client.request(
-        DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-        params,
-      );
-
-      return NoContent();
-    },
-  );
-
-api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
-  {
-    operationId: "SendPetition",
-    summary: "Send parallel",
-    description: outdent`
       Send a parallel to a contact. You can send a parallel to multiple
       people at once so they can fill the parallel collaboratively.
 
@@ -1295,432 +1304,441 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
       ~~~
       The two options can also be mixed if necessary.
     `,
-    body: JsonBody(SendPetition),
-    query: {
-      ...petitionIncludeParam({ includeRecipientUrl: true }),
+      body: JsonBody(SendPetition),
+      query: {
+        ...petitionIncludeParam({ includeRecipientUrl: true }),
+      },
+      responses: {
+        200: SuccessResponse(Petition),
+        400: ErrorResponse({
+          description: "Invalid parameter",
+        }),
+        403: ErrorResponse({
+          description: "You don't have enough credits for this action",
+        }),
+        409: ErrorResponse({
+          description: "The parallel was already sent to some of the provided contacts",
+        }),
+      },
+      tags: ["Parallels"],
     },
-    responses: {
-      200: SuccessResponse(Petition),
-      400: ErrorResponse({
-        description: "Invalid parameter",
-      }),
-      403: ErrorResponse({
-        description: "You don't have enough credits for this action",
-      }),
-      409: ErrorResponse({
-        description: "The parallel was already sent to some of the provided contacts",
-      }),
-    },
-    tags: ["Parallels"],
-  },
-  async ({ client, params, body, query }) => {
-    try {
-      const contactIds = await resolveContacts(client, body.contacts);
-      let message = bodyMessageToRTE(body.message);
+    async ({ client, params, body, query }) => {
+      try {
+        const contactIds = await resolveContacts(client, body.contacts);
+        let message = bodyMessageToRTE(body.message);
 
-      let subject = body.subject;
-      const _query = gql`
-        query CreatePetitionRecipients_petition($id: GID!) {
-          petition(id: $id) {
-            emailBody
-            emailSubject
-          }
-        }
-      `;
-      const _mutation = gql`
-        mutation CreatePetitionRecipients_sendPetition(
-          $petitionId: GID!
-          $contactIds: [GID!]!
-          $subject: String!
-          $body: JSON!
-          $scheduledAt: DateTime
-          $remindersConfig: RemindersConfigInput
-          $skipEmailSend: Boolean
-          $includeRecipients: Boolean!
-          $includeFields: Boolean!
-          $includeTags: Boolean!
-          $includeRecipientUrl: Boolean!
-          $includeReplies: Boolean!
-          $includeProgress: Boolean!
-          $includeSigners: Boolean!
-          $includeVariablesResult: Boolean!
-          $includeSignatureRequests: Boolean!
-          $senderId: GID
-        ) {
-          sendPetition(
-            petitionId: $petitionId
-            contactIdGroups: [$contactIds]
-            subject: $subject
-            body: $body
-            scheduledAt: $scheduledAt
-            remindersConfig: $remindersConfig
-            senderId: $senderId
-            skipEmailSend: $skipEmailSend
-          ) {
-            result
-            petition {
-              ...Petition
+        let subject = body.subject;
+        const _query = gql`
+          query CreatePetitionRecipients_petition($id: GID!) {
+            petition(id: $id) {
+              emailBody
+              emailSubject
             }
           }
-        }
-        ${PetitionFragment}
-      `;
+        `;
+        const _mutation = gql`
+          mutation CreatePetitionRecipients_sendPetition(
+            $petitionId: GID!
+            $contactIds: [GID!]!
+            $subject: String!
+            $body: JSON!
+            $scheduledAt: DateTime
+            $remindersConfig: RemindersConfigInput
+            $skipEmailSend: Boolean
+            $includeRecipients: Boolean!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+            $includeRecipientUrl: Boolean!
+            $includeReplies: Boolean!
+            $includeProgress: Boolean!
+            $includeSigners: Boolean!
+            $includeVariablesResult: Boolean!
+            $includeSignatureRequests: Boolean!
+            $senderId: GID
+          ) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIdGroups: [$contactIds]
+              subject: $subject
+              body: $body
+              scheduledAt: $scheduledAt
+              remindersConfig: $remindersConfig
+              senderId: $senderId
+              skipEmailSend: $skipEmailSend
+            ) {
+              result
+              petition {
+                ...Petition
+              }
+            }
+          }
+          ${PetitionFragment}
+        `;
 
-      if (!isDefined(subject) || !isDefined(message)) {
-        /* 
+        if (!isDefined(subject) || !isDefined(message)) {
+          /* 
           email body and subject are required in the sendPetition mutation, so if those are not defined on the request
           we need to fetch it from the petition. If they are not defined in the petition either, an error will be thrown
          */
-        const query = await client.request(CreatePetitionRecipients_petitionDocument, {
-          id: params.petitionId,
-        });
+          const query = await client.request(CreatePetitionRecipients_petitionDocument, {
+            id: params.petitionId,
+          });
 
-        subject = subject ?? query.petition?.emailSubject ?? null;
-        message = message ?? query.petition?.emailBody ?? null;
-        if (!isDefined(subject) || !isDefined(message)) {
-          throw new BadRequestError(
-            "The subject or the message are missing and not defined on the parallel",
-          );
+          subject = subject ?? query.petition?.emailSubject ?? null;
+          message = message ?? query.petition?.emailBody ?? null;
+          if (!isDefined(subject) || !isDefined(message)) {
+            throw new BadRequestError(
+              "The subject or the message are missing and not defined on the parallel",
+            );
+          }
         }
-      }
 
-      let senderId: string | null = null;
-      const EMAIL_REGEX =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (isDefined(body.sendAs)) {
-        if (isGlobalId(body.sendAs, "User")) {
-          senderId = body.sendAs;
-        } else if (EMAIL_REGEX.test(body.sendAs)) {
-          const _query = gql`
-            query CreatePetitionRecipients_userByEmail($email: String!) {
-              me {
-                organization {
-                  users(limit: 1, offset: 0, search: $email, searchByEmailOnly: true) {
-                    items {
-                      id
-                      email
+        let senderId: string | null = null;
+        const EMAIL_REGEX =
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (isDefined(body.sendAs)) {
+          if (isGlobalId(body.sendAs, "User")) {
+            senderId = body.sendAs;
+          } else if (EMAIL_REGEX.test(body.sendAs)) {
+            const _query = gql`
+              query CreatePetitionRecipients_userByEmail($email: String!) {
+                me {
+                  organization {
+                    users(limit: 1, offset: 0, search: $email, searchByEmailOnly: true) {
+                      items {
+                        id
+                        email
+                      }
                     }
                   }
                 }
               }
-            }
-          `;
+            `;
 
-          const queryResponse = await client.request(CreatePetitionRecipients_userByEmailDocument, {
-            email: body.sendAs,
-          });
-          senderId = queryResponse.me.organization.users.items[0]?.id ?? null;
-        } else {
-          throw new BadRequestError("The sendAs field must be a valid email or a user id");
+            const queryResponse = await client.request(
+              CreatePetitionRecipients_userByEmailDocument,
+              {
+                email: body.sendAs,
+              },
+            );
+            senderId = queryResponse.me.organization.users.items[0]?.id ?? null;
+          } else {
+            throw new BadRequestError("The sendAs field must be a valid email or a user id");
+          }
         }
+
+        const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
+          petitionId: params.petitionId,
+          contactIds,
+          body: message,
+          subject,
+          senderId,
+          scheduledAt: body.scheduledAt,
+          remindersConfig: body.remindersConfig && {
+            limit: 10,
+            ...body.remindersConfig,
+          },
+          skipEmailSend: body.skipEmailSend,
+          ...getPetitionIncludesFromQuery(query),
+        });
+
+        assert(result.sendPetition[0].petition !== null);
+        assert("id" in result.sendPetition[0].petition);
+
+        return Ok(mapPetition(result.sendPetition[0].petition));
+      } catch (error) {
+        if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
+          throw new ConflictError("The parallel was already sent to some of the provided contacts");
+        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          throw new ForbiddenError("You don't have enough credits to send this parallel");
+        } else if (containsGraphQLError(error, "SEND_AS_ERROR")) {
+          throw new ForbiddenError("You don't have permission to send as this user");
+        }
+
+        throw error;
       }
+    },
+  );
 
-      const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
-        petitionId: params.petitionId,
-        contactIds,
-        body: message,
-        subject,
-        senderId,
-        scheduledAt: body.scheduledAt,
-        remindersConfig: body.remindersConfig && {
-          limit: 10,
-          ...body.remindersConfig,
-        },
-        skipEmailSend: body.skipEmailSend,
-        ...getPetitionIncludesFromQuery(query),
-      });
-
-      assert(result.sendPetition[0].petition !== null);
-      assert("id" in result.sendPetition[0].petition);
-
-      return Ok(mapPetition(result.sendPetition[0].petition));
-    } catch (error) {
-      if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
-        throw new ConflictError("The parallel was already sent to some of the provided contacts");
-      } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-        throw new ForbiddenError("You don't have enough credits to send this parallel");
-      } else if (containsGraphQLError(error, "SEND_AS_ERROR")) {
-        throw new ForbiddenError("You don't have permission to send as this user");
-      }
-
-      throw error;
-    }
-  },
-);
-
-api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
-  {
-    operationId: "GetPetitionRecipients",
-    summary: "Get parallel recipients",
-    description: outdent`
+  api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
+    {
+      operationId: "GetPetitionRecipients",
+      summary: "Get parallel recipients",
+      description: outdent`
         Returns the list of recipients this parallel has been sent to.
       `,
-    responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
-    tags: ["Parallel recipients"],
-  },
-  async ({ client, params }) => {
-    const _query = gql`
-      query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
-        petition(id: $petitionId) {
-          ... on Petition {
-            accesses {
-              ...PetitionAccess
-            }
-          }
-        }
-      }
-      ${PetitionAccessFragment}
-    `;
-    const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
-      petitionId: params.petitionId,
-      includeRecipientUrl: false,
-    });
-    assert("accesses" in result.petition!);
-    return Ok(result.petition!.accesses);
-  },
-);
-
-api
-  .path("/petitions/:petitionId/recipients/:accessId/activate", {
-    params: { petitionId, accessId },
-  })
-  .post(
-    {
-      operationId: "ActivatePetitionRecipient",
-      summary: "Activate a parallel recipient",
-      description: "Activates the access of a recipient to a parallel.",
+      responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
       tags: ["Parallel recipients"],
-      responses: {
-        200: SuccessResponse(PetitionAccess),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-      },
     },
     async ({ client, params }) => {
-      const _mutation = gql`
-        mutation ActivatePetitionRecipient_reactivateAccesses($petitionId: GID!, $accessId: GID!) {
-          reactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
-            ...PetitionAccess
-          }
-        }
-        ${PetitionAccessFragment}
-      `;
-
-      const result = await client.request(ActivatePetitionRecipient_reactivateAccessesDocument, {
-        petitionId: params.petitionId,
-        accessId: params.accessId,
-      });
-
-      assert(result.reactivateAccesses.length === 1);
-      assert("id" in result.reactivateAccesses[0]);
-
-      return Ok(result.reactivateAccesses[0]);
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/recipients/:accessId/deactivate", {
-    params: { petitionId, accessId },
-  })
-  .post(
-    {
-      operationId: "DeactivatePetitionRecipient",
-      summary: "Deactivate a parallel recipient",
-      description: "Deactivates the access of a recipient to a parallel.",
-      tags: ["Parallel recipients"],
-      responses: {
-        200: SuccessResponse(PetitionAccess),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-      },
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation DeactivatePetitionRecipient_deactivateAccesses(
-          $petitionId: GID!
-          $accessId: GID!
-        ) {
-          deactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
-            ...PetitionAccess
-          }
-        }
-        ${PetitionAccessFragment}
-      `;
-
-      const result = await client.request(DeactivatePetitionRecipient_deactivateAccessesDocument, {
-        petitionId: params.petitionId,
-        accessId: params.accessId,
-      });
-
-      assert(result.deactivateAccesses.length === 1);
-      assert("id" in result.deactivateAccesses[0]);
-
-      return Ok(result.deactivateAccesses[0]);
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/recipients/:accessId/remind", {
-    params: { petitionId, accessId },
-  })
-  .post(
-    {
-      operationId: "RemindPetitionRecipient",
-      summary: "Remind a parallel recipient",
-      description: "Sends the petition recipient a reminder email to complete the information.",
-      tags: ["Parallel recipients"],
-      body: JsonBody(SendReminder),
-      responses: {
-        200: SuccessResponse(PetitionAccess),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-        409: ErrorResponse({ description: "The parallel is not pending or completed" }),
-      },
-    },
-    async ({ client, params, body }) => {
-      const _mutation = gql`
-        mutation RemindPetitionRecipient_sendReminders(
-          $petitionId: GID!
-          $accessId: GID!
-          $body: JSON
-        ) {
-          sendReminders(petitionId: $petitionId, accessIds: [$accessId], body: $body) {
-            id
-            access {
-              ...PetitionAccess
+      const _query = gql`
+        query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
+          petition(id: $petitionId) {
+            ... on Petition {
+              accesses {
+                ...PetitionAccess
+              }
             }
           }
         }
         ${PetitionAccessFragment}
       `;
+      const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
+        petitionId: params.petitionId,
+        includeRecipientUrl: false,
+      });
+      assert("accesses" in result.petition!);
+      return Ok(result.petition!.accesses);
+    },
+  );
 
-      try {
-        const message = bodyMessageToRTE(body.message);
+  api
+    .path("/petitions/:petitionId/recipients/:accessId/activate", {
+      params: { petitionId, accessId },
+    })
+    .post(
+      {
+        operationId: "ActivatePetitionRecipient",
+        summary: "Activate a parallel recipient",
+        description: "Activates the access of a recipient to a parallel.",
+        tags: ["Parallel recipients"],
+        responses: {
+          200: SuccessResponse(PetitionAccess),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation ActivatePetitionRecipient_reactivateAccesses(
+            $petitionId: GID!
+            $accessId: GID!
+          ) {
+            reactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+              ...PetitionAccess
+            }
+          }
+          ${PetitionAccessFragment}
+        `;
 
-        const result = await client.request(RemindPetitionRecipient_sendRemindersDocument, {
+        const result = await client.request(ActivatePetitionRecipient_reactivateAccessesDocument, {
           petitionId: params.petitionId,
           accessId: params.accessId,
-          body: message,
         });
 
-        assert(result.sendReminders.length === 1);
-        assert("id" in result.sendReminders[0].access);
+        assert(result.reactivateAccesses.length === 1);
+        assert("id" in result.reactivateAccesses[0]);
 
-        return Ok(result.sendReminders[0].access);
-      } catch (error) {
-        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
-          throw new ConflictError("The parallel is not pending or completed");
-        } else if (containsGraphQLError(error, "NO_REMINDERS_LEFT")) {
-          throw new ConflictError("You can't send any more reminders to this recipient");
+        return Ok(result.reactivateAccesses[0]);
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/recipients/:accessId/deactivate", {
+      params: { petitionId, accessId },
+    })
+    .post(
+      {
+        operationId: "DeactivatePetitionRecipient",
+        summary: "Deactivate a parallel recipient",
+        description: "Deactivates the access of a recipient to a parallel.",
+        tags: ["Parallel recipients"],
+        responses: {
+          200: SuccessResponse(PetitionAccess),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation DeactivatePetitionRecipient_deactivateAccesses(
+            $petitionId: GID!
+            $accessId: GID!
+          ) {
+            deactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+              ...PetitionAccess
+            }
+          }
+          ${PetitionAccessFragment}
+        `;
+
+        const result = await client.request(
+          DeactivatePetitionRecipient_deactivateAccessesDocument,
+          {
+            petitionId: params.petitionId,
+            accessId: params.accessId,
+          },
+        );
+
+        assert(result.deactivateAccesses.length === 1);
+        assert("id" in result.deactivateAccesses[0]);
+
+        return Ok(result.deactivateAccesses[0]);
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/recipients/:accessId/remind", {
+      params: { petitionId, accessId },
+    })
+    .post(
+      {
+        operationId: "RemindPetitionRecipient",
+        summary: "Remind a parallel recipient",
+        description: "Sends the petition recipient a reminder email to complete the information.",
+        tags: ["Parallel recipients"],
+        body: JsonBody(SendReminder),
+        responses: {
+          200: SuccessResponse(PetitionAccess),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+          409: ErrorResponse({ description: "The parallel is not pending or completed" }),
+        },
+      },
+      async ({ client, params, body }) => {
+        const _mutation = gql`
+          mutation RemindPetitionRecipient_sendReminders(
+            $petitionId: GID!
+            $accessId: GID!
+            $body: JSON
+          ) {
+            sendReminders(petitionId: $petitionId, accessIds: [$accessId], body: $body) {
+              id
+              access {
+                ...PetitionAccess
+              }
+            }
+          }
+          ${PetitionAccessFragment}
+        `;
+
+        try {
+          const message = bodyMessageToRTE(body.message);
+
+          const result = await client.request(RemindPetitionRecipient_sendRemindersDocument, {
+            petitionId: params.petitionId,
+            accessId: params.accessId,
+            body: message,
+          });
+
+          assert(result.sendReminders.length === 1);
+          assert("id" in result.sendReminders[0].access);
+
+          return Ok(result.sendReminders[0].access);
+        } catch (error) {
+          if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+            throw new ConflictError("The parallel is not pending or completed");
+          } else if (containsGraphQLError(error, "NO_REMINDERS_LEFT")) {
+            throw new ConflictError("You can't send any more reminders to this recipient");
+          }
+
+          throw error;
         }
+      },
+    );
 
-        throw error;
-      }
-    },
-  );
-
-api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
-  {
-    operationId: "PetitionFields",
-    summary: "List parallel replies",
-    description: outdent`
+  api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
+    {
+      operationId: "PetitionFields",
+      summary: "List parallel replies",
+      description: outdent`
       Returns a list of the parallels fields with their submitted replies.
     `,
-    tags: ["Parallel replies"],
-    responses: {
-      200: SuccessResponse(ListOfPetitionFieldsWithReplies),
-    },
-  },
-  async ({ client, params }) => {
-    const _query = gql`
-      query PetitionReplies_replies($petitionId: GID!) {
-        petition(id: $petitionId) {
-          fields {
-            ...PetitionFieldWithReplies
-          }
-        }
-      }
-      ${PetitionFieldWithRepliesFragment}
-    `;
-    const result = await client.request(PetitionReplies_repliesDocument, {
-      petitionId: params.petitionId,
-    });
-
-    return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
-  },
-);
-
-api
-  .path("/petitions/:petitionId/fields/:fieldId", {
-    params: { petitionId, fieldId },
-  })
-  .put(
-    {
-      operationId: "UpdatePetitionField",
-      summary: "Update parallel field",
-      description: outdent`
-      Update the title, description and/or options of the specified field on a parallel.
-    `,
-      body: JsonBody(UpdatePetitionField),
+      tags: ["Parallel replies"],
       responses: {
-        200: SuccessResponse(PetitionField),
-        400: ErrorResponse({ description: "Invalid request body" }),
+        200: SuccessResponse(ListOfPetitionFieldsWithReplies),
       },
-      tags: ["Parallels"],
     },
-    async ({ client, params, body }) => {
-      gql`
-        mutation UpdatePetitionField_updatePetitionField(
-          $petitionId: GID!
-          $fieldId: GID!
-          $title: String
-          $description: String
-          $options: JSONObject
-        ) {
-          updatePetitionField(
-            petitionId: $petitionId
-            fieldId: $fieldId
-            data: { title: $title, description: $description, options: $options }
-          ) {
-            ...PetitionField
+    async ({ client, params }) => {
+      const _query = gql`
+        query PetitionReplies_replies($petitionId: GID!) {
+          petition(id: $petitionId) {
+            fields {
+              ...PetitionFieldWithReplies
+            }
           }
         }
-        ${PetitionFieldFragment}
+        ${PetitionFieldWithRepliesFragment}
       `;
+      const result = await client.request(PetitionReplies_repliesDocument, {
+        petitionId: params.petitionId,
+      });
 
-      let options;
-      if (isDefined(body.options)) {
-        options =
-          typeof body.options[0] === "string"
-            ? { values: body.options, labels: null }
-            : {
-                values: body.options.map((x) => (x as any).value),
-                labels: body.options.map((x) => (x as any).label),
-              };
-
-        if (options.labels?.length === 0) {
-          options.labels = null;
-        }
-      }
-
-      try {
-        const result = await client.request(UpdatePetitionField_updatePetitionFieldDocument, {
-          petitionId: params.petitionId,
-          fieldId: params.fieldId,
-          description: body.description,
-          title: body.title,
-          options,
-        });
-        assert("id" in result.updatePetitionField!);
-        return Ok(mapPetitionField(result.updatePetitionField));
-      } catch (error) {
-        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          throw new BadRequestError("Invalid request body");
-        }
-
-        throw error;
-      }
+      return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
     },
   );
 
-const replyBodyDescription = outdent`
+  api
+    .path("/petitions/:petitionId/fields/:fieldId", {
+      params: { petitionId, fieldId },
+    })
+    .put(
+      {
+        operationId: "UpdatePetitionField",
+        summary: "Update parallel field",
+        description: outdent`
+      Update the title, description and/or options of the specified field on a parallel.
+    `,
+        body: JsonBody(UpdatePetitionField),
+        responses: {
+          200: SuccessResponse(PetitionField),
+          400: ErrorResponse({ description: "Invalid request body" }),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params, body }) => {
+        gql`
+          mutation UpdatePetitionField_updatePetitionField(
+            $petitionId: GID!
+            $fieldId: GID!
+            $title: String
+            $description: String
+            $options: JSONObject
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: { title: $title, description: $description, options: $options }
+            ) {
+              ...PetitionField
+            }
+          }
+          ${PetitionFieldFragment}
+        `;
+
+        let options;
+        if (isDefined(body.options)) {
+          options =
+            typeof body.options[0] === "string"
+              ? { values: body.options, labels: null }
+              : {
+                  values: body.options.map((x) => (x as any).value),
+                  labels: body.options.map((x) => (x as any).label),
+                };
+
+          if (options.labels?.length === 0) {
+            options.labels = null;
+          }
+        }
+
+        try {
+          const result = await client.request(UpdatePetitionField_updatePetitionFieldDocument, {
+            petitionId: params.petitionId,
+            fieldId: params.fieldId,
+            description: body.description,
+            title: body.title,
+            options,
+          });
+          assert("id" in result.updatePetitionField!);
+          return Ok(mapPetitionField(result.updatePetitionField));
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError("Invalid request body");
+          }
+
+          throw error;
+        }
+      },
+    );
+
+  const replyBodyDescription = outdent`
   For \`FILE_UPLOAD\` fields the request must be a \`multipart/form-data\` request containing the file to upload.
   For other types of fields the request will be a normal \`application/json\` request containing the value of the reply.
     - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the reply must be a string.
@@ -1732,393 +1750,393 @@ const replyBodyDescription = outdent`
     - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
   `;
 
-api
-  .path("/petitions/:petitionId/fields/:fieldId/replies", {
-    params: { petitionId, fieldId },
-  })
-  .post(
-    {
-      middleware: singleFileUploadMiddleware("reply"),
-      operationId: "SubmitReply",
-      summary: "Submit a reply",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/fields/:fieldId/replies", {
+      params: { petitionId, fieldId },
+    })
+    .post(
+      {
+        middleware: singleFileUploadMiddleware("reply"),
+        operationId: "SubmitReply",
+        summary: "Submit a reply",
+        description: outdent`
         Submits a reply on a given field of the parallel.
       `,
-      body: Body(
-        [
-          JsonBodyContent(SubmitReply),
-          FormDataBodyContent(SubmitFileReply, { example: { reply: "<binary data>" } }),
-        ],
-        {
-          description: outdent`
+        body: Body(
+          [
+            JsonBodyContent(SubmitReply),
+            FormDataBodyContent(SubmitFileReply, { example: { reply: "<binary data>" } }),
+          ],
+          {
+            description: outdent`
         ${replyBodyDescription}
         - For \`FIELD_GROUP\` fields, you need to first create an 'empty' reply on the field. Then call this endpoint again, passing the id of the child field and the id of the empty reply as the \`parentReplyId\`. Every reply with the same \`parentReplyId\` will be grouped together.
         `,
+          },
+        ),
+        responses: {
+          201: SuccessResponse(PetitionFieldReply),
+          400: ErrorResponse({ description: "Invalid parameters" }),
+          403: ErrorResponse({
+            description: "You don't have enough credits for this action",
+          }),
+          409: ErrorResponse({ description: "The field does not accept more replies." }),
         },
-      ),
-      responses: {
-        201: SuccessResponse(PetitionFieldReply),
-        400: ErrorResponse({ description: "Invalid parameters" }),
-        403: ErrorResponse({
-          description: "You don't have enough credits for this action",
-        }),
-        409: ErrorResponse({ description: "The field does not accept more replies." }),
+        tags: ["Parallel replies"],
       },
-      tags: ["Parallel replies"],
-    },
-    async ({ client, body, params, files }) => {
-      const { petition } = await client.request(SubmitReply_petitionDocument, {
-        petitionId: params.petitionId,
-      });
+      async ({ client, body, params, files }) => {
+        const { petition } = await client.request(SubmitReply_petitionDocument, {
+          petitionId: params.petitionId,
+        });
 
-      const fields = flattenPetitionFields(petition?.fields ?? []);
-      const field = fields?.find((f) => f.id === params.fieldId);
+        const fields = flattenPetitionFields(petition?.fields ?? []);
+        const field = fields?.find((f) => f.id === params.fieldId);
 
-      try {
-        if (field?.isChild && !isDefined(body.parentReplyId)) {
-          throw new BadRequestError("You must specify a parentReplyId for this field");
-        }
-        const fieldType = field?.type;
-        let newReply;
-
-        if (isDefined(fieldType) && isFileTypeField(fieldType)) {
-          const file = files["reply"]?.[0];
-          if (!file) {
-            throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+        try {
+          if (field?.isChild && !isDefined(body.parentReplyId)) {
+            throw new BadRequestError("You must specify a parentReplyId for this field");
           }
-          const {
-            createFileUploadReply: { presignedPostData, reply },
-          } = await client.request(SubmitReply_createFileUploadReplyDocument, {
-            petitionId: params.petitionId,
-            fieldId: params.fieldId,
-            parentReplyId: body.parentReplyId,
-            file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
-          });
+          const fieldType = field?.type;
+          let newReply;
 
-          const uploadResponse = await uploadFile(file, presignedPostData);
-          if (uploadResponse.ok) {
-            await unlink(file.path);
-            const { createFileUploadReplyComplete } = await client.request(
-              SubmitReply_createFileUploadReplyCompleteDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: reply.id,
-              },
-            );
-            newReply = createFileUploadReplyComplete;
-          } else {
-            throw new BadRequestError(uploadResponse.statusText);
-          }
-        } else {
-          ({
-            createPetitionFieldReplies: [newReply],
-          } = await client.request(SubmitReply_createPetitionFieldRepliesDocument, {
-            petitionId: params.petitionId,
-            fields: [
-              {
-                id: params.fieldId,
-                content: buildSubmittedReplyContent(fields, params.fieldId, body),
-                parentReplyId: body.parentReplyId,
-              },
-            ],
-          }));
-        }
-
-        if (isDefined(body.status) && fieldType === "FIELD_GROUP") {
-          throw new BadRequestError("You can't set the status of a FIELD_GROUP reply");
-        }
-
-        if (isDefined(body.status)) {
-          const replyId = newReply.id;
-          const { updatePetitionFieldRepliesStatus } = await client.request(
-            UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
-            {
+          if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+            const file = files["reply"]?.[0];
+            if (!file) {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+            }
+            const {
+              createFileUploadReply: { presignedPostData, reply },
+            } = await client.request(SubmitReply_createFileUploadReplyDocument, {
               petitionId: params.petitionId,
               fieldId: params.fieldId,
-              replyIds: [replyId],
-              status: body.status,
-            },
-          );
-          newReply = updatePetitionFieldRepliesStatus.replies.find((r) => r.id === replyId)!;
+              parentReplyId: body.parentReplyId,
+              file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+            });
+
+            const uploadResponse = await uploadFile(file, presignedPostData);
+            if (uploadResponse.ok) {
+              await unlink(file.path);
+              const { createFileUploadReplyComplete } = await client.request(
+                SubmitReply_createFileUploadReplyCompleteDocument,
+                {
+                  petitionId: params.petitionId,
+                  replyId: reply.id,
+                },
+              );
+              newReply = createFileUploadReplyComplete;
+            } else {
+              throw new BadRequestError(uploadResponse.statusText);
+            }
+          } else {
+            ({
+              createPetitionFieldReplies: [newReply],
+            } = await client.request(SubmitReply_createPetitionFieldRepliesDocument, {
+              petitionId: params.petitionId,
+              fields: [
+                {
+                  id: params.fieldId,
+                  content: buildSubmittedReplyContent(fields, params.fieldId, body),
+                  parentReplyId: body.parentReplyId,
+                },
+              ],
+            }));
+          }
+
+          if (isDefined(body.status) && fieldType === "FIELD_GROUP") {
+            throw new BadRequestError("You can't set the status of a FIELD_GROUP reply");
+          }
+
+          if (isDefined(body.status)) {
+            const replyId = newReply.id;
+            const { updatePetitionFieldRepliesStatus } = await client.request(
+              UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: params.fieldId,
+                replyIds: [replyId],
+                status: body.status,
+              },
+            );
+            newReply = updatePetitionFieldRepliesStatus.replies.find((r) => r.id === replyId)!;
+          }
+
+          return Ok(mapReplyResponse(newReply));
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+            const extra = error.response.errors?.[0].extensions?.extra as
+              | { subcode: string }
+              | undefined;
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+              subcode: extra?.subcode,
+            });
+          } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
+            throw new BadRequestError(
+              "The field is already replied and does not accept any more replies.",
+            );
+          } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+            throw new ForbiddenError("You don't have enough credits to submit a reply");
+          }
+
+          throw error;
         }
+      },
+    );
 
-        return Ok(mapReplyResponse(newReply));
-      } catch (error) {
-        if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-          const extra = error.response.errors?.[0].extensions?.extra as
-            | { subcode: string }
-            | undefined;
-          throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
-            subcode: extra?.subcode,
-          });
-        } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
-          throw new BadRequestError(
-            "The field is already replied and does not accept any more replies.",
-          );
-        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-          throw new ForbiddenError("You don't have enough credits to submit a reply");
-        }
-
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId", {
-    params: { petitionId, fieldId, replyId },
-  })
-  .put(
-    {
-      middleware: singleFileUploadMiddleware("reply"),
-      operationId: "UpdateReply",
-      summary: "Update a reply",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId", {
+      params: { petitionId, fieldId, replyId },
+    })
+    .put(
+      {
+        middleware: singleFileUploadMiddleware("reply"),
+        operationId: "UpdateReply",
+        summary: "Update a reply",
+        description: outdent`
         Updates the \`content\` of a previously submitted reply.
         In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\`.
       `,
-      responses: {
-        201: SuccessResponse(PetitionFieldReply),
-        400: ErrorResponse({ description: "Invalid parameters" }),
-        409: ErrorResponse({ description: "The reply cannot be updated." }),
-      },
-      tags: ["Parallel replies"],
-      body: Body(
-        [
-          JsonBodyContent(UpdateReply),
-          FormDataBodyContent(UpdateFileReply, { example: { reply: "<binary data>" } }),
-        ],
-        {
-          description: replyBodyDescription,
+        responses: {
+          201: SuccessResponse(PetitionFieldReply),
+          400: ErrorResponse({ description: "Invalid parameters" }),
+          409: ErrorResponse({ description: "The reply cannot be updated." }),
         },
-      ),
-    },
-    async ({ client, body, params, files }) => {
-      const { petition } = await client.request(UpdateReply_petitionDocument, {
-        petitionId: params.petitionId,
-      });
-
-      const fields = flattenPetitionFields(petition?.fields ?? []);
-      const field = fields.find((f) => f.replies.some((r) => r.id === params.replyId));
-
-      try {
-        if (field?.type === "FIELD_GROUP") {
-          throw new BadRequestError("You can't update a FIELD_GROUP reply");
-        }
-
-        const fieldType = field?.type;
-        let updatedReply;
-
-        if (isDefined(fieldType) && isFileTypeField(fieldType)) {
-          const file = files["reply"]?.[0];
-          if (!file) {
-            throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
-          }
-          const {
-            updateFileUploadReply: { presignedPostData, reply },
-          } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
-            petitionId: params.petitionId,
-            replyId: params.replyId,
-            file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
-          });
-
-          const uploadResponse = await uploadFile(file, presignedPostData);
-          if (uploadResponse.ok) {
-            await unlink(file.path);
-            const { updateFileUploadReplyComplete } = await client.request(
-              UpdateReply_updateFileUploadReplyCompleteDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: reply.id,
-              },
-            );
-
-            updatedReply = updateFileUploadReplyComplete;
-          } else {
-            throw new BadRequestError(uploadResponse.statusText);
-          }
-        } else {
-          ({
-            updatePetitionFieldReplies: [updatedReply],
-          } = await client.request(UpdateReply_updatePetitionFieldRepliesDocument, {
-            petitionId: params.petitionId,
-            replies: [
-              {
-                id: params.replyId,
-                content: buildSubmittedReplyContent(fields, params.fieldId, body),
-              },
-            ],
-          }));
-        }
-
-        return Ok(mapReplyResponse(updatedReply));
-      } catch (error) {
-        if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-          const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
-          throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
-            subcode,
-          });
-        } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
-          throw new BadRequestError("The reply is already approved and cannot be modified.");
-        }
-
-        throw error;
-      }
-    },
-  )
-  .delete(
-    {
-      operationId: "DeleteReply",
-      summary: "Delete a reply",
-      description: outdent`
-        Deletes a previously submitted reply.
-      `,
-      responses: {
-        204: SuccessResponse(),
-        409: ErrorResponse({ description: "The reply can't be deleted" }),
+        tags: ["Parallel replies"],
+        body: Body(
+          [
+            JsonBodyContent(UpdateReply),
+            FormDataBodyContent(UpdateFileReply, { example: { reply: "<binary data>" } }),
+          ],
+          {
+            description: replyBodyDescription,
+          },
+        ),
       },
-      tags: ["Parallel replies"],
-    },
-    async ({ client, params }) => {
-      try {
-        gql`
-          mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-              id
-            }
-          }
-        `;
-        await client.request(DeleteReply_deletePetitionReplyDocument, params);
-        return NoContent();
-      } catch (error) {
-        if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
-          throw new ConflictError("The reply is already approved and cannot be deleted.");
-        } else if (containsGraphQLError(error, "DELETE_FIELD_GROUP_REPLY_ERROR")) {
-          throw new ConflictError(
-            "You can't delete the last reply of a required FIELD_GROUP field",
-          );
-        }
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/approve", {
-    params: { petitionId, fieldId, replyId },
-  })
-  .post(
-    {
-      operationId: "ApproveReply",
-      summary: "Approve a reply",
-      description:
-        "Updates the reply status to `APPROVED`. Approved replies can't be updated or deleted.",
-      responses: {
-        201: SuccessResponse(PetitionFieldReply),
-        400: ErrorResponse({ description: "Invalid parameters" }),
-      },
-      tags: ["Parallel replies"],
-    },
-    async ({ client, params }) => {
-      const { updatePetitionFieldRepliesStatus } = await client.request(
-        UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
-        {
+      async ({ client, body, params, files }) => {
+        const { petition } = await client.request(UpdateReply_petitionDocument, {
           petitionId: params.petitionId,
-          fieldId: params.fieldId,
-          replyIds: [params.replyId],
-          status: "APPROVED",
-        },
-      );
-      const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
-        (r) => r.id === params.replyId,
-      )!;
-      return Ok(mapReplyResponse(updatedReply));
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/reject", {
-    params: { petitionId, fieldId, replyId },
-  })
-  .post(
-    {
-      operationId: "RejectReply",
-      summary: "Reject a reply",
-      description: "Updates the reply status to `REJECTED`.",
-      responses: {
-        201: SuccessResponse(PetitionFieldReply),
-        400: ErrorResponse({ description: "Invalid parameters" }),
-      },
-      tags: ["Parallel replies"],
-    },
-    async ({ client, params }) => {
-      const { updatePetitionFieldRepliesStatus } = await client.request(
-        UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
-        {
-          petitionId: params.petitionId,
-          fieldId: params.fieldId,
-          replyIds: [params.replyId],
-          status: "REJECTED",
-        },
-      );
-      const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
-        (r) => r.id === params.replyId,
-      )!;
-      return Ok(mapReplyResponse(updatedReply));
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/replies", {
-    params: { petitionId },
-  })
-  .post(
-    {
-      operationId: "SubmitReplies",
-      summary: "Submit replies by field alias",
-      description: outdent`
-      Submits replies on a parallel given a JSON object where each key is a field alias and each value is one or more replies on that field.
-    `,
-      responses: {
-        200: SuccessResponse(SubmitPetitionRepliesResponse),
-        403: ErrorResponse({
-          description: "You don't have enough credits for this action",
-        }),
-      },
-      body: JsonBody(SubmitPetitionReplies),
-      query: {
-        ...petitionIncludeParam(),
-      },
-      tags: ["Parallel replies"],
-    },
-    async ({ client, params, body, query }) => {
-      try {
-        const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
-          petitionId: params.petitionId,
-          replies: body,
-          ...getPetitionIncludesFromQuery(query),
-          includeFields: true,
         });
 
-        return Ok(mapPetition(res.bulkCreatePetitionReplies));
-      } catch (error) {
-        if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-          throw new ForbiddenError("You don't have enough credits to submit a reply");
-        }
-        throw error;
-      }
-    },
-  );
+        const fields = flattenPetitionFields(petition?.fields ?? []);
+        const field = fields.find((f) => f.replies.some((r) => r.id === params.replyId));
 
-api
-  .path("/petitions/:petitionId/replies/:replyId/download", {
-    params: { petitionId, replyId },
-  })
-  .get(
-    {
-      operationId: "DownloadFileReply",
-      summary: "Download a reply",
-      description: outdent`
+        try {
+          if (field?.type === "FIELD_GROUP") {
+            throw new BadRequestError("You can't update a FIELD_GROUP reply");
+          }
+
+          const fieldType = field?.type;
+          let updatedReply;
+
+          if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+            const file = files["reply"]?.[0];
+            if (!file) {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+            }
+            const {
+              updateFileUploadReply: { presignedPostData, reply },
+            } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
+              petitionId: params.petitionId,
+              replyId: params.replyId,
+              file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
+            });
+
+            const uploadResponse = await uploadFile(file, presignedPostData);
+            if (uploadResponse.ok) {
+              await unlink(file.path);
+              const { updateFileUploadReplyComplete } = await client.request(
+                UpdateReply_updateFileUploadReplyCompleteDocument,
+                {
+                  petitionId: params.petitionId,
+                  replyId: reply.id,
+                },
+              );
+
+              updatedReply = updateFileUploadReplyComplete;
+            } else {
+              throw new BadRequestError(uploadResponse.statusText);
+            }
+          } else {
+            ({
+              updatePetitionFieldReplies: [updatedReply],
+            } = await client.request(UpdateReply_updatePetitionFieldRepliesDocument, {
+              petitionId: params.petitionId,
+              replies: [
+                {
+                  id: params.replyId,
+                  content: buildSubmittedReplyContent(fields, params.fieldId, body),
+                },
+              ],
+            }));
+          }
+
+          return Ok(mapReplyResponse(updatedReply));
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+            const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+              subcode,
+            });
+          } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
+            throw new BadRequestError("The reply is already approved and cannot be modified.");
+          }
+
+          throw error;
+        }
+      },
+    )
+    .delete(
+      {
+        operationId: "DeleteReply",
+        summary: "Delete a reply",
+        description: outdent`
+        Deletes a previously submitted reply.
+      `,
+        responses: {
+          204: SuccessResponse(),
+          409: ErrorResponse({ description: "The reply can't be deleted" }),
+        },
+        tags: ["Parallel replies"],
+      },
+      async ({ client, params }) => {
+        try {
+          gql`
+            mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
+              deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+                id
+              }
+            }
+          `;
+          await client.request(DeleteReply_deletePetitionReplyDocument, params);
+          return NoContent();
+        } catch (error) {
+          if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
+            throw new ConflictError("The reply is already approved and cannot be deleted.");
+          } else if (containsGraphQLError(error, "DELETE_FIELD_GROUP_REPLY_ERROR")) {
+            throw new ConflictError(
+              "You can't delete the last reply of a required FIELD_GROUP field",
+            );
+          }
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/approve", {
+      params: { petitionId, fieldId, replyId },
+    })
+    .post(
+      {
+        operationId: "ApproveReply",
+        summary: "Approve a reply",
+        description:
+          "Updates the reply status to `APPROVED`. Approved replies can't be updated or deleted.",
+        responses: {
+          201: SuccessResponse(PetitionFieldReply),
+          400: ErrorResponse({ description: "Invalid parameters" }),
+        },
+        tags: ["Parallel replies"],
+      },
+      async ({ client, params }) => {
+        const { updatePetitionFieldRepliesStatus } = await client.request(
+          UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+          {
+            petitionId: params.petitionId,
+            fieldId: params.fieldId,
+            replyIds: [params.replyId],
+            status: "APPROVED",
+          },
+        );
+        const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
+          (r) => r.id === params.replyId,
+        )!;
+        return Ok(mapReplyResponse(updatedReply));
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/reject", {
+      params: { petitionId, fieldId, replyId },
+    })
+    .post(
+      {
+        operationId: "RejectReply",
+        summary: "Reject a reply",
+        description: "Updates the reply status to `REJECTED`.",
+        responses: {
+          201: SuccessResponse(PetitionFieldReply),
+          400: ErrorResponse({ description: "Invalid parameters" }),
+        },
+        tags: ["Parallel replies"],
+      },
+      async ({ client, params }) => {
+        const { updatePetitionFieldRepliesStatus } = await client.request(
+          UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+          {
+            petitionId: params.petitionId,
+            fieldId: params.fieldId,
+            replyIds: [params.replyId],
+            status: "REJECTED",
+          },
+        );
+        const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
+          (r) => r.id === params.replyId,
+        )!;
+        return Ok(mapReplyResponse(updatedReply));
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/replies", {
+      params: { petitionId },
+    })
+    .post(
+      {
+        operationId: "SubmitReplies",
+        summary: "Submit replies by field alias",
+        description: outdent`
+      Submits replies on a parallel given a JSON object where each key is a field alias and each value is one or more replies on that field.
+    `,
+        responses: {
+          200: SuccessResponse(SubmitPetitionRepliesResponse),
+          403: ErrorResponse({
+            description: "You don't have enough credits for this action",
+          }),
+        },
+        body: JsonBody(SubmitPetitionReplies),
+        query: {
+          ...petitionIncludeParam(),
+        },
+        tags: ["Parallel replies"],
+      },
+      async ({ client, params, body, query }) => {
+        try {
+          const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
+            petitionId: params.petitionId,
+            replies: body,
+            ...getPetitionIncludesFromQuery(query),
+            includeFields: true,
+          });
+
+          return Ok(mapPetition(res.bulkCreatePetitionReplies));
+        } catch (error) {
+          if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+            throw new ForbiddenError("You don't have enough credits to submit a reply");
+          }
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/replies/:replyId/download", {
+      params: { petitionId, replyId },
+    })
+    .get(
+      {
+        operationId: "DownloadFileReply",
+        summary: "Download a reply",
+        description: outdent`
         Download the uploaded file.
 
         ### Important
@@ -2135,63 +2153,63 @@ api
           > image.png
         ~~~
       `,
-      tags: ["Parallel replies"],
-      query: {
-        noredirect: booleanParam({
-          required: false,
-          description: "If param is true, response will be a temporary link.",
-        }),
+        tags: ["Parallel replies"],
+        query: {
+          noredirect: booleanParam({
+            required: false,
+            description: "If param is true, response will be a temporary link.",
+          }),
+        },
+        responses: {
+          201: SuccessResponse(FileDownload),
+          302: RedirectResponse("Redirect to the resource on AWS S3"),
+          400: ErrorResponse({
+            description: `Reply {replyId} is not of "FILE" type`,
+          }),
+        },
       },
-      responses: {
-        201: SuccessResponse(FileDownload),
-        302: RedirectResponse("Redirect to the resource on AWS S3"),
-        400: ErrorResponse({
-          description: `Reply {replyId} is not of "FILE" type`,
-        }),
-      },
-    },
-    async ({ client, params, query }) => {
-      try {
-        const _mutation = gql`
-          mutation DownloadFileReply_fileUploadReplyDownloadLink(
-            $petitionId: GID!
-            $replyId: GID!
-          ) {
-            fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
-              url
+      async ({ client, params, query }) => {
+        try {
+          const _mutation = gql`
+            mutation DownloadFileReply_fileUploadReplyDownloadLink(
+              $petitionId: GID!
+              $replyId: GID!
+            ) {
+              fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+                url
+              }
             }
-          }
-        `;
-        const result = await client.request(
-          DownloadFileReply_fileUploadReplyDownloadLinkDocument,
-          params,
-        );
-        if (query.noredirect) {
-          return Created(
-            { file: result.fileUploadReplyDownloadLink.url! },
-            result.fileUploadReplyDownloadLink.url!,
+          `;
+          const result = await client.request(
+            DownloadFileReply_fileUploadReplyDownloadLinkDocument,
+            params,
           );
-        } else {
-          return Redirect(result.fileUploadReplyDownloadLink.url!);
+          if (query.noredirect) {
+            return Created(
+              { file: result.fileUploadReplyDownloadLink.url! },
+              result.fileUploadReplyDownloadLink.url!,
+            );
+          } else {
+            return Redirect(result.fileUploadReplyDownloadLink.url!);
+          }
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
+            throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
+          }
+          throw error;
         }
-      } catch (error) {
-        if (containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
-          throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
-        }
-        throw error;
-      }
-    },
-  );
+      },
+    );
 
-api
-  .path("/petitions/:petitionId/export", {
-    params: { petitionId },
-  })
-  .get(
-    {
-      operationId: "ExportPetitionReplies",
-      summary: "Export the parallel replies",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/export", {
+      params: { petitionId },
+    })
+    .get(
+      {
+        operationId: "ExportPetitionReplies",
+        summary: "Export the parallel replies",
+        description: outdent`
         Export the replies to a parallel in the specified format.
 
         ### Important
@@ -2208,326 +2226,326 @@ api
           > image.png
         ~~~
       `,
-      query: {
-        format: enumParam({
-          values: ["pdf", "zip"],
-          required: true,
-          description: "The format of the export.",
-        }),
-        noredirect: booleanParam({
-          required: false,
-          description: "If param is true, response will be a temporary link.",
-        }),
+        query: {
+          format: enumParam({
+            values: ["pdf", "zip"],
+            required: true,
+            description: "The format of the export.",
+          }),
+          noredirect: booleanParam({
+            required: false,
+            description: "If param is true, response will be a temporary link.",
+          }),
+        },
+        tags: ["Parallel replies"],
+        responses: {
+          201: SuccessResponse(FileDownload),
+          302: RedirectResponse("Redirect to the resource on AWS S3"),
+          500: ErrorResponse({ description: "Error generating the file" }),
+        },
       },
-      tags: ["Parallel replies"],
-      responses: {
-        201: SuccessResponse(FileDownload),
-        302: RedirectResponse("Redirect to the resource on AWS S3"),
-        500: ErrorResponse({ description: "Error generating the file" }),
-      },
-    },
-    async ({ client, params, query }) => {
-      if (query.format === "zip") {
-        const _mutation = gql`
-          mutation ExportPetitionReplies_createExportRepliesTask(
-            $petitionId: GID!
-            $pattern: String
-          ) {
-            createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
-              ...Task
+      async ({ client, params, query }) => {
+        if (query.format === "zip") {
+          const _mutation = gql`
+            mutation ExportPetitionReplies_createExportRepliesTask(
+              $petitionId: GID!
+              $pattern: String
+            ) {
+              createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+                ...Task
+              }
             }
+            ${TaskFragment}
+          `;
+          try {
+            const result = await client.request(
+              ExportPetitionReplies_createExportRepliesTaskDocument,
+              {
+                petitionId: params.petitionId,
+              },
+            );
+            await waitForTask(client, result.createExportRepliesTask);
+            const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
+            if (query.noredirect) {
+              return Created({ file: url }, url);
+            } else {
+              return Redirect(url);
+            }
+          } catch (error) {
+            throw error;
           }
-          ${TaskFragment}
-        `;
-        try {
-          const result = await client.request(
-            ExportPetitionReplies_createExportRepliesTaskDocument,
-            {
-              petitionId: params.petitionId,
-            },
-          );
-          await waitForTask(client, result.createExportRepliesTask);
-          const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
+        } else if (query.format === "pdf") {
+          const _mutation = gql`
+            mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
+              createPrintPdfTask(petitionId: $petitionId) {
+                ...Task
+              }
+            }
+            ${TaskFragment}
+          `;
+          const result = await client.request(ExportPetitionReplies_createPrintPdfTaskDocument, {
+            petitionId: params.petitionId,
+          });
+          await waitForTask(client, result.createPrintPdfTask);
+          const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
           if (query.noredirect) {
             return Created({ file: url }, url);
           } else {
             return Redirect(url);
           }
-        } catch (error) {
-          throw error;
+        } else {
+          return null as never;
         }
-      } else if (query.format === "pdf") {
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/permissions", { params: { petitionId } })
+    .get(
+      {
+        operationId: "GetPermissions",
+        summary: "Get permissions list",
+        description: outdent`
+        Return a list of users this parallel is shared with.
+      `,
+        responses: { 200: SuccessResponse(ListOfPermissions) },
+        tags: ["Parallel Sharing"],
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query GetPermissions_permissions($petitionId: GID!) {
+            petition(id: $petitionId) {
+              permissions {
+                ...Permission
+              }
+            }
+          }
+          ${PermissionFragment}
+        `;
+        const result = await client.request(GetPermissions_permissionsDocument, params);
+
+        return Ok(result.petition!.permissions);
+      },
+    )
+    .post(
+      {
+        operationId: "SharePetition",
+        summary: "Share the parallel",
+        description: outdent`
+        Share the specified parallel with users and groups from your organization, giving them \`WRITE\` permissions.
+      `,
+        body: JsonBody(SharePetition),
+        responses: {
+          201: SuccessResponse(ListOfPermissions),
+          400: ErrorResponse({ description: "Invalid user input" }),
+        },
+        tags: ["Parallel Sharing"],
+      },
+      async ({ client, params, body }) => {
+        const _usersQuery = gql`
+          query SharePetition_usersByEmail($emails: [String!]!) {
+            me {
+              organization {
+                usersByEmail(limit: 100, offset: 0, emails: $emails) {
+                  items {
+                    id
+                    email
+                  }
+                }
+              }
+            }
+          }
+        `;
         const _mutation = gql`
-          mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
-            createPrintPdfTask(petitionId: $petitionId) {
+          mutation SharePetition_createAddPetitionPermissionTask(
+            $petitionId: GID!
+            $userIds: [GID!]
+            $userGroupIds: [GID!]
+          ) {
+            createAddPetitionPermissionTask(
+              petitionIds: [$petitionId]
+              userIds: $userIds
+              userGroupIds: $userGroupIds
+              permissionType: WRITE
+            ) {
               ...Task
             }
           }
           ${TaskFragment}
         `;
-        const result = await client.request(ExportPetitionReplies_createPrintPdfTaskDocument, {
-          petitionId: params.petitionId,
-        });
-        await waitForTask(client, result.createPrintPdfTask);
-        const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
-        if (query.noredirect) {
-          return Created({ file: url }, url);
-        } else {
-          return Redirect(url);
-        }
-      } else {
-        return null as never;
-      }
-    },
-  );
 
-api
-  .path("/petitions/:petitionId/permissions", { params: { petitionId } })
-  .get(
-    {
-      operationId: "GetPermissions",
-      summary: "Get permissions list",
-      description: outdent`
-        Return a list of users this parallel is shared with.
-      `,
-      responses: { 200: SuccessResponse(ListOfPermissions) },
-      tags: ["Parallel Sharing"],
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query GetPermissions_permissions($petitionId: GID!) {
-          petition(id: $petitionId) {
-            permissions {
-              ...Permission
-            }
-          }
-        }
-        ${PermissionFragment}
-      `;
-      const result = await client.request(GetPermissions_permissionsDocument, params);
-
-      return Ok(result.petition!.permissions);
-    },
-  )
-  .post(
-    {
-      operationId: "SharePetition",
-      summary: "Share the parallel",
-      description: outdent`
-        Share the specified parallel with users and groups from your organization, giving them \`WRITE\` permissions.
-      `,
-      body: JsonBody(SharePetition),
-      responses: {
-        201: SuccessResponse(ListOfPermissions),
-        400: ErrorResponse({ description: "Invalid user input" }),
-      },
-      tags: ["Parallel Sharing"],
-    },
-    async ({ client, params, body }) => {
-      const _usersQuery = gql`
-        query SharePetition_usersByEmail($emails: [String!]!) {
-          me {
-            organization {
-              usersByEmail(limit: 100, offset: 0, emails: $emails) {
-                items {
-                  id
-                  email
-                }
+        const _petitionQuery = gql`
+          query SharePetition_petition($id: GID!) {
+            petition(id: $id) {
+              permissions {
+                ...Permission
               }
             }
           }
-        }
-      `;
-      const _mutation = gql`
-        mutation SharePetition_createAddPetitionPermissionTask(
-          $petitionId: GID!
-          $userIds: [GID!]
-          $userGroupIds: [GID!]
-        ) {
-          createAddPetitionPermissionTask(
-            petitionIds: [$petitionId]
-            userIds: $userIds
-            userGroupIds: $userGroupIds
-            permissionType: WRITE
-          ) {
-            ...Task
+          ${PermissionFragment}
+        `;
+        const userIds = body.userIds ?? [];
+        if (isDefined(body.emails)) {
+          if (!body.emails.every((email) => email.match(EMAIL_REGEX))) {
+            throw new BadRequestError("Some of the provided emails are invalid");
           }
-        }
-        ${TaskFragment}
-      `;
 
-      const _petitionQuery = gql`
-        query SharePetition_petition($id: GID!) {
-          petition(id: $id) {
-            permissions {
-              ...Permission
-            }
+          const usersResponse = await client.request(SharePetition_usersByEmailDocument, {
+            emails: body.emails,
+          });
+          const ids = usersResponse.me.organization.usersByEmail.items.map((u) => u.id);
+          if (body.emails.length !== ids.length) {
+            throw new BadRequestError("Some of the provided emails are invalid");
           }
-        }
-        ${PermissionFragment}
-      `;
-      const userIds = body.userIds ?? [];
-      if (isDefined(body.emails)) {
-        if (!body.emails.every((email) => email.match(EMAIL_REGEX))) {
-          throw new BadRequestError("Some of the provided emails are invalid");
+          userIds.push(...ids);
         }
 
-        const usersResponse = await client.request(SharePetition_usersByEmailDocument, {
-          emails: body.emails,
+        const userGroupIds = body.userGroupIds ?? [];
+
+        if (userIds.length === 0 && userGroupIds.length === 0) {
+          throw new BadRequestError("You must provide at least one user or user group");
+        }
+
+        const task = await client.request(SharePetition_createAddPetitionPermissionTaskDocument, {
+          petitionId: params.petitionId,
+          userIds: userIds.length > 0 ? uniq(userIds) : undefined,
+          userGroupIds: userGroupIds.length > 0 ? uniq(userGroupIds) : undefined,
         });
-        const ids = usersResponse.me.organization.usersByEmail.items.map((u) => u.id);
-        if (body.emails.length !== ids.length) {
-          throw new BadRequestError("Some of the provided emails are invalid");
-        }
-        userIds.push(...ids);
-      }
 
-      const userGroupIds = body.userGroupIds ?? [];
+        await waitForTask(client, task.createAddPetitionPermissionTask);
 
-      if (userIds.length === 0 && userGroupIds.length === 0) {
-        throw new BadRequestError("You must provide at least one user or user group");
-      }
+        const result = await client.request(SharePetition_petitionDocument, {
+          id: params.petitionId,
+        });
 
-      const task = await client.request(SharePetition_createAddPetitionPermissionTaskDocument, {
-        petitionId: params.petitionId,
-        userIds: userIds.length > 0 ? uniq(userIds) : undefined,
-        userGroupIds: userGroupIds.length > 0 ? uniq(userGroupIds) : undefined,
-      });
-
-      await waitForTask(client, task.createAddPetitionPermissionTask);
-
-      const result = await client.request(SharePetition_petitionDocument, {
-        id: params.petitionId,
-      });
-
-      return Ok(result.petition!.permissions);
-    },
-  )
-  .delete(
-    {
-      operationId: "StopSharing",
-      summary: "Stop sharing the parallel",
-      description: outdent`
+        return Ok(result.petition!.permissions);
+      },
+    )
+    .delete(
+      {
+        operationId: "StopSharing",
+        summary: "Stop sharing the parallel",
+        description: outdent`
         Stop sharing the specified parallel.
       `,
-      tags: ["Parallel Sharing"],
-      responses: { 204: SuccessResponse() },
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
-          createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
-            ...Task
+        tags: ["Parallel Sharing"],
+        responses: { 204: SuccessResponse() },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
+            createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
+              ...Task
+            }
           }
-        }
-        ${TaskFragment}
-      `;
-      const task = await client.request(StopSharing_createRemovePetitionPermissionTaskDocument, {
-        petitionId: params.petitionId,
-      });
+          ${TaskFragment}
+        `;
+        const task = await client.request(StopSharing_createRemovePetitionPermissionTaskDocument, {
+          petitionId: params.petitionId,
+        });
 
-      await waitForTask(client, task.createRemovePetitionPermissionTask);
+        await waitForTask(client, task.createRemovePetitionPermissionTask);
 
-      return NoContent();
-    },
-  );
+        return NoContent();
+      },
+    );
 
-api
-  .path("/petitions/:petitionId/permissions/user/:userId", {
-    params: { petitionId, userId },
-  })
-  .delete(
-    {
-      operationId: "RemoveUserPermission",
-      summary: "Delete a permission",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/permissions/user/:userId", {
+      params: { petitionId, userId },
+    })
+    .delete(
+      {
+        operationId: "RemoveUserPermission",
+        summary: "Delete a permission",
+        description: outdent`
         Stop sharing the specified parallel with the specified user.
       `,
-      tags: ["Parallel Sharing"],
-      responses: { 204: SuccessResponse() },
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation RemoveUserPermission_createRemovePetitionPermissionTask(
-          $petitionId: GID!
-          $userId: GID!
-        ) {
-          createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
-            ...Task
+        tags: ["Parallel Sharing"],
+        responses: { 204: SuccessResponse() },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation RemoveUserPermission_createRemovePetitionPermissionTask(
+            $petitionId: GID!
+            $userId: GID!
+          ) {
+            createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
+              ...Task
+            }
           }
-        }
-        ${TaskFragment}
-      `;
-      const task = await client.request(
-        RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
-        {
-          petitionId: params.petitionId,
-          userId: params.userId,
-        },
-      );
+          ${TaskFragment}
+        `;
+        const task = await client.request(
+          RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
+          {
+            petitionId: params.petitionId,
+            userId: params.userId,
+          },
+        );
 
-      await waitForTask(client, task.createRemovePetitionPermissionTask);
+        await waitForTask(client, task.createRemovePetitionPermissionTask);
 
-      return NoContent();
-    },
-  );
+        return NoContent();
+      },
+    );
 
-api
-  .path("/petitions/:petitionId/permissions/group/:userGroupId", {
-    params: { petitionId, userGroupId },
-  })
-  .delete(
-    {
-      operationId: "RemoveUserGroupPermission",
-      summary: "Delete a permission",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/permissions/group/:userGroupId", {
+      params: { petitionId, userGroupId },
+    })
+    .delete(
+      {
+        operationId: "RemoveUserGroupPermission",
+        summary: "Delete a permission",
+        description: outdent`
         Stop sharing the specified parallel with the specified user group.
       `,
-      tags: ["Parallel Sharing"],
-      responses: { 204: SuccessResponse() },
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
-          $petitionId: GID!
-          $userGroupId: GID!
-        ) {
-          createRemovePetitionPermissionTask(
-            petitionIds: [$petitionId]
-            userGroupIds: [$userGroupId]
-          ) {
-            ...Task
-          }
-        }
-        ${TaskFragment}
-      `;
-      const task = await client.request(
-        RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
-        {
-          petitionId: params.petitionId,
-          userGroupId: params.userGroupId,
-        },
-      );
-
-      await waitForTask(client, task.createRemovePetitionPermissionTask);
-
-      return NoContent();
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/transfer", {
-    params: { petitionId },
-  })
-  .post(
-    {
-      operationId: "TransferPetition",
-      summary: "Transfer the parallel",
-      query: {
-        userId: idParam({ type: "User", required: false }),
-        email: stringParam({ required: false }),
+        tags: ["Parallel Sharing"],
+        responses: { 204: SuccessResponse() },
       },
-      description: outdent`
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
+            $petitionId: GID!
+            $userGroupId: GID!
+          ) {
+            createRemovePetitionPermissionTask(
+              petitionIds: [$petitionId]
+              userGroupIds: [$userGroupId]
+            ) {
+              ...Task
+            }
+          }
+          ${TaskFragment}
+        `;
+        const task = await client.request(
+          RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
+          {
+            petitionId: params.petitionId,
+            userGroupId: params.userGroupId,
+          },
+        );
+
+        await waitForTask(client, task.createRemovePetitionPermissionTask);
+
+        return NoContent();
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/transfer", {
+      params: { petitionId },
+    })
+    .post(
+      {
+        operationId: "TransferPetition",
+        summary: "Transfer the parallel",
+        query: {
+          userId: idParam({ type: "User", required: false }),
+          email: stringParam({ required: false }),
+        },
+        description: outdent`
         Transfer the parallel ownership to another user from your organization.
 
         Note that you will still have \`WRITE\` access to the parallel.
@@ -2535,165 +2553,167 @@ api
         You must specify in the query params either \`userId\` or \`email\` argument, but not both.
         If the provided ID or email does not correspond with an active user in your organization, this method will return error.
     `,
-      responses: {
-        201: SuccessResponse(ListOfPermissions),
-        400: ErrorResponse({ description: "Bad user input" }),
+        responses: {
+          201: SuccessResponse(ListOfPermissions),
+          400: ErrorResponse({ description: "Bad user input" }),
+        },
+        tags: ["Parallel Sharing"],
       },
-      tags: ["Parallel Sharing"],
-    },
-    async ({ client, params, query }) => {
-      const _usersQuery = gql`
-        query TransferPetition_searchUserByEmail($search: String) {
-          me {
-            organization {
-              users(limit: 1, offset: 0, search: $search) {
-                items {
-                  id
-                  email
+      async ({ client, params, query }) => {
+        const _usersQuery = gql`
+          query TransferPetition_searchUserByEmail($search: String) {
+            me {
+              organization {
+                users(limit: 1, offset: 0, search: $search) {
+                  items {
+                    id
+                    email
+                  }
                 }
               }
             }
           }
-        }
-      `;
-      const _mutation = gql`
-        mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
-          transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
-            permissions {
-              ...Permission
-            }
-          }
-        }
-        ${PermissionFragment}
-      `;
-      if (
-        (!isDefined(query.userId) && !isDefined(query.email)) ||
-        (isDefined(query.userId) && isDefined(query.email))
-      ) {
-        throw new BadRequestError("Bad user input. You must specify a userId or an email");
-      }
-
-      if (isDefined(query.email) && !query.email.match(EMAIL_REGEX)) {
-        throw new BadRequestError("Invalid email");
-      }
-
-      let userId = query.userId;
-      if (isDefined(query.email)) {
-        const queryResponse = await client.request(TransferPetition_searchUserByEmailDocument, {
-          search: query.email,
-        });
-        const user = queryResponse.me.organization.users.items[0];
-        // email must fully match
-        if (user && user.email === query.email) {
-          userId = user.id;
-        }
-        if (!isDefined(userId)) {
-          throw new BadRequestError("User not found");
-        }
-      }
-
-      const result = await client.request(TransferPetition_transferPetitionOwnershipDocument, {
-        petitionId: params.petitionId,
-        userId: userId!,
-      });
-
-      return Ok(result.transferPetitionOwnership[0].permissions);
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/signatures", { params: { petitionId } })
-  .get(
-    {
-      operationId: "GetSignatures",
-      summary: "List parallel signatures",
-      description: "List every signature request linked with your parallel.",
-      responses: { 204: SuccessResponse(ListOfSignatureRequests) },
-      tags: ["Signatures"],
-    },
-    async ({ client, params }) => {
-      gql`
-        query GetSignatures_petitionSignatures($petitionId: GID!) {
-          petition(id: $petitionId) {
-            __typename
-            ... on Petition {
-              signatureRequests {
-                ...PetitionSignatureRequest
+        `;
+        const _mutation = gql`
+          mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
+            transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
+              permissions {
+                ...Permission
               }
             }
           }
+          ${PermissionFragment}
+        `;
+        if (
+          (!isDefined(query.userId) && !isDefined(query.email)) ||
+          (isDefined(query.userId) && isDefined(query.email))
+        ) {
+          throw new BadRequestError("Bad user input. You must specify a userId or an email");
         }
-        ${PetitionSignatureRequestFragment}
-      `;
-      const data = await client.request(GetSignatures_petitionSignaturesDocument, params);
 
-      if (data.petition?.__typename === "PetitionTemplate") {
-        return Ok([]);
-      } else {
-        return Ok((data.petition?.signatureRequests ?? []).map(mapSignatureRequest));
-      }
-    },
-  )
-  .post(
-    {
-      operationId: "StartSignature",
-      summary: "Start a signature request",
-      description: outdent`
+        if (isDefined(query.email) && !query.email.match(EMAIL_REGEX)) {
+          throw new BadRequestError("Invalid email");
+        }
+
+        let userId = query.userId;
+        if (isDefined(query.email)) {
+          const queryResponse = await client.request(TransferPetition_searchUserByEmailDocument, {
+            search: query.email,
+          });
+          const user = queryResponse.me.organization.users.items[0];
+          // email must fully match
+          if (user && user.email === query.email) {
+            userId = user.id;
+          }
+          if (!isDefined(userId)) {
+            throw new BadRequestError("User not found");
+          }
+        }
+
+        const result = await client.request(TransferPetition_transferPetitionOwnershipDocument, {
+          petitionId: params.petitionId,
+          userId: userId!,
+        });
+
+        return Ok(result.transferPetitionOwnership[0].permissions);
+      },
+    );
+
+  api
+    .path("/petitions/:petitionId/signatures", { params: { petitionId } })
+    .get(
+      {
+        operationId: "GetSignatures",
+        summary: "List parallel signatures",
+        description: "List every signature request linked with your parallel.",
+        responses: { 204: SuccessResponse(ListOfSignatureRequests) },
+        tags: ["Signatures"],
+      },
+      async ({ client, params }) => {
+        gql`
+          query GetSignatures_petitionSignatures($petitionId: GID!) {
+            petition(id: $petitionId) {
+              __typename
+              ... on Petition {
+                signatureRequests {
+                  ...PetitionSignatureRequest
+                }
+              }
+            }
+          }
+          ${PetitionSignatureRequestFragment}
+        `;
+        const data = await client.request(GetSignatures_petitionSignaturesDocument, params);
+
+        if (data.petition?.__typename === "PetitionTemplate") {
+          return Ok([]);
+        } else {
+          return Ok((data.petition?.signatureRequests ?? []).map(mapSignatureRequest));
+        }
+      },
+    )
+    .post(
+      {
+        operationId: "StartSignature",
+        summary: "Start a signature request",
+        description: outdent`
         Start a signature request for the specified parallel.
         If the parallel doesn't have a signature configured, an error will be thrown.
         If the parallel has an ongoing eSignature request, it will be cancelled and a new eSignature request will be started.
       `,
-      tags: ["Signatures"],
-      body: JsonBody(SignatureRequestInput, { required: false }),
-      responses: {
-        201: SuccessResponse(SignatureRequest),
-        403: ErrorResponse({
-          description: "You don't have enough credits to complete this parallel.",
-        }),
-        409: ErrorResponse({ description: "You can't start a signature request on the parallel." }),
+        tags: ["Signatures"],
+        body: JsonBody(SignatureRequestInput, { required: false }),
+        responses: {
+          201: SuccessResponse(SignatureRequest),
+          403: ErrorResponse({
+            description: "You don't have enough credits to complete this parallel.",
+          }),
+          409: ErrorResponse({
+            description: "You can't start a signature request on the parallel.",
+          }),
+        },
       },
-    },
-    async ({ client, params, body }) => {
-      const _mutation = gql`
-        mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
-          startSignatureRequest(petitionId: $petitionId, message: $message) {
-            ...PetitionSignatureRequest
+      async ({ client, params, body }) => {
+        const _mutation = gql`
+          mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
+            startSignatureRequest(petitionId: $petitionId, message: $message) {
+              ...PetitionSignatureRequest
+            }
           }
+          ${PetitionSignatureRequestFragment}
+        `;
+
+        try {
+          const response = await client.request(StartSignature_startSignatureRequestDocument, {
+            petitionId: params.petitionId,
+            message: body.message,
+          });
+
+          assert("id" in response.startSignatureRequest);
+          return Created(mapSignatureRequest(response.startSignatureRequest));
+        } catch (error) {
+          if (containsGraphQLError(error, "MISSING_SIGNATURE_CONFIG_ERROR")) {
+            throw new ConflictError("The parallel does not have a signature configuration");
+          } else if (containsGraphQLError(error, "REQUIRED_SIGNER_INFO_ERROR")) {
+            throw new ConflictError("The parallel requires signer information");
+          } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+            throw new ForbiddenError("You don't have enough credits to complete this parallel");
+          }
+
+          throw error;
         }
-        ${PetitionSignatureRequestFragment}
-      `;
+      },
+    );
 
-      try {
-        const response = await client.request(StartSignature_startSignatureRequestDocument, {
-          petitionId: params.petitionId,
-          message: body.message,
-        });
-
-        assert("id" in response.startSignatureRequest);
-        return Created(mapSignatureRequest(response.startSignatureRequest));
-      } catch (error) {
-        if (containsGraphQLError(error, "MISSING_SIGNATURE_CONFIG_ERROR")) {
-          throw new ConflictError("The parallel does not have a signature configuration");
-        } else if (containsGraphQLError(error, "REQUIRED_SIGNER_INFO_ERROR")) {
-          throw new ConflictError("The parallel requires signer information");
-        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-          throw new ForbiddenError("You don't have enough credits to complete this parallel");
-        }
-
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/signatures/:signatureId/document", {
-    params: { petitionId, signatureId },
-  })
-  .get(
-    {
-      operationId: "DownloadSignedDocument",
-      summary: "Download the signed document",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/signatures/:signatureId/document", {
+      params: { petitionId, signatureId },
+    })
+    .get(
+      {
+        operationId: "DownloadSignedDocument",
+        summary: "Download the signed document",
+        description: outdent`
         Download the signed document.
 
         ### Important
@@ -2710,60 +2730,60 @@ api
           > signed.pdf
         ~~~
       `,
-      query: {
-        noredirect: booleanParam({
-          required: false,
-          description: "If param is true, response will be a temporary link.",
-        }),
+        query: {
+          noredirect: booleanParam({
+            required: false,
+            description: "If param is true, response will be a temporary link.",
+          }),
+        },
+        responses: {
+          201: SuccessResponse(FileDownload),
+          302: RedirectResponse("Redirect to the resource on AWS S3"),
+          400: ErrorResponse({
+            description: "The signed document is not yet ready to be downloaded",
+          }),
+        },
+        tags: ["Signatures"],
       },
-      responses: {
-        201: SuccessResponse(FileDownload),
-        302: RedirectResponse("Redirect to the resource on AWS S3"),
-        400: ErrorResponse({
-          description: "The signed document is not yet ready to be downloaded",
-        }),
-      },
-      tags: ["Signatures"],
-    },
-    async ({ client, params, query }) => {
-      gql`
-        mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {
-          signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId) {
-            result
-            url
+      async ({ client, params, query }) => {
+        gql`
+          mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {
+            signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId) {
+              result
+              url
+            }
+          }
+        `;
+        const { signedPetitionDownloadLink } = await client.request(
+          DownloadSignedDocument_downloadSignedDocDocument,
+          {
+            signatureId: params.signatureId,
+          },
+        );
+        if (signedPetitionDownloadLink.result === "FAILURE") {
+          throw new BadRequestError("The signed document is not yet ready to be downloaded");
+        } else {
+          if (query.noredirect) {
+            return Created(
+              { file: signedPetitionDownloadLink.url! },
+              signedPetitionDownloadLink.url!,
+            );
+          } else {
+            return Redirect(signedPetitionDownloadLink.url!);
           }
         }
-      `;
-      const { signedPetitionDownloadLink } = await client.request(
-        DownloadSignedDocument_downloadSignedDocDocument,
-        {
-          signatureId: params.signatureId,
-        },
-      );
-      if (signedPetitionDownloadLink.result === "FAILURE") {
-        throw new BadRequestError("The signed document is not yet ready to be downloaded");
-      } else {
-        if (query.noredirect) {
-          return Created(
-            { file: signedPetitionDownloadLink.url! },
-            signedPetitionDownloadLink.url!,
-          );
-        } else {
-          return Redirect(signedPetitionDownloadLink.url!);
-        }
-      }
-    },
-  );
+      },
+    );
 
-api
-  .path("/petitions/:petitionId/signatures/:signatureId/audit", {
-    params: { petitionId, signatureId },
-  })
-  .get(
-    {
-      operationId: "DownloadAuditTrail",
-      summary: "Download the audit trail",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/signatures/:signatureId/audit", {
+      params: { petitionId, signatureId },
+    })
+    .get(
+      {
+        operationId: "DownloadAuditTrail",
+        summary: "Download the audit trail",
+        description: outdent`
         Download the audit trail.
   
         ### Important
@@ -2780,975 +2800,946 @@ api
           > audit-trail.pdf
         ~~~
       `,
-      query: {
-        noredirect: booleanParam({
-          required: false,
-          description: "If param is true, response will be a temporary link.",
-        }),
+        query: {
+          noredirect: booleanParam({
+            required: false,
+            description: "If param is true, response will be a temporary link.",
+          }),
+        },
+        responses: {
+          201: SuccessResponse(FileDownload),
+          302: RedirectResponse("Redirect to the resource on AWS S3"),
+          400: ErrorResponse({
+            description: "The document is not yet ready to be downloaded",
+          }),
+        },
+        tags: ["Signatures"],
       },
-      responses: {
-        201: SuccessResponse(FileDownload),
-        302: RedirectResponse("Redirect to the resource on AWS S3"),
-        400: ErrorResponse({
-          description: "The document is not yet ready to be downloaded",
-        }),
-      },
-      tags: ["Signatures"],
-    },
-    async ({ client, params, query }) => {
-      gql`
-        mutation DownloadSignedDocument_downloadAuditTrail($signatureId: GID!) {
-          signedPetitionDownloadLink(
-            petitionSignatureRequestId: $signatureId
-            downloadAuditTrail: true
-          ) {
-            result
-            url
+      async ({ client, params, query }) => {
+        gql`
+          mutation DownloadSignedDocument_downloadAuditTrail($signatureId: GID!) {
+            signedPetitionDownloadLink(
+              petitionSignatureRequestId: $signatureId
+              downloadAuditTrail: true
+            ) {
+              result
+              url
+            }
+          }
+        `;
+        const { signedPetitionDownloadLink } = await client.request(
+          DownloadSignedDocument_downloadAuditTrailDocument,
+          {
+            signatureId: params.signatureId,
+          },
+        );
+        if (signedPetitionDownloadLink.result === "FAILURE") {
+          throw new BadRequestError("The document is not yet ready to be downloaded");
+        } else {
+          if (query.noredirect) {
+            return Created(
+              { file: signedPetitionDownloadLink.url! },
+              signedPetitionDownloadLink.url!,
+            );
+          } else {
+            return Redirect(signedPetitionDownloadLink.url!);
           }
         }
-      `;
-      const { signedPetitionDownloadLink } = await client.request(
-        DownloadSignedDocument_downloadAuditTrailDocument,
-        {
-          signatureId: params.signatureId,
-        },
-      );
-      if (signedPetitionDownloadLink.result === "FAILURE") {
-        throw new BadRequestError("The document is not yet ready to be downloaded");
-      } else {
-        if (query.noredirect) {
-          return Created(
-            { file: signedPetitionDownloadLink.url! },
-            signedPetitionDownloadLink.url!,
-          );
-        } else {
-          return Redirect(signedPetitionDownloadLink.url!);
-        }
-      }
-    },
-  );
+      },
+    );
 
-api
-  .path("/petitions/:petitionId/profiles", { params: { petitionId } })
-  .get(
-    {
-      operationId: "GetPetitionProfiles",
-      summary: "List parallel profiles",
-      description: outdent`
+  api
+    .path("/petitions/:petitionId/profiles", { params: { petitionId } })
+    .get(
+      {
+        operationId: "GetPetitionProfiles",
+        summary: "List parallel profiles",
+        description: outdent`
     Returns a list of all profiles associated to the parallel.
     `,
-      query: {
-        ...profileIncludeParam,
-        type: stringParam({
-          description: "List of profile type IDs to filter by",
-          example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
-          required: false,
-          array: true,
-        }),
+        query: {
+          ...profileIncludeParam,
+          type: stringParam({
+            description: "List of profile type IDs to filter by",
+            example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
+            required: false,
+            array: true,
+          }),
+        },
+        tags: ["Parallels"],
+        responses: { 200: SuccessResponse(ListOfProfiles) },
       },
-      tags: ["Parallels"],
-      responses: { 200: SuccessResponse(ListOfProfiles) },
-    },
-    async ({ client, params, query }) => {
-      const _query = gql`
-        query GetPetitionProfiles_petition(
-          $petitionId: GID!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          petition(id: $petitionId) {
-            __typename
-            ... on Petition {
-              profiles {
+      async ({ client, params, query }) => {
+        const _query = gql`
+          query GetPetitionProfiles_petition(
+            $petitionId: GID!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            petition(id: $petitionId) {
+              __typename
+              ... on Petition {
+                profiles {
+                  ...Profile
+                }
+              }
+            }
+          }
+          ${ProfileFragment}
+        `;
+
+        const response = await client.request(GetPetitionProfiles_petitionDocument, {
+          petitionId: params.petitionId,
+          ...getProfileIncludesFromQuery(query),
+        });
+
+        if (response.petition?.__typename !== "Petition") {
+          return Ok([]);
+        }
+
+        return Ok(
+          response.petition.profiles
+            .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
+            .map(mapProfile),
+        );
+      },
+    )
+    .post(
+      {
+        operationId: "AssociatePetitionToProfile",
+        summary: "Associate a profile",
+        description: "Associates the parallel with a profile.",
+        body: JsonBody(AssociatePetitionToProfileInput),
+        query: {
+          ...profileIncludeParam,
+        },
+        responses: {
+          200: SuccessResponse(Profile),
+          409: ErrorResponse({
+            description: "The profile is already associated to the parallel",
+          }),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params, body, query }) => {
+        const _mutation = gql`
+          mutation AssociatePetitionToProfile_associateProfileToPetition(
+            $profileId: GID!
+            $petitionId: GID!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
+              profile {
                 ...Profile
               }
             }
           }
-        }
-        ${ProfileFragment}
-      `;
+          ${ProfileFragment}
+        `;
 
-      const response = await client.request(GetPetitionProfiles_petitionDocument, {
-        petitionId: params.petitionId,
-        ...getProfileIncludesFromQuery(query),
-      });
+        try {
+          const response = await client.request(
+            AssociatePetitionToProfile_associateProfileToPetitionDocument,
+            {
+              profileId: body.profileId,
+              petitionId: params.petitionId,
+              ...getProfileIncludesFromQuery(query),
+            },
+          );
 
-      if (response.petition?.__typename !== "Petition") {
-        return Ok([]);
-      }
+          assert("id" in response.associateProfileToPetition.profile);
 
-      return Ok(
-        response.petition.profiles
-          .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
-          .map(mapProfile),
-      );
-    },
-  )
-  .post(
-    {
-      operationId: "AssociatePetitionToProfile",
-      summary: "Associate a profile",
-      description: "Associates the parallel with a profile.",
-      body: JsonBody(AssociatePetitionToProfileInput),
-      query: {
-        ...profileIncludeParam,
-      },
-      responses: {
-        200: SuccessResponse(Profile),
-        409: ErrorResponse({
-          description: "The profile is already associated to the parallel",
-        }),
-      },
-      tags: ["Parallels"],
-    },
-    async ({ client, params, body, query }) => {
-      const _mutation = gql`
-        mutation AssociatePetitionToProfile_associateProfileToPetition(
-          $profileId: GID!
-          $petitionId: GID!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
-            profile {
-              ...Profile
-            }
+          return Ok(mapProfile(response.associateProfileToPetition.profile));
+        } catch (error) {
+          if (containsGraphQLError(error, "PROFILE_ALREADY_ASSOCIATED_TO_PETITION")) {
+            throw new ConflictError("The profile is already associated to this parallel");
           }
+          throw error;
         }
-        ${ProfileFragment}
-      `;
-
-      try {
-        const response = await client.request(
-          AssociatePetitionToProfile_associateProfileToPetitionDocument,
-          {
-            profileId: body.profileId,
-            petitionId: params.petitionId,
-            ...getProfileIncludesFromQuery(query),
-          },
-        );
-
-        assert("id" in response.associateProfileToPetition.profile);
-
-        return Ok(mapProfile(response.associateProfileToPetition.profile));
-      } catch (error) {
-        if (containsGraphQLError(error, "PROFILE_ALREADY_ASSOCIATED_TO_PETITION")) {
-          throw new ConflictError("The profile is already associated to this parallel");
-        }
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/petitions/:petitionId/profiles/:profileId", { params: { petitionId, profileId } })
-  .delete(
-    {
-      operationId: "DisassociateProfileFromPetition",
-      summary: "Disassociate a profile",
-      description: "Disassociates the parallel from a profile.",
-      responses: {
-        200: SuccessResponse(),
-        409: ErrorResponse({
-          description: "The profile is not associated to this parallel",
-        }),
       },
-      tags: ["Parallels"],
-    },
-    async ({ client, params }) => {
-      const _mutation = gql`
-        mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
-          $petitionId: GID!
-          $profileIds: [GID!]!
-        ) {
-          disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
-        }
-      `;
+    );
 
-      try {
-        await client.request(
-          DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
-          {
-            profileIds: [params.profileId],
-            petitionId: params.petitionId,
-          },
-        );
-        return NoContent();
-      } catch (error) {
-        if (containsGraphQLError(error, "PROFILE_NOT_ASSOCIATED_TO_PETITION")) {
-          throw new ConflictError("The profile is not associated to this parallel");
-        }
-        throw error;
-      }
-    },
-  );
+  api
+    .path("/petitions/:petitionId/profiles/:profileId", { params: { petitionId, profileId } })
+    .delete(
+      {
+        operationId: "DisassociateProfileFromPetition",
+        summary: "Disassociate a profile",
+        description: "Disassociates the parallel from a profile.",
+        responses: {
+          200: SuccessResponse(),
+          409: ErrorResponse({
+            description: "The profile is not associated to this parallel",
+          }),
+        },
+        tags: ["Parallels"],
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
+            $petitionId: GID!
+            $profileIds: [GID!]!
+          ) {
+            disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
+          }
+        `;
 
-api.path("/templates").get(
-  {
-    operationId: "GetTemplates",
-    summary: "Get templates list",
-    description: outdent`
+        try {
+          await client.request(
+            DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
+            {
+              profileIds: [params.profileId],
+              petitionId: params.petitionId,
+            },
+          );
+          return NoContent();
+        } catch (error) {
+          if (containsGraphQLError(error, "PROFILE_NOT_ASSOCIATED_TO_PETITION")) {
+            throw new ConflictError("The profile is not associated to this parallel");
+          }
+          throw error;
+        }
+      },
+    );
+
+  api.path("/templates").get(
+    {
+      operationId: "GetTemplates",
+      summary: "Get templates list",
+      description: outdent`
       Returns a paginated list of all templates the user has access to.
     `,
-    query: {
-      ...paginationParams(),
-      ...sortByParam(["createdAt", "name", "lastUsedAt"]),
-      ...templateIncludeParam,
-      tags: stringParam({
-        description: "List of tags to filter by",
-        example: "todo,assigned",
-        required: false,
-        array: true,
-      }),
-    },
-    responses: { 200: SuccessResponse(PaginatedTemplates) },
-    tags: ["Templates"],
-  },
-  async ({ client, query }) => {
-    let tags: PetitionTagFilter | undefined = undefined;
-    if (isDefined(query.tags)) {
-      try {
-        tags = await buildTagsFilter(client, query.tags);
-      } catch (e) {
-        if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
-          return Ok({ totalCount: 0, items: [] });
-        }
-      }
-    }
-    const _query = gql`
-      query GetTemplates_templates(
-        $offset: Int!
-        $limit: Int!
-        $tags: PetitionTagFilter
-        $sortBy: [QueryPetitions_OrderBy!]
-        $includeFields: Boolean!
-        $includeTags: Boolean!
-      ) {
-        templates: petitions(
-          offset: $offset
-          limit: $limit
-          sortBy: $sortBy
-          filters: { type: TEMPLATE, tags: $tags }
-        ) {
-          items {
-            ...Template
-          }
-          totalCount
-        }
-      }
-      ${TemplateFragment}
-    `;
-    const result = await client.request(GetTemplates_templatesDocument, {
-      ...pick(query, ["offset", "limit", "sortBy"]),
-      tags,
-      includeFields: query.include?.includes("fields") ?? false,
-      includeTags: query.include?.includes("tags") ?? false,
-    });
-    const { items, totalCount } = result.templates;
-    assertType<TemplateFragmentType[]>(items);
-    return Ok({ items: items.map((t) => mapTemplate(t)), totalCount });
-  },
-);
-
-api
-  .path("/templates/:templateId", {
-    params: { templateId },
-  })
-  .get(
-    {
-      operationId: "GetTemplate",
-      summary: "Get template",
-      description: outdent`
-        Returns the specified template.
-      `,
       query: {
+        ...paginationParams(),
+        ...sortByParam(["createdAt", "name", "lastUsedAt"]),
         ...templateIncludeParam,
+        tags: stringParam({
+          description: "List of tags to filter by",
+          example: "todo,assigned",
+          required: false,
+          array: true,
+        }),
       },
-      responses: { 200: SuccessResponse(Template) },
+      responses: { 200: SuccessResponse(PaginatedTemplates) },
       tags: ["Templates"],
     },
-    async ({ client, params, query }) => {
+    async ({ client, query }) => {
+      let tags: PetitionTagFilter | undefined = undefined;
+      if (isDefined(query.tags)) {
+        try {
+          tags = await buildTagsFilter(client, query.tags);
+        } catch (e) {
+          if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
+            return Ok({ totalCount: 0, items: [] });
+          }
+        }
+      }
       const _query = gql`
-        query GetTemplate_template(
-          $templateId: GID!
+        query GetTemplates_templates(
+          $offset: Int!
+          $limit: Int!
+          $tags: PetitionTagFilter
+          $sortBy: [QueryPetitions_OrderBy!]
           $includeFields: Boolean!
           $includeTags: Boolean!
         ) {
-          template: petition(id: $templateId) {
-            ...Template
-          }
-        }
-        ${TemplateFragment}
-      `;
-      const result = await client.request(GetTemplate_templateDocument, {
-        templateId: params.templateId,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-      });
-      assert("id" in result.template!);
-      return Ok(mapTemplate(result.template!));
-    },
-  )
-  .delete(
-    {
-      operationId: "DeleteTemplate",
-      summary: "Delete template",
-      query: {
-        force: booleanParam({
-          required: false,
-          description:
-            "If the template is shared with other users this method will fail unless passing `true` to this parameter",
-        }),
-      },
-      responses: {
-        204: SuccessResponse(),
-        400: ErrorResponse({
-          description: "The template is being shared with another user. Set force=true to delete.",
-        }),
-      },
-      tags: ["Templates"],
-    },
-    async ({ client, params, query }) => {
-      try {
-        const _mutation = gql`
-          mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
-            deletePetitions(ids: [$templateId], force: $force)
-          }
-        `;
-        await client.request(DeleteTemplate_deletePetitionsDocument, {
-          templateId: params.templateId,
-          force: query.force ?? false,
-        });
-        return NoContent();
-      } catch (error) {
-        if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
-          throw new BadRequestError(
-            "The template is being shared with another user. Set force=true to delete.",
-          );
-        }
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/contacts")
-  .get(
-    {
-      operationId: "GetContacts",
-      summary: "Get contacts list",
-      description: outdent`
-        Returns a paginated list of all contacts in the organization.
-      `,
-      query: {
-        ...paginationParams(),
-        ...sortByParam(["firstName", "lastName", "fullName", "email", "createdAt"]),
-      },
-      responses: { 200: SuccessResponse(PaginatedContacts) },
-      tags: ["Contacts"],
-    },
-    async ({ client, query }) => {
-      const _query = gql`
-        query GetContacts_contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
-          contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+          templates: petitions(
+            offset: $offset
+            limit: $limit
+            sortBy: $sortBy
+            filters: { type: TEMPLATE, tags: $tags }
+          ) {
             items {
-              ...Contact
+              ...Template
             }
             totalCount
           }
         }
-        ${ContactFragment}
+        ${TemplateFragment}
       `;
-      const result = await client.request(GetContacts_contactsDocument, query);
-      return Ok(result.contacts);
+      const result = await client.request(GetTemplates_templatesDocument, {
+        ...pick(query, ["offset", "limit", "sortBy"]),
+        tags,
+        includeFields: query.include?.includes("fields") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
+      });
+      const { items, totalCount } = result.templates;
+      assertType<TemplateFragmentType[]>(items);
+      return Ok({ items: items.map((t) => mapTemplate(t)), totalCount });
     },
-  )
-  .post(
-    {
-      operationId: "CreateContact",
-      summary: "Create contact",
-      description: outdent`
+  );
+
+  api
+    .path("/templates/:templateId", {
+      params: { templateId },
+    })
+    .get(
+      {
+        operationId: "GetTemplate",
+        summary: "Get template",
+        description: outdent`
+        Returns the specified template.
+      `,
+        query: {
+          ...templateIncludeParam,
+        },
+        responses: { 200: SuccessResponse(Template) },
+        tags: ["Templates"],
+      },
+      async ({ client, params, query }) => {
+        const _query = gql`
+          query GetTemplate_template(
+            $templateId: GID!
+            $includeFields: Boolean!
+            $includeTags: Boolean!
+          ) {
+            template: petition(id: $templateId) {
+              ...Template
+            }
+          }
+          ${TemplateFragment}
+        `;
+        const result = await client.request(GetTemplate_templateDocument, {
+          templateId: params.templateId,
+          includeFields: query.include?.includes("fields") ?? false,
+          includeTags: query.include?.includes("tags") ?? false,
+        });
+        assert("id" in result.template!);
+        return Ok(mapTemplate(result.template!));
+      },
+    )
+    .delete(
+      {
+        operationId: "DeleteTemplate",
+        summary: "Delete template",
+        query: {
+          force: booleanParam({
+            required: false,
+            description:
+              "If the template is shared with other users this method will fail unless passing `true` to this parameter",
+          }),
+        },
+        responses: {
+          204: SuccessResponse(),
+          400: ErrorResponse({
+            description:
+              "The template is being shared with another user. Set force=true to delete.",
+          }),
+        },
+        tags: ["Templates"],
+      },
+      async ({ client, params, query }) => {
+        try {
+          const _mutation = gql`
+            mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
+              deletePetitions(ids: [$templateId], force: $force)
+            }
+          `;
+          await client.request(DeleteTemplate_deletePetitionsDocument, {
+            templateId: params.templateId,
+            force: query.force ?? false,
+          });
+          return NoContent();
+        } catch (error) {
+          if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
+            throw new BadRequestError(
+              "The template is being shared with another user. Set force=true to delete.",
+            );
+          }
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/contacts")
+    .get(
+      {
+        operationId: "GetContacts",
+        summary: "Get contacts list",
+        description: outdent`
+        Returns a paginated list of all contacts in the organization.
+      `,
+        query: {
+          ...paginationParams(),
+          ...sortByParam(["firstName", "lastName", "fullName", "email", "createdAt"]),
+        },
+        responses: { 200: SuccessResponse(PaginatedContacts) },
+        tags: ["Contacts"],
+      },
+      async ({ client, query }) => {
+        const _query = gql`
+          query GetContacts_contacts(
+            $offset: Int!
+            $limit: Int!
+            $sortBy: [QueryContacts_OrderBy!]
+          ) {
+            contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+              items {
+                ...Contact
+              }
+              totalCount
+            }
+          }
+          ${ContactFragment}
+        `;
+        const result = await client.request(GetContacts_contactsDocument, query);
+        return Ok(result.contacts);
+      },
+    )
+    .post(
+      {
+        operationId: "CreateContact",
+        summary: "Create contact",
+        description: outdent`
         Creates a contact in the organization.
       `,
-      body: JsonBody(CreateContact),
-      responses: {
-        201: SuccessResponse(Contact),
+        body: JsonBody(CreateContact),
+        responses: {
+          201: SuccessResponse(Contact),
+        },
+        tags: ["Contacts"],
       },
-      tags: ["Contacts"],
-    },
-    async ({ client, body }) => {
-      try {
-        const _mutation = gql`
-          mutation CreateContact_contact($data: CreateContactInput!) {
-            createContact(data: $data) {
+      async ({ client, body }) => {
+        try {
+          const _mutation = gql`
+            mutation CreateContact_contact($data: CreateContactInput!) {
+              createContact(data: $data) {
+                ...Contact
+              }
+            }
+            ${ContactFragment}
+          `;
+          const result = await client.request(CreateContact_contactDocument, { data: body });
+          return Created(result.createContact!);
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
+              email: string;
+              error_code: string;
+            };
+            if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
+              throw new BadRequestError(`${email} is not a valid email`);
+            }
+          }
+
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/contacts/:contactId", {
+      params: {
+        contactId: idParam({
+          type: "Contact",
+          description: "The ID of the contact",
+        }),
+      },
+    })
+    .get(
+      {
+        operationId: "GetContact",
+        summary: "Get contact",
+        description: outdent`
+        Returns the specified contact.
+      `,
+        responses: { 200: SuccessResponse(Contact) },
+        tags: ["Contacts"],
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query GetContact_contact($contactId: GID!) {
+            contact(id: $contactId) {
               ...Contact
             }
           }
           ${ContactFragment}
         `;
-        const result = await client.request(CreateContact_contactDocument, { data: body });
-        return Created(result.createContact!);
-      } catch (error) {
-        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
-            email: string;
-            error_code: string;
-          };
-          if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
-            throw new BadRequestError(`${email} is not a valid email`);
-          }
-        }
+        const result = await client.request(GetContact_contactDocument, {
+          contactId: params.contactId,
+        });
+        return Ok(result.contact!);
+      },
+    );
 
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/contacts/:contactId", {
-    params: {
-      contactId: idParam({
-        type: "Contact",
-        description: "The ID of the contact",
-      }),
-    },
-  })
-  .get(
+  api.path("/users").get(
     {
-      operationId: "GetContact",
-      summary: "Get contact",
+      operationId: "GetUsers",
+      summary: "Get users list",
       description: outdent`
-        Returns the specified contact.
-      `,
-      responses: { 200: SuccessResponse(Contact) },
-      tags: ["Contacts"],
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query GetContact_contact($contactId: GID!) {
-          contact(id: $contactId) {
-            ...Contact
-          }
-        }
-        ${ContactFragment}
-      `;
-      const result = await client.request(GetContact_contactDocument, {
-        contactId: params.contactId,
-      });
-      return Ok(result.contact!);
-    },
-  );
-
-api.path("/users").get(
-  {
-    operationId: "GetUsers",
-    summary: "Get users list",
-    description: outdent`
         This endpoint returns a paginated list of all the available members in your organization.
       `,
-    query: {
-      ...paginationParams(),
-      ...sortByParam(["createdAt", "fullName"]),
+      query: {
+        ...paginationParams(),
+        ...sortByParam(["createdAt", "fullName"]),
+      },
+      responses: { 200: SuccessResponse(PaginatedUsers) },
+      tags: ["Users"],
     },
-    responses: { 200: SuccessResponse(PaginatedUsers) },
-    tags: ["Users"],
-  },
-  async ({ client, query }) => {
-    const _query = gql`
-      query GetOrganizationUsers_users(
-        $offset: Int!
-        $limit: Int!
-        $sortBy: [OrganizationUsers_OrderBy!]
-      ) {
-        me {
-          organization {
-            users(limit: $limit, offset: $offset, sortBy: $sortBy) {
-              totalCount
-              items {
-                ...User
+    async ({ client, query }) => {
+      const _query = gql`
+        query GetOrganizationUsers_users(
+          $offset: Int!
+          $limit: Int!
+          $sortBy: [OrganizationUsers_OrderBy!]
+        ) {
+          me {
+            organization {
+              users(limit: $limit, offset: $offset, sortBy: $sortBy) {
+                totalCount
+                items {
+                  ...User
+                }
               }
             }
           }
         }
-      }
-      ${UserFragment}
-    `;
-    const result = await client.request(GetOrganizationUsers_usersDocument, query);
-    return Ok(result.me.organization.users);
-  },
-);
-
-api
-  .path("/subscriptions")
-  .get(
-    {
-      operationId: "GetSubscriptions",
-      summary: "Get your subscription info",
-      description: "Return a list with all your event subscriptions",
-      responses: { 200: SuccessResponse(ListOfSubscriptions) },
-      tags: ["Subscriptions"],
-    },
-    async ({ client }) => {
-      const _query = gql`
-        query EventSubscriptions_getSubscriptions {
-          subscriptions {
-            ...EventSubscription
-          }
-        }
-        ${EventSubscriptionFragment}
+        ${UserFragment}
       `;
-      const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
-      return Ok(result.subscriptions.map(mapSubscription));
+      const result = await client.request(GetOrganizationUsers_usersDocument, query);
+      return Ok(result.me.organization.users);
     },
-  )
-  .post(
-    {
-      operationId: "CreateSubscription",
-      summary: "Create subscription",
-      description: outdent`Creates a new event subscription on any of your parallels of profiles.`,
-      body: JsonBody(CreateEventSubscription),
-      responses: {
-        201: SuccessResponse(EventSubscription),
-        400: ErrorResponse({ description: "Invalid request" }),
+  );
+
+  api
+    .path("/subscriptions")
+    .get(
+      {
+        operationId: "GetSubscriptions",
+        summary: "Get your subscription info",
+        description: "Return a list with all your event subscriptions",
+        responses: { 200: SuccessResponse(ListOfSubscriptions) },
+        tags: ["Subscriptions"],
       },
-      callbacks: {
-        PetitionEventCreated: {
-          "{$request.body#/eventsUrl}": {
-            post: {
-              operationId: "PetitionEventCreated",
-              summary: "New Parallel Event",
-              description: outdent`
+      async ({ client }) => {
+        const _query = gql`
+          query EventSubscriptions_getSubscriptions {
+            subscriptions {
+              ...EventSubscription
+            }
+          }
+          ${EventSubscriptionFragment}
+        `;
+        const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
+        return Ok(result.subscriptions.map(mapSubscription));
+      },
+    )
+    .post(
+      {
+        operationId: "CreateSubscription",
+        summary: "Create subscription",
+        description: outdent`Creates a new event subscription on any of your parallels of profiles.`,
+        body: JsonBody(CreateEventSubscription),
+        responses: {
+          201: SuccessResponse(EventSubscription),
+          400: ErrorResponse({ description: "Invalid request" }),
+        },
+        callbacks: {
+          PetitionEventCreated: {
+            "{$request.body#/eventsUrl}": {
+              post: {
+                operationId: "PetitionEventCreated",
+                summary: "New Parallel Event",
+                description: outdent`
                 A new event was triggered on one of your subscribed parallels.
                 
                 A POST request will be sent to the provided events URL containing the event information.
                 
                 Additionally, if you created one or more signature keys, special headers will be sent with the request, containing the event signatures. You can read more about signature verification in [this help center article](https://help.onparallel.com/en/articles/7035199-event-subscriptions-and-signature-keys).
               `,
-              requestBody: {
-                required: true,
-                content: { "application/json": { schema: PetitionEvent as any } },
-              },
-              responses: {
-                "200": {
-                  description:
-                    "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                requestBody: {
+                  required: true,
+                  content: { "application/json": { schema: PetitionEvent as any } },
+                },
+                responses: {
+                  "200": {
+                    description:
+                      "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                  },
                 },
               },
             },
           },
-        },
-        ProfileEventCreated: {
-          "{$request.body#/eventsUrl}": {
-            post: {
-              operationId: "ProfileEventCreated",
-              summary: "New Profile Event",
-              description: outdent`
+          ProfileEventCreated: {
+            "{$request.body#/eventsUrl}": {
+              post: {
+                operationId: "ProfileEventCreated",
+                summary: "New Profile Event",
+                description: outdent`
                 A new event was triggered on one of your subscribed profiles.
                 
                 A POST request will be sent to the provided events URL containing the event information.
                 
                 Additionally, if you created one or more signature keys, special headers will be sent with the request, containing the event signatures. You can read more about signature verification in [this help center article](https://help.onparallel.com/en/articles/7035199-event-subscriptions-and-signature-keys).
               `,
-              requestBody: {
-                required: true,
-                content: { "application/json": { schema: ProfileEvent as any } },
-              },
-              responses: {
-                "200": {
-                  description:
-                    "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                requestBody: {
+                  required: true,
+                  content: { "application/json": { schema: ProfileEvent as any } },
+                },
+                responses: {
+                  "200": {
+                    description:
+                      "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                  },
                 },
               },
             },
           },
         },
+        tags: ["Subscriptions"],
       },
+      async ({ client, body }) => {
+        const _petitionMutation = gql`
+          mutation EventSubscriptions_createPetitionEventSubscription(
+            $eventsUrl: String!
+            $eventTypes: [PetitionEventType!]
+            $name: String
+            $fromTemplateId: GID
+          ) {
+            createPetitionEventSubscription(
+              eventsUrl: $eventsUrl
+              eventTypes: $eventTypes
+              name: $name
+              fromTemplateId: $fromTemplateId
+            ) {
+              ...PetitionEventSubscription
+            }
+          }
+          ${PetitionEventSubscriptionFragment}
+        `;
+        const _profileMutation = gql`
+          mutation EventSubscriptions_createProfileEventSubscription(
+            $eventsUrl: String!
+            $eventTypes: [ProfileEventType!]
+            $name: String
+            $fromProfileTypeId: GID
+          ) {
+            createProfileEventSubscription(
+              eventsUrl: $eventsUrl
+              eventTypes: $eventTypes
+              name: $name
+              fromProfileTypeId: $fromProfileTypeId
+            ) {
+              ...ProfileEventSubscription
+            }
+          }
+          ${ProfileEventSubscriptionFragment}
+        `;
+        try {
+          if (body.type === "PETITION") {
+            const result = await client.request(
+              EventSubscriptions_createPetitionEventSubscriptionDocument,
+              {
+                eventsUrl: body.eventsUrl,
+                eventTypes: body.eventTypes,
+                name: body.name,
+                fromTemplateId: body.fromTemplateId,
+              },
+            );
+
+            return Created(mapSubscription(result.createPetitionEventSubscription));
+          } else {
+            const result = await client.request(
+              EventSubscriptions_createProfileEventSubscriptionDocument,
+              {
+                eventsUrl: body.eventsUrl,
+                eventTypes: body.eventTypes,
+                name: body.name,
+                fromProfileTypeId: body.fromProfileTypeId,
+              },
+            );
+
+            return Created(mapSubscription(result.createProfileEventSubscription));
+          }
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
+          }
+          if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
+            throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
+          }
+
+          throw error;
+        }
+      },
+    );
+
+  api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delete(
+    {
+      operationId: "DeleteSubscription",
+      summary: "Delete subscription",
+      description: "Delete the specified subscription.",
+      responses: { 204: SuccessResponse() },
       tags: ["Subscriptions"],
     },
-    async ({ client, body }) => {
-      const _petitionMutation = gql`
-        mutation EventSubscriptions_createPetitionEventSubscription(
-          $eventsUrl: String!
-          $eventTypes: [PetitionEventType!]
-          $name: String
-          $fromTemplateId: GID
-        ) {
-          createPetitionEventSubscription(
-            eventsUrl: $eventsUrl
-            eventTypes: $eventTypes
-            name: $name
-            fromTemplateId: $fromTemplateId
-          ) {
-            ...PetitionEventSubscription
-          }
+    async ({ client, params }) => {
+      const _mutation = gql`
+        mutation EventSubscriptions_deleteSubscription($ids: [GID!]!) {
+          deleteEventSubscriptions(ids: $ids)
         }
-        ${PetitionEventSubscriptionFragment}
       `;
-      const _profileMutation = gql`
-        mutation EventSubscriptions_createProfileEventSubscription(
-          $eventsUrl: String!
-          $eventTypes: [ProfileEventType!]
-          $name: String
-          $fromProfileTypeId: GID
-        ) {
-          createProfileEventSubscription(
-            eventsUrl: $eventsUrl
-            eventTypes: $eventTypes
-            name: $name
-            fromProfileTypeId: $fromProfileTypeId
-          ) {
-            ...ProfileEventSubscription
-          }
-        }
-        ${ProfileEventSubscriptionFragment}
-      `;
-      try {
-        if (body.type === "PETITION") {
-          const result = await client.request(
-            EventSubscriptions_createPetitionEventSubscriptionDocument,
-            {
-              eventsUrl: body.eventsUrl,
-              eventTypes: body.eventTypes,
-              name: body.name,
-              fromTemplateId: body.fromTemplateId,
-            },
-          );
-
-          return Created(mapSubscription(result.createPetitionEventSubscription));
-        } else {
-          const result = await client.request(
-            EventSubscriptions_createProfileEventSubscriptionDocument,
-            {
-              eventsUrl: body.eventsUrl,
-              eventTypes: body.eventTypes,
-              name: body.name,
-              fromProfileTypeId: body.fromProfileTypeId,
-            },
-          );
-
-          return Created(mapSubscription(result.createProfileEventSubscription));
-        }
-      } catch (error) {
-        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
-        }
-        if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
-          throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
-        }
-
-        throw error;
-      }
+      await client.request(EventSubscriptions_deleteSubscriptionDocument, {
+        ids: [params.subscriptionId],
+      });
+      return NoContent();
     },
   );
 
-api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delete(
-  {
-    operationId: "DeleteSubscription",
-    summary: "Delete subscription",
-    description: "Delete the specified subscription.",
-    responses: { 204: SuccessResponse() },
-    tags: ["Subscriptions"],
-  },
-  async ({ client, params }) => {
-    const _mutation = gql`
-      mutation EventSubscriptions_deleteSubscription($ids: [GID!]!) {
-        deleteEventSubscriptions(ids: $ids)
-      }
-    `;
-    await client.request(EventSubscriptions_deleteSubscriptionDocument, {
-      ids: [params.subscriptionId],
-    });
-    return NoContent();
-  },
-);
-
-api.path("/petition-events").get(
-  {
-    operationId: "GetPetitionEvents",
-    summary: "Get your latest petition events",
-    excludeFromSpec: true,
-    description: "Returns a list with your latest parallel events",
-    query: {
-      before: idParam({
-        type: "PetitionEvent",
-        description: "Fetch events that ocurred before this ID",
-        required: false,
-      }),
-      eventTypes: enumParam({
-        values: PetitionEventTypeValues,
-        description: "Filter events by types",
-        required: false,
-        array: true,
-      }),
-    },
-    responses: { 200: SuccessResponse(ListOfPetitionEvents) },
-  },
-  async ({ client, query }) => {
-    const _query = gql`
-      query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
-        petitionEvents(before: $before, eventTypes: $eventTypes) {
-          id
-          data
-          petition {
-            id
-          }
-          type
-          createdAt
-        }
-      }
-    `;
-
-    const result = await client.request(GetPetitionEvents_PetitionEventsDocument, {
-      before: query.before,
-      eventTypes: query.eventTypes,
-    });
-
-    return Ok(
-      result.petitionEvents
-        .filter((e) => isDefined(e.petition))
-        .map((e) => ({
-          id: e.id,
-          petitionId: e.petition!.id,
-          type: e.type,
-          data: e.data,
-          createdAt: e.createdAt,
-        })),
-    );
-  },
-);
-
-api.path("/profile-events").get(
-  {
-    operationId: "GetProfileEvents",
-    summary: "Get your latest profile events",
-    excludeFromSpec: true,
-    description: "Returns a list with your latest profile events",
-    query: {
-      before: idParam({
-        type: "ProfileEvent",
-        description: "Fetch events that ocurred before this ID",
-        required: false,
-      }),
-      eventTypes: enumParam({
-        values: ProfileEventTypeValues,
-        description: "Filter events by types",
-        required: false,
-        array: true,
-      }),
-    },
-    responses: { 200: SuccessResponse(ListOfProfileEvents) },
-  },
-  async ({ client, query }) => {
-    const _query = gql`
-      query GetProfileEvents_ProfileEvents($before: GID, $eventTypes: [ProfileEventType!]) {
-        profileEvents(before: $before, eventTypes: $eventTypes) {
-          id
-          data
-          profile {
-            id
-          }
-          type
-          createdAt
-        }
-      }
-    `;
-
-    const result = await client.request(GetProfileEvents_ProfileEventsDocument, {
-      before: query.before,
-      eventTypes: query.eventTypes,
-    });
-
-    return Ok(
-      result.profileEvents
-        .filter((e) => isDefined(e.profile))
-        .map((e) => ({
-          id: e.id,
-          profileId: e.profile!.id,
-          type: e.type,
-          data: e.data,
-          createdAt: e.createdAt,
-        })),
-    );
-  },
-);
-
-api
-  .path("/profiles")
-  .get(
+  api.path("/petition-events").get(
     {
-      operationId: "GetProfiles",
-      summary: "Get your profiles",
-      description: "Returns a paginated list with all your organization profiles",
+      operationId: "GetPetitionEvents",
+      summary: "Get your latest petition events",
+      excludeFromSpec: true,
+      description: "Returns a list with your latest parallel events",
       query: {
-        ...paginationParams(),
-        ...profileIncludeParam,
-        ...sortByParam(["createdAt", "name"]),
-        search: stringParam({
-          description: "Search profiles by name",
+        before: idParam({
+          type: "PetitionEvent",
+          description: "Fetch events that ocurred before this ID",
           required: false,
         }),
-        profileTypeIds: stringParam({
-          description: "List of profile type IDs to filter by",
-          example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
-          required: false,
-          array: true,
-        }),
-        status: stringParam({
-          description: "Filter profiles by status",
-          example: "OPEN",
+        eventTypes: enumParam({
+          values: PetitionEventTypeValues,
+          description: "Filter events by types",
           required: false,
           array: true,
         }),
       },
-      responses: { 200: SuccessResponse(PaginatedProfiles) },
-      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(ListOfPetitionEvents) },
     },
     async ({ client, query }) => {
       const _query = gql`
-        query GetProfiles_profiles(
-          $offset: Int
-          $limit: Int
-          $sortBy: [QueryProfiles_OrderBy!]
-          $search: String
-          $profileTypeIds: [GID!]
-          $status: [ProfileStatus!]
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          profiles(
-            offset: $offset
-            limit: $limit
-            sortBy: $sortBy
-            search: $search
-            filter: { profileTypeId: $profileTypeIds, status: $status }
-          ) {
-            totalCount
-            items {
-              ...Profile
+        query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
+          petitionEvents(before: $before, eventTypes: $eventTypes) {
+            id
+            data
+            petition {
+              id
             }
+            type
+            createdAt
           }
         }
-        ${ProfileFragment}
       `;
 
-      const result = await client.request(GetProfiles_profilesDocument, {
-        ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
-        status: query.status as ProfileStatus[] | undefined,
-        ...getProfileIncludesFromQuery(query),
+      const result = await client.request(GetPetitionEvents_PetitionEventsDocument, {
+        before: query.before,
+        eventTypes: query.eventTypes,
       });
-      return Ok({
-        totalCount: result.profiles.totalCount,
-        items: result.profiles.items.map(mapProfile),
-      });
+
+      return Ok(
+        result.petitionEvents
+          .filter((e) => isDefined(e.petition))
+          .map((e) => ({
+            id: e.id,
+            petitionId: e.petition!.id,
+            type: e.type,
+            data: e.data,
+            createdAt: e.createdAt,
+          })),
+      );
     },
-  )
-  .post(
+  );
+
+  api.path("/profile-events").get(
     {
-      operationId: "CreateProfile",
-      summary: "Create a profile",
-      description: "Creates a new profile on your organization",
-      body: JsonBody(CreateProfile),
-      query: profileIncludeParam,
-      responses: {
-        201: SuccessResponse(Profile),
-        400: ErrorResponse({ description: "Invalid request body" }),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      operationId: "GetProfileEvents",
+      summary: "Get your latest profile events",
+      excludeFromSpec: true,
+      description: "Returns a list with your latest profile events",
+      query: {
+        before: idParam({
+          type: "ProfileEvent",
+          description: "Fetch events that ocurred before this ID",
+          required: false,
+        }),
+        eventTypes: enumParam({
+          values: ProfileEventTypeValues,
+          description: "Filter events by types",
+          required: false,
+          array: true,
+        }),
       },
-      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(ListOfProfileEvents) },
     },
-    async ({ client, body, query }) => {
-      const _mutations = [
-        gql`
-          mutation CreateProfile_createProfile(
-            $profileTypeId: GID!
-            $subscribe: Boolean
-            $fields: [UpdateProfileFieldValueInput!]
+    async ({ client, query }) => {
+      const _query = gql`
+        query GetProfileEvents_ProfileEvents($before: GID, $eventTypes: [ProfileEventType!]) {
+          profileEvents(before: $before, eventTypes: $eventTypes) {
+            id
+            data
+            profile {
+              id
+            }
+            type
+            createdAt
+          }
+        }
+      `;
+
+      const result = await client.request(GetProfileEvents_ProfileEventsDocument, {
+        before: query.before,
+        eventTypes: query.eventTypes,
+      });
+
+      return Ok(
+        result.profileEvents
+          .filter((e) => isDefined(e.profile))
+          .map((e) => ({
+            id: e.id,
+            profileId: e.profile!.id,
+            type: e.type,
+            data: e.data,
+            createdAt: e.createdAt,
+          })),
+      );
+    },
+  );
+
+  api
+    .path("/profiles")
+    .get(
+      {
+        operationId: "GetProfiles",
+        summary: "Get your profiles",
+        description: "Returns a paginated list with all your organization profiles",
+        query: {
+          ...paginationParams(),
+          ...profileIncludeParam,
+          ...sortByParam(["createdAt", "name"]),
+          search: stringParam({
+            description: "Search profiles by name",
+            required: false,
+          }),
+          profileTypeIds: stringParam({
+            description: "List of profile type IDs to filter by",
+            example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
+            required: false,
+            array: true,
+          }),
+          status: stringParam({
+            description: "Filter profiles by status",
+            example: "OPEN",
+            required: false,
+            array: true,
+          }),
+        },
+        responses: { 200: SuccessResponse(PaginatedProfiles) },
+        tags: ["Profiles"],
+      },
+      async ({ client, query }) => {
+        const _query = gql`
+          query GetProfiles_profiles(
+            $offset: Int
+            $limit: Int
+            $sortBy: [QueryProfiles_OrderBy!]
+            $search: String
+            $profileTypeIds: [GID!]
+            $status: [ProfileStatus!]
             $includeFields: Boolean!
             $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
-            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
-              ...Profile
+            profiles(
+              offset: $offset
+              limit: $limit
+              sortBy: $sortBy
+              search: $search
+              filter: { profileTypeId: $profileTypeIds, status: $status }
+            ) {
+              totalCount
+              items {
+                ...Profile
+              }
             }
           }
           ${ProfileFragment}
-        `,
-      ];
+        `;
 
-      try {
-        const result = await client.request(CreateProfile_createProfileDocument, {
-          profileTypeId: body.profileTypeId,
-          subscribe: body.subscribe,
-          fields: body.fields,
+        const result = await client.request(GetProfiles_profilesDocument, {
+          ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
+          status: query.status as ProfileStatus[] | undefined,
           ...getProfileIncludesFromQuery(query),
         });
-        assert("id" in result.createProfile);
+        return Ok({
+          totalCount: result.profiles.totalCount,
+          items: result.profiles.items.map(mapProfile),
+        });
+      },
+    )
+    .post(
+      {
+        operationId: "CreateProfile",
+        summary: "Create a profile",
+        description: "Creates a new profile on your organization",
+        body: JsonBody(CreateProfile),
+        query: profileIncludeParam,
+        responses: {
+          201: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Invalid request body" }),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+        tags: ["Profiles"],
+      },
+      async ({ client, body, query }) => {
+        const _mutations = [
+          gql`
+            mutation CreateProfile_createProfile(
+              $profileTypeId: GID!
+              $subscribe: Boolean
+              $fields: [UpdateProfileFieldValueInput!]
+              $includeFields: Boolean!
+              $includeFieldsByAlias: Boolean!
+              $includeSubscribers: Boolean!
+            ) {
+              createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
+                ...Profile
+              }
+            }
+            ${ProfileFragment}
+          `,
+        ];
 
-        return Created(mapProfile(result.createProfile));
-      } catch (error) {
-        if (containsGraphQLError(error, "EXPIRY_ON_NON_EXPIRABLE_FIELD")) {
-          throw new BadRequestError("You can't set an expiry date on a non-expirable field");
+        try {
+          const result = await client.request(CreateProfile_createProfileDocument, {
+            profileTypeId: body.profileTypeId,
+            subscribe: body.subscribe,
+            fields: body.fields,
+            ...getProfileIncludesFromQuery(query),
+          });
+          assert("id" in result.createProfile);
+
+          return Created(mapProfile(result.createProfile));
+        } catch (error) {
+          if (containsGraphQLError(error, "EXPIRY_ON_NON_EXPIRABLE_FIELD")) {
+            throw new BadRequestError("You can't set an expiry date on a non-expirable field");
+          }
+          if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+            throw new BadRequestError(
+              error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
+              { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
+            );
+          }
+          throw error;
         }
-        if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
-          throw new BadRequestError(
-            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
-            { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
-          );
-        }
-        throw error;
-      }
-    },
-  );
+      },
+    );
 
-api.path("/profiles/:profileId", { params: { profileId } }).get(
-  {
-    operationId: "GetProfile",
-    summary: "Get a profile",
-    description: "Returns the specified profile",
-    query: profileIncludeParam,
-    responses: { 200: SuccessResponse(Profile) },
-    tags: ["Profiles"],
-  },
-  async ({ client, params, query }) => {
-    const _query = gql`
-      query GetProfile_profile(
-        $profileId: GID!
-        $includeFields: Boolean!
-        $includeFieldsByAlias: Boolean!
-        $includeSubscribers: Boolean!
-      ) {
-        profile(profileId: $profileId) {
-          ...Profile
-        }
-      }
-      ${ProfileFragment}
-    `;
-
-    const result = await client.request(GetProfile_profileDocument, {
-      profileId: params.profileId,
-      ...getProfileIncludesFromQuery(query),
-    });
-    assert("id" in result.profile);
-    return Ok(mapProfile(result.profile));
-  },
-);
-
-api
-  .path("/profiles/:profileId/fields", { params: { profileId } })
-  .get(
+  api.path("/profiles/:profileId", { params: { profileId } }).get(
     {
-      operationId: "GetProfileFields",
-      summary: "List profile fields",
-      description: "Returns a list with all the fields of the specified profile",
-      responses: { 200: SuccessResponse(ListOfProfileProperties) },
+      operationId: "GetProfile",
+      summary: "Get a profile",
+      description: "Returns the specified profile",
+      query: profileIncludeParam,
+      responses: { 200: SuccessResponse(Profile) },
       tags: ["Profiles"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       const _query = gql`
-        query GetProfileFields_profile(
+        query GetProfile_profile(
           $profileId: GID!
           $includeFields: Boolean!
           $includeFieldsByAlias: Boolean!
@@ -3761,25 +3752,59 @@ api
         ${ProfileFragment}
       `;
 
-      const result = await client.request(GetProfileFields_profileDocument, {
+      const result = await client.request(GetProfile_profileDocument, {
         profileId: params.profileId,
-        ...getProfileIncludesFromQuery({ include: ["fields"] }),
+        ...getProfileIncludesFromQuery(query),
       });
-
-      return Ok(mapProfile(result.profile).fields!);
+      assert("id" in result.profile);
+      return Ok(mapProfile(result.profile));
     },
-  )
-  .put(
-    {
-      operationId: "CreateProfileFieldValue",
-      summary: "Submit values by profile field alias",
-      description: outdent`
+  );
+
+  api
+    .path("/profiles/:profileId/fields", { params: { profileId } })
+    .get(
+      {
+        operationId: "GetProfileFields",
+        summary: "List profile fields",
+        description: "Returns a list with all the fields of the specified profile",
+        responses: { 200: SuccessResponse(ListOfProfileProperties) },
+        tags: ["Profiles"],
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query GetProfileFields_profile(
+            $profileId: GID!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            profile(profileId: $profileId) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `;
+
+        const result = await client.request(GetProfileFields_profileDocument, {
+          profileId: params.profileId,
+          ...getProfileIncludesFromQuery({ include: ["fields"] }),
+        });
+
+        return Ok(mapProfile(result.profile).fields!);
+      },
+    )
+    .put(
+      {
+        operationId: "CreateProfileFieldValue",
+        summary: "Submit values by profile field alias",
+        description: outdent`
         Submit a list of values on a profile given a form-data where each key is a field alias.
         The profile has to be in \`OPEN\` status.
       `,
-      middleware: anyFileUploadMiddleware(),
-      body: FormDataBody(CreateProfileFieldValue, {
-        description: outdent`
+        middleware: anyFileUploadMiddleware(),
+        body: FormDataBody(CreateProfileFieldValue, {
+          description: outdent`
           A multipart/form-data body where each key is a field alias and the value is the value to submit.
 
           e.g.: \`{ "name": "John Doe", "amount": 500, "date": "2023-06-27" }\` will submit the values \`"John Doe"\` for the field with alias \`"name"\`, \`500\` for the field with alias \`"amount"\` and \`"2023-06-27"\` for the field with alias \`"date"\`.
@@ -3788,400 +3813,159 @@ api
 
           Have in mind that the value must match with the profile field type. For example, if the field is a \`DATE\` field, the value must be a valid date string. If the field is a \`FILE\` field, value must be a selection of Files to upload.
           `,
-      }),
-      tags: ["Profiles"],
-      responses: {
-        200: SuccessResponse(Profile),
-        400: ErrorResponse({ description: "Bad request input" }),
+        }),
+        tags: ["Profiles"],
+        responses: {
+          200: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Bad request input" }),
+        },
       },
-    },
-    async ({ client, params, body }) => {
-      const _query = gql`
-        query CreateProfileFieldValue_profile(
-          $profileId: GID!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          profile(profileId: $profileId) {
-            ...Profile
-          }
-        }
-        ${ProfileFragment}
-      `;
-
-      const _mutations = [
-        gql`
-          mutation CreateProfileFieldValue_updateProfileFieldValue(
+      async ({ client, params, body }) => {
+        const _query = gql`
+          query CreateProfileFieldValue_profile(
             $profileId: GID!
-            $fields: [UpdateProfileFieldValueInput!]!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
           ) {
-            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-              id
+            profile(profileId: $profileId) {
+              ...Profile
             }
           }
-        `,
-        gql`
-          mutation CreateProfileFieldValue_createProfileFieldFileUploadLink(
-            $profileId: GID!
-            $profileTypeFieldId: GID!
-            $data: [FileUploadInput!]!
-          ) {
-            createProfileFieldFileUploadLink(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              data: $data
+          ${ProfileFragment}
+        `;
+
+        const _mutations = [
+          gql`
+            mutation CreateProfileFieldValue_updateProfileFieldValue(
+              $profileId: GID!
+              $fields: [UpdateProfileFieldValueInput!]!
             ) {
-              uploads {
-                file {
-                  id
-                }
-                presignedPostData {
-                  fields
-                  url
-                }
-              }
-            }
-          }
-        `,
-        gql`
-          mutation CreateProfileFieldValue_profileFieldFileUploadComplete(
-            $profileId: GID!
-            $profileTypeFieldId: GID!
-            $profileFieldFileIds: [GID!]!
-          ) {
-            profileFieldFileUploadComplete(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              profileFieldFileIds: $profileFieldFileIds
-            ) {
-              id
-            }
-          }
-        `,
-      ];
-
-      const queryResponse = await client.request(CreateProfileFieldValue_profileDocument, {
-        profileId: params.profileId,
-        ...getProfileIncludesFromQuery({ include: ["fields"] }),
-      });
-      const profileFields = queryResponse.profile.properties!.map((p) => p.field);
-
-      const simpleTextUpdateFields: UpdateProfileFieldValueInput[] = [];
-      const fileUpdateFields: { profileTypeFieldId: string; files: Express.Multer.File[] }[] = [];
-
-      for (const [alias, value] of Object.entries(body)) {
-        const field = profileFields.find((f) => f.alias === alias);
-        if (field && value !== undefined) {
-          if (field.type === "FILE") {
-            if (typeof value !== "object") {
-              throw new BadRequestError(
-                `Invalid value for field ${field.alias}. Expected an array of files.`,
-              );
-            }
-            fileUpdateFields.push({
-              profileTypeFieldId: field.id,
-              files: value as Express.Multer.File[],
-            });
-          } else {
-            if (typeof value !== "string") {
-              throw new BadRequestError(
-                `Invalid value for field ${field.alias}. Expected a string.`,
-              );
-            }
-            simpleTextUpdateFields.push({ profileTypeFieldId: field.id, content: { value } });
-          }
-        }
-      }
-
-      try {
-        if (simpleTextUpdateFields.length > 0) {
-          await client.request(CreateProfileFieldValue_updateProfileFieldValueDocument, {
-            profileId: params.profileId,
-            fields: simpleTextUpdateFields,
-          });
-        }
-
-        if (fileUpdateFields.length > 0) {
-          for (const fileUpdate of fileUpdateFields) {
-            const fileUpdateResponse = await client.request(
-              CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
-              {
-                profileId: params.profileId,
-                profileTypeFieldId: fileUpdate.profileTypeFieldId,
-                data: fileUpdate.files.map((file) => ({
-                  filename: file.filename,
-                  contentType: file.mimetype,
-                  size: file.size,
-                })),
-              },
-            );
-            for (const [file, presignedPostData] of zip(
-              fileUpdate.files,
-              fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
-                (u) => u.presignedPostData,
-              ),
-            )) {
-              await uploadFile(file, presignedPostData);
-            }
-
-            await client.request(CreateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
-              profileId: params.profileId,
-              profileTypeFieldId: fileUpdate.profileTypeFieldId,
-              profileFieldFileIds: fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
-                (u) => u.file.id,
-              ),
-            });
-          }
-        }
-
-        const response = await client.request(CreateProfileFieldValue_profileDocument, {
-          profileId: params.profileId,
-          ...getProfileIncludesFromQuery({ include: ["fieldsByAlias"] }),
-        });
-
-        assert("id" in response.profile);
-        return Ok(mapProfile(response.profile));
-      } catch (error) {
-        if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
-          throw new BadRequestError(
-            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
-          );
-        }
-        throw error;
-      }
-    },
-  );
-
-api
-  .path("/profiles/:profileId/fields/:profileTypeFieldId", {
-    params: { profileId, profileTypeFieldId },
-  })
-  .delete(
-    {
-      operationId: "DeleteProfileFieldValue",
-      summary: "Remove a value on the profile field",
-      description: outdent`
-      Removes a value on the profile field.
-      If the field is of type \`FILE\`, the related files will be deleted.
-      The profile has to be in \`OPEN\` status.
-    `,
-      tags: ["Profiles"],
-      responses: { 200: SuccessResponse() },
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query DeleteProfileFieldValue_profile($profileId: GID!) {
-          profile(profileId: $profileId) {
-            properties {
-              field {
+              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
                 id
-                type
               }
             }
-          }
-        }
-      `;
-
-      const _mutations = [
-        gql`
-          mutation DeleteProfileFieldValue_updateProfileFieldValue(
-            $profileId: GID!
-            $fields: [UpdateProfileFieldValueInput!]!
-          ) {
-            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-              id
-            }
-          }
-        `,
-        gql`
-          mutation DeleteProfileFieldValue_deleteProfileFieldFile(
-            $profileId: GID!
-            $profileTypeFieldId: GID!
-          ) {
-            deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
-          }
-        `,
-      ];
-
-      const queryResponse = await client.request(DeleteProfileFieldValue_profileDocument, {
-        profileId: params.profileId,
-      });
-
-      const field = queryResponse.profile.properties!.find(
-        (p) => p.field.id === params.profileTypeFieldId,
-      )?.field;
-
-      if (!field) {
-        throw new ForbiddenError("You don't have access to this profile field");
-      }
-
-      if (field.type === "FILE") {
-        await client.request(DeleteProfileFieldValue_deleteProfileFieldFileDocument, {
-          profileId: params.profileId,
-          profileTypeFieldId: params.profileTypeFieldId,
-        });
-      } else {
-        await client.request(DeleteProfileFieldValue_updateProfileFieldValueDocument, {
-          profileId: params.profileId,
-          fields: [{ profileTypeFieldId: params.profileTypeFieldId, content: null }],
-        });
-      }
-
-      return NoContent();
-    },
-  )
-  .put(
-    {
-      operationId: "UpdateProfileFieldValue",
-      summary: "Submit values",
-      description: outdent`
-      Creates or updates a value of a profile field.
-      The profile has to be in \`OPEN\` status.
-      `,
-      tags: ["Profiles"],
-      middleware: anyFileUploadMiddleware(),
-      body: FormDataBody(UpdateProfileFieldValueFormDataBody, {
-        description:
-          "The request must be a `multipart/form-data` request containing the value or file(s) to upload.",
-      }),
-      responses: {
-        200: SuccessResponse(Profile),
-        403: ErrorResponse({ description: "You don't have access to this resource" }),
-      },
-    },
-    async ({ client, params, body }) => {
-      const _query = gql`
-        query UpdateProfileFieldValue_profile(
-          $profileId: GID!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          profile(profileId: $profileId) {
-            ...Profile
-          }
-        }
-        ${ProfileFragment}
-      `;
-
-      const _mutations = [
-        gql`
-          mutation UpdateProfileFieldValue_updateProfileFieldValue(
-            $profileId: GID!
-            $fields: [UpdateProfileFieldValueInput!]!
-          ) {
-            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-              id
-            }
-          }
-        `,
-        gql`
-          mutation UpdateProfileFieldValue_createProfileFieldFileUploadLink(
-            $profileId: GID!
-            $profileTypeFieldId: GID!
-            $data: [FileUploadInput!]!
-            $expiryDate: Date
-          ) {
-            createProfileFieldFileUploadLink(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              data: $data
-              expiryDate: $expiryDate
+          `,
+          gql`
+            mutation CreateProfileFieldValue_createProfileFieldFileUploadLink(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $data: [FileUploadInput!]!
             ) {
-              uploads {
-                file {
-                  id
-                }
-                presignedPostData {
-                  fields
-                  url
+              createProfileFieldFileUploadLink(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                data: $data
+              ) {
+                uploads {
+                  file {
+                    id
+                  }
+                  presignedPostData {
+                    fields
+                    url
+                  }
                 }
               }
             }
-          }
-        `,
-        gql`
-          mutation UpdateProfileFieldValue_profileFieldFileUploadComplete(
-            $profileId: GID!
-            $profileTypeFieldId: GID!
-            $profileFieldFileIds: [GID!]!
-          ) {
-            profileFieldFileUploadComplete(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              profileFieldFileIds: $profileFieldFileIds
+          `,
+          gql`
+            mutation CreateProfileFieldValue_profileFieldFileUploadComplete(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $profileFieldFileIds: [GID!]!
             ) {
-              id
+              profileFieldFileUploadComplete(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                profileFieldFileIds: $profileFieldFileIds
+              ) {
+                id
+              }
+            }
+          `,
+        ];
+
+        const queryResponse = await client.request(CreateProfileFieldValue_profileDocument, {
+          profileId: params.profileId,
+          ...getProfileIncludesFromQuery({ include: ["fields"] }),
+        });
+        const profileFields = queryResponse.profile.properties!.map((p) => p.field);
+
+        const simpleTextUpdateFields: UpdateProfileFieldValueInput[] = [];
+        const fileUpdateFields: { profileTypeFieldId: string; files: Express.Multer.File[] }[] = [];
+
+        for (const [alias, value] of Object.entries(body)) {
+          const field = profileFields.find((f) => f.alias === alias);
+          if (field && value !== undefined) {
+            if (field.type === "FILE") {
+              if (typeof value !== "object") {
+                throw new BadRequestError(
+                  `Invalid value for field ${field.alias}. Expected an array of files.`,
+                );
+              }
+              fileUpdateFields.push({
+                profileTypeFieldId: field.id,
+                files: value as Express.Multer.File[],
+              });
+            } else {
+              if (typeof value !== "string") {
+                throw new BadRequestError(
+                  `Invalid value for field ${field.alias}. Expected a string.`,
+                );
+              }
+              simpleTextUpdateFields.push({ profileTypeFieldId: field.id, content: { value } });
             }
           }
-        `,
-      ];
-
-      const queryResponse = await client.request(UpdateProfileFieldValue_profileDocument, {
-        profileId: params.profileId,
-        includeFields: true,
-        includeFieldsByAlias: false,
-        includeSubscribers: false,
-      });
-
-      const field = queryResponse.profile.properties!.find(
-        (p) => p.field.id === params.profileTypeFieldId,
-      )?.field;
-
-      if (!isDefined(field)) {
-        throw new ForbiddenError("You don't have access to this profile field");
-      }
-
-      if (field.type === "FILE") {
-        if (typeof body.value !== "object") {
-          throw new BadRequestError(`Invalid value for field. Expected an array of files.`);
-        }
-        const createUploadLinkResponse = await client.request(
-          UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
-          {
-            profileId: params.profileId,
-            profileTypeFieldId: params.profileTypeFieldId,
-            data: (body.value as Express.Multer.File[]).map((file) => ({
-              filename: file.originalname,
-              contentType: file.mimetype,
-              size: file.size,
-            })),
-            expiryDate: body.expiryDate,
-          },
-        );
-
-        for (const [file, uploadData] of zip(
-          body.value as Express.Multer.File[],
-          createUploadLinkResponse.createProfileFieldFileUploadLink.uploads,
-        )) {
-          await uploadFile(file, uploadData.presignedPostData);
-        }
-
-        await client.request(UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
-          profileId: params.profileId,
-          profileTypeFieldId: params.profileTypeFieldId,
-          profileFieldFileIds:
-            createUploadLinkResponse.createProfileFieldFileUploadLink.uploads.map(
-              (upload) => upload.file.id,
-            ),
-        });
-      } else {
-        if (typeof body.value === "object") {
-          throw new BadRequestError(`Invalid value for field. Expected a string.`);
         }
 
         try {
-          await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
+          if (simpleTextUpdateFields.length > 0) {
+            await client.request(CreateProfileFieldValue_updateProfileFieldValueDocument, {
+              profileId: params.profileId,
+              fields: simpleTextUpdateFields,
+            });
+          }
+
+          if (fileUpdateFields.length > 0) {
+            for (const fileUpdate of fileUpdateFields) {
+              const fileUpdateResponse = await client.request(
+                CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+                {
+                  profileId: params.profileId,
+                  profileTypeFieldId: fileUpdate.profileTypeFieldId,
+                  data: fileUpdate.files.map((file) => ({
+                    filename: file.filename,
+                    contentType: file.mimetype,
+                    size: file.size,
+                  })),
+                },
+              );
+              for (const [file, presignedPostData] of zip(
+                fileUpdate.files,
+                fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
+                  (u) => u.presignedPostData,
+                ),
+              )) {
+                await uploadFile(file, presignedPostData);
+              }
+
+              await client.request(CreateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
+                profileId: params.profileId,
+                profileTypeFieldId: fileUpdate.profileTypeFieldId,
+                profileFieldFileIds:
+                  fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map((u) => u.file.id),
+              });
+            }
+          }
+
+          const response = await client.request(CreateProfileFieldValue_profileDocument, {
             profileId: params.profileId,
-            fields: [
-              {
-                profileTypeFieldId: params.profileTypeFieldId,
-                content: { value: body.value },
-                expiryDate: body.expiryDate,
-              },
-            ],
+            ...getProfileIncludesFromQuery({ include: ["fieldsByAlias"] }),
           });
+
+          assert("id" in response.profile);
+          return Ok(mapProfile(response.profile));
         } catch (error) {
           if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
             throw new BadRequestError(
@@ -4190,254 +3974,507 @@ api
           }
           throw error;
         }
-      }
+      },
+    );
 
-      const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {
-        profileId: params.profileId,
-        ...getProfileIncludesFromQuery({ include: ["fields"] }),
-      });
-
-      assert("id" in profileQuery.profile);
-      return Ok(mapProfile(profileQuery.profile));
-    },
-  );
-
-api
-  .path("/profiles/:profileId/subscribers", { params: { profileId } })
-  .get(
-    {
-      operationId: "GetProfileSubscribers",
-      summary: "List profile subscribers",
-      description: "Returns a list with all the users subscribed to the specified profile",
-      tags: ["Profiles"],
-      responses: { 200: SuccessResponse(ListOfProfileSubscriptions) },
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query GetProfileSubscribers_profile($profileId: GID!) {
-          profile(profileId: $profileId) {
-            subscribers {
-              user {
-                ...User
+  api
+    .path("/profiles/:profileId/fields/:profileTypeFieldId", {
+      params: { profileId, profileTypeFieldId },
+    })
+    .delete(
+      {
+        operationId: "DeleteProfileFieldValue",
+        summary: "Remove a value on the profile field",
+        description: outdent`
+      Removes a value on the profile field.
+      If the field is of type \`FILE\`, the related files will be deleted.
+      The profile has to be in \`OPEN\` status.
+    `,
+        tags: ["Profiles"],
+        responses: { 200: SuccessResponse() },
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query DeleteProfileFieldValue_profile($profileId: GID!) {
+            profile(profileId: $profileId) {
+              properties {
+                field {
+                  id
+                  type
+                }
               }
             }
           }
+        `;
+
+        const _mutations = [
+          gql`
+            mutation DeleteProfileFieldValue_updateProfileFieldValue(
+              $profileId: GID!
+              $fields: [UpdateProfileFieldValueInput!]!
+            ) {
+              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+                id
+              }
+            }
+          `,
+          gql`
+            mutation DeleteProfileFieldValue_deleteProfileFieldFile(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+            ) {
+              deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+            }
+          `,
+        ];
+
+        const queryResponse = await client.request(DeleteProfileFieldValue_profileDocument, {
+          profileId: params.profileId,
+        });
+
+        const field = queryResponse.profile.properties!.find(
+          (p) => p.field.id === params.profileTypeFieldId,
+        )?.field;
+
+        if (!field) {
+          throw new ForbiddenError("You don't have access to this profile field");
         }
-        ${UserFragment}
-      `;
 
-      const result = await client.request(GetProfileSubscribers_profileDocument, {
-        profileId: params.profileId,
-      });
+        if (field.type === "FILE") {
+          await client.request(DeleteProfileFieldValue_deleteProfileFieldFileDocument, {
+            profileId: params.profileId,
+            profileTypeFieldId: params.profileTypeFieldId,
+          });
+        } else {
+          await client.request(DeleteProfileFieldValue_updateProfileFieldValueDocument, {
+            profileId: params.profileId,
+            fields: [{ profileTypeFieldId: params.profileTypeFieldId, content: null }],
+          });
+        }
 
-      return Ok(result.profile.subscribers);
-    },
-  )
-  .post(
-    {
-      operationId: "SubscribeToProfile",
-      summary: "Subscribe to a profile",
-      description: "Subscribes a user to the specified profile",
-      tags: ["Profiles"],
-      body: JsonBody(ProfileSubscriptionInput(true)),
-      query: profileIncludeParam,
-      responses: {
-        201: SuccessResponse(Profile),
+        return NoContent();
       },
-    },
-    async ({ client, params, body, query }) => {
-      const _mutation = gql`
-        mutation SubscribeToProfile_subscribeToProfile(
-          $profileId: GID!
-          $userIds: [GID!]!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
-            ...Profile
+    )
+    .put(
+      {
+        operationId: "UpdateProfileFieldValue",
+        summary: "Submit values",
+        description: outdent`
+      Creates or updates a value of a profile field.
+      The profile has to be in \`OPEN\` status.
+      `,
+        tags: ["Profiles"],
+        middleware: anyFileUploadMiddleware(),
+        body: FormDataBody(UpdateProfileFieldValueFormDataBody, {
+          description:
+            "The request must be a `multipart/form-data` request containing the value or file(s) to upload.",
+        }),
+        responses: {
+          200: SuccessResponse(Profile),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+      },
+      async ({ client, params, body }) => {
+        const _query = gql`
+          query UpdateProfileFieldValue_profile(
+            $profileId: GID!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            profile(profileId: $profileId) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `;
+
+        const _mutations = [
+          gql`
+            mutation UpdateProfileFieldValue_updateProfileFieldValue(
+              $profileId: GID!
+              $fields: [UpdateProfileFieldValueInput!]!
+            ) {
+              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+                id
+              }
+            }
+          `,
+          gql`
+            mutation UpdateProfileFieldValue_createProfileFieldFileUploadLink(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $data: [FileUploadInput!]!
+              $expiryDate: Date
+            ) {
+              createProfileFieldFileUploadLink(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                data: $data
+                expiryDate: $expiryDate
+              ) {
+                uploads {
+                  file {
+                    id
+                  }
+                  presignedPostData {
+                    fields
+                    url
+                  }
+                }
+              }
+            }
+          `,
+          gql`
+            mutation UpdateProfileFieldValue_profileFieldFileUploadComplete(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $profileFieldFileIds: [GID!]!
+            ) {
+              profileFieldFileUploadComplete(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                profileFieldFileIds: $profileFieldFileIds
+              ) {
+                id
+              }
+            }
+          `,
+        ];
+
+        const queryResponse = await client.request(UpdateProfileFieldValue_profileDocument, {
+          profileId: params.profileId,
+          includeFields: true,
+          includeFieldsByAlias: false,
+          includeSubscribers: false,
+        });
+
+        const field = queryResponse.profile.properties!.find(
+          (p) => p.field.id === params.profileTypeFieldId,
+        )?.field;
+
+        if (!isDefined(field)) {
+          throw new ForbiddenError("You don't have access to this profile field");
+        }
+
+        if (field.type === "FILE") {
+          if (typeof body.value !== "object") {
+            throw new BadRequestError(`Invalid value for field. Expected an array of files.`);
+          }
+          const createUploadLinkResponse = await client.request(
+            UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+            {
+              profileId: params.profileId,
+              profileTypeFieldId: params.profileTypeFieldId,
+              data: (body.value as Express.Multer.File[]).map((file) => ({
+                filename: file.originalname,
+                contentType: file.mimetype,
+                size: file.size,
+              })),
+              expiryDate: body.expiryDate,
+            },
+          );
+
+          for (const [file, uploadData] of zip(
+            body.value as Express.Multer.File[],
+            createUploadLinkResponse.createProfileFieldFileUploadLink.uploads,
+          )) {
+            await uploadFile(file, uploadData.presignedPostData);
+          }
+
+          await client.request(UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
+            profileId: params.profileId,
+            profileTypeFieldId: params.profileTypeFieldId,
+            profileFieldFileIds:
+              createUploadLinkResponse.createProfileFieldFileUploadLink.uploads.map(
+                (upload) => upload.file.id,
+              ),
+          });
+        } else {
+          if (typeof body.value === "object") {
+            throw new BadRequestError(`Invalid value for field. Expected a string.`);
+          }
+
+          try {
+            await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
+              profileId: params.profileId,
+              fields: [
+                {
+                  profileTypeFieldId: params.profileTypeFieldId,
+                  content: { value: body.value },
+                  expiryDate: body.expiryDate,
+                },
+              ],
+            });
+          } catch (error) {
+            if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+              throw new BadRequestError(
+                error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
+              );
+            }
+            throw error;
           }
         }
-        ${ProfileFragment}
-      `;
-      const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
-        profileId: params.profileId,
-        userIds: body.userIds,
-        ...getProfileIncludesFromQuery(query),
-      });
 
-      assert(response.subscribeToProfile.length === 1);
-      assert("id" in response.subscribeToProfile[0]);
+        const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {
+          profileId: params.profileId,
+          ...getProfileIncludesFromQuery({ include: ["fields"] }),
+        });
 
-      return Created(mapProfile(response.subscribeToProfile[0]));
-    },
-  )
-  .delete(
-    {
-      operationId: "UnsubscribeFromProfile",
-      summary: "Unsubscribe from a profile",
-      description: "Unsubscribes a user from the specified profile",
-      tags: ["Profiles"],
-      query: profileIncludeParam,
-      body: JsonBody(ProfileSubscriptionInput(false)),
-      responses: {
-        200: SuccessResponse(Profile),
+        assert("id" in profileQuery.profile);
+        return Ok(mapProfile(profileQuery.profile));
       },
+    );
+
+  api
+    .path("/profiles/:profileId/subscribers", { params: { profileId } })
+    .get(
+      {
+        operationId: "GetProfileSubscribers",
+        summary: "List profile subscribers",
+        description: "Returns a list with all the users subscribed to the specified profile",
+        tags: ["Profiles"],
+        responses: { 200: SuccessResponse(ListOfProfileSubscriptions) },
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query GetProfileSubscribers_profile($profileId: GID!) {
+            profile(profileId: $profileId) {
+              subscribers {
+                user {
+                  ...User
+                }
+              }
+            }
+          }
+          ${UserFragment}
+        `;
+
+        const result = await client.request(GetProfileSubscribers_profileDocument, {
+          profileId: params.profileId,
+        });
+
+        return Ok(result.profile.subscribers);
+      },
+    )
+    .post(
+      {
+        operationId: "SubscribeToProfile",
+        summary: "Subscribe to a profile",
+        description: "Subscribes a user to the specified profile",
+        tags: ["Profiles"],
+        body: JsonBody(ProfileSubscriptionInput(true)),
+        query: profileIncludeParam,
+        responses: {
+          201: SuccessResponse(Profile),
+        },
+      },
+      async ({ client, params, body, query }) => {
+        const _mutation = gql`
+          mutation SubscribeToProfile_subscribeToProfile(
+            $profileId: GID!
+            $userIds: [GID!]!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `;
+        const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
+          profileId: params.profileId,
+          userIds: body.userIds,
+          ...getProfileIncludesFromQuery(query),
+        });
+
+        assert(response.subscribeToProfile.length === 1);
+        assert("id" in response.subscribeToProfile[0]);
+
+        return Created(mapProfile(response.subscribeToProfile[0]));
+      },
+    )
+    .delete(
+      {
+        operationId: "UnsubscribeFromProfile",
+        summary: "Unsubscribe from a profile",
+        description: "Unsubscribes a user from the specified profile",
+        tags: ["Profiles"],
+        query: profileIncludeParam,
+        body: JsonBody(ProfileSubscriptionInput(false)),
+        responses: {
+          200: SuccessResponse(Profile),
+        },
+      },
+      async ({ client, params, query, body }) => {
+        const _mutation = gql`
+          mutation UnsubscribeFromProfile_unsubscribeFromProfile(
+            $profileId: GID!
+            $userIds: [GID!]!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `;
+
+        const response = await client.request(
+          UnsubscribeFromProfile_unsubscribeFromProfileDocument,
+          {
+            profileId: params.profileId,
+            userIds: body.userIds,
+            ...getProfileIncludesFromQuery(query),
+          },
+        );
+
+        assert(response.unsubscribeFromProfile.length === 1);
+        assert("id" in response.unsubscribeFromProfile[0]);
+
+        return Ok(mapProfile(response.unsubscribeFromProfile[0]));
+      },
+    );
+
+  api.path("/templates/:templateId/send", { params: { templateId } }).post(
+    {
+      // this endpoint is for Parc Taulí use case, don't expose it in the API docs
+      excludeFromSpec: true,
+      middleware: singleFileUploadMiddleware("file"),
+      body: FormDataBody({ type: "object", format: "binary" }),
     },
-    async ({ client, params, query, body }) => {
-      const _mutation = gql`
-        mutation UnsubscribeFromProfile_unsubscribeFromProfile(
-          $profileId: GID!
-          $userIds: [GID!]!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
+    async ({ client, params, files }) => {
+      const _mutations = gql`
+        mutation BulkSendTemplate_createBulkPetitionSendTask(
+          $templateId: GID!
+          $temporaryFileId: GID!
         ) {
-          unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
-            ...Profile
+          createBulkPetitionSendTask(templateId: $templateId, temporaryFileId: $temporaryFileId) {
+            ...Task
           }
         }
-        ${ProfileFragment}
+        ${TaskFragment}
+
+        mutation BulkSendTemplate_uploadBulkPetitionSendTaskInputFile($file: FileUploadInput!) {
+          uploadBulkPetitionSendTaskInputFile(file: $file)
+        }
       `;
+      const file = files?.["file"]?.[0];
+      if (!file) {
+        throw new BadRequestError("Input file is missing");
+      }
 
-      const response = await client.request(UnsubscribeFromProfile_unsubscribeFromProfileDocument, {
-        profileId: params.profileId,
-        userIds: body.userIds,
-        ...getProfileIncludesFromQuery(query),
-      });
+      try {
+        const fileUpload = await client.request(
+          BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
+          { file: { contentType: file.mimetype, filename: file.originalname, size: file.size } },
+        );
 
-      assert(response.unsubscribeFromProfile.length === 1);
-      assert("id" in response.unsubscribeFromProfile[0]);
+        const { temporaryFileId, presignedPostData } =
+          fileUpload.uploadBulkPetitionSendTaskInputFile;
 
-      return Ok(mapProfile(response.unsubscribeFromProfile[0]));
+        await uploadFile(file, presignedPostData);
+
+        const result = await client.request(BulkSendTemplate_createBulkPetitionSendTaskDocument, {
+          templateId: params.templateId,
+          temporaryFileId: temporaryFileId,
+        });
+
+        return Ok({ taskId: result.createBulkPetitionSendTask.id });
+      } catch (error) {
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
+            error_code: string;
+          };
+          if (errorCode === "INVALID_CONTENT_TYPE_ERROR") {
+            throw new BadRequestError(`File must be a CSV file`);
+          }
+          if (errorCode === "FILE_SIZE_EXCEEDED_ERROR") {
+            throw new BadRequestError(`File size exceeded`);
+          }
+        }
+        throw error;
+      }
     },
   );
 
-api.path("/templates/:templateId/send", { params: { templateId } }).post(
-  {
-    // this endpoint is for Parc Taulí use case, don't expose it in the API docs
-    excludeFromSpec: true,
-    middleware: singleFileUploadMiddleware("file"),
-    body: FormDataBody({ type: "object", format: "binary" }),
-  },
-  async ({ client, params, files }) => {
-    const _mutations = gql`
-      mutation BulkSendTemplate_createBulkPetitionSendTask(
-        $templateId: GID!
-        $temporaryFileId: GID!
-      ) {
-        createBulkPetitionSendTask(templateId: $templateId, temporaryFileId: $temporaryFileId) {
-          ...Task
+  api
+    .path("/templates/:templateId/export", { params: { templateId } })
+    .get({ excludeFromSpec: true }, async ({ client, params }) => {
+      const _mutation = gql`
+        mutation ExportTemplate_createTemplateRepliesCsvExportTask($templateId: GID!) {
+          createTemplateRepliesCsvExportTask(templateId: $templateId) {
+            ...Task
+          }
         }
-      }
-      ${TaskFragment}
+        ${TaskFragment}
+      `;
 
-      mutation BulkSendTemplate_uploadBulkPetitionSendTaskInputFile($file: FileUploadInput!) {
-        uploadBulkPetitionSendTaskInputFile(file: $file)
-      }
-    `;
-    const file = files?.["file"]?.[0];
-    if (!file) {
-      throw new BadRequestError("Input file is missing");
-    }
-
-    try {
-      const fileUpload = await client.request(
-        BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
-        { file: { contentType: file.mimetype, filename: file.originalname, size: file.size } },
+      const result = await client.request(
+        ExportTemplate_createTemplateRepliesCsvExportTaskDocument,
+        {
+          templateId: params.templateId,
+        },
       );
 
-      const { temporaryFileId, presignedPostData } = fileUpload.uploadBulkPetitionSendTaskInputFile;
-
-      await uploadFile(file, presignedPostData);
-
-      const result = await client.request(BulkSendTemplate_createBulkPetitionSendTaskDocument, {
-        templateId: params.templateId,
-        temporaryFileId: temporaryFileId,
-      });
-
-      return Ok({ taskId: result.createBulkPetitionSendTask.id });
-    } catch (error) {
-      if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-        const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
-          error_code: string;
-        };
-        if (errorCode === "INVALID_CONTENT_TYPE_ERROR") {
-          throw new BadRequestError(`File must be a CSV file`);
-        }
-        if (errorCode === "FILE_SIZE_EXCEEDED_ERROR") {
-          throw new BadRequestError(`File size exceeded`);
-        }
-      }
-      throw error;
-    }
-  },
-);
-
-api
-  .path("/templates/:templateId/export", { params: { templateId } })
-  .get({ excludeFromSpec: true }, async ({ client, params }) => {
-    const _mutation = gql`
-      mutation ExportTemplate_createTemplateRepliesCsvExportTask($templateId: GID!) {
-        createTemplateRepliesCsvExportTask(templateId: $templateId) {
-          ...Task
-        }
-      }
-      ${TaskFragment}
-    `;
-
-    const result = await client.request(ExportTemplate_createTemplateRepliesCsvExportTaskDocument, {
-      templateId: params.templateId,
+      return Ok({ taskId: result.createTemplateRepliesCsvExportTask.id });
     });
 
-    return Ok({ taskId: result.createTemplateRepliesCsvExportTask.id });
-  });
-
-api
-  .path("/tasks/:taskId/status", { params: { taskId: idParam({ type: "Task" }) } })
-  .get({ excludeFromSpec: true }, async ({ client, params }) => {
-    const _query = gql`
-      query Task_TaskStatus($taskId: GID!) {
-        task(id: $taskId) {
-          id
-          name
-          progress
-          status
-          output
+  api
+    .path("/tasks/:taskId/status", { params: { taskId: idParam({ type: "Task" }) } })
+    .get({ excludeFromSpec: true }, async ({ client, params }) => {
+      const _query = gql`
+        query Task_TaskStatus($taskId: GID!) {
+          task(id: $taskId) {
+            id
+            name
+            progress
+            status
+            output
+          }
         }
-      }
-    `;
+      `;
 
-    const _mutation = gql`
-      mutation Task_getTaskResultFile($taskId: GID!, $preview: Boolean) {
-        getTaskResultFile(taskId: $taskId, preview: $preview) {
-          url
+      const _mutation = gql`
+        mutation Task_getTaskResultFile($taskId: GID!, $preview: Boolean) {
+          getTaskResultFile(taskId: $taskId, preview: $preview) {
+            url
+          }
         }
-      }
-    `;
-    const result = await client.request(Task_TaskStatusDocument, {
-      taskId: params.taskId,
-      preview: true,
-    });
-
-    // for file exports, we return the file URL instead of task output
-    if (result.task.status === "COMPLETED" && result.task.name === "TEMPLATE_REPLIES_CSV_EXPORT") {
-      const fileResult = await client.request(Task_getTaskResultFileDocument, {
+      `;
+      const result = await client.request(Task_TaskStatusDocument, {
         taskId: params.taskId,
+        preview: true,
       });
+
+      // for file exports, we return the file URL instead of task output
+      if (
+        result.task.status === "COMPLETED" &&
+        result.task.name === "TEMPLATE_REPLIES_CSV_EXPORT"
+      ) {
+        const fileResult = await client.request(Task_getTaskResultFileDocument, {
+          taskId: params.taskId,
+        });
+
+        return Ok({
+          id: result.task.id,
+          status: result.task.status,
+          progress: (result.task.progress ?? 0) / 100,
+          output: pick(fileResult.getTaskResultFile, ["url"]),
+        });
+      }
 
       return Ok({
         id: result.task.id,
         status: result.task.status,
         progress: (result.task.progress ?? 0) / 100,
-        output: pick(fileResult.getTaskResultFile, ["url"]),
+        output: result.task.output,
       });
-    }
-
-    return Ok({
-      id: result.task.id,
-      status: result.task.status,
-      progress: (result.task.progress ?? 0) / 100,
-      output: result.task.output,
     });
-  });
+
+  return api;
+}
