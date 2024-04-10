@@ -230,13 +230,20 @@ export const ProfileForm = Object.assign(
                         }
                         return null;
                       } else {
+                        const _content =
+                          prop?.field.type === "DATE"
+                            ? { value: content?.value || null }
+                            : isDefined(content?.value)
+                              ? content
+                              : null;
+
                         return {
                           profileTypeFieldId,
-                          content: isDefined(content?.value) ? content : null,
+                          content: _content,
                           expiryDate:
                             content?.value && prop?.field.isExpirable
                               ? useValueAsExpiryDate
-                                ? content?.value ?? null
+                                ? content?.value || null
                                 : expiryDate || null
                               : undefined,
                         };
@@ -361,6 +368,19 @@ export const ProfileForm = Object.assign(
                   }),
                 }),
               );
+            } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
+              const aggregatedErrors =
+                (e.graphQLErrors[0].extensions.aggregatedErrors as {
+                  profileTypeFieldId: string;
+                  code: string;
+                }[]) ?? [];
+
+              for (const err of aggregatedErrors) {
+                const index = fields.findIndex(
+                  (f) => f.profileTypeFieldId === err.profileTypeFieldId,
+                );
+                setError(`fields.${index}.content.value`, { type: "validate" });
+              }
             } else {
               throw e;
             }

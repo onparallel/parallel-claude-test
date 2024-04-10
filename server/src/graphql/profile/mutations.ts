@@ -1002,6 +1002,8 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
 
+    const aggregatedErrors: { profileTypeFieldId: string; code: string; message: string }[] = [];
+
     const fieldsWithZonedExpires = await pMap(
       fields,
       async (field) => {
@@ -1016,10 +1018,11 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
             await validateProfileFieldValue(profileTypeField, field.content);
           } catch (e) {
             if (e instanceof Error) {
-              throw new ApolloError(
-                `Invalid profile field value: ${e.message}`,
-                "INVALID_PROFILE_FIELD_VALUE",
-              );
+              aggregatedErrors.push({
+                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
+                code: "INVALID_PROFILE_FIELD_VALUE",
+                message: `Invalid profile field value: ${e.message}`,
+              });
             }
           }
         }
@@ -1063,6 +1066,12 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       },
       { concurrency: 1 },
     );
+
+    if (aggregatedErrors.length > 0) {
+      throw new ApolloError("Invalid profile field value", "INVALID_PROFILE_FIELD_VALUE", {
+        aggregatedErrors,
+      });
+    }
 
     const {
       profile: updatedProfile,
