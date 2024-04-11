@@ -1,6 +1,9 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
-import { flatten, groupBy, isDefined, mapValues, pipe } from "remeda";
+import pMap from "p-map";
+import { filter, flatten, groupBy, indexBy, isDefined, mapValues, pipe } from "remeda";
+import { UserLocale } from "../db/__types";
+import { PetitionFieldOptions, selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
@@ -50,14 +53,33 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       args.petitionId ? this.petitions.loadFieldsForPetition(args.petitionId) : null,
     ]);
 
-    const validFields =
-      fields?.filter(
+    const fieldsById = pipe(
+      fields!,
+      filter(
         (f) =>
           !["HEADING", "FIELD_GROUP"].includes(f.type) && !isFileTypeField(f.type) && f.is_internal,
-      ) ?? [];
+      ),
+      indexBy((f) => f.id),
+    );
 
-    const replies = pipe(
-      await this.petitions.loadRepliesForField(validFields.map((f) => f.id)),
+    const intl = await this.i18n.getIntl(petition!.recipient_locale);
+    const valuesAndLabelsByFieldId = Object.fromEntries(
+      await pMap(
+        fields!.filter((f) => f.type === "SELECT"),
+        async (f) =>
+          [
+            f.id,
+            await selectOptionsValuesAndLabels(
+              f.options as PetitionFieldOptions["SELECT"],
+              intl.locale as UserLocale,
+            ),
+          ] as const,
+        { concurrency: 1 },
+      ),
+    );
+
+    const repliesByFieldId = pipe(
+      await this.petitions.loadRepliesForField(Object.keys(fieldsById).map((id) => parseInt(id))),
       flatten(),
       groupBy((r) => r.petition_field_id),
       mapValues((replies) => replies?.[0]),
@@ -71,20 +93,39 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
           )
         : null;
 
-    const intl = await this.i18n.getIntl(petition!.recipient_locale);
-
     return (key: string) => {
       if (isGlobalId(key, "PetitionField")) {
         const id = fromGlobalId(key, "PetitionField").id;
-        const reply = replies[id];
+        const field = fieldsById[id];
+        const reply = repliesByFieldId[id];
         if (!isDefined(reply)) {
           return "";
         } else {
           switch (reply.type) {
             case "NUMBER":
               return intl.formatNumber(reply.content.value as number);
-            case "CHECKBOX":
-              return intl.formatList(reply.content.value as string[]);
+            case "CHECKBOX": {
+              const { values, labels } = field.options as PetitionFieldOptions["CHECKBOX"];
+              return intl.formatList(
+                (reply.content.value as string[]).map((value) => {
+                  const index = values.indexOf(value);
+                  return index >= 0
+                    ? isDefined(labels)
+                      ? labels[index]
+                      : values[index]
+                    : reply.content.value;
+                }),
+              );
+            }
+            case "SELECT": {
+              const { values, labels } = valuesAndLabelsByFieldId[field.id];
+              const index = values.indexOf(reply.content.value);
+              return index >= 0
+                ? isDefined(labels)
+                  ? labels[index]
+                  : values[index]
+                : reply.content.value;
+            }
             case "PHONE":
               return formatPhoneNumber(reply.content.value as string, "INTERNATIONAL");
             case "DATE":
@@ -101,7 +142,6 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
               );
             case "TEXT":
             case "SHORT_TEXT":
-            case "SELECT":
               return reply.content.value;
             default:
               throw new Error(
