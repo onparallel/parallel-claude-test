@@ -59,6 +59,7 @@ export function PetitionComposeFieldGroupSettings({
         <Input
           value={groupName}
           maxWidth="260px"
+          width="auto"
           size="sm"
           onChange={handleGroupNameChange}
           placeholder={intl.formatMessage({

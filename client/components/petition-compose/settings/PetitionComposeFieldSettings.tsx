@@ -260,7 +260,7 @@ export const PetitionComposeFieldSettings = Object.assign(
               </SettingsRowGroup>
             ) : null}
 
-            {isFieldGroupChild ||
+            {(isFieldGroupChild && !isFileTypeField(field.type)) ||
             field.type === "DOW_JONES_KYC" ||
             field.type === "BACKGROUND_CHECK" ||
             !petition.isDocumentGenerationEnabled ? null : (
@@ -280,7 +280,9 @@ export const PetitionComposeFieldSettings = Object.assign(
                     onChange={handleFieldEdit}
                   />
                 )}
-                {showInPdf && isReplyable ? (
+                {showInPdf &&
+                (field.type === "FIELD_GROUP" || isReplyable) &&
+                !isFieldGroupChild ? (
                   <ShowReplyActivitySettingsRow
                     isDisabled={isReadOnly}
                     isChecked={field.showActivityInPdf}

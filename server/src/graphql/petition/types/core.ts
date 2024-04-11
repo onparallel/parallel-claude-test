@@ -685,8 +685,7 @@ export const PetitionField = objectType({
     t.boolean("showActivityInPdf", {
       description: "Determines if the field last activity is visible in PDF export.",
       resolve: (o) =>
-        !["DOW_JONES_KYC", "BACKGROUND_CHECK", "FIELD_GROUP"].includes(o.type) &&
-        o.show_activity_in_pdf,
+        !["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) && o.show_activity_in_pdf,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",

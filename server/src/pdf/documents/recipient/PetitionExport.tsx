@@ -480,7 +480,9 @@ function PetitionExportField({
                 ) : (
                   <Text style={[styles.text]}>{reply.content.value}</Text>
                 )}
-                {isPetition && field.showActivityInPdf ? (
+                {isPetition &&
+                ((isDefined(field.parent) && field.parent.showActivityInPdf) ||
+                  (field.showActivityInPdf && field.type !== "FIELD_GROUP")) ? (
                   <FieldActivity reply={reply} style={styles.text} />
                 ) : null}
               </View>
@@ -674,6 +676,10 @@ PetitionExport.fragments = {
     return gql`
       fragment PetitionExport_PetitionField on PetitionField {
         ...PetitionExport_PetitionFieldInner
+        parent {
+          id
+          showActivityInPdf
+        }
         children {
           ...PetitionExport_PetitionFieldInner
           parent {

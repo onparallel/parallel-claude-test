@@ -5782,6 +5782,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
           math: Array<{ [key: string]: any }> | null;
+          parent: { id: string; showActivityInPdf: boolean } | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -5833,6 +5834,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       lastReviewedBy: { id: string; fullName: string | null } | null;
       field: { requireApproval: boolean } | null;
     }>;
+    parent: { id: string; showActivityInPdf: boolean } | null;
     children: Array<{
       id: string;
       type: PetitionFieldType;
@@ -5904,6 +5906,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
           math: Array<{ [key: string]: any }> | null;
+          parent: { id: string; showActivityInPdf: boolean } | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -5955,6 +5958,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       lastReviewedBy: { id: string; fullName: string | null } | null;
       field: { requireApproval: boolean } | null;
     }>;
+    parent: { id: string; showActivityInPdf: boolean } | null;
     children: Array<{
       id: string;
       type: PetitionFieldType;
@@ -6031,6 +6035,7 @@ export type PetitionExport_PetitionFieldFragment = {
   showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
   math: Array<{ [key: string]: any }> | null;
+  parent: { id: string; showActivityInPdf: boolean } | null;
   children: Array<{
     id: string;
     type: PetitionFieldType;
@@ -6079,6 +6084,7 @@ export type PetitionExport_PetitionFieldReplyFragment = {
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
+      parent: { id: string; showActivityInPdf: boolean } | null;
       children: Array<{
         id: string;
         type: PetitionFieldType;
@@ -6181,6 +6187,7 @@ export type PetitionExport_petitionQuery = {
                 showActivityInPdf: boolean;
                 visibility: { [key: string]: any } | null;
                 math: Array<{ [key: string]: any }> | null;
+                parent: { id: string; showActivityInPdf: boolean } | null;
                 children: Array<{
                   id: string;
                   type: PetitionFieldType;
@@ -6238,6 +6245,7 @@ export type PetitionExport_petitionQuery = {
             lastReviewedBy: { id: string; fullName: string | null } | null;
             field: { requireApproval: boolean } | null;
           }>;
+          parent: { id: string; showActivityInPdf: boolean } | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -6308,6 +6316,7 @@ export type PetitionExport_petitionQuery = {
                 showActivityInPdf: boolean;
                 visibility: { [key: string]: any } | null;
                 math: Array<{ [key: string]: any }> | null;
+                parent: { id: string; showActivityInPdf: boolean } | null;
                 children: Array<{
                   id: string;
                   type: PetitionFieldType;
@@ -6365,6 +6374,7 @@ export type PetitionExport_petitionQuery = {
             lastReviewedBy: { id: string; fullName: string | null } | null;
             field: { requireApproval: boolean } | null;
           }>;
+          parent: { id: string; showActivityInPdf: boolean } | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -6535,6 +6545,10 @@ export const PetitionExport_PetitionFieldReplyInnerFragmentDoc = gql`
 export const PetitionExport_PetitionFieldFragmentDoc = gql`
   fragment PetitionExport_PetitionField on PetitionField {
     ...PetitionExport_PetitionFieldInner
+    parent {
+      id
+      showActivityInPdf
+    }
     children {
       ...PetitionExport_PetitionFieldInner
       parent {
