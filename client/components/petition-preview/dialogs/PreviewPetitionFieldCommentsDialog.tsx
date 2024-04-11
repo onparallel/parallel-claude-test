@@ -187,9 +187,9 @@ export function PreviewPetitionFieldCommentsDialog({
           )}
         </ModalHeader>
         <Divider />
-        <ModalBody padding={0} minHeight="0">
+        <ModalBody padding={0} display="flex" minHeight="0">
           {loading && !comments.length ? (
-            <Center minHeight={44}>
+            <Center minHeight={44} width="100%">
               <Spinner
                 thickness="4px"
                 speed="0.65s"
@@ -206,6 +206,7 @@ export function PreviewPetitionFieldCommentsDialog({
               paddingY={8}
               justifyContent="center"
               alignItems="center"
+              width="100%"
             >
               {hasCommentsEnabled && !onlyReadPermission ? (
                 <>
@@ -249,12 +250,7 @@ export function PreviewPetitionFieldCommentsDialog({
               )}
             </Flex>
           ) : (
-            <Stack
-              spacing={0}
-              divider={<Divider />}
-              overflow="auto"
-              maxHeight="calc(100vh - 20rem)"
-            >
+            <Stack spacing={0} divider={<Divider />} overflow="auto" width="100%">
               {comments.map((comment) => (
                 <PetitionFieldComment
                   key={comment.id}

@@ -164,7 +164,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const pageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    pageRef.current!.scrollTop = 0;
+    if (pageRef.current) {
+      pageRef.current.scrollTop = 0;
+    }
   }, [currentPage]);
 
   const goToSection = useGoToPetitionSection();

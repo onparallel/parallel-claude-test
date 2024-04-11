@@ -164,9 +164,9 @@ export function RecipientViewPetitionFieldCommentsDialog({
           </ModalHeader>
         )}
         <Divider />
-        <ModalBody padding={0} display="flex" flexDirection="column-reverse" minHeight="0">
+        <ModalBody padding={0} display="flex" minHeight="0">
           {loading ? (
-            <Center minHeight={64}>
+            <Center minHeight={64} width="100%">
               <Spinner
                 thickness="4px"
                 speed="0.65s"
@@ -183,6 +183,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               justifyContent="center"
               alignItems="center"
               textAlign="center"
+              width="100%"
             >
               {field ? (
                 <>
@@ -216,7 +217,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               )}
             </Flex>
           ) : (
-            <Stack spacing={0} divider={<Divider />} overflow="auto">
+            <Stack spacing={0} divider={<Divider />} overflow="auto" width="100%">
               {comments.map((comment) => (
                 <PublicPetitionFieldComment
                   key={comment.id}
