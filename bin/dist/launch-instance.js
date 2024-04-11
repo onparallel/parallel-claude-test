@@ -150,8 +150,8 @@ async function main() {
         for (const alarm of [
             // CPU over 40% for 5 consecutive minutes
             { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 40.0 },
-            // CPU over 80% for 1 minute
-            { Period: 60, EvaluationPeriods: 1, DatapointsToAlarm: 1, Threshold: 80.0 },
+            // CPU over 85% for 1 minute
+            { Period: 60, EvaluationPeriods: 1, DatapointsToAlarm: 1, Threshold: 85.0 },
         ])
             await cw.send(new client_cloudwatch_1.PutMetricAlarmCommand({
                 AlarmName: `${name}-cpu-${alarm.DatapointsToAlarm}m`,
