@@ -23,7 +23,7 @@ export const AlertPopover = chakraForwardRef<"svg", AlertPopoverProps>(function 
     >
       <AlertCircleFilledIcon
         ref={ref}
-        marginLeft={2}
+        marginStart={2}
         color="yellow.500"
         _hover={{ color: "yellow.600" }}
         _focus={{

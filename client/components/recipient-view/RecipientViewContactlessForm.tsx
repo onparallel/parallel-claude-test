@@ -297,7 +297,7 @@ export function RecipientViewContactlessForm({
                     values={{ tone }}
                   />
                   <IconButton
-                    marginLeft={2}
+                    marginStart={2}
                     icon={<QuestionOutlineIcon />}
                     aria-label={intl.formatMessage({ id: "generic.help", defaultMessage: "Help" })}
                     onClick={handleHelpClick}
@@ -492,13 +492,13 @@ export function RecipientViewContactlessForm({
       {organization.hasRemoveParallelBranding ? null : (
         <Box
           position="absolute"
-          right={0}
+          insetEnd={0}
           bottom={0}
           as="a"
           href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
           target="_blank"
           backgroundColor="gray.200"
-          borderTopLeftRadius="xl"
+          borderTopStartRadius="xl"
           paddingX={4}
           paddingY={1.5}
           fontSize="sm"

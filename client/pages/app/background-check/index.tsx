@@ -198,7 +198,7 @@ function BackgroundCheckFieldSearch({
                     <Center
                       boxSize={10}
                       position="absolute"
-                      right={0}
+                      insetEnd={0}
                       bottom={0}
                       pointerEvents="none"
                     >

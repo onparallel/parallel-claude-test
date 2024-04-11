@@ -294,8 +294,8 @@ export const RecipientViewHeader = Object.assign(
                       }}
                       borderRadius="full"
                       height={10}
-                      paddingLeft={0}
-                      paddingRight={0}
+                      paddingStart={0}
+                      paddingEnd={0}
                       transition="all 200ms"
                     >
                       <Avatar
@@ -310,7 +310,7 @@ export const RecipientViewHeader = Object.assign(
                           background="yellow.500"
                           position="absolute"
                           top="-4px"
-                          right="-4px"
+                          insetEnd="-4px"
                           border="1px solid"
                           borderColor="white"
                         />
@@ -456,7 +456,7 @@ export const RecipientViewHeader = Object.assign(
                 >
                   <Stack flex="1">
                     <Box>
-                      <Text as="span" marginRight={2}>
+                      <Text as="span" marginEnd={2}>
                         <FormattedMessage
                           id="recipient-view.requested-by"
                           defaultMessage="Requested by"
@@ -467,7 +467,7 @@ export const RecipientViewHeader = Object.assign(
                     </Box>
                     {message ? (
                       <Box>
-                        <Text as="span" marginRight={2}>
+                        <Text as="span" marginEnd={2}>
                           <FormattedMessage
                             id="recipient-view.petition-subject"
                             defaultMessage="Subject"
@@ -480,7 +480,7 @@ export const RecipientViewHeader = Object.assign(
                   </Stack>
                   <Stack flex="2">
                     <Box flexWrap="wrap">
-                      <Text as="span" whiteSpace="nowrap" marginRight={2}>
+                      <Text as="span" whiteSpace="nowrap" marginEnd={2}>
                         <FormattedMessage id="recipient-view.in-order-to" defaultMessage="To" />:
                       </Text>
                       <EnumerateList

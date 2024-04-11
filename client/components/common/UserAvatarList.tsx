@@ -44,7 +44,7 @@ export const UserAvatarList = Object.assign(
               alignItems="center"
               fontSize="2xs"
               borderRadius="full"
-              paddingLeft="8px"
+              paddingStart="8px"
               sx={{ ...styles.label, ...styles.excessLabel }}
             >
               <Box as="span">+{excess}</Box>
@@ -65,7 +65,7 @@ export const UserAvatarList = Object.assign(
             <Tooltip key={u.id} label={label}>
               <Box
                 marginY={-1}
-                marginRight={i === 0 && !excess ? 0 : -2}
+                marginEnd={i === 0 && !excess ? 0 : -2}
                 sx={{
                   ":hover > *": {
                     transform: "translateY(-0.25rem)",

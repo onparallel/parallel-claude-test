@@ -28,7 +28,7 @@ export function SelectedSignerRow({
       paddingX={2}
       paddingY={1}
       position="relative"
-      paddingRight={24}
+      paddingEnd={24}
       {...props}
     >
       <Text as="span">
@@ -37,7 +37,7 @@ export function SelectedSignerRow({
         {">"}
       </Text>
       {isEditable ? (
-        <Center position="absolute" right={2} top={0} height="100%">
+        <Center position="absolute" insetEnd={2} top={0} height="100%">
           <Stack direction="row" spacing={1}>
             <IconButtonWithTooltip
               variant="ghost"
@@ -51,7 +51,7 @@ export function SelectedSignerRow({
               variant="ghost"
               size="sm"
               label={intl.formatMessage({ id: "generic.remove", defaultMessage: "Remove" })}
-              marginLeft={1}
+              marginStart={1}
               icon={<DeleteIcon />}
               _hover={{ backgroundColor: "gray.200" }}
               onClick={onRemove}

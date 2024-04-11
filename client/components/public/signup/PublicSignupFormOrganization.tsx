@@ -229,7 +229,7 @@ function SelectLogoInput({
             backgroundColor="white"
             rounded="full"
             top="-1rem"
-            right="-1rem"
+            insetEnd="-1rem"
             fontSize="0.75rem"
             aria-label={intl.formatMessage({
               id: "component.public-signup-form-organization.remove-image",

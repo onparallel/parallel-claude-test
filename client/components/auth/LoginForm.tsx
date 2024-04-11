@@ -111,7 +111,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         </FormControl>
         {ssoUrl && !forcePassword ? (
           <Center marginTop={2} height="72px">
-            <LockClosedIcon marginRight={2} />
+            <LockClosedIcon marginEnd={2} />
             <FormattedMessage
               id="public.login.sso-enabled"
               defaultMessage="Single sign-on enabled"

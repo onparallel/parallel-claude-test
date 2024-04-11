@@ -52,9 +52,9 @@ export function RecipientViewPetitionFieldLayout({
   return (
     <>
       <Flex alignItems="baseline" minHeight={6}>
-        <Box flex="1" marginRight={2}>
+        <Box flex="1" marginEnd={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
-            {field.isInternal ? <InternalFieldBadge marginRight={2.5} marginBottom={0.5} /> : null}
+            {field.isInternal ? <InternalFieldBadge marginEnd={2.5} marginBottom={0.5} /> : null}
             {field.title || (
               <Text as="span" color="gray.500" fontWeight="normal" fontStyle="italic">
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -68,7 +68,7 @@ export function RecipientViewPetitionFieldLayout({
                   defaultMessage: "Required field",
                 })}
               >
-                <Text as="span" userSelect="none" marginLeft={1}>
+                <Text as="span" userSelect="none" marginStart={1}>
                   *
                 </Text>
               </Tooltip>

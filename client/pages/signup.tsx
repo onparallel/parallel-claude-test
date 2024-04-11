@@ -110,7 +110,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
     >
       <Flex minHeight="100vh">
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
-          <Box paddingTop={5} marginLeft={-1}>
+          <Box paddingTop={5} marginStart={-1}>
             <Box as="a" href="/">
               <Logo width="152px" />
             </Box>
@@ -144,7 +144,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
         </Flex>
         <Box
           display={{ base: "none", lg: "block" }}
-          paddingLeft={8}
+          paddingStart={8}
           maxWidth="container.md"
           flex="1"
         >
@@ -179,7 +179,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
                               role="presentation"
                               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/${imageName}`}
                               opacity={step === 0 ? 0 : 1}
-                              marginLeft={i === 1 ? "-96px" : 0}
+                              marginStart={i === 1 ? "-96px" : 0}
                               animation={animation}
                             />
                           </Box>

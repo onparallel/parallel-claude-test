@@ -77,13 +77,13 @@ export const PetitionUserNotification = Object.assign(
         borderBottom="1px solid"
         borderColor="gray.200"
       >
-        <Flex minWidth={16} paddingLeft={4} alignItems="center" justifyContent="flex-end">
+        <Flex minWidth={16} paddingStart={4} alignItems="center" justifyContent="flex-end">
           {isRead ? null : (
             <Circle
               data-testid="notification-circle"
               size={2}
               backgroundColor="primary.400"
-              marginRight={1}
+              marginEnd={1}
             />
           )}
           {icon}
@@ -150,7 +150,7 @@ export const PetitionUserNotification = Object.assign(
             useRelativeTime
           />
         </Stack>
-        <Box display="none" className="mark-as" position="absolute" right={4} top={2}>
+        <Box display="none" className="mark-as" position="absolute" insetEnd={4} top={2}>
           <IconButtonWithTooltip
             tabIndex={-1}
             label={markAsReadText}

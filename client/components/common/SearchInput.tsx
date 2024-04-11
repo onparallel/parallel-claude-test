@@ -38,8 +38,8 @@ export const SearchInput = chakraForwardRef<"input", InputProps>(function Search
       </InputLeftElement>
       <Input
         ref={mergedRef}
-        paddingRight={isActive ? 12 : undefined}
-        paddingLeft={10}
+        paddingEnd={isActive ? 12 : undefined}
+        paddingStart={10}
         type="search"
         placeholder={
           props.placeholder ||

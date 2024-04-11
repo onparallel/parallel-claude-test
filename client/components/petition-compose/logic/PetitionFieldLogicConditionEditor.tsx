@@ -216,7 +216,7 @@ function ConditionMultipleValueModifier({
           ...styles,
           minWidth: "100%",
           width: "unset",
-          left: "50%",
+          insetStart: "50%",
           transform: "translateX(-50%)",
         }),
         option: (styles) => ({
@@ -614,7 +614,7 @@ function ConditionPredicate({
               ...styles,
               minWidth: "100%",
               width: "unset",
-              left: "50%",
+              insetStart: "50%",
               transform: "translateX(-50%)",
             }),
             option: (styles) => ({
@@ -643,7 +643,7 @@ function ConditionPredicate({
               ...styles,
               minWidth: "100%",
               width: "unset",
-              left: "50%",
+              insetStart: "50%",
               transform: "translateX(-50%)",
             }),
             option: (styles) => ({
@@ -787,7 +787,7 @@ function ConditionPredicateValueDatetime({
   }, [condition.value]);
 
   const icon = (
-    <HelpPopover marginLeft={0}>
+    <HelpPopover marginStart={0}>
       <Text fontSize="sm">
         <FormattedMessage
           id="component.petition-field-visibility-editor.date-time-help"
@@ -932,7 +932,7 @@ function ConditionPredicateValueNumber({
       <NumberInputField
         type="number"
         textAlign="right"
-        paddingRight={8}
+        paddingEnd={8}
         backgroundColor="white"
         placeholder={intl.formatMessage({
           id: "generic.enter-a-value",

@@ -48,7 +48,7 @@ export function TemplateIconDefaultPermissions({
                 return (
                   <Flex key={p.id} as={ListItem} alignItems="center">
                     <UserAvatar size="xs" user={p.user} />
-                    <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
+                    <Flex marginStart={2} direction="row" alignItems="center" gap={1}>
                       <Text noOfLines={1} wordBreak="break-all">
                         {p.user.fullName}
                       </Text>
@@ -82,7 +82,7 @@ export function TemplateIconDefaultPermissions({
                       icon={<UsersIcon boxSize={3.5} />}
                       color="gray.800"
                     />
-                    <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
+                    <Flex marginStart={2} direction="row" alignItems="center" gap={1}>
                       <Text noOfLines={1} wordBreak="break-all">
                         <UserGroupReference userGroup={p.group} />
                       </Text>

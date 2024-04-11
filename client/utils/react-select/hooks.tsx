@@ -185,8 +185,8 @@ export function useReactSelectProps<
         } = theme;
         return {
           ...omit(styles, ["padding"]),
-          paddingLeft: padding,
-          paddingRight: 0,
+          paddingInlineStart: padding,
+          paddingInlineEnd: 0,
         };
       },
       option: (
@@ -289,7 +289,7 @@ export function useReactSelectProps<
       ) => {
         return {
           ...omit(styles, ["borderRadius"]),
-          paddingRight:
+          paddingEnd:
             typeof data === "object" && isDefined(data) && "isDisabled" in data && data.isDisabled
               ? 6
               : undefined,
@@ -376,8 +376,8 @@ function DropdownIndicator(props: DropdownIndicatorProps & ExtendComponentProps)
   return (
     <Flex
       alignItems="center"
-      paddingRight={theme.spacing.padding / 4}
-      paddingLeft={theme.spacing.padding / 4 / 2}
+      paddingEnd={theme.spacing.padding / 4}
+      paddingStart={theme.spacing.padding / 4 / 2}
       color="gray.600"
     >
       <ChevronDownIcon display="block" position="relative" top="1px" />

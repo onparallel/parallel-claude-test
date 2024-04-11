@@ -31,8 +31,8 @@ export function BackgroundCheckEntityDetailsPersonOverview({
               "& td": {
                 paddingTop: 2,
                 paddingBottom: 2,
-                paddingLeft: 5,
-                paddingRight: 5,
+                paddingStart: 5,
+                paddingEnd: 5,
                 verticalAlign: "top",
               },
               "& td:first-of-type": {

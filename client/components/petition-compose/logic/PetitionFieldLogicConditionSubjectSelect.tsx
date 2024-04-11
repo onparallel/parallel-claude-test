@@ -124,7 +124,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
       fontWeight="semibold"
       top="2.5px"
       spacing={1}
-      marginRight={2}
+      marginEnd={2}
     />
   ) : (
     <Select
@@ -202,7 +202,7 @@ const ConditionSubjectItem = chakraForwardRef<
           fieldIndex={fieldIndex}
           isTooltipDisabled
           flexShrink={0}
-          marginLeft={indent && option.isChild ? 2 : 0}
+          marginStart={indent && option.isChild ? 2 : 0}
         />
         <Box
           fontSize="sm"
@@ -234,7 +234,7 @@ const ConditionSubjectItem = chakraForwardRef<
           fieldIndex={`${fieldIndex}${column}`}
           isTooltipDisabled
           flexShrink={0}
-          marginLeft={indent ? (isChild ? 4 : 2) : 0}
+          marginStart={indent ? (isChild ? 4 : 2) : 0}
         />
         <HighlightText
           as="div"

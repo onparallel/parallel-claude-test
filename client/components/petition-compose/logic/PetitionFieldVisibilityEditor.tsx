@@ -142,7 +142,7 @@ export function PetitionFieldVisibilityEditor({
                           <Flex
                             flex="1"
                             alignItems="start"
-                            paddingLeft="11px"
+                            paddingStart="11px"
                             textStyle={isReadOnly ? "muted" : undefined}
                           >
                             {visibility.operator === "AND" ? (

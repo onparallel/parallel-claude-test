@@ -75,7 +75,7 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
           >
             <>{children}</>
             {/* This box ensures that the popover works correctly on Chrome */}
-            <Box position="absolute" top="0" left="0" width="100%" height="100%" />
+            <Box position="absolute" top="0" insetStart="0" width="100%" height="100%" />
           </Box>
         ) : (
           children

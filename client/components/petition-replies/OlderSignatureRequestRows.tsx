@@ -57,7 +57,7 @@ export function OlderSignatureRequestRows({
       </GridItem>
       {signatures.map((signature, i) => (
         <Fragment key={i}>
-          <GridItem padding={2} paddingLeft={4}>
+          <GridItem padding={2} paddingStart={4}>
             <PetitionSignatureRequestStatusText signature={signature} />
           </GridItem>
           <GridItem padding={2}>
@@ -87,7 +87,7 @@ export function OlderSignatureRequestRows({
               />
             )}
           </GridItem>
-          <GridItem padding={2} paddingRight={4} marginLeft="auto">
+          <GridItem padding={2} paddingEnd={4} marginStart="auto">
             {signature.status === "COMPLETED" ? (
               <HStack justifyContent="flex-end">
                 {signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (

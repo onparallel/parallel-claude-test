@@ -84,12 +84,12 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
       >
         <Box
           position="absolute"
-          right="0"
+          insetEnd="0"
           top="0"
           paddingX={5}
           paddingY={1.5}
           backgroundColor="gray.700"
-          borderBottomLeftRadius="md"
+          borderBottomStartRadius="md"
         >
           <Text color="white" fontSize="sm">
             <FormattedMessage
@@ -106,8 +106,8 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
           position="absolute"
           overflow="hidden"
           top={0}
-          right={0}
-          left={0}
+          insetEnd={0}
+          insetStart={0}
           style={styles.page}
         >
           <Box marginBottom={`calc(${mmRatio}*10)`}>

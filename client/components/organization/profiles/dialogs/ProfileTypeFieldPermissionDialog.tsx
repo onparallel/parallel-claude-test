@@ -199,7 +199,7 @@ export function ProfileTypeFieldPermissionDialog({
                 onSearch={handleSearchUsers}
               />
             </FormControl>
-            <FormControl id="permissionType" minWidth="130px" width="auto" marginLeft={2}>
+            <FormControl id="permissionType" minWidth="130px" width="auto" marginStart={2}>
               <Controller
                 name="permissionType"
                 control={control}
@@ -294,7 +294,7 @@ export function ProfileTypeFieldPermissionDialog({
                       icon={<UsersIcon />}
                       size="sm"
                     />
-                    <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                    <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                       <Text noOfLines={1} wordBreak="break-all">
                         <UserGroupReference userGroup={target} />
                       </Text>

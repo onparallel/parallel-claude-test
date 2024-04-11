@@ -247,7 +247,7 @@ export function PublicLinkSettingsDialog({
                   defaultMessage="Title of the page"
                 />
               </Text>
-              <Text as="span" marginLeft={0.5}>
+              <Text as="span" marginStart={0.5}>
                 *
               </Text>
             </FormLabel>
@@ -267,7 +267,7 @@ export function PublicLinkSettingsDialog({
                   defaultMessage="Description"
                 />
               </Text>
-              <Text as="span" marginLeft={0.5}>
+              <Text as="span" marginStart={0.5}>
                 *
               </Text>
             </FormLabel>
@@ -296,7 +296,7 @@ export function PublicLinkSettingsDialog({
                   defaultMessage="Link"
                 />
               </Text>
-              <Text as="span" marginLeft={0.5}>
+              <Text as="span" marginStart={0.5}>
                 *
               </Text>
               <HelpPopover>

@@ -260,7 +260,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
             <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
               <Text as="span">{row.user.fullName}</Text>
               {row.user.isOrgOwner ? (
-                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                <Badge marginStart={2} colorScheme="primary" position="relative" top="1.5px">
                   <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
                 </Badge>
               ) : null}

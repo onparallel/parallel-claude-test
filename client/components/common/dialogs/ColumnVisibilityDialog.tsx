@@ -223,7 +223,7 @@ function ColumnItem({
 }) {
   const intl = useIntl();
   return (
-    <HStack padding={1} height={8} paddingLeft={isDraggable ? 1 : 7}>
+    <HStack padding={1} height={8} paddingStart={isDraggable ? 1 : 7}>
       <Center cursor="grab" display={isDraggable ? "block" : "none"} {...dragHandleProps}>
         <DragHandleIcon color="gray.400" role="presentation" pointerEvents="none" />
       </Center>

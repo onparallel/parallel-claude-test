@@ -28,7 +28,7 @@ export function EmailEventsIndicator({
         {...props}
       >
         <CheckIcon color="red.500" position="relative" top="-1px" />
-        <CheckShortIcon marginLeft="-7px" color="red.500" position="relative" top="-1px" />
+        <CheckShortIcon marginStart="-7px" color="red.500" position="relative" top="-1px" />
       </Box>
     );
   } else {
@@ -60,7 +60,7 @@ export function EmailEventsIndicator({
           />
         </Box>
         <Box
-          marginLeft="-7px"
+          marginStart="-7px"
           title={
             openedAt
               ? intl.formatMessage(

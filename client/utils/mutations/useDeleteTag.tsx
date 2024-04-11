@@ -91,7 +91,7 @@ function useConfirmDeleteTagDialog() {
                 defaultMessage="The following users are using the selected tag:"
               />
             </Text>
-            <Stack as="ul" paddingLeft={8} spacing={0}>
+            <Stack as="ul" paddingStart={8} spacing={0}>
               {extra.map((data, i) => {
                 const { fullName, email, petitionCount, templateCount, petitionListViewCount } =
                   data;

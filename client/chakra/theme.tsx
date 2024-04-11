@@ -212,7 +212,7 @@ export const theme = extendTheme({
       baseStyle: {
         closeButton: {
           top: 4,
-          right: 3,
+          insetEnd: 3,
         },
       },
     },

@@ -48,12 +48,12 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
       >
         <Box
           position="absolute"
-          right="0"
+          insetEnd="0"
           top="0"
           paddingX={5}
           paddingY={1.5}
           backgroundColor="gray.700"
-          borderBottomLeftRadius="md"
+          borderBottomStartRadius="md"
         >
           <Text color="white" fontSize="sm">
             <FormattedMessage
@@ -105,7 +105,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
               <SkeletonText noOfLines={1} width="10%" speed={0} startColor="gray.400" />
               <SkeletonText noOfLines={1} width="30%" speed={0} startColor="gray.400" />
             </Stack>
-            <UnorderedList paddingLeft={4}>
+            <UnorderedList paddingStart={4}>
               <ListItem>
                 <FormattedMessage
                   id="component.branding-general-preview.pending-fields"

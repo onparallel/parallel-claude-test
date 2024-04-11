@@ -201,8 +201,8 @@ const ProfileTypeFieldSelectItem = memo(function ProfileTypeFieldSelectItem<
       <ProfileTypeFieldTypeIndicator type={field.type} fieldIndex={fieldIndex} />
       <Box
         fontSize={fontSize}
-        marginLeft={2}
-        paddingRight={1}
+        marginStart={2}
+        paddingEnd={1}
         flex="1"
         minWidth="0"
         whiteSpace="nowrap"

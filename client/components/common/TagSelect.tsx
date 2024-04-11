@@ -146,8 +146,8 @@ export const TagSelect = Object.assign(
         ...({
           valueContainer: (styles: CSSObjectWithLabel) => ({
             ...styles,
-            paddingLeft: "0.5rem",
-            paddingRight: "0.5rem",
+            paddingInlineStart: "0.5rem",
+            paddingInlineEnd: "0.5rem",
             paddingTop: "2px",
             paddingBottom: "2px",
             gridGap: "0.25rem",
@@ -368,7 +368,7 @@ function Option(props: OptionProps<TagSelection> & { selectProps: ReactSelectExt
           values={{
             tag: (
               <Tag
-                marginLeft="0.5rem"
+                marginStart="0.5rem"
                 flex="0 1 auto"
                 minWidth="0"
                 tag={{

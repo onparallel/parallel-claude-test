@@ -67,8 +67,8 @@ export function EmailVerificationRequiredAlert({
         justifyContent="flex-start"
         marginX="auto"
         width="100%"
-        paddingLeft={4}
-        paddingRight={12}
+        paddingStart={4}
+        paddingEnd={12}
       >
         <AlertIcon />
         <Stack spacing={1}>

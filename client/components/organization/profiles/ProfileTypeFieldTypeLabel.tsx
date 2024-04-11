@@ -29,7 +29,7 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
         >
           <Icon as={icon} type={type} display="block" boxSize="20px" role="presentation" />
         </Box>
-        <Text whiteSpace="nowrap" as="div" flex="1" marginLeft={2}>
+        <Text whiteSpace="nowrap" as="div" flex="1" marginStart={2}>
           {label(intl)}
         </Text>
         {!hasBackgroundCheck && type === "BACKGROUND_CHECK" ? <PaidBadge marginLeft={2} /> : null}

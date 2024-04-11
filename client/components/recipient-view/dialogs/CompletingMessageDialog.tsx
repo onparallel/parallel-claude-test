@@ -76,7 +76,7 @@ function CompletingMessageDialog({
             )}
             <ModalCloseButton
               top={0}
-              right={0}
+              insetEnd={0}
               size="lg"
               position="relative"
               aria-label={intl.formatMessage({

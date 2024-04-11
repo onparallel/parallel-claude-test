@@ -155,7 +155,7 @@ export function RecipientViewPetitionFieldDate({
   const inputProps = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef as any,
-    paddingRight: 3,
+    paddingEnd: 3,
     isDisabled,
     isInvalid: isInvalid || hasAlreadyRepliedError,
     value,
@@ -248,12 +248,12 @@ export function RecipientViewPetitionFieldDate({
         <Flex flex="1" position="relative" marginTop={2}>
           <DateInput {...inputProps} />
           {browserName !== "Firefox" ? (
-            <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+            <Center boxSize={10} position="absolute" insetEnd={0} bottom={0} pointerEvents="none">
               <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
             </Center>
           ) : null}
 
-          <Center boxSize={10} position="absolute" right={8} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
@@ -300,7 +300,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     type: reply.isAnonymized ? "text" : "date",
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref: ref as any,
-    paddingRight: 3,
+    paddingEnd: 3,
     value,
     // This removes the reset button on Firefox
     required: true,
@@ -342,7 +342,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       <Flex flex="1" position="relative">
         <DateInput {...props} />
         {browserName !== "Firefox" || reply.status === "APPROVED" || isDisabled ? (
-          <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+          <Center boxSize={10} position="absolute" insetEnd={0} bottom={0} pointerEvents="none">
             <FieldDateIcon
               fontSize="18px"
               color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
@@ -350,7 +350,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
           </Center>
         ) : null}
 
-        <Center boxSize={10} position="absolute" right={8} bottom={0}>
+        <Center boxSize={10} position="absolute" insetEnd={8} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
       </Flex>

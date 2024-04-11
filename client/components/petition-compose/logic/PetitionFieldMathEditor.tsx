@@ -222,7 +222,7 @@ function PetitionFieldMathRow({
             <Fragment key={index}>
               <Box fontSize="sm">
                 {index === 0 ? (
-                  <Flex height="32px" alignItems="center" paddingLeft={2}>
+                  <Flex height="32px" alignItems="center" paddingStart={2}>
                     <FormattedMessage
                       id="component.petition-field-math-editor.when"
                       defaultMessage="When"
@@ -251,7 +251,7 @@ function PetitionFieldMathRow({
                         />
                       </Box>
                     ) : (
-                      <Flex flex="1" alignItems="start" paddingLeft="11px">
+                      <Flex flex="1" alignItems="start" paddingStart="11px">
                         {row.operator === "AND" ? (
                           <FormattedMessage
                             id="generic.condition-logical-join-and"
@@ -296,7 +296,7 @@ function PetitionFieldMathRow({
         {row.operations.map((operation, index) => (
           <Fragment key={index}>
             {index === 0 ? (
-              <Center height="30px" fontSize="sm" paddingLeft={2}>
+              <Center height="30px" fontSize="sm" paddingStart={2}>
                 <FormattedMessage
                   id="component.petition-field-math-editor.then"
                   defaultMessage="Then"

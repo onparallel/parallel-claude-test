@@ -608,7 +608,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                 display={{ base: "none", xl: "flex" }}
                                 position="absolute"
                                 top="0px"
-                                right="-48px"
+                                insetEnd="-48px"
                                 height="100%"
                                 width="auto"
                                 minWidth="48px"

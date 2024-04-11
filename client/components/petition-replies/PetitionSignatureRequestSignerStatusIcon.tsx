@@ -20,7 +20,7 @@ function DatesList({
   bouncedAt,
 }: DatesList_SignerStatusFragment) {
   return (
-    <Stack as="ul" paddingLeft={4} spacing={1}>
+    <Stack as="ul" paddingStart={4} spacing={1}>
       {sentAt ? (
         <Text as="li" fontSize="sm">
           <FormattedMessage

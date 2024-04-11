@@ -322,7 +322,7 @@ function useSignatureTokensTableColumns() {
                       ) : null
                     }
                   >
-                    <AlertCircleFilledIcon color="yellow.500" marginRight={1} />
+                    <AlertCircleFilledIcon color="yellow.500" marginEnd={1} />
                   </SmallPopover>
                 ) : null}
                 <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">

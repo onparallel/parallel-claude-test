@@ -49,7 +49,7 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
         </chakra.span>
 
         <chakra.span
-          marginLeft={hideIconOnDesktop ? 0 : 2}
+          marginStart={hideIconOnDesktop ? 0 : 2}
           display={{ base: "none", [breakpoint]: "inline" }}
           whiteSpace="nowrap"
           overflow="hidden"

@@ -143,7 +143,7 @@ export function PublicPetitionInitialForm({
               defaultMessage="Enter your data to access"
             />
             <IconButton
-              marginLeft={2}
+              marginStart={2}
               rounded="full"
               size="xs"
               variant="ghost"
@@ -245,7 +245,7 @@ export function PublicPetitionInitialForm({
           <ModalOverlay />
           <ModalContent margin={2}>
             <ModalHeader>
-              <HStack fontSize="xl" marginRight={4}>
+              <HStack fontSize="xl" marginEnd={4}>
                 <QuestionOutlineIcon fontSize="2xl" />
                 <Text>
                   <FormattedMessage
@@ -285,7 +285,7 @@ export function PublicPetitionInitialForm({
                 />
               </NormalLink>
               <Button
-                marginLeft={4}
+                marginStart={4}
                 ref={closeDialogRef}
                 colorScheme="primary"
                 onClick={onCloseDialog}

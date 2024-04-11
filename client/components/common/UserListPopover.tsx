@@ -53,7 +53,7 @@ export function UserListPopover({
                   {u.__typename === "User" ? (
                     <>
                       <UserAvatar size="xs" user={u} />
-                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
+                      <Text flex="1" marginStart={2} noOfLines={1} wordBreak="break-all">
                         {u.fullName}
                       </Text>
                     </>
@@ -65,7 +65,7 @@ export function UserListPopover({
                         icon={<UsersIcon boxSize={3.5} />}
                         color="gray.800"
                       />
-                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
+                      <Text flex="1" marginStart={2} noOfLines={1} wordBreak="break-all">
                         <UserGroupReference userGroup={u} />
                       </Text>
                     </>

@@ -95,8 +95,8 @@ export function PetitionTagListCellContent({
               container: (styles) => ({ ...styles, width: "100%" }),
               valueContainer: (styles) => ({
                 ...omit(styles as any, ["padding"]),
-                paddingLeft: "0.5rem",
-                paddingRight: "0.5rem",
+                paddingStart: "0.5rem",
+                paddingEnd: "0.5rem",
                 paddingTop: "6px",
                 paddingBottom: "6px",
                 fontSize: "14px",
@@ -122,7 +122,7 @@ export function PetitionTagListCellContent({
           direction="row"
           flex="1"
           paddingX={2}
-          paddingRight={5}
+          paddingEnd={5}
           alignItems="center"
           maxWidth="400px"
         >

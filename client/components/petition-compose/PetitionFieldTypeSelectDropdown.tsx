@@ -205,8 +205,8 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             flex="1"
             minWidth={`${descriptionWidth}px`}
             backgroundColor="gray.50"
-            borderLeft="1px solid"
-            borderLeftColor="gray.200"
+            borderStart="1px solid"
+            borderStartColor="gray.200"
             paddingX={4}
             paddingY={3}
           >

@@ -240,9 +240,9 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         Header: () => <Box as="th" width="1px" />,
         cellProps: {
           paddingY: 0,
-          paddingRight: 1,
+          paddingEnd: 1,
           _first: {
-            paddingLeft: 2,
+            paddingStart: 2,
           },
         },
         CellContent: ({ isExpanded, onToggleExpand: toggleExpand }) => {
@@ -297,7 +297,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             position="relative"
             _after={{
               position: "absolute",
-              right: 0,
+              insetEnd: 0,
               top: 0,
               content: "''",
               display: "block",
@@ -325,8 +325,8 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         ),
         cellProps: {
           paddingY: 0,
-          paddingRight: 0,
-          _first: { paddingLeft: 0 },
+          paddingEnd: 0,
+          _first: { paddingStart: 0 },
         },
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
@@ -546,8 +546,8 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
     <Box
       as="td"
       padding={2}
-      _last={{ paddingRight: 5 }}
-      _first={{ paddingLeft: 5 }}
+      _last={{ paddingEnd: 5 }}
+      _first={{ paddingStart: 5 }}
       userSelect="contain"
       textAlign={column.align ?? "left"}
       {...cellProps}
@@ -633,8 +633,8 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
       as="th"
       paddingX={2}
       paddingY={1}
-      _last={{ paddingRight: 5 }}
-      _first={{ paddingLeft: 5 }}
+      _last={{ paddingEnd: 5 }}
+      _first={{ paddingStart: 5 }}
       height="38px"
       fontSize="sm"
       fontWeight="normal"

@@ -33,7 +33,7 @@ export const RecipientViewFooter = Object.assign(
                     href={`https://www.onparallel.com/${intl.locale}?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
                     passHref
                   >
-                    <Flex as="a" marginLeft={2.5}>
+                    <Flex as="a" marginStart={2.5}>
                       <Logo display="inline-block" width="100px" />
                     </Flex>
                   </NakedLink>

@@ -60,13 +60,13 @@ export function AppLayoutNavbarLink({
               height: "4px",
               width: "100%",
               top: 0,
-              left: 0,
+              insetStart: 0,
               backgroundColor: "primary.600",
             },
             sm: {
               width: "4px",
               height: "100%",
-              left: 0,
+              insetStart: 0,
               top: 0,
             },
           },
@@ -138,7 +138,7 @@ function AppLayoutNavbarLinkContent({
             <AlertCircleFilledIcon
               position="absolute"
               color="yellow.500"
-              right={4}
+              insetEnd={4}
               top={2}
               transition="transform 150ms ease"
             />

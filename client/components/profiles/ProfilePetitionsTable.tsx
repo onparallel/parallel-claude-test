@@ -288,7 +288,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
         headerProps: { padding: 0, width: 8 },
         cellProps: { padding: 0 },
         CellContent: ({ row }) => (
-          <Flex alignItems="center" paddingRight="2">
+          <Flex alignItems="center" paddingEnd="2">
             <PetitionSignatureCellContent petition={row!} />
           </Flex>
         ),

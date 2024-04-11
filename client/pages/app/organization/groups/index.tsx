@@ -355,7 +355,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
                       </Text>
                     }
                   >
-                    <KeyIcon marginBottom={0.5} marginLeft={0.5} />
+                    <KeyIcon marginBottom={0.5} marginStart={0.5} />
                   </SmallPopover>
                 </Text>
               ) : null}

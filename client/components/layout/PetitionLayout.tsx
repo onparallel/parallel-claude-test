@@ -185,7 +185,7 @@ export function PetitionLayout({
             overflow="hidden"
           >
             <MotionSection
-              borderLeft={{ base: "none", lg: "1px solid" }}
+              borderStart={{ base: "none", lg: "1px solid" }}
               borderColor={{ base: "none", lg: "gray.200" }}
               boxShadow={{ base: "none", lg: "short" }}
               position="absolute"

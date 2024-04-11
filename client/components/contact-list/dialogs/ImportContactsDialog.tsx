@@ -47,7 +47,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
                   id="contacts.import-from-excel.import-error.details"
                   defaultMessage="We have detected an error in the following file rows:"
                 />
-                <Text as="b" marginLeft={1.5}>
+                <Text as="b" marginStart={1.5}>
                   <FormattedList value={rows} />
                 </Text>
               </Text>
@@ -184,7 +184,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
                 id="contacts.import-from-excel.download-model"
                 defaultMessage="Download contact loading model"
               />
-              <DownloadIcon marginLeft={2} />
+              <DownloadIcon marginStart={2} />
             </NormalLink>
           </Box>
         </ModalBody>
@@ -213,7 +213,7 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
                 id="contacts.import-from-excel.import-error.details-domain"
                 defaultMessage="The following emails could not be validated:"
               />
-              <Text as="b" marginLeft={1.5}>
+              <Text as="b" marginStart={1.5}>
                 <FormattedList value={emails} />
               </Text>
             </Text>

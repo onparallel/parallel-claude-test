@@ -38,7 +38,7 @@ export function SettingsTabsInnerLayout<T extends string>({
       flexDirection="column"
       minHeight={0}
     >
-      <TabList paddingLeft={6} background="white" paddingTop={2} marginBottom={0}>
+      <TabList paddingStart={6} background="white" paddingTop={2} marginBottom={0}>
         {tabs.map(({ key, title, href, isDisabled, decorate }) => {
           const tab = isDisabled ? (
             <Tab fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>

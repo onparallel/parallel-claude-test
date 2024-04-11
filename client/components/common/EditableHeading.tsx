@@ -82,7 +82,7 @@ export function EditableHeading({ isDisabled, value, maxLength, onChange }: Edit
             maxLength={maxLength}
           />
           <EditableControls
-            marginLeft={1}
+            marginStart={1}
             background={"white"}
             color={"gray.400"}
             fontSize={18}

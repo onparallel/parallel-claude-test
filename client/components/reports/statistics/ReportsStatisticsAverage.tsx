@@ -313,7 +313,7 @@ export function ReportsStatisticsAverage({
                         fontSize="10px"
                         position="absolute"
                         top={"-4px"}
-                        right={"1px"}
+                        insetEnd={"1px"}
                       />
                     </Flex>
                     <Box

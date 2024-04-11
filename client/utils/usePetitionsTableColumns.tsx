@@ -313,7 +313,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     cellProps: { padding: 0, minWidth: "72px" },
     CellContent: ({ row }) =>
       row.__typename === "Petition" ? (
-        <Flex alignItems="center" paddingRight="2">
+        <Flex alignItems="center" paddingEnd="2">
           <PetitionSignatureCellContent petition={row} />
         </Flex>
       ) : (
@@ -430,7 +430,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                     placement="bottom-end"
                   >
                     <IconButton
-                      marginLeft={1}
+                      marginStart={1}
                       variant="ghost"
                       aria-label={intl.formatMessage({
                         id: "component.petitions-table-columns.header-reminders-next-reminder-at",
@@ -460,7 +460,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     cellProps: {
       minWidth: "300px",
       padding: 0,
-      _last: { paddingRight: 0 },
+      _last: { paddingEnd: 0 },
     },
     isFilterable: true,
     Filter: PetitionListTagFilter,
@@ -639,7 +639,7 @@ export const TEMPLATES_COLUMNS = (
       width: "30%",
       minWidth: "300px",
       padding: 0,
-      _last: { paddingRight: 0 },
+      _last: { paddingEnd: 0 },
     },
     isFilterable: true,
     Filter: PetitionListTagFilter,

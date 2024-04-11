@@ -641,7 +641,7 @@ function _PetitionSettings({
                       size="sm"
                       border={"1px solid"}
                       borderColor="inherit"
-                      borderLeftRadius={0}
+                      borderStartRadius={0}
                       text={petition.publicLink?.url as string}
                     />
                   </InputRightAddon>
@@ -1186,7 +1186,7 @@ function DeadlineInput({
     } catch {}
   }
   return (
-    <InputGroup size="sm" borderRadius="md" flex="1" paddingLeft={4}>
+    <InputGroup size="sm" borderRadius="md" flex="1" paddingStart={4}>
       <Input
         isReadOnly
         placeholder={

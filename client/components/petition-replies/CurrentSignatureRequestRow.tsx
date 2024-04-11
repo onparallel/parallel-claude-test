@@ -72,7 +72,7 @@ export function CurrentSignatureRequestRow({
 
   return (
     <>
-      <GridItem padding={2} paddingLeft={4}>
+      <GridItem padding={2} paddingStart={4}>
         <Heading size="xs" as="h4" paddingBottom={1}>
           <FormattedMessage
             id="component.petition-signatures-card.status"
@@ -113,11 +113,11 @@ export function CurrentSignatureRequestRow({
           )}
         </Box>
       </GridItem>
-      <GridItem padding={2} paddingRight={4} marginLeft="auto">
+      <GridItem padding={2} paddingEnd={4} marginStart="auto">
         {isAwaitingSignature && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip
-              marginRight={2}
+              marginEnd={2}
               icon={<BellIcon />}
               label={intl.formatMessage({
                 id: "component.petition-signatures-card.send-reminder",

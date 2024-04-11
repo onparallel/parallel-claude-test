@@ -110,7 +110,7 @@ export function ConfigureAutomateSearchDialog({
                 id="component.configure-automate-search-dialog.name-label"
                 defaultMessage="Name of person/entity"
               />
-              <Text as="span" marginLeft={1}>
+              <Text as="span" marginStart={1}>
                 *
               </Text>
             </FormLabel>

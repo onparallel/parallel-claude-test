@@ -111,7 +111,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
                       return (
                         <FormControl key={fields[index].id} as={HStack} alignItems="center">
                           <Flex flex={1} alignItems="center">
-                            <FormLabel margin={0} fontWeight={400} marginLeft={2}>
+                            <FormLabel margin={0} fontWeight={400} marginStart={2}>
                               <HighlightText as="span" search={search}>
                                 {title}
                               </HighlightText>

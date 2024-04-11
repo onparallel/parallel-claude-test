@@ -174,10 +174,10 @@ export function PetitionRepliesFieldReply({
               <CopyOrDownloadReplyButton reply={reply} content={content} onAction={handleAction} />
             </GridItem>
             <GridItem
-              borderLeft="2px solid"
+              borderStart="2px solid"
               borderColor="gray.200"
               paddingBottom={1}
-              paddingLeft={2}
+              paddingStart={2}
             >
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
                 {reply.isAnonymized ? (
@@ -217,7 +217,7 @@ export function PetitionRepliesFieldReply({
                       >
                         <FileSize value={content.size} />
                       </Text>
-                      <Box display="inline-block" marginLeft={2}>
+                      <Box display="inline-block" marginStart={2}>
                         {editReplyIconButton()}
                       </Box>
                     </Text>
@@ -268,7 +268,7 @@ export function PetitionRepliesFieldReply({
                           </Text>
                         </>
                       )}
-                      <Box display="inline-block" marginLeft={1}>
+                      <Box display="inline-block" marginStart={1}>
                         {editReplyIconButton()}
                       </Box>
                     </Flex>
@@ -283,7 +283,7 @@ export function PetitionRepliesFieldReply({
                         })}
                       </VisuallyHidden>
                       <Text as="span">
-                        <Text as="span" display="inline-block" marginRight={2}>
+                        <Text as="span" display="inline-block" marginEnd={2}>
                           {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
                         </Text>
                         {content.entity.name}
@@ -299,7 +299,7 @@ export function PetitionRepliesFieldReply({
                         >
                           <FileSize value={content.size} />
                         </Text>
-                        <Box display="inline-block" marginLeft={2}>
+                        <Box display="inline-block" marginStart={2}>
                           {editReplyIconButton()}
                         </Box>
                       </Text>
@@ -344,7 +344,7 @@ export function PetitionRepliesFieldReply({
                         </Text>
                       </HelpPopover>
                     ) : null}
-                    <Box display="inline-block" height={6} marginLeft={2} verticalAlign="baseline">
+                    <Box display="inline-block" height={6} marginStart={2} verticalAlign="baseline">
                       {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
                     </Box>
                   </HStack>
@@ -356,9 +356,9 @@ export function PetitionRepliesFieldReply({
         <GridItem
           gridColumn={2}
           fontSize="sm"
-          borderLeft="2px solid"
+          borderStart="2px solid"
           borderColor="gray.200"
-          paddingLeft={2}
+          paddingStart={2}
         >
           {isFileTypeField(type) &&
           (reply.content.uploadComplete === false || reply.content.error) ? (

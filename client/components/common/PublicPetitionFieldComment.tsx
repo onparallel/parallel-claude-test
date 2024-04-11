@@ -66,11 +66,11 @@ export function PublicPetitionFieldComment({
           position="absolute"
           top="50%"
           transform="translateY(-50%)"
-          left={2}
+          insetStart={2}
         />
       ) : null}
       <Box fontSize="sm" display="flex" alignItems="center">
-        <Box paddingRight={2}>
+        <Box paddingEnd={2}>
           {isAuthor ? (
             <Text as="strong" fontStyle="italic">
               <FormattedMessage id="generic.you" defaultMessage="You" />

@@ -93,7 +93,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
               maxWidth="200px"
               onClick={() => !uploadHasFailed && onDownload()}
             />
-            <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
+            <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
               (<FileSize value={attachment.file.size} />)
             </Text>
           </Flex>

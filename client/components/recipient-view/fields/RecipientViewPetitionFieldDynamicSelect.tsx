@@ -346,7 +346,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
             }
             styles={{
               menu: (styles) => ({ ...styles, zIndex: 100 }),
-              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+              valueContainer: (styles) => ({ ...styles, paddingInlineEnd: 32 }),
               placeholder: (base) => ({
                 ...base,
                 fontStyle: reply?.isAnonymized ? "italic" : "normal",
@@ -354,7 +354,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
             }}
           />
           {reply && (
-            <Center height="100%" position="absolute" right="42px" top={0}>
+            <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
             </Center>
           )}
@@ -362,7 +362,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
         {reply &&
           (level === 0 ? (
             <IconButtonWithTooltip
-              marginLeft={2}
+              marginStart={2}
               isDisabled={isDisabled || !reply || reply.status === "APPROVED"}
               onClick={() => onDeleteReply?.()}
               variant="ghost"
@@ -375,7 +375,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
               })}
             />
           ) : (
-            <Box width="40px" marginLeft={2} />
+            <Box width="40px" marginStart={2} />
           ))}
       </Flex>
     </FormControl>

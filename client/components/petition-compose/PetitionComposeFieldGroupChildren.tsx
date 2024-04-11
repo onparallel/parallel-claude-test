@@ -133,8 +133,8 @@ export function PetitionComposeFieldGroupChildren({
     <Stack
       textStyle={isReadOnly ? "muted" : undefined}
       paddingBottom={hasChildren ? 12 : 6}
-      paddingLeft={3}
-      paddingRight={4}
+      paddingStart={3}
+      paddingEnd={4}
     >
       <Stack
         borderRadius="md"
@@ -321,7 +321,7 @@ function PetitionComposeFieldWrapper({
           <AddFieldButton
             position="absolute"
             bottom={0}
-            left="calc(50% - 14px)"
+            insetStart="calc(50% - 14px)"
             transform="translate(-50%, 50%)"
             className="add-field-after-button"
             data-testid="small-add-field-button"
@@ -351,7 +351,7 @@ function PetitionComposeFieldWrapper({
           <AddFieldButton
             position="absolute"
             bottom={0}
-            left="calc(50% - 14px)"
+            insetStart="calc(50% - 14px)"
             transform="translate(-50%, 50%)"
             className="add-field-after-button"
             data-testid="small-add-field-button"

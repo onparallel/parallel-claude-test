@@ -178,12 +178,12 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
         fieldIndex={fieldIndex}
         isTooltipDisabled
         flexShrink={0}
-        marginLeft={field.parent && indent ? 2 : 0}
+        marginStart={field.parent && indent ? 2 : 0}
       />
       <Box
         fontSize="sm"
-        marginLeft={2}
-        paddingRight={1}
+        marginStart={2}
+        paddingEnd={1}
         flex="1"
         minWidth="0"
         whiteSpace="nowrap"

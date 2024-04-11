@@ -96,7 +96,7 @@ export function PetitionRemindersConfig({
             data-testid="enable-reminders-checkbox"
             colorScheme="primary"
             size="lg"
-            marginRight={2}
+            marginEnd={2}
             isChecked={isActive}
             onChange={(event) => handleEnableRemindersChange(event.target.checked)}
           >
@@ -197,7 +197,7 @@ export function PetitionRemindersConfig({
               data-testid="reminders-config-weekdays-only-checkbox"
               colorScheme="primary"
               size="md"
-              marginRight={2}
+              marginEnd={2}
               isChecked={value.weekdaysOnly}
               onChange={(event) =>
                 onChange({

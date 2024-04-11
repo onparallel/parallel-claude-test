@@ -200,7 +200,7 @@ function Contact({ contactId }: ContactProps) {
                   <Button
                     variant="outline"
                     onClick={() => setIsEditing(false)}
-                    marginRight={{ base: 0, sm: 2 }}
+                    marginEnd={{ base: 0, sm: 2 }}
                     marginBottom={{ base: 2, sm: 0 }}
                   >
                     <FormattedMessage id="generic.cancel-save-changes" defaultMessage="Cancel" />
@@ -325,8 +325,8 @@ function useContactPetitionAccessesColumns() {
             defaultMessage: "eSignature status",
           }),
         align: "center",
-        headerProps: { paddingLeft: 0 },
-        cellProps: { paddingLeft: 0, width: "1%" },
+        headerProps: { paddingStart: 0 },
+        cellProps: { paddingStart: 0, width: "1%" },
         CellContent: ({ row: { petition } }) => (
           <Flex alignItems="center">
             <PetitionSignatureCellContent petition={petition!} />
@@ -485,15 +485,15 @@ const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleI
   return isEditing ? (
     <Input ref={ref} {...props} />
   ) : children === null ? (
-    <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
+    <Text paddingStart={4} height="40px" lineHeight="40px" textStyle="hint">
       <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
     </Text>
   ) : (
     <Box
       height="40px"
       display="flex"
-      borderLeft="1px solid transparent"
-      paddingLeft={4}
+      borderStart="1px solid transparent"
+      paddingStart={4}
       alignItems="center"
     >
       {children}

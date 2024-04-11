@@ -269,7 +269,7 @@ function PublicPetitionLink({
                       as="a"
                       target="_blank"
                       backgroundColor="gray.200"
-                      borderTopLeftRadius="xl"
+                      borderTopStartRadius="xl"
                       paddingX={4}
                       paddingY={1.5}
                       fontSize="sm"

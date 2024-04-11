@@ -36,7 +36,7 @@ export const PetitionHeaderTab = chakraForwardRef<
         {...(props as any)}
       >
         {children}
-        {rightIcon ? <Center marginLeft={1}>{rightIcon}</Center> : null}
+        {rightIcon ? <Center marginStart={1}>{rightIcon}</Center> : null}
       </Center>
       {isActive && (
         <MotionBox

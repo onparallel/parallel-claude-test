@@ -531,10 +531,10 @@ const _PetitionComposeField = chakraForwardRef<
                 <PetitionComposeFieldInner
                   ref={ref}
                   flex="1"
-                  paddingLeft={3}
+                  paddingStart={3}
                   paddingTop={2}
                   paddingBottom={10}
-                  paddingRight={4}
+                  paddingEnd={4}
                   user={user}
                   petition={petition}
                   field={field}
@@ -573,7 +573,7 @@ const _PetitionComposeField = chakraForwardRef<
                   className={isChildren ? "field-actions-children" : "field-actions"}
                   position="absolute"
                   bottom={0}
-                  right={2}
+                  insetEnd={2}
                   onUnlinkField={onUnlinkField}
                   isReadOnly={isReadOnly}
                 />
@@ -894,7 +894,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           </FormControl>
         )}
       </Stack>
-      <Stack paddingLeft={14}>
+      <Stack paddingStart={14}>
         {!description && isReadOnly ? null : (
           <GrowingTextarea
             ref={descriptionRef}
@@ -1031,7 +1031,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   id="component.petition-compose-field.dynamic-select-not-configured"
                   defaultMessage="Click on field settings to configure this field"
                 />
-                <Text as="span" marginLeft={1} position="relative" top="-1px">
+                <Text as="span" marginStart={1} position="relative" top="-1px">
                   (<SettingsIcon />)
                 </Text>
               </Text>
@@ -1661,14 +1661,14 @@ const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
                       color="gray.500"
                       fontSize="xs"
                       transform={isExpanded ? "rotate(90deg)" : undefined}
-                      marginRight={2}
+                      marginEnd={2}
                     />
                     <ConditionIcon />
                     <FormattedMessage
                       id="component.petition-compose-field.visibility-title"
                       defaultMessage="Visibility conditions"
                     />
-                    <HelpPopover marginLeft={1}>
+                    <HelpPopover marginStart={1}>
                       <Text fontSize="sm">
                         <FormattedMessage
                           id="component.petition-compose-field.visibility-help"
@@ -1727,14 +1727,14 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
                       color="gray.500"
                       fontSize="xs"
                       transform={isExpanded ? "rotate(90deg)" : undefined}
-                      marginRight={2}
+                      marginEnd={2}
                     />
                     <CalculatorIcon />
                     <FormattedMessage
                       id="component.petition-compose-field.calculations-title"
                       defaultMessage="Calculations"
                     />
-                    <HelpPopover marginLeft={1}>
+                    <HelpPopover marginStart={1}>
                       <Text fontSize="sm">
                         <FormattedMessage
                           id="component.petition-compose-field.calculations-help"
@@ -1750,7 +1750,7 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
                   </HStack>
                 </AccordionButton>
                 {!isReadOnly ? (
-                  <Flex position="absolute" right={3} top={1}>
+                  <Flex position="absolute" insetEnd={3} top={1}>
                     <Button
                       background="white"
                       size="sm"

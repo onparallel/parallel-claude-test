@@ -19,7 +19,7 @@ export function TimelineItem({ icon, children, ...props }: TimelineItemProps) {
       <Flex width="36px" justifyContent="center">
         {icon}
       </Flex>
-      <Flex flex="1" marginLeft={2} alignItems="center">
+      <Flex flex="1" marginStart={2} alignItems="center">
         <Box flex="1">{children}</Box>
       </Flex>
     </Box>

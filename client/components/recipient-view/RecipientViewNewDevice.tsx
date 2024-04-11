@@ -193,13 +193,13 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
       {organization.hasRemoveParallelBranding ? null : (
         <Box
           position="absolute"
-          right={0}
+          insetEnd={0}
           bottom={0}
           as="a"
           href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
           target="_blank"
           backgroundColor="gray.200"
-          borderTopLeftRadius="xl"
+          borderTopStartRadius="xl"
           paddingX={4}
           paddingY={1.5}
           fontSize="sm"

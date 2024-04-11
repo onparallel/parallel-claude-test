@@ -389,7 +389,7 @@ export function ProfileField(props: ProfileFieldProps) {
           />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
-          <HStack marginTop={1} marginLeft={1} color="gray.700" spacing={1.5}>
+          <HStack marginTop={1} marginStart={1} color="gray.700" spacing={1.5}>
             <FieldDateIcon marginBottom={0.5} />
             <Text fontSize="sm">
               <FormattedMessage

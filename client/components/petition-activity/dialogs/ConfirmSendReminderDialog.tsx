@@ -67,7 +67,7 @@ export function ConfirmSendReminderDialog({
                           defaultMessage="The following contacts have opted out from receiving reminders for this parallel:"
                         />
                       </Text>
-                      <UnorderedList paddingLeft={2}>
+                      <UnorderedList paddingStart={2}>
                         {optedOut.map((pa) => (
                           <ListItem key={pa.id}>
                             <ContactReference contact={pa.contact} />

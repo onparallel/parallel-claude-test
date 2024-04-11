@@ -298,11 +298,9 @@ export function RecipientViewPetitionFieldGroupLayout({
     <Stack spacing={4} as="section" id={`field-${field.id}`}>
       <Stack spacing={1} paddingX={2} position="relative">
         <Flex alignItems="baseline">
-          <Box flex="1" marginRight={2}>
+          <Box flex="1" marginEnd={2}>
             <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
-              {field.isInternal ? (
-                <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
-              ) : null}
+              {field.isInternal ? <InternalFieldBadge marginEnd={2.5} marginBottom={0.5} /> : null}
               {field.title || (
                 <Text as="span" color="gray.500" fontWeight="normal" fontStyle="italic">
                   <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -316,7 +314,7 @@ export function RecipientViewPetitionFieldGroupLayout({
                     defaultMessage: "Required field",
                   })}
                 >
-                  <Text as="span" userSelect="none" marginLeft={1}>
+                  <Text as="span" userSelect="none" marginStart={1}>
                     *
                   </Text>
                 </Tooltip>
@@ -357,7 +355,7 @@ export function RecipientViewPetitionFieldGroupLayout({
             display={{ base: "none", xl: "flex" }}
             position="absolute"
             top="0px"
-            right="-48px"
+            insetEnd="-48px"
             height="100%"
             width="auto"
             minWidth="48px"

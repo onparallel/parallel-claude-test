@@ -99,7 +99,7 @@ export function TimelineMessageScheduledEvent({
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
@@ -110,7 +110,7 @@ export function TimelineMessageScheduledEvent({
             size="sm"
             variant="outline"
             colorScheme="red"
-            marginLeft={4}
+            marginStart={4}
             onClick={handleCancelScheduledMessage}
           >
             <FormattedMessage id="timeline.message-scheduled-cancel" defaultMessage="Cancel" />

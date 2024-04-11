@@ -21,7 +21,7 @@ export const Tag = Object.assign(
         borderRadius="full"
         height="24px"
         paddingX={2}
-        paddingRight={isRemovable ? 0 : undefined}
+        paddingEnd={isRemovable ? 0 : undefined}
         display="flex"
         alignItems="center"
         backgroundColor={tag.color}
@@ -42,8 +42,8 @@ export const Tag = Object.assign(
               { tag: tag.name },
             )}
             alignSelf="stretch"
-            paddingRight={2}
-            paddingLeft={1}
+            paddingEnd={2}
+            paddingStart={1}
             color="gray.600"
             _hover={{ color: "gray.900" }}
             onClick={onRemove}

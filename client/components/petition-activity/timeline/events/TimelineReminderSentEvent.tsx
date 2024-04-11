@@ -95,7 +95,7 @@ export function TimelineReminderSentEvent({
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />

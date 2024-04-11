@@ -220,8 +220,8 @@ export const ViewTabs = Object.assign(
           borderTop="1px solid"
           borderX="1px solid"
           borderTopColor="inherit"
-          borderLeftColor="inherit"
-          borderRightColor="inherit"
+          borderStartColor="inherit"
+          borderEndColor="inherit"
           borderTopRadius="md"
           marginTop="-1px"
           marginX="-1px"
@@ -251,11 +251,11 @@ export const ViewTabs = Object.assign(
                 "> *": { position: "relative" },
                 "label:not([data-checked]):after": {
                   content: "''",
-                  borderLeft: "1px solid",
-                  borderLeftColor: "gray.200",
+                  borderStart: "1px solid",
+                  borderStartColor: "gray.200",
                   height: "24px",
                   position: "absolute",
-                  right: "0",
+                  insetEnd: "0",
                 },
               }}
               backgroundColor="gray.50"
@@ -469,7 +469,7 @@ export function ViewTab({
             onDragEnd,
           }) as any)}
       userSelect="none"
-      marginLeft="-1px"
+      marginStart="-1px"
       minWidth={`${MIN_TAB_WIDTH}px`}
       flexShrink={1}
       aria-grabbed={draggedViewId === view.id}
@@ -483,7 +483,7 @@ export function ViewTab({
         flex={1}
         minWidth={0}
         _focus={{ boxShadow: "none" }}
-        paddingRight={{ base: 1, sm: 2 }}
+        paddingEnd={{ base: 1, sm: 2 }}
         gap={{ base: 1, sm: 2 }}
         backgroundColor={isActive ? "white" : "gray.50"}
         backgroundClip="padding-box"

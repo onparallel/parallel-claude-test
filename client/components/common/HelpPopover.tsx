@@ -23,7 +23,7 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
     >
       <QuestionIcon
         ref={ref}
-        marginLeft={2}
+        marginStart={2}
         color="gray.400"
         _hover={{ color: "gray.500" }}
         _focus={{

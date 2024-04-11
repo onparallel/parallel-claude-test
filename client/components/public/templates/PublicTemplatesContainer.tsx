@@ -46,7 +46,7 @@ export function PublicTemplatesContainer({
       >
         <Stack
           display={{ base: "none", md: "flex" }}
-          borderRight="1px solid"
+          borderEnd="1px solid"
           borderColor="gray.200"
           paddingY={12}
           spacing={0}
@@ -55,7 +55,7 @@ export function PublicTemplatesContainer({
             <Button
               as="a"
               paddingY={6}
-              paddingLeft={6}
+              paddingStart={6}
               justifyContent="space-between"
               borderRadius="none"
               fontWeight="bold"
@@ -88,7 +88,7 @@ export function PublicTemplatesContainer({
                 <Button
                   as="a"
                   paddingY={6}
-                  paddingLeft={6}
+                  paddingStart={6}
                   justifyContent="space-between"
                   borderRadius="none"
                   fontWeight="normal"

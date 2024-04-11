@@ -102,8 +102,8 @@ export const RecipientPortalHeader = Object.assign(
                   }}
                   borderRadius="full"
                   height={10}
-                  paddingLeft={0}
-                  paddingRight={0}
+                  paddingStart={0}
+                  paddingEnd={0}
                   transition="all 200ms"
                 >
                   <Avatar

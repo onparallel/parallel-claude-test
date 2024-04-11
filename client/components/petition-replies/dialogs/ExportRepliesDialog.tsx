@@ -201,7 +201,7 @@ export function ExportRepliesDialog({
                 </>
               ) : null}
               {selectedOption === "EXPORT_CUATRECASAS" ? (
-                <FormControl paddingLeft={7} isInvalid={clientIdError}>
+                <FormControl paddingStart={7} isInvalid={clientIdError}>
                   <FormLabel fontWeight="normal">
                     <FormattedMessage
                       id="component.export-replies-dialog.export-cuatrecasas-client-number"
@@ -232,7 +232,7 @@ export function ExportRepliesDialog({
           {example[0] !== null ? (
             <Stack>
               <Checkbox
-                marginLeft={1}
+                marginStart={1}
                 isChecked={rename}
                 onChange={(e) => {
                   setRename(e.target.checked);
@@ -249,7 +249,7 @@ export function ExportRepliesDialog({
                 />
               </Checkbox>
               <PaddedCollapse in={rename}>
-                <Box marginLeft={7}>
+                <Box marginStart={7}>
                   <PlaceholderInput
                     ref={inputRef}
                     value={pattern}

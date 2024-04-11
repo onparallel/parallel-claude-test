@@ -725,7 +725,7 @@ function useOrganizationUsersTableColumns() {
                   })}
                 >
                   <ForbiddenIcon
-                    marginLeft={2}
+                    marginStart={2}
                     aria-label={intl.formatMessage({
                       id: "page.users.inactive-user",
                       defaultMessage: "Inactive user",
@@ -741,7 +741,7 @@ function useOrganizationUsersTableColumns() {
                 >
                   <AlertCircleFilledIcon
                     color="yellow.500"
-                    marginLeft={2}
+                    marginStart={2}
                     aria-label={intl.formatMessage({
                       id: "page.users.untransferred-parallels",
                       defaultMessage: "Untransferred parallels",
@@ -750,7 +750,7 @@ function useOrganizationUsersTableColumns() {
                 </Tooltip>
               ) : null}
               {row.isOrgOwner ? (
-                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                <Badge marginStart={2} colorScheme="primary" position="relative" top="1.5px">
                   <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
                 </Badge>
               ) : null}
@@ -811,7 +811,7 @@ function useOrganizationUsersTableColumns() {
               renderItem={({ value }, index) => {
                 return (
                   <Text key={index} as="span" whiteSpace="nowrap">
-                    {value.hasPermissions ? <KeyIcon marginRight={1} marginBottom={0.5} /> : null}
+                    {value.hasPermissions ? <KeyIcon marginEnd={1} marginBottom={0.5} /> : null}
                     <LocalizableUserTextRender value={value.localizableName} default={value.name} />
                   </Text>
                 );
@@ -829,9 +829,9 @@ function useOrganizationUsersTableColumns() {
                             return (
                               <Text key={index} as="span" whiteSpace="nowrap">
                                 {userGroup.hasPermissions ? (
-                                  <KeyIcon marginRight={1} marginBottom={0.5} />
+                                  <KeyIcon marginEnd={1} marginBottom={0.5} />
                                 ) : (
-                                  <UsersIcon marginRight={1} marginBottom={0.5} />
+                                  <UsersIcon marginEnd={1} marginBottom={0.5} />
                                 )}
                                 <LocalizableUserTextRender
                                   value={userGroup.localizableName}

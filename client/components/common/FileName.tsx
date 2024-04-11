@@ -46,7 +46,7 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(function FileNam
         <chakra.span whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           {value?.slice(0, -10)}
         </chakra.span>
-        <chakra.span flexShrink={0} position="relative" left="-0.2rem">
+        <chakra.span flexShrink={0} position="relative" insetStart="-0.2rem">
           {value?.slice(-10)}
         </chakra.span>
       </Flex>

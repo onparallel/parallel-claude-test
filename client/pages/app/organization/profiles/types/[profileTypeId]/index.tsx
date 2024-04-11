@@ -420,7 +420,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <HStack paddingRight={2}>
+          <HStack paddingEnd={2}>
             <Heading as="h3" size="md" noOfLines={1} wordBreak="break-all">
               <LocalizableUserTextRender
                 value={profileType.name}
@@ -588,7 +588,7 @@ function DraggableList({
       <HStack>
         <Center
           padding={5}
-          borderRight="1px"
+          borderEnd="1px"
           cursor="pointer"
           borderColor="gray.200"
           onClick={toggleAll}
@@ -719,14 +719,14 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
         {...props}
         paddingX={4}
       >
-        <Center cursor="pointer" padding={3} paddingLeft={1} onClick={onToggle}>
+        <Center cursor="pointer" padding={3} paddingStart={1} onClick={onToggle}>
           <Checkbox isChecked={isSelected} colorScheme="primary" />
         </Center>
         <HStack flex="1" userSelect="none">
           <Box
             className="drag-handle"
             position="absolute"
-            left={1}
+            insetStart={1}
             display="flex"
             flexDirection="column"
             justifyContent="center"

@@ -220,7 +220,7 @@ export function ProfileFieldSelectSettings({
             <Table variant="unstyled">
               <Thead>
                 <Tr>
-                  <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
+                  <Th paddingEnd={1} paddingBlock={2} width="50%">
                     <FormattedMessage
                       id="component.create-or-update-property-dialog.options-label"
                       defaultMessage="Label"
@@ -397,7 +397,7 @@ function ProfileFieldSelectOption({
       <FormControl
         as={Td}
         verticalAlign="top"
-        paddingInlineEnd={1}
+        paddingEnd={1}
         paddingBlock={2}
         width="50%"
         isInvalid={!!errors.options?.values?.[index]?.label}

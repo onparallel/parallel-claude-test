@@ -243,7 +243,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     id: "component.petition-accesses-table.reminders-opt-out-popover",
                     defaultMessage: "Opted out from receiving reminders",
                   })}
-                  marginLeft={1}
+                  marginStart={1}
                   fontSize="16px"
                   color="gray.500"
                   _hover={{ color: "gray.600" }}

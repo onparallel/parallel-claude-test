@@ -31,7 +31,7 @@ export const SelectLikeButton = chakraForwardRef<"button", SelectLikeButtonProps
         {...(rest as any)}
         aria-haspopup="listbox"
       >
-        <Box paddingBottom={0} paddingRight={10} display="flex" alignItems="center">
+        <Box paddingBottom={0} paddingEnd={10} display="flex" alignItems="center">
           {children}
         </Box>
         <Box
@@ -39,7 +39,7 @@ export const SelectLikeButton = chakraForwardRef<"button", SelectLikeButtonProps
           display="inline-flex"
           alignItems="center"
           justifyContent="center"
-          right="0.5rem"
+          insetEnd="0.5rem"
           pointerEvents="none"
           top="50%"
           transform="translateY(-50%)"

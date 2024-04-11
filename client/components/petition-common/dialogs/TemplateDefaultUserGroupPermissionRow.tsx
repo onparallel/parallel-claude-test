@@ -44,7 +44,7 @@ export function TemplateDefaultUserGroupPermissionRow({
         icon={<UsersIcon />}
         size="sm"
       />
-      <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+      <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
         <Stack direction={"row"} spacing={1} align="center">
           <Text noOfLines={1} wordBreak="break-all">
             <UserGroupReference userGroup={group} />

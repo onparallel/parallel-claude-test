@@ -299,7 +299,7 @@ export const AppLayout = Object.assign(
               position="fixed"
               size="48px"
               bottom="20px"
-              right="20px"
+              insetEnd="20px"
               zIndex={2147483001}
             />
           ) : null}

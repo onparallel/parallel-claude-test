@@ -126,7 +126,7 @@ function _PetitionComposeContentsItem<T extends PetitionComposeContents_Petition
           height="auto"
           paddingX={2}
           paddingY={1}
-          paddingLeft={field.type === "HEADING" ? 2 : isChildField ? 8 : 4}
+          paddingStart={field.type === "HEADING" ? 2 : isChildField ? 8 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
           onClick={onFieldClick}

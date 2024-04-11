@@ -98,7 +98,7 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
         return (
           <PetitionRepliesContentsDivider key={index} isDashed>
             <Flex alignItems="center">
-              <EyeOffIcon marginRight={1} />
+              <EyeOffIcon marginEnd={1} />
               <FormattedMessage
                 id="component.petition-contents.hidden-fields-divider"
                 defaultMessage="{count, plural, =1 {1 field is} other {# fields are}} not applicable"
@@ -197,7 +197,7 @@ function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_Petition
           height="auto"
           paddingX={2}
           paddingY={1}
-          paddingLeft={field.type === "HEADING" ? 2 : 4}
+          paddingStart={field.type === "HEADING" ? 2 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
           onClick={onFieldClick}

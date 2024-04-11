@@ -255,7 +255,7 @@ export function GenericFolderDialog({
                       _focus={{ _disabled: { boxShadow: "outline" } }}
                       leftIcon={isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
                       justifyContent="flex-start"
-                      paddingInlineStart={`${0.75 + (level - 1) * 1}rem`}
+                      paddingStart={`${0.75 + (level - 1) * 1}rem`}
                       onClick={handleSelect}
                       onDoubleClick={handleExpand}
                       tabIndex={0}

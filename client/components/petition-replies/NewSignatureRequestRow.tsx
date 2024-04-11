@@ -34,7 +34,7 @@ export function NewSignatureRequestRow({
 
   return (
     <>
-      <GridItem padding={2} paddingLeft={4}>
+      <GridItem padding={2} paddingStart={4}>
         <Heading size="xs" as="h4" paddingBottom={1}>
           <FormattedMessage
             id="component.petition-signatures-card.status"
@@ -70,10 +70,10 @@ export function NewSignatureRequestRow({
           )}
         </Box>
       </GridItem>
-      <GridItem padding={2} paddingRight={4} marginLeft="auto">
+      <GridItem padding={2} paddingEnd={4} marginStart="auto">
         <Button
           colorScheme="primary"
-          marginLeft={2}
+          marginStart={2}
           onClick={handleStartSignature}
           isDisabled={isDisabled}
         >

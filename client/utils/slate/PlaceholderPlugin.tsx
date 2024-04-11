@@ -217,7 +217,7 @@ function RenderPlaceholderOption({ item, search }: ComboboxItemProps<ComboboxIte
         <PetitionFieldTypeIndicator
           as="div"
           isTooltipDisabled
-          marginRight={2}
+          marginEnd={2}
           fieldIndex={item.data.index!}
           type={item.data.field.type}
         />
@@ -400,7 +400,7 @@ function PlaceholderElement({
                 fontSize: "2xs",
                 height: 3.5,
                 paddingX: 1,
-                marginRight: 1,
+                marginEnd: 1,
               }}
             />
             <Box as="span" fontSize={0} aria-hidden>

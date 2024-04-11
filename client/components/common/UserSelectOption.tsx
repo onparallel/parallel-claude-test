@@ -40,7 +40,7 @@ export function UserSelectOption({ data, highlight, isDisabled }: UserSelectOpti
   ) : data.__typename === "UserGroup" ? (
     <Flex alignItems="center">
       <UsersIcon
-        marginRight={2}
+        marginEnd={2}
         position="relative"
         aria-label={intl.formatMessage({
           id: "component.user-select.user-group-icon-alt",

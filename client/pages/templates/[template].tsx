@@ -279,7 +279,7 @@ function LandingTemplateDetails({
                         </Text>
                       </Text>
                     ) : (
-                      <Text key={field.id} marginLeft={4} marginBottom={2}>
+                      <Text key={field.id} marginStart={4} marginBottom={2}>
                         {fieldIndex}.{" "}
                         {field.title ? (
                           <Text as="span">{field.title}</Text>
@@ -299,7 +299,7 @@ function LandingTemplateDetails({
               {fields.length > 10 ? (
                 <Box
                   paddingTop={4}
-                  paddingLeft={4}
+                  paddingStart={4}
                   sx={{
                     boxShadow: showFields ? undefined : "0px -23px 50px 45px #fff",
                   }}

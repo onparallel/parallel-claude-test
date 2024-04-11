@@ -123,7 +123,7 @@ export function useDeletePetitions() {
                       defaultMessage="The following {type, select, PETITION {parallels} other{templates}} cannot be deleted because they have been shared with you through a team:"
                       values={{ type }}
                     />
-                    <UnorderedList paddingLeft={4} pt={2}>
+                    <UnorderedList paddingStart={4} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
                           <PetitionNameWithPath petition={petition!} relativePath={currentPath} />
@@ -157,7 +157,7 @@ export function useDeletePetitions() {
                       id="component.delete-petitions.public-templates-error-plural"
                       defaultMessage="The following templates cannot be deleted because they are public:"
                     />
-                    <UnorderedList paddingLeft={2} pt={2}>
+                    <UnorderedList paddingStart={2} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
                           <PetitionNameWithPath petition={petition!} relativePath={currentPath} />
@@ -336,7 +336,7 @@ function ConfirmDeleteSharedPetitionsDialog({
               />
             </Center>
           ) : (
-            <UnorderedList paddingLeft={4}>
+            <UnorderedList paddingStart={4}>
               {petitions.map((petition) => (
                 <ListItem key={petition!.id}>
                   <PetitionNameWithPath petition={petition!} relativePath={currentPath} />

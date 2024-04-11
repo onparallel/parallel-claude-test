@@ -76,7 +76,7 @@ function useConfirmDeleteContactsDialog() {
                     id="component.use-delete-contact.confirm-delete-alert-single-text"
                     defaultMessage="This contact has access to:"
                   />
-                  <Stack as="ul" paddingLeft={8} spacing={0}>
+                  <Stack as="ul" paddingStart={8} spacing={0}>
                     {extra.PENDING > 0 ? (
                       <Text as="li">
                         <FormattedMessage

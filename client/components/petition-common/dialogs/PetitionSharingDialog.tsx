@@ -348,7 +348,7 @@ export function PetitionSharingDialog({
                   )}
                 />
               </FormControl>
-              <FormControl id="permissionType" minWidth="120px" width="120px" marginLeft={2}>
+              <FormControl id="permissionType" minWidth="120px" width="120px" marginStart={2}>
                 <Controller
                   name="permissionType"
                   control={control}
@@ -410,7 +410,7 @@ export function PetitionSharingDialog({
                 {userPermissions.map(({ user, permissionType }) => (
                   <Flex key={user.id} alignItems="center">
                     <UserAvatar role="presentation" user={user} size="sm" />
-                    <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                    <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                       <Flex direction="row" alignItems="center" gap={1}>
                         <Text noOfLines={1} wordBreak="break-all">
                           {user.fullName}
@@ -520,7 +520,7 @@ export function PetitionSharingDialog({
                         icon={<UsersIcon />}
                         size="sm"
                       />
-                      <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                      <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                         <Text noOfLines={1} wordBreak="break-all">
                           <UserGroupReference userGroup={group} />
                         </Text>
@@ -645,7 +645,7 @@ export function PetitionSharingDialog({
                             />
                           )}
                         </Text>
-                        <UnorderedList paddingLeft={4} pt={2}>
+                        <UnorderedList paddingStart={4} pt={2}>
                           {sharingInfo.readPetitions.map((petition) => (
                             <ListItem key={petition.id}>
                               <PetitionNameWithPath

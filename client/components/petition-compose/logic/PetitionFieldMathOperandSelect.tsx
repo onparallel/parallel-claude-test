@@ -213,11 +213,11 @@ const MathOperandItem = chakraForwardRef<
           fieldIndex={fieldIndex}
           isTooltipDisabled
           flexShrink={0}
-          marginLeft={indent && option.isChild ? 2 : 0}
+          marginStart={indent && option.isChild ? 2 : 0}
         />
         <Box
           fontSize="sm"
-          paddingRight={0.5}
+          paddingEnd={0.5}
           flex="1"
           minWidth="0"
           whiteSpace="nowrap"

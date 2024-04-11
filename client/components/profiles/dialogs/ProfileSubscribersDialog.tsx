@@ -164,7 +164,7 @@ function ProfileSubscribersDialog({
             return (
               <Flex key={user.id} alignItems="center">
                 <UserAvatar role="presentation" user={user} size="sm" />
-                <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                   <Flex direction="row" alignItems="center" gap={1}>
                     <Text noOfLines={1} wordBreak="break-all">
                       {user.fullName}

@@ -206,7 +206,7 @@ function RecipientViewConfirmPetitionSignersDialog({
             ) : null}
             <FormControl id="signers" isInvalid={!!errors.additionalSigners}>
               {additionalSigners.length === 0 && (
-                <Text color="gray.500" marginLeft={1}>
+                <Text color="gray.500" marginStart={1}>
                   <FormattedMessage
                     id="component.recipient-view-confirm-petition-signers-dialog.signers-added"
                     defaultMessage="You haven't added any signers yet"

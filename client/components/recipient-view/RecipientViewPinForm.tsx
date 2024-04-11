@@ -39,7 +39,7 @@ export function RecipientViewPinForm({
       <HStack
         sx={{
           "> :not(style) ~ :not(style):nth-of-type(4)": {
-            marginLeft: 8,
+            marginStart: 8,
           },
         }}
       >

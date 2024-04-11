@@ -105,7 +105,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
               id="component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model"
               defaultMessage="Download option loading model"
             />
-            <DownloadIcon marginLeft={2} />
+            <DownloadIcon marginStart={2} />
           </NormalLink>
         </Stack>
       </SettingsRow>

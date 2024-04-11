@@ -429,7 +429,7 @@ export const PetitionHeader = Object.assign(
             <HeaderNameEditable
               ref={editableRef}
               flex="1"
-              paddingRight={4}
+              paddingEnd={4}
               petition={petition}
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
@@ -446,7 +446,7 @@ export const PetitionHeader = Object.assign(
                 <PetitionStatusLabel status={status} />
               </Center>
             ) : (
-              <Badge colorScheme="primary" marginRight={2}>
+              <Badge colorScheme="primary" marginEnd={2}>
                 <FormattedMessage id="generic.template" defaultMessage="Template" />
               </Badge>
             )}

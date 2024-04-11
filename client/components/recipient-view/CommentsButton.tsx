@@ -29,7 +29,7 @@ export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
 
     return commentCount > 0 ? (
       <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
-        <RecipientViewCommentsBadge hasUnreadComments={hasUnreadComments} marginRight={2} />
+        <RecipientViewCommentsBadge hasUnreadComments={hasUnreadComments} marginEnd={2} />
         {intl.formatNumber(commentCount)}
       </Button>
     ) : (

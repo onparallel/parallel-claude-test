@@ -85,8 +85,8 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           }}
           borderRadius="full"
           height={12}
-          paddingLeft={0}
-          paddingRight={0}
+          paddingStart={0}
+          paddingEnd={0}
           transition="all 200ms"
         >
           <UserAvatar user={me} size="md">
@@ -104,7 +104,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
             boxSize={1}
             position="absolute"
             bottom={0}
-            right={0}
+            insetEnd={0}
             aria-hidden
             cursor="crosshair"
             overflow="hidden"

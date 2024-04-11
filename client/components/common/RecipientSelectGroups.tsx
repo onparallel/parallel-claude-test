@@ -278,7 +278,7 @@ export function RecipientSelectGroups({
               </Box>
               {index > 0 ? (
                 <IconButton
-                  marginLeft={2}
+                  marginStart={2}
                   variant="ghost"
                   aria-label={intl.formatMessage({
                     id: "component.recipient-select-groups.delete-group-label",
@@ -371,7 +371,7 @@ export function RecipientSelectGroups({
                 }}
               />
             </Text>
-            <UnorderedList paddingLeft={2}>
+            <UnorderedList paddingStart={2}>
               {bouncedEmailRecipients.map((recipient, index) => (
                 <ListItem key={index}>{`${recipient.fullName} <${recipient.email}>`}</ListItem>
               ))}

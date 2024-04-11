@@ -102,7 +102,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
       return (
         <Card {...props}>
           <CardHeader
-            leftIcon={<AppWindowIcon marginRight={2} role="presentation" />}
+            leftIcon={<AppWindowIcon marginEnd={2} role="presentation" />}
             rightAction={
               <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isReadOnly} />
             }

@@ -396,14 +396,14 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
         }}
         backgroundColor={hasUnreadComments ? "primary.50" : undefined}
       >
-        <Box paddingLeft={2.5} position="relative">
+        <Box paddingStart={2.5} position="relative">
           {hasUnreadComments ? (
             <Circle
               size="10px"
               background="primary.500"
               position="absolute"
               top="calc(50% - 5px)"
-              left="-6px"
+              insetStart="-6px"
             />
           ) : null}
           {petition.status === "PENDING" ? (

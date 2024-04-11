@@ -135,7 +135,7 @@ function OptOut(props: OptOutProps) {
                     })}
                   </Stack>
                   {reason === "OTHER" ? (
-                    <FormControl id="other-reason" paddingLeft={6} paddingTop={2} isRequired>
+                    <FormControl id="other-reason" paddingStart={6} paddingTop={2} isRequired>
                       <Input
                         type="text"
                         placeholder={intl.formatMessage({

@@ -109,13 +109,13 @@ export function PublicLayout({
         id="target-container"
         data-testid="cookie-consent"
         position="fixed"
-        left="200px"
-        right="200px"
+        insetStart="200px"
+        insetEnd="200px"
         bottom="20px"
         sx={{
           "@media screen and (max-width: 991px)": {
-            left: "12px",
-            right: "12px",
+            insetStart: "12px",
+            insetEnd: "12px",
           },
         }}
       />

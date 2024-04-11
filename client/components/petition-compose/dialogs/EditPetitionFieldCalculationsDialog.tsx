@@ -96,7 +96,7 @@ function EditPetitionFieldCalculationsDialog({
                 variant="outline"
                 backgroundColor="white"
                 size="sm"
-                marginLeft={2}
+                marginStart={2}
                 onClick={() => withError(handleAddNewVariable)}
               >
                 <FormattedMessage

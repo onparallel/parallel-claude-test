@@ -26,7 +26,7 @@ export const DateInput = chakraForwardRef<"input", InputProps>(function DateInpu
       }
       {...props}
       sx={{
-        paddingRight: 1.5,
+        paddingEnd: 1.5,
         "&::-webkit-calendar-picker-indicator": {
           color: "transparent",
           background: "transparent",

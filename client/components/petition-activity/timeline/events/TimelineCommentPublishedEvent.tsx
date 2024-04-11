@@ -76,7 +76,7 @@ export function TimelineCommentPublishedEvent({
               )}
 
               {isEdited ? (
-                <Text as="span" textStyle="hint" marginLeft={2} fontSize="sm">
+                <Text as="span" textStyle="hint" marginStart={2} fontSize="sm">
                   <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
                 </Text>
               ) : null}

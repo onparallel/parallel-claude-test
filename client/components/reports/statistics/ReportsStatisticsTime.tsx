@@ -374,7 +374,7 @@ export function ReportsStatisticsTime({
                 >
                   <Tr textTransform="uppercase">
                     <Th fontSize="14px" fontWeight="normal">
-                      <Text marginLeft={6}>
+                      <Text marginStart={6}>
                         <FormattedMessage
                           id="component.reports-statistics-time.steps"
                           defaultMessage="Steps"

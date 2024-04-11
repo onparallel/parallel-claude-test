@@ -155,7 +155,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
           })}
         />
         {loading ? null : (
-          <ModalHeader paddingRight={12}>
+          <ModalHeader paddingEnd={12}>
             {field?.title || (
               <Text fontWeight="normal" textStyle="hint">
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />

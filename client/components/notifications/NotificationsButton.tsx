@@ -78,7 +78,7 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(
                   backgroundColor="inherit"
                   boxSize="14px"
                   padding="2px"
-                  right="9px"
+                  insetEnd="9px"
                   top="0px"
                 >
                   <Badge

@@ -165,7 +165,7 @@ export function RecipientViewPetitionFieldText({
   const inputProps = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef as any,
-    paddingRight: 10,
+    paddingEnd: 10,
     isDisabled: isDisabled,
     maxLength: field.options.maxLength ?? undefined,
     value,
@@ -260,7 +260,7 @@ export function RecipientViewPetitionFieldText({
             data-testid="recipient-view-field-text-new-reply-textarea"
             {...inputProps}
           />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
@@ -305,7 +305,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   const props = {
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref: ref as any,
-    paddingRight: 10,
+    paddingEnd: 10,
     value,
     maxLength: field.options.maxLength ?? undefined,
     isDisabled: isDisabled || reply.status === "APPROVED",
@@ -348,7 +348,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <GrowingTextarea data-testid="recipient-view-field-text-reply-textarea" {...props} />
-        <Center boxSize={10} position="absolute" right={0} bottom={0}>
+        <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
       </Flex>

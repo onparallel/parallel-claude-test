@@ -141,9 +141,9 @@ export function DateRangePicker({
                   ...(isEqual(date, startDate) && isEqual(endOfDay(date), endDate)
                     ? {}
                     : isEqual(date, startDate)
-                      ? { right: 0, width: "calc(50% + 16px)", borderLeftRadius: "full" }
+                      ? { insetEnd: 0, width: "calc(50% + 16px)", borderStartRadius: "full" }
                       : isEqual(endOfDay(date), endDate)
-                        ? { left: 0, width: "calc(50% + 16px)", borderRightRadius: "full" }
+                        ? { insetStart: 0, width: "calc(50% + 16px)", borderEndRadius: "full" }
                         : isAfter(date, startDate) && isBefore(date, endDate)
                           ? { width: "100%" }
                           : {}),
@@ -190,15 +190,15 @@ export function DateRangePicker({
                           width: "calc(50% + 16px)",
                           borderBlockWidth: "2px",
                           ...(edgeSelection === "START"
-                            ? { right: 0, borderLeftRadius: "full", borderLeftWidth: "2px" }
-                            : { left: 0, borderRightRadius: "full", borderRightWidth: "2px" }),
+                            ? { insetEnd: 0, borderStartRadius: "full", borderStartWidth: "2px" }
+                            : { insetStart: 0, borderEndRadius: "full", borderEndWidth: "2px" }),
                         }
                       : edgeSelection === "START" && isEqual(endOfDay(date), endDate!)
                         ? // date is endDate and hovering after it
-                          { width: "50%", left: 0, borderBlockWidth: "2px" }
+                          { width: "50%", insetStart: 0, borderBlockWidth: "2px" }
                         : edgeSelection === "END" && isEqual(date, startDate!)
                           ? // date is startDate and hovering before it it
-                            { width: "50%", right: 0, borderBlockWidth: "2px" }
+                            { width: "50%", insetEnd: 0, borderBlockWidth: "2px" }
                           : { width: "100%", borderBlockWidth: "2px" }),
                 },
               }

@@ -53,7 +53,7 @@ export function RecipientViewSignatureSentAlert({
         justifyContent="flex-start"
         marginX="auto"
         width="100%"
-        paddingLeft={4}
+        paddingStart={4}
         flexDirection={{ base: "column", md: "row" }}
         gap={{ base: 2, md: 6 }}
       >
@@ -130,7 +130,7 @@ export function RecipientViewSignatureSentAlert({
         </Flex>
         {petition.latestSignatureRequest && !isPendingStart && (
           <Box>
-            <Button marginLeft="auto" onClick={handleCheckStatusClick} background="white">
+            <Button marginStart="auto" onClick={handleCheckStatusClick} background="white">
               <FormattedMessage
                 id="component.recipient-view-signature-sent-alert.check-status-button"
                 defaultMessage="Check status"
@@ -250,7 +250,7 @@ function SignatureStatusDialog({
               />
             )}
           </Text>
-          <Stack as="ul" spacing={1} paddingLeft={4}>
+          <Stack as="ul" spacing={1} paddingStart={4}>
             {signers.map((signer, i) => (
               <Text as="li" key={i}>
                 {signer.signer.fullName} {`<${signer.signer.email}>`}{" "}

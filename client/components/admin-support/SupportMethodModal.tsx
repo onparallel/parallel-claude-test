@@ -214,7 +214,7 @@ function CopyToClipboardButton({ content }: { content: string }) {
   return (
     <Button color="black" onClick={handleExportClick}>
       {copied ? "Copied to clipboard!" : "Copy to clipboard"}
-      {copied ? <CheckIcon marginLeft={1} color="green.500" /> : null}
+      {copied ? <CheckIcon marginStart={1} color="green.500" /> : null}
     </Button>
   );
 }

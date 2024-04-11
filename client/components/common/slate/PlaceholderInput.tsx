@@ -201,7 +201,7 @@ export const PlaceholderInput = chakraForwardRef<
               <PlaceholderCombobox placeholders={placeholders} />
             </PlateWithEditorRef>
           </PlaceholdersProvider>
-          <Center paddingRight={1} height="full">
+          <Center paddingEnd={1} height="full">
             <ToolbarPlaceholderButton
               isDisabled={formControl.disabled}
               variant="outline"

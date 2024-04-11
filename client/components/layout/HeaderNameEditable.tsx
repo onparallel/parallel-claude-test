@@ -140,7 +140,7 @@ export const HeaderNameEditable = Object.assign(
                           }
                           fontSize="xs"
                           cursor="default"
-                          marginLeft={2}
+                          marginStart={2}
                         >
                           {state === "SAVING" ? (
                             <CloudUploadIcon fontSize="sm" role="presentation" />

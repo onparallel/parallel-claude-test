@@ -126,8 +126,8 @@ export function NotificationsDrawer() {
       <DrawerContent data-testid="notifications-drawer">
         <DrawerCloseButton top={4} data-testid="notifications-drawer-close" />
         <DrawerHeader
-          paddingInlineStart={4}
-          paddingInlineEnd={4}
+          paddingStart={4}
+          paddingEnd={4}
           paddingBottom={2}
           borderBottom="1px solid"
           borderColor="gray.200"
@@ -149,8 +149,8 @@ export function NotificationsDrawer() {
           />
         </DrawerHeader>
         <DrawerBody
-          paddingInlineStart={0}
-          paddingInlineEnd={0}
+          paddingStart={0}
+          paddingEnd={0}
           paddingY={0}
           display="flex"
           flexDirection="column"

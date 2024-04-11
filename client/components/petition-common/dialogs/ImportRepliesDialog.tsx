@@ -284,7 +284,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
             id="component.import-replies-dialog.title"
             defaultMessage="Import replies"
           />
-          <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/2
           </Text>
         </Flex>

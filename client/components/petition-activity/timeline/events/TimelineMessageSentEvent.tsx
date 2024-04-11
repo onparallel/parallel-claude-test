@@ -121,7 +121,7 @@ export function TimelineMessageSentEvent({
             openedAt={message.openedAt}
             deliveredAt={message.deliveredAt}
             bouncedAt={message.bouncedAt}
-            marginLeft={2}
+            marginStart={2}
           />
         </Box>
         {message.emailBody ? (
@@ -129,7 +129,7 @@ export function TimelineMessageSentEvent({
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />

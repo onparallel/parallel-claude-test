@@ -22,10 +22,7 @@ export function RecipientViewPagination({
   return (
     <Box as="nav" role="navigation" {...props}>
       <List display="flex">
-        <ListItem
-          paddingRight={1}
-          display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}
-        >
+        <ListItem paddingEnd={1} display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}>
           <PageLink
             page={currentPage - 1}
             icon={<ArrowBackIcon />}
@@ -69,7 +66,10 @@ export function RecipientViewPagination({
           ),
         )}
         <Spacer />
-        <ListItem paddingLeft={1} display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}>
+        <ListItem
+          paddingStart={1}
+          display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}
+        >
           <PageLink
             page={currentPage + 1}
             icon={<ArrowForwardIcon />}

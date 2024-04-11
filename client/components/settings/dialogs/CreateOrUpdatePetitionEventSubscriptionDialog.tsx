@@ -343,7 +343,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
               defaultMessage="Signature keys"
             />
           )}
-          <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/2
           </Text>
         </Flex>
@@ -453,7 +453,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
               />
             </FormControl>
             <PaddedCollapse in={eventsMode === "SPECIFIC"}>
-              <Stack paddingLeft={6}>
+              <Stack paddingStart={6}>
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.create-event-subscription-dialog.events-documentation"
@@ -509,7 +509,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                 eventTypes.every((e) => FIELD_EVENTS.includes(e))
               }
             >
-              <Stack paddingLeft={6}>
+              <Stack paddingStart={6}>
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.create-petition-event-subscription-dialog.filter-fields"
@@ -543,7 +543,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                 id="component.create-event-subscription-dialog.signature-keys-explanation"
                 defaultMessage="You can validate the integrity and authenticity of the events you receive in your subscription by creating a signature key."
               />
-              <HelpCenterLink marginLeft={1} articleId={7035199}>
+              <HelpCenterLink marginStart={1} articleId={7035199}>
                 <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
               </HelpCenterLink>
             </Text>
@@ -568,7 +568,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                       <CopyToClipboardButton
                         border={"1px solid"}
                         borderColor="inherit"
-                        borderLeftRadius={0}
+                        borderStartRadius={0}
                         text={k.publicKey}
                       />
                     </InputRightAddon>

@@ -60,7 +60,7 @@ export function SolveUnreviewedRepliesDialog(
                     backgroundColor="green.500"
                     borderRadius="md"
                     boxSize={6}
-                    marginRight={2}
+                    marginEnd={2}
                   >
                     <CheckIcon boxSize={4} color="white" />
                   </Flex>
@@ -89,7 +89,7 @@ export function SolveUnreviewedRepliesDialog(
                     backgroundColor="red.500"
                     borderRadius="md"
                     boxSize={6}
-                    marginRight={2}
+                    marginEnd={2}
                   >
                     <CloseIcon boxSize={4} color="white" />
                   </Flex>
@@ -118,7 +118,7 @@ export function SolveUnreviewedRepliesDialog(
                     backgroundColor="gray.400"
                     borderRadius="md"
                     boxSize={6}
-                    marginRight={2}
+                    marginEnd={2}
                   >
                     <ForbiddenIcon boxSize={4} color="white" />
                   </Flex>

@@ -54,7 +54,7 @@ export function TemplateDefaultUserPermissionRow({
         />
       )}
 
-      <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+      <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
         {isDefined(permission) ? (
           <>
             <Stack direction={"row"} spacing={1} align="center">

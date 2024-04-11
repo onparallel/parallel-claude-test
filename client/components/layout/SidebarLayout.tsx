@@ -54,8 +54,8 @@ export function SidebarLayout({
         <Flex
           direction="column"
           backgroundColor="white"
-          borderRight="1px solid"
-          borderRightColor="gray.100"
+          borderEnd="1px solid"
+          borderEndColor="gray.100"
           flex="1"
           minHeight={0}
           maxWidth={{ base: "auto", md: 64 }}
@@ -108,7 +108,7 @@ export function SidebarLayout({
                     id: "generic.go-back",
                     defaultMessage: "Go back",
                   })}
-                  marginRight={2}
+                  marginEnd={2}
                   display={{
                     base: "flex",
                     md: showBackButton ? "flex" : "none",
@@ -161,14 +161,14 @@ function SidebarLayoutMenuItem({ path, children }: SidebarLayoutMenuItemProps) {
         display="flex"
         borderBottom="1px solid"
         borderBottomColor="gray.100"
-        borderRight="4px solid"
-        borderRightColor="transparent"
+        borderEnd="4px solid"
+        borderEndColor="transparent"
         backgroundColor="white"
         alignItems="center"
         aria-current={active ? "page" : undefined}
         _activeLink={{
           backgroundColor: "gray.75",
-          borderRightColor: "primary.500",
+          borderEndColor: "primary.500",
         }}
         _hover={{
           backgroundColor: "gray.50",
@@ -180,7 +180,7 @@ function SidebarLayoutMenuItem({ path, children }: SidebarLayoutMenuItemProps) {
         <Box flex="1" padding={3}>
           <Text fontSize="md">{children}</Text>
         </Box>
-        <ChevronRightIcon boxSize="6" marginRight={2} />
+        <ChevronRightIcon boxSize="6" marginEnd={2} />
       </Box>
     </NakedLink>
   );

@@ -156,7 +156,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           onRefetch={async () => {
             await refetch();
           }}
-          borderRight="1px solid"
+          borderEnd="1px solid"
           borderColor="gray.200"
           maxWidth="container.xs"
           minWidth="container.3xs"

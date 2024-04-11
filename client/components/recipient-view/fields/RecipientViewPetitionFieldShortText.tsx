@@ -190,7 +190,7 @@ export function RecipientViewPetitionFieldShortText({
   const inputProps = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef,
-    paddingRight: 10,
+    paddingEnd: 10,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id] || isInvalid || hasAlreadyRepliedError,
     maxLength: field.options.maxLength ?? undefined,
@@ -310,7 +310,7 @@ export function RecipientViewPetitionFieldShortText({
               {...inputProps}
               format={format}
             />
-            <Center boxSize={10} position="absolute" right={0} bottom={0}>
+            <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
           </Flex>
@@ -366,7 +366,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   const props: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref,
-    paddingRight: 10,
+    paddingEnd: 10,
     value,
     maxLength: field.options.maxLength ?? undefined,
     isDisabled: isDisabled || reply.status === "APPROVED",
@@ -430,7 +430,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
             {...props}
             format={format}
           />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
           </Center>
         </Flex>

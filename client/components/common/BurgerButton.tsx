@@ -15,7 +15,7 @@ export function BurgerButton({ isOpen, ...props }: BurgerButtonProps) {
     transition: "300ms",
     position: "absolute",
     top: "50%",
-    left: "5px",
+    insetStart: "5px",
   };
 
   return (

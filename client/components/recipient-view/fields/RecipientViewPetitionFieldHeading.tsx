@@ -25,13 +25,13 @@ export const RecipientViewPetitionFieldHeading = chakraForwardRef<
       <HStack alignItems="flex-start">
         <Box flex="1">
           <Heading size="md">
-            {field.isInternal ? <InternalFieldBadge marginRight={2.5} marginBottom={0.5} /> : null}
+            {field.isInternal ? <InternalFieldBadge marginEnd={2.5} marginBottom={0.5} /> : null}
             {field.title ? field.title : null}
           </Heading>
         </Box>
         {(field.hasCommentsEnabled || field.__typename === "PetitionField") &&
         isDefined(onCommentsButtonClick) ? (
-          <Box paddingRight={2}>
+          <Box paddingEnd={2}>
             <CommentsButton
               commentCount={field.commentCount}
               hasUnreadComments={field.unreadCommentCount > 0}

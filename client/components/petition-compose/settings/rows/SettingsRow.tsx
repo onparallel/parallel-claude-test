@@ -36,7 +36,7 @@ export function SettingsRow({
         fontWeight="normal"
         whiteSpace="nowrap"
         margin={0}
-        marginRight={4}
+        marginEnd={4}
         minHeight={8}
       >
         <HStack>
@@ -44,7 +44,7 @@ export function SettingsRow({
           <Text as="span" whiteSpace="break-spaces">
             {label}
           </Text>
-          {description ? <HelpPopover marginLeft={0}>{description}</HelpPopover> : null}
+          {description ? <HelpPopover marginStart={0}>{description}</HelpPopover> : null}
         </HStack>
       </FormLabel>
       {children}

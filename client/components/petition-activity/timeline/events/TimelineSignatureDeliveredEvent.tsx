@@ -36,7 +36,7 @@ export function TimelineSignatureDeliveredEvent({ event }: TimelineSignatureDeli
               openedAt={event.openedAt}
               deliveredAt={event.deliveredAt}
               bouncedAt={event.bouncedAt}
-              marginLeft={2}
+              marginStart={2}
             />
           ) : null}
         </Box>

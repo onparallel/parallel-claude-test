@@ -673,9 +673,9 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
               })
               .map(({ category, permissions }) => {
                 return (
-                  <UnorderedList key={category} listStyleType="none" marginInlineStart={0}>
+                  <UnorderedList key={category} listStyleType="none" marginStart={0}>
                     <ListItem fontWeight={500}>{category}</ListItem>
-                    <UnorderedList listStyleType="none" marginInlineStart={2} spacing={2}>
+                    <UnorderedList listStyleType="none" marginStart={2} spacing={2}>
                       {permissions.map(({ name, title, description }) => {
                         const index = fields.findIndex((f) => f.name === name)!;
                         return (

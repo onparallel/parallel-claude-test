@@ -359,7 +359,7 @@ function MultiValueLabel({
         <UserGroupMembersPopover userGroupId={data.id}>
           <OverflownText>
             <UsersIcon
-              marginRight={1}
+              marginEnd={1}
               aria-label={intl.formatMessage({
                 id: "component.user-select.user-group-icon-alt",
                 defaultMessage: "Team",

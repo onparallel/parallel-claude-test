@@ -69,7 +69,7 @@ export function UserGroupMembersPopover({
                     <Flex key={user.id} as={ListItem} alignItems="center" paddingX={3}>
                       <UserAvatar size="xs" user={user} />
                       <Flex direction="row" alignItems="center" gap={1}>
-                        <Text marginLeft={2} noOfLines={1} wordBreak="break-all">
+                        <Text marginStart={2} noOfLines={1} wordBreak="break-all">
                           {user.fullName}
                         </Text>
                         {userDetails?.(user.id) ?? null}

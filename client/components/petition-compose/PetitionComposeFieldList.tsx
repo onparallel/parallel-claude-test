@@ -482,7 +482,7 @@ export const PetitionComposeFieldList = Object.assign(
                     <AddFieldButton
                       position="absolute"
                       bottom={0}
-                      left="50%"
+                      insetStart="50%"
                       transform="translate(-50%, 50%)"
                       className="add-field-after-button"
                       data-testid="small-add-field-button"

@@ -93,12 +93,12 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
       >
         <RadioTab
           value="0"
-          borderTopLeftRadius={0}
+          borderTopStartRadius={0}
           isDisabled={!hasCommentsEnabled}
           cursor={hasCommentsEnabled ? "pointer" : "not-allowed"}
           color={hasCommentsEnabled ? "inherit" : "gray.400"}
           fontWeight="semibold"
-          borderLeft="none"
+          borderStart="none"
         >
           <FormattedMessage
             id="component.petition-comments-and-notes-editor.comments"

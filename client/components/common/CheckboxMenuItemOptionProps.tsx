@@ -20,7 +20,7 @@ export function CheckboxMenuItemOption({ children, value, onChange }: CheckboxMe
           pointerEvents="none"
           colorScheme="primary"
           isChecked={value}
-          marginRight={2}
+          marginEnd={2}
         />
         {children}
       </Flex>

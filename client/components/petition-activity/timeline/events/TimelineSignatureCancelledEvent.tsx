@@ -97,7 +97,7 @@ export function TimelineSignatureCancelledEvent({
             onClick={() => handleSeeRequestErrorMessageClick(event)}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage
@@ -111,7 +111,7 @@ export function TimelineSignatureCancelledEvent({
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage
@@ -126,7 +126,7 @@ export function TimelineSignatureCancelledEvent({
             event.errorCode,
           ) && (
             <NakedLink href="/app/organization/integrations/signature">
-              <Button as="a" variant="outline" size="sm" marginLeft={4}>
+              <Button as="a" variant="outline" size="sm" marginStart={4}>
                 <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
               </Button>
             </NakedLink>

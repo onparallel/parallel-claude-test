@@ -166,7 +166,7 @@ export function RecipientViewPetitionFieldDateTime({
   const inputProps = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef as any,
-    paddingRight: 3,
+    paddingEnd: 3,
     isDisabled,
     isInvalid: isInvalid || hasAlreadyRepliedError,
     value,
@@ -254,12 +254,12 @@ export function RecipientViewPetitionFieldDateTime({
           <Flex flex="1" position="relative" marginTop={2}>
             <DateInput {...inputProps} type="datetime-local" />
             {browserName !== "Firefox" ? (
-              <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+              <Center boxSize={10} position="absolute" insetEnd={0} bottom={0} pointerEvents="none">
                 <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
               </Center>
             ) : null}
 
-            <Center boxSize={10} position="absolute" right={8} bottom={0}>
+            <Center boxSize={10} position="absolute" insetEnd={8} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
           </Flex>
@@ -314,7 +314,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     type: reply.isAnonymized ? "text" : "datetime-local",
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref: ref as any,
-    paddingRight: 3,
+    paddingEnd: 3,
     value,
     // This removes the reset button on Firefox
     required: true,
@@ -382,7 +382,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
         <Flex flex="1" position="relative">
           <DateInput {...props} />
           {browserName !== "Firefox" || reply.status === "APPROVED" ? (
-            <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+            <Center boxSize={10} position="absolute" insetEnd={0} bottom={0} pointerEvents="none">
               <FieldDateIcon
                 fontSize="18px"
                 color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
@@ -390,7 +390,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
             </Center>
           ) : null}
 
-          <Center boxSize={10} position="absolute" right={8} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
           </Center>
         </Flex>
@@ -429,7 +429,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               fontWeight={600}
               size="sm"
               onClick={handleRestoreTimezoneDefaults}
-              marginLeft={2}
+              marginStart={2}
               isDisabled={isDisabled || reply.status === "APPROVED"}
             >
               <FormattedMessage
@@ -450,7 +450,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               fontWeight={600}
               size="sm"
               onClick={() => setShowTimezone(true)}
-              marginLeft={1.5}
+              marginStart={1.5}
               isDisabled={isDisabled || reply.status === "APPROVED"}
             >
               <FormattedMessage

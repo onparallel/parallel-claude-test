@@ -90,11 +90,11 @@ export function PetitionFieldComment({
           position="absolute"
           top="50%"
           transform="translateY(-50%)"
-          left={2}
+          insetStart={2}
         />
       ) : null}
       <Box fontSize="sm" display="flex" alignItems="center">
-        <Box paddingRight={2}>
+        <Box paddingEnd={2}>
           {comment.author?.__typename === "PetitionAccess" ? (
             <ContactReference contact={comment.author.contact} fontWeight="bold" />
           ) : comment.author?.__typename === "User" ? (
@@ -120,14 +120,14 @@ export function PetitionFieldComment({
               </Text>
             }
           >
-            <Badge color="gray.600" variant="outline" cursor="default" marginRight={2}>
+            <Badge color="gray.600" variant="outline" cursor="default" marginEnd={2}>
               <FormattedMessage id="generic.note" defaultMessage="Note" />
             </Badge>
           </SmallPopover>
         )}
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
         {comment.isEdited ? (
-          <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
+          <Text as="span" color="gray.400" marginStart={2} fontSize="xs">
             <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
           </Text>
         ) : null}

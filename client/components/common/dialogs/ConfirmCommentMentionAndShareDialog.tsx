@@ -108,7 +108,7 @@ function ConfirmCommentMentionAndShareDialog({
               ),
             }}
           />
-          <UnorderedList paddingLeft={2}>
+          <UnorderedList paddingStart={2}>
             {[...users, ...groups].map((t, i) => (
               <ListItem key={i}>
                 {t.__typename === "User" ? (

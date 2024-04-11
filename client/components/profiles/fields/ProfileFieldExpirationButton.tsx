@@ -48,14 +48,14 @@ export function ProfileFieldExpirationButton({
         {...props}
         leftIcon={
           showDot ? (
-            <Circle background="primary.500" size={2} marginLeft={1.5} marginRight={-0.5} />
+            <Circle background="primary.500" size={2} marginStart={1.5} marginEnd={-0.5} />
           ) : undefined
         }
         isDisabled={isDisabled}
         size="xs"
         minHeight={7}
         minWidth={7}
-        icon={<FieldDateIcon boxSize={3.5} marginRight={showDot ? 1.5 : undefined} />}
+        icon={<FieldDateIcon boxSize={3.5} marginEnd={showDot ? 1.5 : undefined} />}
         label={intl.formatMessage({
           id: "component.profile-field.set-expiration-button-label",
           defaultMessage: "Set expiration",

@@ -74,7 +74,7 @@ export function TimelinePetitionClosedNotifiedEvent({
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={2}
+            marginStart={2}
             background="white"
           >
             <FormattedMessage

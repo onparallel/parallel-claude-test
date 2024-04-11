@@ -320,7 +320,7 @@ function MultiValueLabel({ children, ...props }: MultiValueProps<ContactSelectSe
   return (
     <>
       <components.MultiValueLabel {...props}>
-        <Text as="span" marginLeft={1}>
+        <Text as="span" marginStart={1}>
           {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
         </Text>
       </components.MultiValueLabel>
@@ -343,7 +343,7 @@ function SingleValue(props: SingleValueProps<ContactSelectSelection>) {
   const intl = useIntl();
   return (
     <components.SingleValue {...props}>
-      <Text as="span" marginLeft={1}>
+      <Text as="span" marginStart={1}>
         {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
       </Text>
       {hasBouncedEmail ? (
@@ -353,7 +353,7 @@ function SingleValue(props: SingleValueProps<ContactSelectSelection>) {
             defaultMessage: "Previously bounced email",
           })}
         >
-          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginStart={2} />
         </Tooltip>
       ) : null}
     </components.SingleValue>
@@ -386,7 +386,7 @@ function Option({ children, ...props }: OptionProps<ContactSelectSelection>) {
         </Text>
 
         {contact.hasBouncedEmail ? (
-          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginStart={2} />
         ) : null}
       </components.Option>
     );

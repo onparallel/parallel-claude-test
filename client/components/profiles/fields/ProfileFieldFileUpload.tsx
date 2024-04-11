@@ -310,7 +310,7 @@ function ProfileFile({ name, type, size, onRemove, onPreview, isDisabled }: Prof
           maxWidth="200px"
           onClick={() => onPreview(isMouseOver && isShiftDown ? false : true)}
         />
-        <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
+        <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
           (<FileSize value={size} />)
         </Text>
       </Flex>

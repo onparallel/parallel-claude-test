@@ -44,7 +44,7 @@ export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStarte
             onClick={handleSeeMessageClick}
             size="sm"
             variant="outline"
-            marginLeft={4}
+            marginStart={4}
             background="white"
           >
             <FormattedMessage

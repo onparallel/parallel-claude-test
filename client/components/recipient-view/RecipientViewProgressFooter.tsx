@@ -143,7 +143,7 @@ export const RecipientViewProgressFooter = Object.assign(
             width="1rem"
             height="1rem"
             backgroundColor={isCompleted ? "green.400" : "gray.200"}
-            marginLeft={2}
+            marginStart={2}
           />
         </Flex>
         <Popover
@@ -177,10 +177,10 @@ export const RecipientViewProgressFooter = Object.assign(
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent backgroundColor="blue.500" color="white" marginRight={4}>
+          <PopoverContent backgroundColor="blue.500" color="white" marginEnd={4}>
             <PopoverArrow backgroundColor="blue.500" />
             <PopoverCloseButton />
-            <PopoverBody paddingRight={10}>
+            <PopoverBody paddingEnd={10}>
               <FormattedMessage
                 id="component.recipient-view.reminder-submit"
                 defaultMessage="Remember to click Finalize when you finish entering all the information."

@@ -283,7 +283,7 @@ export const AppLayoutNavbar = Object.assign(
                   backgroundColor: "red.500",
                   border: "2px solid white",
                   top: "5px",
-                  right: "3px",
+                  insetEnd: "3px",
                   width: "16px",
                   height: "16px",
                 },

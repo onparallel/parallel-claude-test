@@ -188,11 +188,11 @@ export function RecipientViewPetitionFieldSelect({
               }
               styles={{
                 menu: (styles) => ({ ...styles, zIndex: 100 }),
-                valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+                valueContainer: (styles) => ({ ...styles, paddingInlineEnd: 32 }),
               }}
               isInvalid={isInvalid || hasAlreadyRepliedError}
             />
-            <Center height="100%" position="absolute" right="42px" top={0}>
+            <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
           </Box>
@@ -266,14 +266,14 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
               }
               styles={{
                 menu: (styles) => ({ ...styles, zIndex: 100 }),
-                valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+                valueContainer: (styles) => ({ ...styles, paddingInlineEnd: 32 }),
                 placeholder: (base) => ({
                   ...base,
                   fontStyle: reply.isAnonymized ? "italic" : "normal",
                 }),
               }}
             />
-            <Center height="100%" position="absolute" right="42px" top={0}>
+            <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
             </Center>
           </Box>

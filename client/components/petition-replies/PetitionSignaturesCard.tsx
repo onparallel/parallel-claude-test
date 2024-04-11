@@ -287,7 +287,7 @@ export const PetitionSignaturesCard = Object.assign(
             />
           </HelpPopover>
           {signatureEnvironment === "DEMO" ? (
-            <Box display="inline-block" marginLeft={2}>
+            <Box display="inline-block" marginStart={2}>
               <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
             </Box>
           ) : null}

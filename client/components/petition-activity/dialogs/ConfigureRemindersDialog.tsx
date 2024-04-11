@@ -67,7 +67,7 @@ export function ConfigureRemindersDialog({
                       defaultMessage="The following contacts opted out from receiving reminders and any changes will not apply to them:"
                     />
                   </Text>
-                  <UnorderedList paddingLeft={2}>
+                  <UnorderedList paddingStart={2}>
                     {optedOut.map((pa) => (
                       <ListItem key={pa.id}>
                         <ContactReference contact={pa.contact} />

@@ -31,7 +31,7 @@ export const PasswordInput = chakraForwardRef<"input", InputProps>(
 
     return (
       <InputGroup size="md">
-        <Input ref={mergedRef} paddingRight={12} type={show ? "text" : "password"} {...props} />
+        <Input ref={mergedRef} paddingEnd={12} type={show ? "text" : "password"} {...props} />
         <InputRightElement>
           <IconButtonWithTooltip
             tabIndex={-1}

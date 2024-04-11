@@ -200,7 +200,7 @@ export function SignatureConfigDialog({
       header={
         <Flex alignItems="center">
           {stepHeaders[currentStep]}
-          <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/{maxSteps + 1}
           </Text>
         </Flex>
@@ -337,7 +337,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
             id="component.signature-config-dialog.title-label"
             defaultMessage="Title of the document"
           />
-          <Text color="gray.500" marginLeft={1}>
+          <Text color="gray.500" marginStart={1}>
             (<FormattedMessage id="generic.optional" defaultMessage="Optional" />)
           </Text>
 
@@ -664,7 +664,7 @@ function SignatureConfigDialogBodyStep3({
   return (
     <FormControl id="presetSigners" isInvalid={!!errors.presetSigners}>
       {presetSigners.length === 0 ? (
-        <Text color={!!errors.presetSigners ? "red.500" : "gray.500"} marginLeft={1}>
+        <Text color={!!errors.presetSigners ? "red.500" : "gray.500"} marginStart={1}>
           <FormattedMessage
             id="component.signature-config-dialog.no-signers-added"
             defaultMessage="You haven't added any signers yet"

@@ -122,10 +122,10 @@ export const MapFieldsTable = Object.assign(
               opacity: isDisabled ? 0.5 : 1,
             },
             "& th:first-of-type": {
-              paddingLeft: 4,
+              paddingStart: 4,
             },
             "& th:last-of-type": {
-              paddingRight: 4,
+              paddingEnd: 4,
             },
             "& td": {
               borderBottom: "1px solid",
@@ -391,8 +391,8 @@ function TableRow({
 
   return (
     <Tr>
-      <Td padding={2} paddingLeft={4} minWidth={0} opacity={opacity}>
-        <HStack paddingLeft={targetFieldIsChild ? 3 : 0}>
+      <Td padding={2} paddingStart={4} minWidth={0} opacity={opacity}>
+        <HStack paddingStart={targetFieldIsChild ? 3 : 0}>
           <PetitionFieldTypeIndicator
             as="span"
             marginTop="2px"
@@ -461,7 +461,7 @@ function TableRow({
           expandFieldGroups
         />
       </Td>
-      <Td padding={2} paddingRight={4} minWidth={0} maxWidth="200px" opacity={opacity}>
+      <Td padding={2} paddingEnd={4} minWidth={0} maxWidth="200px" opacity={opacity}>
         <HStack>
           {selectedField ? (
             <Stack minWidth={0} flex="1" spacing={2}>

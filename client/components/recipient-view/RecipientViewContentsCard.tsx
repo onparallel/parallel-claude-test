@@ -185,7 +185,7 @@ export const RecipientViewContentsCard = Object.assign(
                         <ChevronFilledIcon
                           color="gray.500"
                           position="absolute"
-                          left={2}
+                          insetStart={2}
                           top={2.5}
                           fontSize="sm"
                           transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
@@ -212,7 +212,7 @@ export const RecipientViewContentsCard = Object.assign(
                         ) : null}
                         {isInternal ? (
                           <Center>
-                            <InternalFieldBadge marginLeft={2} />
+                            <InternalFieldBadge marginStart={2} />
                           </Center>
                         ) : null}
                       </Button>
@@ -282,7 +282,7 @@ export const RecipientViewContentsCard = Object.assign(
                                     commentCount={field.commentCount}
                                   />
                                 ) : null}
-                                {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
+                                {field.isInternal ? <InternalFieldBadge marginStart={2} /> : null}
                               </Button>
                             </Text>
                           </ListItem>
@@ -393,7 +393,7 @@ function RecipientViewContentsIndicators({
       fontWeight="normal"
     >
       <RecipientViewCommentsBadge
-        marginRight={2}
+        marginEnd={2}
         boxSize={1.5}
         hasUnreadComments={hasUnreadComments}
       />
@@ -407,7 +407,7 @@ function RecipientViewContentsIndicators({
       <Text as="span" fontSize="sm" aria-hidden height="12px" lineHeight="12px">
         {intl.formatNumber(commentCount)}
       </Text>
-      <CommentIcon marginLeft={1} role="presentation" fontSize="sm" />
+      <CommentIcon marginStart={1} role="presentation" fontSize="sm" />
     </Flex>
   );
 }

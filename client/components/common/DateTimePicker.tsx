@@ -39,7 +39,7 @@ export function DateTimePicker({
           isDisabledDate={isDisabledDate}
         />
       </Box>
-      <Flex flex="1" direction="column" marginLeft={{ base: 0, sm: 4 }}>
+      <Flex flex="1" direction="column" marginStart={{ base: 0, sm: 4 }}>
         <Flex direction={{ base: "row", sm: "column" }}>
           <Input
             type="date"
@@ -58,7 +58,7 @@ export function DateTimePicker({
           />
           <Input
             marginTop={{ base: 0, sm: 2 }}
-            marginLeft={{ base: 4, sm: 0 }}
+            marginStart={{ base: 4, sm: 0 }}
             type="time"
             {...timeInput}
           />

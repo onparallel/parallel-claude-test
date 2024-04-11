@@ -713,8 +713,8 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     >
       <HStack
         ref={ref}
-        paddingLeft={5}
-        paddingRight={3}
+        paddingStart={5}
+        paddingEnd={3}
         _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"
         backgroundColor="white"
@@ -737,7 +737,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
         <Box
           className="drag-handle"
           position="absolute"
-          left={1}
+          insetStart={1}
           display="flex"
           flexDirection="column"
           justifyContent="center"
@@ -768,7 +768,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
               size="xs"
               aria-label={menuButtonLabel}
               leftIcon={menuIcon}
-              rightIcon={<ChevronDownIcon marginLeft={-2} />}
+              rightIcon={<ChevronDownIcon marginStart={-2} />}
               isDisabled={isDisabled}
             />
           </Box>
@@ -830,7 +830,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           <Text as="span" marginX={2}>
             -
           </Text>
-          <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
+          <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
             <FileSize value={size} />
           </Text>
           {!isComplete && progress ? (

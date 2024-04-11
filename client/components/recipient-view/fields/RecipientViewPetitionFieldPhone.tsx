@@ -165,7 +165,7 @@ export function RecipientViewPetitionFieldPhone({
   const props: ComponentProps<typeof PhoneInputLazy> = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     inputRef: newReplyRef,
-    paddingRight: 10,
+    paddingInlineEnd: 10,
     isDisabled: isDisabled,
     isInvalid: isInvalidValue || isInvalid || hasAlreadyRepliedError,
     onKeyDown: async (event: KeyboardEvent) => {
@@ -260,7 +260,7 @@ export function RecipientViewPetitionFieldPhone({
             }}
             {...props}
           />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
@@ -306,7 +306,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   const props: ComponentProps<typeof PhoneInputLazy> = {
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     inputRef: ref,
-    paddingRight: 10,
+    paddingEnd: 10,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: isInvalidValue || reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {
@@ -346,7 +346,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
           }}
           {...props}
         />
-        <Center boxSize={10} position="absolute" right={0} bottom={0}>
+        <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
         </Center>
       </Flex>

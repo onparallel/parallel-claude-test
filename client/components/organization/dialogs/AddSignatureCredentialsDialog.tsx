@@ -142,7 +142,7 @@ function AddSignatureCredentialsDialog({
               defaultMessage="New signature provider"
             />
           </Text>
-          <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/2
           </Text>
         </Flex>
@@ -292,7 +292,7 @@ function DocusignCredentialsInput({ hasDocusignSandbox }: { hasDocusignSandbox: 
                 />
               </Text>
             </HelpPopover>
-            <Switch {...register("credentials.sandboxMode")} marginLeft={2} />
+            <Switch {...register("credentials.sandboxMode")} marginStart={2} />
           </FormLabel>
         </FormControl>
       ) : null}

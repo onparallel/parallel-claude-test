@@ -128,8 +128,8 @@ export const PetitionRepliesField = Object.assign(
     return field.type === "HEADING" ? (
       <Grid
         ref={ref as any}
-        paddingLeft={{ base: 4, md: 6 }}
-        paddingRight={4}
+        paddingStart={{ base: 4, md: 6 }}
+        paddingEnd={4}
         paddingY={2}
         as="section"
         templateColumns="32px 10px 1fr 8px auto"
@@ -168,7 +168,7 @@ export const PetitionRepliesField = Object.assign(
             {...(field.title ? {} : { textStyle: "hint" })}
           >
             {field.isInternal ? (
-              <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+              <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
             ) : null}
             {field.title || (
               <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
@@ -207,8 +207,8 @@ export const PetitionRepliesField = Object.assign(
         {...props}
       >
         <Grid
-          paddingLeft={{ base: 4, md: 6 }}
-          paddingRight={4}
+          paddingStart={{ base: 4, md: 6 }}
+          paddingEnd={4}
           paddingY={2}
           templateColumns="32px 10px 1fr 8px auto"
           gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
@@ -239,7 +239,7 @@ export const PetitionRepliesField = Object.assign(
                 })}
               >
                 <Box
-                  paddingLeft={{ base: 2.5, md: 0 }}
+                  paddingStart={{ base: 2.5, md: 0 }}
                   width={4}
                   height={4}
                   textAlign="center"
@@ -247,7 +247,7 @@ export const PetitionRepliesField = Object.assign(
                   color="red.600"
                   userSelect="none"
                   position="absolute"
-                  left={0}
+                  insetStart={0}
                   top={0}
                   transform={{
                     base: "translate(-1.25rem, 50%)",
@@ -277,7 +277,7 @@ export const PetitionRepliesField = Object.assign(
                 : { textStyle: "hint", whiteSpace: "nowrap" })}
             >
               {field.isInternal ? (
-                <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+                <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
               ) : null}
               {field.title || (
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -306,7 +306,7 @@ export const PetitionRepliesField = Object.assign(
             ) : null}
           </Box>
         </Grid>
-        <Stack paddingLeft={10} spacing={3}>
+        <Stack paddingStart={10} spacing={3}>
           {field.replies.length > 0 ? (
             field.replies.map((reply, index) => {
               return (
@@ -314,7 +314,7 @@ export const PetitionRepliesField = Object.assign(
                   id={`reply-${reply.id}`}
                   key={reply.id}
                   padding={4}
-                  paddingLeft={6}
+                  paddingStart={6}
                   as={Stack}
                   layerStyle="highlightable"
                 >
@@ -354,7 +354,7 @@ export const PetitionRepliesField = Object.assign(
                                     })}
                                   >
                                     <Box
-                                      paddingLeft={{ base: 2.5, md: 0 }}
+                                      paddingStart={{ base: 2.5, md: 0 }}
                                       width={4}
                                       height={4}
                                       textAlign="center"
@@ -362,7 +362,7 @@ export const PetitionRepliesField = Object.assign(
                                       color="red.600"
                                       userSelect="none"
                                       position="absolute"
-                                      left={0}
+                                      insetStart={0}
                                       top={0}
                                       transform={{
                                         base: "translate(-1.25rem, 25%)",
@@ -466,8 +466,8 @@ export const PetitionRepliesField = Object.assign(
         flexDirection="column"
         position="relative"
         paddingY={4}
-        paddingLeft={{ base: 4, md: 6 }}
-        paddingRight={4}
+        paddingStart={{ base: 4, md: 6 }}
+        paddingEnd={4}
         {...props}
       >
         <Grid
@@ -500,7 +500,7 @@ export const PetitionRepliesField = Object.assign(
                 })}
               >
                 <Box
-                  paddingLeft={{ base: 2.5, md: 0 }}
+                  paddingStart={{ base: 2.5, md: 0 }}
                   width={4}
                   height={4}
                   textAlign="center"
@@ -508,7 +508,7 @@ export const PetitionRepliesField = Object.assign(
                   color="red.600"
                   userSelect="none"
                   position="absolute"
-                  left={0}
+                  insetStart={0}
                   top={0}
                   transform={{
                     base: "translate(-1.25rem, 50%)",
@@ -538,7 +538,7 @@ export const PetitionRepliesField = Object.assign(
                 : { textStyle: "hint", whiteSpace: "nowrap" })}
             >
               {field.isInternal ? (
-                <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+                <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
               ) : null}
               {field.title || (
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -714,7 +714,7 @@ function PetitionRepliesFieldAttachments({
           color="gray.700"
           _hover={{ background: "transparent" }}
           padding="0"
-          marginLeft={1}
+          marginStart={1}
         >
           <Stack direction="row" alignItems="center">
             <PaperclipIcon boxSize="14px" />
@@ -795,7 +795,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
       <RecipientViewCommentsBadge
         hasUnreadComments={hasUnreadComments}
         isReversedPurple={isActive}
-        marginRight={2}
+        marginEnd={2}
       />
     </Button>
   ) : (

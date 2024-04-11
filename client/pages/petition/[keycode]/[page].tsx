@@ -287,7 +287,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               <Box
                 flex={{ base: 0, [breakpoint]: 1 }}
                 minWidth={0}
-                marginRight={{ base: 0, [breakpoint]: 4 }}
+                marginEnd={{ base: 0, [breakpoint]: 4 }}
                 marginBottom={4}
                 display={{ base: "none", [breakpoint]: "block" }}
               >

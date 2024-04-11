@@ -243,7 +243,7 @@ export function TemplateDefaultPermissionsDialog({
                   )}
                 />
               </FormControl>
-              <FormControl id="permissionType" width="180px" marginLeft={2}>
+              <FormControl id="permissionType" width="180px" marginStart={2}>
                 <Controller
                   name="permissionType"
                   control={control}

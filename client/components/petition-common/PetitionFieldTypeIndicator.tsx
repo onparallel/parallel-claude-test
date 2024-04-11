@@ -54,7 +54,7 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
             contentEditable={false}
             as="span"
             fontSize="xs"
-            marginLeft={hideIcon ? 0 : 0.5}
+            marginStart={hideIcon ? 0 : 0.5}
             textAlign="center"
           >
             {fieldIndex}

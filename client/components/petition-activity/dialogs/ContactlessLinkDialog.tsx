@@ -44,7 +44,7 @@ export function ContactlessLinkDialog({
               <CopyToClipboardButton
                 border={"1px solid"}
                 borderColor="inherit"
-                borderLeftRadius={0}
+                borderStartRadius={0}
                 text={link}
               />
             </InputRightAddon>

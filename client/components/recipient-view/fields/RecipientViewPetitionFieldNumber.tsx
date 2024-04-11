@@ -253,7 +253,7 @@ export function RecipientViewPetitionFieldNumber({
       <Flex flexWrap="wrap" alignItems="center">
         <Text
           fontSize="sm"
-          marginRight={2}
+          marginEnd={2}
           color={Object.keys(isInvalidReply).length ? "red.600" : "gray.600"}
         >
           {hasRange ? (
@@ -333,7 +333,7 @@ export function RecipientViewPetitionFieldNumber({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <NumeralInput data-testid="recipient-view-field-number-new-reply-input" {...inputProps} />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
@@ -403,7 +403,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     isInvalid: reply.status === "REJECTED" || isInvalid,
     onlyPositive: isDefined(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
-    paddingRight: 10,
+    paddingInlineEnd: 10,
     onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
@@ -444,7 +444,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <NumeralInput data-testid="recipient-view-field-number-reply-input" {...props} />
-        <Center boxSize={10} position="absolute" right={0} bottom={0}>
+        <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
       </Flex>

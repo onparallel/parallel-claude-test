@@ -295,7 +295,7 @@ function useOrganizationMembersTableColumns() {
                   })}
                 >
                   <ForbiddenIcon
-                    marginLeft={2}
+                    marginStart={2}
                     color="red.300"
                     aria-label={intl.formatMessage({
                       id: "page.users.inactive-user",
@@ -305,7 +305,7 @@ function useOrganizationMembersTableColumns() {
                 </Tooltip>
               ) : null}
               {row.isOrgOwner ? (
-                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                <Badge marginStart={2} colorScheme="primary" position="relative" top="1.5px">
                   <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
                 </Badge>
               ) : null}

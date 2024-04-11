@@ -535,7 +535,7 @@ export function OrganizationUsagePeriodsTable({
               defaultMessage="Periods of {selector}"
               values={{
                 selector: (
-                  <Stack marginLeft={4}>
+                  <Stack marginStart={4}>
                     <SimpleSelect<OrganizationUsageLimitName>
                       isSearchable={false}
                       options={[

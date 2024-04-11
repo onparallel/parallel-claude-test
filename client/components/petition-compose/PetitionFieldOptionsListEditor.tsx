@@ -193,7 +193,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
                 defaultMessage='Standard options from <b>"{standardList}"</b>. Edit from the field settings.'
                 values={{ standardList: getStandardListLabel(standardList, intl) }}
               />
-              <Text as="span" marginLeft={1} position="relative" top="-1px">
+              <Text as="span" marginStart={1} position="relative" top="-1px">
                 (<SettingsIcon />)
               </Text>
             </Text>
@@ -203,7 +203,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
                 id="component.petition-field-options-list-editor.settings-imported-options-description"
                 defaultMessage="Options imported with internal values. To edit, import an Excel file from field settings."
               />
-              <Text as="span" marginLeft={1} position="relative" top="-1px">
+              <Text as="span" marginStart={1} position="relative" top="-1px">
                 (<SettingsIcon />)
               </Text>
             </Text>
@@ -213,7 +213,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
             {field.options.values.map((value: string, index: number) => {
               const label = field.options.labels?.[index];
               return (
-                <ListItem key={index} _before={{ content: "'-'", marginRight: 1 }}>
+                <ListItem key={index} _before={{ content: "'-'", marginEnd: 1 }}>
                   {value}
                   {isDefined(label) ? `: ${label}` : null}
                 </ListItem>
@@ -258,7 +258,7 @@ function renderElement({ attributes, children, element }: RenderElementProps) {
   return (
     <Text
       as="li"
-      _before={{ content: "'-'", marginRight: 1 }}
+      _before={{ content: "'-'", marginEnd: 1 }}
       sx={{
         "[aria-invalid] &": {
           color: "red.500",

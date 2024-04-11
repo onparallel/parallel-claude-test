@@ -29,7 +29,7 @@ export const PetitionFieldTypeLabel = chakraForwardRef<"div", PetitionFieldTypeL
           type={type}
           as={"div" as any}
           flex="1"
-          marginLeft={2}
+          marginStart={2}
         />
       </Box>
     );

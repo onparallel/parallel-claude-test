@@ -327,7 +327,7 @@ export function UpdateOrganizationUsageDetailsDialog({
               >
                 <Stack>
                   <Text>
-                    <Text as="strong" marginRight={2}>
+                    <Text as="strong" marginEnd={2}>
                       <FormattedMessage
                         id="component.update-organization-usage-details-dialog.next-period-label"
                         defaultMessage="Next period:"
@@ -347,7 +347,7 @@ export function UpdateOrganizationUsageDetailsDialog({
                     )}
                   </Text>
                   <Text>
-                    <Text as="strong" marginRight={2}>
+                    <Text as="strong" marginEnd={2}>
                       <FormattedMessage
                         id="component.update-organization-usage-details-dialog.subscription-end-label"
                         defaultMessage="Subscription end:"

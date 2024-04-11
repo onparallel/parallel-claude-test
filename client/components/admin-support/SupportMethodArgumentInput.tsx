@@ -128,7 +128,7 @@ function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentIn
             isChecked={value}
             onChange={(event) => onValue(event.target.checked)}
           />
-          <Text marginLeft={2}>{arg.description}</Text>
+          <Text marginStart={2}>{arg.description}</Text>
         </Flex>
       );
     case "Int":
@@ -195,7 +195,7 @@ function ObjectInput({
     schemaTypes,
   );
   return (
-    <Grid templateColumns="84px 1fr" gridColumn="1/3" rowGap={2} columnGap={2} marginLeft={4}>
+    <Grid templateColumns="84px 1fr" gridColumn="1/3" rowGap={2} columnGap={2} marginStart={4}>
       {inputFields.map((field) => (
         <SupportMethodArgumentInput
           key={field.name}

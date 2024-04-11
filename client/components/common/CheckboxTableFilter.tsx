@@ -119,7 +119,7 @@ export function CheckboxTableFilter<T extends string>({
         data-index={0}
         tabIndex={activeIndex === 0 || activeIndex === null ? 0 : -1}
       >
-        <Center boxSize={4} marginRight={2} pointerEvents="none">
+        <Center boxSize={4} marginEnd={2} pointerEvents="none">
           <CloseIcon fontSize="xs" role="presentation" />
         </Center>
         <FormattedMessage
@@ -141,7 +141,7 @@ export function CheckboxTableFilter<T extends string>({
             role="presentation"
             isChecked={value?.includes(option.value) ?? false}
             isReadOnly
-            marginRight={2}
+            marginEnd={2}
           />
           {option.text}
         </Flex>

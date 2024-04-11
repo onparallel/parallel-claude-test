@@ -129,9 +129,9 @@ export function TemplateDetailsModal({
       <ModalOverlay>
         <ModalContent data-template-id={template.id}>
           <ModalHeader
-            paddingLeft={6}
+            paddingStart={6}
             paddingTop={6}
-            paddingRight={12}
+            paddingEnd={12}
             paddingBottom={0}
             as={Stack}
             spacing={2}
@@ -172,7 +172,7 @@ export function TemplateDetailsModal({
             <Flex alignItems="center">
               <TemplateActiveSettingsIcons template={template} spacing={4} />
               {isFromPublicTemplates ? null : (
-                <HStack marginLeft={6}>
+                <HStack marginStart={6}>
                   <Text>
                     <FormattedMessage
                       id="component.template-details-modal.shared-with"
@@ -384,7 +384,7 @@ export function TemplateDetailsModal({
                   <AccordionIcon />
                 </AccordionButton>
 
-                <AccordionPanel paddingLeft={7} paddingBottom={3}>
+                <AccordionPanel paddingStart={7} paddingBottom={3}>
                   {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices]) => {
                     if (field.type === "HEADING") {
                       if (!field.title) {
@@ -405,7 +405,7 @@ export function TemplateDetailsModal({
                         <PetitionFieldTitleContent
                           field={field}
                           index={fieldIndex}
-                          marginLeft={4}
+                          marginStart={4}
                           marginBottom={2}
                         />
                         {field.type === "FIELD_GROUP" && field.children?.length
@@ -415,7 +415,7 @@ export function TemplateDetailsModal({
                                   key={field.id}
                                   field={field}
                                   index={fieldIndex}
-                                  marginLeft={7}
+                                  marginStart={7}
                                   marginBottom={2}
                                 />
                               ),

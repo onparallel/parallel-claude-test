@@ -454,8 +454,8 @@ export function ReportsStatisticsConversion({
             flex="1"
             width="100%"
             spacing={8}
-            paddingLeft={14}
-            paddingRight={4}
+            paddingStart={14}
+            paddingEnd={4}
             justifyContent="space-between"
           >
             {calculatedData.map(({ id, label, total, percentage, relativePercentage }) => {
