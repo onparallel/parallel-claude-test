@@ -222,7 +222,8 @@ export const AppLayout = Object.assign(
             <Flex
               flexDirection={{ base: "row", sm: "column" }}
               flexShrink={0}
-              borderWidth={{ base: "1px 0 0 0", sm: "0 1px 0 0" }}
+              borderEndWidth={{ base: 0, sm: "1px" }}
+              borderTopWidth={{ base: "1px", sm: 0 }}
               borderColor="gray.200"
               overflow={{ base: "auto hidden", sm: "hidden auto" }}
             >
