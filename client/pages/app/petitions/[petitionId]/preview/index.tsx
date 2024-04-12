@@ -492,7 +492,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 <Button
                   size="sm"
                   colorScheme="blue"
-                  marginLeft={2}
+                  marginStart={2}
                   onClick={() => handleGeneratePrefilledPublicLinkClick()}
                 >
                   <FormattedMessage

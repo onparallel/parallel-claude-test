@@ -1071,7 +1071,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             >
               <TabList marginX="-1px" marginTop="-1px" flex="none">
                 <Tab padding={4} lineHeight={5} fontWeight="bold">
-                  <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
+                  <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                 </Tab>
                 <Tab
@@ -1081,7 +1081,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   lineHeight={5}
                   fontWeight="bold"
                 >
-                  <SettingsIcon fontSize="16px" marginRight={2} aria-hidden="true" />
+                  <SettingsIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
                     id="page.compose.petition-settings-header"
                     defaultMessage="Settings"
@@ -1094,7 +1094,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   lineHeight={5}
                   fontWeight="bold"
                 >
-                  <CalculatorIcon fontSize="16px" marginRight={2} aria-hidden="true" />
+                  <CalculatorIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
                     id="page.compose.petition-variables-header"
                     defaultMessage="Variables"

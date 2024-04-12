@@ -564,11 +564,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           <Tabs variant="enclosed" overflow="hidden" {...extendFlexColumn}>
             <TabList marginX="-1px" marginTop="-1px" flex="none">
               <Tab padding={4} lineHeight={5} fontWeight="bold">
-                <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
+                <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
                 <FormattedMessage id="generic.contents" defaultMessage="Contents" />
               </Tab>
               <Tab padding={4} lineHeight={5} fontWeight="bold">
-                <SparklesIcon fontSize="18px" marginRight={2} role="presentation" />
+                <SparklesIcon fontSize="18px" marginEnd={2} role="presentation" />
                 <FormattedMessage
                   id="page.replies.summary-header"
                   defaultMessage="Analyze with Mike"
