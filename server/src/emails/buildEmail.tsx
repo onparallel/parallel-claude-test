@@ -1,9 +1,9 @@
 import { render } from "@faire/mjml-react/utils/render";
+import htmlnano from "htmlnano";
 import { ComponentType, createElement } from "react";
-import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
+import { IntlConfig, IntlProvider, IntlShape, createIntl } from "react-intl";
 import { ContactLocale, UserLocale } from "../db/__types";
 import { loadMessages } from "../util/loadMessages";
-import htmlnano from "htmlnano";
 
 export interface EmailOptions {
   locale: ContactLocale | UserLocale;
@@ -30,18 +30,36 @@ export async function buildEmail<T extends {}>(
     },
     onWarn: () => {},
   };
-  const { html } = render(
-    <IntlProvider {...intlProps}>{createElement<T>(email.html, props)}</IntlProvider>,
-    {
-      keepComments: false,
-      minify: false,
-      validationLevel: "skip",
-    },
-  );
   const intl = createIntl(intlProps);
-  const text = email.text(props, intl);
   const subject = email.subject(props, intl);
+  const text = email.text(props, intl);
   const from = email.from(props, intl);
-  const minified = await htmlnano.process(html, { minifyCss: false }, htmlnano.presets.safe);
-  return { html: minified.html, text, subject, from };
+  let html: string;
+  if (subject.includes("htmlnanotest")) {
+    const result = render(
+      <IntlProvider {...intlProps}>{createElement<T>(email.html, props)}</IntlProvider>,
+      {
+        keepComments: false,
+        minify: false,
+        validationLevel: "skip",
+      },
+    );
+    const minified = await htmlnano.process(
+      result.html,
+      { mergeStyles: true, minifyCss: false },
+      htmlnano.presets.safe,
+    );
+    html = minified.html;
+  } else {
+    const result = render(
+      <IntlProvider {...intlProps}>{createElement<T>(email.html, props)}</IntlProvider>,
+      {
+        keepComments: false,
+        minify: true,
+        validationLevel: "skip",
+      },
+    );
+    html = result.html;
+  }
+  return { html, text, subject, from };
 }
