@@ -407,7 +407,7 @@ function ProfileFieldSelectOption({
           className="drag-handle"
           position="absolute"
           top="50%"
-          left={0}
+          insetStart={0}
           paddingInline={1}
           height="38px"
           transform="translateY(-50%)"

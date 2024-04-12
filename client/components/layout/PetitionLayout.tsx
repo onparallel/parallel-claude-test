@@ -164,8 +164,8 @@ export function PetitionLayout({
             width={{ base: "100%", lg: "390px" }}
             backgroundColor="white"
             display={{ base: isRightPaneActive ? "flex" : "none", lg: "flex" }}
-            borderLeft={{ base: "none", lg: "1px solid" }}
-            borderLeftColor={{ base: "none", lg: "gray.200" }}
+            borderStart={{ base: "none", lg: "1px solid" }}
+            borderStartColor={{ base: "none", lg: "gray.200" }}
             flexDirection="column"
           >
             {drawerIsShown ? null : rightPane}
@@ -180,7 +180,7 @@ export function PetitionLayout({
             width={{ base: "full", lg: "390px" }}
             top={{ base: "105px", lg: "66px" }}
             bottom={0}
-            right={0}
+            insetEnd={0}
             zIndex={1}
             overflow="hidden"
           >

@@ -19,5 +19,18 @@ module.exports = {
         },
       },
     ],
+    "react/forbid-component-props": [
+      "error",
+      {
+        forbid: [
+          ...["margin", "padding", "border"].flatMap((p) => [
+            { propName: `${p}Left`, message: `Use ${p}Start instead for better rtl support` },
+            { propName: `${p}Right`, message: `Use ${p}End instead for better rtl support` },
+          ]),
+          { propName: `left`, message: `Use insetStart instead for better rtl support` },
+          { propName: `right`, message: `Use insetEnd instead for better rtl support` },
+        ],
+      },
+    ],
   },
 };
