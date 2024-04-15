@@ -9,6 +9,8 @@ export interface IRedis {
    */
   connect(): Promise<void>;
 
+  sendRawCommand: RedisClient["sendCommand"];
+
   withConnection(): Promise<AsyncDisposable>;
 
   /**
@@ -34,12 +36,16 @@ export interface IRedis {
 
 export const REDIS = Symbol.for("REDIS");
 
+type RedisClient = ReturnType<typeof redis.createClient>;
+
 @injectable()
 export class Redis implements IRedis {
-  private readonly client: ReturnType<typeof redis.createClient>;
+  private readonly client: RedisClient;
+  public readonly sendRawCommand: RedisClient["sendCommand"];
 
   constructor(@inject(CONFIG) config: Config) {
     this.client = redis.createClient({ socket: { ...config.redis } });
+    this.sendRawCommand = this.client.sendCommand.bind(this.client);
   }
 
   async connect() {

@@ -34,10 +34,10 @@ export class UserAuthenticationRepository extends BaseRepository {
         return null;
       }
 
-      if (!isDefined(uat.token_hint)) {
+      if (!isDefined(uat.token_hint) || uat.token_hint.length < 7) {
         await this.from("user_authentication_token", t)
           .where("id", uat.id)
-          .update({ token_hint: token.slice(0, 5) });
+          .update({ token_hint: token.slice(0, 7) });
       }
 
       return user;
@@ -73,7 +73,7 @@ export class UserAuthenticationRepository extends BaseRepository {
     const [userAuthToken] = await this.insert("user_authentication_token", {
       token_name: tokenName,
       token_hash: await hash(apiKey, ""),
-      token_hint: apiKey.slice(0, 5),
+      token_hint: apiKey.slice(0, 7),
       user_id: user.id,
       created_by: `User:${user.id}`,
     });

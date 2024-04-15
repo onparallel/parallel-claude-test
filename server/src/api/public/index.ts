@@ -226,10 +226,15 @@ import {
 } from "./schemas/core";
 import { PetitionEvent, ProfileEvent } from "./schemas/events";
 import { assert } from "../../util/assert";
+import { ratelimit } from "./ratelimit";
+import { IRedis, REDIS } from "../../services/Redis";
+import { ILogger, LOGGER } from "../../services/Logger";
 
 function assertType<T>(value: any): asserts value is T {}
 
 export function publicApi(container: Container) {
+  const redis = container.get<IRedis>(REDIS);
+  const logger = container.get<ILogger>(LOGGER);
   const api = new RestApi({
     openapi: "3.0.2",
     info: {
@@ -343,10 +348,7 @@ export function publicApi(container: Container) {
       },
     ],
     context: ({ req }) => {
-      const authorization = req.header("authorization");
-      if (!authorization) {
-        throw new UnauthorizedError("API token is missing");
-      }
+      const authorization = req.header("authorization")!;
       req.requestId = randomUUID();
       return {
         client: new GraphQLClient("http://localhost/graphql", {
@@ -370,6 +372,17 @@ export function publicApi(container: Container) {
       console.log(stringify(error));
       throw error;
     },
+    middleware: [
+      (req, res, next) => {
+        const authorization = req.header("authorization");
+        if (!authorization || !authorization.match(/^Bearer [A-Za-z0-9]+$/)) {
+          new UnauthorizedError("API token is missing").apply(res);
+        } else {
+          next();
+        }
+      },
+      ratelimit(redis, logger),
+    ],
   });
 
   function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: boolean } = {}) {

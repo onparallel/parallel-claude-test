@@ -317,6 +317,7 @@ export interface RestApiOptions<TContext = {}> {
   components?: OpenAPIV3.ComponentsObject;
   context?: ContextFunction<TContext>;
   errorHandler?: ErrorHandler;
+  middleware?: RequestHandler[];
 }
 
 export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = any> = TContext & {
@@ -346,7 +347,10 @@ export class RestApi<TContext = {}> {
   private _spec: Omit<RestApiOptions, "middleware">;
 
   constructor(private apiOptions: RestApiOptions<TContext> = {} as RestApiOptions<TContext>) {
-    this._spec = omit(apiOptions, ["context", "errorHandler"]);
+    this._spec = omit(apiOptions, ["context", "errorHandler", "middleware"]);
+    for (const middleware of apiOptions.middleware ?? []) {
+      this.router.use(middleware);
+    }
   }
 
   path<TPath extends string, TParams extends PathParameters<TPath>>(

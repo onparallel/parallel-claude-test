@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker/locale/af_ZA";
+import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
@@ -76,6 +77,9 @@ export class MockAuth implements IAuth {
 
 @injectable()
 export class MockRedis implements IRedis {
+  async sendRawCommand<T = RedisCommandRawReply>(): Promise<T> {
+    return null as T;
+  }
   async connect() {
     return;
   }

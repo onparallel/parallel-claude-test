@@ -130,3 +130,15 @@ export class InvalidRequestBodyError extends HttpError {
     );
   }
 }
+
+export class TooManyRequestsError extends HttpError {
+  static readonly status = 429;
+  static readonly code = "TooManyRequests";
+  constructor() {
+    super(
+      TooManyRequestsError.status,
+      TooManyRequestsError.code,
+      `Too many requests, please try again later`,
+    );
+  }
+}
