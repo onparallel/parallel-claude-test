@@ -857,27 +857,6 @@ type Mutation {
   activateUser(userIds: [GID!]!): [User!]!
 
   """
-  Adds permissions on given parallel and users
-  """
-  addPetitionPermission(
-    message: String
-
-    """
-    Wether to notify the user via email or not.
-    """
-    notify: Boolean = false
-    permissionType: PetitionPermissionTypeRW!
-    petitionIds: [GID!]!
-
-    """
-    Subscribe to notifications.
-    """
-    subscribe: Boolean = true
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): [PetitionBase!]! @deprecated(reason: "Use createAddPetitionPermissionTask instead")
-
-  """
   Add users to a user group
   """
   addUsersToUserGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
@@ -1072,17 +1051,6 @@ type Mutation {
     userGroupIds: [GID!]
     userIds: [GID!]
   ): Task!
-
-  """
-  Creates an event subscription for the user's petitions
-  """
-  createEventSubscription(
-    eventTypes: [PetitionEventType!]
-    eventsUrl: String!
-    fromTemplateFieldIds: [GID!]
-    fromTemplateId: GID
-    name: String
-  ): PetitionEventSubscription! @deprecated(reason: "Use createPetitionEventSubscription")
 
   """
   Creates a pair of asymmetric keys to be used for signing webhook events
@@ -1539,16 +1507,6 @@ type Mutation {
   dynamicSelectFieldFileDownloadLink(fieldId: GID!, petitionId: GID!): FileUploadDownloadLinkResult!
 
   """
-  Edits permissions on given parallel and users
-  """
-  editPetitionPermission(
-    permissionType: PetitionPermissionType!
-    petitionIds: [GID!]!
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): [PetitionBase!]! @deprecated(reason: "Use createEditPetitionPermissionTask instead")
-
-  """
   Generates a download link for a file reply.
   """
   fileUploadReplyDownloadLink(
@@ -1933,20 +1891,6 @@ type Mutation {
   removePetitionPassword(petitionId: GID!): SupportMethodResponse!
 
   """
-  Removes permissions on given parallel and users
-  """
-  removePetitionPermission(
-    petitionIds: [GID!]!
-
-    """
-    Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
-    """
-    removeAll: Boolean
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): [PetitionBase]! @deprecated(reason: "Use createRemovePetitionPermissionTask instead")
-
-  """
   Removes users from a user group
   """
   removeUsersFromGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
@@ -2198,19 +2142,6 @@ type Mutation {
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
-
-  """
-  Updates an existing event subscription for the user's petitions
-  """
-  updateEventSubscription(
-    eventTypes: [PetitionEventType!]
-    eventsUrl: String
-    fromTemplateFieldIds: [GID!]
-    fromTemplateId: GID
-    id: GID!
-    isEnabled: Boolean
-    name: String
-  ): PetitionEventSubscription! @deprecated(reason: "Use updatePetitionEventSubscription")
 
   """
   Activate or deactivate a feature flag on a specific user

@@ -1,8 +1,6 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
-import { PetitionUserNotification } from "../../db/notifications";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { WorkerContext } from "../../context";
 import {
   Organization,
   Petition,
@@ -11,8 +9,12 @@ import {
   PetitionFieldComment,
   User,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { PetitionUserNotification } from "../../db/notifications";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { PetitionSharingRunner } from "../../workers/tasks/PetitionSharingRunner";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL - PetitionUserNotifications", () => {
   let testClient: TestClient;
@@ -30,8 +32,6 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
   let organization: Organization;
 
-  let otherUserApiKey: string;
-
   beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
@@ -40,11 +40,6 @@ describe("GraphQL - PetitionUserNotifications", () => {
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
 
     [otherUser] = await mocks.createRandomUsers(organization.id, 1);
-
-    ({ apiKey: otherUserApiKey } = await mocks.createUserAuthToken(
-      "other-user-token",
-      otherUser.id,
-    ));
   });
 
   afterAll(async () => {
@@ -683,22 +678,24 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(transferErrors).toBeUndefined();
 
-    const { errors: otherUserStopSharingError } = await testClient
-      .withApiKey(otherUserApiKey)
-      .mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userIds: [GID!]) {
-            removePetitionPermission(petitionIds: $petitionIds, userIds: $userIds) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", petition.id)],
-          userIds: [toGlobalId("User", sessionUser.id)],
-        },
-      });
-    expect(otherUserStopSharingError).toBeUndefined();
+    const [task] = await knex
+      .from("task")
+      .insert({
+        name: "PETITION_SHARING",
+        input: { action: "REMOVE", petition_ids: [petition.id], user_ids: [sessionUser.id] },
+        user_id: otherUser.id,
+        status: "PROCESSING",
+        progress: 0,
+        started_at: new Date(),
+      })
+      .returning("*");
+
+    const runner = new PetitionSharingRunner(
+      testClient.container.get<WorkerContext>(WorkerContext),
+      task as any,
+    );
+
+    await runner.run();
 
     const { data, errors } = await testClient.query({
       query: gql`
@@ -747,22 +744,28 @@ describe("GraphQL - PetitionUserNotifications", () => {
     // at this point, `groupPetition` is shared with a group which sessionUser is member.
 
     // next request is executed by `otherUser`
-    const { errors: otherUserStopSharingError } = await testClient
-      .withApiKey(otherUserApiKey)
-      .mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
-            removePetitionPermission(petitionIds: $petitionIds, userGroupIds: $userGroupIds) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", groupPetition.id)],
-          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+    const [task] = await knex
+      .from("task")
+      .insert({
+        name: "PETITION_SHARING",
+        input: {
+          action: "REMOVE",
+          petition_ids: [groupPetition.id],
+          user_group_ids: [userGroup.id],
         },
-      });
-    expect(otherUserStopSharingError).toBeUndefined();
+        user_id: otherUser.id,
+        status: "PROCESSING",
+        progress: 0,
+        started_at: new Date(),
+      })
+      .returning("*");
+
+    const runner = new PetitionSharingRunner(
+      testClient.container.get<WorkerContext>(WorkerContext),
+      task as any,
+    );
+
+    await runner.run();
 
     const { data, errors } = await testClient.query({
       query: gql`
@@ -809,22 +812,28 @@ describe("GraphQL - PetitionUserNotifications", () => {
     await mocks.sharePetitionWithGroups(otherPetition.id, [userGroup.id]);
     await mocks.sharePetitions([otherPetition.id], sessionUser.id, "READ");
 
-    const { errors: otherUserStopSharingError } = await testClient
-      .withApiKey(otherUserApiKey)
-      .mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
-            removePetitionPermission(petitionIds: $petitionIds, userGroupIds: $userGroupIds) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", otherPetition.id)],
-          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+    const [task] = await knex
+      .from("task")
+      .insert({
+        name: "PETITION_SHARING",
+        input: {
+          action: "REMOVE",
+          petition_ids: [otherPetition.id],
+          user_group_ids: [userGroup.id],
         },
-      });
-    expect(otherUserStopSharingError).toBeUndefined();
+        user_id: otherUser.id,
+        status: "PROCESSING",
+        progress: 0,
+        started_at: new Date(),
+      })
+      .returning("*");
+
+    const runner = new PetitionSharingRunner(
+      testClient.container.get<WorkerContext>(WorkerContext),
+      task as any,
+    );
+
+    await runner.run();
 
     const { data, errors } = await testClient.query({
       query: gql`

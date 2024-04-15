@@ -1788,7 +1788,6 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     activateUser: NexusGenRootTypes["User"][]; // [User!]!
-    addPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
@@ -1819,7 +1818,6 @@ export interface NexusGenFieldTypes {
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
     createEditPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
-    createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
@@ -1880,7 +1878,6 @@ export interface NexusGenFieldTypes {
     disassociatePetitionFromProfile: NexusGenEnums["Success"]; // Success!
     disassociateProfileFromPetition: NexusGenEnums["Success"]; // Success!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
-    editPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
@@ -1925,7 +1922,6 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldReplies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    removePetitionPermission: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1962,7 +1958,6 @@ export interface NexusGenFieldTypes {
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
-    updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -4239,7 +4234,6 @@ export interface NexusGenFieldTypeNames {
   Mutation: {
     // field return type name
     activateUser: "User";
-    addPetitionPermission: "PetitionBase";
     addUsersToUserGroup: "UserGroup";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
@@ -4270,7 +4264,6 @@ export interface NexusGenFieldTypeNames {
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
     createEditPetitionPermissionTask: "Task";
-    createEventSubscription: "PetitionEventSubscription";
     createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
@@ -4331,7 +4324,6 @@ export interface NexusGenFieldTypeNames {
     disassociatePetitionFromProfile: "Success";
     disassociateProfileFromPetition: "Success";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
-    editPetitionPermission: "PetitionBase";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
@@ -4376,7 +4368,6 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionFieldReplies: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     removePetitionPassword: "SupportMethodResponse";
-    removePetitionPermission: "PetitionBase";
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
     reopenPetition: "Petition";
@@ -4413,7 +4404,6 @@ export interface NexusGenFieldTypeNames {
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
     updateContact: "Contact";
-    updateEventSubscription: "PetitionEventSubscription";
     updateFeatureFlag: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
@@ -6237,16 +6227,6 @@ export interface NexusGenArgTypes {
       // args
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
-    addPetitionPermission: {
-      // args
-      message?: string | null; // String
-      notify?: boolean | null; // Boolean
-      permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      subscribe: boolean | null; // Boolean
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     addUsersToUserGroup: {
       // args
       userGroupId: NexusGenScalars["GID"]; // GID!
@@ -6411,14 +6391,6 @@ export interface NexusGenArgTypes {
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
-    createEventSubscription: {
-      // args
-      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
-      eventsUrl: string; // String!
-      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
-      name?: string | null; // String
     };
     createEventSubscriptionSignatureKey: {
       // args
@@ -6753,13 +6725,6 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    editPetitionPermission: {
-      // args
-      permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     fileUploadReplyDownloadLink: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -7017,13 +6982,6 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    removePetitionPermission: {
-      // args
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      removeAll?: boolean | null; // Boolean
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     removeUsersFromGroup: {
       // args
       userGroupId: NexusGenScalars["GID"]; // GID!
@@ -7220,16 +7178,6 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
-    };
-    updateEventSubscription: {
-      // args
-      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
-      eventsUrl?: string | null; // String
-      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
-      id: NexusGenScalars["GID"]; // GID!
-      isEnabled?: boolean | null; // Boolean
-      name?: string | null; // String
     };
     updateFeatureFlag: {
       // args

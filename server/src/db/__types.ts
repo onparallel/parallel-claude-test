@@ -596,7 +596,6 @@ export interface TableTypes {
   petition_attachment: PetitionAttachment;
   petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
-  petition_event_subscription: PetitionEventSubscription;
   petition_field: PetitionField;
   petition_field_attachment: PetitionFieldAttachment;
   petition_field_comment: PetitionFieldComment;
@@ -659,7 +658,6 @@ export interface TableCreateTypes {
   petition_attachment: CreatePetitionAttachment;
   petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
-  petition_event_subscription: CreatePetitionEventSubscription;
   petition_field: CreatePetitionField;
   petition_field_attachment: CreatePetitionFieldAttachment;
   petition_field_comment: CreatePetitionFieldComment;
@@ -722,7 +720,6 @@ export interface TablePrimaryKeys {
   petition_attachment: "id";
   petition_contact_notification: "id";
   petition_event: "id";
-  petition_event_subscription: "id";
   petition_field: "id";
   petition_field_attachment: "id";
   petition_field_comment: "id";
@@ -1352,42 +1349,6 @@ export interface PetitionEvent {
 export type CreatePetitionEvent = PartialProps<
   Omit<PetitionEvent, "id">,
   "data" | "created_at" | "processed_at" | "processed_by"
->;
-
-export interface PetitionEventSubscription {
-  id: number; // int4
-  user_id: number; // int4
-  endpoint: string; // varchar
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-  deleted_at: Maybe<Date>; // timestamptz
-  deleted_by: Maybe<string>; // varchar
-  is_enabled: boolean; // bool
-  event_types: Maybe<any>; // jsonb
-  name: Maybe<string>; // varchar
-  from_template_id: Maybe<number>; // int4
-  is_failing: boolean; // bool
-  from_template_field_ids: Maybe<number[]>; // int4[]
-  error_log: any; // jsonb
-}
-
-export type CreatePetitionEventSubscription = PartialProps<
-  Omit<PetitionEventSubscription, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
-  | "is_enabled"
-  | "event_types"
-  | "name"
-  | "from_template_id"
-  | "is_failing"
-  | "from_template_field_ids"
-  | "error_log"
 >;
 
 export interface PetitionField {

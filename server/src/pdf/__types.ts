@@ -742,11 +742,6 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /**
-   * Adds permissions on given parallel and users
-   * @deprecated Use createAddPetitionPermissionTask instead
-   */
-  addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
   /** Anonymizes a petition */
@@ -817,11 +812,6 @@ export type Mutation = {
    *
    */
   createEditPetitionPermissionTask: Task;
-  /**
-   * Creates an event subscription for the user's petitions
-   * @deprecated Use createPetitionEventSubscription
-   */
-  createEventSubscription: PetitionEventSubscription;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
   createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -939,11 +929,6 @@ export type Mutation = {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
-  /**
-   * Edits permissions on given parallel and users
-   * @deprecated Use createEditPetitionPermissionTask instead
-   */
-  editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Forces an update of the branding of every signature integration of the selected organization. */
@@ -1030,11 +1015,6 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
-  /**
-   * Removes permissions on given parallel and users
-   * @deprecated Use createRemovePetitionPermissionTask instead
-   */
-  removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Renames a folder. */
@@ -1100,11 +1080,6 @@ export type Mutation = {
   updateBackgroundCheckEntity: Success;
   /** Updates a contact. */
   updateContact: Contact;
-  /**
-   * Updates an existing event subscription for the user's petitions
-   * @deprecated Use updatePetitionEventSubscription
-   */
-  updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate a feature flag on a specific user */
   updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
@@ -1207,16 +1182,6 @@ export type Mutation = {
 
 export type MutationactivateUserArgs = {
   userIds: Array<Scalars["GID"]["input"]>;
-};
-
-export type MutationaddPetitionPermissionArgs = {
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
-  permissionType: PetitionPermissionTypeRW;
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationaddUsersToUserGroupArgs = {
@@ -1382,14 +1347,6 @@ export type MutationcreateEditPetitionPermissionTaskArgs = {
   petitionIds: Array<Scalars["GID"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
-export type MutationcreateEventSubscriptionArgs = {
-  eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl: Scalars["String"]["input"];
-  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationcreateEventSubscriptionSignatureKeyArgs = {
@@ -1725,13 +1682,6 @@ export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
-export type MutationeditPetitionPermissionArgs = {
-  permissionType: PetitionPermissionType;
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
 export type MutationfileUploadReplyDownloadLinkArgs = {
   petitionId: Scalars["GID"]["input"];
   preview?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1989,13 +1939,6 @@ export type MutationremovePetitionPasswordArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
-export type MutationremovePetitionPermissionArgs = {
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
 export type MutationremoveUsersFromGroupArgs = {
   userGroupId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
@@ -2191,16 +2134,6 @@ export type MutationupdateBackgroundCheckEntityArgs = {
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["GID"]["input"];
-};
-
-export type MutationupdateEventSubscriptionArgs = {
-  eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
-  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
-  id: Scalars["GID"]["input"];
-  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationupdateFeatureFlagArgs = {
