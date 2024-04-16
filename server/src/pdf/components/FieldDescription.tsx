@@ -1,4 +1,4 @@
-import { marked } from "@onparallel/marked-do-not-use";
+import { marked, Token, Tokens } from "@onparallel/marked-do-not-use";
 import { Image, Link, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Fragment, useMemo } from "react";
 import { range, zip } from "remeda";
@@ -66,7 +66,7 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
               <TrailingNewLines raw={t.raw} />
             </Fragment>
           ) : t.type === "paragraph" ? (
-            t.tokens.length === 1 && t.tokens[0].type === "image" ? (
+            t.tokens && t.tokens.length === 1 && t.tokens[0].type === "image" ? (
               <View
                 key={i}
                 style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
@@ -79,10 +79,10 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
               </Text>
             )
           ) : t.type === "list" ? (
-            <MdList key={i} token={t} />
+            <MdList key={i} token={t as Tokens.List} />
           ) : t.type === "table" ? (
             <Fragment key={i}>
-              <MdTable token={t} />
+              <MdTable token={t as Tokens.Table} />
               <TrailingNewLines raw={t.raw} />
             </Fragment>
           ) : t.type === "hr" ? (
@@ -110,7 +110,7 @@ function TrailingNewLines({ raw }: { raw: string }) {
   return newLines === 1 ? null : <Text>{"\n".repeat(newLines - 1)}</Text>;
 }
 
-function MdTable({ token }: { token: marked.Tokens.Table }) {
+function MdTable({ token }: { token: Tokens.Table }) {
   const theme = useTheme();
   const styles = StyleSheet.create({
     tableRow: {
@@ -155,7 +155,7 @@ function MdTable({ token }: { token: marked.Tokens.Table }) {
   );
 }
 
-function MdList({ token }: { token: marked.Tokens.List }) {
+function MdList({ token }: { token: Tokens.List }) {
   const theme = useTheme();
   const styles = StyleSheet.create({
     listItemContainer: {
@@ -203,14 +203,14 @@ function MdList({ token }: { token: marked.Tokens.List }) {
     },
   });
   const flatten = (
-    list: marked.Tokens.List,
+    list: Tokens.List,
     level: number,
-  ): [token: marked.Token, level: number, index: number | null, ordered: boolean][] => {
+  ): [token: Token, level: number, index: number | null, ordered: boolean][] => {
     return list.items.flatMap((t, i) =>
       t.tokens.flatMap(
         (t, j) =>
           (t.type === "list"
-            ? flatten(t, level + 1)
+            ? flatten(t as Tokens.List, level + 1)
             : [
                 [
                   t,
@@ -218,7 +218,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
                   j === 0 ? (typeof list.start === "number" ? list.start : 1) + i : null,
                   list.ordered,
                 ],
-              ]) as [[token: marked.Token, level: number, index: number | null, ordered: boolean]],
+              ]) as [[token: Token, level: number, index: number | null, ordered: boolean]],
       ),
     );
   };
@@ -263,15 +263,15 @@ function MdList({ token }: { token: marked.Tokens.List }) {
 }
 
 type InlineToken =
-  | marked.Tokens.HTML
-  | marked.Tokens.Text
-  | marked.Tokens.Link
-  | marked.Tokens.Codespan
-  | marked.Tokens.Strong
-  | marked.Tokens.Em
-  | marked.Tokens.Del
-  | marked.Tokens.Space
-  | marked.Tokens.Image;
+  | Tokens.HTML
+  | Tokens.Text
+  | Tokens.Link
+  | Tokens.Codespan
+  | Tokens.Strong
+  | Tokens.Em
+  | Tokens.Del
+  | Tokens.Space
+  | Tokens.Image;
 
 function MdInlineContent({ tokens }: { tokens: InlineToken[] }) {
   return (

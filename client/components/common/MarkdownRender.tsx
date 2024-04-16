@@ -1,5 +1,5 @@
 import { Center, Heading, Image, Table, Tbody, Td, Th, Thead, Tr, chakra } from "@chakra-ui/react";
-import { Lexer, type marked } from "@onparallel/marked-do-not-use";
+import { Lexer, Tokens } from "@onparallel/marked-do-not-use";
 import { Fragment, memo, useMemo } from "react";
 import { times, zip } from "remeda";
 import { BreakLines } from "./BreakLines";
@@ -26,7 +26,7 @@ export const MarkdownRender = memo(({ markdown }: { markdown: string }) => {
             <TrailingNewLines raw={t.raw} />
           </Fragment>
         ) : t.type === "paragraph" ? (
-          t.tokens.length === 1 && t.tokens[0].type === "image" ? (
+          t.tokens && t.tokens.length === 1 && t.tokens[0].type === "image" ? (
             <Center key={i}>
               <Image alt={t.tokens[0].text} src={t.tokens[0].href} width="75%" />
             </Center>
@@ -36,7 +36,7 @@ export const MarkdownRender = memo(({ markdown }: { markdown: string }) => {
             </chakra.p>
           )
         ) : t.type === "list" ? (
-          <MdList key={i} token={t} />
+          <MdList key={i} token={t as Tokens.List} />
         ) : t.type === "hr" ? (
           <Fragment key={i}>
             <Divider />
@@ -44,7 +44,7 @@ export const MarkdownRender = memo(({ markdown }: { markdown: string }) => {
           </Fragment>
         ) : t.type === "table" ? (
           <Fragment key={i}>
-            <MdTable token={t} />
+            <MdTable token={t as Tokens.Table} />
             <TrailingNewLines raw={t.raw} />
           </Fragment>
         ) : t.type === "space" ? (
@@ -73,17 +73,17 @@ function TrailingNewLines({ raw }: { raw: string }) {
 }
 
 type InlineToken =
-  | marked.Tokens.HTML
-  | marked.Tokens.Text
-  | marked.Tokens.Link
-  | marked.Tokens.Codespan
-  | marked.Tokens.Strong
-  | marked.Tokens.Em
-  | marked.Tokens.Del
-  | marked.Tokens.Space
-  | marked.Tokens.Image;
+  | Tokens.HTML
+  | Tokens.Text
+  | Tokens.Link
+  | Tokens.Codespan
+  | Tokens.Strong
+  | Tokens.Em
+  | Tokens.Del
+  | Tokens.Space
+  | Tokens.Image;
 
-function MdTable({ token }: { token: marked.Tokens.Table }) {
+function MdTable({ token }: { token: Tokens.Table }) {
   return (
     <Table size="sm">
       <Thead>
@@ -110,7 +110,7 @@ function MdTable({ token }: { token: marked.Tokens.Table }) {
   );
 }
 
-function MdList({ token }: { token: marked.Tokens.List }) {
+function MdList({ token }: { token: Tokens.List }) {
   return (
     <chakra.div
       as={token.ordered ? "ol" : "ul"}
@@ -121,7 +121,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
         <chakra.li key={i}>
           {t.tokens.map((t, i) =>
             t.type === "list" ? (
-              <MdList key={i} token={t} />
+              <MdList key={i} token={t as Tokens.List} />
             ) : t.type === "text" ? (
               <MdInlineContent key={i} tokens={(t as any).tokens} />
             ) : t.type === "space" ? (
