@@ -205,15 +205,20 @@ function MdList({ token }: { token: marked.Tokens.List }) {
   const flatten = (
     list: marked.Tokens.List,
     level: number,
-  ): [token: marked.Token, level: number, index: number, ordered: boolean][] => {
+  ): [token: marked.Token, level: number, index: number | null, ordered: boolean][] => {
     return list.items.flatMap((t, i) =>
       t.tokens.flatMap(
-        (t) =>
+        (t, j) =>
           (t.type === "list"
             ? flatten(t, level + 1)
             : [
-                [t, level, typeof list.start === "number" ? list.start + i : i + 1, list.ordered],
-              ]) as [[token: marked.Token, level: number, index: number, ordered: boolean]],
+                [
+                  t,
+                  level,
+                  j === 0 ? (typeof list.start === "number" ? list.start : 1) + i : null,
+                  list.ordered,
+                ],
+              ]) as [[token: marked.Token, level: number, index: number | null, ordered: boolean]],
       ),
     );
   };
@@ -225,7 +230,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
             <View key={i} style={styles.listPaddingBox} />
           ))}
           <View style={styles.listItemBulletContainer}>
-            {t.type === "text" ? (
+            {t.type === "text" && i !== null ? (
               ordered ? (
                 <Text>{`${i}.`}</Text>
               ) : (
