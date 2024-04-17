@@ -412,6 +412,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             info,
             "data.options",
             "Can't remove standard options from a SELECT field.",
+            { code: "REMOVE_STANDARD_OPTIONS_ERROR" },
           );
         }
 

@@ -26,6 +26,11 @@ const STANDARD_LISTS = {
       id: "component.standard-list-select.non-eu-countries-iso",
       defaultMessage: "List of non-EU countries",
     }),
+  CURRENCIES: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.currencies",
+      defaultMessage: "List of currencies",
+    }),
 } satisfies Record<string, (intl: IntlShape) => string>;
 
 type StandardListType = keyof typeof STANDARD_LISTS;

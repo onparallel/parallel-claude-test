@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { ProfileField_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
+import { ProfileField_ProfileTypeFieldFragment, UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -14,6 +14,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
+import { sortBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
@@ -53,6 +54,7 @@ export function ProfileFieldSelect({
           render={({ field: { value, onChange, onBlur } }) => {
             return (
               <ProfileFieldSelectInner
+                isDisabled={isDisabled}
                 field={field}
                 value={value}
                 onChange={onChange}
@@ -101,7 +103,14 @@ export function ProfileFieldSelectInner({
 }: ProfileFieldSelectInnerProps) {
   const intl = useIntl();
 
-  const { values, showOptionsWithColors } = field.options as ProfileTypeFieldOptions<"SELECT">;
+  const { values, showOptionsWithColors, standardList } =
+    field.options as ProfileTypeFieldOptions<"SELECT">;
+
+  const valuesOrderedByLocale = useMemo(
+    // only sort by locale if options are from standard list
+    () => (standardList ? sortBy(values, (v) => v.label[intl.locale as UserLocale]!) : values),
+    [values],
+  );
 
   const rsProps = useReactSelectProps({
     ...props,
@@ -113,7 +122,7 @@ export function ProfileFieldSelectInner({
   });
 
   const _value = useMemo(() => {
-    return values?.find((v) => v.value === value) ?? null;
+    return valuesOrderedByLocale.find((v) => v.value === value) ?? null;
   }, [props.options, props.isMulti, value]);
 
   const extensions = {
@@ -129,7 +138,7 @@ export function ProfileFieldSelectInner({
   return (
     <Select<SelectOptionValue, false, never>
       value={_value}
-      options={values}
+      options={valuesOrderedByLocale}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       isClearable

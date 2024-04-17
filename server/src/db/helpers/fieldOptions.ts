@@ -147,7 +147,7 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", null],
       },
     },
   },
@@ -545,6 +545,16 @@ export async function selectOptionsValuesAndLabels(
       return {
         values: countryCodes,
         labels: countryCodes.map((code) => countries[code]),
+      };
+    }
+    case "CURRENCIES": {
+      const currencies = (
+        await import(join(__dirname, `../../../data/currencies/currencies_${locale}.json`))
+      ).default;
+      const currenciesCodes = Object.keys(currencies);
+      return {
+        values: currenciesCodes,
+        labels: currenciesCodes.map((code) => currencies[code].filter(isDefined).join(" - ")),
       };
     }
     default:

@@ -229,6 +229,7 @@ function CreateProfileDialog({
                             value={value}
                             onChange={onChange}
                             onBlur={onBlur}
+                            isDisabled={field.myPermission !== "WRITE"}
                           />
                         );
                       }}

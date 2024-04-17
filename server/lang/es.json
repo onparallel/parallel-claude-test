@@ -905,9 +905,39 @@
     "context": "Name"
   },
   {
-    "term": "profiles.default-profile-type-field.contract-amount",
-    "definition": "Importe",
-    "context": "Amount"
+    "term": "profiles.default-profile-type-field.contract-billing-contact-email",
+    "definition": "Correo electrónico del contacto de facturación",
+    "context": "Billing contact email"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-billing-contact-full-name",
+    "definition": "Nombre completo del contacto de facturación",
+    "context": "Billing contact full name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-compliance-obligations",
+    "definition": "Obligaciones de cumplimiento",
+    "context": "Compliance obligations"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-confidentiality-agreement",
+    "definition": "Acuerdo de confidencialidad",
+    "context": "Confidentiality agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-contract-amendments",
+    "definition": "Enmiendas",
+    "context": "Amendments"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-contract-original-document",
+    "definition": "Documento original",
+    "context": "Original document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-contract-type",
+    "definition": "Tipo de contrato",
+    "context": "Contract type"
   },
   {
     "term": "profiles.default-profile-type-field.contract-counterparty",
@@ -915,29 +945,74 @@
     "context": "Counterparty"
   },
   {
-    "term": "profiles.default-profile-type-field.contract-description",
-    "definition": "Descripción breve",
-    "context": "Short description"
+    "term": "profiles.default-profile-type-field.contract-currency",
+    "definition": "Moneda",
+    "context": "Currency"
   },
   {
-    "term": "profiles.default-profile-type-field.contract-document",
-    "definition": "Documento",
-    "context": "Document"
+    "term": "profiles.default-profile-type-field.contract-dispute-resolution-mechanism",
+    "definition": "Mecanismo de resolución de disputas",
+    "context": "Dispute resolution mechanism"
   },
   {
-    "term": "profiles.default-profile-type-field.contract-expiry-date",
-    "definition": "Fecha de vencimiento",
-    "context": "Expiry date"
-  },
-  {
-    "term": "profiles.default-profile-type-field.contract-start-date",
+    "term": "profiles.default-profile-type-field.contract-effective-date",
     "definition": "Fecha de inicio",
-    "context": "Start date"
+    "context": "Effective date"
   },
   {
-    "term": "profiles.default-profile-type-field.contract-type",
-    "definition": "Tipo de contrato",
-    "context": "Type of contract"
+    "term": "profiles.default-profile-type-field.contract-expiration-date",
+    "definition": "Fecha de vencimiento",
+    "context": "Expiration date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-jurisdiction",
+    "definition": "Jurisdicción",
+    "context": "Jurisdiction"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-legal-contact-email",
+    "definition": "Correo electrónico del contacto de legal",
+    "context": "Legal contact email"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-legal-contact-full-name",
+    "definition": "Nombre completo del contacto de legal",
+    "context": "Legal contact full name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-notes",
+    "definition": "Notas",
+    "context": "Notes"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-payment-terms",
+    "definition": "Términos de pago",
+    "context": "Payment terms"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-performance-metrics",
+    "definition": "Métricas de desempeño",
+    "context": "Performance metrics"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-renewal-terms",
+    "definition": "Términos de renovación",
+    "context": "Renewal terms"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-security-provisions",
+    "definition": "Provisiones de seguridad",
+    "context": "Security provisions"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-termination-clauses",
+    "definition": "Cláusulas de terminación",
+    "context": "Termination clauses"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-value",
+    "definition": "Valor del contrato",
+    "context": "Contract value"
   },
   {
     "term": "profiles.default-profile-type-field.individual-address",
@@ -945,9 +1020,29 @@
     "context": "Address"
   },
   {
+    "term": "profiles.default-profile-type-field.individual-background-check",
+    "definition": "Verificación de antecedentes",
+    "context": "Background check"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-city",
+    "definition": "Ciudad",
+    "context": "City"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-country-of-residence",
+    "definition": "País de residencia",
+    "context": "Country of residence"
+  },
+  {
     "term": "profiles.default-profile-type-field.individual-date-of-birth",
     "definition": "Fecha de nacimiento",
     "context": "Date of birth"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-email",
+    "definition": "Correo electrónico",
+    "context": "Email"
   },
   {
     "term": "profiles.default-profile-type-field.individual-first-name",
@@ -955,9 +1050,24 @@
     "context": "First name"
   },
   {
-    "term": "profiles.default-profile-type-field.individual-id",
-    "definition": "Documento de identificación",
-    "context": "ID"
+    "term": "profiles.default-profile-type-field.individual-gender",
+    "definition": "Género",
+    "context": "Gender"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-id-document",
+    "definition": "Documento de identidad",
+    "context": "ID document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-id-number",
+    "definition": "Número de identificación",
+    "context": "ID number"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-is-pep",
+    "definition": "¿Es PRP?",
+    "context": "Is PEP?"
   },
   {
     "term": "profiles.default-profile-type-field.individual-last-name",
@@ -965,29 +1075,294 @@
     "context": "Last name"
   },
   {
+    "term": "profiles.default-profile-type-field.individual-mobile-phone-number",
+    "definition": "Número de teléfono móvil",
+    "context": "Mobile phone number"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-nationality",
+    "definition": "Nacionalidad",
+    "context": "Nationality"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-occupation",
+    "definition": "Ocupación",
+    "context": "Occupation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-passport",
+    "definition": "Pasaporte",
+    "context": "Passport"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-passport-number",
+    "definition": "Número de pasaporte",
+    "context": "Passport number"
+  },
+  {
     "term": "profiles.default-profile-type-field.individual-phone-number",
     "definition": "Número de teléfono",
     "context": "Phone number"
   },
   {
-    "term": "profiles.default-profile-type-field.legal-entity-address",
-    "definition": "Domicilio",
-    "context": "Address"
+    "term": "profiles.default-profile-type-field.individual-postal-code",
+    "definition": "Código postal",
+    "context": "Postal code"
   },
   {
-    "term": "profiles.default-profile-type-field.legal-entity-corporate-name",
+    "term": "profiles.default-profile-type-field.individual-proof-of-address-document",
+    "definition": "Documento de prueba de domicilio",
+    "context": "Proof of address document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-risk",
+    "definition": "Riesgo",
+    "context": "Risk"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-risk-assessment",
+    "definition": "Evaluación de riesgo",
+    "context": "Risk assessment"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-source-of-funds",
+    "definition": "Orígen de los fondos",
+    "context": "Source of funds"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-country-of-incorporation",
+    "definition": "País de constitución",
+    "context": "Country of incorporation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-effective-date-of-power-of-attorney",
+    "definition": "Fecha de inicio del poder",
+    "context": "Effective date of power of attorney"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-entity-name",
     "definition": "Denominación social",
-    "context": "Corporate name"
+    "context": "Entity name"
   },
   {
-    "term": "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
-    "definition": "Fecha de constitución",
-    "context": "Date of incorporation"
+    "term": "profiles.default-profile-type-field.legal-entity-entity-type",
+    "definition": "Tipo de Entidad",
+    "context": "Entity type"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-expiration-date-of-power-of-attorney",
+    "definition": "Fecha de vencimiento del poder",
+    "context": "Expiration date of power of attorney"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-financial-statements",
+    "definition": "Estados financieros",
+    "context": "Financial statements"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-main-business-activity",
+    "definition": "Actividad comercial principal",
+    "context": "Main business activity"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-ownership-structure",
+    "definition": "Estructura de propiedad",
+    "context": "Ownership structure"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-power-of-attorney-document",
+    "definition": "Documento del poder de representación",
+    "context": "Power of attorney document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-power-of-attorney-scope",
+    "definition": "Alcance del Poder",
+    "context": "Power of attorney scope"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-power-of-attorney-types",
+    "definition": "Tipos de Poderes",
+    "context": "Power of attorney types"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-registered-address",
+    "definition": "Domicilio social",
+    "context": "Registered address"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-registered-power-of-attorney",
+    "definition": "Poder de representación registrado",
+    "context": "Registered power of attorney"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-registration-number",
+    "definition": "Número de registro",
+    "context": "Registration number"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-revocation-conditions",
+    "definition": "Condiciones de revocación",
+    "context": "Revocation conditions"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-risk",
+    "definition": "Riesgo",
+    "context": "Risk"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-risk-assessment",
+    "definition": "Evaluación de riesgo",
+    "context": "Risk assessment"
   },
   {
     "term": "profiles.default-profile-type-field.legal-entity-tax-id",
     "definition": "Número de identificación fiscal",
     "context": "Tax ID"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-trade-name",
+    "definition": "Nombre comercial",
+    "context": "Trade name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-ubo-statement",
+    "definition": "Acta de titularidad real",
+    "context": "UBO statement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-consulting-agreement",
+    "definition": "Contrato de consultoría",
+    "context": "Consulting agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-employment-contract",
+    "definition": "Contrato de trabajo",
+    "context": "Employment contract"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-lease-agreement",
+    "definition": "Contrato de arrendamiento",
+    "context": "Lease agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-nda",
+    "definition": "Acuerdo de confidencialidad (NDA)",
+    "context": "Non-Disclosure Agreement (NDA)"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-partnership-agreement",
+    "definition": "Contrato de colaboración",
+    "context": "Partnership agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-purchase-order",
+    "definition": "Orden de Compra",
+    "context": "Purchase order"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-sales-contract",
+    "definition": "Contrato de venta",
+    "context": "Sales contract"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-service-agreement",
+    "definition": "Contrato de servicios",
+    "context": "Service agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-software-development-agreement",
+    "definition": "Contrato de desarrollo de software",
+    "context": "Software development agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-supply-contract",
+    "definition": "Contrato de suministro",
+    "context": "Supply contract"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-association",
+    "definition": "Asociación",
+    "context": "Association"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-foundation",
+    "definition": "Fundación",
+    "context": "Foundation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-incorporated",
+    "definition": "Sociedad Anónima",
+    "context": "Incorporated"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-limited-liability-company",
+    "definition": "Sociedad de Responsabilidad Limitada",
+    "context": "Limited Liability Company"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-limited-liability-partnership",
+    "definition": "Sociedad Limitada Profesional",
+    "context": "Limited Liability Partnership"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-entity-type-trust",
+    "definition": "Trust",
+    "context": "Trust"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-gender-female",
+    "definition": "Mujer",
+    "context": "Female"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-gender-male",
+    "definition": "Hombre",
+    "context": "Male"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-legal-entity-power-of-attorney-type-general",
+    "definition": "Poder general",
+    "context": "General power of attorney"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-legal-entity-power-of-attorney-type-special",
+    "definition": "Poder especial",
+    "context": "Special power of attorney"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-no",
+    "definition": "No",
+    "context": "No"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-risk-high",
+    "definition": "Alto",
+    "context": "High"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-risk-low",
+    "definition": "Bajo",
+    "context": "Low"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-risk-medium",
+    "definition": "Medio",
+    "context": "Medium"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-risk-medium-high",
+    "definition": "Medio-alto",
+    "context": "Medium-high"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-risk-medium-low",
+    "definition": "Medio-bajo",
+    "context": "Medium-low"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-yes",
+    "definition": "Si",
+    "context": "Yes"
   },
   {
     "term": "profiles.default-profile-type.contract",

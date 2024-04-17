@@ -219,6 +219,16 @@ export class ProfileRepository extends BaseRepository {
                 ]),
                 // when cloning a standard profile_type, set alias to null so cloned fields are not considered standard
                 alias: sourceProfileType.standard_type ? null : field.alias,
+                // remove "isStandard" from options values when cloning a standard profile_type, so the user can edit options
+                options:
+                  field.type === "SELECT"
+                    ? {
+                        ...field.options,
+                        values: (field.options.values ?? []).map((v: any) => ({
+                          ...omit(v, ["isStandard"]),
+                        })),
+                      }
+                    : field.options,
                 profile_type_id: profileType.id,
                 expiry_alert_ahead_time:
                   field.is_expirable && field.expiry_alert_ahead_time

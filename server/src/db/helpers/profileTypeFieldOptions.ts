@@ -94,7 +94,7 @@ const SCHEMAS = {
       showOptionsWithColors: { type: ["boolean", "null"] },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", null],
       },
     },
   },
@@ -324,6 +324,32 @@ export async function profileTypeFieldSelectValues(
           value: code,
           label: Object.fromEntries(
             UserLocaleValues.map((locale) => [locale, countriesByLocale[locale][code]]),
+          ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+      case "CURRENCIES": {
+        const currenciesByUserLocale = Object.fromEntries(
+          await pMap(UserLocaleValues, async (locale) => [
+            locale,
+            (await import(join(__dirname, `../../../data/currencies/currencies_${locale}.json`)))
+              .default,
+          ]),
+        );
+
+        const currencyCodes = Object.keys(currenciesByUserLocale["en"]);
+
+        return currencyCodes.map((code) => ({
+          value: code,
+          label: Object.fromEntries(
+            UserLocaleValues.map((locale) => {
+              const label =
+                currenciesByUserLocale[locale][
+                  code as keyof (typeof currenciesByUserLocale)["en"]
+                ] ?? currenciesByUserLocale["en"][code]; // VED currency is missing in es, ca, it, pt. fallback to en for this case
+
+              return [locale, label.filter(isDefined).join(" - ")];
+            }),
           ) as Record<UserLocale, string>,
           isStandard: true,
         }));

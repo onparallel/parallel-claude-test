@@ -144,7 +144,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
     defaultValues: {
       name: profileTypeField?.name ?? { [intl.locale]: "" },
       type: profileTypeField?.type ?? "SHORT_TEXT",
-      alias: profileTypeField?.alias ?? null,
+      alias: profileTypeField?.alias ?? "",
       isExpirable: profileTypeField?.isExpirable ?? false,
       options:
         profileTypeField?.type === "SELECT" || profileTypeField?.type === "BACKGROUND_CHECK"
@@ -285,8 +285,15 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       profileTypeId: profileType.id,
                       profileTypeFieldId: profileTypeField.id,
                       data: {
-                        ...(isStandard ? {} : dirtyData),
-                        ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
+                        ...(isStandard
+                          ? {}
+                          : {
+                              ...dirtyData,
+                              ...(isDefined(dirtyData.alias)
+                                ? { alias: dirtyData.alias || null }
+                                : {}),
+                            }),
+
                         options,
                         isExpirable: formData.isExpirable,
                         expiryAlertAheadTime,
@@ -432,6 +439,13 @@ function CreateOrUpdateProfileTypeFieldDialog({
             if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
               setError("alias", { type: "unavailable" });
             }
+            if (
+              isApolloError(e, "ARG_VALIDATION_ERROR") &&
+              (e.graphQLErrors[0].extensions?.extra as any)?.code ===
+                "REMOVE_STANDARD_OPTIONS_ERROR"
+            ) {
+              setError("options.values", { type: "validate" });
+            }
           }
         }),
       }}
@@ -467,7 +481,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
           {referencedIn.length ? (
             <PropertyReferencedAlert propertyNames={referencedPropertiesNames} />
           ) : null}
-          <FormControl isInvalid={!!errors.name} isDisabled={isDisabled}>
+          <FormControl isInvalid={!!errors.name} isDisabled={isDisabled || isStandard}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.property-name"

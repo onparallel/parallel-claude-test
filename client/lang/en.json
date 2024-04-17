@@ -1980,6 +1980,11 @@
     "context": "Remove option"
   },
   {
+    "term": "component.create-or-update-property-dialog.remove-standard-values-error",
+    "definition": "You can't remove standard values from the options list.",
+    "context": "You can't remove standard values from the options list."
+  },
+  {
     "term": "component.create-or-update-property-dialog.reserved-alias-error",
     "definition": "This identifier is reserved and can't be used",
     "context": "This identifier is reserved and can't be used"
@@ -8903,6 +8908,11 @@
     "term": "component.standard-list-select.countries-iso",
     "definition": "List of countries",
     "context": "List of countries"
+  },
+  {
+    "term": "component.standard-list-select.currencies",
+    "definition": "List of currencies",
+    "context": "List of currencies"
   },
   {
     "term": "component.standard-list-select.eu-countries-iso",
