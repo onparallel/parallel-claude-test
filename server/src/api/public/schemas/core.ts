@@ -393,6 +393,106 @@ const _PetitionField = {
   },
 } as const;
 
+const _PetitionFieldComment = {
+  title: "PetitionFieldComment",
+  type: "object",
+  required: ["id", "content", "author", "mentions", "createdAt"],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the parallel field comment",
+      example: toGlobalId("PetitionFieldComment", 100),
+    },
+    content: {
+      type: "string",
+      description: "The content of the comment in plain text",
+      example: `This is a comment for @[John Doe|id:${toGlobalId("User", 42)}]`,
+    },
+    author: {
+      type: ["object", "null"],
+      required: ["type", "id", "email", "fullName"],
+      properties: {
+        type: {
+          type: "string",
+          description: "The type of the comment author",
+          enum: ["USER", "CONTACT"],
+          example: "USER",
+        },
+        id: {
+          type: "string",
+          description: "The ID of the comment author",
+          example: toGlobalId("User", 2),
+        },
+        email: {
+          type: "string",
+          description: "The email of the comment author",
+          example: "mike.ross@example.com",
+        },
+        fullName: {
+          type: ["string", "null"],
+          description: "The full name of the comment author",
+          example: "Mike Ross",
+        },
+      },
+    },
+    mentions: {
+      type: "array",
+      description: "The mentioned users and groups in the comment",
+      items: {
+        anyOf: [
+          {
+            title: "UserMention",
+            type: ["object", "null"],
+            required: ["id", "type", "email", "name"],
+            properties: {
+              type: { type: "string", const: "USER" },
+              id: {
+                type: "string",
+                description: "The ID of the mentioned user",
+                example: toGlobalId("User", 42),
+              },
+              email: {
+                type: "string",
+                description: "The email of the mentioned user",
+                example: "john.doe@example.com",
+              },
+              name: {
+                type: "string",
+                description: "The full name of the mentioned user",
+                example: "John Doe",
+              },
+            },
+          },
+          {
+            title: "UserGroupMention",
+            type: ["object", "null"],
+            required: ["id", "type", "name"],
+            properties: {
+              type: { type: "string", const: "GROUP" },
+              id: {
+                type: "string",
+                description: "The ID of the mentioned group",
+                example: toGlobalId("UserGroup", 42),
+              },
+              name: {
+                type: "string",
+                description: "The name of the mentioned group",
+                example: "Developers",
+              },
+            },
+          },
+        ],
+      },
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Creation date of the comment",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+  },
+} as const;
+
 const _PetitionFieldReplyInner = {
   title: "PetitionFieldReply",
   type: "object",
@@ -1099,6 +1199,8 @@ export const UpdatePetitionField = schema({
 const _Tag = { type: "string", example: ["kyc", "priority"] } as const;
 
 export const PetitionField = schema(_PetitionField);
+export const PetitionFieldComment = schema(_PetitionFieldComment);
+export const ListOfPetitionFieldComments = ListOf(_PetitionFieldComment);
 export const PaginatedTags = schema(_PaginationOf(_Tag));
 export const PaginatedPetitions = schema(_PaginationOf(_Petition));
 export const PaginatedUsers = schema(_PaginationOf(_User));
@@ -1109,6 +1211,49 @@ export const PaginatedTemplates = schema(_PaginationOf(_Template));
 export const Contact = schema(_Contact);
 export const User = schema(_User);
 export const UserWithOrg = schema(_UserWithOrg);
+
+export const CreatePetitionFieldComment = schema({
+  title: "CreatePetitionFieldComment",
+  type: "object",
+  additionalProperties: false,
+  required: ["content"],
+  properties: {
+    content: {
+      type: "string",
+      description: outdent`
+        The content of the comment.
+    
+        You can mention other users and groups in your organization by using special tags in your comment:
+    
+        \`@[id:${toGlobalId("User", 1)}]\` will mention the user with id \`${toGlobalId("User", 1)}\`.
+    
+        \`@[email:john.doe@example.com]\` will mention the user with email \`john.doe@example.com\`.
+    
+        \`@[group:Marketing]\` will mention the group named \`Marketing\`.
+    
+        Have in mind:
+        - When mentioning by group name, the first group found with that name will be mentioned.
+        - Mentions by group name are case-insensitive but must match the group name exactly.
+        - If no user or group is found, the comment will not be submitted and an error will be returned.
+      `,
+      example: "This is a comment for @[id:6SgRex7ZDC]",
+    },
+    sharePermission: {
+      type: "string",
+      description:
+        "Share the parallel with READ or WRITE permission if mentioned users or groups don't have access to it. This has no effect if the mentioned users or groups already have access to the parallel.",
+      enum: ["READ", "WRITE"],
+      example: "READ",
+    },
+    subscribe: {
+      type: "boolean",
+      description:
+        "Subscribe mentioned users or groups to the parallel when sharing. Has no effect if sharePermission is not set.",
+      example: true,
+    },
+  },
+} as const);
+
 export const CreateContact = schema({
   title: "CreateContact",
   type: "object",

@@ -6132,6 +6132,34 @@ export type ProfileFragment = {
   }>;
 };
 
+export type PetitionFieldCommentFragment = {
+  id: string;
+  content: any | null;
+  isInternal: boolean;
+  createdAt: string;
+  author:
+    | {
+        __typename: "PetitionAccess";
+        contact: { id: string; email: string; fullName: string } | null;
+      }
+    | { __typename: "User"; id: string; email: string; fullName: string | null }
+    | null;
+  mentions: Array<
+    | {
+        __typename: "PetitionFieldCommentUserGroupMention";
+        userGroup: {
+          id: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+        } | null;
+      }
+    | {
+        __typename: "PetitionFieldCommentUserMention";
+        user: { id: string; email: string; fullName: string | null } | null;
+      }
+  >;
+};
+
 export type waitForTask_TaskQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
@@ -7663,6 +7691,121 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
       optional: boolean;
       multiple: boolean;
     }> | null;
+  };
+};
+
+export type GetPetitionFieldComments_petitionFieldCommentsQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+}>;
+
+export type GetPetitionFieldComments_petitionFieldCommentsQuery = {
+  petitionField: {
+    comments: Array<{
+      id: string;
+      content: any | null;
+      isInternal: boolean;
+      createdAt: string;
+      author:
+        | {
+            __typename: "PetitionAccess";
+            contact: { id: string; email: string; fullName: string } | null;
+          }
+        | { __typename: "User"; id: string; email: string; fullName: string | null }
+        | null;
+      mentions: Array<
+        | {
+            __typename: "PetitionFieldCommentUserGroupMention";
+            userGroup: {
+              id: string;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+            } | null;
+          }
+        | {
+            __typename: "PetitionFieldCommentUserMention";
+            user: { id: string; email: string; fullName: string | null } | null;
+          }
+      >;
+    }>;
+  };
+};
+
+export type SendPetitionFieldComment_usersByEmailQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+}>;
+
+export type SendPetitionFieldComment_usersByEmailQuery = {
+  me: { organization: { usersByEmail: { items: Array<{ id: string; fullName: string | null }> } } };
+};
+
+export type SendPetitionFieldComment_userGroupsQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+}>;
+
+export type SendPetitionFieldComment_userGroupsQuery = {
+  userGroups: {
+    items: Array<{
+      id: string;
+      name: string;
+      localizableName: { [locale in UserLocale]?: string };
+    }>;
+  };
+};
+
+export type SendPetitionFieldComment_getUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type SendPetitionFieldComment_getUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
+    | { __typename: "User"; id: string; fullName: string | null }
+    | {
+        __typename: "UserGroup";
+        id: string;
+        name: string;
+        localizableName: { [locale in UserLocale]?: string };
+      }
+  >;
+};
+
+export type SendPetitionFieldComment_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  content: Scalars["JSON"]["input"];
+  isInternal: Scalars["Boolean"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type SendPetitionFieldComment_createPetitionFieldCommentMutation = {
+  createPetitionFieldComment: {
+    id: string;
+    content: any | null;
+    isInternal: boolean;
+    createdAt: string;
+    author:
+      | {
+          __typename: "PetitionAccess";
+          contact: { id: string; email: string; fullName: string } | null;
+        }
+      | { __typename: "User"; id: string; email: string; fullName: string | null }
+      | null;
+    mentions: Array<
+      | {
+          __typename: "PetitionFieldCommentUserGroupMention";
+          userGroup: {
+            id: string;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+          } | null;
+        }
+      | {
+          __typename: "PetitionFieldCommentUserMention";
+          user: { id: string; email: string; fullName: string | null } | null;
+        }
+    >;
   };
 };
 
@@ -10331,6 +10474,46 @@ export const ProfileFragmentDoc = gql`
   ${ProfileFieldPropertyFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileFragment, unknown>;
+export const PetitionFieldCommentFragmentDoc = gql`
+  fragment PetitionFieldComment on PetitionFieldComment {
+    id
+    content
+    isInternal
+    createdAt
+    author {
+      __typename
+      ... on User {
+        id
+        email
+        fullName
+      }
+      ... on PetitionAccess {
+        contact {
+          id
+          email
+          fullName
+        }
+      }
+    }
+    mentions {
+      __typename
+      ... on PetitionFieldCommentUserMention {
+        user {
+          id
+          email
+          fullName
+        }
+      }
+      ... on PetitionFieldCommentUserGroupMention {
+        userGroup {
+          id
+          name
+          localizableName
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<PetitionFieldCommentFragment, unknown>;
 export const waitForTask_TaskDocument = gql`
   query waitForTask_Task($id: GID!) {
     task(id: $id) {
@@ -10833,6 +11016,97 @@ export const UpdatePetitionField_updatePetitionFieldDocument = gql`
 ` as unknown as DocumentNode<
   UpdatePetitionField_updatePetitionFieldMutation,
   UpdatePetitionField_updatePetitionFieldMutationVariables
+>;
+export const GetPetitionFieldComments_petitionFieldCommentsDocument = gql`
+  query GetPetitionFieldComments_petitionFieldComments($petitionId: GID!, $fieldId: GID!) {
+    petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
+      comments {
+        ...PetitionFieldComment
+      }
+    }
+  }
+  ${PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionFieldComments_petitionFieldCommentsQuery,
+  GetPetitionFieldComments_petitionFieldCommentsQueryVariables
+>;
+export const SendPetitionFieldComment_usersByEmailDocument = gql`
+  query SendPetitionFieldComment_usersByEmail($search: String!) {
+    me {
+      organization {
+        usersByEmail(emails: [$search], limit: 1, offset: 0) {
+          items {
+            id
+            fullName
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  SendPetitionFieldComment_usersByEmailQuery,
+  SendPetitionFieldComment_usersByEmailQueryVariables
+>;
+export const SendPetitionFieldComment_userGroupsDocument = gql`
+  query SendPetitionFieldComment_userGroups($search: String!) {
+    userGroups(search: $search, limit: 1, offset: 0) {
+      items {
+        id
+        name
+        localizableName
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  SendPetitionFieldComment_userGroupsQuery,
+  SendPetitionFieldComment_userGroupsQueryVariables
+>;
+export const SendPetitionFieldComment_getUsersOrGroupsDocument = gql`
+  query SendPetitionFieldComment_getUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      __typename
+      ... on User {
+        id
+        fullName
+      }
+      ... on UserGroup {
+        id
+        name
+        localizableName
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  SendPetitionFieldComment_getUsersOrGroupsQuery,
+  SendPetitionFieldComment_getUsersOrGroupsQueryVariables
+>;
+export const SendPetitionFieldComment_createPetitionFieldCommentDocument = gql`
+  mutation SendPetitionFieldComment_createPetitionFieldComment(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $content: JSON!
+    $isInternal: Boolean!
+    $sharePetition: Boolean
+    $sharePetitionPermission: PetitionPermissionTypeRW
+    $sharePetitionSubscribed: Boolean
+  ) {
+    createPetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      content: $content
+      isInternal: $isInternal
+      sharePetition: $sharePetition
+      sharePetitionPermission: $sharePetitionPermission
+      sharePetitionSubscribed: $sharePetitionSubscribed
+      throwOnNoPermission: false
+    ) {
+      ...PetitionFieldComment
+    }
+  }
+  ${PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  SendPetitionFieldComment_createPetitionFieldCommentMutation,
+  SendPetitionFieldComment_createPetitionFieldCommentMutationVariables
 >;
 export const DeleteReply_deletePetitionReplyDocument = gql`
   mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {

@@ -11,6 +11,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
+import { renderSlateToText } from "../../util/slate/render";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
@@ -32,6 +33,7 @@ import {
   EventSubscriptionFragment,
   getTags_tagsByNameDocument,
   getTaskResultFileUrl_getTaskResultFileDocument,
+  PetitionFieldCommentFragment,
   PetitionFieldFragment,
   PetitionFieldReplyFragment,
   PetitionFieldType,
@@ -725,4 +727,46 @@ export async function resolveContacts(
     }
     throw new BadRequestError("Error updating contacts");
   }
+}
+
+export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
+  return {
+    id: comment.id,
+    content: renderSlateToText(comment.content, {
+      override: {
+        // escape pipe character in mentions
+        mention: (node) => `@[${node.children![0].text?.replace(/\|/g, "\\|")}|id:${node.mention}]`,
+      },
+    }),
+    author:
+      comment.author?.__typename === "User"
+        ? { type: "USER" as const, ...omit(comment.author, ["__typename"]) }
+        : comment.author?.__typename === "PetitionAccess" && isDefined(comment.author.contact)
+          ? { type: "CONTACT" as const, ...comment.author.contact }
+          : null,
+    mentions:
+      comment.mentions?.map((m) =>
+        m.__typename === "PetitionFieldCommentUserMention"
+          ? m.user
+            ? {
+                type: "USER" as const,
+                id: m.user.id,
+                name: m.user.fullName || "",
+                email: m.user.email,
+              }
+            : null
+          : m.userGroup
+            ? {
+                type: "GROUP" as const,
+                id: m.userGroup.id,
+                name:
+                  m.userGroup.name ||
+                  m.userGroup.localizableName["en"] ||
+                  m.userGroup.localizableName["es"] ||
+                  "",
+              }
+            : null,
+      ) ?? [],
+    createdAt: comment.createdAt,
+  };
 }

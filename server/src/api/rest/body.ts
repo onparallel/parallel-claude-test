@@ -1,12 +1,12 @@
 import { Request } from "express";
+import { OpenAPIV3 } from "openapi-types";
 import { outdent } from "outdent";
 import { isDefined } from "remeda";
 import typeIs from "type-is";
 import { unMaybeArray } from "../../util/arrays";
 import { RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
-import { buildValidateSchema, JsonSchemaFor } from "./schemas";
-import { OpenAPIV3 } from "openapi-types";
+import { JsonSchemaFor, buildValidateSchema } from "./schemas";
 
 export interface BodyOptions {
   description?: string;

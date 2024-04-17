@@ -7,6 +7,7 @@ import { validateAnd } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validGlobalId } from "../helpers/validators/validGlobalId";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 
@@ -87,6 +88,7 @@ export const getUsersOrGroups = queryField("getUsersOrGroups", {
   args: {
     ids: nonNull(list(nonNull(idArg()))),
   },
+  validateArgs: validGlobalId((args) => args.ids, ["User", "UserGroup"], "ids"),
   resolve: async (_, { ids }, ctx) => {
     const decoded = ids.map((id) => fromGlobalId(id));
     const result = await Promise.all(

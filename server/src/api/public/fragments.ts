@@ -391,3 +391,44 @@ export const ProfileFragment = gql`
   ${ProfileFieldPropertyFragment}
   ${UserFragment}
 `;
+
+export const PetitionFieldCommentFragment = gql`
+  fragment PetitionFieldComment on PetitionFieldComment {
+    id
+    content
+    isInternal
+    createdAt
+    author {
+      __typename
+      ... on User {
+        id
+        email
+        fullName
+      }
+      ... on PetitionAccess {
+        contact {
+          id
+          email
+          fullName
+        }
+      }
+    }
+    mentions {
+      __typename
+      ... on PetitionFieldCommentUserMention {
+        user {
+          id
+          email
+          fullName
+        }
+      }
+      ... on PetitionFieldCommentUserGroupMention {
+        userGroup {
+          id
+          name
+          localizableName
+        }
+      }
+    }
+  }
+`;

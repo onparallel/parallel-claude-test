@@ -7,8 +7,13 @@ import { outdent } from "outdent";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
+import { ILogger, LOGGER } from "../../services/Logger";
+import { IRedis, REDIS } from "../../services/Redis";
+import { assert } from "../../util/assert";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { fromPlainTextWithMentions } from "../../util/slate/utils";
+import { titleize } from "../../util/strings";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi, RestParameter } from "../rest/core";
 import {
@@ -70,6 +75,7 @@ import {
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
   GetPetitionEvents_PetitionEventsDocument,
+  GetPetitionFieldComments_petitionFieldCommentsDocument,
   GetPetitionProfiles_petitionDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetition_petitionDocument,
@@ -93,6 +99,10 @@ import {
   RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
   RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
   ReopenPetition_reopenPetitionDocument,
+  SendPetitionFieldComment_createPetitionFieldCommentDocument,
+  SendPetitionFieldComment_getUsersOrGroupsDocument,
+  SendPetitionFieldComment_userGroupsDocument,
+  SendPetitionFieldComment_usersByEmailDocument,
   SharePetition_createAddPetitionPermissionTaskDocument,
   SharePetition_petitionDocument,
   SharePetition_usersByEmailDocument,
@@ -138,6 +148,7 @@ import {
   PermissionFragment,
   PetitionAccessFragment,
   PetitionEventSubscriptionFragment,
+  PetitionFieldCommentFragment,
   PetitionFieldFragment,
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
@@ -159,6 +170,7 @@ import {
   idParam,
   mapPetition,
   mapPetitionField,
+  mapPetitionFieldComment,
   mapPetitionFieldRepliesContent,
   mapProfile,
   mapReplyResponse,
@@ -172,6 +184,7 @@ import {
   waitForTask,
 } from "./helpers";
 import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
+import { ratelimit } from "./ratelimit";
 import {
   AssociatePetitionToProfileInput,
   Contact,
@@ -179,6 +192,7 @@ import {
   CreateEventSubscription,
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
+  CreatePetitionFieldComment,
   CreateProfile,
   CreateProfileFieldValue,
   EventSubscription,
@@ -186,6 +200,7 @@ import {
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionEvents,
+  ListOfPetitionFieldComments,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileEvents,
   ListOfProfileProperties,
@@ -203,6 +218,7 @@ import {
   PetitionAccess,
   PetitionCustomProperties,
   PetitionField,
+  PetitionFieldComment,
   PetitionFieldReply,
   Profile,
   ProfileSubscriptionInput,
@@ -225,10 +241,6 @@ import {
   UserWithOrg,
 } from "./schemas/core";
 import { PetitionEvent, ProfileEvent } from "./schemas/events";
-import { assert } from "../../util/assert";
-import { ratelimit } from "./ratelimit";
-import { IRedis, REDIS } from "../../services/Redis";
-import { ILogger, LOGGER } from "../../services/Logger";
 
 function assertType<T>(value: any): asserts value is T {}
 
@@ -276,6 +288,7 @@ export function publicApi(container: Container) {
         tags: [
           "Parallels",
           "Parallel replies",
+          "Parallel comments and notes",
           "Parallel recipients",
           "Signatures",
           "Parallel Sharing",
@@ -296,6 +309,10 @@ export function publicApi(container: Container) {
       {
         name: "Parallel replies",
         description: "See the replies to your parallels",
+      },
+      {
+        name: "Parallel comments and notes",
+        description: "Send comments and notes",
       },
       {
         name: "Parallel recipients",
@@ -1750,6 +1767,220 @@ export function publicApi(container: Container) {
         }
       },
     );
+
+  for (const type of ["comment", "note"] as const) {
+    api
+      .path(`/petitions/:petitionId/fields/:fieldId/${type}s`, {
+        params: { petitionId, fieldId },
+      })
+      .get(
+        {
+          operationId: `GetPetitionField${titleize(type)}s`,
+          summary: `Get ${type}s on a petition field`,
+          description: `Returns a list of ${type}s on the specified petition field`,
+          responses: {
+            200: SuccessResponse(ListOfPetitionFieldComments),
+          },
+          tags: ["Parallel comments and notes"],
+        },
+        async ({ client, params }) => {
+          const _query = gql`
+            query GetPetitionFieldComments_petitionFieldComments(
+              $petitionId: GID!
+              $fieldId: GID!
+            ) {
+              petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
+                comments {
+                  ...PetitionFieldComment
+                }
+              }
+            }
+            ${PetitionFieldCommentFragment}
+          `;
+
+          const response = await client.request(
+            GetPetitionFieldComments_petitionFieldCommentsDocument,
+            {
+              petitionId: params.petitionId,
+              fieldId: params.fieldId,
+            },
+          );
+
+          return Ok(
+            response.petitionField.comments
+              .filter((c) => c.isInternal === (type === "note"))
+              .map(mapPetitionFieldComment),
+          );
+        },
+      )
+      .post(
+        {
+          operationId: `SendPetitionField${titleize(type)}`,
+          summary: `Send a ${type} to a petition field`,
+          description: `Send a ${type} to the specified petition field`,
+          body: JsonBody(CreatePetitionFieldComment),
+
+          responses: {
+            200: SuccessResponse(PetitionFieldComment),
+            400: ErrorResponse({ description: "Invalid request body" }),
+          },
+          tags: ["Parallel comments and notes"],
+        },
+        async ({ client, params, body }) => {
+          const _queries = gql`
+            query SendPetitionFieldComment_usersByEmail($search: String!) {
+              me {
+                organization {
+                  usersByEmail(emails: [$search], limit: 1, offset: 0) {
+                    items {
+                      id
+                      fullName
+                    }
+                  }
+                }
+              }
+            }
+            query SendPetitionFieldComment_userGroups($search: String!) {
+              userGroups(search: $search, limit: 1, offset: 0) {
+                items {
+                  id
+                  name
+                  localizableName
+                }
+              }
+            }
+            query SendPetitionFieldComment_getUsersOrGroups($ids: [ID!]!) {
+              getUsersOrGroups(ids: $ids) {
+                __typename
+                ... on User {
+                  id
+                  fullName
+                }
+                ... on UserGroup {
+                  id
+                  name
+                  localizableName
+                }
+              }
+            }
+            mutation SendPetitionFieldComment_createPetitionFieldComment(
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $content: JSON!
+              $isInternal: Boolean!
+              $sharePetition: Boolean
+              $sharePetitionPermission: PetitionPermissionTypeRW
+              $sharePetitionSubscribed: Boolean
+            ) {
+              createPetitionFieldComment(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                content: $content
+                isInternal: $isInternal
+                sharePetition: $sharePetition
+                sharePetitionPermission: $sharePetitionPermission
+                sharePetitionSubscribed: $sharePetitionSubscribed
+                throwOnNoPermission: false
+              ) {
+                ...PetitionFieldComment
+              }
+            }
+            ${PetitionFieldCommentFragment}
+          `;
+
+          const slateComment = await fromPlainTextWithMentions(body.content, async (mention) => {
+            try {
+              if (mention.startsWith("@[id:")) {
+                const {
+                  getUsersOrGroups: [data],
+                } = await client.request(SendPetitionFieldComment_getUsersOrGroupsDocument, {
+                  ids: [mention.slice(5, -1)],
+                });
+
+                return {
+                  id: data.id,
+                  name:
+                    data.__typename === "User"
+                      ? data.fullName ?? ""
+                      : data.name || data.localizableName["en"] || data.localizableName["es"] || "",
+                };
+              } else if (mention.startsWith("@[group:")) {
+                const search = mention.slice(8, -1);
+                const {
+                  userGroups: {
+                    items: [firstGroup],
+                  },
+                } = await client.request(SendPetitionFieldComment_userGroupsDocument, {
+                  search,
+                });
+
+                if (!firstGroup) {
+                  throw new Error();
+                }
+
+                const name = [
+                  firstGroup.name,
+                  firstGroup.localizableName["en"],
+                  firstGroup.localizableName["es"],
+                ].filter(isDefined);
+
+                if (name.every((name) => name.toLowerCase() !== search.toLowerCase())) {
+                  throw new Error(); // group name must fully match search term, case-insensitive
+                }
+                return {
+                  id: firstGroup.id,
+                  name: name.find((n) => n !== "") ?? "",
+                };
+              } else if (mention.startsWith("@[email:")) {
+                const email = mention.slice(8, -1);
+                if (!email.match(EMAIL_REGEX)) {
+                  throw new Error();
+                }
+                const {
+                  me: {
+                    organization: {
+                      usersByEmail: {
+                        items: [firstUser],
+                      },
+                    },
+                  },
+                } = await client.request(SendPetitionFieldComment_usersByEmailDocument, {
+                  search: email,
+                });
+
+                if (!firstUser) {
+                  throw new Error();
+                }
+
+                return {
+                  id: firstUser.id,
+                  name: firstUser.fullName || "",
+                };
+              } else {
+                throw new Error();
+              }
+            } catch {
+              throw new BadRequestError(`${mention} is not a valid mention`);
+            }
+          });
+
+          const { createPetitionFieldComment } = await client.request(
+            SendPetitionFieldComment_createPetitionFieldCommentDocument,
+            {
+              petitionId: params.petitionId,
+              petitionFieldId: params.fieldId,
+              isInternal: type === "note",
+              content: slateComment,
+              sharePetition: body.sharePermission !== undefined,
+              sharePetitionPermission: body.sharePermission,
+              sharePetitionSubscribed: body.subscribe,
+            },
+          );
+
+          return Ok(mapPetitionFieldComment(createPetitionFieldComment));
+        },
+      );
+  }
 
   const replyBodyDescription = outdent`
   For \`FILE_UPLOAD\` fields the request must be a \`multipart/form-data\` request containing the file to upload.
