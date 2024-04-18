@@ -1651,6 +1651,28 @@ describe("GraphQL/Users", () => {
                 },
                 {
                   id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "City", es: "Ciudad" },
+                  alias: "p_city",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 6,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "ZIP Code", es: "Código postal" },
+                  alias: "p_zip",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 7,
+                },
+                {
+                  id: expect.any(String),
                   type: "SELECT",
                   name: { en: "Country of incorporation", es: "País de constitución" },
                   alias: "p_country_of_incorporation",
@@ -1658,7 +1680,18 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: { values: expect.toBeArrayOfSize(250), standardList: "COUNTRIES" },
-                  position: 6,
+                  position: 8,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE",
+                  name: { en: "Date of incorporation", es: "Fecha de constitución" },
+                  alias: "p_date_of_incorporation",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: { useReplyAsExpiryDate: false },
+                  position: 9,
                 },
                 {
                   id: expect.any(String),
@@ -1669,7 +1702,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 7,
+                  position: 10,
                 },
                 {
                   id: expect.any(String),
@@ -1680,7 +1713,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 8,
+                  position: 11,
                 },
                 {
                   id: expect.any(String),
@@ -1691,7 +1724,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 9,
+                  position: 12,
                 },
                 {
                   id: expect.any(String),
@@ -1702,7 +1735,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 10,
+                  position: 13,
                 },
                 {
                   id: expect.any(String),
@@ -1747,7 +1780,7 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 11,
+                  position: 14,
                 },
                 {
                   id: expect.any(String),
@@ -1758,7 +1791,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 12,
+                  position: 15,
                 },
                 {
                   id: expect.any(String),
@@ -1782,7 +1815,7 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 13,
+                  position: 16,
                 },
                 {
                   id: expect.any(String),
@@ -1793,7 +1826,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 14,
+                  position: 17,
                 },
                 {
                   id: expect.any(String),
@@ -1807,7 +1840,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 15,
+                  position: 18,
                 },
                 {
                   id: expect.any(String),
@@ -1823,7 +1856,7 @@ describe("GraphQL/Users", () => {
                   options: {
                     useReplyAsExpiryDate: false,
                   },
-                  position: 16,
+                  position: 19,
                 },
                 {
                   id: expect.any(String),
@@ -1839,7 +1872,7 @@ describe("GraphQL/Users", () => {
                   options: {
                     useReplyAsExpiryDate: false,
                   },
-                  position: 17,
+                  position: 20,
                 },
                 {
                   id: expect.any(String),
@@ -1850,7 +1883,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 18,
+                  position: 21,
                 },
                 {
                   id: expect.any(String),
@@ -1877,7 +1910,7 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 19,
+                  position: 22,
                 },
               ],
             },

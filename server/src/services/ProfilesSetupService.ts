@@ -460,6 +460,22 @@ export class ProfilesSetupService implements IProfilesSetupService {
           alias: "p_registered_address",
         },
         {
+          type: "SHORT_TEXT",
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type-field.legal-entity-city",
+            defaultMessage: "City",
+          }),
+          alias: "p_city",
+        },
+        {
+          type: "SHORT_TEXT",
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type-field.legal-entity-zip-code",
+            defaultMessage: "ZIP Code",
+          }),
+          alias: "p_zip",
+        },
+        {
           type: "SELECT",
           name: await this.intl.getLocalizableUserText({
             id: "profiles.default-profile-type-field.legal-entity-country-of-incorporation",
@@ -469,6 +485,17 @@ export class ProfilesSetupService implements IProfilesSetupService {
           options: {
             values: [],
             standardList: "COUNTRIES",
+          },
+        },
+        {
+          type: "DATE",
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
+            defaultMessage: "Date of incorporation",
+          }),
+          alias: "p_date_of_incorporation",
+          options: {
+            useReplyAsExpiryDate: false,
           },
         },
         {

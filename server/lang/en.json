@@ -1025,6 +1025,11 @@
     "context": "Background check"
   },
   {
+    "term": "profiles.default-profile-type-field.individual-citizenship",
+    "definition": "Citizenship",
+    "context": "Citizenship"
+  },
+  {
     "term": "profiles.default-profile-type-field.individual-city",
     "definition": "City",
     "context": "City"
@@ -1080,11 +1085,6 @@
     "context": "Mobile phone number"
   },
   {
-    "term": "profiles.default-profile-type-field.individual-citizenship",
-    "definition": "Citizenship",
-    "context": "Citizenship"
-  },
-  {
     "term": "profiles.default-profile-type-field.individual-occupation",
     "definition": "Occupation",
     "context": "Occupation"
@@ -1130,9 +1130,19 @@
     "context": "Source of funds"
   },
   {
+    "term": "profiles.default-profile-type-field.legal-entity-city",
+    "definition": "City",
+    "context": "City"
+  },
+  {
     "term": "profiles.default-profile-type-field.legal-entity-country-of-incorporation",
     "definition": "Country of incorporation",
     "context": "Country of incorporation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
+    "definition": "Date of incorporation",
+    "context": "Date of incorporation"
   },
   {
     "term": "profiles.default-profile-type-field.legal-entity-effective-date-of-power-of-attorney",
@@ -1228,6 +1238,11 @@
     "term": "profiles.default-profile-type-field.legal-entity-ubo-statement",
     "definition": "UBO statement",
     "context": "UBO statement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-zip-code",
+    "definition": "ZIP Code",
+    "context": "ZIP Code"
   },
   {
     "term": "profiles.default-profile-type-field.option-contract-type-consulting-agreement",
