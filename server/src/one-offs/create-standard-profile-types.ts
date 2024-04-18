@@ -8,6 +8,7 @@ import {
   ProfileTypeStandardTypeValues,
 } from "../db/__types";
 import { loadEnv } from "../util/loadEnv";
+import { waitFor } from "../util/promises/waitFor";
 
 async function initKnex() {
   await loadEnv();
@@ -805,6 +806,9 @@ async function main() {
     .where("is_org_owner", true)
     .select("*")
     .orderBy("org_id");
+
+  console.log(`About to run on ${orgOwners.length} organizations`);
+  await waitFor(3_000);
 
   let i = 0;
   for (const { id: ownerId, org_id: orgId } of orgOwners) {
