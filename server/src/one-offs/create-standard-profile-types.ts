@@ -366,8 +366,8 @@ async function createStandardIndividualContractType(knex: Knex, orgId: number, c
         },
         {
           type: "SELECT",
-          name: { en: "Nationality", es: "Nacionalidad" },
-          alias: "p_nationality",
+          name: { en: "Citizenship", es: "Nacionalidad" },
+          alias: "p_citizenship",
           options: {
             values: [],
             standardList: "COUNTRIES",

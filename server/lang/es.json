@@ -1080,9 +1080,9 @@
     "context": "Mobile phone number"
   },
   {
-    "term": "profiles.default-profile-type-field.individual-nationality",
+    "term": "profiles.default-profile-type-field.individual-citizenship",
     "definition": "Nacionalidad",
-    "context": "Nationality"
+    "context": "Citizenship"
   },
   {
     "term": "profiles.default-profile-type-field.individual-occupation",

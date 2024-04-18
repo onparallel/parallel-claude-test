@@ -1372,8 +1372,8 @@ describe("GraphQL/Users", () => {
                 {
                   id: expect.any(String),
                   type: "SELECT",
-                  name: { en: "Nationality", es: "Nacionalidad" },
-                  alias: "p_nationality",
+                  name: { en: "Citizenship", es: "Nacionalidad" },
+                  alias: "p_citizenship",
                   isStandard: true,
                   isExpirable: false,
                   expiryAlertAheadTime: null,

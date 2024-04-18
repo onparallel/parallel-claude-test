@@ -186,10 +186,10 @@ export class ProfilesSetupService implements IProfilesSetupService {
         {
           type: "SELECT",
           name: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type-field.individual-nationality",
-            defaultMessage: "Nationality",
+            id: "profiles.default-profile-type-field.individual-citizenship",
+            defaultMessage: "Citizenship",
           }),
-          alias: "p_nationality",
+          alias: "p_citizenship",
           options: {
             values: [],
             standardList: "COUNTRIES",
