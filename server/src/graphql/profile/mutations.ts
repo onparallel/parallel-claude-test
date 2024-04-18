@@ -854,7 +854,7 @@ export const createProfile = mutationField("createProfile", {
       await ctx.profiles.subscribeUsersToProfiles(
         [profile.id],
         [ctx.user!.id],
-        `User:${ctx.user!.id}}`,
+        `User:${ctx.user!.id}`,
       );
     }
 
