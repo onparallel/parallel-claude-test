@@ -687,14 +687,14 @@ async function createStandardContractProfileType(knex: Knex, orgId: number, crea
     )
     .returning("*");
 
-  const contractType = fields.find((f) => f.alias === "p_contract_type")!;
   const counterParty = fields.find((f) => f.alias === "p_counterparty")!;
+  const contractType = fields.find((f) => f.alias === "p_contract_type")!;
 
   await knex
     .from("profile_type")
     .where("id", contract.id)
     .update({
-      profile_name_pattern: JSON.stringify([contractType.id, " - ", counterParty.id]),
+      profile_name_pattern: JSON.stringify([counterParty.id, " - ", contractType.id]),
     });
 }
 

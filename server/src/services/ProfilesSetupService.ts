@@ -1080,12 +1080,12 @@ export class ProfilesSetupService implements IProfilesSetupService {
 
       const contractFields = await this.createContractProfileTypeField(contract.id, createdBy, t);
 
-      const contractType = contractFields.find((f) => f.alias === "p_contract_type")!;
       const counterParty = contractFields.find((f) => f.alias === "p_counterparty")!;
+      const contractType = contractFields.find((f) => f.alias === "p_contract_type")!;
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         contract.id,
-        [contractType.id, " - ", counterParty.id],
+        [counterParty.id, " - ", contractType.id],
         createdBy,
         t,
       );

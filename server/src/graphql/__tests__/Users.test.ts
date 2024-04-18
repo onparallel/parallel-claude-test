@@ -1917,7 +1917,7 @@ describe("GraphQL/Users", () => {
             {
               name: { en: "Contract", es: "Contrato" },
               isStandard: true,
-              profileNamePattern: `{{ ${profilesData.profileTypes.items[2].fields[1].id} }} - {{ ${profilesData.profileTypes.items[2].fields[0].id} }}`,
+              profileNamePattern: `{{ ${profilesData.profileTypes.items[2].fields[0].id} }} - {{ ${profilesData.profileTypes.items[2].fields[1].id} }}`,
               fields: [
                 {
                   id: expect.any(String),
