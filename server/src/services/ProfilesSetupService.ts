@@ -505,8 +505,8 @@ export class ProfilesSetupService implements IProfilesSetupService {
           {
             type: "SHORT_TEXT",
             name: await this.intl.getLocalizableUserText({
-              id: "profiles.default-profile-type-field.individual-postal-code",
-              defaultMessage: "Postal code",
+              id: "profiles.default-profile-type-field.individual-zip-code",
+              defaultMessage: "ZIP code",
             }),
             alias: "p_zip",
           },

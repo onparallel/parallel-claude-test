@@ -1105,11 +1105,6 @@
     "context": "Phone number"
   },
   {
-    "term": "profiles.default-profile-type-field.individual-postal-code",
-    "definition": "Postal code",
-    "context": "Postal code"
-  },
-  {
     "term": "profiles.default-profile-type-field.individual-proof-of-address-document",
     "definition": "Proof of address document",
     "context": "Proof of address document"
@@ -1128,6 +1123,11 @@
     "term": "profiles.default-profile-type-field.individual-source-of-funds",
     "definition": "Source of funds",
     "context": "Source of funds"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-zip-code",
+    "definition": "ZIP code",
+    "context": "ZIP code"
   },
   {
     "term": "profiles.default-profile-type-field.legal-entity-city",
