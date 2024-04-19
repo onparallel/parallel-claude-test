@@ -49,12 +49,11 @@
     "storybook:client": "SERVER_STORIES_PORT=5000 NODE_OPTIONS=\"--preserve-symlinks --preserve-symlinks-main\" storybook dev --port 60000 --quiet",
     "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",
-    "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
     "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue",
     "archive-migrations": "ts-node ./migrations/scripts/archive-migrations.ts",
     "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts",
-    "profile-types:remove-unused": "yarn run-ts-script src/one-offs/remove-unused-profile-types.ts",
-    "profile-types:sync-standard-types": "yarn run-ts-script src/one-offs/sync-standard-profile-types.ts"
+    "profile-types:remove-unused": "node dist/one-offs/remove-unused-profile-types.js",
+    "profile-types:sync-standard-types": "node dist/one-offs/sync-standard-profile-types.js"
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
