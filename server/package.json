@@ -52,7 +52,9 @@
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
     "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue",
     "archive-migrations": "ts-node ./migrations/scripts/archive-migrations.ts",
-    "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts"
+    "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts",
+    "profile-types:remove-unused": "yarn run-ts-script src/one-offs/remove-unused-profile-types.ts",
+    "profile-types:sync-standard-types": "yarn run-ts-script src/one-offs/sync-standard-profile-types.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
