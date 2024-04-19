@@ -1250,6 +1250,16 @@
     "context": "Consulting agreement"
   },
   {
+    "term": "profiles.default-profile-type-field.option-contract-type-credit-facility",
+    "definition": "Línea de crédito",
+    "context": "Credit facility"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-dpa",
+    "definition": "Acuerdo de protección de datos (DPA)",
+    "context": "Data protection agreement (DPA)"
+  },
+  {
     "term": "profiles.default-profile-type-field.option-contract-type-employment-contract",
     "definition": "Contrato de trabajo",
     "context": "Employment contract"
@@ -1258,6 +1268,11 @@
     "term": "profiles.default-profile-type-field.option-contract-type-lease-agreement",
     "definition": "Contrato de arrendamiento",
     "context": "Lease agreement"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-loan-agreement",
+    "definition": "Acuerdo de préstamo",
+    "context": "Loan agreement"
   },
   {
     "term": "profiles.default-profile-type-field.option-contract-type-nda",
@@ -1273,6 +1288,11 @@
     "term": "profiles.default-profile-type-field.option-contract-type-purchase-order",
     "definition": "Orden de Compra",
     "context": "Purchase order"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-contract-type-saas",
+    "definition": "Contrato de Software como Servicio (SaaS)",
+    "context": "Software as a Service agreement (SaaS)"
   },
   {
     "term": "profiles.default-profile-type-field.option-contract-type-sales-contract",

@@ -166,6 +166,38 @@ export class ProfilesSetupService implements IProfilesSetupService {
                   }),
                   isStandard: true,
                 },
+                {
+                  value: "SAAS",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-contract-type-saas",
+                    defaultMessage: "Software as a Service agreement (SaaS)",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "DPA",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-contract-type-dpa",
+                    defaultMessage: "Data protection agreement (DPA)",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "LOAN",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-contract-type-loan-agreement",
+                    defaultMessage: "Loan agreement",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "CREDIT",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-contract-type-credit-facility",
+                    defaultMessage: "Credit facility",
+                  }),
+                  isStandard: true,
+                },
               ],
             },
           },
