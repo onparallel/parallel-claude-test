@@ -1339,7 +1339,7 @@ describe("GraphQL/Users", () => {
                 {
                   id: expect.any(String),
                   type: "SHORT_TEXT",
-                  name: { en: "Postal code", es: "Código postal" },
+                  name: { en: "ZIP code", es: "Código postal" },
                   alias: "p_zip",
                   isStandard: true,
                   isExpirable: false,
@@ -1995,6 +1995,38 @@ describe("GraphQL/Users", () => {
                         value: "PURCHASE_ORDER",
                         label: { en: "Purchase order", es: "Orden de Compra" },
                         isStandard: true,
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Software as a Service agreement (SaaS)",
+                          es: "Contrato de Software como Servicio (SaaS)",
+                        },
+                        value: "SAAS",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Data protection agreement (DPA)",
+                          es: "Acuerdo de protección de datos (DPA)",
+                        },
+                        value: "DPA",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Loan agreement",
+                          es: "Acuerdo de préstamo",
+                        },
+                        value: "LOAN",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Credit facility",
+                          es: "Línea de crédito",
+                        },
+                        value: "CREDIT",
                       },
                     ],
                   },
