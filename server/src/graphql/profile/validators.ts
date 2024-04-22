@@ -103,7 +103,7 @@ export async function validateProfileFieldValue(
     case "SELECT": {
       const values = await profileTypeFieldSelectValues(field.options);
       if (!values.find((option: any) => content.value === option.value)) {
-        throw new Error("Value need to be a valid option");
+        throw new Error("Value is not a valid option");
       }
       return;
     }

@@ -2289,7 +2289,7 @@ const _Profile = {
   title: "Profile",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "status", "profileType", "createdAt"],
+  required: ["id", "name", "status", "profileType", "values", "createdAt"],
   properties: {
     id: {
       type: "string",
@@ -2326,12 +2326,11 @@ const _Profile = {
       description:
         "If parameter `include` contains `fields`, this will be the list of profile fields and files",
     },
-    fieldsByAlias: {
+    values: {
       type: "object",
-      description:
-        "If parameter `include` contains `fieldsByAlias`, this will be the list of profile fields and files indexed by alias",
+      description: "The list of profile field values indexed by alias",
       example: {
-        name: "Parallel Solutions",
+        p_entity_name: "Parallel Solutions",
       },
     },
     subscribers: {
@@ -2364,37 +2363,49 @@ export const CreateProfile = schema({
       example: toGlobalId("ProfileType", 42),
     },
     subscribe: {
-      type: ["boolean"],
-      description: "Whether to subscribe the user to the profile type",
-      example: true,
-    },
-    fields: {
-      type: "array",
-      description: "The profile fields to assign to the created profile",
-      items: {
-        type: "object",
-        title: "UpdateProfileFieldValueInput",
-        additionalProperties: false,
-        required: ["profileTypeFieldId"],
-        properties: {
-          profileTypeFieldId: {
-            type: "string",
-            description: "The ID of the profile type field to update",
-            example: toGlobalId("ProfileTypeField", 1),
-          },
-          content: {
-            type: ["object", "null"],
-            description: "The content of the profile field",
-            example: {
-              value: "Parallel Solutions",
-            },
-          },
-          expiryDate: {
-            type: ["string", "null"],
-            description: "The expiry date of the profile field",
-            example: "2026-10-15",
-          },
+      anyOf: [
+        {
+          type: "boolean",
+          description: "Whether to subscribe the user to the profile type",
+          example: true,
         },
+        {
+          type: "string",
+          enum: ["true", "false"],
+          description: "Whether to subscribe the user to the profile type",
+          example: "true",
+        },
+      ],
+    },
+    values: {
+      type: "object",
+      description: "The profile field values to assign to the created profile, indexed by alias",
+      properties: {
+        "<alias>": {
+          oneOf: [
+            { type: "string", example: "Parallel Solutions", description: "Value of the property" },
+            {
+              type: "object",
+              required: ["value"],
+              additionalProperties: false,
+              properties: {
+                value: {
+                  type: "string",
+                  description: "Value of the property",
+                },
+                expiryDate: {
+                  type: "string",
+                  format: "date",
+                  example: "2023-06-27",
+                  description: "Expiration date of the value",
+                },
+              },
+            },
+          ],
+        },
+      },
+      example: {
+        p_entity_name: "Parallel Solutions",
       },
     },
   },
@@ -2430,29 +2441,46 @@ export const CreateProfileFieldValue = schema({
   example: { name: "John Doe", amount: 500, date: "2023-06-27" },
 } as const);
 
-export const UpdateProfileFieldValueFormDataBody = schema({
+export const UpdateProfileFieldValue = schema({
   type: "object",
-  required: ["value"],
+  required: ["values"],
   additionalProperties: false,
   properties: {
-    value: {
-      anyOf: [
-        _ListOf({
-          format: "binary",
-          title: "File",
-          description: "File to be uploaded to the profile field",
-        }),
-        {
-          type: ["string", "null"],
-          description:
-            "For fields of type other than `FILE`, this contains the value to be uploaded, or pass `null` to remove it.",
-        },
-      ],
-    },
-    expiryDate: {
-      type: ["string", "null"],
+    values: {
+      type: "object",
       description:
-        "Pass a date in format YYYY-MM-DD to specify when the value should expire. The field must be previously configured to allow expiration.",
+        "The profile field values to update or delete, indexed by alias. Pass `null` or an empty string to delete the value.",
+      properties: {
+        "<alias>": {
+          oneOf: [
+            {
+              type: ["string", "null"],
+              example: "Parallel Solutions",
+              description: "Value of the property",
+            },
+            {
+              type: ["object", "null"],
+              additionalProperties: false,
+              properties: {
+                value: {
+                  type: "string",
+                  example: "Parallel Solutions",
+                  description: "Value of the property",
+                },
+                expiryDate: {
+                  type: "string",
+                  format: "date",
+                  example: "2023-06-27",
+                  description: "Expiration date of the value",
+                },
+              },
+            },
+          ],
+        },
+      },
+      example: {
+        p_entity_name: "Parallel Solutions",
+      },
     },
   },
 } as const);

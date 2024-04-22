@@ -299,6 +299,7 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "ID", es: "DNI" }),
             type: "FILE" as const,
             alias: "ID_PHOTO",
+            is_expirable: true,
           },
           {
             name: json({ en: "Contract", es: "Contrato" }),

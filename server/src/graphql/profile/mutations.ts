@@ -778,7 +778,12 @@ export const createProfile = mutationField("createProfile", {
         ? await ctx.profiles.loadProfileTypeField(args.fields.map((f) => f.profileTypeFieldId))
         : [];
 
-    const aggregatedErrors: { profileTypeFieldId: string; code: string; message: string }[] = [];
+    const aggregatedErrors: {
+      profileTypeFieldId: string;
+      code: string;
+      message: string;
+      alias: string | null;
+    }[] = [];
     const fields = await pMap(
       args.fields ?? [],
       async (field) => {
@@ -813,8 +818,9 @@ export const createProfile = mutationField("createProfile", {
           } catch (e) {
             if (e instanceof Error) {
               aggregatedErrors.push({
-                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
                 code: "INVALID_PROFILE_FIELD_VALUE",
+                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
+                alias: profileTypeField.alias,
                 message: e.message,
               });
             }
@@ -1003,7 +1009,12 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
 
-    const aggregatedErrors: { profileTypeFieldId: string; code: string; message: string }[] = [];
+    const aggregatedErrors: {
+      profileTypeFieldId: string;
+      code: string;
+      message: string;
+      alias: string | null;
+    }[] = [];
 
     const fieldsWithZonedExpires = await pMap(
       fields,
@@ -1020,8 +1031,9 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           } catch (e) {
             if (e instanceof Error) {
               aggregatedErrors.push({
-                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
                 code: "INVALID_PROFILE_FIELD_VALUE",
+                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
+                alias: profileTypeField.alias,
                 message: `Invalid profile field value: ${e.message}`,
               });
             }
@@ -1162,6 +1174,13 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     let files: ProfileFieldFile[] = [];
 
     const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+
+    if (expiryDate !== undefined && !profileTypeField!.is_expirable) {
+      throw new ApolloError(
+        `Can't set expiry on a non expirable field`,
+        "EXPIRY_ON_NON_EXPIRABLE_FIELD",
+      );
+    }
 
     if (data.length > 0) {
       fileUploads = await ctx.files.createFileUpload(

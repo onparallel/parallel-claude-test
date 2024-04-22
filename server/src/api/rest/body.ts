@@ -7,6 +7,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { JsonSchemaFor, buildValidateSchema } from "./schemas";
+import { unflatten } from "flat";
 
 export interface BodyOptions {
   description?: string;
@@ -58,13 +59,14 @@ export function FormDataBodyContent<T>(
           }
         }
       }
-      const valid = validate(body);
+      const unflattenedBody = unflatten(body);
+      const valid = validate(unflattenedBody);
       if (!valid) {
         const error = validate.errors![0];
         throw new InvalidRequestBodyError(`Property at ${error.instancePath} ${error.message}`);
       }
-      context.body = body;
-      context.files = files;
+      context.body = unflattenedBody;
+      context.files = unflatten(body);
     },
     ...other,
   };

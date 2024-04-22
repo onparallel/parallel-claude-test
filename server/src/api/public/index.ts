@@ -45,17 +45,13 @@ import {
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_userByEmailDocument,
   CreatePetition_petitionDocument,
-  CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
-  CreateProfileFieldValue_profileDocument,
-  CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
-  CreateProfileFieldValue_updateProfileFieldValueDocument,
   CreateProfile_createProfileDocument,
+  CreateProfile_createProfileFieldFileUploadLinkDocument,
+  CreateProfile_profileFieldFileUploadCompleteDocument,
+  CreateProfile_profileTypeDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
-  DeleteProfileFieldValue_deleteProfileFieldFileDocument,
-  DeleteProfileFieldValue_profileDocument,
-  DeleteProfileFieldValue_updateProfileFieldValueDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
@@ -81,7 +77,6 @@ import {
   GetPetition_petitionDocument,
   GetPetitions_petitionsDocument,
   GetProfileEvents_ProfileEventsDocument,
-  GetProfileFields_profileDocument,
   GetProfileSubscribers_profileDocument,
   GetProfile_profileDocument,
   GetProfiles_profilesDocument,
@@ -131,6 +126,7 @@ import {
   UpdatePetition_updatePetitionDocument,
   UpdateProfileFieldValueInput,
   UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+  UpdateProfileFieldValue_deleteProfileFieldFileDocument,
   UpdateProfileFieldValue_profileDocument,
   UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   UpdateProfileFieldValue_updateProfileFieldValueDocument,
@@ -178,6 +174,7 @@ import {
   mapSubscription,
   mapTemplate,
   paginationParams,
+  parseProfileTypeFieldInput,
   resolveContacts,
   sortByParam,
   uploadFile,
@@ -194,7 +191,6 @@ import {
   CreatePetition,
   CreatePetitionFieldComment,
   CreateProfile,
-  CreateProfileFieldValue,
   EventSubscription,
   FileDownload,
   ListOfPermissions,
@@ -203,7 +199,6 @@ import {
   ListOfPetitionFieldComments,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileEvents,
-  ListOfProfileProperties,
   ListOfProfileSubscriptions,
   ListOfProfiles,
   ListOfSignatureRequests,
@@ -236,7 +231,7 @@ import {
   UpdateFileReply,
   UpdatePetition,
   UpdatePetitionField,
-  UpdateProfileFieldValueFormDataBody,
+  UpdateProfileFieldValue,
   UpdateReply,
   UserWithOrg,
 } from "./schemas/core";
@@ -475,7 +470,7 @@ export function publicApi(container: Container) {
       description: "Include optional fields in the response",
       array: true,
       required: false,
-      values: ["fields", "fieldsByAlias", "subscribers"],
+      values: ["fields", "subscribers"],
     }),
   };
 
@@ -486,7 +481,6 @@ export function publicApi(container: Container) {
   >(query: Q) {
     return {
       includeFields: query.include?.includes("fields") ?? false,
-      includeFieldsByAlias: query.include?.includes("fieldsByAlias") ?? false,
       includeSubscribers: query.include?.includes("subscribers") ?? false,
     };
   }
@@ -530,10 +524,6 @@ export function publicApi(container: Container) {
   const profileId = idParam({
     type: "Profile",
     description: "The ID of the profile",
-  });
-  const profileTypeFieldId = idParam({
-    type: "ProfileTypeField",
-    description: "The ID of the profile type field",
   });
 
   api.path("/me").get(
@@ -3100,8 +3090,8 @@ export function publicApi(container: Container) {
         operationId: "GetPetitionProfiles",
         summary: "List parallel profiles",
         description: outdent`
-    Returns a list of all profiles associated to the parallel.
-    `,
+          Returns a list of all profiles associated to the parallel.
+        `,
         query: {
           ...profileIncludeParam,
           type: stringParam({
@@ -3119,7 +3109,6 @@ export function publicApi(container: Container) {
           query GetPetitionProfiles_petition(
             $petitionId: GID!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             petition(id: $petitionId) {
@@ -3173,7 +3162,6 @@ export function publicApi(container: Container) {
             $profileId: GID!
             $petitionId: GID!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
@@ -3885,7 +3873,6 @@ export function publicApi(container: Container) {
             $profileTypeIds: [GID!]
             $status: [ProfileStatus!]
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profiles(
@@ -3920,7 +3907,47 @@ export function publicApi(container: Container) {
         operationId: "CreateProfile",
         summary: "Create a profile",
         description: "Creates a new profile on your organization",
-        body: JsonBody(CreateProfile),
+        middleware: anyFileUploadMiddleware(),
+        body: Body([JsonBodyContent(CreateProfile), FormDataBodyContent(CreateProfile)], {
+          description: outdent`
+          Create a profile and optionally pass the initial values by setting the \`values\` property.
+          Values is a key value object where the keys are the alias of the fields and the values are the value you want to store on the profile.
+          
+          Example:
+          \`\`\`json
+          {
+            "profileTypeId": "${toGlobalId("ProfileType", 42)}"
+            "values": {
+              "p_firstname": "John",
+              "p_lastname": "Smith"
+            }
+          }
+          \`\`\`
+          
+          In case you want to set the expiry date of a field, instead of the value you can pass and object as shown below
+          
+          \`\`\`json
+          {
+            "profileTypeId": "${toGlobalId("ProfileType", 42)}"
+            "values": {
+              "p_id": {"value": "11111111H", "expiryDate": "2031-05-28"}
+            }
+          }
+          \`\`\`
+          
+          In order to fill FILE type fields, your request needs to be a \`multipart/form-data\` request instead of an \`application/json\` one.
+          
+          The schema of the payload would be the same:
+          - \`profileTypeId\`: \`${toGlobalId("ProfileType", 42)}\`
+          - \`values.p_id_document\`: \`FILE\`
+
+          or if you also want to set the expiry date:
+          - \`profileTypeId\`: \`${toGlobalId("ProfileType", 42)}\`
+          - \`values.p_id_document.value\`: \`FILE\`
+          - \`values.p_id_document.expiryDate\`: \`2031-05-28\`
+
+        `,
+        }),
         query: profileIncludeParam,
         responses: {
           201: SuccessResponse(Profile),
@@ -3929,7 +3956,19 @@ export function publicApi(container: Container) {
         },
         tags: ["Profiles"],
       },
-      async ({ client, body, query }) => {
+      async ({ client, body, query, files }) => {
+        const _query = gql`
+          query CreateProfile_profileType($profileTypeId: GID!) {
+            profileType(profileTypeId: $profileTypeId) {
+              fields {
+                id
+                type
+                alias
+                isExpirable
+              }
+            }
+          }
+        `;
         const _mutations = [
           gql`
             mutation CreateProfile_createProfile(
@@ -3937,7 +3976,6 @@ export function publicApi(container: Container) {
               $subscribe: Boolean
               $fields: [UpdateProfileFieldValueInput!]
               $includeFields: Boolean!
-              $includeFieldsByAlias: Boolean!
               $includeSubscribers: Boolean!
             ) {
               createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
@@ -3946,16 +3984,136 @@ export function publicApi(container: Container) {
             }
             ${ProfileFragment}
           `,
+          gql`
+            mutation CreateProfile_createProfileFieldFileUploadLink(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $expiryDate: Date
+              $data: [FileUploadInput!]!
+            ) {
+              createProfileFieldFileUploadLink(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                expiryDate: $expiryDate
+                data: $data
+              ) {
+                uploads {
+                  file {
+                    id
+                  }
+                  presignedPostData {
+                    url
+                    fields
+                  }
+                }
+              }
+            }
+          `,
+          gql`
+            mutation CreateProfile_profileFieldFileUploadComplete(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $profileFieldFileIds: [GID!]!
+              $includeFields: Boolean!
+              $includeSubscribers: Boolean!
+            ) {
+              profileFieldFileUploadComplete(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                profileFieldFileIds: $profileFieldFileIds
+              ) {
+                profile {
+                  ...Profile
+                }
+              }
+            }
+          `,
         ];
 
         try {
+          const { profileType } = await client.request(CreateProfile_profileTypeDocument, {
+            profileTypeId: body.profileTypeId,
+          });
+
+          const profileTypeFields = profileType.fields.filter((f) => isDefined(f.alias));
+
+          const createFields: UpdateProfileFieldValueInput[] = [];
+          const uploadFiles: {
+            alias: string;
+            expiryDate?: string;
+            value: Express.Multer.File[];
+          }[] = [];
+
+          try {
+            for (const [field, content, expiryDate] of parseProfileTypeFieldInput(
+              Object.assign({}, body?.values ?? {}, files?.values ?? {}),
+              profileTypeFields,
+              files?.values ?? {},
+            )) {
+              if (content?.value !== null) {
+                if (field.type === "FILE") {
+                  uploadFiles.push({
+                    alias: field.alias!,
+                    ...(content as any),
+                    expiryDate,
+                  });
+                } else {
+                  createFields.push({
+                    profileTypeFieldId: field.id,
+                    content,
+                    expiryDate,
+                  });
+                }
+              }
+            }
+          } catch (e) {
+            if (e instanceof Error) {
+              throw new BadRequestError(e.message);
+            }
+            throw e;
+          }
+
           const result = await client.request(CreateProfile_createProfileDocument, {
             profileTypeId: body.profileTypeId,
-            subscribe: body.subscribe,
-            fields: body.fields,
+            subscribe: body.subscribe === true || body.subscribe === "true",
+            fields: createFields,
             ...getProfileIncludesFromQuery(query),
           });
           assert("id" in result.createProfile);
+
+          for (const fileField of uploadFiles) {
+            const profileTypeField = profileTypeFields.find((f) => f.alias === fileField.alias)!;
+            const {
+              createProfileFieldFileUploadLink: { uploads },
+            } = await client.request(CreateProfile_createProfileFieldFileUploadLinkDocument, {
+              profileId: result.createProfile.id,
+              profileTypeFieldId: profileTypeField.id,
+              data:
+                fileField.value?.map((file) => ({
+                  contentType: file.mimetype,
+                  filename: file.originalname,
+                  size: file.size,
+                })) ?? [],
+              expiryDate: fileField.expiryDate,
+            });
+
+            for (const [file, uploadData] of zip(fileField.value ?? [], uploads)) {
+              await uploadFile(file, uploadData.presignedPostData);
+            }
+
+            const { profileFieldFileUploadComplete: uploadComplete } = await client.request(
+              CreateProfile_profileFieldFileUploadCompleteDocument,
+              {
+                profileId: result.createProfile.id,
+                profileTypeFieldId: profileTypeField.id,
+                profileFieldFileIds: uploads.map((upload) => upload.file.id),
+                ...getProfileIncludesFromQuery(query),
+              },
+            );
+
+            assert("id" in uploadComplete[0].profile);
+            return Created(mapProfile(uploadComplete[0].profile));
+          }
 
           return Created(mapProfile(result.createProfile));
         } catch (error) {
@@ -3973,55 +4131,22 @@ export function publicApi(container: Container) {
       },
     );
 
-  api.path("/profiles/:profileId", { params: { profileId } }).get(
-    {
-      operationId: "GetProfile",
-      summary: "Get a profile",
-      description: "Returns the specified profile",
-      query: profileIncludeParam,
-      responses: { 200: SuccessResponse(Profile) },
-      tags: ["Profiles"],
-    },
-    async ({ client, params, query }) => {
-      const _query = gql`
-        query GetProfile_profile(
-          $profileId: GID!
-          $includeFields: Boolean!
-          $includeFieldsByAlias: Boolean!
-          $includeSubscribers: Boolean!
-        ) {
-          profile(profileId: $profileId) {
-            ...Profile
-          }
-        }
-        ${ProfileFragment}
-      `;
-
-      const result = await client.request(GetProfile_profileDocument, {
-        profileId: params.profileId,
-        ...getProfileIncludesFromQuery(query),
-      });
-      assert("id" in result.profile);
-      return Ok(mapProfile(result.profile));
-    },
-  );
-
   api
-    .path("/profiles/:profileId/fields", { params: { profileId } })
+    .path("/profiles/:profileId", { params: { profileId } })
     .get(
       {
-        operationId: "GetProfileFields",
-        summary: "List profile fields",
-        description: "Returns a list with all the fields of the specified profile",
-        responses: { 200: SuccessResponse(ListOfProfileProperties) },
+        operationId: "GetProfile",
+        summary: "Get a profile",
+        description: "Returns the specified profile",
+        query: profileIncludeParam,
+        responses: { 200: SuccessResponse(Profile) },
         tags: ["Profiles"],
       },
-      async ({ client, params }) => {
+      async ({ client, params, query }) => {
         const _query = gql`
-          query GetProfileFields_profile(
+          query GetProfile_profile(
             $profileId: GID!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profile(profileId: $profileId) {
@@ -4031,300 +4156,88 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        const result = await client.request(GetProfileFields_profileDocument, {
+        const result = await client.request(GetProfile_profileDocument, {
           profileId: params.profileId,
-          ...getProfileIncludesFromQuery({ include: ["fields"] }),
+          ...getProfileIncludesFromQuery(query),
         });
-
-        return Ok(mapProfile(result.profile).fields!);
-      },
-    )
-    .put(
-      {
-        operationId: "CreateProfileFieldValue",
-        summary: "Submit values by profile field alias",
-        description: outdent`
-        Submit a list of values on a profile given a form-data where each key is a field alias.
-        The profile has to be in \`OPEN\` status.
-      `,
-        middleware: anyFileUploadMiddleware(),
-        body: FormDataBody(CreateProfileFieldValue, {
-          description: outdent`
-          A multipart/form-data body where each key is a field alias and the value is the value to submit.
-
-          e.g.: \`{ "name": "John Doe", "amount": 500, "date": "2023-06-27" }\` will submit the values \`"John Doe"\` for the field with alias \`"name"\`, \`500\` for the field with alias \`"amount"\` and \`"2023-06-27"\` for the field with alias \`"date"\`.
-
-          If any of the keys does not match a field alias, it will be ignored.
-
-          Have in mind that the value must match with the profile field type. For example, if the field is a \`DATE\` field, the value must be a valid date string. If the field is a \`FILE\` field, value must be a selection of Files to upload.
-          `,
-        }),
-        tags: ["Profiles"],
-        responses: {
-          200: SuccessResponse(Profile),
-          400: ErrorResponse({ description: "Bad request input" }),
-        },
-      },
-      async ({ client, params, body }) => {
-        const _query = gql`
-          query CreateProfileFieldValue_profile(
-            $profileId: GID!
-            $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
-            $includeSubscribers: Boolean!
-          ) {
-            profile(profileId: $profileId) {
-              ...Profile
-            }
-          }
-          ${ProfileFragment}
-        `;
-
-        const _mutations = [
-          gql`
-            mutation CreateProfileFieldValue_updateProfileFieldValue(
-              $profileId: GID!
-              $fields: [UpdateProfileFieldValueInput!]!
-            ) {
-              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-                id
-              }
-            }
-          `,
-          gql`
-            mutation CreateProfileFieldValue_createProfileFieldFileUploadLink(
-              $profileId: GID!
-              $profileTypeFieldId: GID!
-              $data: [FileUploadInput!]!
-            ) {
-              createProfileFieldFileUploadLink(
-                profileId: $profileId
-                profileTypeFieldId: $profileTypeFieldId
-                data: $data
-              ) {
-                uploads {
-                  file {
-                    id
-                  }
-                  presignedPostData {
-                    fields
-                    url
-                  }
-                }
-              }
-            }
-          `,
-          gql`
-            mutation CreateProfileFieldValue_profileFieldFileUploadComplete(
-              $profileId: GID!
-              $profileTypeFieldId: GID!
-              $profileFieldFileIds: [GID!]!
-            ) {
-              profileFieldFileUploadComplete(
-                profileId: $profileId
-                profileTypeFieldId: $profileTypeFieldId
-                profileFieldFileIds: $profileFieldFileIds
-              ) {
-                id
-              }
-            }
-          `,
-        ];
-
-        const queryResponse = await client.request(CreateProfileFieldValue_profileDocument, {
-          profileId: params.profileId,
-          ...getProfileIncludesFromQuery({ include: ["fields"] }),
-        });
-        const profileFields = queryResponse.profile.properties!.map((p) => p.field);
-
-        const simpleTextUpdateFields: UpdateProfileFieldValueInput[] = [];
-        const fileUpdateFields: { profileTypeFieldId: string; files: Express.Multer.File[] }[] = [];
-
-        for (const [alias, value] of Object.entries(body)) {
-          const field = profileFields.find((f) => f.alias === alias);
-          if (field && value !== undefined) {
-            if (field.type === "FILE") {
-              if (typeof value !== "object") {
-                throw new BadRequestError(
-                  `Invalid value for field ${field.alias}. Expected an array of files.`,
-                );
-              }
-              fileUpdateFields.push({
-                profileTypeFieldId: field.id,
-                files: value as Express.Multer.File[],
-              });
-            } else {
-              if (typeof value !== "string") {
-                throw new BadRequestError(
-                  `Invalid value for field ${field.alias}. Expected a string.`,
-                );
-              }
-              simpleTextUpdateFields.push({ profileTypeFieldId: field.id, content: { value } });
-            }
-          }
-        }
-
-        try {
-          if (simpleTextUpdateFields.length > 0) {
-            await client.request(CreateProfileFieldValue_updateProfileFieldValueDocument, {
-              profileId: params.profileId,
-              fields: simpleTextUpdateFields,
-            });
-          }
-
-          if (fileUpdateFields.length > 0) {
-            for (const fileUpdate of fileUpdateFields) {
-              const fileUpdateResponse = await client.request(
-                CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
-                {
-                  profileId: params.profileId,
-                  profileTypeFieldId: fileUpdate.profileTypeFieldId,
-                  data: fileUpdate.files.map((file) => ({
-                    filename: file.filename,
-                    contentType: file.mimetype,
-                    size: file.size,
-                  })),
-                },
-              );
-              for (const [file, presignedPostData] of zip(
-                fileUpdate.files,
-                fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
-                  (u) => u.presignedPostData,
-                ),
-              )) {
-                await uploadFile(file, presignedPostData);
-              }
-
-              await client.request(CreateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
-                profileId: params.profileId,
-                profileTypeFieldId: fileUpdate.profileTypeFieldId,
-                profileFieldFileIds:
-                  fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map((u) => u.file.id),
-              });
-            }
-          }
-
-          const response = await client.request(CreateProfileFieldValue_profileDocument, {
-            profileId: params.profileId,
-            ...getProfileIncludesFromQuery({ include: ["fieldsByAlias"] }),
-          });
-
-          assert("id" in response.profile);
-          return Ok(mapProfile(response.profile));
-        } catch (error) {
-          if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
-            throw new BadRequestError(
-              error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
-            );
-          }
-          throw error;
-        }
-      },
-    );
-
-  api
-    .path("/profiles/:profileId/fields/:profileTypeFieldId", {
-      params: { profileId, profileTypeFieldId },
-    })
-    .delete(
-      {
-        operationId: "DeleteProfileFieldValue",
-        summary: "Remove a value on the profile field",
-        description: outdent`
-      Removes a value on the profile field.
-      If the field is of type \`FILE\`, the related files will be deleted.
-      The profile has to be in \`OPEN\` status.
-    `,
-        tags: ["Profiles"],
-        responses: { 200: SuccessResponse() },
-      },
-      async ({ client, params }) => {
-        const _query = gql`
-          query DeleteProfileFieldValue_profile($profileId: GID!) {
-            profile(profileId: $profileId) {
-              properties {
-                field {
-                  id
-                  type
-                }
-              }
-            }
-          }
-        `;
-
-        const _mutations = [
-          gql`
-            mutation DeleteProfileFieldValue_updateProfileFieldValue(
-              $profileId: GID!
-              $fields: [UpdateProfileFieldValueInput!]!
-            ) {
-              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-                id
-              }
-            }
-          `,
-          gql`
-            mutation DeleteProfileFieldValue_deleteProfileFieldFile(
-              $profileId: GID!
-              $profileTypeFieldId: GID!
-            ) {
-              deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
-            }
-          `,
-        ];
-
-        const queryResponse = await client.request(DeleteProfileFieldValue_profileDocument, {
-          profileId: params.profileId,
-        });
-
-        const field = queryResponse.profile.properties!.find(
-          (p) => p.field.id === params.profileTypeFieldId,
-        )?.field;
-
-        if (!field) {
-          throw new ForbiddenError("You don't have access to this profile field");
-        }
-
-        if (field.type === "FILE") {
-          await client.request(DeleteProfileFieldValue_deleteProfileFieldFileDocument, {
-            profileId: params.profileId,
-            profileTypeFieldId: params.profileTypeFieldId,
-          });
-        } else {
-          await client.request(DeleteProfileFieldValue_updateProfileFieldValueDocument, {
-            profileId: params.profileId,
-            fields: [{ profileTypeFieldId: params.profileTypeFieldId, content: null }],
-          });
-        }
-
-        return NoContent();
+        assert("id" in result.profile);
+        return Ok(mapProfile(result.profile));
       },
     )
     .put(
       {
         operationId: "UpdateProfileFieldValue",
-        summary: "Submit values",
+        summary: "Update a profile",
         description: outdent`
-      Creates or updates a value of a profile field.
-      The profile has to be in \`OPEN\` status.
+        Updates the values of a profile.
+
+        The profile has to be in \`OPEN\` status.
       `,
         tags: ["Profiles"],
         middleware: anyFileUploadMiddleware(),
-        body: FormDataBody(UpdateProfileFieldValueFormDataBody, {
-          description:
-            "The request must be a `multipart/form-data` request containing the value or file(s) to upload.",
-        }),
+        body: Body(
+          [JsonBodyContent(UpdateProfileFieldValue), FormDataBodyContent(UpdateProfileFieldValue)],
+          {
+            description: outdent`
+              Update a profile values by setting the \`values\` property.
+              Values is a key value object where the keys are the alias of the fields and the values are the value you want to store on the profile.
+              
+              Example:
+              \`\`\`json
+              {
+                "values": {
+                  "p_firstname": "John",
+                  "p_lastname": "Smith"
+                }
+              }
+              \`\`\`
+              
+              In case you want to update the expiry date of a field, instead of the value you can pass and object as shown below
+              
+              \`\`\`json
+              {
+                "values": {
+                  "p_id": {"value": "11111111H", "expiryDate": "2031-05-28"}
+                }
+              }
+              \`\`\`
+              *(you can also pass just the expiry date if you don't intend to update the value of the field.)*
+
+              In case you want to remove an existing value, you can pass \`null\` as the value.
+
+              \`\`\`json
+              {
+                "values": {
+                  "p_firstname": null
+                }
+              }
+              \`\`\`
+              
+              In order to update FILE type fields, your request needs to be a \`multipart/form-data\` request instead of an \`application/json\` one.
+              Files will be added to the current uploaded files on the value.
+
+              The schema of the payload would be the same:
+              - \`values.p_id_document\`: \`FILE\`
+
+              or if you want to update the expiry date:
+              - \`values.p_id_document.value\`: \`FILE\`
+              - \`values.p_id_document.expiryDate\`: \`2031-05-28\`
+
+              if you want to remove every uploaded file, you can leave the value empty.
+            `,
+          },
+        ),
         responses: {
           200: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Invalid request body" }),
           403: ErrorResponse({ description: "You don't have access to this resource" }),
         },
       },
-      async ({ client, params, body }) => {
+      async ({ client, params, body, files }) => {
         const _query = gql`
           query UpdateProfileFieldValue_profile(
             $profileId: GID!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profile(profileId: $profileId) {
@@ -4385,80 +4298,117 @@ export function publicApi(container: Container) {
               }
             }
           `,
+          gql`
+            mutation UpdateProfileFieldValue_deleteProfileFieldFile(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+            ) {
+              deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+            }
+          `,
         ];
 
-        const queryResponse = await client.request(UpdateProfileFieldValue_profileDocument, {
+        const { profile } = await client.request(UpdateProfileFieldValue_profileDocument, {
           profileId: params.profileId,
           includeFields: true,
-          includeFieldsByAlias: false,
           includeSubscribers: false,
         });
 
-        const field = queryResponse.profile.properties!.find(
-          (p) => p.field.id === params.profileTypeFieldId,
-        )?.field;
+        const profileTypeFields = profile.values
+          .filter((v) => isDefined(v.field.alias))
+          .map((v) => v.field);
 
-        if (!isDefined(field)) {
-          throw new ForbiddenError("You don't have access to this profile field");
+        const updateFields: UpdateProfileFieldValueInput[] = [];
+        const deleteFileFields: { id: string }[] = [];
+        const uploadFiles: {
+          alias: string;
+          expiryDate?: string;
+          value: Express.Multer.File[];
+        }[] = [];
+        try {
+          for (const [field, content, expiryDate] of parseProfileTypeFieldInput(
+            Object.assign({}, body?.values ?? {}, files?.values ?? {}),
+            profileTypeFields,
+            files?.values ?? {},
+          )) {
+            if (field.type === "FILE") {
+              if (content?.value === null || content?.value === "") {
+                deleteFileFields.push({ id: field.id });
+              } else {
+                uploadFiles.push({ alias: field.alias!, ...(content as any), expiryDate });
+              }
+            } else {
+              updateFields.push({
+                profileTypeFieldId: field.id,
+                content,
+                expiryDate,
+              });
+            }
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            throw new BadRequestError(e.message);
+          }
+          throw e;
         }
 
-        if (field.type === "FILE") {
-          if (typeof body.value !== "object") {
-            throw new BadRequestError(`Invalid value for field. Expected an array of files.`);
-          }
-          const createUploadLinkResponse = await client.request(
-            UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
-            {
-              profileId: params.profileId,
-              profileTypeFieldId: params.profileTypeFieldId,
-              data: (body.value as Express.Multer.File[]).map((file) => ({
-                filename: file.originalname,
-                contentType: file.mimetype,
-                size: file.size,
-              })),
-              expiryDate: body.expiryDate,
-            },
-          );
-
-          for (const [file, uploadData] of zip(
-            body.value as Express.Multer.File[],
-            createUploadLinkResponse.createProfileFieldFileUploadLink.uploads,
-          )) {
-            await uploadFile(file, uploadData.presignedPostData);
-          }
-
-          await client.request(UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
-            profileId: params.profileId,
-            profileTypeFieldId: params.profileTypeFieldId,
-            profileFieldFileIds:
-              createUploadLinkResponse.createProfileFieldFileUploadLink.uploads.map(
-                (upload) => upload.file.id,
-              ),
-          });
-        } else {
-          if (typeof body.value === "object") {
-            throw new BadRequestError(`Invalid value for field. Expected a string.`);
-          }
-
-          try {
+        try {
+          if (updateFields.length > 0) {
             await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
               profileId: params.profileId,
-              fields: [
-                {
-                  profileTypeFieldId: params.profileTypeFieldId,
-                  content: { value: body.value },
-                  expiryDate: body.expiryDate,
-                },
-              ],
+              fields: updateFields,
             });
-          } catch (error) {
-            if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
-              throw new BadRequestError(
-                error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
-              );
-            }
-            throw error;
           }
+
+          for (const fileField of uploadFiles) {
+            const profileTypeField = profile.values.find(
+              (v) => v.field.alias === fileField.alias,
+            )!.field;
+
+            const {
+              createProfileFieldFileUploadLink: { uploads },
+            } = await client.request(
+              UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+              {
+                profileId: params.profileId,
+                profileTypeFieldId: profileTypeField.id,
+                data:
+                  fileField.value?.map((file) => ({
+                    contentType: file.mimetype,
+                    filename: file.originalname,
+                    size: file.size,
+                  })) ?? [],
+                expiryDate: fileField.expiryDate,
+              },
+            );
+
+            for (const [file, uploadData] of zip(fileField.value ?? [], uploads)) {
+              await uploadFile(file, uploadData.presignedPostData);
+            }
+
+            if (uploads.length > 0) {
+              await client.request(UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
+                profileId: params.profileId,
+                profileTypeFieldId: profileTypeField.id,
+                profileFieldFileIds: uploads.map((upload) => upload.file.id),
+              });
+            }
+          }
+
+          for (const fileField of deleteFileFields) {
+            await client.request(UpdateProfileFieldValue_deleteProfileFieldFileDocument, {
+              profileId: params.profileId,
+              profileTypeFieldId: fileField.id,
+            });
+          }
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+            throw new BadRequestError(
+              error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
+              { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
+            );
+          }
+          throw error;
         }
 
         const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {
@@ -4520,7 +4470,6 @@ export function publicApi(container: Container) {
             $profileId: GID!
             $userIds: [GID!]!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
@@ -4559,7 +4508,6 @@ export function publicApi(container: Container) {
             $profileId: GID!
             $userIds: [GID!]!
             $includeFields: Boolean!
-            $includeFieldsByAlias: Boolean!
             $includeSubscribers: Boolean!
           ) {
             unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {

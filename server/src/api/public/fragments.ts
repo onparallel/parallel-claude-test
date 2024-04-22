@@ -377,7 +377,7 @@ export const ProfileFragment = gql`
     properties @include(if: $includeFields) {
       ...ProfileFieldProperty
     }
-    propertiesByAlias: properties @include(if: $includeFieldsByAlias) {
+    values: properties {
       ...ProfileFieldProperty
     }
     subscribers @include(if: $includeSubscribers) {

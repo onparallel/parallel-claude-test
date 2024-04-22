@@ -7,12 +7,14 @@ import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { isDefined, omit, pick, pipe, uniq, zip } from "remeda";
 import { promisify } from "util";
+import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
 import { renderSlateToText } from "../../util/slate/render";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
+import { isValidDate } from "../../util/time";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
 import { BadRequestError, InternalError } from "../rest/errors";
@@ -541,11 +543,11 @@ function mapProfilePropertyOptions(field: Pick<ProfileTypeFieldFragment, "type" 
   return {};
 }
 
-function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
+function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "values">>(
   profile: T,
 ) {
   return {
-    ...omit(profile, ["properties", "propertiesByAlias"]),
+    ...omit(profile, ["properties"]),
     fields: profile.properties?.map((prop) => {
       return {
         field: {
@@ -555,13 +557,11 @@ function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "pr
         ...(prop.field.type === "FILE" ? { files: prop.files } : { value: prop.value }),
       };
     }),
-    fieldsByAlias: isDefined(profile.propertiesByAlias)
-      ? fillPropertiesByAlias(profile.propertiesByAlias)
-      : undefined,
+    values: fillPropertiesByAlias(profile.values),
   };
 }
 
-function fillPropertiesByAlias(props: ProfileFragment["propertiesByAlias"]) {
+function fillPropertiesByAlias(props: ProfileFragment["values"]) {
   return props.reduce(
     (acc, prop) => {
       if (isDefined(prop.field.alias)) {
@@ -578,9 +578,7 @@ function fillPropertiesByAlias(props: ProfileFragment["propertiesByAlias"]) {
   );
 }
 
-export function mapProfile<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
-  profile: T,
-) {
+export function mapProfile<T extends Pick<ProfileFragment, "properties" | "values">>(profile: T) {
   return pipe(profile, mapProfileProperties);
 }
 
@@ -769,4 +767,72 @@ export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
       ) ?? [],
     createdAt: comment.createdAt,
   };
+}
+
+export function parseProfileTypeFieldInput<
+  T extends { type: ProfileTypeFieldType; alias: string | null; isExpirable: boolean },
+>(input: Record<string, any>, profileTypeFields: T[], files: any) {
+  return Object.entries(input).map(([alias, value]) => {
+    // map every value to { value, expiryDate } format
+    const field = profileTypeFields.find((f) => f.alias === alias);
+    if (!isDefined(field)) {
+      throw new Error(`Unknown alias '${alias}' in values object`);
+    }
+
+    if (field.type === "BACKGROUND_CHECK") {
+      throw new Error(
+        `Field '${alias}' cannot be submitted via API. Please, remove it from the values and try again.`,
+      );
+    }
+
+    const content = (
+      value === null ||
+      typeof value === "string" ||
+      typeof value === "number" ||
+      Array.isArray(value)
+        ? { value: value === "" ? null : value }
+        : value && "value" in value && value.value === ""
+          ? { value: null }
+          : value
+    ) as { value?: string | number | Express.Multer.File[] | null; expiryDate?: string };
+
+    if (!field.isExpirable && isDefined(content.expiryDate)) {
+      throw new Error(`Can't set expiryDate on field '${field.alias}', as it is not expirable`);
+    }
+
+    if (isDefined(content.expiryDate) && !isValidDate(content.expiryDate)) {
+      throw new Error(`Invalid expiry date '${content.expiryDate}' for field '${field.alias}'`);
+    }
+
+    if (
+      field.type === "FILE" &&
+      content.value !== null &&
+      (!isDefined(files[alias]) ||
+        ("value" in files[alias] && !Array.isArray(files[alias].value)) ||
+        (!("value" in files[alias]) && !Array.isArray(files[alias])))
+    ) {
+      throw new Error(`Expected one or more files to be uploaded for field '${field.alias}'.`);
+    }
+
+    if (content.value && field.type !== "FILE" && Array.isArray(content.value)) {
+      throw new Error(`Expected a string or number for field '${field.alias}'.`);
+    }
+
+    return [
+      field,
+      content.value !== undefined
+        ? {
+            value:
+              field.type === "NUMBER" && content.value
+                ? parseFloat(content.value as string)
+                : content.value,
+          }
+        : undefined,
+      content.expiryDate,
+    ] as [
+      T,
+      { value: string | number | Express.Multer.File[] | null } | undefined,
+      string | undefined,
+    ];
+  });
 }
