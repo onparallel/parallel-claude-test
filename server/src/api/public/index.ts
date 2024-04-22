@@ -623,6 +623,7 @@ export function publicApi(container: Container) {
             description: "Optionally filter parallels by their status",
             required: false,
             values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] as const,
+            array: true,
           }),
           tags: stringParam({
             description: "List of tags to filter by",
