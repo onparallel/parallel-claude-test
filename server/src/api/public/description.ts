@@ -1,6 +1,6 @@
 import { outdent } from "outdent";
 
-export const description = outdent`
+export const description = outdent/*md*/ `
 ## Introduction
 Parallel is a document process solution that helps its users collect documents 
 and information efficiently, giving them control over what their recipients
@@ -20,7 +20,56 @@ When you make any requests to the Parallel API pass the generated token in the
 ~~~
 Authorization: Bearer QrUV6NYDk2KcXg96KrHCQTTuKyt5oU8ETHueF5awWZe6
 ~~~
-<SecurityDefinitions />
+
+## Rate limiting
+
+To ensure optimal performance and fair access to our API resources for all
+users, we have implemented rate limiting. Starting September 1st, API usage will
+be limited to 100 requests per minute per client.
+
+Rate limit information is provided through HTTP headers in two distinct formats:
+
+### X-RateLimit-\\* Headers
+These headers provide clear, separate indicators of rate limit status:
+- \`X-RateLimit-Limit\`: Indicates the maximum number of requests a client
+  can make within a defined time window. This header is required.
+- \`X-RateLimit-Remaining\`: Shows the number of requests remaining in the
+  current rate limit window.
+- \`X-RateLimit-Reset\`: Indicates the remaining window before the rate limit
+  resets, in UTC epoch seconds.
+
+### RateLimit Header (IETF Standard)
+In accordance with the IETF's [RateLimit Header Fields for HTTP draft](https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-07.html),
+which standardizes the fields for HTTP rate limiting, this header combines all
+necessary rate limit information into a single, concise format:
+
+\`\`\`
+RateLimit: limit=100, remaining=98, reset=48
+\`\`\`
+
+This standardized \`RateLimit\` header simplifies the integration and parsing of
+rate limit information by aggregating the limit, remaining requests, and reset
+timer into one header.
+
+### Handling Limit Exceedance
+
+After the transition period, if a request is made after the rate limit has been
+exceeded, the server will return a **429 Too Many Requests** status code. Clients
+should handle this response by implementing appropriate retry mechanisms,
+respecting the reset time.
+
+### Best Practices
+
+- **Monitor Your Usage**: Regularly monitor your rate limit status through the
+  RateLimit headers to adapt your request patterns appropriately.
+- **Graceful Handling of 429 Errors**: Implement robust error handling to
+  manage 429 responses.
+- **Adjustment Period**: Familiarize yourself with the rate limit during the
+  transition period when overages will not block requests but will still be
+  flagged by headers.
+
+For more detailed information or to discuss the rate limiting policy further,
+please contact our support team.
 
 ## Getting started
 To quick start on Parallel, we have prepared a brief tutorial that will guide
