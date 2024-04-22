@@ -416,6 +416,7 @@ export function publicApi(container: Container) {
             : ``
         }
         - \`variablesResult\`: An array with the result of the defined variables of the parallel.
+        - \`owner\`: The user who owns the parallel.
       `,
         array: true,
         required: false,
@@ -429,6 +430,7 @@ export function publicApi(container: Container) {
           "signatures",
           ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
           "variablesResult",
+          "owner",
         ],
       }),
     };
@@ -451,6 +453,7 @@ export function publicApi(container: Container) {
       includeSigners: query.include?.includes("signers") ?? false,
       includeSignatureRequests: query.include?.includes("signatures") ?? false,
       includeVariablesResult: query.include?.includes("variablesResult") ?? false,
+      includeOwner: query.include?.includes("owner") ?? false,
     };
   }
 
@@ -664,6 +667,7 @@ export function publicApi(container: Container) {
             $includeSigners: Boolean!
             $includeVariablesResult: Boolean!
             $includeSignatureRequests: Boolean!
+            $includeOwner: Boolean!
             $fromTemplateId: [GID!]
           ) {
             petitions(
@@ -731,6 +735,7 @@ export function publicApi(container: Container) {
             $includeSigners: Boolean!
             $includeVariablesResult: Boolean!
             $includeSignatureRequests: Boolean!
+            $includeOwner: Boolean!
           ) {
             createPetition(name: $name, petitionId: $templateId) {
               ...Petition
@@ -775,6 +780,7 @@ export function publicApi(container: Container) {
             $includeSigners: Boolean!
             $includeVariablesResult: Boolean!
             $includeSignatureRequests: Boolean!
+            $includeOwner: Boolean!
           ) {
             petition(id: $petitionId) {
               ...Petition
@@ -843,6 +849,7 @@ export function publicApi(container: Container) {
             $includeSigners: Boolean!
             $includeVariablesResult: Boolean!
             $includeSignatureRequests: Boolean!
+            $includeOwner: Boolean!
           ) {
             updatePetition(petitionId: $petitionId, data: $data) {
               ...Petition
@@ -969,6 +976,7 @@ export function publicApi(container: Container) {
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
           $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
         ) {
           closePetition(petitionId: $petitionId) {
             ...Petition
@@ -1015,6 +1023,7 @@ export function publicApi(container: Container) {
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
           $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
         ) {
           reopenPetition(petitionId: $petitionId) {
             ...Petition
@@ -1101,6 +1110,7 @@ export function publicApi(container: Container) {
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
           $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
         ) {
           tagPetition(petitionId: $petitionId, tagId: $tagId) {
             ...Petition
@@ -1375,6 +1385,7 @@ export function publicApi(container: Container) {
             $includeSigners: Boolean!
             $includeVariablesResult: Boolean!
             $includeSignatureRequests: Boolean!
+            $includeOwner: Boolean!
             $senderId: GID
           ) {
             sendPetition(

@@ -5916,6 +5916,7 @@ export type PetitionFragment = {
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     };
   }>;
+  owner?: { id: string; fullName: string | null; email: string };
 };
 
 export type TemplateFragment = {
@@ -6244,6 +6245,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
@@ -6364,6 +6366,7 @@ export type GetPetitions_petitionsQuery = {
               signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
             };
           }>;
+          owner?: { id: string; fullName: string | null; email: string };
         }
       | {}
     >;
@@ -6382,6 +6385,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -6499,6 +6503,7 @@ export type CreatePetition_petitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
+        owner?: { id: string; fullName: string | null; email: string };
       }
     | {};
 };
@@ -6514,6 +6519,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -6631,6 +6637,7 @@ export type GetPetition_petitionQuery = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
+        owner?: { id: string; fullName: string | null; email: string };
       }
     | {}
     | null;
@@ -6681,6 +6688,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -6798,6 +6806,7 @@ export type UpdatePetition_updatePetitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
+        owner?: { id: string; fullName: string | null; email: string };
       }
     | {};
 };
@@ -6820,6 +6829,7 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type ClosePetition_closePetitionMutation = {
@@ -6936,6 +6946,7 @@ export type ClosePetition_closePetitionMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
+    owner?: { id: string; fullName: string | null; email: string };
   };
 };
 
@@ -6950,6 +6961,7 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type ReopenPetition_reopenPetitionMutation = {
@@ -7066,6 +7078,7 @@ export type ReopenPetition_reopenPetitionMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
+    owner?: { id: string; fullName: string | null; email: string };
   };
 };
 
@@ -7096,6 +7109,7 @@ export type TagPetition_tagPetitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type TagPetition_tagPetitionMutation = {
@@ -7213,6 +7227,7 @@ export type TagPetition_tagPetitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
+        owner?: { id: string; fullName: string | null; email: string };
       }
     | {};
 };
@@ -7295,6 +7310,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
   senderId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
@@ -7414,6 +7430,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         };
       }>;
+      owner?: { id: string; fullName: string | null; email: string };
     } | null;
   }>;
 };
@@ -9814,6 +9831,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
   includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -9930,6 +9948,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
+    owner?: { id: string; fullName: string | null; email: string };
   };
 };
 
@@ -10206,6 +10225,11 @@ export const PetitionFragmentDoc = gql`
     }
     signatures: signatureRequests @include(if: $includeSignatureRequests) {
       ...PetitionSignatureRequest
+    }
+    owner @include(if: $includeOwner) {
+      id
+      fullName
+      email
     }
   }
   ${PetitionAccessFragmentDoc}
@@ -10520,6 +10544,7 @@ export const GetPetitions_petitionsDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
     $fromTemplateId: [GID!]
   ) {
     petitions(
@@ -10550,6 +10575,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -10572,6 +10598,7 @@ export const GetPetition_petitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
@@ -10610,6 +10637,7 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -10640,6 +10668,7 @@ export const ClosePetition_closePetitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     closePetition(petitionId: $petitionId) {
       ...Petition
@@ -10662,6 +10691,7 @@ export const ReopenPetition_reopenPetitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     reopenPetition(petitionId: $petitionId) {
       ...Petition
@@ -10703,6 +10733,7 @@ export const TagPetition_tagPetitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     tagPetition(petitionId: $petitionId, tagId: $tagId) {
       ...Petition
@@ -10800,6 +10831,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
     $senderId: GID
   ) {
     sendPetition(
@@ -11910,6 +11942,7 @@ export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
     $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

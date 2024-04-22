@@ -215,6 +215,11 @@ export const PetitionFragment = gql`
     signatures: signatureRequests @include(if: $includeSignatureRequests) {
       ...PetitionSignatureRequest
     }
+    owner @include(if: $includeOwner) {
+      id
+      fullName
+      email
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
