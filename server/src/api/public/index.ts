@@ -3918,8 +3918,8 @@ export function publicApi(container: Container) {
           {
             "profileTypeId": "${toGlobalId("ProfileType", 42)}"
             "values": {
-              "p_firstname": "John",
-              "p_lastname": "Smith"
+              "p_first_name": "John",
+              "p_last_name": "Smith"
             }
           }
           \`\`\`
@@ -4186,8 +4186,8 @@ export function publicApi(container: Container) {
               \`\`\`json
               {
                 "values": {
-                  "p_firstname": "John",
-                  "p_lastname": "Smith"
+                  "p_first_name": "John",
+                  "p_last_name": "Smith"
                 }
               }
               \`\`\`
@@ -4208,7 +4208,7 @@ export function publicApi(container: Container) {
               \`\`\`json
               {
                 "values": {
-                  "p_firstname": null
+                  "p_first_name": null
                 }
               }
               \`\`\`

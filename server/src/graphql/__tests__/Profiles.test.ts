@@ -2685,7 +2685,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           data: {
-            alias: "p_firstname",
+            alias: "p_first_name",
             name: { en: "First Name" },
             type: "TEXT",
           },
