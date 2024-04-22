@@ -16,6 +16,7 @@ import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic"
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { titleize } from "../../util/strings";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
@@ -100,6 +101,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     const parallelUrl = this.ctx.config.misc.parallelUrl;
 
     if (petitions.length > 0) {
+      const ids = petitions.map((p) => p.id);
       const [
         petitionsAccesses,
         petitionsMessages,
@@ -109,17 +111,17 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         petitionsEvents,
         latestSignatures,
       ] = await Promise.all([
-        this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(
-          petitions.map((p) => p.id),
+        this.ctx.readonlyPetitions.loadAccessesForPetition(ids),
+        this.ctx.readonlyPetitions.loadMessagesByPetitionId(ids),
+        pMapChunk(
+          ids,
+          (ids) => this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
+          { chunkSize: 200, concurrency: 3 },
         ),
-        this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
-        this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(
-          petitions.map((p) => p.id),
-        ),
+        this.ctx.readonlyPetitions.loadPetitionOwner(ids),
+        this.ctx.readonlyTags.loadTagsByPetitionId(ids),
+        this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
+        this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(ids),
       ]);
 
       const petitionsAccessesContacts = await Promise.all(
