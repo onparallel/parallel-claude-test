@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { unflatten } from "flat";
 import { OpenAPIV3 } from "openapi-types";
 import { outdent } from "outdent";
 import { isDefined } from "remeda";
@@ -7,7 +8,6 @@ import { unMaybeArray } from "../../util/arrays";
 import { RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { JsonSchemaFor, buildValidateSchema } from "./schemas";
-import { unflatten } from "flat";
 
 export interface BodyOptions {
   description?: string;

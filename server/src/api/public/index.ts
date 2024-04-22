@@ -243,7 +243,7 @@ export function publicApi(container: Container) {
   const redis = container.get<IRedis>(REDIS);
   const logger = container.get<ILogger>(LOGGER);
   const api = new RestApi({
-    openapi: "3.0.2",
+    openapi: "3.1.0",
     info: {
       title: "Parallel API",
       description,
@@ -3919,8 +3919,21 @@ export function publicApi(container: Container) {
         summary: "Create a profile",
         description: "Creates a new profile on your organization",
         middleware: anyFileUploadMiddleware(),
-        body: Body([JsonBodyContent(CreateProfile), FormDataBodyContent(CreateProfile)], {
-          description: outdent`
+        body: Body(
+          [
+            JsonBodyContent(CreateProfile),
+            FormDataBodyContent(CreateProfile, {
+              example: outdent`
+                profileTypeId: ${toGlobalId("ProfileType", 42)}
+                subscribe: true
+                values.p_first_name: John
+                values.p_id.value: 11111111H
+                values.p_id.expiryDate: 2032-04-26
+              `,
+            }),
+          ],
+          {
+            description: outdent`
           Create a profile and optionally pass the initial values by setting the \`values\` property.
           Values is a key value object where the keys are the alias of the fields and the values are the value you want to store on the profile.
           
@@ -3958,7 +3971,8 @@ export function publicApi(container: Container) {
           - \`values.p_id_document.expiryDate\`: \`2031-05-28\`
 
         `,
-        }),
+          },
+        ),
         query: profileIncludeParam,
         responses: {
           201: SuccessResponse(Profile),
@@ -4187,7 +4201,16 @@ export function publicApi(container: Container) {
         tags: ["Profiles"],
         middleware: anyFileUploadMiddleware(),
         body: Body(
-          [JsonBodyContent(UpdateProfileFieldValue), FormDataBodyContent(UpdateProfileFieldValue)],
+          [
+            JsonBodyContent(UpdateProfileFieldValue),
+            FormDataBodyContent(UpdateProfileFieldValue, {
+              example: outdent`
+                values.p_first_name: John
+                values.p_id.value: 11111111H
+                values.p_id.expiryDate: 2032-04-26
+              `,
+            }),
+          ],
           {
             description: outdent`
               Update a profile values by setting the \`values\` property.

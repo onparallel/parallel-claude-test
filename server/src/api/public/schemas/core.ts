@@ -2380,29 +2380,28 @@ export const CreateProfile = schema({
     values: {
       type: "object",
       description: "The profile field values to assign to the created profile, indexed by alias",
-      properties: {
-        "<alias>": {
-          oneOf: [
-            { type: "string", example: "Parallel Solutions", description: "Value of the property" },
-            {
-              type: "object",
-              required: ["value"],
-              additionalProperties: false,
-              properties: {
-                value: {
-                  type: "string",
-                  description: "Value of the property",
-                },
-                expiryDate: {
-                  type: "string",
-                  format: "date",
-                  example: "2023-06-27",
-                  description: "Expiration date of the value",
-                },
+      properties: {},
+      additionalProperties: {
+        oneOf: [
+          { type: "string", example: "Parallel Solutions", description: "Value of the property" },
+          {
+            type: "object",
+            required: ["value"],
+            additionalProperties: false,
+            properties: {
+              value: {
+                type: "string",
+                description: "Value of the property",
+              },
+              expiryDate: {
+                type: "string",
+                format: "date",
+                example: "2023-06-27",
+                description: "Expiration date of the value",
               },
             },
-          ],
-        },
+          },
+        ],
       },
       example: {
         p_entity_name: "Parallel Solutions",
@@ -2450,33 +2449,31 @@ export const UpdateProfileFieldValue = schema({
       type: "object",
       description:
         "The profile field values to update or delete, indexed by alias. Pass `null` or an empty string to delete the value.",
-      properties: {
-        "<alias>": {
-          oneOf: [
-            {
-              type: ["string", "null"],
-              example: "Parallel Solutions",
-              description: "Value of the property",
-            },
-            {
-              type: ["object", "null"],
-              additionalProperties: false,
-              properties: {
-                value: {
-                  type: "string",
-                  example: "Parallel Solutions",
-                  description: "Value of the property",
-                },
-                expiryDate: {
-                  type: "string",
-                  format: "date",
-                  example: "2023-06-27",
-                  description: "Expiration date of the value",
-                },
+      properties: {},
+      additionalProperties: {
+        oneOf: [
+          {
+            type: ["string", "null"],
+            example: "Parallel Solutions",
+            description: "Value of the property",
+          },
+          {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              value: {
+                type: ["string", "null"],
+                description: "Value of the property",
+              },
+              expiryDate: {
+                type: ["string", "null"],
+                format: "date",
+                example: "2023-06-27",
+                description: "Expiration date of the value",
               },
             },
-          ],
-        },
+          },
+        ],
       },
       example: {
         p_entity_name: "Parallel Solutions",
