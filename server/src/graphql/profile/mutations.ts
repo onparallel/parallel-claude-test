@@ -110,7 +110,7 @@ export const updateProfileType = mutationField("updateProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-    profileTypeIsNotStandard("profileTypeId"),
+    ifArgDefined("name", profileTypeIsNotStandard("profileTypeId")),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),

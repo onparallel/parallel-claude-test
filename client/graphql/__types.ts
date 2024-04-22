@@ -8855,6 +8855,7 @@ export type ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment = {
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
   options: { [key: string]: any };
+  alias?: string | null;
 };
 
 export type ProfileFieldBackgroundCheckSettings_ProfileTypeFragment = {
@@ -8866,6 +8867,7 @@ export type ProfileFieldBackgroundCheckSettings_ProfileTypeFragment = {
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
     options: { [key: string]: any };
+    alias?: string | null;
   }>;
 };
 
@@ -45141,6 +45143,7 @@ export const ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc = g
     name
     type
     options
+    alias
     ...ProfileTypeFieldSelect_ProfileTypeField
   }
   ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}

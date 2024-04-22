@@ -1897,44 +1897,6 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
-
-    it("fails when trying to update profile name pattern of a standard profile type", async () => {
-      const [standardProfileType] = await mocks.createRandomProfileTypes(
-        organization.id,
-        1,
-        () => ({
-          name: json({ en: "Standard", es: "Standard" }),
-          standard_type: "CONTRACT",
-        }),
-      );
-
-      const [profileTypeField] = await mocks.createRandomProfileTypeFields(
-        organization.id,
-        standardProfileType.id,
-        1,
-        () => ({ type: "SHORT_TEXT" }),
-      );
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
-            updateProfileType(
-              profileTypeId: $profileTypeId
-              profileNamePattern: $profileNamePattern
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          profileTypeId: toGlobalId("ProfileType", standardProfileType.id),
-          profileNamePattern: `Hello {{${toGlobalId("ProfileTypeField", profileTypeField.id)}}}`,
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
   });
 
   describe("cloneProfileType", () => {

@@ -110,36 +110,29 @@ const SUGGESTED_RISK_LEVEL = {
     showOptionsWithColors: true,
     values: [
       {
-        color: "#D5E7DE",
-        label: {
-          es: "Riesgo bajo",
-          en: "Low risk",
-        },
-        value: "low_risk",
-      },
-      {
-        color: "#FEEBC8",
-        label: {
-          es: "Riesgo medio",
-          en: "Medium risk",
-        },
-        value: "medium_risk",
-      },
-      {
+        value: "HIGH",
+        label: { en: "High", es: "Alto" },
         color: "#FED7D7",
-        label: {
-          es: "Riesgo alto",
-          en: "High risk",
-        },
-        value: "high_risk",
       },
       {
-        color: "#E2E8F0",
-        label: {
-          es: "Riesgo muy alto",
-          en: "Very high risk",
-        },
-        value: "very_high_risk",
+        value: "MEDIUM_HIGH",
+        label: { en: "Medium-high", es: "Medio-alto" },
+        color: "#FEEBC8",
+      },
+      {
+        value: "MEDIUM",
+        label: { en: "Medium", es: "Medio" },
+        color: "#F5EFE8",
+      },
+      {
+        value: "MEDIUM_LOW",
+        label: { en: "Medium-low", es: "Medio-bajo" },
+        color: "#CEEDFF",
+      },
+      {
+        value: "LOW",
+        label: { en: "Low", es: "Bajo" },
+        color: "#D5E7DE",
       },
     ],
   },
@@ -155,7 +148,16 @@ export function ProfileFieldBackgroundCheckSettings({
   const intl = useIntl();
 
   const [profileTypeFields, setProfileTypeFields] = useState(profileType.fields);
-
+  const hasRiskProperty = profileTypeFields.some(
+    (f) =>
+      f.type === "SELECT" &&
+      (f.alias === "p_risk" || f.name.en === "Risk level" || f.name.es === "Nivel de riesgo"),
+  );
+  const hasBusinessRelationshipProperty = profileTypeFields.some(
+    (f) =>
+      f.type === "SELECT" &&
+      (f.name.en === "Business relationship" || f.name.es === "Relación de negocio"),
+  );
   const {
     register,
     watch,
@@ -356,10 +358,14 @@ export function ProfileFieldBackgroundCheckSettings({
                               onChange(profileTypeField.id);
                             } catch {}
                           }}
-                          suggestedPropertyName={intl.formatMessage({
-                            id: "component.profile-field-background-check-settings.business-relationship",
-                            defaultMessage: "Business relationship",
-                          })}
+                          suggestedPropertyName={
+                            hasBusinessRelationshipProperty
+                              ? undefined
+                              : intl.formatMessage({
+                                  id: "component.profile-field-background-check-settings.business-relationship",
+                                  defaultMessage: "Business relationship",
+                                })
+                          }
                           fields={profileTypeFields}
                           value={profileTypeFields.find((f) => f.id === value) ?? null}
                           onChange={(field) => {
@@ -490,10 +496,14 @@ export function ProfileFieldBackgroundCheckSettings({
                             onChange(profileTypeField.id);
                           } catch {}
                         }}
-                        suggestedPropertyName={intl.formatMessage({
-                          id: "component.profile-field-background-check-settings.risk-level",
-                          defaultMessage: "Risk level",
-                        })}
+                        suggestedPropertyName={
+                          hasRiskProperty
+                            ? undefined
+                            : intl.formatMessage({
+                                id: "component.profile-field-background-check-settings.risk-level",
+                                defaultMessage: "Risk level",
+                              })
+                        }
                         fields={profileTypeFields}
                         value={profileTypeFields.find((f) => f.id === value) ?? null}
                         onChange={(field) => {
@@ -617,6 +627,7 @@ ProfileFieldBackgroundCheckSettings.fragments = {
       name
       type
       options
+      alias
       ...ProfileTypeFieldSelect_ProfileTypeField
     }
     ${ProfileTypeFieldSelect.fragments.ProfileTypeField}

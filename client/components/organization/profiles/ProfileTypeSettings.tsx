@@ -61,8 +61,6 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
       }),
     }));
 
-  const isPatternDisabled = profileType.isStandard;
-
   return (
     <Card
       {...props}
@@ -84,7 +82,6 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
       <FormControl
         id="pattern"
         isInvalid={!!errors.pattern}
-        isDisabled={isPatternDisabled}
         as={Stack}
         paddingX={6}
         paddingY={4}
@@ -142,7 +139,6 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
                 })}
                 onChange={onChange}
                 placeholders={placeholders}
-                isDisabled={isPatternDisabled}
               />
             )}
           />
