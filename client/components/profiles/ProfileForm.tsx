@@ -257,12 +257,17 @@ export const ProfileForm = Object.assign(
             await pMap(
               fileFields,
               async (fileField) => {
-                const { profileTypeFieldId, content, expiryDate } = fileField;
+                const { profileTypeFieldId, content, expiryDate: _expiryDate } = fileField;
+                const prop = profile.properties?.find(
+                  (prop) => prop.field.id === profileTypeFieldId,
+                );
                 const events = content!.value as ProfileFieldFileAction[];
                 const deleteFiles = events.filter(discriminator("type", "DELETE"));
                 const addFiles = events.filter(discriminator("type", "ADD"));
                 const updateExpiresAt = events.filter(discriminator("type", "UPDATE"));
                 const copyFiles = events.filter(discriminator("type", "COPY"));
+
+                const expiryDate = prop?.field.isExpirable ? _expiryDate : undefined;
 
                 if (updateExpiresAt.length && !addFiles.length) {
                   await createProfileFieldFileUploadLink({
