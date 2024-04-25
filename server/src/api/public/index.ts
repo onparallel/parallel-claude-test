@@ -56,6 +56,8 @@ import {
   DeleteTemplate_deletePetitionsDocument,
   DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
+  DownloadProfileFieldFile_profileDocument,
+  DownloadProfileFieldFile_profileFieldFileDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
   DownloadSignedDocument_downloadSignedDocDocument,
   EventSubscriptions_createPetitionEventSubscriptionDocument,
@@ -528,6 +530,10 @@ export function publicApi(container: Container) {
   const profileId = idParam({
     type: "Profile",
     description: "The ID of the profile",
+  });
+  const profileFieldFileId = idParam({
+    type: "ProfileFieldFile",
+    description: "The ID of a file uploaded to the profile",
   });
 
   api.path("/me").get(
@@ -4151,6 +4157,11 @@ export function publicApi(container: Container) {
               { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
             );
           }
+          if (containsGraphQLError(error, "MAX_FILES_EXCEEDED")) {
+            throw new BadRequestError(
+              "You can't upload more files to this field. Please remove some files first.",
+            );
+          }
           throw error;
         }
       },
@@ -4441,6 +4452,11 @@ export function publicApi(container: Container) {
               { errors: error.response.errors?.[0]?.extensions.aggregatedErrors ?? [] },
             );
           }
+          if (containsGraphQLError(error, "MAX_FILES_EXCEEDED")) {
+            throw new BadRequestError(
+              "You can't upload more files to this field. Please remove some files first.",
+            );
+          }
           throw error;
         }
 
@@ -4451,6 +4467,130 @@ export function publicApi(container: Container) {
 
         assert("id" in profileQuery.profile);
         return Ok(mapProfile(profileQuery.profile));
+      },
+    );
+
+  api
+    .path("/profiles/:profileId/values/:alias/:fileId", {
+      params: {
+        profileId,
+        alias: stringParam({
+          description: "The alias of the field to download. Must be of type FILE",
+          required: true,
+          example: "p_id_document",
+          pattern: /^[A-Za-z0-9_]+$/,
+        }),
+        fileId: profileFieldFileId,
+      },
+    })
+    .get(
+      {
+        operationId: "DownloadProfileFieldFile",
+        summary: "Download a file from a profile",
+        description: outdent`
+        Downloads a file uploaded to specified field in the profile.
+
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'https://www.onparallel.com/api/v1/profiles/{profileId}/values/{alias}/{fileId}' \\
+          > image.png
+        ~~~
+      `,
+        tags: ["Profiles"],
+        query: {
+          noredirect: booleanParam({
+            required: false,
+            description: "If param is true, response will be a temporary link.",
+          }),
+        },
+        responses: {
+          201: SuccessResponse(FileDownload),
+          302: RedirectResponse("Redirect to the resource on AWS S3"),
+          400: ErrorResponse({
+            description: `Field {alias} is not of "FILE" type`,
+          }),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+      },
+      async ({ client, params, query }) => {
+        const _queries = [
+          gql`
+            query DownloadProfileFieldFile_profile($profileId: GID!) {
+              profile(profileId: $profileId) {
+                properties {
+                  field {
+                    id
+                    type
+                    alias
+                  }
+                  files {
+                    id
+                  }
+                }
+              }
+            }
+          `,
+          gql`
+            mutation DownloadProfileFieldFile_profileFieldFileDownloadLink(
+              $profileId: GID!
+              $profileTypeFieldId: GID!
+              $profileFieldFileId: GID!
+            ) {
+              profileFieldFileDownloadLink(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                profileFieldFileId: $profileFieldFileId
+              ) {
+                url
+              }
+            }
+          `,
+        ];
+
+        const { profile } = await client.request(DownloadProfileFieldFile_profileDocument, {
+          profileId: params.profileId,
+        });
+
+        const fileField = profile.properties.find((p) => p.field.alias === params.alias);
+
+        if (!fileField) {
+          throw new BadRequestError(`Unknown field ${params.alias}`);
+        }
+
+        if (fileField.field.type !== "FILE") {
+          throw new BadRequestError(`Field ${params.alias} is not of "FILE" type`);
+        }
+
+        const file = fileField.files?.find((file) => file.id === params.fileId);
+        if (!file) {
+          throw new BadRequestError(`File ${params.fileId} not found in field ${params.alias}`);
+        }
+
+        const { profileFieldFileDownloadLink } = await client.request(
+          DownloadProfileFieldFile_profileFieldFileDownloadLinkDocument,
+          {
+            profileId: params.profileId,
+            profileTypeFieldId: fileField.field.id,
+            profileFieldFileId: params.fileId,
+          },
+        );
+
+        if (query.noredirect) {
+          return Created(
+            { file: profileFieldFileDownloadLink.url! },
+            profileFieldFileDownloadLink.url!,
+          );
+        } else {
+          return Redirect(profileFieldFileDownloadLink.url!);
+        }
       },
     );
 

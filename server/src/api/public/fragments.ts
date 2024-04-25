@@ -216,15 +216,14 @@ export const PetitionFragment = gql`
       ...PetitionSignatureRequest
     }
     owner @include(if: $includeOwner) {
-      id
-      fullName
-      email
+      ...User
     }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
   ${PetitionTagFragment}
   ${PetitionSignatureRequestFragment}
+  ${UserFragment}
 `;
 
 export const TemplateFragment = gql`

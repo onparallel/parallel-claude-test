@@ -914,6 +914,11 @@ const _Petition = {
         "If parameter `include` contains `signatures`, this will be the list of ongoing and finished signatures of the parallel.",
       ...ListOfSignatureRequests,
     },
+    owner: {
+      description:
+        "If parameter `include` contains `owner`, this will be the owner of the parallel.",
+      ..._User,
+    },
   },
 } as const;
 

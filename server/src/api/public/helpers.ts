@@ -569,7 +569,7 @@ function fillPropertiesByAlias(props: ProfileFragment["values"]) {
     (acc, prop) => {
       if (isDefined(prop.field.alias)) {
         if (prop.field.type === "FILE") {
-          acc[prop.field.alias] = prop.files?.map((f) => f.file) ?? null;
+          acc[prop.field.alias] = prop.files?.map((f) => ({ id: f.id, ...f.file })) ?? null;
         } else {
           acc[prop.field.alias] = prop.value?.content?.value ?? null;
         }

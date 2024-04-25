@@ -5916,7 +5916,13 @@ export type PetitionFragment = {
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     };
   }>;
-  owner?: { id: string; fullName: string | null; email: string };
+  owner?: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
 };
 
 export type TemplateFragment = {
@@ -6366,7 +6372,13 @@ export type GetPetitions_petitionsQuery = {
               signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
             };
           }>;
-          owner?: { id: string; fullName: string | null; email: string };
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
         }
       | {}
     >;
@@ -6503,7 +6515,13 @@ export type CreatePetition_petitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
-        owner?: { id: string; fullName: string | null; email: string };
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
       }
     | {};
 };
@@ -6637,7 +6655,13 @@ export type GetPetition_petitionQuery = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
-        owner?: { id: string; fullName: string | null; email: string };
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
       }
     | {}
     | null;
@@ -6806,7 +6830,13 @@ export type UpdatePetition_updatePetitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
-        owner?: { id: string; fullName: string | null; email: string };
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
       }
     | {};
 };
@@ -6946,7 +6976,13 @@ export type ClosePetition_closePetitionMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
-    owner?: { id: string; fullName: string | null; email: string };
+    owner?: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    };
   };
 };
 
@@ -7078,7 +7114,13 @@ export type ReopenPetition_reopenPetitionMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
-    owner?: { id: string; fullName: string | null; email: string };
+    owner?: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    };
   };
 };
 
@@ -7227,7 +7269,13 @@ export type TagPetition_tagPetitionMutation = {
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           };
         }>;
-        owner?: { id: string; fullName: string | null; email: string };
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
       }
     | {};
 };
@@ -7430,7 +7478,13 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         };
       }>;
-      owner?: { id: string; fullName: string | null; email: string };
+      owner?: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
     } | null;
   }>;
 };
@@ -9400,6 +9454,29 @@ export type UpdateProfileFieldValue_deleteProfileFieldFileMutation = {
   deleteProfileFieldFile: Result;
 };
 
+export type DownloadProfileFieldFile_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type DownloadProfileFieldFile_profileQuery = {
+  profile: {
+    properties: Array<{
+      field: { id: string; type: ProfileTypeFieldType; alias: string | null };
+      files: Array<{ id: string }> | null;
+    }>;
+  };
+};
+
+export type DownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileFieldFileId: Scalars["GID"]["input"];
+}>;
+
+export type DownloadProfileFieldFile_profileFieldFileDownloadLinkMutation = {
+  profileFieldFileDownloadLink: { url: string | null };
+};
+
 export type GetProfileSubscribers_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
 }>;
@@ -9948,7 +10025,13 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       };
     }>;
-    owner?: { id: string; fullName: string | null; email: string };
+    owner?: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    };
   };
 };
 
@@ -10227,15 +10310,14 @@ export const PetitionFragmentDoc = gql`
       ...PetitionSignatureRequest
     }
     owner @include(if: $includeOwner) {
-      id
-      fullName
-      email
+      ...User
     }
   }
   ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}
   ${TagFragmentDoc}
   ${PetitionSignatureRequestFragmentDoc}
+  ${UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionFragment, unknown>;
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
@@ -11700,6 +11782,43 @@ export const UpdateProfileFieldValue_deleteProfileFieldFileDocument = gql`
 ` as unknown as DocumentNode<
   UpdateProfileFieldValue_deleteProfileFieldFileMutation,
   UpdateProfileFieldValue_deleteProfileFieldFileMutationVariables
+>;
+export const DownloadProfileFieldFile_profileDocument = gql`
+  query DownloadProfileFieldFile_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      properties {
+        field {
+          id
+          type
+          alias
+        }
+        files {
+          id
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadProfileFieldFile_profileQuery,
+  DownloadProfileFieldFile_profileQueryVariables
+>;
+export const DownloadProfileFieldFile_profileFieldFileDownloadLinkDocument = gql`
+  mutation DownloadProfileFieldFile_profileFieldFileDownloadLink(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileId: GID!
+  ) {
+    profileFieldFileDownloadLink(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileId: $profileFieldFileId
+    ) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadProfileFieldFile_profileFieldFileDownloadLinkMutation,
+  DownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables
 >;
 export const GetProfileSubscribers_profileDocument = gql`
   query GetProfileSubscribers_profile($profileId: GID!) {
