@@ -5,7 +5,7 @@ import { outdent } from "outdent";
 import { isDefined } from "remeda";
 import typeIs from "type-is";
 import { unMaybeArray } from "../../util/arrays";
-import { RestApiContext, RestBody, RestBodyContent } from "./core";
+import { FormDataFile, RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { JsonSchemaFor, buildValidateSchema } from "./schemas";
 
@@ -37,25 +37,27 @@ export function FormDataBodyContent<T>(
   const validate = buildValidateSchema(schema);
   return {
     contentType: "multipart/form-data",
-    schema,
     validate: (req, context) => {
       const body = { ...(req.body ?? {}) };
-      const files: typeof context.files = {};
+      context.files = {};
       if (isDefined(req.file)) {
-        body[req.file.fieldname] = req.file;
-        files[req.file.fieldname] = [req.file];
+        const file = new FormDataFile(req.file);
+        body[req.file.fieldname] = file;
+        context.files[req.file.fieldname] = [file];
       }
       // This needs to be tested
       if (isDefined(req.files)) {
         if (Array.isArray(req.files)) {
           for (const file of req.files) {
-            body[file.fieldname] = [...(body[file.fieldname] ?? []), file];
-            files[file.fieldname] = [...(files[file.fieldname] ?? []), file];
+            const _file = new FormDataFile(file);
+            body[file.fieldname] = [...(body[file.fieldname] ?? []), _file];
+            context.files[file.fieldname] = [...(context.files[file.fieldname] ?? []), _file];
           }
         } else {
-          for (const [fieldname, _files] of Object.entries(req.files)) {
+          for (const [fieldname, files] of Object.entries(req.files)) {
+            const _files = files.map((file) => new FormDataFile(file));
             body[fieldname] = _files;
-            files[fieldname] = _files;
+            context.files[fieldname] = _files;
           }
         }
       }
@@ -66,7 +68,6 @@ export function FormDataBodyContent<T>(
         throw new InvalidRequestBodyError(`Property at ${error.instancePath} ${error.message}`);
       }
       context.body = unflattenedBody;
-      context.files = unflatten(body);
     },
     ...other,
   };

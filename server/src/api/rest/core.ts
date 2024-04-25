@@ -10,8 +10,29 @@ import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError
 import { ParseError } from "./params";
 import { Text } from "./responses";
 import { JsonSchemaFor } from "./schemas";
+import { Readable } from "stream";
 
-export type File = Exclude<Request["file"], undefined>;
+/*
+ * We wrap multer files in a class with a custom .toString so that unflatten doesn't rebuild the object.
+ */
+export class FormDataFile implements Express.Multer.File {
+  fieldname!: string;
+  originalname!: string;
+  encoding!: string;
+  mimetype!: string;
+  size!: number;
+  stream!: Readable;
+  destination!: string;
+  filename!: string;
+  path!: string;
+  buffer!: Buffer;
+  constructor(file: Express.Multer.File) {
+    Object.assign(this, file);
+  }
+  get [Symbol.toStringTag]() {
+    return `[object File]`;
+  }
+}
 
 export type RestMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 
@@ -37,7 +58,7 @@ export interface RestBody<T> {
 export interface RestBodyContent<T>
   extends Pick<OpenAPIV3.MediaTypeObject, "example" | "examples"> {
   contentType: string;
-  schema: JsonSchemaFor<T>;
+  schema?: JsonSchemaFor<T>;
   validate: (req: Request, context: RestApiContext) => void;
 }
 
@@ -324,7 +345,7 @@ export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = a
   params: TParams;
   query: TQuery;
   body: TBody;
-  files: Record<string, File[]>;
+  files: Record<string, FormDataFile[]>;
   signal: AbortSignal;
 };
 

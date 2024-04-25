@@ -16,7 +16,7 @@ import { renderSlateToText } from "../../util/slate/render";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { isValidDate } from "../../util/time";
 import { Maybe, UnwrapArray } from "../../util/types";
-import { File, RestParameter } from "../rest/core";
+import { FormDataFile, RestParameter } from "../rest/core";
 import { BadRequestError, InternalError } from "../rest/errors";
 import {
   buildDefinition,
@@ -58,7 +58,7 @@ export function paginationParams() {
       defaultValue: 0,
       required: false,
       minimum: 0,
-      example: 5,
+      example: 0,
     }),
     limit: intParam({
       description:
@@ -427,7 +427,10 @@ export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType
   return getTaskResultFile.url;
 }
 
-export async function uploadFile(file: File, presignedPostData: AWSPresignedPostDataFragment) {
+export async function uploadFile(
+  file: FormDataFile,
+  presignedPostData: AWSPresignedPostDataFragment,
+) {
   const formData = new FormData();
   Object.keys(presignedPostData.fields).forEach((key) => {
     formData.append(key, presignedPostData.fields[key]);
@@ -771,7 +774,7 @@ export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
 
 export function parseProfileTypeFieldInput<
   T extends { type: ProfileTypeFieldType; alias: string | null; isExpirable: boolean },
->(input: Record<string, any>, profileTypeFields: T[], files: any) {
+>(input: Record<string, any>, profileTypeFields: T[]) {
   return Object.entries(input).map(([alias, value]) => {
     // map every value to { value, expiryDate } format
     const field = profileTypeFields.find((f) => f.alias === alias);
@@ -794,7 +797,7 @@ export function parseProfileTypeFieldInput<
         : value && "value" in value && value.value === ""
           ? { value: null }
           : value
-    ) as { value?: string | number | Express.Multer.File[] | null; expiryDate?: string };
+    ) as { value?: string | number | FormDataFile[] | null; expiryDate?: string };
 
     if (!field.isExpirable && isDefined(content.expiryDate)) {
       throw new Error(`Can't set expiryDate on field '${field.alias}', as it is not expirable`);
@@ -807,14 +810,17 @@ export function parseProfileTypeFieldInput<
     if (
       field.type === "FILE" &&
       content.value !== null &&
-      (!isDefined(files[alias]) ||
-        ("value" in files[alias] && !Array.isArray(files[alias].value)) ||
-        (!("value" in files[alias]) && !Array.isArray(files[alias])))
+      (!Array.isArray(content.value) || !content.value.every((v) => v instanceof FormDataFile))
     ) {
       throw new Error(`Expected one or more files to be uploaded for field '${field.alias}'.`);
     }
 
-    if (content.value && field.type !== "FILE" && Array.isArray(content.value)) {
+    if (
+      content.value &&
+      field.type !== "FILE" &&
+      typeof content.value !== "string" &&
+      typeof content.value !== "number"
+    ) {
       throw new Error(`Expected a string or number for field '${field.alias}'.`);
     }
 
@@ -829,10 +835,6 @@ export function parseProfileTypeFieldInput<
           }
         : undefined,
       content.expiryDate,
-    ] as [
-      T,
-      { value: string | number | Express.Multer.File[] | null } | undefined,
-      string | undefined,
-    ];
+    ] as [T, { value: string | number | FormDataFile[] | null } | undefined, string | undefined];
   });
 }

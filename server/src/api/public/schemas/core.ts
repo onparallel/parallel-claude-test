@@ -1427,8 +1427,8 @@ const _NumberReplySubmitContent = {
 
 const _FileUploadReplySubmitContent = {
   title: "FileUploadReplyContent",
-  type: "string",
-  format: "binary",
+  type: "object",
+  isFile: true,
   description:
     "For fields of type `FILE_UPLOAD`. The content of this reply is the file to be uploaded.",
   example: "<binary data>",
@@ -1773,19 +1773,6 @@ export const CreateOrUpdatePetitionCustomProperty = schema({
       type: "string",
       example: "12345",
       maxLength: 1000,
-    },
-  },
-} as const);
-
-export const FileUpload = schema({
-  title: "FileUpload",
-  type: "object",
-  additionalProperties: false,
-  required: ["file"],
-  properties: {
-    file: {
-      type: "object",
-      format: "binary",
     },
   },
 } as const);
@@ -2351,6 +2338,20 @@ const _Profile = {
 export const PaginatedProfiles = schema(_PaginationOf(_Profile as JsonSchema));
 export const Profile = schema(_Profile as JsonSchema);
 export const ListOfProfiles = ListOf(_Profile as JsonSchema);
+
+const CreateProfileValue = {
+  oneOf: [
+    { type: "string", example: "Parallel Solutions", description: "Value of the property" },
+    {
+      type: "array",
+      items: {
+        type: "object",
+        isFile: true,
+      },
+    },
+  ],
+} as const;
+
 export const CreateProfile = schema({
   title: "CreateProfile",
   type: "object",
@@ -2383,16 +2384,13 @@ export const CreateProfile = schema({
       properties: {},
       additionalProperties: {
         oneOf: [
-          { type: "string", example: "Parallel Solutions", description: "Value of the property" },
+          CreateProfileValue,
           {
             type: "object",
             required: ["value"],
             additionalProperties: false,
             properties: {
-              value: {
-                type: "string",
-                description: "Value of the property",
-              },
+              value: CreateProfileValue,
               expiryDate: {
                 type: "string",
                 format: "date",
@@ -2435,12 +2433,21 @@ export const ProfileSubscriptionInput = (subscribe: boolean) =>
 
 export const ListOfProfileProperties = ListOf(_ProfileFieldProperty as any);
 
-export const CreateProfileFieldValue = schema({
-  type: "object",
-  example: { name: "John Doe", amount: 500, date: "2023-06-27" },
-} as const);
+const UpdateProfileValue = {
+  oneOf: [
+    { type: "null" },
+    { type: "string", example: "Parallel Solutions", description: "Value of the property" },
+    {
+      type: "array",
+      items: {
+        type: "object",
+        isFile: true,
+      },
+    },
+  ],
+} as const;
 
-export const UpdateProfileFieldValue = schema({
+export const UpdateProfileFieldValues = schema({
   type: "object",
   required: ["values"],
   additionalProperties: false,
@@ -2452,19 +2459,12 @@ export const UpdateProfileFieldValue = schema({
       properties: {},
       additionalProperties: {
         oneOf: [
-          {
-            type: ["string", "null"],
-            example: "Parallel Solutions",
-            description: "Value of the property",
-          },
+          UpdateProfileValue,
           {
             type: "object",
             additionalProperties: false,
             properties: {
-              value: {
-                type: ["string", "null"],
-                description: "Value of the property",
-              },
+              value: UpdateProfileValue,
               expiryDate: {
                 type: ["string", "null"],
                 format: "date",
@@ -2497,42 +2497,8 @@ export const AssociatePetitionToProfileInput = schema({
 } as const);
 
 export const BulkSendTemplateInput = schema({
-  type: "array",
-  items: {
-    type: "object",
-    additionalProperties: false,
-    required: ["contacts"],
-    properties: {
-      contacts: {
-        type: "array",
-        items: {
-          oneOf: [
-            { type: "string" },
-            {
-              type: "object",
-              additionalProperties: false,
-              required: ["email", "firstName"],
-              properties: {
-                email: {
-                  type: "string",
-                  format: "email",
-                },
-                firstName: {
-                  type: "string",
-                  maxLength: 255,
-                },
-                lastName: {
-                  type: ["string", "null"],
-                  maxLength: 255,
-                },
-              },
-            },
-          ],
-        },
-      },
-      prefill: {
-        type: "object",
-      },
-    },
-  },
+  type: "object",
+  required: ["file"],
+  additionalProperties: false,
+  properties: { file: { type: "object", isFile: true } },
 } as const);

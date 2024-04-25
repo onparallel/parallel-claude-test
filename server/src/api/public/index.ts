@@ -15,7 +15,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { fromPlainTextWithMentions } from "../../util/slate/utils";
 import { titleize } from "../../util/strings";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
-import { RestApi, RestParameter } from "../rest/core";
+import { FormDataFile, RestApi, RestParameter } from "../rest/core";
 import {
   BadRequestError,
   ConflictError,
@@ -184,6 +184,7 @@ import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middlewar
 import { ratelimit } from "./ratelimit";
 import {
   AssociatePetitionToProfileInput,
+  BulkSendTemplateInput,
   Contact,
   CreateContact,
   CreateEventSubscription,
@@ -231,7 +232,7 @@ import {
   UpdateFileReply,
   UpdatePetition,
   UpdatePetitionField,
-  UpdateProfileFieldValue,
+  UpdateProfileFieldValues as UpdateProfileValues,
   UpdateReply,
   UserWithOrg,
 } from "./schemas/core";
@@ -2030,7 +2031,7 @@ export function publicApi(container: Container) {
         },
         tags: ["Parallel replies"],
       },
-      async ({ client, body, params, files }) => {
+      async ({ client, body, params }) => {
         const { petition } = await client.request(SubmitReply_petitionDocument, {
           petitionId: params.petitionId,
         });
@@ -2046,7 +2047,7 @@ export function publicApi(container: Container) {
           let newReply;
 
           if (isDefined(fieldType) && isFileTypeField(fieldType)) {
-            const file = files["reply"]?.[0];
+            const file = body.reply as FormDataFile;
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
@@ -2157,7 +2158,7 @@ export function publicApi(container: Container) {
           },
         ),
       },
-      async ({ client, body, params, files }) => {
+      async ({ client, body, params }) => {
         const { petition } = await client.request(UpdateReply_petitionDocument, {
           petitionId: params.petitionId,
         });
@@ -2174,7 +2175,7 @@ export function publicApi(container: Container) {
           let updatedReply;
 
           if (isDefined(fieldType) && isFileTypeField(fieldType)) {
-            const file = files["reply"]?.[0];
+            const file = body.reply as FormDataFile;
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
@@ -3923,13 +3924,13 @@ export function publicApi(container: Container) {
           [
             JsonBodyContent(CreateProfile),
             FormDataBodyContent(CreateProfile, {
-              example: outdent`
-                profileTypeId: ${toGlobalId("ProfileType", 42)}
-                subscribe: true
-                values.p_first_name: John
-                values.p_id.value: 11111111H
-                values.p_id.expiryDate: 2032-04-26
-              `,
+              example: {
+                profileTypeId: toGlobalId("ProfileType", 42),
+                subscribe: true,
+                "values.p_first_name": "John",
+                "values.p_id.value": "11111111H",
+                "values.p_id.expiryDate": "2032-04-26",
+              },
             }),
           ],
           {
@@ -3981,7 +3982,7 @@ export function publicApi(container: Container) {
         },
         tags: ["Profiles"],
       },
-      async ({ client, body, query, files }) => {
+      async ({ client, body, query }) => {
         const _query = gql`
           query CreateProfile_profileType($profileTypeId: GID!) {
             profileType(profileTypeId: $profileTypeId) {
@@ -4066,14 +4067,13 @@ export function publicApi(container: Container) {
           const uploadFiles: {
             alias: string;
             expiryDate?: string;
-            value: Express.Multer.File[];
+            value: FormDataFile[];
           }[] = [];
 
           try {
             for (const [field, content, expiryDate] of parseProfileTypeFieldInput(
-              Object.assign({}, body?.values ?? {}, files?.values ?? {}),
+              body?.values ?? {},
               profileTypeFields,
-              files?.values ?? {},
             )) {
               if (content?.value !== null) {
                 if (field.type === "FILE") {
@@ -4202,13 +4202,13 @@ export function publicApi(container: Container) {
         middleware: anyFileUploadMiddleware(),
         body: Body(
           [
-            JsonBodyContent(UpdateProfileFieldValue),
-            FormDataBodyContent(UpdateProfileFieldValue, {
-              example: outdent`
-                values.p_first_name: John
-                values.p_id.value: 11111111H
-                values.p_id.expiryDate: 2032-04-26
-              `,
+            JsonBodyContent(UpdateProfileValues),
+            FormDataBodyContent(UpdateProfileValues, {
+              example: {
+                "values.p_first_name": "John",
+                "values.p_id.value": "11111111H",
+                "values.p_id.expiryDate": "2032-04-26",
+              },
             }),
           ],
           {
@@ -4267,7 +4267,7 @@ export function publicApi(container: Container) {
           403: ErrorResponse({ description: "You don't have access to this resource" }),
         },
       },
-      async ({ client, params, body, files }) => {
+      async ({ client, params, body }) => {
         const _query = gql`
           query UpdateProfileFieldValue_profile(
             $profileId: GID!
@@ -4357,13 +4357,12 @@ export function publicApi(container: Container) {
         const uploadFiles: {
           alias: string;
           expiryDate?: string;
-          value: Express.Multer.File[];
+          value: FormDataFile[];
         }[] = [];
         try {
           for (const [field, content, expiryDate] of parseProfileTypeFieldInput(
-            Object.assign({}, body?.values ?? {}, files?.values ?? {}),
+            body?.values ?? {},
             profileTypeFields,
-            files?.values ?? {},
           )) {
             if (field.type === "FILE") {
               if (content?.value === null || content?.value === "") {
@@ -4572,9 +4571,9 @@ export function publicApi(container: Container) {
       // this endpoint is for Parc Taulí use case, don't expose it in the API docs
       excludeFromSpec: true,
       middleware: singleFileUploadMiddleware("file"),
-      body: FormDataBody({ type: "object", format: "binary" }),
+      body: FormDataBody(BulkSendTemplateInput),
     },
-    async ({ client, params, files }) => {
+    async ({ client, params, body }) => {
       const _mutations = gql`
         mutation BulkSendTemplate_createBulkPetitionSendTask(
           $templateId: GID!
@@ -4590,7 +4589,7 @@ export function publicApi(container: Container) {
           uploadBulkPetitionSendTaskInputFile(file: $file)
         }
       `;
-      const file = files?.["file"]?.[0];
+      const file = body.file as unknown as FormDataFile;
       if (!file) {
         throw new BadRequestError("Input file is missing");
       }

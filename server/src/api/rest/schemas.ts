@@ -2,6 +2,7 @@ import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import { FromSchema, JSONSchema as _JSONSchema } from "json-schema-to-ts";
 import { isValidTime, isValidTimezone } from "../../util/time";
+import { FormDataFile } from "./core";
 
 export type JsonSchema = Exclude<_JSONSchema, boolean>;
 
@@ -20,5 +21,16 @@ export function buildValidateSchema<T = any>(schema: JsonSchema) {
   addFormats(ajv, ["date-time", "date", "email", "uri", "binary"]);
   ajv.addFormat("time-zone", isValidTimezone);
   ajv.addFormat("time", isValidTime);
+  ajv.addKeyword({
+    keyword: "isFile",
+    type: "object",
+    schemaType: "boolean",
+    validate(isFile: boolean, value: any) {
+      if (isFile && !(value instanceof FormDataFile)) {
+        return false;
+      }
+      return true;
+    },
+  });
   return ajv.compile<T>(schema);
 }
