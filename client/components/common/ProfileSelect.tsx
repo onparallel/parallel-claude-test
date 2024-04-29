@@ -355,11 +355,13 @@ function SingleValue(
 ) {
   return (
     <components.SingleValue {...props}>
-      <ProfileSelectOption
-        data={props.data}
-        isDisabled={props.isDisabled}
-        hideProfileType={props.selectProps.hideProfileType}
-      />
+      <OverflownText key={props.data.id}>
+        <ProfileSelectOption
+          data={props.data}
+          isDisabled={props.isDisabled}
+          hideProfileType={props.selectProps.hideProfileType}
+        />
+      </OverflownText>
     </components.SingleValue>
   );
 }
@@ -400,12 +402,12 @@ function Option({
             : {}),
         }}
       >
-        <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
+        <Box verticalAlign="baseline" noOfLines={2} wordBreak="break-all">
           <ProfileSelectOption
             data={props.data}
             highlight={props.selectProps.inputValue}
-            isSelected={props.isSelected}
             isDisabled={props.isDisabled}
+            isSelected={props.isSelected}
             hideProfileType={props.selectProps.hideProfileType}
           />
         </Box>
@@ -430,7 +432,7 @@ function ProfileSelectOption({
   hideProfileType,
 }: ProfileSelectOptionProps) {
   return (
-    <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
+    <>
       {data.name ? (
         <HighlightText search={highlight} as="span">
           {data.name}
@@ -441,21 +443,19 @@ function ProfileSelectOption({
         </Text>
       )}
       {hideProfileType ? null : (
-        <>
+        <Text as="span" fontSize="87.5%" color={isSelected ? undefined : "gray.500"}>
           <Text as="span" display="inline-block" width={2} />
-          <Text as="span" fontSize="sm" color={isSelected ? undefined : "gray.500"}>
-            <LocalizableUserTextRender
-              value={data.profileType.name}
-              default={
-                <FormattedMessage
-                  id="generic.unnamed-profile-type"
-                  defaultMessage="Unnamed profile type"
-                />
-              }
-            />
-          </Text>
-        </>
+          <LocalizableUserTextRender
+            value={data.profileType.name}
+            default={
+              <FormattedMessage
+                id="generic.unnamed-profile-type"
+                defaultMessage="Unnamed profile type"
+              />
+            }
+          />
+        </Text>
       )}
-    </Box>
+    </>
   );
 }

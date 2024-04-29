@@ -16,6 +16,7 @@ import Select, {
 import { isDefined } from "remeda";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
+import { OverflownText } from "./OverflownText";
 
 export type ProfileRelationshipTypeWithDirectionSelectSelection =
   ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment;
@@ -137,37 +138,39 @@ export const ProfileRelationshipTypeWithDirectionSelect = Object.assign(
 function SingleValue(props: SingleValueProps<ProfileRelationshipTypeWithDirectionSelectSelection>) {
   return (
     <components.SingleValue {...props}>
-      {props.data.direction === "LEFT_RIGHT" ? (
-        <LocalizableUserTextRender
-          value={props.data.profileRelationshipType.leftRightName}
-          default={<></>}
-        />
-      ) : (
-        <LocalizableUserTextRender
-          value={props.data.profileRelationshipType.rightLeftName}
-          default={<></>}
-        />
-      )}
-      {props.data.profileRelationshipType.isReciprocal ? null : (
-        <>
-          <Text as="span" display="inline-block" width={1} />
-          <Text as="span" fontSize="sm" color="gray.500">
-            /
+      <OverflownText key={props.data.profileRelationshipType.id + props.data.direction}>
+        {props.data.direction === "LEFT_RIGHT" ? (
+          <LocalizableUserTextRender
+            value={props.data.profileRelationshipType.leftRightName}
+            default={<></>}
+          />
+        ) : (
+          <LocalizableUserTextRender
+            value={props.data.profileRelationshipType.rightLeftName}
+            default={<></>}
+          />
+        )}
+        {props.data.profileRelationshipType.isReciprocal ? null : (
+          <>
             <Text as="span" display="inline-block" width={1} />
-            {props.data.direction === "LEFT_RIGHT" ? (
-              <LocalizableUserTextRender
-                value={props.data.profileRelationshipType.rightLeftName}
-                default={<></>}
-              />
-            ) : (
-              <LocalizableUserTextRender
-                value={props.data.profileRelationshipType.leftRightName}
-                default={<></>}
-              />
-            )}
-          </Text>
-        </>
-      )}
+            <Text as="span" fontSize="87.5%" color="gray.500">
+              /
+              <Text as="span" display="inline-block" width={1} />
+              {props.data.direction === "LEFT_RIGHT" ? (
+                <LocalizableUserTextRender
+                  value={props.data.profileRelationshipType.rightLeftName}
+                  default={<></>}
+                />
+              ) : (
+                <LocalizableUserTextRender
+                  value={props.data.profileRelationshipType.leftRightName}
+                  default={<></>}
+                />
+              )}
+            </Text>
+          </>
+        )}
+      </OverflownText>
     </components.SingleValue>
   );
 }
@@ -196,7 +199,7 @@ function Option({
         {props.data.profileRelationshipType.isReciprocal ? null : (
           <>
             <Text as="span" display="inline-block" width={1} />
-            <Text as="span" fontSize="sm" color={props.isSelected ? undefined : "gray.500"}>
+            <Text as="span" fontSize="87.5%" color={props.isSelected ? undefined : "gray.500"}>
               /
               <Text as="span" display="inline-block" width={1} />
               <HighlightText as="span" search={props.selectProps.inputValue}>

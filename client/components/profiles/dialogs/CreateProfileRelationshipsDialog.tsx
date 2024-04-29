@@ -395,7 +395,7 @@ function ProfileRelationshipRow({
 
   return (
     <FormControl as={NoElement} isInvalid={true}>
-      <FormControl isInvalid={hasProfileError} isDisabled={isDisabled || isUpdating}>
+      <FormControl isInvalid={hasProfileError} isDisabled={isDisabled || isUpdating} minWidth={0}>
         <Controller
           name={`relationships.${index}.profile` as const}
           control={control}
@@ -420,7 +420,7 @@ function ProfileRelationshipRow({
           }}
         />
       </FormControl>
-      <FormControl isInvalid={hasRelationsShipError} isDisabled={isDisabled}>
+      <FormControl isInvalid={hasRelationsShipError} isDisabled={isDisabled} minWidth={0}>
         <Controller
           name={`relationships.${index}.profileRelationshipTypeWithDirection` as const}
           control={control}
