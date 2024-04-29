@@ -70,16 +70,16 @@ async function fetchMissingProfileRelationshipAllowedProfileTypes(
     >[];
   }>(
     /* sql */ `
-    with all_types_indexed as (
-      select *, concat("profile_relationship_type_id", '-', "allowed_profile_type_id", '-', "direction") as "index"
-      from (values ${input.map(() => "(?::int, ?::int, ?::profile_relationship_type_direction)").join(", ")}) as t("profile_relationship_type_id", "allowed_profile_type_id", "direction")
+    with all_types as (
+      select * from (values ${input.map(() => "(?::int, ?::int, ?::profile_relationship_type_direction)").join(", ")}) as t("profile_relationship_type_id", "allowed_profile_type_id", "direction")
     ),
     current_types as (
-      select concat("profile_relationship_type_id", '-', "allowed_profile_type_id", '-', "direction") as "index"
+      select profile_relationship_type_id, allowed_profile_type_id, direction
       from profile_relationship_type_allowed_profile_type where org_id = ? and deleted_at is null
     )
-    select a_t.* from all_types_indexed a_t 
-    where a_t.index not in (select "index" from current_types)
+    select * from all_types
+    except
+    select * from current_types;
   `,
     [...input.flat(), orgId],
   );
@@ -106,8 +106,9 @@ async function fetchMissingProfileRelationshipTypes(
     current_types as (
       select alias from profile_relationship_type where org_id = ? and deleted_at is null
     )
-    select a_t.alias from all_types a_t 
-    where a_t.alias not in (select alias from current_types)
+    select * from all_types
+    except
+    select * from current_types;
   `,
     [...allRelationshipTypes, orgId],
   );
@@ -121,13 +122,14 @@ async function fetchMissingStandardTypes(knex: Knex, orgId: number) {
   }>(
     /* sql */ `
     with all_types as (
-      select * from (values ${ProfileTypeStandardTypeValues.map(() => "(?)").join(", ")}) as t("standard_type")
+      select * from (values ${ProfileTypeStandardTypeValues.map(() => "(?::profile_type_standard_type)").join(", ")}) as t("standard_type")
     ),
     current_types as (
       select standard_type from profile_type where org_id = ? and standard_type is not null and deleted_at is null and archived_at is null
     )
-    select a_t.standard_type from all_types a_t 
-    where a_t.standard_type::profile_type_standard_type not in (select standard_type from current_types);
+    select * from all_types
+    except
+    select * from current_types;
   `,
     [...ProfileTypeStandardTypeValues, orgId],
   );
