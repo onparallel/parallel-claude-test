@@ -5,7 +5,6 @@ import {
   AlertIcon,
   Box,
   Button,
-  CloseButton,
   HStack,
   Heading,
   Input,
@@ -88,6 +87,7 @@ import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionD
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
+import { CloseButton } from "../common/CloseButton";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -1217,14 +1217,7 @@ function DeadlineInput({
       />
       {value ? (
         <InputRightElement>
-          <CloseButton
-            size="sm"
-            aria-label={intl.formatMessage({
-              id: "generic.clear",
-              defaultMessage: "Clear",
-            })}
-            onClick={() => onChange(null)}
-          />
+          <CloseButton isClear onClick={() => onChange(null)} />
         </InputRightElement>
       ) : (
         <InputRightElement pointerEvents="none">

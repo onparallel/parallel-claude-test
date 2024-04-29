@@ -1,12 +1,6 @@
-import {
-  Alert,
-  AlertProps,
-  CloseButton,
-  useDisclosure,
-  UseDisclosureProps,
-} from "@chakra-ui/react";
+import { Alert, AlertProps, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useIntl } from "react-intl";
+import { CloseButton } from "./CloseButton";
 
 export interface CloseableAlertProps extends AlertProps, Omit<UseDisclosureProps, "id"> {}
 
@@ -14,7 +8,6 @@ export const CloseableAlert = chakraForwardRef<"div", CloseableAlertProps>(funct
   { isOpen, defaultIsOpen = true, onClose, onOpen, children, ...props },
   ref,
 ) {
-  const intl = useIntl();
   const disclosure = useDisclosure({
     isOpen,
     defaultIsOpen,
@@ -25,8 +18,17 @@ export const CloseableAlert = chakraForwardRef<"div", CloseableAlertProps>(funct
     <Alert ref={ref} {...props}>
       {children}
       <CloseButton
-        aria-label={intl.formatMessage({ id: "generic.close", defaultMessage: "Close" })}
         onClick={disclosure.onClose}
+        sx={{
+          _hover: {
+            backgroundColor: "blackAlpha.100",
+          },
+          _active: {
+            backgroundColor: "blackAlpha.200",
+          },
+        }}
+        color="inherit"
+        size="sm"
       />
     </Alert>
   ) : null;

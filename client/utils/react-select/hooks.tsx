@@ -1,5 +1,6 @@
-import { CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
+import { Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
+import { CloseButton } from "@parallel/components/common/CloseButton";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -357,18 +358,7 @@ function IndicatorSeparator() {
 }
 
 function ClearIndicator({ innerProps }: ClearIndicatorProps) {
-  const intl = useIntl();
-  return (
-    <CloseButton
-      tabIndex={-1}
-      aria-label={intl.formatMessage({
-        id: "generic.clear",
-        defaultMessage: "Clear",
-      })}
-      size="sm"
-      {...(innerProps as any)}
-    />
-  );
+  return <CloseButton tabIndex={-1} isClear {...(innerProps as any)} />;
 }
 
 function DropdownIndicator(props: DropdownIndicatorProps & ExtendComponentProps) {

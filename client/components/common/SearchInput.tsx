@@ -1,5 +1,4 @@
 import {
-  CloseButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -14,7 +13,8 @@ import { useFocus } from "@parallel/utils/useFocus";
 import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
-import { pick, omit } from "remeda";
+import { omit, pick } from "remeda";
+import { CloseButton } from "./CloseButton";
 
 export const SearchInput = chakraForwardRef<"input", InputProps>(function SearchInput(props, ref) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,15 +64,7 @@ export const SearchInput = chakraForwardRef<"input", InputProps>(function Search
       />
       {isActive ? (
         <InputRightElement>
-          <CloseButton
-            tabIndex={-1}
-            aria-label={intl.formatMessage({
-              id: "generic.clear",
-              defaultMessage: "Clear",
-            })}
-            size="sm"
-            onClick={handleClearClick}
-          />
+          <CloseButton tabIndex={-1} isClear onClick={handleClearClick} />
         </InputRightElement>
       ) : null}
     </InputGroup>

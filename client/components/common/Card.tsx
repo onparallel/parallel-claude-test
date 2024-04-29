@@ -1,7 +1,7 @@
-import { Box, CloseButton, Heading, HeadingProps, HStack } from "@chakra-ui/react";
+import { Box, Heading, HeadingProps, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
-import { useIntl } from "react-intl";
+import { CloseButton } from "./CloseButton";
 import { Divider } from "./Divider";
 
 export interface CardProps {
@@ -55,23 +55,11 @@ export interface CloseableCardHeaderProps extends Omit<CardHeaderProps, "rightAc
 
 export const CloseableCardHeader = chakraForwardRef<"header", CloseableCardHeaderProps>(
   function CloseableCardHeader({ isCloseable = true, onClose, ...props }, ref) {
-    const intl = useIntl();
     return (
       <CardHeader
         ref={ref}
         {...props}
-        rightAction={
-          isCloseable ? (
-            <CloseButton
-              size="sm"
-              aria-label={intl.formatMessage({
-                id: "generic.close",
-                defaultMessage: "Close",
-              })}
-              onClick={onClose}
-            />
-          ) : null
-        }
+        rightAction={isCloseable ? <CloseButton onClick={onClose} /> : null}
       />
     );
   },

@@ -32,5 +32,17 @@ module.exports = {
         ],
       },
     ],
+    "no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          {
+            name: "@chakra-ui/react",
+            importNames: ["CloseButton"],
+            message: "Please use CloseButton from @parallel/common/CloseButton instead.",
+          },
+        ],
+      },
+    ],
   },
 };

@@ -1,11 +1,12 @@
-import { Box, CloseButton } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
+import { CloseIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { FilterSharedWithOperator, PetitionSharedWithFilterLine } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { UserSelect } from "../../../common/UserSelect";
 import { useSearchUsers } from "../../../../utils/useSearchUsers";
+import { UserSelect } from "../../../common/UserSelect";
 
 export interface PetitionListSharedWithFilterProps
   extends ValueProps<PetitionSharedWithFilterLine, false> {
@@ -59,13 +60,15 @@ export function PetitionListSharedWithFilterLine({
 
   return (
     <>
-      <CloseButton
+      <IconButton
+        variant="ghost"
+        icon={<CloseIcon boxSize={3} />}
         gridRow={{ base: "span 2", sm: "auto" }}
         aria-label={intl.formatMessage({
           id: "generic.remove",
           defaultMessage: "Remove",
         })}
-        size="md"
+        size="sm"
         onClick={onRemove}
       />
       <SimpleSelect

@@ -1,4 +1,5 @@
-import { Box, CloseButton } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
+import { CloseIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { TagSelect } from "@parallel/components/common/TagSelect";
 import { PetitionTagFilterLine, PetitionTagFilterLineOperator } from "@parallel/graphql/__types";
@@ -44,13 +45,15 @@ export function PetitionListTagFilterLine({
 
   return (
     <>
-      <CloseButton
+      <IconButton
+        variant="ghost"
+        icon={<CloseIcon boxSize={3} />}
         gridRow={{ base: value.operator === "IS_EMPTY" ? "auto" : "span 2", sm: "auto" }}
         aria-label={intl.formatMessage({
           id: "generic.remove",
           defaultMessage: "Remove",
         })}
-        size="md"
+        size="sm"
         onClick={onRemove}
       />
       <Box gridColumn={{ base: "auto", sm: value.operator === "IS_EMPTY" ? "span 2" : "auto" }}>
