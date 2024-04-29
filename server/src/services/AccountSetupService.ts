@@ -132,6 +132,7 @@ export class AccountSetupService implements IAccountSetupService {
         is_default: true,
       },
       this.config.signature.signaturitSandboxApiKey,
+      "sandbox",
       false,
       createdBy,
     );

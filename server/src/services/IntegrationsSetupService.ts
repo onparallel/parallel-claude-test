@@ -19,6 +19,7 @@ export interface IIntegrationsSetupService {
   createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
+    environment: SignaturitEnvironment | null,
     isParallelManaged: boolean,
     createdBy: string,
     t?: Knex.Transaction,
@@ -75,11 +76,15 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
   async createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
+    env: SignaturitEnvironment | null,
     isParallelManaged: boolean,
     createdBy: string,
     t?: Knex.Transaction,
   ) {
-    const { environment } = await this.authenticateSignaturitApiKey(apiKey);
+    let environment = env;
+    if (!environment) {
+      ({ environment } = await this.authenticateSignaturitApiKey(apiKey));
+    }
     return await this.signaturitIntegration.createOrgIntegration(
       {
         ...data,

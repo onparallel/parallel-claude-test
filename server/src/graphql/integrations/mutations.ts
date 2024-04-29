@@ -52,6 +52,7 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
           is_default: args.isDefault ?? false,
         },
         args.apiKey,
+        null,
         false,
         `User:${ctx.user!.id}`,
       );
