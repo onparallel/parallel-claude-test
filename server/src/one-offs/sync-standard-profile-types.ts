@@ -1,19 +1,119 @@
 import "./../init";
 // keep this space to prevent import sorting removing init from top
 import { Knex } from "knex";
+import pMap from "p-map";
 import { isDefined, maxBy } from "remeda";
 import yargs from "yargs";
 import { createContainer } from "../container";
 import {
+  ProfileRelationshipTypeAllowedProfileType,
+  ProfileRelationshipTypeDirection,
   ProfileTypeFieldType,
   ProfileTypeStandardType,
   ProfileTypeStandardTypeValues,
 } from "../db/__types";
+import { ProfileTypeFieldOptions } from "../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../db/knex";
-import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../services/ProfilesSetupService";
+import {
+  PROFILES_SETUP_SERVICE,
+  ProfileRelationshipTypeAlias,
+  ProfilesSetupService,
+} from "../services/ProfilesSetupService";
 import { loadEnv } from "../util/loadEnv";
 import { waitFor } from "../util/promises/waitFor";
-import { ProfileTypeFieldOptions } from "../db/helpers/profileTypeFieldOptions";
+
+async function fetchMissingProfileRelationshipAllowedProfileTypes(
+  knex: Knex,
+  orgId: number,
+  allowedTypesDefinition: Record<
+    ProfileRelationshipTypeAlias,
+    [ProfileTypeStandardType[], ProfileTypeStandardType[]]
+  >,
+) {
+  const standardProfileTypes = await knex
+    .from("profile_type")
+    .where({
+      deleted_at: null,
+      org_id: orgId,
+      archived_at: null,
+    })
+    .whereNotNull("standard_type")
+    .select("*");
+
+  const relationshipTypes = await knex
+    .from("profile_relationship_type")
+    .where({
+      deleted_at: null,
+      org_id: orgId,
+    })
+    .whereNotNull("alias")
+    .select("*");
+
+  const input = Object.entries(allowedTypesDefinition).flatMap(([alias, [left, right]]) => {
+    const relationshipType = relationshipTypes.find((r) => r.alias === alias)!;
+    return [
+      ...left.map((l) => {
+        const standardType = standardProfileTypes.find((s) => s.standard_type === l)!;
+        return [relationshipType.id, standardType.id, "LEFT_RIGHT"];
+      }),
+      ...right.map((r) => {
+        const standardType = standardProfileTypes.find((s) => s.standard_type === r)!;
+        return [relationshipType.id, standardType.id, "RIGHT_LEFT"];
+      }),
+    ];
+  }) as unknown as [number, number, ProfileRelationshipTypeDirection][];
+
+  const data = await knex.raw<{
+    rows: Pick<
+      ProfileRelationshipTypeAllowedProfileType,
+      "profile_relationship_type_id" | "allowed_profile_type_id" | "direction"
+    >[];
+  }>(
+    /* sql */ `
+    with all_types_indexed as (
+      select *, concat("profile_relationship_type_id", '-', "allowed_profile_type_id", '-', "direction") as "index"
+      from (values ${input.map(() => "(?::int, ?::int, ?::profile_relationship_type_direction)").join(", ")}) as t("profile_relationship_type_id", "allowed_profile_type_id", "direction")
+    ),
+    current_types as (
+      select concat("profile_relationship_type_id", '-', "allowed_profile_type_id", '-', "direction") as "index"
+      from profile_relationship_type_allowed_profile_type where org_id = ? and deleted_at is null
+    )
+    select a_t.* from all_types_indexed a_t 
+    where a_t.index not in (select "index" from current_types)
+  `,
+    [...input.flat(), orgId],
+  );
+
+  return data.rows.map((r) => ({
+    profile_relationship_type_id: r.profile_relationship_type_id,
+    allowed_profile_type_id: r.allowed_profile_type_id,
+    direction: r.direction,
+  }));
+}
+
+async function fetchMissingProfileRelationshipTypes(
+  knex: Knex,
+  orgId: number,
+  allRelationshipTypes: ProfileRelationshipTypeAlias[],
+) {
+  const data = await knex.raw<{
+    rows: { alias: ProfileRelationshipTypeAlias }[];
+  }>(
+    /* sql */ `
+    with all_types as (
+      select * from (values ${allRelationshipTypes.map(() => "(?)").join(", ")}) as t("alias")
+    ),
+    current_types as (
+      select alias from profile_relationship_type where org_id = ? and deleted_at is null
+    )
+    select a_t.alias from all_types a_t 
+    where a_t.alias not in (select alias from current_types)
+  `,
+    [...allRelationshipTypes, orgId],
+  );
+
+  return data.rows.map((r) => r.alias);
+}
 
 async function fetchMissingStandardTypes(knex: Knex, orgId: number) {
   const data = await knex.raw<{
@@ -26,9 +126,8 @@ async function fetchMissingStandardTypes(knex: Knex, orgId: number) {
     current_types as (
       select standard_type from profile_type where org_id = ? and standard_type is not null and deleted_at is null and archived_at is null
     )
-    select a_t.* from all_types a_t 
-    left join current_types c_t on a_t.standard_type::profile_type_standard_type = c_t.standard_type::profile_type_standard_type
-    where c_t.standard_type is null;
+    select a_t.standard_type from all_types a_t 
+    where a_t.standard_type::profile_type_standard_type not in (select standard_type from current_types);
   `,
     [...ProfileTypeStandardTypeValues, orgId],
   );
@@ -63,6 +162,13 @@ async function main() {
 
   console.log(`About to run on ${orgOwners.length} organizations`);
   await waitFor(3_000);
+
+  const profileRelationshipTypesDefinition = profiles.getProfileRelationshipTypesDefinition();
+  const allowedProfileTypesDefinition =
+    profiles.getProfileRelationshipAllowedProfileTypesDefinition();
+  const allProfileRelationshipTypes = Object.keys(
+    profileRelationshipTypesDefinition,
+  ) as ProfileRelationshipTypeAlias[];
 
   let i = 0;
   for (const { id: ownerId, org_id: orgId } of orgOwners) {
@@ -126,6 +232,7 @@ async function main() {
             permission: "WRITE",
             profile_type_id: profileType.id,
             created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
             is_expirable: propertyDefinition.is_expirable ?? false,
             expiry_alert_ahead_time: propertyDefinition.expiry_alert_ahead_time ?? null,
           });
@@ -203,6 +310,54 @@ async function main() {
           }
         }
       }
+    }
+
+    // make sure every profile_relationship_type is inserted for the org
+    const missingRelationshipAliases = await fetchMissingProfileRelationshipTypes(
+      knex,
+      orgId,
+      allProfileRelationshipTypes,
+    );
+    if (missingRelationshipAliases.length > 0) {
+      console.log(`Creating relationship types: ${missingRelationshipAliases.join(", ")}`);
+      await knex.from("profile_relationship_type").insert(
+        await pMap(
+          missingRelationshipAliases,
+          async (alias) => {
+            const [left, right] = await profileRelationshipTypesDefinition[alias]();
+            return {
+              org_id: orgId,
+              alias,
+              left_right_name: left,
+              right_left_name: right,
+              is_reciprocal: right === null,
+              created_by: `User:${ownerId}`,
+              updated_by: `User:${ownerId}`,
+            };
+          },
+          { concurrency: 10 },
+        ),
+      );
+    }
+
+    const missingAllowedTypes = await fetchMissingProfileRelationshipAllowedProfileTypes(
+      knex,
+      orgId,
+      allowedProfileTypesDefinition,
+    );
+
+    if (missingAllowedTypes.length > 0) {
+      console.log(`Creating ${missingAllowedTypes.length} allowed profile types for relationships`);
+      await knex.from("profile_relationship_type_allowed_profile_type").insert(
+        missingAllowedTypes.map((r) => ({
+          org_id: orgId,
+          profile_relationship_type_id: r.profile_relationship_type_id,
+          allowed_profile_type_id: r.allowed_profile_type_id,
+          direction: r.direction,
+          created_by: `User:${ownerId}`,
+          updated_by: `User:${ownerId}`,
+        })),
+      );
     }
   }
 }

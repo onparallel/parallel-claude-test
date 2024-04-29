@@ -1286,7 +1286,7 @@
   },
   {
     "term": "profiles.default-profile-type-field.option-contract-type-purchase-order",
-    "definition": "Orden de Compra",
+    "definition": "Orden de compra",
     "context": "Purchase order"
   },
   {
@@ -1413,6 +1413,136 @@
     "term": "profiles.default-profile-type.legal-entity",
     "definition": "Persona jurídica",
     "context": "Legal entity"
+  },
+  {
+    "term": "profiles.default-relationship-type.addendum",
+    "definition": "Adenda",
+    "context": "Addendum"
+  },
+  {
+    "term": "profiles.default-relationship-type.amended-by",
+    "definition": "Modificado por",
+    "context": "Amended by"
+  },
+  {
+    "term": "profiles.default-relationship-type.annex",
+    "definition": "Anexo",
+    "context": "Annex"
+  },
+  {
+    "term": "profiles.default-relationship-type.associated-company",
+    "definition": "Empresa asociada",
+    "context": "Associated company"
+  },
+  {
+    "term": "profiles.default-relationship-type.beneficial-owner",
+    "definition": "Titular real",
+    "context": "Beneficial owner"
+  },
+  {
+    "term": "profiles.default-relationship-type.branch-office",
+    "definition": "Sucursal",
+    "context": "Branch office"
+  },
+  {
+    "term": "profiles.default-relationship-type.child",
+    "definition": "Hijo/Hija",
+    "context": "Child"
+  },
+  {
+    "term": "profiles.default-relationship-type.close-associate",
+    "definition": "Asociado cercano",
+    "context": "Close associate"
+  },
+  {
+    "term": "profiles.default-relationship-type.contract",
+    "definition": "Contrato",
+    "context": "Contract"
+  },
+  {
+    "term": "profiles.default-relationship-type.counterparty",
+    "definition": "Contraparte",
+    "context": "Counterparty"
+  },
+  {
+    "term": "profiles.default-relationship-type.direct-or-indirect-property",
+    "definition": "Propiedad directa o indirecta",
+    "context": "Direct or indirect property"
+  },
+  {
+    "term": "profiles.default-relationship-type.director",
+    "definition": "Administrador",
+    "context": "Director"
+  },
+  {
+    "term": "profiles.default-relationship-type.family-member",
+    "definition": "Familiar",
+    "context": "Family member"
+  },
+  {
+    "term": "profiles.default-relationship-type.legal-guardian",
+    "definition": "Tutor legal",
+    "context": "Legal guardian"
+  },
+  {
+    "term": "profiles.default-relationship-type.legal-representative",
+    "definition": "Representante legal",
+    "context": "Legal representative"
+  },
+  {
+    "term": "profiles.default-relationship-type.legally-guarded",
+    "definition": "Tutorizado legal",
+    "context": "Legally guarded"
+  },
+  {
+    "term": "profiles.default-relationship-type.legally-represented",
+    "definition": "Representado",
+    "context": "Legally represented"
+  },
+  {
+    "term": "profiles.default-relationship-type.main-contract",
+    "definition": "Contrato principal",
+    "context": "Main contract"
+  },
+  {
+    "term": "profiles.default-relationship-type.main-office",
+    "definition": "Sede central",
+    "context": "Main office"
+  },
+  {
+    "term": "profiles.default-relationship-type.managed-by",
+    "definition": "Gestionada",
+    "context": "Managed by"
+  },
+  {
+    "term": "profiles.default-relationship-type.parent",
+    "definition": "Padre/Madre",
+    "context": "Parent"
+  },
+  {
+    "term": "profiles.default-relationship-type.parent-company",
+    "definition": "Matriz",
+    "context": "Parent company"
+  },
+  {
+    "term": "profiles.default-relationship-type.participated-in-by",
+    "definition": "Participada",
+    "context": "Participated in by"
+  },
+  {
+    "term": "profiles.default-relationship-type.shareholder",
+    "definition": "Socio",
+    "context": "Shareholder"
+  },
+  {
+    "term": "profiles.default-relationship-type.spouse",
+    "definition": "Cónyuge",
+    "context": "Spouse"
+  },
+  {
+    "term": "profiles.default-relationship-type.subsidiary",
+    "definition": "Filial",
+    "context": "Subsidiary"
   },
   {
     "term": "public-petition-link.text-1",

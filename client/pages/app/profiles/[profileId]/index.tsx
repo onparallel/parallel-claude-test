@@ -152,6 +152,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     >
       <Flex minHeight="100%" direction="row">
         <ProfileForm
+          key={profile.id}
           profile={profile}
           onRefetch={async () => {
             await refetch();
@@ -288,7 +289,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           </HStack>
           <Stack spacing={6} padding={4} paddingBottom={24} flex={1} minHeight={0} overflow="auto">
             <Flex flex={1} direction="column" minHeight="305px">
-              <ProfileRelationshipsTable />
+              <ProfileRelationshipsTable profileId={profile.id} />
             </Flex>
             <Flex flex={1} direction="column" minHeight="305px">
               <ProfilePetitionsTable profileId={profile.id} />

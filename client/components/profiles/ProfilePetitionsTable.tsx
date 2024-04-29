@@ -43,11 +43,12 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       offset: state.items * (state.page - 1),
       limit: state.items,
     },
+    fetchPolicy: "cache-and-network",
   });
   const profile = data?.profile;
   const petitions = profile?.petitions;
 
-  const { selectedRows, onChangeSelectedIds } = useSelection(petitions?.items, "id");
+  const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(petitions?.items, "id");
 
   const [associateProfileToPetition] = useMutation(
     ProfilePetitionsTable_associateProfileToPetitionDocument,
@@ -80,7 +81,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       });
 
       await disassociatePetitionFromProfile({
-        variables: { profileId, petitionIds: selectedRows.map((row) => row.id) },
+        variables: { profileId, petitionIds: selectedIds },
       });
       await refetch();
     } catch {}
@@ -132,12 +133,14 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       header={
         <HStack paddingX={4} paddingY={2}>
           <Heading size="md">
-            <FormattedMessage id="generic.root-petitions" defaultMessage="Parallels" />
+            <FormattedMessage
+              id="component.profile-petitions-table.header"
+              defaultMessage="Associated parallels"
+            />
           </Heading>
           <Spacer />
           <Button
             leftIcon={<AddIcon />}
-            colorScheme="primary"
             onClick={handleAddPetition}
             isDisabled={profile?.status === "DELETION_SCHEDULED"}
           >
@@ -154,7 +157,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
             <Stack spacing={1} align="center">
               <Text color="gray.400">
                 <FormattedMessage
-                  id="component.profile-petitions-table.no-parallels-associated"
+                  id="component.profile-petitions-table.no-petitions"
                   defaultMessage="There are no parallels associated to this profile yet."
                 />
               </Text>
@@ -191,7 +194,7 @@ function useProfilePetitionsActions({
       leftIcon: <CloseIconSmall />,
       children: (
         <FormattedMessage
-          id="component.profile-petitions-table.remove-profile-button"
+          id="component.profile-petitions-table.remove-petition"
           defaultMessage="Remove association"
         />
       ),
@@ -362,6 +365,9 @@ const _mutations = [
       associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
         profile {
           ...ProfilePetitionsTable_Profile
+          petitionsTotalCount: petitions {
+            totalCount
+          }
         }
       }
     }
@@ -388,6 +394,9 @@ const _queries = [
           items {
             ...ProfilePetitionsTable_Petition
           }
+          totalCount
+        }
+        petitionsTotalCount: petitions {
           totalCount
         }
       }

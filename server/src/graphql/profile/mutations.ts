@@ -25,6 +25,8 @@ import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
   ProfileFieldValueUpdatedEvent,
+  ProfileRelationshipCreatedEvent,
+  ProfileRelationshipRemovedEvent,
 } from "../../db/events/ProfileEvent";
 import {
   ProfileTypeFieldOptions,
@@ -75,7 +77,10 @@ import {
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
   profileTypeIsNotStandard,
+  profilesCanBeAssociated,
   userHasAccessToProfile,
+  userHasAccessToProfileRelationship,
+  userHasAccessToProfileRelationshipsInput,
   userHasAccessToProfileType,
   userHasPermissionOnProfileTypeField,
 } from "./authorizers";
@@ -940,6 +945,54 @@ export const deleteProfile = mutationField("deleteProfile", {
     }
 
     await ctx.profiles.deleteProfile(profileIds, `User:${ctx.user!.id}`);
+
+    const removedRelationships = await ctx.profiles.removeProfileRelationshipsByProfileId(
+      profileIds,
+      ctx.user!,
+    );
+
+    if (removedRelationships.length > 0) {
+      const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+        removedRelationships.map((r) => r.profile_relationship_type_id),
+      );
+
+      // create events only on profiles that were not deleted
+      const eventsData = removedRelationships
+        .flatMap((r) => [
+          profileIds.includes(r.left_side_profile_id)
+            ? null
+            : {
+                profileId: r.left_side_profile_id,
+                profileRelationshipId: r.id,
+                profileRelationshipTypeId: r.profile_relationship_type_id,
+              },
+          profileIds.includes(r.right_side_profile_id)
+            ? null
+            : {
+                profileId: r.right_side_profile_id,
+                profileRelationshipId: r.id,
+                profileRelationshipTypeId: r.profile_relationship_type_id,
+              },
+        ])
+        .filter(isDefined);
+
+      await ctx.profiles.createEvent(
+        eventsData.map((d) => ({
+          type: "PROFILE_RELATIONSHIP_REMOVED",
+          org_id: ctx.user!.org_id,
+          profile_id: d.profileId,
+          data: {
+            user_id: ctx.user!.id,
+            profile_relationship_id: d.profileRelationshipId,
+            reason: "PROFILE_DELETED",
+            profile_relationship_type_alias: relationshipTypes.find(
+              (rt) => rt!.id === d.profileRelationshipTypeId,
+            )!.alias,
+          },
+        })),
+      );
+    }
+
     return SUCCESS;
   },
 });
@@ -1894,5 +1947,146 @@ export const scheduleProfileForDeletion = mutationField("scheduleProfileForDelet
     );
 
     return profiles;
+  },
+});
+
+export const createProfileRelationship = mutationField("createProfileRelationship", {
+  description: "Associates a profile with one or more relationships.",
+  type: "Profile",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileIsNotAnonymized("profileId"),
+    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
+    profilesCanBeAssociated("profileId", "relationships"),
+    userHasAccessToProfileRelationshipsInput("relationships"),
+    (_, { profileId, relationships }) => relationships.every((r) => r.profileId !== profileId),
+  ),
+  validateArgs: notEmptyArray((args) => args.relationships, "relationships"),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    relationships: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "CreateProfileRelationshipInput",
+            definition(t) {
+              t.nonNull.globalId("profileRelationshipTypeId", {
+                prefixName: "ProfileRelationshipType",
+              });
+              t.nonNull.field("direction", { type: "ProfileRelationshipDirection" });
+              t.nonNull.globalId("profileId", { prefixName: "Profile" });
+            },
+          }),
+        ),
+      ),
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    const relationships = await ctx.profiles.createProfileRelationship(
+      args.relationships.map((r) => ({
+        profile_relationship_type_id: r.profileRelationshipTypeId,
+        left_side_profile_id: r.direction === "LEFT_RIGHT" ? args.profileId : r.profileId,
+        right_side_profile_id: r.direction === "RIGHT_LEFT" ? args.profileId : r.profileId,
+      })),
+      ctx.user!,
+    );
+
+    const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+      relationships.map((r) => r.profile_relationship_type_id),
+    );
+
+    await ctx.profiles.createEvent(
+      relationships.flatMap(
+        (r) =>
+          [
+            {
+              org_id: ctx.user!.org_id,
+              profile_id: r.left_side_profile_id,
+              type: "PROFILE_RELATIONSHIP_CREATED",
+              data: {
+                user_id: ctx.user!.id,
+                profile_relationship_id: r.id,
+                profile_relationship_type_alias: relationshipTypes.find(
+                  (rt) => rt!.id === r.profile_relationship_type_id,
+                )!.alias,
+              },
+            },
+            {
+              org_id: ctx.user!.org_id,
+              profile_id: r.right_side_profile_id,
+              type: "PROFILE_RELATIONSHIP_CREATED",
+              data: {
+                user_id: ctx.user!.id,
+                profile_relationship_id: r.id,
+                profile_relationship_type_alias: relationshipTypes.find(
+                  (rt) => rt!.id === r.profile_relationship_type_id,
+                )!.alias,
+              },
+            },
+          ] satisfies ProfileRelationshipCreatedEvent<true>[],
+      ),
+    );
+
+    return (await ctx.profiles.loadProfile(args.profileId))!;
+  },
+});
+
+export const removeProfileRelationship = mutationField("removeProfileRelationship", {
+  description: "Disassociates two profiles with a relationship.",
+  type: "Success",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileRelationship("profileRelationshipIds"),
+  ),
+  args: {
+    profileRelationshipIds: nonNull(list(nonNull(globalIdArg("ProfileRelationship")))),
+  },
+  validateArgs: notEmptyArray((args) => args.profileRelationshipIds, "profileRelationshipIds"),
+  resolve: async (_, args, ctx) => {
+    const relationships = await ctx.profiles.removeProfileRelationships(
+      args.profileRelationshipIds,
+      ctx.user!,
+    );
+
+    const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+      relationships.map((r) => r.profile_relationship_type_id),
+    );
+
+    await ctx.profiles.createEvent(
+      relationships.flatMap(
+        (r) =>
+          [
+            {
+              org_id: ctx.user!.org_id,
+              profile_id: r.left_side_profile_id,
+              type: "PROFILE_RELATIONSHIP_REMOVED",
+              data: {
+                user_id: ctx.user!.id,
+                profile_relationship_id: r.id,
+                profile_relationship_type_alias: relationshipTypes.find(
+                  (rt) => rt!.id === r.profile_relationship_type_id,
+                )!.alias,
+                reason: "REMOVED_BY_USER",
+              },
+            },
+            {
+              org_id: ctx.user!.org_id,
+              profile_id: r.right_side_profile_id,
+              type: "PROFILE_RELATIONSHIP_REMOVED",
+              data: {
+                user_id: ctx.user!.id,
+                profile_relationship_id: r.id,
+                profile_relationship_type_alias: relationshipTypes.find(
+                  (rt) => rt!.id === r.profile_relationship_type_id,
+                )!.alias,
+                reason: "REMOVED_BY_USER",
+              },
+            },
+          ] satisfies ProfileRelationshipRemovedEvent<true>[],
+      ),
+    );
+
+    return RESULT.SUCCESS;
   },
 });

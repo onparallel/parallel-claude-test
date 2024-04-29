@@ -51,6 +51,17 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
   PROFILE_UPDATED: {
     user_id: number | null; // null means profile was updated by monitoring rules
   };
+  PROFILE_RELATIONSHIP_CREATED: {
+    user_id: number;
+    profile_relationship_id: number;
+    profile_relationship_type_alias: string | null;
+  };
+  PROFILE_RELATIONSHIP_REMOVED: {
+    user_id: number | null;
+    profile_relationship_id: number;
+    profile_relationship_type_alias: string | null;
+    reason: string;
+  };
 }[TType];
 
 export type GenericProfileEvent<
@@ -110,6 +121,14 @@ export type ProfileUpdatedEvent<IsCreate extends boolean = false> = GenericProfi
   "PROFILE_UPDATED",
   IsCreate
 >;
+export type ProfileRelationshipCreatedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_RELATIONSHIP_CREATED",
+  IsCreate
+>;
+export type ProfileRelationshipRemovedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_RELATIONSHIP_REMOVED",
+  IsCreate
+>;
 
 export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileCreatedEvent<IsCreate>
@@ -123,6 +142,8 @@ export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileScheduledForDeletionEvent<IsCreate>
   | ProfileReopenedEvent<IsCreate>
   | ProfileAnonymizedEvent<IsCreate>
-  | ProfileUpdatedEvent<IsCreate>;
+  | ProfileUpdatedEvent<IsCreate>
+  | ProfileRelationshipCreatedEvent<IsCreate>
+  | ProfileRelationshipRemovedEvent<IsCreate>;
 
 export type CreateProfileEvent = ProfileEvent<true>;

@@ -14,7 +14,7 @@ import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
 import { NormalLink } from "../common/Link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
-import { ProfileLink } from "../common/ProfileLink";
+import { ProfileReference } from "../common/ProfileReference";
 import { Table, TableColumn } from "../common/Table";
 import { UserAvatarList } from "../common/UserAvatarList";
 
@@ -150,15 +150,7 @@ function usePetitionProfilesColumns(): TableColumn<
         cellProps: {
           minWidth: "220px",
         },
-        CellContent: ({ row }) => (
-          <>
-            {row.name || (
-              <Text textStyle="hint" as="span">
-                <FormattedMessage id="generic.unnamed-profile" defaultMessage="Unnamed profile" />
-              </Text>
-            )}
-          </>
-        ),
+        CellContent: ({ row }) => <ProfileReference profile={row} asLink />,
       },
       {
         key: "type",
@@ -237,7 +229,7 @@ PetitionProfilesTable.fragments = {
         ...ProfileLink_Profile
       }
       ${UserAvatarList.fragments.User}
-      ${ProfileLink.fragments.Profile}
+      ${ProfileReference.fragments.Profile}
     `;
   },
   get Petition() {

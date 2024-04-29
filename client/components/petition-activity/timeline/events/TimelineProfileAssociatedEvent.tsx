@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { ArrowDiagonalRightIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { ProfileLink } from "@parallel/components/common/ProfileLink";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -27,7 +27,7 @@ export function TimelineProfileAssociatedEvent({ event }: TimelineProfileAssocia
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
-          profileName: <ProfileLink profile={event.profile} />,
+          profileName: <ProfileReference profile={event.profile} asLink />,
         }}
       />
     </TimelineItem>
@@ -46,6 +46,6 @@ TimelineProfileAssociatedEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ProfileLink.fragments.Profile}
+    ${ProfileReference.fragments.Profile}
   `,
 };

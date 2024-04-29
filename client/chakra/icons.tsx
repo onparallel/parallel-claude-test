@@ -2740,3 +2740,21 @@ export const ShortSearchIcon = createIcon({
     </g>
   ),
 });
+
+export const RelationshipIcon = createIcon({
+  displayName: "RelationshipIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m5 12h14" />
+      <path d="m16 7 5 5-5 5" />
+      <path d="m8 7-5 5 5 5" />
+    </g>
+  ),
+});

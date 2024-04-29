@@ -1993,7 +1993,7 @@ describe("GraphQL/Users", () => {
                       },
                       {
                         value: "PURCHASE_ORDER",
-                        label: { en: "Purchase order", es: "Orden de Compra" },
+                        label: { en: "Purchase order", es: "Orden de compra" },
                         isStandard: true,
                       },
                       {

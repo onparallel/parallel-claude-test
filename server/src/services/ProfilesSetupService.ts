@@ -1,14 +1,38 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import pMap from "p-map";
+import { indexBy } from "remeda";
 import { CreateProfileTypeField, ProfileType, ProfileTypeStandardType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { LocalizableUserText } from "../graphql";
-import { I18N_SERVICE, II18nService } from "./I18nService";
 import { Replace } from "../util/types";
+import { I18N_SERVICE, II18nService } from "./I18nService";
 
 type StandardProfileTypeFieldDefinition = Replace<
   Omit<CreateProfileTypeField, "profile_type_id" | "position">,
   { name: LocalizableUserText }
+>;
+
+export type ProfileRelationshipTypeAlias =
+  | "p_parent__child"
+  | "p_family_member"
+  | "p_close_associate"
+  | "p_spouse"
+  | "p_legal_representative__legally_represented"
+  | "p_legal_guardian__legally_guarded"
+  | "p_director__managed_by"
+  | "p_shareholder__participated_in_by"
+  | "p_beneficial_owner__direct_or_indirect_property"
+  | "p_parent_company__subsidiary"
+  | "p_main_office__branch_office"
+  | "p_associated_company"
+  | "p_main_contract__annex"
+  | "p_addendum__amended_by"
+  | "p_contract__counterparty";
+
+type ProfileRelationshipTypeDefinition = Record<
+  ProfileRelationshipTypeAlias,
+  () => Promise<[LocalizableUserText, LocalizableUserText | null]>
 >;
 
 export const PROFILES_SETUP_SERVICE = Symbol.for("PROFILES_SETUP_SERVICE");
@@ -18,13 +42,19 @@ export interface IProfilesSetupService {
     name: LocalizableUserText,
     createdBy: string,
   ): Promise<ProfileType>;
-  createDefaultOrganizationProfileTypesAndFields(orgId: number, createdBy: string): Promise<void>;
+  createDefaultProfileTypes(orgId: number, createdBy: string): Promise<void>;
   createDefaultContractProfileType(orgId: number, createdBy: string): Promise<void>;
   createDefaultIndividualProfileType(orgId: number, createdBy: string): Promise<void>;
   createDefaultLegalEntityProfileType(orgId: number, createdBy: string): Promise<void>;
+  createDefaultProfileRelationshipTypes(orgId: number, createdBy: string): Promise<void>;
   getProfileTypeFieldsDefinition(
     standardType: ProfileTypeStandardType,
   ): Promise<StandardProfileTypeFieldDefinition[]>;
+  getProfileRelationshipTypesDefinition(): ProfileRelationshipTypeDefinition;
+  getProfileRelationshipAllowedProfileTypesDefinition(): Record<
+    ProfileRelationshipTypeAlias,
+    [ProfileTypeStandardType[], ProfileTypeStandardType[]]
+  >;
 }
 
 @injectable()
@@ -1134,11 +1164,221 @@ export class ProfilesSetupService implements IProfilesSetupService {
     );
   }
 
-  async createDefaultOrganizationProfileTypesAndFields(orgId: number, createdBy: string) {
+  async createDefaultProfileTypes(orgId: number, createdBy: string) {
     await this.profiles.withTransaction(async (t) => {
       await this.createDefaultIndividualProfileType(orgId, createdBy, t);
       await this.createDefaultLegalEntityProfileType(orgId, createdBy, t);
       await this.createDefaultContractProfileType(orgId, createdBy, t);
     });
+  }
+
+  async createDefaultProfileRelationshipTypes(orgId: number, createdBy: string) {
+    const profileTypes = await this.profiles.getOrganizationStandardProfileTypes(orgId);
+    const profileTypesByStandardType = indexBy(profileTypes, (pt) => pt.standard_type);
+    const relationshipTypesDefinition = this.getProfileRelationshipTypesDefinition();
+
+    const relationships = await this.profiles.createProfileRelationshipType(
+      await pMap(Object.entries(relationshipTypesDefinition), async ([alias, i18n]) => {
+        const [left, right] = await i18n();
+        return {
+          org_id: orgId,
+          alias,
+          left_right_name: left,
+          right_left_name: right,
+          is_reciprocal: right === null,
+        };
+      }),
+
+      createdBy,
+    );
+
+    const relationshipsByAlias = indexBy(relationships, (r) => r.alias);
+
+    const allowedProfileTypesDefinition =
+      this.getProfileRelationshipAllowedProfileTypesDefinition();
+
+    await this.profiles.createProfileRelationshipAllowedProfileType(
+      Object.entries(allowedProfileTypesDefinition).flatMap(([alias, [left, right]]) => [
+        ...left.map((type) => ({
+          org_id: orgId,
+          allowed_profile_type_id: profileTypesByStandardType[type].id,
+          profile_relationship_type_id: relationshipsByAlias[alias].id,
+          direction: "LEFT_RIGHT" as const,
+        })),
+        ...right.map((type) => ({
+          org_id: orgId,
+          allowed_profile_type_id: profileTypesByStandardType[type].id,
+          profile_relationship_type_id: relationshipsByAlias[alias].id,
+          direction: "RIGHT_LEFT" as const,
+        })),
+      ]),
+      createdBy,
+    );
+  }
+
+  getProfileRelationshipTypesDefinition(): ProfileRelationshipTypeDefinition {
+    return {
+      p_parent__child: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.parent",
+          defaultMessage: "Parent",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.child",
+          defaultMessage: "Child",
+        }),
+      ],
+      p_family_member: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.family-member",
+          defaultMessage: "Family member",
+        }),
+        null,
+      ],
+      p_close_associate: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.close-associate",
+          defaultMessage: "Close associate",
+        }),
+        null,
+      ],
+      p_spouse: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.spouse",
+          defaultMessage: "Spouse",
+        }),
+        null,
+      ],
+      p_legal_representative__legally_represented: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.legal-representative",
+          defaultMessage: "Legal representative",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.legally-represented",
+          defaultMessage: "Legally represented",
+        }),
+      ],
+      p_legal_guardian__legally_guarded: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.legal-guardian",
+          defaultMessage: "Legal guardian",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.legally-guarded",
+          defaultMessage: "Legally guarded",
+        }),
+      ],
+      p_director__managed_by: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.director",
+          defaultMessage: "Director",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.managed-by",
+          defaultMessage: "Managed by",
+        }),
+      ],
+      p_shareholder__participated_in_by: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.shareholder",
+          defaultMessage: "Shareholder",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.participated-in-by",
+          defaultMessage: "Participated in by",
+        }),
+      ],
+      p_beneficial_owner__direct_or_indirect_property: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.beneficial-owner",
+          defaultMessage: "Beneficial owner",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.direct-or-indirect-property",
+          defaultMessage: "Direct or indirect property",
+        }),
+      ],
+      p_parent_company__subsidiary: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.parent-company",
+          defaultMessage: "Parent company",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.subsidiary",
+          defaultMessage: "Subsidiary",
+        }),
+      ],
+      p_main_office__branch_office: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.main-office",
+          defaultMessage: "Main office",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.branch-office",
+          defaultMessage: "Branch office",
+        }),
+      ],
+      p_associated_company: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.associated-company",
+          defaultMessage: "Associated company",
+        }),
+        null,
+      ],
+      p_main_contract__annex: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.main-contract",
+          defaultMessage: "Main contract",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.annex",
+          defaultMessage: "Annex",
+        }),
+      ],
+      p_addendum__amended_by: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.addendum",
+          defaultMessage: "Addendum",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.amended-by",
+          defaultMessage: "Amended by",
+        }),
+      ],
+      p_contract__counterparty: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.contract",
+          defaultMessage: "Contract",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.counterparty",
+          defaultMessage: "Counterparty",
+        }),
+      ],
+    };
+  }
+
+  getProfileRelationshipAllowedProfileTypesDefinition(): Record<
+    ProfileRelationshipTypeAlias,
+    [ProfileTypeStandardType[], ProfileTypeStandardType[]]
+  > {
+    return {
+      p_parent__child: [["INDIVIDUAL"], ["INDIVIDUAL"]],
+      p_family_member: [["INDIVIDUAL"], ["INDIVIDUAL"]],
+      p_close_associate: [["INDIVIDUAL"], ["INDIVIDUAL"]],
+      p_spouse: [["INDIVIDUAL"], ["INDIVIDUAL"]],
+      p_legal_representative__legally_represented: [["INDIVIDUAL"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
+      p_legal_guardian__legally_guarded: [["INDIVIDUAL"], ["INDIVIDUAL"]],
+      p_director__managed_by: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
+      p_shareholder__participated_in_by: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
+      p_beneficial_owner__direct_or_indirect_property: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
+      p_contract__counterparty: [["CONTRACT"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
+      p_parent_company__subsidiary: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
+      p_main_office__branch_office: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
+      p_associated_company: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
+      p_main_contract__annex: [["CONTRACT"], ["CONTRACT"]],
+      p_addendum__amended_by: [["CONTRACT"], ["CONTRACT"]],
+    };
   }
 }

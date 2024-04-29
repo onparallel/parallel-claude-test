@@ -378,7 +378,9 @@ export type ProfileEventType =
   | "PROFILE_SCHEDULED_FOR_DELETION"
   | "PROFILE_REOPENED"
   | "PROFILE_ANONYMIZED"
-  | "PROFILE_UPDATED";
+  | "PROFILE_UPDATED"
+  | "PROFILE_RELATIONSHIP_CREATED"
+  | "PROFILE_RELATIONSHIP_REMOVED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -393,7 +395,16 @@ export const ProfileEventTypeValues = [
   "PROFILE_REOPENED",
   "PROFILE_ANONYMIZED",
   "PROFILE_UPDATED",
+  "PROFILE_RELATIONSHIP_CREATED",
+  "PROFILE_RELATIONSHIP_REMOVED",
 ] as ProfileEventType[];
+
+export type ProfileRelationshipTypeDirection = "LEFT_RIGHT" | "RIGHT_LEFT";
+
+export const ProfileRelationshipTypeDirectionValues = [
+  "LEFT_RIGHT",
+  "RIGHT_LEFT",
+] as ProfileRelationshipTypeDirection[];
 
 export type ProfileStatus = "OPEN" | "CLOSED" | "DELETION_SCHEDULED";
 
@@ -612,6 +623,9 @@ export interface TableTypes {
   profile_event: ProfileEvent;
   profile_field_file: ProfileFieldFile;
   profile_field_value: ProfileFieldValue;
+  profile_relationship: ProfileRelationship;
+  profile_relationship_type: ProfileRelationshipType;
+  profile_relationship_type_allowed_profile_type: ProfileRelationshipTypeAllowedProfileType;
   profile_subscription: ProfileSubscription;
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
@@ -674,6 +688,9 @@ export interface TableCreateTypes {
   profile_event: CreateProfileEvent;
   profile_field_file: CreateProfileFieldFile;
   profile_field_value: CreateProfileFieldValue;
+  profile_relationship: CreateProfileRelationship;
+  profile_relationship_type: CreateProfileRelationshipType;
+  profile_relationship_type_allowed_profile_type: CreateProfileRelationshipTypeAllowedProfileType;
   profile_subscription: CreateProfileSubscription;
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
@@ -736,6 +753,9 @@ export interface TablePrimaryKeys {
   profile_event: "id";
   profile_field_file: "id";
   profile_field_value: "id";
+  profile_relationship: "id";
+  profile_relationship_type: "id";
+  profile_relationship_type_allowed_profile_type: "id";
   profile_subscription: "id";
   profile_type: "id";
   profile_type_field: "id";
@@ -1772,6 +1792,73 @@ export type CreateProfileFieldValue = PartialProps<
   | "anonymized_at"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface ProfileRelationship {
+  id: number; // int4
+  org_id: number; // int4
+  left_side_profile_id: number; // int4
+  profile_relationship_type_id: number; // int4
+  right_side_profile_id: number; // int4
+  created_by_user_id: number; // int4
+  created_at: Date; // timestamptz
+  removed_at: Maybe<Date>; // timestamptz
+  removed_by_user_id: Maybe<number>; // int4
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileRelationship = PartialProps<
+  Omit<ProfileRelationship, "id">,
+  "created_at" | "removed_at" | "removed_by_user_id" | "deleted_at" | "deleted_by"
+>;
+
+export interface ProfileRelationshipType {
+  id: number; // int4
+  org_id: number; // int4
+  left_right_name: any; // jsonb
+  right_left_name: Maybe<any>; // jsonb
+  is_reciprocal: boolean; // bool
+  alias: Maybe<string>; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileRelationshipType = PartialProps<
+  Omit<ProfileRelationshipType, "id">,
+  | "left_right_name"
+  | "right_left_name"
+  | "is_reciprocal"
+  | "alias"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface ProfileRelationshipTypeAllowedProfileType {
+  id: number; // int4
+  org_id: number; // int4
+  profile_relationship_type_id: number; // int4
+  allowed_profile_type_id: number; // int4
+  direction: ProfileRelationshipTypeDirection; // profile_relationship_type_direction
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileRelationshipTypeAllowedProfileType = PartialProps<
+  Omit<ProfileRelationshipTypeAllowedProfileType, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface ProfileSubscription {

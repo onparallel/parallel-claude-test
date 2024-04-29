@@ -1,14 +1,21 @@
 import { addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
-import { isDefined, pick, sortBy } from "remeda";
+import { isDefined, pick, sortBy, uniq } from "remeda";
 import {
+  ProfileRelationshipTypeDirectionValues,
   ProfileStatusValues,
   ProfileTypeFieldPermissionTypeValues,
   ProfileTypeFieldTypeValues,
+  ProfileTypeStandardTypeValues,
 } from "../../db/__types";
 import { mapProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { toGlobalId } from "../../util/globalId";
+
+export const ProfileTypeStandardType = enumType({
+  name: "ProfileTypeStandardType",
+  members: ProfileTypeStandardTypeValues,
+});
 
 export const ProfileType = objectType({
   name: "ProfileType",
@@ -195,6 +202,12 @@ export const Profile = objectType({
               ctx.config.cronWorkers.anonymizer.deleteScheduledProfilesAfterDays,
             )
           : null,
+    });
+    t.nonNull.list.nonNull.field("relationships", {
+      type: "ProfileRelationship",
+      resolve: async (o, _, ctx) => {
+        return await ctx.profiles.loadProfileRelationshipsByProfileId(o.id);
+      },
     });
     t.implements("Timestamps");
   },
@@ -399,6 +412,88 @@ export const PetitionProfile = objectType({
       type: "Profile",
       resolve: async (o, _, ctx) => {
         return (await ctx.profiles.loadProfile(o.profile_id))!;
+      },
+    });
+  },
+});
+
+export const ProfileRelationshipType = objectType({
+  name: "ProfileRelationshipType",
+  definition(t) {
+    t.nonNull.globalId("id");
+    t.nonNull.localizableUserText("leftRightName", { resolve: (o) => o.left_right_name });
+    t.nonNull.localizableUserText("rightLeftName", {
+      resolve: (o) => (o.is_reciprocal ? o.left_right_name : o.right_left_name),
+    });
+    t.nullable.string("alias");
+    t.nonNull.boolean("isReciprocal", { resolve: (o) => o.is_reciprocal });
+    t.nonNull.list.nonNull.globalId("allowedLeftRightProfileTypeIds", {
+      prefixName: "ProfileType",
+      resolve: async (o, _, ctx) => {
+        const allowedProfileTypes =
+          await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
+            { profileRelationshipTypeId: o.id, direction: "LEFT_RIGHT", orgId: ctx.user!.org_id },
+          );
+        return uniq(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+      },
+    });
+    t.nonNull.list.nonNull.globalId("allowedRightLeftProfileTypeIds", {
+      prefixName: "ProfileType",
+      resolve: async (o, _, ctx) => {
+        const allowedProfileTypes =
+          await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
+            { profileRelationshipTypeId: o.id, direction: "RIGHT_LEFT", orgId: ctx.user!.org_id },
+          );
+        return uniq(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+      },
+    });
+  },
+});
+
+export const ProfileRelationshipDirection = enumType({
+  name: "ProfileRelationshipDirection",
+  members: ProfileRelationshipTypeDirectionValues,
+});
+
+export const ProfileRelationshipTypeWithDirection = objectType({
+  name: "ProfileRelationshipTypeWithDirection",
+  sourceType: /*ts */ `{
+    profile_relationship_type_id: number,
+    direction: db.ProfileRelationshipTypeDirection,
+  }`,
+  definition(t) {
+    t.nonNull.field("profileRelationshipType", {
+      type: "ProfileRelationshipType",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfileRelationshipType(o.profile_relationship_type_id))!;
+      },
+    });
+    t.nonNull.field("direction", {
+      type: "ProfileRelationshipDirection",
+    });
+  },
+});
+
+export const ProfileRelationship = objectType({
+  name: "ProfileRelationship",
+  definition(t) {
+    t.nonNull.globalId("id");
+    t.nonNull.field("leftSideProfile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfile(o.left_side_profile_id))!;
+      },
+    });
+    t.nonNull.field("rightSideProfile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfile(o.right_side_profile_id))!;
+      },
+    });
+    t.nonNull.field("relationshipType", {
+      type: "ProfileRelationshipType",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfileRelationshipType(o.profile_relationship_type_id))!;
       },
     });
   },

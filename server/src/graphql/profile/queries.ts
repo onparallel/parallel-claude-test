@@ -1,12 +1,12 @@
-import { arg, inputObjectType, nonNull, queryField } from "nexus";
+import { arg, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
 import { isDefined } from "remeda";
-import { authenticateAnd } from "../helpers/authorize";
-import { ArgValidationError } from "../helpers/errors";
+import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
-import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
+import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizers";
 
 export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
@@ -157,3 +157,39 @@ export const expiringProfileProperties = queryField((t) => {
     },
   });
 });
+
+export const profileRelationshipTypesWithDirection = queryField(
+  "profileRelationshipTypesWithDirection",
+  {
+    type: nonNull(list(nonNull("ProfileRelationshipTypeWithDirection"))),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      ifArgDefined(
+        "otherSideProfileTypeId",
+        userHasAccessToProfileType("otherSideProfileTypeId" as never),
+      ),
+    ),
+    args: {
+      otherSideProfileTypeId: nullable(globalIdArg("ProfileType")),
+    },
+    resolve: async (_, { otherSideProfileTypeId }, ctx) => {
+      try {
+        const rows =
+          await ctx.profiles.getProfileRelationshipTypeAllowedProfileTypesByAllowedProfileTypeId(
+            ctx.user!.org_id,
+            otherSideProfileTypeId ?? null,
+          );
+        // switch directions as we are interested in the opposite direction
+        return rows.map((r) => ({
+          ...r,
+          direction: r.direction === "LEFT_RIGHT" ? "RIGHT_LEFT" : "LEFT_RIGHT",
+        }));
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new ApolloError(error.message, "PROFILE_RELATIONSHIPS_QUERY_ERROR");
+        }
+        throw error;
+      }
+    },
+  },
+);

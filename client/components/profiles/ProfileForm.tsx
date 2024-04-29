@@ -52,6 +52,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { Link } from "../common/Link";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { ProfileReference } from "../common/ProfileReference";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -402,17 +403,8 @@ export const ProfileForm = Object.assign(
           justifyContent="center"
         >
           <HStack alignItems="center">
-            <OverflownText
-              as="h2"
-              fontSize="xl"
-              fontWeight={400}
-              textStyle={profile.name ? undefined : "hint"}
-            >
-              {profile.name ||
-                intl.formatMessage({
-                  id: "generic.unnamed-profile",
-                  defaultMessage: "Unnamed profile",
-                })}
+            <OverflownText as="h2" fontSize="xl" fontWeight={400}>
+              <ProfileReference profile={profile} />
             </OverflownText>
             {profile.status === "CLOSED" ? (
               <Badge>
@@ -452,9 +444,16 @@ export const ProfileForm = Object.assign(
             </Box>
             <Box>
               <FormattedMessage
+                id="component.profile-form.associated-profiles-count"
+                defaultMessage="{count, plural, =1 {# association} other {# associations}}"
+                values={{ count: profile.relationships.length }}
+              />
+            </Box>
+            <Box>
+              <FormattedMessage
                 id="generic.petition-count"
                 defaultMessage="{count, plural, =1 {# parallel} other {# parallels}}"
-                values={{ count: profile.petitions.totalCount }}
+                values={{ count: profile.petitionsTotalCount.totalCount }}
               />
             </Box>
           </HStack>
@@ -618,8 +617,11 @@ export const ProfileForm = Object.assign(
             properties {
               ...ProfileForm_ProfileFieldProperty
             }
-            petitions {
+            petitionsTotalCount: petitions {
               totalCount
+            }
+            relationships {
+              id
             }
             permanentDeletionAt
           }

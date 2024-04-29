@@ -27,6 +27,7 @@ import {
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
@@ -673,12 +674,8 @@ export function useProfileTableColumns(
         },
         CellContent: ({ row }) => {
           return (
-            <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.name ||
-                intl.formatMessage({
-                  id: "generic.unnamed-profile",
-                  defaultMessage: "Unnamed profile",
-                })}
+            <OverflownText>
+              <ProfileReference profile={row} />
             </OverflownText>
           );
         },

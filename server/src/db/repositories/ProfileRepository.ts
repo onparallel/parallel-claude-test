@@ -3,16 +3,20 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
 import {
+  filter,
   groupBy,
   indexBy,
   isDefined,
+  map,
   mapToObj,
   omit,
   partition,
   pick,
+  pipe,
   sortBy,
   times,
   uniq,
+  uniqBy,
   zip,
 } from "remeda";
 import { LocalizableUserText } from "../../graphql";
@@ -26,6 +30,9 @@ import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
   CreateProfileEvent,
+  CreateProfileRelationship,
+  CreateProfileRelationshipType,
+  CreateProfileRelationshipTypeAllowedProfileType,
   CreateProfileType,
   CreateProfileTypeField,
   Organization,
@@ -34,6 +41,10 @@ import {
   ProfileEventType,
   ProfileFieldFile,
   ProfileFieldValue,
+  ProfileRelationship,
+  ProfileRelationshipTypeAllowedProfileType,
+  ProfileRelationshipTypeDirection,
+  ProfileRelationshipTypeDirectionValues,
   ProfileStatus,
   ProfileType,
   ProfileTypeFieldPermission,
@@ -2040,4 +2051,209 @@ export class ProfileRepository extends BaseRepository {
 
     return results;
   }
+
+  readonly loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId =
+    this.buildLoader<
+      {
+        orgId: number;
+        profileRelationshipTypeId: number;
+        direction: ProfileRelationshipTypeDirection;
+      },
+      ProfileRelationshipTypeAllowedProfileType[],
+      string
+    >(
+      async (keys, t) => {
+        const rows = await this.from("profile_relationship_type_allowed_profile_type")
+          .whereIn(
+            "org_id",
+            keys.map((k) => k.orgId),
+          )
+          .whereIn(
+            "profile_relationship_type_id",
+            keys.map((k) => k.profileRelationshipTypeId),
+          )
+          .whereIn(
+            "direction",
+            keys.map((k) => k.direction),
+          )
+          .whereNull("deleted_at")
+          .select("*");
+
+        const results = groupBy(
+          rows,
+          keyBuilder(["org_id", "profile_relationship_type_id", "direction"]),
+        );
+        return keys
+          .map(keyBuilder(["orgId", "profileRelationshipTypeId", "direction"]))
+          .map((key) => results[key] ?? []);
+      },
+      { cacheKeyFn: keyBuilder(["orgId", "profileRelationshipTypeId", "direction"]) },
+    );
+
+  async getProfileRelationshipTypeAllowedProfileTypesByAllowedProfileTypeId(
+    orgId: number,
+    fixedProfileTypeId: Maybe<number>,
+  ) {
+    const data: (ProfileRelationshipTypeAllowedProfileType & { is_reciprocal: boolean })[] =
+      await this.knex
+        .from({
+          prta: "profile_relationship_type_allowed_profile_type",
+        })
+        .join({ prt: "profile_relationship_type" }, "prt.id", "prta.profile_relationship_type_id")
+        .where("prta.org_id", orgId)
+        .whereNull("prta.deleted_at")
+        .where("prt.org_id", orgId)
+        .whereNull("prt.deleted_at")
+        .mmodify((q) => {
+          if (isDefined(fixedProfileTypeId)) {
+            q.where("prta.allowed_profile_type_id", fixedProfileTypeId);
+          }
+        })
+        .select("prt.is_reciprocal", "prta.*");
+
+    return pipe(
+      data,
+      filter((d) => !(d.is_reciprocal && d.direction === "RIGHT_LEFT")), // remove RIGHT_LEFT if reciprocal, as those are duplicates and redundant
+      uniqBy((d) => `${d.profile_relationship_type_id}-${d.direction}`),
+      map((d) => omit(d, ["is_reciprocal"]) as ProfileRelationshipTypeAllowedProfileType),
+    );
+  }
+
+  readonly loadProfileRelationshipType = this.buildLoadBy("profile_relationship_type", "id", (q) =>
+    q.whereNull("deleted_at"),
+  );
+
+  async createProfileRelationshipType(
+    data: MaybeArray<CreateProfileRelationshipType>,
+    createdBy: string,
+  ) {
+    return await this.from("profile_relationship_type").insert(
+      unMaybeArray(data).map((d) => ({ ...d, created_by: createdBy })),
+      "*",
+    );
+  }
+
+  async getOrganizationStandardProfileTypes(orgId: number) {
+    return await this.from("profile_type")
+      .where({ deleted_at: null, org_id: orgId })
+      .whereNotNull("standard_type")
+      .select("*");
+  }
+
+  async createProfileRelationshipAllowedProfileType(
+    data: MaybeArray<CreateProfileRelationshipTypeAllowedProfileType>,
+    createdBy: string,
+  ) {
+    return await this.from("profile_relationship_type_allowed_profile_type").insert(
+      unMaybeArray(data).map((d) => ({ ...d, created_by: createdBy })),
+      "*",
+    );
+  }
+
+  async profileRelationshipsAreAllowed(
+    profileId: number,
+    relationships: {
+      profileId: number;
+      profileRelationshipTypeId: number;
+      direction: ProfileRelationshipTypeDirection;
+    }[],
+  ) {
+    const profile = (await this.loadProfile(profileId))!;
+    const relationshipProfileTypes = await this.loadProfileTypeForProfileId(
+      relationships.map((r) => r.profileId),
+    );
+
+    // for the association to be possible we need to find 2 rows with the same relationship type id.
+    // - 1st row will be with the left profile type id and direction LEFT_RIGHT
+    // - 2nd row will be with the right profile type id and direction RIGHT_LEFT
+    const allowedRelationships = await this.from("profile_relationship_type_allowed_profile_type")
+      .where("org_id", profile.org_id)
+      .whereIn(
+        "profile_relationship_type_id",
+        relationships.map((r) => r.profileRelationshipTypeId),
+      )
+      .whereNull("deleted_at");
+
+    return relationships.every((r, relationshipIndex) => {
+      const allowed = allowedRelationships.filter(
+        (ar) =>
+          ar.profile_relationship_type_id === r.profileRelationshipTypeId &&
+          ((ar.allowed_profile_type_id === profile.profile_type_id &&
+            ar.direction === r.direction) ||
+            (ar.allowed_profile_type_id === relationshipProfileTypes[relationshipIndex]!.id &&
+              ar.direction ===
+                ProfileRelationshipTypeDirectionValues.find((d) => d !== r.direction)!)),
+      );
+
+      return allowed.length === 2;
+    });
+  }
+
+  readonly loadProfileRelationship = this.buildLoadBy("profile_relationship", "id", (q) =>
+    q.whereNull("deleted_at").whereNull("removed_at"),
+  );
+
+  async createProfileRelationship(
+    data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
+    user: User,
+  ) {
+    return await this.from("profile_relationship").insert(
+      unMaybeArray(data).map((d) => ({
+        ...d,
+        created_by_user_id: user.id,
+        org_id: user.org_id,
+      })),
+      "*",
+    );
+  }
+
+  async removeProfileRelationships(profileRelationshipIds: number[], user: User) {
+    return await this.from("profile_relationship")
+      .where("org_id", user.org_id)
+      .whereIn("id", profileRelationshipIds)
+      .update({ removed_at: this.now(), removed_by_user_id: user.id })
+      .returning("*");
+  }
+
+  async removeProfileRelationshipsByProfileId(profileIds: number[], user: User) {
+    return await this.from("profile_relationship")
+      .where("org_id", user.org_id)
+      .where((q) =>
+        q
+          .orWhereIn("left_side_profile_id", profileIds)
+          .orWhereIn("right_side_profile_id", profileIds),
+      )
+      .update({ removed_at: this.now(), removed_by_user_id: user.id })
+      .returning("*");
+  }
+
+  async deleteProfileRelationshipsByProfileId(profileIds: number[], deletedBy: string) {
+    return await this.from("profile_relationship")
+      .where((q) =>
+        q
+          .orWhereIn("left_side_profile_id", profileIds)
+          .orWhereIn("right_side_profile_id", profileIds),
+      )
+      .update({ deleted_at: this.now(), deleted_by: deletedBy })
+      .returning("*");
+  }
+
+  readonly loadProfileRelationshipsByProfileId = this.buildLoader<number, ProfileRelationship[]>(
+    async (values, t) => {
+      const rows = await this.from("profile_relationship", t)
+        .whereNull("deleted_at")
+        .whereNull("removed_at")
+        .where((q) => {
+          q.orWhereIn("left_side_profile_id", values).orWhereIn("right_side_profile_id", values);
+        })
+        .select("*");
+
+      return values.map(
+        (profileId) =>
+          rows.filter(
+            (r) => r.left_side_profile_id === profileId || r.right_side_profile_id === profileId,
+          ) ?? [],
+      );
+    },
+  );
 }

@@ -121,10 +121,8 @@ export class AccountSetupService implements IAccountSetupService {
     const organization = await this.organizations.createOrganization(data, createdBy);
 
     await this.organizations.createDefaultOrganizationThemes(organization.id, createdBy);
-    await this.profilesSetup.createDefaultOrganizationProfileTypesAndFields(
-      organization.id,
-      createdBy,
-    );
+    await this.profilesSetup.createDefaultProfileTypes(organization.id, createdBy);
+    await this.profilesSetup.createDefaultProfileRelationshipTypes(organization.id, createdBy);
     await this.integrationsSetup.createSignaturitIntegration(
       {
         name: "Signaturit Sandbox",

@@ -1047,6 +1047,52 @@ const ProfileEventSchemas = {
       },
     },
   },
+  PROFILE_RELATIONSHIP_CREATED: {
+    description: "A profile has been associated with another profile through a relationship",
+    properties: {
+      userId: {
+        description: "The ID of the user that created the relationship",
+        type: "string",
+        example: toGlobalId("User", 1),
+      },
+      profileRelationshipId: {
+        description: "The ID of the relationship",
+        type: "string",
+        example: toGlobalId("ProfileRelationship", 1),
+      },
+      relationshipAlias: {
+        description: "The alias of the relationship",
+        type: ["string", "null"],
+        example: "parent",
+      },
+    },
+  },
+  PROFILE_RELATIONSHIP_REMOVED: {
+    description: "A profile relationship has been removed",
+    properties: {
+      userId: {
+        description:
+          "The ID of the user that created the relationship. Null if the relationship was removed automatically by compliance rules.",
+        type: ["string", "null"],
+        example: toGlobalId("User", 1),
+      },
+      profileRelationshipId: {
+        description: "The ID of the relationship",
+        type: "string",
+        example: toGlobalId("ProfileRelationship", 1),
+      },
+      relationshipAlias: {
+        description: "The alias of the relationship",
+        type: ["string", "null"],
+        example: "parent",
+      },
+      reason: {
+        type: "string",
+        description: "The reason why the relationship was removed",
+        example: "PROFILE_DELETED",
+      },
+    },
+  },
 } as Record<ProfileEventType, JsonSchema>;
 
 const _ProfileEvent = {

@@ -1,4 +1,4 @@
-import { uniq } from "remeda";
+import { isDefined, uniq } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { createCronWorker } from "./helpers/createCronWorker";
@@ -89,6 +89,54 @@ async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorker
       `Deleting ${profilesScheduledForDeletion.length} profiles in DELETION_SCHEDULED state`,
     );
     await ctx.profiles.deleteProfile(profilesScheduledForDeletion, "AnonymizerWorker");
+    const removedRelationships = await ctx.profiles.deleteProfileRelationshipsByProfileId(
+      profilesScheduledForDeletion,
+      "AnonymizerWorker",
+    );
+
+    if (removedRelationships.length > 0) {
+      const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+        removedRelationships.map((r) => r.profile_relationship_type_id),
+      );
+
+      // create events only on profiles that were not deleted
+      const eventsData = removedRelationships
+        .flatMap((r) => [
+          profileIds.includes(r.left_side_profile_id)
+            ? null
+            : {
+                profileId: r.left_side_profile_id,
+                profileRelationshipId: r.id,
+                profileRelationshipTypeId: r.profile_relationship_type_id,
+                orgId: r.org_id,
+              },
+          profileIds.includes(r.right_side_profile_id)
+            ? null
+            : {
+                profileId: r.right_side_profile_id,
+                profileRelationshipId: r.id,
+                profileRelationshipTypeId: r.profile_relationship_type_id,
+                orgId: r.org_id,
+              },
+        ])
+        .filter(isDefined);
+
+      await ctx.profiles.createEvent(
+        eventsData.map((d) => ({
+          type: "PROFILE_RELATIONSHIP_REMOVED",
+          org_id: d.orgId,
+          profile_id: d.profileId,
+          data: {
+            user_id: null,
+            profile_relationship_id: d.profileRelationshipId,
+            reason: "PROFILE_DELETED",
+            profile_relationship_type_alias: relationshipTypes.find(
+              (rt) => rt!.id === d.profileRelationshipTypeId,
+            )!.alias,
+          },
+        })),
+      );
+    }
   }
 
   const fileIdsToDelete: number[] = [];

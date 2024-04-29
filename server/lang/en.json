@@ -1415,6 +1415,136 @@
     "context": "Legal entity"
   },
   {
+    "term": "profiles.default-relationship-type.addendum",
+    "definition": "Addendum",
+    "context": "Addendum"
+  },
+  {
+    "term": "profiles.default-relationship-type.amended-by",
+    "definition": "Amended by",
+    "context": "Amended by"
+  },
+  {
+    "term": "profiles.default-relationship-type.annex",
+    "definition": "Annex",
+    "context": "Annex"
+  },
+  {
+    "term": "profiles.default-relationship-type.associated-company",
+    "definition": "Associated company",
+    "context": "Associated company"
+  },
+  {
+    "term": "profiles.default-relationship-type.beneficial-owner",
+    "definition": "Beneficial owner",
+    "context": "Beneficial owner"
+  },
+  {
+    "term": "profiles.default-relationship-type.branch-office",
+    "definition": "Branch office",
+    "context": "Branch office"
+  },
+  {
+    "term": "profiles.default-relationship-type.child",
+    "definition": "Child",
+    "context": "Child"
+  },
+  {
+    "term": "profiles.default-relationship-type.close-associate",
+    "definition": "Close associate",
+    "context": "Close associate"
+  },
+  {
+    "term": "profiles.default-relationship-type.contract",
+    "definition": "Contract",
+    "context": "Contract"
+  },
+  {
+    "term": "profiles.default-relationship-type.counterparty",
+    "definition": "Counterparty",
+    "context": "Counterparty"
+  },
+  {
+    "term": "profiles.default-relationship-type.direct-or-indirect-property",
+    "definition": "Direct or indirect property",
+    "context": "Direct or indirect property"
+  },
+  {
+    "term": "profiles.default-relationship-type.director",
+    "definition": "Director",
+    "context": "Director"
+  },
+  {
+    "term": "profiles.default-relationship-type.family-member",
+    "definition": "Family member",
+    "context": "Family member"
+  },
+  {
+    "term": "profiles.default-relationship-type.legal-guardian",
+    "definition": "Legal guardian",
+    "context": "Legal guardian"
+  },
+  {
+    "term": "profiles.default-relationship-type.legal-representative",
+    "definition": "Legal representative",
+    "context": "Legal representative"
+  },
+  {
+    "term": "profiles.default-relationship-type.legally-guarded",
+    "definition": "Legally guarded",
+    "context": "Legally guarded"
+  },
+  {
+    "term": "profiles.default-relationship-type.legally-represented",
+    "definition": "Legally represented",
+    "context": "Legally represented"
+  },
+  {
+    "term": "profiles.default-relationship-type.main-contract",
+    "definition": "Main contract",
+    "context": "Main contract"
+  },
+  {
+    "term": "profiles.default-relationship-type.main-office",
+    "definition": "Main office",
+    "context": "Main office"
+  },
+  {
+    "term": "profiles.default-relationship-type.managed-by",
+    "definition": "Managed by",
+    "context": "Managed by"
+  },
+  {
+    "term": "profiles.default-relationship-type.parent",
+    "definition": "Parent",
+    "context": "Parent"
+  },
+  {
+    "term": "profiles.default-relationship-type.parent-company",
+    "definition": "Parent company",
+    "context": "Parent company"
+  },
+  {
+    "term": "profiles.default-relationship-type.participated-in-by",
+    "definition": "Participated in by",
+    "context": "Participated in by"
+  },
+  {
+    "term": "profiles.default-relationship-type.shareholder",
+    "definition": "Shareholder",
+    "context": "Shareholder"
+  },
+  {
+    "term": "profiles.default-relationship-type.spouse",
+    "definition": "Spouse",
+    "context": "Spouse"
+  },
+  {
+    "term": "profiles.default-relationship-type.subsidiary",
+    "definition": "Subsidiary",
+    "context": "Subsidiary"
+  },
+  {
     "term": "public-petition-link.text-1",
     "definition": "We send you the requested access to {petitionTitle}.",
     "context": "We send you the requested access to {petitionTitle}."

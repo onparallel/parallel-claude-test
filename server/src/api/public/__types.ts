@@ -349,6 +349,12 @@ export type CreatePetitionVariableInput = {
   name: Scalars["String"]["input"];
 };
 
+export type CreateProfileRelationshipInput = {
+  direction: ProfileRelationshipDirection;
+  profileId: Scalars["GID"]["input"];
+  profileRelationshipTypeId: Scalars["GID"]["input"];
+};
+
 export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -854,6 +860,8 @@ export type Mutation = {
   /** Creates an event subscription for the user's profiles */
   createProfileEventSubscription: ProfileEventSubscription;
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
+  /** Associates a profile with one or more relationships. */
+  createProfileRelationship: Profile;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
   /** Creates a public link from a user's template */
@@ -1015,6 +1023,8 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
+  /** Disassociates two profiles with a relationship. */
+  removeProfileRelationship: Success;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Renames a folder. */
@@ -1485,6 +1495,11 @@ export type MutationcreateProfileFieldFileUploadLinkArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateProfileRelationshipArgs = {
+  profileId: Scalars["GID"]["input"];
+  relationships: Array<CreateProfileRelationshipInput>;
+};
+
 export type MutationcreateProfileTypeArgs = {
   name: Scalars["LocalizableUserText"]["input"];
 };
@@ -1937,6 +1952,10 @@ export type MutationreactivateAccessesArgs = {
 
 export type MutationremovePetitionPasswordArgs = {
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationremoveProfileRelationshipArgs = {
+  profileRelationshipIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationremoveUsersFromGroupArgs = {
@@ -3911,6 +3930,7 @@ export type Profile = Timestamps & {
   petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
+  relationships: Array<ProfileRelationship>;
   status: ProfileStatus;
   subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
@@ -4010,6 +4030,8 @@ export type ProfileEventType =
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
   | "PROFILE_FIELD_VALUE_UPDATED"
+  | "PROFILE_RELATIONSHIP_CREATED"
+  | "PROFILE_RELATIONSHIP_REMOVED"
   | "PROFILE_REOPENED"
   | "PROFILE_SCHEDULED_FOR_DELETION"
   | "PROFILE_UPDATED";
@@ -4144,6 +4166,50 @@ export type ProfilePropertyFilter = {
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
+export type ProfileRelationship = {
+  id: Scalars["GID"]["output"];
+  leftSideProfile: Profile;
+  relationshipType: ProfileRelationshipType;
+  rightSideProfile: Profile;
+};
+
+export type ProfileRelationshipCreatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  relationship: Maybe<ProfileRelationship>;
+  type: ProfileEventType;
+  user: User;
+};
+
+export type ProfileRelationshipDirection = "LEFT_RIGHT" | "RIGHT_LEFT";
+
+export type ProfileRelationshipRemovedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  reason: Scalars["String"]["output"];
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileRelationshipType = {
+  alias: Maybe<Scalars["String"]["output"]>;
+  allowedLeftRightProfileTypeIds: Array<Maybe<Scalars["GID"]["output"]>>;
+  allowedRightLeftProfileTypeIds: Array<Maybe<Scalars["GID"]["output"]>>;
+  id: Scalars["GID"]["output"];
+  leftRightName: Scalars["LocalizableUserText"]["output"];
+  rightLeftName: Scalars["LocalizableUserText"]["output"];
+};
+
+export type ProfileRelationshipTypeAllowedProfileType = {
+  direction: ProfileRelationshipDirection;
+  id: Scalars["GID"]["output"];
+  profileRelationshipType: ProfileRelationshipType;
+};
+
 export type ProfileReopenedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -4229,6 +4295,8 @@ export type ProfileTypePagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
 };
+
+export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
 
 export type ProfileUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
@@ -4593,6 +4661,7 @@ export type Query = {
   petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
+  profileRelationships: Array<ProfileRelationshipTypeAllowedProfileType>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
@@ -4791,6 +4860,10 @@ export type QueryprofileArgs = {
 export type QueryprofileEventsArgs = {
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
+};
+
+export type QueryprofileRelationshipsArgs = {
+  otherSideProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type QueryprofileTypeArgs = {
@@ -8933,6 +9006,20 @@ export type GetProfileEvents_ProfileEventsQueryVariables = Exact<{
 
 export type GetProfileEvents_ProfileEventsQuery = {
   profileEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };

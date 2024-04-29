@@ -23,17 +23,20 @@ export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise
           clearTimeout(timeout.current);
           promise.current!.reject("DEBOUNCED");
         }
-        promise.current = { reject };
-        timeout.current = setTimeout(async () => {
-          try {
-            resolve(await callback(...args));
-          } catch (error: any) {
-            reject(error);
-          } finally {
-            timeout.current = null;
-            promise.current = null;
-          }
-        }, ms);
+        // this timeout makes it so that if called immediately after dep change, the useEffect from above doesn't cancel
+        setTimeout(() => {
+          promise.current = { reject };
+          timeout.current = setTimeout(async () => {
+            try {
+              resolve(await callback(...args));
+            } catch (error: any) {
+              reject(error);
+            } finally {
+              timeout.current = null;
+              promise.current = null;
+            }
+          }, ms);
+        });
       });
     } as T,
     [...(deps ?? []), ms],

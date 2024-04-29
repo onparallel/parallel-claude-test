@@ -1415,6 +1415,31 @@
     "context": "Are you sure you want to remove your permissions? Doing so will cause you to lose access."
   },
   {
+    "term": "component.confirm-remove-profile-relationships-dialog.body",
+    "definition": "¿Estás seguro de querer desasociar el perfil {profileName} del perfil {relatedProfileName}?",
+    "context": "Are you sure you want to remove the association between {profileName} and profile {relatedProfileName}?"
+  },
+  {
+    "term": "component.confirm-remove-profile-relationships-dialog.body-2",
+    "definition": "Si continúas, se mantendrán los datos y únicamente se quitará la asociación.",
+    "context": "If you continue, the data will remain intact and only the association will be removed."
+  },
+  {
+    "term": "component.confirm-remove-profile-relationships-dialog.body-profiles-multiple",
+    "definition": "¿Estás seguro de querer quitar la asociación con los perfiles seleccionados?",
+    "context": "Are you sure you want to remove the association with the selected profiles?"
+  },
+  {
+    "term": "component.confirm-remove-profile-relationships-dialog.confirm",
+    "definition": "Sí, desasociar",
+    "context": "Yes, remove association"
+  },
+  {
+    "term": "component.confirm-remove-profile-relationships-dialog.header",
+    "definition": "Quitar {count, plural, =1{asociación} other {# asociaciones}}",
+    "context": "Remove {count, plural, =1{association} other {# associations}}"
+  },
+  {
     "term": "component.confirm-resend-completed-notification.confirm-button",
     "definition": "Sí, reenviar la notificación",
     "context": "Yes, resend the notification"
@@ -1980,11 +2005,6 @@
     "context": "Remove option"
   },
   {
-    "term": "component.create-or-update-property-dialog.remove-standard-values-error",
-    "definition": "No puedes eliminar opciones estándar del listado de opciones.",
-    "context": "You can't remove standard values from the options list."
-  },
-  {
     "term": "component.create-or-update-property-dialog.reserved-alias-error",
     "definition": "Este identificador está reservado y no puede ser usado",
     "context": "This identifier is reserved and can't be used"
@@ -2093,6 +2113,61 @@
     "term": "component.create-profile-event-subscription-dialog.from-profiles-label",
     "definition": "Filtrar eventos de perfiles creados a partir de un tipo de perfil específico (Opcional).",
     "context": "Filter events from profiles created from a specific profile type (Optional)."
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.add-profile",
+    "definition": "Añadir perfil",
+    "context": "Add profile"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.duplicated-relationship",
+    "definition": "Esta asociación está duplicada",
+    "context": "This association is duplicated"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.existing-relationship",
+    "definition": "Esta asociación ya existe",
+    "context": "This association already exists"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.header",
+    "definition": "Perfiles asociados con {profileName}",
+    "context": "Associate profiles with {profileName}"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.header-updating",
+    "definition": "Editar asociación con {profileName}",
+    "context": "Edit association with {profileName}"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.no-relationships-contact-alert",
+    "definition": "No se puede asociar este perfil porque no tiene relaciones compatibles. Por favor, contacta con nosotros para más información.",
+    "context": "This profile cannot be associated because it does not have compatible relationships. Please contact us for more information."
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.no-relationships-contact-message-alert",
+    "definition": "Hola, me gustaría obtener más información sobre asociaciones entre perfiles.",
+    "context": "Hi, I would like to get more information about associations between profiles."
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.no-relationships-selected",
+    "definition": "No hay perfiles asociados. Selecciona un perfil para previsualizar la asociación.",
+    "context": "There are no profiles associated. Select a profile to preview the association."
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.preview",
+    "definition": "Previsualizar",
+    "context": "Preview"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.profile",
+    "definition": "Perfil",
+    "context": "Profile"
+  },
+  {
+    "term": "component.create-profile-relationships-dialog.relationship",
+    "definition": "Relación",
+    "context": "Relationship"
   },
   {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
@@ -6720,6 +6795,11 @@
     "context": "Remove attachment"
   },
   {
+    "term": "component.profile-form.associated-profiles-count",
+    "definition": "{count, plural, =1 {# asociación} other {# asociaciones}}",
+    "context": "{count, plural, =1 {# association} other {# associations}}"
+  },
+  {
     "term": "component.profile-form.closed-status",
     "definition": "Cerrado",
     "context": "Closed"
@@ -6750,24 +6830,44 @@
     "context": "Add parallel"
   },
   {
-    "term": "component.profile-petitions-table.no-parallels-associated",
+    "term": "component.profile-petitions-table.header",
+    "definition": "Parallels asociados",
+    "context": "Associated parallels"
+  },
+  {
+    "term": "component.profile-petitions-table.no-petitions",
     "definition": "Todavía no hay parallels asociados a este perfil.",
     "context": "There are no parallels associated to this profile yet."
   },
   {
-    "term": "component.profile-petitions-table.remove-profile-button",
+    "term": "component.profile-petitions-table.remove-petition",
     "definition": "Quitar asociación",
     "context": "Remove association"
   },
   {
-    "term": "component.profile-relationships-table.comming-soon",
-    "definition": "Muy pronto podrás relacionar tus perfiles entre sí",
-    "context": "Relationships between profiles coming soon."
+    "term": "component.profile-relationship-type-with-direction-select.placeholder",
+    "definition": "Selecciona el tipo de relación",
+    "context": "Select a relationship type"
+  },
+  {
+    "term": "component.profile-relationships-table.add-relationship",
+    "definition": "Añadir perfil",
+    "context": "Add profile"
   },
   {
     "term": "component.profile-relationships-table.header",
-    "definition": "Perfiles",
-    "context": "Profiles"
+    "definition": "Perfiles asociados",
+    "context": "Associated profiles"
+  },
+  {
+    "term": "component.profile-relationships-table.no-relationships",
+    "definition": "No hay perfiles asociados a este perfil aún.",
+    "context": "There are no profiles associated to this profile yet."
+  },
+  {
+    "term": "component.profile-relationships-table.remove-relationship",
+    "definition": "Quitar asociación",
+    "context": "Remove association"
   },
   {
     "term": "component.profile-select.add-profile",

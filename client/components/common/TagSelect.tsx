@@ -35,7 +35,6 @@ import {
   DependencyList,
   ForwardedRef,
   ReactElement,
-  ReactNode,
   RefAttributes,
   forwardRef,
   useCallback,
@@ -64,6 +63,7 @@ import { Tag } from "./Tag";
 import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
+import { NoElement } from "./NoElement";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -654,10 +654,6 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
       cancel={<></>}
     />
   );
-}
-
-function NoElement({ children }: { children: ReactNode }) {
-  return <>{children}</>;
 }
 
 ManageTagsDialog.mutations = [

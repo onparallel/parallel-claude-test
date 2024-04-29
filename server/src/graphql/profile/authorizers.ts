@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, uniq } from "remeda";
+import { groupBy, isDefined, pick, uniq } from "remeda";
 import {
   Profile,
   ProfileStatus,
@@ -9,13 +9,13 @@ import {
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
 } from "../../db/__types";
+import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFieldOptions";
 import { unMaybeArray } from "../../util/arrays";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
-import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFieldOptions";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
   predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
@@ -351,5 +351,123 @@ export function profileTypeFieldIsNotUsedInMonitoringRules<
     }
 
     return true;
+  };
+}
+
+export function userHasAccessToProfileRelationshipsInput<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileRelationshipTypeId extends Arg<
+    TypeName,
+    FieldName,
+    MaybeArray<NexusGenInputs["CreateProfileRelationshipInput"]>
+  >,
+>(
+  profileRelationshipsArg: TProfileRelationshipTypeId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const relationships = unMaybeArray(
+      args[profileRelationshipsArg] as unknown as MaybeArray<
+        NexusGenInputs["CreateProfileRelationshipInput"]
+      >,
+    );
+
+    const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+      relationships.map((r) => r.profileRelationshipTypeId),
+    );
+
+    const profiles = await ctx.profiles.loadProfile(relationships.map((r) => r.profileId));
+
+    return (
+      relationshipTypes.every((prt) => prt?.org_id === ctx.user!.org_id) &&
+      profiles.every(
+        (p) =>
+          p?.org_id === ctx.user!.org_id &&
+          !p.anonymized_at &&
+          ["OPEN", "CLOSED"].includes(p.status),
+      )
+    );
+  };
+}
+
+export function profilesCanBeAssociated<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TRelationshipsArg extends Arg<
+    TypeName,
+    FieldName,
+    MaybeArray<NexusGenInputs["CreateProfileRelationshipInput"]>
+  >,
+>(
+  profileIdArg: TProfileIdArg,
+  relationshipsArg: TRelationshipsArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
+    const relationshipsData = unMaybeArray(
+      args[relationshipsArg] as unknown as MaybeArray<
+        NexusGenInputs["CreateProfileRelationshipInput"]
+      >,
+    );
+
+    const currentRelationships =
+      await ctx.profiles.loadProfileRelationshipsByProfileId.raw(profileId);
+
+    const allRelationships = [
+      ...currentRelationships.map(
+        pick(["profile_relationship_type_id", "left_side_profile_id", "right_side_profile_id"]),
+      ),
+      ...relationshipsData.map((r) => ({
+        profile_relationship_type_id: r.profileRelationshipTypeId,
+        left_side_profile_id: r.direction === "LEFT_RIGHT" ? profileId : r.profileId,
+        right_side_profile_id: r.direction === "LEFT_RIGHT" ? r.profileId : profileId,
+      })),
+    ];
+
+    if (allRelationships.length > 100) {
+      throw new ForbiddenError("A profile can't have more than 100 relationships");
+    }
+
+    if (
+      Object.values(
+        groupBy(
+          allRelationships,
+          (r) =>
+            `${r.profile_relationship_type_id}-${r.left_side_profile_id}-${r.right_side_profile_id}`,
+        ),
+      ).some((group) => group.length > 1)
+    ) {
+      throw new ApolloError(
+        "The provided profiles are already associated",
+        "PROFILES_ALREADY_ASSOCIATED_ERROR",
+      );
+    }
+
+    if (!(await ctx.profiles.profileRelationshipsAreAllowed(profileId, relationshipsData))) {
+      throw new ApolloError(
+        "The provided profiles cannot be associated",
+        "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR",
+      );
+    }
+
+    return true;
+  };
+}
+
+export function userHasAccessToProfileRelationship<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileRelationshipIdArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  profileRelationshipIdArg: TProfileRelationshipIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileRelationshipIds = unMaybeArray(
+      args[profileRelationshipIdArg] as unknown as MaybeArray<number>,
+    );
+
+    const relationships = await ctx.profiles.loadProfileRelationship(profileRelationshipIds);
+    return relationships.every((r) => isDefined(r) && r.org_id === ctx.user!.org_id);
   };
 }

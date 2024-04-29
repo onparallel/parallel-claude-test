@@ -42,6 +42,7 @@ const fragments = {
     fragment ProfileSelect_Profile on Profile {
       id
       name
+      status
       profileType {
         id
         name
@@ -140,7 +141,7 @@ export const ProfileSelect = Object.assign(
         return result.data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
-      [profileTypeId],
+      [profileTypeId?.join(",")],
     );
 
     const getProfiles = useGetProfiles();
@@ -241,6 +242,9 @@ export const ProfileSelect = Object.assign(
       />
     ) : userCanCreateProfiles ? (
       <AsyncCreatableSelect<OptionType, IsMulti, never>
+        // a key is needed to force a rerender of the component and refetch of the default options
+        key={profileTypeId?.join(",")}
+        cacheOptions={false}
         ref={ref as any}
         value={_value as any}
         onChange={onChange as any}
@@ -257,6 +261,9 @@ export const ProfileSelect = Object.assign(
       />
     ) : (
       <AsyncSelect<OptionType, IsMulti, never>
+        // a key is needed to force a rerender of the component and refetch of the default options
+        key={profileTypeId?.join(",")}
+        cacheOptions={false}
         ref={ref as any}
         value={_value as any}
         onChange={onChange as any}

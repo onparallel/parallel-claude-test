@@ -1,7 +1,7 @@
 import { isDefined } from "remeda";
 import { PetitionEvent } from "../db/events/PetitionEvent";
-import { toGlobalId } from "./globalId";
 import { ProfileEvent } from "../db/events/ProfileEvent";
+import { toGlobalId } from "./globalId";
 
 export function mapPetitionEventPayload(event: PetitionEvent) {
   switch (event.type) {
@@ -440,6 +440,27 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PROFILE_UPDATED": {
       return {
         userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+      };
+    }
+    case "PROFILE_RELATIONSHIP_CREATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileRelationshipId: toGlobalId(
+          "ProfileRelationship",
+          event.data.profile_relationship_id,
+        ),
+        relationshipAlias: event.data.profile_relationship_type_alias,
+      };
+    }
+    case "PROFILE_RELATIONSHIP_REMOVED": {
+      return {
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        profileRelationshipId: toGlobalId(
+          "ProfileRelationship",
+          event.data.profile_relationship_id,
+        ),
+        relationshipAlias: event.data.profile_relationship_type_alias,
+        reason: event.data.reason,
       };
     }
     default:

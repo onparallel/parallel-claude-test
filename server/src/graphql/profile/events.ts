@@ -48,6 +48,10 @@ export const ProfileEvent = interfaceType({
         return "ProfileAnonymizedEvent";
       case "PROFILE_UPDATED":
         return "ProfileUpdatedEvent";
+      case "PROFILE_RELATIONSHIP_CREATED":
+        return "ProfileRelationshipCreatedEvent";
+      case "PROFILE_RELATIONSHIP_REMOVED":
+        return "ProfileRelationshipRemovedEvent";
     }
   },
   sourceType: "profileEvents.ProfileEvent",
@@ -182,3 +186,37 @@ export const ProfileUpdatedEvent = createProfileEvent("ProfileUpdatedEvent", (t)
     },
   });
 });
+
+export const ProfileRelationshipCreatedEvent = createProfileEvent(
+  "ProfileRelationshipCreatedEvent",
+  (t) => {
+    t.nullable.field("relationship", {
+      type: "ProfileRelationship",
+      resolve: async (root, _, ctx) => {
+        return await ctx.profiles.loadProfileRelationship(root.data.profile_relationship_id);
+      },
+    });
+    t.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.data.user_id))!;
+      },
+    });
+  },
+);
+
+export const ProfileRelationshipRemovedEvent = createProfileEvent(
+  "ProfileRelationshipRemovedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        if (!isDefined(root.data.user_id)) {
+          return null;
+        }
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.nonNull.string("reason", { resolve: (o) => o.data.reason });
+  },
+);

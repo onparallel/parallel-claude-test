@@ -374,6 +374,12 @@ input CreatePetitionVariableInput {
   name: String!
 }
 
+input CreateProfileRelationshipInput {
+  direction: ProfileRelationshipDirection!
+  profileId: GID!
+  profileRelationshipTypeId: GID!
+}
+
 input CreateProfileTypeFieldInput {
   alias: String
   expiryAlertAheadTime: Duration
@@ -1265,6 +1271,14 @@ type Mutation {
     profileId: GID!
     profileTypeFieldId: GID!
   ): ProfileFieldPropertyAndFileWithUploadData!
+
+  """
+  Associates a profile with one or more relationships.
+  """
+  createProfileRelationship(
+    profileId: GID!
+    relationships: [CreateProfileRelationshipInput!]!
+  ): Profile!
   createProfileType(name: LocalizableUserText!): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
@@ -1889,6 +1903,11 @@ type Mutation {
   Removes the password on a petition or template
   """
   removePetitionPassword(petitionId: GID!): SupportMethodResponse!
+
+  """
+  Disassociates two profiles with a relationship.
+  """
+  removeProfileRelationship(profileRelationshipIds: [GID!]!): Success!
 
   """
   Removes users from a user group
@@ -5038,6 +5057,7 @@ type Profile implements Timestamps {
   ): PetitionPagination!
   profileType: ProfileType!
   properties: [ProfileFieldProperty!]!
+  relationships: [ProfileRelationship!]!
   status: ProfileStatus!
   subscribers: [ProfileSubscription!]!
 
@@ -5135,6 +5155,8 @@ enum ProfileEventType {
   PROFILE_FIELD_FILE_ADDED
   PROFILE_FIELD_FILE_REMOVED
   PROFILE_FIELD_VALUE_UPDATED
+  PROFILE_RELATIONSHIP_CREATED
+  PROFILE_RELATIONSHIP_REMOVED
   PROFILE_REOPENED
   PROFILE_SCHEDULED_FOR_DELETION
   PROFILE_UPDATED
@@ -5313,6 +5335,53 @@ input ProfilePropertyFilter {
   profileTypeId: [GID!]
 }
 
+type ProfileRelationship {
+  id: GID!
+  leftSideProfile: Profile!
+  relationshipType: ProfileRelationshipType!
+  rightSideProfile: Profile!
+}
+
+type ProfileRelationshipCreatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  profile: Profile
+  relationship: ProfileRelationship
+  type: ProfileEventType!
+  user: User!
+}
+
+enum ProfileRelationshipDirection {
+  LEFT_RIGHT
+  RIGHT_LEFT
+}
+
+type ProfileRelationshipRemovedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  profile: Profile
+  reason: String!
+  type: ProfileEventType!
+  user: User
+}
+
+type ProfileRelationshipType {
+  alias: String
+  allowedLeftRightProfileTypeIds: [GID!]!
+  allowedRightLeftProfileTypeIds: [GID!]!
+  id: GID!
+  isReciprocal: Boolean!
+  leftRightName: LocalizableUserText!
+  rightLeftName: LocalizableUserText!
+}
+
+type ProfileRelationshipTypeWithDirection {
+  direction: ProfileRelationshipDirection!
+  profileRelationshipType: ProfileRelationshipType!
+}
+
 type ProfileReopenedEvent implements ProfileEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -5419,6 +5488,12 @@ type ProfileTypePagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+enum ProfileTypeStandardType {
+  CONTRACT
+  INDIVIDUAL
+  LEGAL_ENTITY
 }
 
 type ProfileUpdatedEvent implements ProfileEvent {
@@ -6245,6 +6320,9 @@ type Query {
     before: GID
     eventTypes: [ProfileEventType!]
   ): [ProfileEvent!]!
+  profileRelationshipTypesWithDirection(
+    otherSideProfileTypeId: GID
+  ): [ProfileRelationshipTypeWithDirection!]!
   profileType(profileTypeId: GID!): ProfileType!
   profileTypes(
     filter: ProfileTypeFilter
