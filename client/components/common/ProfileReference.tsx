@@ -10,14 +10,18 @@ interface ProfileReferenceProps {
   profile?: ProfileLink_ProfileFragment | null;
   asLink?: boolean;
   _notDeleted?: HTMLChakraProps<any>["_active"];
+  showNameEvenIfDeleted?: boolean;
 }
 
 export const ProfileReference = Object.assign(
   chakraForwardRef<"span" | "a", ProfileReferenceProps>(function ProfileReference(
-    { profile, asLink, _notDeleted, ...props },
+    { profile, asLink, _notDeleted, showNameEvenIfDeleted, ...props },
     ref,
   ) {
-    if (isDefined(profile) && ["OPEN", "CLOSED"].includes(profile.status)) {
+    if (
+      isDefined(profile) &&
+      (showNameEvenIfDeleted || ["OPEN", "CLOSED"].includes(profile.status))
+    ) {
       const content = profile.name || (
         <Text textStyle="hint" as="span">
           <FormattedMessage id="generic.unnamed-profile" defaultMessage="Unnamed profile" />

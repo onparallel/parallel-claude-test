@@ -654,8 +654,6 @@ export function useProfileTableColumns(
   status: ProfileStatus,
 ): TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[] {
   const intl = useIntl();
-  const showSubscribers = status === "OPEN";
-
   return useMemo(
     () => [
       {
@@ -675,7 +673,10 @@ export function useProfileTableColumns(
         CellContent: ({ row }) => {
           return (
             <OverflownText>
-              <ProfileReference profile={row} />
+              <ProfileReference
+                profile={row}
+                showNameEvenIfDeleted={status === "DELETION_SCHEDULED"}
+              />
             </OverflownText>
           );
         },
@@ -712,7 +713,7 @@ export function useProfileTableColumns(
           );
         },
       },
-      ...(showSubscribers
+      ...(status === "OPEN"
         ? ([
             {
               key: "subscribed",
@@ -756,7 +757,7 @@ export function useProfileTableColumns(
         ),
       },
     ],
-    [intl.locale, showSubscribers],
+    [intl.locale, status],
   );
 }
 
