@@ -294,8 +294,8 @@ export function publicApi(container: Container) {
           "Tags",
           "Contacts",
           "Users",
-          "Subscriptions",
           "Profiles",
+          "Webhooks",
         ],
       },
     ],
@@ -345,7 +345,7 @@ export function publicApi(container: Container) {
         description: "Users are members of your organization",
       },
       {
-        name: "Subscriptions",
+        name: "Webhooks",
         description: outdent`
         Subscribe to our events to get real time updates on your parallels and profiles.
 
@@ -3564,7 +3564,7 @@ export function publicApi(container: Container) {
         summary: "Get your subscription info",
         description: "Return a list with all your event subscriptions",
         responses: { 200: SuccessResponse(ListOfSubscriptions) },
-        tags: ["Subscriptions"],
+        tags: ["Webhooks"],
       },
       async ({ client }) => {
         const _query = gql`
@@ -3641,7 +3641,7 @@ export function publicApi(container: Container) {
             },
           },
         },
-        tags: ["Subscriptions"],
+        tags: ["Webhooks"],
       },
       async ({ client, body }) => {
         const _petitionMutation = gql`
@@ -3725,7 +3725,7 @@ export function publicApi(container: Container) {
       summary: "Delete subscription",
       description: "Delete the specified subscription.",
       responses: { 204: SuccessResponse() },
-      tags: ["Subscriptions"],
+      tags: ["Webhooks"],
     },
     async ({ client, params }) => {
       const _mutation = gql`
