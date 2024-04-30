@@ -12,7 +12,6 @@ import {
   Thead,
   Tr,
   VisuallyHidden,
-  useMergeRefs,
 } from "@chakra-ui/react";
 import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -28,6 +27,7 @@ import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fie
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
+import useMergedRef from "@react-hook/merged-ref";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isDefined, omit } from "remeda";
@@ -72,8 +72,9 @@ export const MapFieldsTable = Object.assign(
     },
     ref,
   ) {
-    const fieldsWithIndices = useAllFieldsWithIndices(fields);
     const containerRef = useRef<HTMLDivElement>(null);
+    const _ref = useMergedRef(ref, containerRef);
+    const fieldsWithIndices = useAllFieldsWithIndices(fields);
 
     const allSourcePetitionFields = useMemo(
       () => sourcePetitionFields.flatMap((f) => [f, ...(f.children ?? [])]),
@@ -97,7 +98,7 @@ export const MapFieldsTable = Object.assign(
 
     return (
       <TableContainer
-        ref={useMergeRefs(ref, containerRef)}
+        ref={_ref}
         overflowY="auto"
         border="1px solid"
         borderColor="gray.200"
