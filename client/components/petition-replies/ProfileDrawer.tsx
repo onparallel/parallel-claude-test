@@ -15,6 +15,7 @@ import {
   ProfileSelectInstance,
   ProfileSelectSelection,
 } from "../common/ProfileSelect";
+import { useRerender } from "@parallel/utils/useReRender";
 
 interface ProfileDrawerProps {
   profileId: string;
@@ -50,12 +51,12 @@ export const ProfileDrawer = Object.assign(
       },
     });
 
-    const [counter, setCounter] = useState(0);
+    const [key, rerender] = useRerender();
 
     const handleRefetchProfile = async () => {
       try {
         await refetchProfile();
-        setCounter((c) => c + 1);
+        rerender();
       } catch {}
     };
 
@@ -73,7 +74,7 @@ export const ProfileDrawer = Object.assign(
           <Box flex="1" fontWeight={400} fontSize="md">
             <ProfileSelect
               ref={ref}
-              key={counter}
+              key={key}
               isSync
               value={profileId}
               onChange={(profile) => onChangeProfile(profile?.id ?? profileId)}

@@ -64,6 +64,7 @@ import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { NoElement } from "./NoElement";
+import { useRerender } from "@parallel/utils/useReRender";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -93,8 +94,8 @@ export const TagSelect = Object.assign(
     const intl = useIntl();
     const [newTagColor, setNewTagColor] = useState(randomColor());
     const apollo = useApolloClient();
-    const [id, setId] = useState(0);
-    const _value = useGetTagValues(value, props.isMulti ?? false, [id]);
+    const [key, rerender] = useRerender();
+    const _value = useGetTagValues(value, props.isMulti ?? false, [key]);
     const canCreateTags = useHasPermission("TAGS:CREATE_TAGS") && allowCreatingTags;
     const canUpdateTags = useHasPermission("TAGS:UPDATE_TAGS") && allowUpdatingTags;
     // The following code makes sure the component is rerendered whenever the tag search is invalidated
@@ -111,7 +112,7 @@ export const TagSelect = Object.assign(
             firstLoadRef.current = false;
           } else {
             if (!isDefined(data.tags) && partial) {
-              setId((id) => id + 1);
+              rerender();
             }
           }
         });
@@ -195,7 +196,7 @@ export const TagSelect = Object.assign(
 
     return (
       <Component
-        key={id}
+        key={key}
         ref={ref}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}

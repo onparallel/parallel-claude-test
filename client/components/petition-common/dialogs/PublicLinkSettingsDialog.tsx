@@ -36,7 +36,8 @@ import { Maybe } from "@parallel/utils/types";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useMemo, useRef, useState } from "react";
+import { useRerender } from "@parallel/utils/useReRender";
+import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -101,11 +102,11 @@ export function PublicLinkSettingsDialog({
     required: true,
   });
 
-  const [counter, setCounter] = useState(0);
+  const [key, rerender] = useRerender();
 
   const handleRestorePetitionNamePattern = () => {
     setValue("petitionNamePattern", defaultPetitionNamePattern, { shouldDirty: true });
-    setCounter(counter + 1);
+    rerender();
   };
 
   const debouncedIsValidSlug = useDebouncedAsync(
@@ -378,7 +379,7 @@ export function PublicLinkSettingsDialog({
               control={control}
               render={({ field: { onChange, value, ...props } }) => (
                 <PlaceholderInput
-                  key={counter}
+                  key={key}
                   value={value ?? ""}
                   onChange={onChange}
                   placeholder={intl.formatMessage({
