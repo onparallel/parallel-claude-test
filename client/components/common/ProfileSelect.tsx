@@ -11,8 +11,11 @@ import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/ty
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { useRerender } from "@parallel/utils/useReRender";
 import pMap from "p-map";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
+import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -22,13 +25,15 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import AsyncCreatableSelect from "react-select/async-creatable";
 import AsyncSelect from "react-select/async";
-import { indexBy, isDefined, pick, zip } from "remeda";
+import AsyncCreatableSelect from "react-select/async-creatable";
+import { indexBy, isDefined, zip } from "remeda";
+import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { isDialogError } from "./dialogs/DialogProvider";
+import useMergedRef from "@react-hook/merged-ref";
 
 export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 
@@ -89,7 +94,7 @@ export interface ProfileSelectProps<
   excludeProfiles?: string[];
   isSync?: IsSync;
   defaultOptions?: boolean;
-  onCreateProfile?: (name: string) => Promise<ProfileSelectSelection | undefined>;
+  canCreateProfiles?: boolean;
   hideProfileType?: boolean;
 }
 
@@ -105,14 +110,16 @@ export const ProfileSelect = Object.assign(
       onChange,
       options,
       isMulti,
-      placeholder: _placeholder,
+      placeholder,
       profileTypeId,
       excludeProfiles,
-      onCreateProfile,
+      canCreateProfiles,
       ...props
     }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
     ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
   ) {
+    const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>();
+    const _ref = useMergedRef(ref, innerRef);
     const intl = useIntl();
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -169,21 +176,6 @@ export const ProfileSelect = Object.assign(
               .join(","),
     ]);
 
-    const placeholder = useMemo(() => {
-      return (
-        _placeholder ??
-        intl.formatMessage(
-          {
-            id: "component.profile-select.placeholder",
-            defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
-          },
-          {
-            isMulti,
-          },
-        )
-      );
-    }, [_placeholder, isMulti]);
-
     const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
       ...props,
       components: {
@@ -206,36 +198,59 @@ export const ProfileSelect = Object.assign(
       );
     };
 
-    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES") && canCreateProfiles;
 
-    async function handleCreate(name: string) {
-      const profile = await onCreateProfile?.(name);
-      if (profile) {
-        const option = pick(profile, ["id", "name"]) as ProfileSelectSelection;
-        const newOption = needsLoading ? option.id : option;
-        if (isMulti) {
-          const selectedValues = unMaybeArray(_value);
-          onChange([...selectedValues, newOption] as any, {
-            action: "select-option",
-            option: newOption as any,
+    const [key, rerender] = useRerender();
+    const showCreateProfileDialog = useCreateProfileDialog();
+    async function handleCreateOption(name: string) {
+      try {
+        const { profile } = await showCreateProfileDialog({ suggestedName: name });
+        if (profile) {
+          rerender();
+          if (isMulti) {
+            const selectedValues = unMaybeArray(_value);
+            onChange([...selectedValues, profile] as any, {
+              action: "select-option",
+              option: profile as any,
+            });
+          } else {
+            onChange(profile as any, { action: "select-option", option: profile as any });
+          }
+        }
+      } catch (e) {
+        if (isDialogError(e)) {
+          setTimeout(() => {
+            // this line seems to be needed in some scenarios on FF
+            innerRef.current?.controlRef?.closest("form")?.focus();
+            innerRef.current?.focus();
           });
-        } else {
-          onChange(newOption as any, { action: "select-option", option: newOption as any });
         }
       }
     }
+    useEffectSkipFirst(() => {
+      rerender();
+    }, [profileTypeId?.join(",")]);
 
     return isSync ? (
       <Select<OptionType, IsMulti, never>
-        ref={ref as any}
+        ref={_ref as any}
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
         options={options}
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
-        onCreateOption={handleCreate}
-        placeholder={placeholder}
+        onCreateOption={handleCreateOption}
+        placeholder={
+          placeholder ??
+          intl.formatMessage(
+            {
+              id: "component.profile-select.placeholder",
+              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+            },
+            { isMulti },
+          )
+        }
         isClearable={props.isClearable}
         {...props}
         {...rsProps}
@@ -243,17 +258,26 @@ export const ProfileSelect = Object.assign(
     ) : userCanCreateProfiles ? (
       <AsyncCreatableSelect<OptionType, IsMulti, never>
         // a key is needed to force a rerender of the component and refetch of the default options
-        key={profileTypeId?.join(",")}
+        key={key}
         cacheOptions={false}
-        ref={ref as any}
+        ref={_ref as any}
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
         loadOptions={loadProfiles}
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
-        onCreateOption={handleCreate}
-        placeholder={placeholder}
+        onCreateOption={handleCreateOption}
+        placeholder={
+          placeholder ??
+          intl.formatMessage(
+            {
+              id: "component.profile-select.placeholder",
+              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+            },
+            { isMulti },
+          )
+        }
         isClearable={props.isClearable}
         formatCreateLabel={formatCreateLabel}
         {...props}
@@ -262,16 +286,25 @@ export const ProfileSelect = Object.assign(
     ) : (
       <AsyncSelect<OptionType, IsMulti, never>
         // a key is needed to force a rerender of the component and refetch of the default options
-        key={profileTypeId?.join(",")}
+        key={key}
         cacheOptions={false}
-        ref={ref as any}
+        ref={_ref as any}
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
         loadOptions={loadProfiles}
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
-        placeholder={placeholder}
+        placeholder={
+          placeholder ??
+          intl.formatMessage(
+            {
+              id: "component.profile-select.placeholder",
+              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+            },
+            { isMulti },
+          )
+        }
         isClearable={props.isClearable}
         {...props}
         {...rsProps}

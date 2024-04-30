@@ -3,13 +3,8 @@ import { Button, FormControl, FormErrorMessage, FormLabel, HStack, Text } from "
 import { ArrowDiagonalRightIcon } from "@parallel/chakra/icons";
 import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import {
-  DialogProps,
-  isDialogError,
-  useDialog,
-} from "@parallel/components/common/dialogs/DialogProvider";
-import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
-import { useRef, useState } from "react";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
@@ -33,32 +28,7 @@ function AssociateProfileToPetitionDialog({
     defaultValues: { profileId: null },
   });
 
-  const [counter, setCounter] = useState(0);
-
-  const formRef = useRef<HTMLFormElement>(null);
   const selectRef = useRef<ProfileSelectInstance<false>>(null);
-
-  const showCreateProfileDialog = useCreateProfileDialog();
-  const handleCreateProfile = async (search: string) => {
-    try {
-      const { profile } = await showCreateProfileDialog({
-        suggestedName: search,
-      });
-
-      setCounter((c) => c + 1);
-
-      return profile;
-    } catch (e) {
-      if (isDialogError(e)) {
-        setTimeout(() => {
-          // for some reason this is needed, at least on ff
-          formRef.current?.focus();
-          selectRef.current?.focus();
-        });
-      }
-    }
-  };
-
   return (
     <ConfirmDialog
       size="lg"
@@ -66,13 +36,10 @@ function AssociateProfileToPetitionDialog({
       closeOnOverlayClick={false}
       hasCloseButton={true}
       initialFocusRef={selectRef}
-      content={
-        {
-          as: "form",
-          ref: formRef,
-          onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
-        } as any
-      }
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
+      }}
       {...props}
       header={
         <HStack>
@@ -100,14 +67,11 @@ function AssociateProfileToPetitionDialog({
             render={({ field: { value, onChange } }) => (
               <ProfileSelect
                 ref={selectRef}
-                key={counter}
                 excludeProfiles={excludeProfiles}
                 defaultOptions
                 value={value}
-                onChange={(v) => {
-                  onChange(v?.id ?? null);
-                }}
-                onCreateProfile={handleCreateProfile}
+                onChange={(v) => onChange(v?.id ?? null)}
+                canCreateProfiles
               />
             )}
           />

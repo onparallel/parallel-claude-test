@@ -30,7 +30,6 @@ import {
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isDefined, uniq } from "remeda";
-import { useCreateProfileDialog } from "./CreateProfileDialog";
 
 interface CreateProfileRelationshipsDialogProps {
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
@@ -77,14 +76,6 @@ function CreateProfileRelationshipsDialog({
     name: "relationships",
     control,
   });
-
-  const showCreateProfileDialog = useCreateProfileDialog();
-  const handleCreateProfile = async (search: string) => {
-    try {
-      const { profile } = await showCreateProfileDialog({ suggestedName: search });
-      return profile;
-    } catch (e) {}
-  };
 
   const handleCreateRelationship = () => {
     append({
@@ -222,7 +213,6 @@ function CreateProfileRelationshipsDialog({
                     key={id}
                     index={index}
                     profile={profile}
-                    onCreateProfile={handleCreateProfile}
                     onRemove={() => remove(index)}
                     canRemove={fields.length > 1}
                     isUpdating={isUpdating}
@@ -328,7 +318,6 @@ interface ProfileRelationshipRowProps {
   index: number;
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
   profileRelationshipTypesWithDirection: useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment[];
-  onCreateProfile: (name: string) => Promise<ProfileSelectSelection | undefined>;
   onRemove: () => void;
   canRemove: boolean;
   isUpdating: boolean;
@@ -339,7 +328,6 @@ function ProfileRelationshipRow({
   index,
   profile,
   profileRelationshipTypesWithDirection,
-  onCreateProfile,
   onRemove,
   canRemove,
   isUpdating,
@@ -407,7 +395,7 @@ function ProfileRelationshipRow({
                 excludeProfiles={[profile.id]}
                 profileTypeId={compatibleProfileTypeIds}
                 defaultOptions
-                onCreateProfile={onCreateProfile}
+                canCreateProfiles
                 onChange={(v) => {
                   if (hasProfileError) {
                     clearErrors(`relationships.${index}`);

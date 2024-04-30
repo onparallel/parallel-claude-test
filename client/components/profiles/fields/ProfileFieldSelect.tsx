@@ -5,11 +5,12 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren, forwardRef, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
 import Select, {
   OptionProps,
+  SelectInstance,
   Props as SelectProps,
   SingleValueProps,
   components,
@@ -95,12 +96,10 @@ interface ProfileFieldSelectInnerProps
   field: ProfileField_ProfileTypeFieldFragment;
 }
 
-export function ProfileFieldSelectInner({
-  field,
-  value,
-  onChange,
-  ...props
-}: ProfileFieldSelectInnerProps) {
+export const ProfileFieldSelectInner = forwardRef<
+  SelectInstance<SelectOptionValue, false, never>,
+  ProfileFieldSelectInnerProps
+>(function ProfileFieldSelectInner({ field, value, onChange, ...props }, ref) {
   const intl = useIntl();
 
   const { values, showOptionsWithColors, standardList } =
@@ -137,6 +136,7 @@ export function ProfileFieldSelectInner({
 
   return (
     <Select<SelectOptionValue, false, never>
+      ref={ref}
       value={_value}
       options={valuesOrderedByLocale}
       getOptionLabel={getOptionLabel}
@@ -153,7 +153,7 @@ export function ProfileFieldSelectInner({
       {...(extensions as any)}
     />
   );
-}
+});
 
 interface ReactSelectExtraProps {
   showOptionsWithColors?: boolean;
