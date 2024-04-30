@@ -37,7 +37,7 @@ import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWith
 import { UnwrapArray } from "@parallel/utils/types";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import ASCIIFolder from "fold-to-ascii";
-import { Reorder, useDragControls } from "framer-motion";
+import { MotionConfig, Reorder, useDragControls } from "framer-motion";
 import { nanoid } from "nanoid";
 import { KeyboardEvent, useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -251,22 +251,24 @@ export function ProfileFieldSelectSettings({
                   <Th paddingInline={1} paddingBlock={2}></Th>
                 </Tr>
               </Thead>
-              <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
-                {fields.map((field, index) => {
-                  return (
-                    <ProfileFieldSelectOption
-                      key={field.id}
-                      index={index}
-                      field={field}
-                      fields={fields}
-                      onRemove={handleRemoveOption}
-                      canRemoveOption={fields.length > 1}
-                      isDisabled={isDisabled}
-                      showOptionsWithColors={showOptionsWithColors ?? false}
-                    />
-                  );
-                })}
-              </Reorder.Group>
+              <MotionConfig reducedMotion="always">
+                <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
+                  {fields.map((field, index) => {
+                    return (
+                      <ProfileFieldSelectOption
+                        key={field.id}
+                        index={index}
+                        field={field}
+                        fields={fields}
+                        onRemove={handleRemoveOption}
+                        canRemoveOption={fields.length > 1}
+                        isDisabled={isDisabled}
+                        showOptionsWithColors={showOptionsWithColors ?? false}
+                      />
+                    );
+                  })}
+                </Reorder.Group>
+              </MotionConfig>
             </Table>
           </Box>
           <HStack>

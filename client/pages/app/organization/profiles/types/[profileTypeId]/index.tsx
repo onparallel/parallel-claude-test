@@ -76,7 +76,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSelection, useSelectionState } from "@parallel/utils/useSelectionState";
-import { Reorder, useDragControls } from "framer-motion";
+import { MotionConfig, Reorder, useDragControls } from "framer-motion";
 import { useRouter } from "next/router";
 import {
   Fragment,
@@ -624,33 +624,35 @@ function DraggableList({
         )}
       </HStack>
       <Divider borderColor="gray.200" />
-      <Stack
-        listStyleType="none"
-        as={Reorder.Group}
-        axis="y"
-        values={list}
-        onReorder={setList as any}
-        spacing={0}
-        borderBottom="1px"
-        borderColor="gray.200"
-      >
-        {list.map((item, i) => {
-          const key = getKey(item, rowKeyProp);
-          return (
-            <ProfileTypeField
-              key={key}
-              item={item}
-              index={i}
-              onEdit={() => onEdit(item)}
-              onConfigureVisibility={() => onConfigureVisibility(item)}
-              onDelete={() => onDelete(item)}
-              onDragEnd={() => onReorder(list.map((i) => i.id))}
-              onToggle={(event) => toggle(key, event)}
-              isSelected={selection[key]}
-            />
-          );
-        })}
-      </Stack>
+      <MotionConfig reducedMotion="always">
+        <Stack
+          listStyleType="none"
+          as={Reorder.Group}
+          axis="y"
+          values={list}
+          onReorder={setList as any}
+          spacing={0}
+          borderBottom="1px"
+          borderColor="gray.200"
+        >
+          {list.map((item, i) => {
+            const key = getKey(item, rowKeyProp);
+            return (
+              <ProfileTypeField
+                key={key}
+                item={item}
+                index={i}
+                onEdit={() => onEdit(item)}
+                onConfigureVisibility={() => onConfigureVisibility(item)}
+                onDelete={() => onDelete(item)}
+                onDragEnd={() => onReorder(list.map((i) => i.id))}
+                onToggle={(event) => toggle(key, event)}
+                isSelected={selection[key]}
+              />
+            );
+          })}
+        </Stack>
+      </MotionConfig>
     </Card>
   );
 }
