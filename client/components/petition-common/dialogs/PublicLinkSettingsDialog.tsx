@@ -36,7 +36,7 @@ import { Maybe } from "@parallel/utils/types";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useRerender } from "@parallel/utils/useReRender";
+import { useRerender } from "@parallel/utils/useRerender";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

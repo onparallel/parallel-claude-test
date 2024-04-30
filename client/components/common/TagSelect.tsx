@@ -64,7 +64,7 @@ import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { NoElement } from "./NoElement";
-import { useRerender } from "@parallel/utils/useReRender";
+import { useRerender } from "@parallel/utils/useRerender";
 
 type TagSelection = TagSelect_TagFragment;
 

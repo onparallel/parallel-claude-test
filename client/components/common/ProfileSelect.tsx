@@ -13,7 +13,7 @@ import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
-import { useRerender } from "@parallel/utils/useReRender";
+import { useRerender } from "@parallel/utils/useRerender";
 import pMap from "p-map";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

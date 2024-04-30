@@ -15,7 +15,7 @@ import {
   ProfileSelectInstance,
   ProfileSelectSelection,
 } from "../common/ProfileSelect";
-import { useRerender } from "@parallel/utils/useReRender";
+import { useRerender } from "@parallel/utils/useRerender";
 
 interface ProfileDrawerProps {
   profileId: string;
