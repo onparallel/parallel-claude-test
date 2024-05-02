@@ -41,6 +41,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
+import { untranslated } from "@parallel/utils/untranslated";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -81,7 +82,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
-          alt="Signaturit"
+          alt={untranslated("Signaturit")}
           maxWidth="124px"
         />
       ),
@@ -108,7 +109,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
-          alt="DocuSign"
+          alt={untranslated("DocuSign")}
           maxWidth="124px"
         />
       ),
@@ -129,7 +130,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
-          alt="Zapier"
+          alt={untranslated("Zapier")}
           maxWidth="100px"
         />
       ),
@@ -146,7 +147,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/open-sanctions.png`}
-          alt="OpenSanctions"
+          alt={untranslated("OpenSanctions")}
           maxWidth="124px"
         />
       ),
@@ -261,7 +262,10 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
-          alt="Parallel API"
+          alt={intl.formatMessage({
+            id: "page.organization-integrations.parallel-api-title",
+            defaultMessage: "Parallel API",
+          })}
           maxWidth="124px"
         />
       ),

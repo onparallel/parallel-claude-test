@@ -342,13 +342,13 @@ function useSignatureTokensTableColumns() {
             row.provider === "SIGNATURIT" ? (
               <Image
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
-                alt="Signaturit"
+                alt={untranslated("Signaturit")}
                 maxWidth="80px"
               />
             ) : row.provider === "DOCUSIGN" ? (
               <Image
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
-                alt="DocuSign"
+                alt={untranslated("DocuSign")}
                 maxWidth="80px"
               />
             ) : null,

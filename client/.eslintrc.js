@@ -15,7 +15,14 @@ module.exports = {
       "error",
       {
         props: {
-          include: [["*", "title"]],
+          include: [
+            ["*", "title"],
+            ["*", "placeholder"],
+            ["*", "aria-label"],
+            ["*", "label"],
+            ["*", "description"],
+            ["*", "alt"],
+          ],
         },
       },
     ],
