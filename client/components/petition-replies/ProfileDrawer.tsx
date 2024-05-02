@@ -7,7 +7,8 @@ import {
   ProfileDrawer_ProfileFragment,
   ProfileDrawer_profileDocument,
 } from "@parallel/graphql/__types";
-import { forwardRef, useState } from "react";
+import { useRerender } from "@parallel/utils/useRerender";
+import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { MenuListProps, components } from "react-select";
 import {
@@ -15,7 +16,6 @@ import {
   ProfileSelectInstance,
   ProfileSelectSelection,
 } from "../common/ProfileSelect";
-import { useRerender } from "@parallel/utils/useRerender";
 
 interface ProfileDrawerProps {
   profileId: string;
