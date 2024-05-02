@@ -1968,6 +1968,7 @@ export interface NexusGenFieldTypes {
     subscribeToProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    transferAdminPermissions: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     unarchiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
@@ -4460,6 +4461,7 @@ export interface NexusGenFieldTypeNames {
     subscribeToProfile: "Profile";
     switchAutomaticReminders: "PetitionAccess";
     tagPetition: "PetitionBase";
+    transferAdminPermissions: "SupportMethodResponse";
     transferOrganizationOwnership: "SupportMethodResponse";
     transferPetitionOwnership: "PetitionBase";
     unarchiveProfileType: "ProfileType";
@@ -7254,6 +7256,10 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       tagId: NexusGenScalars["GID"]; // GID!
+    };
+    transferAdminPermissions: {
+      // args
+      organizationId: NexusGenScalars["GID"]; // GID!
     };
     transferOrganizationOwnership: {
       // args

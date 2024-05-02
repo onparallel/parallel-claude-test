@@ -1078,6 +1078,8 @@ export type Mutation = {
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
   tagPetition: PetitionBase;
+  /** Creates an "Admins" team on the organization and removes Admin-only permissions from "All Users". Org owner will be added to "Admins" team. */
+  transferAdminPermissions: SupportMethodResponse;
   /** Transfers the ownership of an organization to a given user. */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
@@ -2112,6 +2114,10 @@ export type MutationswitchAutomaticRemindersArgs = {
 export type MutationtagPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
   tagId: Scalars["GID"]["input"];
+};
+
+export type MutationtransferAdminPermissionsArgs = {
+  organizationId: Scalars["GID"]["input"];
 };
 
 export type MutationtransferOrganizationOwnershipArgs = {
@@ -4197,16 +4203,16 @@ export type ProfileRelationshipRemovedEvent = ProfileEvent & {
 
 export type ProfileRelationshipType = {
   alias: Maybe<Scalars["String"]["output"]>;
-  allowedLeftRightProfileTypeIds: Array<Maybe<Scalars["GID"]["output"]>>;
-  allowedRightLeftProfileTypeIds: Array<Maybe<Scalars["GID"]["output"]>>;
+  allowedLeftRightProfileTypeIds: Array<Scalars["GID"]["output"]>;
+  allowedRightLeftProfileTypeIds: Array<Scalars["GID"]["output"]>;
   id: Scalars["GID"]["output"];
+  isReciprocal: Scalars["Boolean"]["output"];
   leftRightName: Scalars["LocalizableUserText"]["output"];
   rightLeftName: Scalars["LocalizableUserText"]["output"];
 };
 
-export type ProfileRelationshipTypeAllowedProfileType = {
+export type ProfileRelationshipTypeWithDirection = {
   direction: ProfileRelationshipDirection;
-  id: Scalars["GID"]["output"];
   profileRelationshipType: ProfileRelationshipType;
 };
 
@@ -4661,7 +4667,7 @@ export type Query = {
   petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
-  profileRelationships: Array<ProfileRelationshipTypeAllowedProfileType>;
+  profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
@@ -4862,7 +4868,7 @@ export type QueryprofileEventsArgs = {
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
 };
 
-export type QueryprofileRelationshipsArgs = {
+export type QueryprofileRelationshipTypesWithDirectionArgs = {
   otherSideProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 

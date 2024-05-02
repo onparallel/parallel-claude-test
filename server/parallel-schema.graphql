@@ -2124,6 +2124,11 @@ type Mutation {
   tagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
+  Creates an "Admins" team on the organization and removes Admin-only permissions from "All Users". Org owner will be added to "Admins" team.
+  """
+  transferAdminPermissions(organizationId: GID!): SupportMethodResponse!
+
+  """
   Transfers the ownership of an organization to a given user.
   """
   transferOrganizationOwnership(

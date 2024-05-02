@@ -1,21 +1,22 @@
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { DatabaseError } from "pg";
 import { isDefined, uniq } from "remeda";
+import { UserGroupPermissionName } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
+import { RESULT } from "../helpers/Result";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { validEmail } from "../helpers/validators/validEmail";
+import { validUrl } from "../helpers/validators/validUrl";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
-import { validEmail } from "../helpers/validators/validEmail";
 import { validateHexColor } from "../tag/validators";
 import { superAdminAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
-import { DatabaseError } from "pg";
-import { validUrl } from "../helpers/validators/validUrl";
 
 export const forceUpdateSignatureOrganizationBrandings = mutationField(
   "forceUpdateSignatureOrganizationBrandings",
@@ -577,6 +578,115 @@ export const deleteAzureOpenAiIntegration = mutationField("deleteAzureOpenAiInte
       return {
         result: RESULT.SUCCESS,
         message: `Integration ${toGlobalId("OrgIntegration", args.id)} deleted successfully`,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
+
+export const transferAdminPermissions = mutationField("transferAdminPermissions", {
+  description:
+    'Creates an "Admins" team on the organization and removes Admin-only permissions from "All Users". Org owner will be added to "Admins" team.',
+  type: "SupportMethodResponse",
+  authorize: superAdminAccess(),
+  args: {
+    organizationId: nonNull(globalIdArg("Organization")),
+  },
+  resolve: async (_, { organizationId }, ctx) => {
+    try {
+      const admins = await ctx.userGroups.createUserGroup(
+        {
+          name: "Admins",
+          type: "INITIAL",
+          org_id: organizationId,
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      // grant every permission for Admins group
+      await ctx.userGroups.upsertUserGroupPermissions(
+        admins.id,
+        (
+          [
+            "REPORTS:OVERVIEW",
+            "REPORTS:TEMPLATE_STATISTICS",
+            "REPORTS:TEMPLATE_REPLIES",
+            "PROFILES:DELETE_PROFILES",
+            "PROFILES:DELETE_PERMANENTLY_PROFILES",
+            "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+            "INTEGRATIONS:CRUD_INTEGRATIONS",
+            "USERS:CRUD_USERS",
+            "USERS:GHOST_LOGIN",
+            "TEAMS:CRUD_TEAMS",
+            "ORG_SETTINGS",
+            "CONTACTS:DELETE_CONTACTS",
+            "PETITIONS:SEND_ON_BEHALF",
+            "PETITIONS:CHANGE_PATH",
+            "PETITIONS:CREATE_TEMPLATES",
+            "INTEGRATIONS:CRUD_API",
+            "PROFILES:SUBSCRIBE_PROFILES",
+            "PETITIONS:CREATE_PETITIONS",
+            "PROFILES:CREATE_PROFILES",
+            "PROFILES:CLOSE_PROFILES",
+            "PROFILES:LIST_PROFILES",
+            "PROFILE_ALERTS:LIST_ALERTS",
+            "CONTACTS:LIST_CONTACTS",
+            "USERS:LIST_USERS",
+            "TEAMS:LIST_TEAMS",
+            "TAGS:CREATE_TAGS",
+            "TAGS:UPDATE_TAGS",
+            "TAGS:DELETE_TAGS",
+            "TEAMS:READ_PERMISSIONS",
+            "TEAMS:UPDATE_PERMISSIONS",
+            "PETITIONS:LIST_PUBLIC_TEMPLATES",
+          ] as UserGroupPermissionName[]
+        ).map((name) => ({ effect: "GRANT", name })),
+        `User:${ctx.user!.id}`,
+      );
+
+      // add org owner to Admins group
+      const orgOwner = (await ctx.organizations.loadOrgOwner(organizationId))!;
+      await ctx.userGroups.addUsersToGroups(admins.id, [orgOwner.id], `User:${ctx.user!.id}`);
+
+      const allUsersGroups = await ctx.userGroups.loadAllUsersGroupsByOrgId(organizationId);
+
+      for (const allUsers of allUsersGroups) {
+        // remove admin permissions from all-users groups
+        await ctx.userGroups.upsertUserGroupPermissions(
+          allUsers.id,
+          (
+            [
+              "REPORTS:OVERVIEW",
+              "REPORTS:TEMPLATE_STATISTICS",
+              "REPORTS:TEMPLATE_REPLIES",
+              "PROFILES:DELETE_PROFILES",
+              "PROFILES:DELETE_PERMANENTLY_PROFILES",
+              "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+              "INTEGRATIONS:CRUD_INTEGRATIONS",
+              "USERS:CRUD_USERS",
+              "USERS:GHOST_LOGIN",
+              "TEAMS:CRUD_TEAMS",
+              "ORG_SETTINGS",
+              "CONTACTS:DELETE_CONTACTS",
+              "PETITIONS:SEND_ON_BEHALF",
+              "TAGS:CREATE_TAGS",
+              "TAGS:UPDATE_TAGS",
+              "TAGS:DELETE_TAGS",
+              "TEAMS:READ_PERMISSIONS",
+              "TEAMS:UPDATE_PERMISSIONS",
+            ] as UserGroupPermissionName[]
+          ).map((name) => ({ name, effect: "NONE" })),
+          `User:${ctx.user!.id}`,
+        );
+      }
+
+      return {
+        result: RESULT.SUCCESS,
+        message: "Admin permissions transferred successfully",
       };
     } catch (error) {
       return {

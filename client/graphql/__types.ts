@@ -1137,6 +1137,8 @@ export interface Mutation {
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
   tagPetition: PetitionBase;
+  /** Creates an "Admins" team on the organization and removes Admin-only permissions from "All Users". Org owner will be added to "Admins" team. */
+  transferAdminPermissions: SupportMethodResponse;
   /** Transfers the ownership of an organization to a given user. */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
@@ -2171,6 +2173,10 @@ export interface MutationswitchAutomaticRemindersArgs {
 export interface MutationtagPetitionArgs {
   petitionId: Scalars["GID"]["input"];
   tagId: Scalars["GID"]["input"];
+}
+
+export interface MutationtransferAdminPermissionsArgs {
+  organizationId: Scalars["GID"]["input"];
 }
 
 export interface MutationtransferOrganizationOwnershipArgs {
@@ -20672,6 +20678,18 @@ export type ProfileSubscribers_UserFragment = {
   fullName?: string | null;
   avatarUrl?: string | null;
   initials?: string | null;
+};
+
+export type useCreateProfileDialog_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  name: string;
+  status: ProfileStatus;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  };
 };
 
 export type useCreateProfileDialog_ProfileTypeFragment = {
@@ -46629,6 +46647,17 @@ export const ProfileRelationshipsTable_ProfileFragmentDoc = gql`
   ${ProfileRelationshipsTable_ProfileRelationshipFragmentDoc}
   ${useCreateProfileRelationshipsDialog_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileRelationshipsTable_ProfileFragment, unknown>;
+export const useCreateProfileDialog_ProfileFragmentDoc = gql`
+  fragment useCreateProfileDialog_Profile on Profile {
+    id
+    name
+    status
+    profileType {
+      id
+      name
+    }
+  }
+` as unknown as DocumentNode<useCreateProfileDialog_ProfileFragment, unknown>;
 export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreateProfileDialog_ProfileType on ProfileType {
     id
@@ -54903,10 +54932,10 @@ export const useCreateProfileDialog_createProfileDocument = gql`
     $fields: [UpdateProfileFieldValueInput!]
   ) {
     createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
-      ...ProfileSelect_Profile
+      ...useCreateProfileDialog_Profile
     }
   }
-  ${ProfileSelect_ProfileFragmentDoc}
+  ${useCreateProfileDialog_ProfileFragmentDoc}
 ` as unknown as DocumentNode<
   useCreateProfileDialog_createProfileMutation,
   useCreateProfileDialog_createProfileMutationVariables
