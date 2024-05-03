@@ -1070,7 +1070,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onChange={handleTabsChange}
             >
               <TabList marginX="-1px" marginTop="-1px" flex="none">
-                <Tab padding={4} lineHeight={5} fontWeight="bold">
+                <Tab padding={4} lineHeight={5} fontWeight="bold" borderTopRadius={0}>
                   <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                 </Tab>
@@ -1080,6 +1080,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   padding={4}
                   lineHeight={5}
                   fontWeight="bold"
+                  borderTopRadius={0}
                 >
                   <SettingsIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
@@ -1093,6 +1094,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   padding={4}
                   lineHeight={5}
                   fontWeight="bold"
+                  borderTopRadius={0}
                 >
                   <CalculatorIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
