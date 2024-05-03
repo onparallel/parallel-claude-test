@@ -415,7 +415,7 @@ export const PetitionHeader = Object.assign(
     return (
       <Grid
         backgroundColor="white"
-        borderBottom="2px solid"
+        borderBottom="1px solid"
         borderBottomColor="gray.200"
         position="relative"
         paddingX={4}
