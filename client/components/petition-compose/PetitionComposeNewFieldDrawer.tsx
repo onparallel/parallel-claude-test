@@ -464,8 +464,6 @@ function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
         "descripción",
         "name",
         "nombre",
-        "phone",
-        "teléfono",
         "url",
         "website",
         "webpage",
