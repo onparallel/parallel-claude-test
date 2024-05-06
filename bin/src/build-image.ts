@@ -22,7 +22,7 @@ import { run } from "./utils/run";
 import { timestamp } from "./utils/timestamp";
 import { wait, waitFor } from "./utils/wait";
 
-const INSTANCE_TYPE = "t2.large";
+const INSTANCE_TYPE = "t3.large";
 const KEY_NAME = "ops";
 const SECURITY_GROUP_IDS = ["sg-0a7b2cbb5cd5e9020"];
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
