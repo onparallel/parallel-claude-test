@@ -13,7 +13,7 @@ export function PetitionPreviewSignatureReviewAlert(props: AlertProps) {
             defaultMessage="<b>Pending eSignature</b>, you can start it from the {tabName} tab."
             values={{
               tabName: intl.formatMessage({
-                id: "petition.header.replies-tab",
+                id: "component.petition-header.replies-tab",
                 defaultMessage: "Review",
               }),
             }}

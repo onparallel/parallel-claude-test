@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, chakra } from "@chakra-ui/react";
+import { Box, BoxProps, Flex, chakra, useBreakpointValue } from "@chakra-ui/react";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
@@ -37,6 +37,7 @@ import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
+const MotionBox = motion<BoxProps>(Box);
 export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
@@ -49,6 +50,9 @@ export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   hasRightPane?: boolean;
   isRightPaneActive?: boolean;
   rightPane?: ReactNode;
+  hasLeftPane?: boolean;
+  isLeftPaneActive?: boolean;
+  leftPane?: ReactNode;
 }
 
 export function PetitionLayout({
@@ -65,6 +69,9 @@ export function PetitionLayout({
   isRightPaneActive,
   rightPane,
   hasRightPane,
+  hasLeftPane,
+  isLeftPaneActive,
+  leftPane,
 }: PropsWithChildren<PetitionLayoutProps>) {
   const intl = useIntl();
   const title = useMemo(
@@ -73,23 +80,23 @@ export function PetitionLayout({
         ? (
             {
               compose: intl.formatMessage({
-                id: "petition.header.compose-tab",
+                id: "component.petition-header.compose-tab",
                 defaultMessage: "Compose",
               }),
               messages: intl.formatMessage({
-                id: "petition.header.messages-tab",
+                id: "component.petition-header.messages-tab",
                 defaultMessage: "Messages",
               }),
               preview: intl.formatMessage({
-                id: "petition.header.preview-tab",
+                id: "component.petition-header.input-tab",
                 defaultMessage: "Input",
               }),
               replies: intl.formatMessage({
-                id: "petition.header.replies-tab",
+                id: "component.petition-header.replies-tab",
                 defaultMessage: "Review",
               }),
               activity: intl.formatMessage({
-                id: "petition.header.activity-tab",
+                id: "component.petition-header.activity-tab",
                 defaultMessage: "Activity",
               }),
             } as Record<PetitionHeaderProps["section"], string>
@@ -120,6 +127,8 @@ export function PetitionLayout({
   const bodyRef = useRef<HTMLDivElement>(null);
   const [drawerIsShown, setDrawerIsShown] = useState(false);
 
+  const showFullWidthDrawer = useBreakpointValue({ base: true, lg: false });
+
   return (
     <AppLayout
       title={`${
@@ -147,11 +156,51 @@ export function PetitionLayout({
         section={section!}
         actions={headerActions}
       />
-      <Flex ref={bodyRef} flex="1" minHeight={0}>
+      <Flex ref={bodyRef} flex="1" minHeight={0} position="relative">
+        <AnimatePresence>
+          {isLeftPaneActive ? (
+            <MotionBox
+              initial={{ width: showFullWidthDrawer ? "100%" : "0px", opacity: 0 }}
+              animate={{
+                width: showFullWidthDrawer ? "100%" : "280px",
+                opacity: 1,
+                transition: { type: "spring", bounce: 0, duration: 0.4 },
+              }}
+              exit={{
+                width: showFullWidthDrawer ? "100%" : "0px",
+                opacity: 0,
+                transition: { type: "spring", bounce: 0, duration: 0.3 },
+              }}
+              position={{ base: "absolute", xl: "relative" }}
+              top={0}
+              insetStart={0}
+              zIndex={10}
+              height="100%"
+            >
+              <Box position="relative" overflow="hidden" height="100%" width="100%">
+                <Box
+                  as="section"
+                  width={{ base: "100%", lg: "280px" }}
+                  height="100%"
+                  backgroundColor="white"
+                  display="flex"
+                  borderEnd={{ base: "none", lg: "1px solid" }}
+                  borderEndColor={{ base: "none", lg: "gray.200" }}
+                  flexDirection="column"
+                  position="absolute"
+                  top={0}
+                  insetEnd={0}
+                >
+                  {leftPane}
+                </Box>
+              </Box>
+            </MotionBox>
+          ) : null}
+        </AnimatePresence>
         <Flex
           flex="1"
           minWidth={0}
-          display={{ base: isRightPaneActive ? "none" : "flex", lg: "flex" }}
+          display={{ base: isLeftPaneActive || isRightPaneActive ? "none" : "flex", lg: "flex" }}
           flexDirection="column"
           overflow="auto"
           id="petition-layout-body"

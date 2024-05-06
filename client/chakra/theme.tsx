@@ -75,12 +75,10 @@ export const theme = extendTheme({
       "&[data-highlighted], [data-highlighted] &": {
         animation: ((theme: any) =>
           `${keyframes`
-              0% { background-color: white; }
-              25% { background-color: ${theme.colors.gray[100]}; }
-              50% { background-color: white }
-              75% { background-color: ${theme.colors.gray[100]}; }
-              100% { background-color: white; }
-              `} 500ms ease`) as any,
+              0% { background-color: inherit; }
+              20% { background-color: ${theme.colors.gray[100]}; }
+              100% { background-color: inherit }
+              `} 250ms ease`) as any,
       },
     },
   },

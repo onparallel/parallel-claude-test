@@ -114,7 +114,6 @@ export interface PetitionComposeFieldProps {
   onDeleteClick: () => void;
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
-  onAddField: (type?: PetitionFieldType, position?: number, parentFieldId?: string) => void;
   fieldProps?: (
     fieldId: string,
   ) => Pick<
@@ -128,11 +127,11 @@ export interface PetitionComposeFieldProps {
     | "onFieldCalculationsClick"
     | "onFocusPrevField"
     | "onFocusNextField"
-    | "onAddField"
   >;
   onUpdateFieldPositions: (fieldIds: string[], parentFieldId?: string) => void;
   onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
   onLinkField?: (parentFieldId: string, childrenFieldIds: string[]) => void;
+  showAddField?: (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => void;
   isReadOnly?: boolean;
 }
 
@@ -169,11 +168,11 @@ const _PetitionComposeField = chakraForwardRef<
     onFieldCalculationsClick,
     onFocusNextField,
     onFocusPrevField,
-    onAddField,
     fieldProps,
     onUpdateFieldPositions,
     onLinkField,
     onUnlinkField,
+    showAddField,
     isReadOnly,
     ...props
   },
@@ -417,7 +416,7 @@ const _PetitionComposeField = chakraForwardRef<
       {...restProps}
     >
       {isVisible ? (
-        <Box>
+        <>
           <input type="file" {...getInputProps()} />
           {isDragActive && isOverCurrent ? (
             <PetitionComposeDragActiveIndicator
@@ -444,6 +443,7 @@ const _PetitionComposeField = chakraForwardRef<
             flexDirection="row"
             opacity={isDragging ? 0 : 1}
             data-active={isActive ? true : undefined}
+            layerStyle="highlightable"
             backgroundColor="white"
             sx={{
               "[draggable]": {
@@ -545,7 +545,6 @@ const _PetitionComposeField = chakraForwardRef<
                   onFieldEdit={onFieldEdit}
                   onFocusNextField={onFocusNextField}
                   onFocusPrevField={onFocusPrevField}
-                  onAddField={onAddField}
                   onRemoveAttachment={handleRemoveAttachment}
                   onDownloadAttachment={handleDownloadAttachment}
                   onTypeIndicatorClick={onTypeIndicatorClick}
@@ -557,6 +556,7 @@ const _PetitionComposeField = chakraForwardRef<
                   isReadOnly={isReadOnly}
                   fieldProps={fieldProps}
                   onUpdateFieldPositions={onUpdateFieldPositions}
+                  showAddField={showAddField}
                 />
                 <PetitionComposeFieldActions
                   field={field}
@@ -590,15 +590,15 @@ const _PetitionComposeField = chakraForwardRef<
                   petition={petition}
                   activeChildFieldId={activeChildFieldId}
                   fieldProps={fieldProps}
-                  onAddField={onAddField}
                   onUpdateFieldPositions={onUpdateFieldPositions}
                   onLinkField={onLinkField}
                   onUnlinkField={onUnlinkField}
+                  showAddField={showAddField}
                 />
               ) : null}
             </Stack>
           </Box>
-        </Box>
+        </>
       ) : (
         <Box height={`${height}px`} />
       )}
@@ -668,7 +668,6 @@ interface PetitionComposeFieldInnerProps
     | "onFieldEdit"
     | "onFocusNextField"
     | "onFocusPrevField"
-    | "onAddField"
     | "onCloneField"
     | "onSettingsClick"
     | "onDeleteClick"
@@ -676,6 +675,7 @@ interface PetitionComposeFieldInnerProps
     | "onFieldCalculationsClick"
     | "fieldProps"
     | "onUpdateFieldPositions"
+    | "showAddField"
   > {
   attachmentUploadProgress: Record<string, number>;
   onRemoveAttachment: (attachmentId: string) => void;
@@ -702,7 +702,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onTypeIndicatorClick,
     onFocusNextField,
     onFocusPrevField,
-    onAddField,
     onDownloadAttachment,
     onRemoveAttachment,
     onCloneField,
@@ -714,6 +713,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onFieldCalculationsClick,
     index,
     isReadOnly,
+    showAddField,
     ...props
   },
   ref,
@@ -838,7 +838,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onKeyUp={(event) => {
               switch (event.key) {
                 case "Enter":
-                  onAddField();
+                  showAddField?.(field.id, field.parent?.id, true);
                   break;
               }
             }}
@@ -1358,9 +1358,7 @@ const fragments = {
       fragment PetitionComposeField_User on User {
         id
         hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-        ...PetitionComposeFieldGroupChildren_User
       }
-      ${PetitionComposeFieldGroupChildren.fragments.User}
     `;
   },
   get PetitionBase() {

@@ -12208,13 +12208,6 @@ export type useSendPetitionHandler_sendPetitionMutation = {
   }>;
 };
 
-export type AddFieldPopover_UserFragment = {
-  __typename?: "User";
-  hasEsTaxDocumentsField: boolean;
-  hasDowJonesField: boolean;
-  hasBackgroundCheck: boolean;
-};
-
 export type PetitionComposeAttachments_PetitionAttachmentFragment = {
   __typename?: "PetitionAttachment";
   id: string;
@@ -12841,8 +12834,6 @@ export type PetitionComposeField_UserFragment = {
   __typename?: "User";
   id: string;
   hasBackgroundCheck: boolean;
-  hasEsTaxDocumentsField: boolean;
-  hasDowJonesField: boolean;
 };
 
 export type PetitionComposeField_PetitionBase_Petition_Fragment = {
@@ -13087,8 +13078,6 @@ export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
 export type PetitionComposeFieldGroupChildren_UserFragment = {
   __typename?: "User";
   id: string;
-  hasEsTaxDocumentsField: boolean;
-  hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
 };
 
@@ -13141,8 +13130,6 @@ export type PetitionComposeFieldList_UserFragment = {
   __typename?: "User";
   id: string;
   hasBackgroundCheck: boolean;
-  hasEsTaxDocumentsField: boolean;
-  hasDowJonesField: boolean;
 };
 
 export type PetitionComposeFieldList_PetitionFieldFragment = {
@@ -13355,6 +13342,13 @@ export type PetitionComposeFieldList_PetitionBase_PetitionTemplate_Fragment = {
 export type PetitionComposeFieldList_PetitionBaseFragment =
   | PetitionComposeFieldList_PetitionBase_Petition_Fragment
   | PetitionComposeFieldList_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionComposeNewFieldDrawer_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
+  hasDowJonesField: boolean;
+  hasBackgroundCheck: boolean;
+};
 
 export type PetitionComposeVariables_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -29723,14 +29717,14 @@ export type PetitionCompose_QueryFragment = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
+    hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
-    hasEsTaxDocumentsField: boolean;
-    hasDowJonesField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30127,6 +30121,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
+            position: number;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
@@ -30152,6 +30147,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
+            position: number;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
@@ -30473,6 +30469,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          position: number;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -30497,6 +30494,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          position: number;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -31031,14 +31029,14 @@ export type PetitionCompose_userQuery = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
+    hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
-    hasEsTaxDocumentsField: boolean;
-    hasDowJonesField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -46038,40 +46036,22 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
   ${PetitionFieldTitleContent_PetitionFieldFragmentDoc}
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<TemplateDetailsModal_PetitionTemplateFragment, unknown>;
-export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
-  fragment PetitionFieldTypeSelectDropdown_User on User {
-    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
-    hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-  }
-` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
-export const AddFieldPopover_UserFragmentDoc = gql`
-  fragment AddFieldPopover_User on User {
-    ...PetitionFieldTypeSelectDropdown_User
-  }
-  ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
-` as unknown as DocumentNode<AddFieldPopover_UserFragment, unknown>;
 export const PetitionComposeFieldGroupChildren_UserFragmentDoc = gql`
   fragment PetitionComposeFieldGroupChildren_User on User {
     id
-    ...AddFieldPopover_User
+    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
   }
-  ${AddFieldPopover_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldGroupChildren_UserFragment, unknown>;
 export const PetitionComposeField_UserFragmentDoc = gql`
   fragment PetitionComposeField_User on User {
     id
     hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-    ...PetitionComposeFieldGroupChildren_User
   }
-  ${PetitionComposeFieldGroupChildren_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeField_UserFragment, unknown>;
 export const PetitionComposeFieldList_UserFragmentDoc = gql`
   fragment PetitionComposeFieldList_User on User {
-    ...AddFieldPopover_User
     ...PetitionComposeField_User
   }
-  ${AddFieldPopover_UserFragmentDoc}
   ${PetitionComposeField_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldList_UserFragment, unknown>;
 export const FieldErrorDialog_PetitionFieldFragmentDoc = gql`
@@ -49795,6 +49775,13 @@ export const PetitionSettings_UserFragmentDoc = gql`
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${SignatureConfigDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
+export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
+  fragment PetitionFieldTypeSelectDropdown_User on User {
+    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+    hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+  }
+` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
   fragment PetitionFieldTypeSelect_User on User {
     ...PetitionFieldTypeSelectDropdown_User
@@ -49807,6 +49794,13 @@ export const PetitionComposeFieldSettings_UserFragmentDoc = gql`
   }
   ${PetitionFieldTypeSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_UserFragment, unknown>;
+export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
+  fragment PetitionComposeNewFieldDrawer_User on User {
+    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+    hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+  }
+` as unknown as DocumentNode<PetitionComposeNewFieldDrawer_UserFragment, unknown>;
 export const PetitionCompose_QueryFragmentDoc = gql`
   fragment PetitionCompose_Query on Query {
     ...PetitionLayout_Query
@@ -49822,6 +49816,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
         }
       }
       ...PetitionComposeFieldSettings_User
+      ...PetitionComposeNewFieldDrawer_User
     }
   }
   ${PetitionLayout_QueryFragmentDoc}
@@ -49829,6 +49824,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${PetitionComposeFieldSettings_UserFragmentDoc}
+  ${PetitionComposeNewFieldDrawer_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_QueryFragment, unknown>;
 export const MessageEmailBodyFormControl_PetitionBaseFragmentDoc = gql`
   fragment MessageEmailBodyFormControl_PetitionBase on PetitionBase {
@@ -56912,6 +56908,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
         ...PetitionLayout_PetitionBase
         fields {
           id
+          position
           children {
             id
           }
@@ -56961,6 +56958,7 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
       ...PetitionLayout_PetitionBase
       fields {
         id
+        position
         children {
           id
         }

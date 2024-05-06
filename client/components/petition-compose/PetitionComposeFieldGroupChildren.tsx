@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Stack, Text } from "@chakra-ui/react";
-import { PlusCircleIcon } from "@parallel/chakra/icons";
+import { Box, Button, Center, IconButton, Stack, Text } from "@chakra-ui/react";
+import { AddIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeFieldGroupChildren_PetitionFieldFragment,
   PetitionComposeFieldGroupChildren_UserFragment,
@@ -10,11 +10,8 @@ import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useState } from "react";
 import { useDrop } from "react-dnd";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { AddFieldButton } from "../petition-common/AddFieldButton";
-import { AddFieldPopover } from "./AddFieldPopover";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
 import {
   PetitionComposeField,
@@ -22,21 +19,23 @@ import {
   PetitionComposeFieldRef,
 } from "./PetitionComposeField";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
+import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
 import { PetitionFieldOptionsListEditor } from "./PetitionFieldOptionsListEditor";
 import { ReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
+import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 
 interface PetitionComposeFieldGroupChildrenProps
   extends Pick<
     PetitionComposeFieldProps,
     | "petition"
-    | "onAddField"
     | "activeChildFieldId"
     | "showError"
     | "fieldProps"
     | "onUpdateFieldPositions"
     | "onLinkField"
     | "onUnlinkField"
+    | "showAddField"
   > {
   isReadOnly?: boolean;
   field: PetitionComposeFieldGroupChildren_PetitionFieldFragment;
@@ -63,11 +62,11 @@ export function PetitionComposeFieldGroupChildren({
   user,
   activeChildFieldId,
   petition,
-  onAddField,
   fieldProps,
   onUpdateFieldPositions,
   onLinkField,
   onUnlinkField,
+  showAddField,
 }: PetitionComposeFieldGroupChildrenProps) {
   const { fields: children, onFieldMove } = usePetitionComposeFieldReorder({
     fields: field.children?.filter(isDefined) ?? [],
@@ -76,6 +75,11 @@ export function PetitionComposeFieldGroupChildren({
     },
     isFieldGroup: true,
   });
+
+  const { newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId } =
+    useAddNewFieldPlaceholderContext();
+
+  const parentFieldId = field.id;
 
   // use drop to allow dropping fields into the group
   const [{ isOver, draggedFieldType }, drop] = useDrop<DragItem, unknown, any>(
@@ -91,44 +95,12 @@ export function PetitionComposeFieldGroupChildren({
         draggedFieldType: monitor.getItem()?.fieldType,
       }),
     }),
-    [],
+    [newFieldPlaceholderFieldId],
   );
-  const showErrorDialog = useErrorDialog();
-  const handleAddNewField = async (type: PetitionFieldType, position?: number) => {
-    const childrenLength = field.children?.length ?? 0;
-    let _position = position ?? childrenLength + 1;
-    if (
-      (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
-      childrenLength === 0 &&
-      !field.isInternal
-    ) {
-      try {
-        await showErrorDialog({
-          message: (
-            <FormattedMessage
-              id="component.petition-compose-field-group-children.first-child-is-internal-error"
-              defaultMessage="The first field of a group cannot be internal if the group is not."
-            />
-          ),
-        });
-      } catch {}
-    } else {
-      // If the grouop has fields and they try to add to first position, we add it to the second position
-      if (
-        (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
-        childrenLength > 0 &&
-        position === 0 &&
-        !field.isInternal
-      ) {
-        _position = 1;
-      }
-      onAddField(type, _position, field.id);
-    }
-  };
 
   const hasChildren = isDefined(field.children) && field.children.length > 0;
   const hasDropErrors = FIELD_GROUP_EXCLUDED_FIELD_TYPES.includes(draggedFieldType) && isOver;
-
+  const newFieldPlaceholderIndex = children.findIndex((f) => f.id === newFieldPlaceholderFieldId);
   return (
     <Stack
       textStyle={isReadOnly ? "muted" : undefined}
@@ -176,9 +148,31 @@ export function PetitionComposeFieldGroupChildren({
                 index={i}
                 isTemplate={petition.__typename === "PetitionTemplate"}
                 hideAddButtons={isReadOnly || isOver}
-                onAddNewField={handleAddNewField}
-                user={user}
+                onAddNewField={(linkToPreviousField: boolean) => {
+                  const fieldIdToLink = linkToPreviousField
+                    ? children[i - 1]?.id ?? undefined
+                    : field.id;
+                  showAddField?.(fieldIdToLink, parentFieldId);
+                }}
+                newFieldPlaceholderIndex={
+                  newFieldPlaceholderParentFieldId !== parentFieldId
+                    ? undefined
+                    : newFieldPlaceholderIndex !== -1
+                      ? newFieldPlaceholderIndex + 1
+                      : 0
+                }
               >
+                {i === 0 &&
+                newFieldPlaceholderParentFieldId === parentFieldId &&
+                !newFieldPlaceholderFieldId ? (
+                  <PetitionComposeNewFieldPlaceholder
+                    borderTop="none"
+                    borderBottom="1px solid"
+                    borderBottomColor="gray.200"
+                    isGroupChild={true}
+                    isTemplate={petition.__typename === "PetitionTemplate"}
+                  />
+                ) : null}
                 <PetitionComposeField
                   ref={fieldRefs?.[field.id]}
                   borderTopRadius={i === 0 ? "md" : undefined}
@@ -202,6 +196,7 @@ export function PetitionComposeFieldGroupChildren({
                   onUpdateFieldPositions={onUpdateFieldPositions}
                   onSettingsClick={onSettingsClick}
                   onUnlinkField={onUnlinkField}
+                  showAddField={showAddField}
                   sx={{
                     ".field-actions-children": {
                       display: "none",
@@ -228,9 +223,21 @@ export function PetitionComposeFieldGroupChildren({
                   }}
                   {...restFieldProps}
                 />
+                {newFieldPlaceholderFieldId === field.id ? (
+                  <PetitionComposeNewFieldPlaceholder
+                    isGroupChild={true}
+                    isTemplate={petition.__typename === "PetitionTemplate"}
+                  />
+                ) : null}
               </PetitionComposeFieldWrapper>
             );
           })
+        ) : newFieldPlaceholderParentFieldId === parentFieldId ? (
+          <PetitionComposeNewFieldPlaceholder
+            borderTop="none"
+            isGroupChild={true}
+            isTemplate={petition.__typename === "PetitionTemplate"}
+          />
         ) : (
           <Center paddingY={6} paddingX={4}>
             <Text fontSize="md" align="center" color="gray.500">
@@ -242,10 +249,9 @@ export function PetitionComposeFieldGroupChildren({
           </Center>
         )}
       </Stack>
-      {!hasChildren ? (
-        <AddFieldPopover
-          as={Button}
-          leftIcon={<PlusCircleIcon position="relative" top="-1px" />}
+      {!hasChildren && newFieldPlaceholderParentFieldId !== parentFieldId ? (
+        <Button
+          leftIcon={<PlusCircleIcon />}
           isDisabled={isReadOnly}
           fontWeight="normal"
           variant="outline"
@@ -253,36 +259,35 @@ export function PetitionComposeFieldGroupChildren({
           fontSize="md"
           alignSelf="center"
           transform="translateX(-14px)"
-          isFieldGroupChild
-          onSelectFieldType={handleAddNewField}
-          user={user}
+          onClick={() => showAddField?.(undefined, parentFieldId)}
         >
           <FormattedMessage
-            id="component.petition-compose-field-group-children.add-field"
+            id="component.petition-compose-field-list.add-field"
             defaultMessage="Add field"
           />
-        </AddFieldPopover>
+        </Button>
       ) : null}
     </Stack>
   );
 }
 
 function PetitionComposeFieldWrapper({
-  user,
   isTemplate,
   index,
   onAddNewField,
   hideAddButtons,
+  newFieldPlaceholderIndex,
   children,
   ...props
 }: {
-  user: PetitionComposeFieldGroupChildren_UserFragment;
   isTemplate: boolean;
   index: number;
-  onAddNewField: (type: PetitionFieldType, position?: number) => void;
+  onAddNewField: (linkToPreviousField: boolean) => void;
   hideAddButtons?: boolean;
+  newFieldPlaceholderIndex?: number;
   children: React.ReactNode;
 }) {
+  const intl = useIntl();
   const [showAddFieldButton, setShowAddFieldButton] = useState(false);
 
   return (
@@ -306,7 +311,7 @@ function PetitionComposeFieldWrapper({
         setShowAddFieldButton(false);
       }}
     >
-      {!hideAddButtons ? (
+      {!hideAddButtons && newFieldPlaceholderIndex !== index ? (
         <Box
           className="add-field-button-wrapper"
           position="relative"
@@ -318,7 +323,7 @@ function PetitionComposeFieldWrapper({
             },
           }}
         >
-          <AddFieldButton
+          <IconButton
             position="absolute"
             bottom={0}
             insetStart="calc(50% - 14px)"
@@ -326,17 +331,30 @@ function PetitionComposeFieldWrapper({
             className="add-field-after-button"
             data-testid="small-add-field-button"
             colorScheme={isTemplate ? "primary" : undefined}
-            isFieldGroupChild
-            onSelectFieldType={(type) => onAddNewField(type, index)}
-            user={user}
-            onOpen={() => {
-              setShowAddFieldButton(true);
+            onClick={() => onAddNewField(true)}
+            aria-label={intl.formatMessage({
+              id: "component.add-field-button.label",
+              defaultMessage: "Add field",
+            })}
+            icon={<AddIcon />}
+            size="xs"
+            variant="outline"
+            rounded="full"
+            backgroundColor="white"
+            borderColor="gray.200"
+            color="gray.500"
+            _hover={{
+              borderColor: "gray.300",
+              color: "gray.800",
+            }}
+            _active={{
+              backgroundColor: "gray.50",
             }}
           />
         </Box>
       ) : null}
       {children}
-      {!hideAddButtons ? (
+      {!hideAddButtons && newFieldPlaceholderIndex !== index + 1 ? (
         <Box
           className="add-field-button-wrapper"
           position="relative"
@@ -348,7 +366,7 @@ function PetitionComposeFieldWrapper({
             },
           }}
         >
-          <AddFieldButton
+          <IconButton
             position="absolute"
             bottom={0}
             insetStart="calc(50% - 14px)"
@@ -356,11 +374,24 @@ function PetitionComposeFieldWrapper({
             className="add-field-after-button"
             data-testid="small-add-field-button"
             colorScheme={isTemplate ? "primary" : undefined}
-            isFieldGroupChild
-            onSelectFieldType={(type) => onAddNewField(type, index + 1)}
-            user={user}
-            onOpen={() => {
-              setShowAddFieldButton(true);
+            onClick={() => onAddNewField(false)}
+            aria-label={intl.formatMessage({
+              id: "component.add-field-button.label",
+              defaultMessage: "Add field",
+            })}
+            icon={<AddIcon />}
+            size="xs"
+            variant="outline"
+            rounded="full"
+            backgroundColor="white"
+            borderColor="gray.200"
+            color="gray.500"
+            _hover={{
+              borderColor: "gray.300",
+              color: "gray.800",
+            }}
+            _active={{
+              backgroundColor: "gray.50",
             }}
           />
         </Box>
@@ -373,9 +404,8 @@ PetitionComposeFieldGroupChildren.fragments = {
   User: gql`
     fragment PetitionComposeFieldGroupChildren_User on User {
       id
-      ...AddFieldPopover_User
+      hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     }
-    ${AddFieldPopover.fragments.User}
   `,
   // Can't reference PetitionComposeField because it generates a recursive dependency
   PetitionField: gql`

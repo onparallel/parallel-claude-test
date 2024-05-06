@@ -56,7 +56,10 @@ export function ContactlessLinkDialog({
               values={{
                 activityLink: (
                   <Link fontWeight="bold" href={`/app/petitions/${petitionId}/activity`}>
-                    <FormattedMessage id="petition.header.activity-tab" defaultMessage="Activity" />
+                    <FormattedMessage
+                      id="component.petition-header.activity-tab"
+                      defaultMessage="Activity"
+                    />
                   </Link>
                 ),
               }}

@@ -1,20 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Button,
-  ButtonOptions,
-  Flex,
-  HTMLChakraProps,
-  ThemingProps,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Button, Flex, HTMLChakraProps, IconButton } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
-import {
-  AddFieldPopover,
-  AddFieldPopoverProps,
-} from "@parallel/components/petition-compose/AddFieldPopover";
 import {
   PetitionComposeField,
   PetitionComposeFieldProps,
@@ -23,7 +10,6 @@ import {
 import {
   PetitionComposeFieldList_PetitionBaseFragment,
   PetitionComposeFieldList_UserFragment,
-  PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
@@ -41,10 +27,11 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { intersection, isDefined } from "remeda";
-import { AddFieldButton } from "../petition-common/AddFieldButton";
+import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
 import { useEditPetitionFieldCalculationsDialog } from "./dialogs/EditPetitionFieldCalculationsDialog";
+import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 
 export interface PetitionComposeFieldListProps extends BoxProps {
   user: PetitionComposeFieldList_UserFragment;
@@ -56,10 +43,10 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onFieldSettingsClick: (fieldId: string) => void;
   onFieldTypeIndicatorClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => Promise<void>;
-  onAddField: (type: PetitionFieldType, position?: number, parentFieldId?: string) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
   onLinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
+  showAddField: (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => void;
   isReadOnly?: boolean;
 }
 
@@ -74,14 +61,17 @@ export const PetitionComposeFieldList = Object.assign(
     onFieldSettingsClick,
     onFieldTypeIndicatorClick,
     onDeleteField,
-    onAddField,
     onFieldEdit,
     onLinkField,
     onUnlinkField,
+    showAddField,
     isReadOnly,
     ...props
   }: PetitionComposeFieldListProps) {
+    const intl = useIntl();
     const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
+
+    const { newFieldPlaceholderFieldId } = useAddNewFieldPlaceholderContext();
 
     const { fields, onFieldMove } = usePetitionComposeFieldReorder({
       fields: petition.fields,
@@ -115,7 +105,6 @@ export const PetitionComposeFieldList = Object.assign(
         | "onFieldCalculationsClick"
         | "onFocusPrevField"
         | "onFocusNextField"
-        | "onAddField"
       > => ({
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
@@ -279,35 +268,12 @@ export const PetitionComposeFieldList = Object.assign(
             fieldRefs[nextId].current!.focusFromPrevious();
           }
         },
-        onAddField: (type?: PetitionFieldType, position?: number, parentFieldId?: string) => {
-          if (type) {
-            onAddField(type, position, parentFieldId);
-          } else {
-            const { fields } = fieldsDataRef.current!;
-            const index = fields.findIndex((f) => f.id === fieldId);
-            if (index === fields.length - 1) {
-              document
-                .querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")
-                ?.click();
-            } else {
-              setHoveredFieldId(fieldId);
-              setTimeout(() => {
-                document
-                  .querySelector<HTMLButtonElement>(
-                    `#field-${fieldId} + .add-field-button-wrapper  button`,
-                  )!
-                  .click();
-              });
-            }
-          }
-        },
       }),
       [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit, isReadOnly],
     );
 
     const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
     const hoveredFieldIdRef = useRef<string>(null);
-    const hoveredFieldIdWhileMenuOpenedRef = useRef<string>(null);
     const setHoveredFieldId = useCallback(
       (fieldId: string | null) => {
         _setHoveredFieldId(fieldId);
@@ -324,7 +290,6 @@ export const PetitionComposeFieldList = Object.assign(
       },
       [_setFocusedFieldId],
     );
-    const isMenuOpenedRef = useRef(false);
     const timeoutRef = useRef<number>();
     const fieldMouseHandlers = useMemoFactory(
       (fieldId) =>
@@ -353,6 +318,18 @@ export const PetitionComposeFieldList = Object.assign(
               }
             }
           },
+          onMouseEnter() {
+            clearTimeout(timeoutRef.current);
+            setHoveredFieldId(fieldId);
+          },
+          onMouseMove() {
+            if (fieldId !== hoveredFieldIdRef.current) {
+              setHoveredFieldId(fieldId);
+            }
+          },
+          onMouseLeave() {
+            timeoutRef.current = window.setTimeout(() => setHoveredFieldId(null));
+          },
           onBlur() {
             /**
              * When moving from a field to another the following happens synchronously:
@@ -365,61 +342,8 @@ export const PetitionComposeFieldList = Object.assign(
              */
             timeoutRef.current = window.setTimeout(() => setFocusedFieldId(null));
           },
-          onMouseMove() {
-            if (!isMenuOpenedRef.current) {
-              if (fieldId !== hoveredFieldIdRef.current) {
-                setHoveredFieldId(fieldId);
-              }
-            } else {
-              if (fieldId !== hoveredFieldIdWhileMenuOpenedRef.current) {
-                assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
-              }
-            }
-          },
-          onMouseEnter() {
-            clearTimeout(timeoutRef.current);
-            if (!isMenuOpenedRef.current) {
-              setHoveredFieldId(fieldId);
-            } else {
-              assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
-            }
-          },
-          onMouseLeave() {
-            // Something very similar to the focus/blur situation happens here, see comment
-            // for the onBlur handler above.
-            if (!isMenuOpenedRef.current) {
-              timeoutRef.current = window.setTimeout(() => setHoveredFieldId(null));
-            } else {
-              assignRef(hoveredFieldIdWhileMenuOpenedRef, null);
-            }
-          },
         }) as HTMLChakraProps<"div">,
       [setHoveredFieldId, setFocusedFieldId, onFieldSettingsClick],
-    );
-    const addButtonMouseHandlers = useMemoFactory(
-      (fieldId) => ({
-        onMouseEnter() {
-          clearTimeout(timeoutRef.current);
-        },
-        onFocus() {
-          clearTimeout(timeoutRef.current);
-        },
-        onSelectFieldType(type: PetitionFieldType) {
-          const { fields } = fieldsDataRef.current;
-          onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
-        },
-        onOpen() {
-          assignRef(isMenuOpenedRef, true);
-        },
-        onClose() {
-          assignRef(isMenuOpenedRef, false);
-          if (hoveredFieldIdRef.current !== hoveredFieldIdWhileMenuOpenedRef.current) {
-            setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
-          }
-        },
-        user,
-      }),
-      [],
     );
 
     return (
@@ -437,9 +361,11 @@ export const PetitionComposeFieldList = Object.assign(
         >
           {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices], i) => {
             const nextFieldId = i < fields.length - 1 ? fields[i + 1].id : null;
-            const showAddFieldButton = [field.id, nextFieldId].some(
-              (id) => id === hoveredFieldId || id === focusedFieldId,
-            );
+            const showAddFieldButton =
+              [field.id, nextFieldId].some(
+                (id) => id === hoveredFieldId || id === focusedFieldId,
+              ) && newFieldPlaceholderFieldId !== field.id;
+
             return (
               <Fragment key={field.id}>
                 <PetitionComposeField
@@ -466,6 +392,7 @@ export const PetitionComposeFieldList = Object.assign(
                   onUpdateFieldPositions={onUpdateFieldPositions}
                   onLinkField={onLinkField}
                   onUnlinkField={onUnlinkField}
+                  showAddField={showAddField}
                 />
                 {nextFieldId && !isReadOnly ? (
                   <Box
@@ -475,11 +402,11 @@ export const PetitionComposeFieldList = Object.assign(
                     sx={{
                       visibility: showAddFieldButton ? "visible" : "hidden",
                       "& :hover, & :focus-within": {
-                        visibility: "visible",
+                        visibility: newFieldPlaceholderFieldId !== field.id ? "visible" : undefined,
                       },
                     }}
                   >
-                    <AddFieldButton
+                    <IconButton
                       position="absolute"
                       bottom={0}
                       insetStart="50%"
@@ -489,24 +416,57 @@ export const PetitionComposeFieldList = Object.assign(
                       colorScheme={
                         petition.__typename === "PetitionTemplate" ? "primary" : undefined
                       }
-                      {...addButtonMouseHandlers(field.id)}
+                      onClick={() => showAddField(field.id)}
+                      aria-label={intl.formatMessage({
+                        id: "component.add-field-button.label",
+                        defaultMessage: "Add field",
+                      })}
+                      icon={<AddIcon />}
+                      size="xs"
+                      variant="outline"
+                      rounded="full"
+                      backgroundColor="white"
+                      borderColor="gray.200"
+                      color="gray.500"
+                      _hover={{
+                        borderColor: "gray.300",
+                        color: "gray.800",
+                      }}
+                      _active={{
+                        backgroundColor: "gray.50",
+                      }}
+                      onMouseEnter={() => {
+                        clearTimeout(timeoutRef.current);
+                      }}
+                      onFocus={() => {
+                        clearTimeout(timeoutRef.current);
+                      }}
                     />
                   </Box>
+                ) : null}
+                {newFieldPlaceholderFieldId === field.id ? (
+                  <PetitionComposeNewFieldPlaceholder />
                 ) : null}
               </Fragment>
             );
           })}
         </Card>
-        {!isReadOnly ? (
+        {!isReadOnly &&
+        fieldsWithIndices[fieldsWithIndices.length - 1][0].id !== newFieldPlaceholderFieldId ? (
           <Flex marginTop={4} justifyContent="center">
-            <BigAddFieldButton
+            <Button
+              leftIcon={<AddIcon />}
               id="big-add-field-button"
               data-action="big-add-field"
               data-testid="big-add-field-button"
-              onSelectFieldType={onAddField}
-              colorScheme={petition.__typename === "PetitionTemplate" ? "primary" : undefined}
-              user={user}
-            />
+              onClick={() => showAddField(fieldsWithIndices[fieldsWithIndices.length - 1][0].id)}
+              colorScheme="primary"
+            >
+              <FormattedMessage
+                id="component.petition-compose-field-list.add-field"
+                defaultMessage="Add field"
+              />
+            </Button>
           </Flex>
         ) : null}
       </>
@@ -516,10 +476,8 @@ export const PetitionComposeFieldList = Object.assign(
     fragments: {
       User: gql`
         fragment PetitionComposeFieldList_User on User {
-          ...AddFieldPopover_User
           ...PetitionComposeField_User
         }
-        ${AddFieldPopover.fragments.User}
         ${PetitionComposeField.fragments.User}
       `,
       PetitionField: gql`
@@ -550,22 +508,4 @@ export const PetitionComposeFieldList = Object.assign(
       `,
     },
   },
-);
-
-interface BigAddFieldButtonProps
-  extends ButtonOptions,
-    ThemingProps<"Button">,
-    AddFieldPopoverProps {}
-
-const BigAddFieldButton = memo(
-  chakraForwardRef<"button", BigAddFieldButtonProps>(function BigAddFieldButton(props, ref) {
-    return (
-      <AddFieldPopover as={Button} leftIcon={<AddIcon />} {...props}>
-        <FormattedMessage
-          id="petition.add-another-field-button"
-          defaultMessage="Add another field"
-        />
-      </AddFieldPopover>
-    );
-  }),
 );

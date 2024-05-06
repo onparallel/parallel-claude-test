@@ -4640,11 +4640,6 @@
     "context": "Remove attachment"
   },
   {
-    "term": "component.petition-compose-field-group-children.add-field",
-    "definition": "Añadir campo",
-    "context": "Add field"
-  },
-  {
     "term": "component.petition-compose-field-group-children.drag-field-to-link-error",
     "definition": "Este campo no se puede añadir a un grupo",
     "context": "This field can not be added to a group"
@@ -4653,11 +4648,6 @@
     "term": "component.petition-compose-field-group-children.drag-field-to-link-text",
     "definition": "Arrastra campos aquí para añadirlos al grupo",
     "context": "Drag fields here to add them to the group"
-  },
-  {
-    "term": "component.petition-compose-field-group-children.first-child-is-internal-error",
-    "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es.",
-    "context": "The first field of a group cannot be internal if the group is not."
   },
   {
     "term": "component.petition-compose-field-group-settings.group-name",
@@ -4678,6 +4668,11 @@
     "term": "component.petition-compose-field-group-settings.input-group-name-placeholder",
     "definition": "Ej: Familiar",
     "context": "E.g., Family member"
+  },
+  {
+    "term": "component.petition-compose-field-list.add-field",
+    "definition": "Añadir campo",
+    "context": "Add field"
   },
   {
     "term": "component.petition-compose-field-settings.alias-warning",
@@ -4973,6 +4968,61 @@
     "term": "component.petition-compose-heading-settings.visibility",
     "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
     "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-files",
+    "definition": "Archivos y fuentes externas",
+    "context": "Files and external sources"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-headings",
+    "definition": "Títulos y grupos",
+    "context": "Headings and groups"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-numbers",
+    "definition": "Números",
+    "context": "Numbers"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-options",
+    "definition": "Opciones",
+    "context": "Options"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-text",
+    "definition": "Texto",
+    "context": "Text"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.thumbnail-alt",
+    "definition": "Previsualización del tipo de campo \"{type}\"",
+    "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.adding-field",
+    "definition": "Añadiendo {fields}...",
+    "context": "Adding {fields}..."
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.select-field",
+    "definition": "Selecciona el campo que necesites",
+    "context": "Select the field that you need"
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.select-field-group-children",
+    "definition": "Selecciona el campo que necesites o arrastra campos {isTemplate, select, true {de la plantilla} other {del parallel}}",
+    "context": "Select the field that you need or drag and drop fields from the {isTemplate, select, true {template} other {petition}}"
+  },
+  {
+    "term": "component.petition-compose-new-field.empty-search-text",
+    "definition": "No se han encontrado coincidencias con tu búsqueda.",
+    "context": "No matches found for your search."
+  },
+  {
+    "term": "component.petition-compose-new-field.what-do-you-need",
+    "definition": "¿Qué necesitas?",
+    "context": "What do you need?"
   },
   {
     "term": "component.petition-compose-select-settings.list-of-options-description-1",
@@ -5420,6 +5470,11 @@
     "context": "Edit parallel"
   },
   {
+    "term": "component.petition-header.activity-tab",
+    "definition": "Actividad",
+    "context": "Activity"
+  },
+  {
     "term": "component.petition-header.add-tags",
     "definition": "Añadir etiquetas",
     "context": "Add tags"
@@ -5430,7 +5485,12 @@
     "context": "Associate profile"
   },
   {
-    "term": "component.petition-header.compose-tab.readonly",
+    "term": "component.petition-header.compose-tab",
+    "definition": "Editar",
+    "context": "Compose"
+  },
+  {
+    "term": "component.petition-header.compose-tab-readonly",
     "definition": "Edición restringida. Para realizar cambios, puede desactivar la protección en la pestaña Ajustes.",
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
   },
@@ -5470,9 +5530,24 @@
     "context": "Replies succesfully imported"
   },
   {
+    "term": "component.petition-header.input-tab",
+    "definition": "Completar",
+    "context": "Input"
+  },
+  {
+    "term": "component.petition-header.messages-tab",
+    "definition": "Mensajes",
+    "context": "Messages"
+  },
+  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "No recibir notificaciones sobre este parallel.",
     "context": "Don't get notifications about this parallel."
+  },
+  {
+    "term": "component.petition-header.preview-tab",
+    "definition": "Previsualizar",
+    "context": "Preview"
   },
   {
     "term": "component.petition-header.profile-asociated-toast-description",
@@ -5488,6 +5563,11 @@
     "term": "component.petition-header.reopen-button",
     "definition": "Reabrir parallel",
     "context": "Reopen parallel"
+  },
+  {
+    "term": "component.petition-header.replies-tab",
+    "definition": "Revisar",
+    "context": "Review"
   },
   {
     "term": "component.petition-header.save-as-template-button",
@@ -13060,6 +13140,11 @@
     "context": "Grants users in this team permissions to view the list of users on the organization"
   },
   {
+    "term": "page.petition-compose.first-child-is-internal-error",
+    "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es.",
+    "context": "The first field of a group cannot be internal if the group is not."
+  },
+  {
     "term": "page.petition-replies.export-pdf",
     "definition": "Exportar a PDF",
     "context": "Export to PDF"
@@ -14175,11 +14260,6 @@
     "context": "Waiting for signature"
   },
   {
-    "term": "petition.add-another-field-button",
-    "definition": "Añadir otro campo",
-    "context": "Add another field"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Añadir destinatario",
     "context": "Add recipient"
@@ -14268,31 +14348,6 @@
     "term": "petition.confirm-delete-theme.header",
     "definition": "Eliminar tema",
     "context": "Delete theme"
-  },
-  {
-    "term": "petition.header.activity-tab",
-    "definition": "Actividad",
-    "context": "Activity"
-  },
-  {
-    "term": "petition.header.compose-tab",
-    "definition": "Editar",
-    "context": "Compose"
-  },
-  {
-    "term": "petition.header.messages-tab",
-    "definition": "Mensajes",
-    "context": "Messages"
-  },
-  {
-    "term": "petition.header.preview-tab",
-    "definition": "Completar",
-    "context": "Input"
-  },
-  {
-    "term": "petition.header.replies-tab",
-    "definition": "Revisar",
-    "context": "Review"
   },
   {
     "term": "petition.long-batch-send-dialog.header",
@@ -15245,11 +15300,6 @@
     "context": "Write a short description of this template."
   },
   {
-    "term": "template.header.preview-tab",
-    "definition": "Previsualizar",
-    "context": "Preview"
-  },
-  {
     "term": "timeline.access-activated-description",
     "definition": "{userIsYou, select, true {Diste} other {{user} dio}} acceso a {contact} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
@@ -15773,6 +15823,81 @@
     "term": "util.get-open-sanctions-relationship.wife-father",
     "definition": "Padre de la esposa",
     "context": "Wife's father"
+  },
+  {
+    "term": "util.get-petition-field-type-description.background-check-description",
+    "definition": "Integra un campo de búsqueda interna para listas de sanciones y PEPs.",
+    "context": "Integrate an internal search field for sanctions lists and PEPs."
+  },
+  {
+    "term": "util.get-petition-field-type-description.checkbox",
+    "definition": "Incluye una lista de opciones entre las que elegir.",
+    "context": "Include a list of options to choose from."
+  },
+  {
+    "term": "util.get-petition-field-type-description.date",
+    "definition": "Añade un campo de fecha.",
+    "context": "Create a date selection field."
+  },
+  {
+    "term": "util.get-petition-field-type-description.date-time",
+    "definition": "Añade un campo para entradas de fecha y hora.",
+    "context": "Set up a field for date and time entries."
+  },
+  {
+    "term": "util.get-petition-field-type-description.dow-jones-kyc-research-description",
+    "definition": "Realiza una búsqueda en Dow Jones para comprobar los antecedentes de un individuo o entidad.",
+    "context": "Easily search in Dow Jones to run a background check of an individual or legal entity."
+  },
+  {
+    "term": "util.get-petition-field-type-description.dynamic-select-description",
+    "definition": "Incluye listas desplegables en cascada donde cada selección actualiza dinámicamente la lista de opciones siguiente.",
+    "context": "Include cascading dropdowns where each selection dynamically updates the next options list."
+  },
+  {
+    "term": "util.get-petition-field-type-description.field-group-description",
+    "definition": "Agrupa campos para obtener información del mismo perfil, o varios perfiles.",
+    "context": "Group fields to gather information from the same profile, or multiple profiles."
+  },
+  {
+    "term": "util.get-petition-field-type-description.file-upload-description",
+    "definition": "Configura un campo de subida de documentos o archivos, con la opción de adjuntarlos como anexos al PDF.",
+    "context": "Set up a document or file upload field, with optional PDF annexing."
+  },
+  {
+    "term": "util.get-petition-field-type-description.heading-description",
+    "definition": "Añade títulos, textos y saltos de página.",
+    "context": "Insert headings, paragraphs and page breaks."
+  },
+  {
+    "term": "util.get-petition-field-type-description.number",
+    "definition": "Añade un campo de entrada numérica para importes, cantidades, etc.",
+    "context": "Set up a numeric entry field for amounts, quantities, etc."
+  },
+  {
+    "term": "util.get-petition-field-type-description.phone",
+    "definition": "Añade un campo para introducir números de teléfono.",
+    "context": "Create a field for phone number entries."
+  },
+  {
+    "term": "util.get-petition-field-type-description.select-description",
+    "definition": "Incluye una lista desplegable de opciones de la que escoger.",
+    "context": "Enable selection from a dropdown list of options."
+  },
+  {
+    "term": "util.get-petition-field-type-description.short-text-description",
+    "definition": "Crea un campo de respuesta corta, con validación opcional del formato (Ej: email, IBAN).",
+    "context": "Create a short-answer field, with optional format validation (e.g., email, IBAN)."
+  },
+  {
+    "term": "util.get-petition-field-type-description.tax-documents-description",
+    "definition": "Simplifica la obtención de documentos oficiales de administraciones españolas (Ej: AEAT, DGT y Seguridad Social).",
+    "context": "Simplify retrieval of official documents from Spanish authorities (e.g., AEAT, DGT, and Social Security)."
+  },
+  {
+    "term": "util.get-petition-field-type-description.text-description",
+    "definition": "Añade un campo de respuesta larga para respuestas detalladas, como descripciones, direcciones, etc.",
+    "context": "Add a long-answer field for detailed input, such as descriptions, addresses, etc."
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

@@ -1467,18 +1467,24 @@ export const FieldTextIcon = createIcon({
   displayName: "FieldTextIcon",
   viewBox: "0 0 24 24",
   path: (
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.83333"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21.5099 10.7559L11.2099 10.7559" />
-      <path d="M2.27493 19.9668H21.8459" />
-      <path d="M2 15.3633H21.571" />
-      <path d="M2.27493 11.9074L5.08107 5L7.88721 11.9074" />
-      <path d="M3.40021 10.0381L6.77634 10.0381" />
+    <g>
+      <clipPath id="a">
+        <path d="m1 3.5h22v17h-22z" />
+      </clipPath>
+      <g
+        fill="none"
+        clipPath="url(#a)"
+        stroke="currentColor"
+        strokeWidth="1.83333"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m21.809 10.2559h-10.6" />
+        <path d="m2 19.4668h19.8" />
+        <path d="m2 14.8633h19.8" />
+        <path d="m2.27539 11.4074 2.80614-6.9074 2.80614 6.9074" />
+        <path d="m3.40039 9.53809h3.37613" />
+      </g>
     </g>
   ),
 });

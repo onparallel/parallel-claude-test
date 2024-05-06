@@ -20,9 +20,11 @@ import {
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { AddNewFieldPlaceholderProvider } from "@parallel/components/petition-compose/AddNewFieldPlaceholderProvider";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import { PetitionComposeContents } from "@parallel/components/petition-compose/PetitionComposeContents";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
+import { PetitionComposeNewFieldDrawer } from "@parallel/components/petition-compose/PetitionComposeNewFieldDrawer";
 import { PetitionComposeVariables } from "@parallel/components/petition-compose/PetitionComposeVariables";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
@@ -73,13 +75,14 @@ import {
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { waitForElement } from "@parallel/utils/waitForElement";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -134,9 +137,37 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [allFieldsWithIndices, activeFieldId]);
   const activeField = activeFieldWithIndex?.[0] ?? null;
 
-  const fieldsRef = useUpdatingRef({ allFieldsWithIndices, activeFieldId });
+  const fieldsRef = useUpdatingRef({ allFieldsWithIndices, activeFieldId, fieldsWithIndices });
 
   const wrapper = usePetitionStateWrapper();
+
+  const [isLeftPaneActive, setIsLeftPaneActive] = useState(false);
+  const [newFieldPlaceholderFieldId, setNewFieldPlaceholderFieldId] = useState<
+    string | undefined
+  >();
+  const [newFieldPlaceholderParentFieldId, setNewFieldPlaceholderParentFieldId] = useState<
+    string | undefined
+  >();
+  const fieldDrawerRef = useRef<HTMLDivElement>(null);
+
+  const handleCloseFieldDrawer = useCallback(() => {
+    setIsLeftPaneActive(false);
+    setNewFieldPlaceholderFieldId(undefined);
+    setNewFieldPlaceholderParentFieldId(undefined);
+  }, []);
+
+  const handleOpenFieldDrawer = useCallback(
+    (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => {
+      setIsLeftPaneActive(true);
+      setNewFieldPlaceholderFieldId(fieldId);
+      setNewFieldPlaceholderParentFieldId(parentFieldId);
+
+      if (focusSearchInput) {
+        fieldDrawerRef.current?.querySelector("input")?.focus();
+      }
+    },
+    [],
+  );
 
   const [showErrors, setShowErrors] = useState(false);
 
@@ -158,8 +189,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
   useTempQueryParam("field", async (fieldId) => {
-    await waitFor(500);
-    handleIndexFieldClick(fieldId);
+    scrollToField(fieldId);
   });
 
   useTempQueryParam("fromTemplate", () => {
@@ -376,7 +406,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       async function deleteField(force: boolean) {
         try {
           const { allFieldsWithIndices } = fieldsRef.current;
-          const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
+          const fieldIndex = allFieldsWithIndices.findIndex(([f]) => f.id === fieldId);
+          const field = allFieldsWithIndices[fieldIndex]![0];
+
           await deletePetitionField({
             variables: { petitionId, fieldId, force },
             update: (cache, { data }) => {
@@ -393,6 +425,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               }
             },
           });
+
+          if (newFieldPlaceholderFieldId === field.id) {
+            setNewFieldPlaceholderFieldId(
+              field.position ? allFieldsWithIndices[fieldIndex - 1][0].id : undefined,
+            );
+          }
         } catch (e) {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             try {
@@ -434,7 +472,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId],
+    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
   );
 
   const handleFieldSettingsClick = useCallback(
@@ -688,9 +726,70 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId],
   );
 
+  const validateNewFieldPosition = async (type: PetitionFieldType, position?: number) => {
+    const { allFieldsWithIndices } = fieldsRef.current!;
+    const field = allFieldsWithIndices.find(([f]) => f.id === newFieldPlaceholderParentFieldId)![0];
+    const childrenLength = field.children?.length ?? 0;
+    let _position = isDefined(position) && childrenLength > position ? position + 1 : 0;
+    if (
+      (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+      childrenLength === 0 &&
+      !field.isInternal
+    ) {
+      try {
+        await showErrorDialog({
+          message: (
+            <FormattedMessage
+              id="page.petition-compose.first-child-is-internal-error"
+              defaultMessage="The first field of a group cannot be internal if the group is not."
+            />
+          ),
+        });
+      } catch {}
+
+      throw new Error("FIRST_CHILD_IS_INTERNAL_ERROR");
+    } else {
+      if (
+        (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+        childrenLength > 0 &&
+        position === 0 &&
+        !field.isInternal
+      ) {
+        _position = 1;
+      }
+    }
+    return _position;
+  };
+
   const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
   const handleAddField = useCallback(
-    wrapper(async function (type: PetitionFieldType, position?: number, parentFieldId?: string) {
+    wrapper(async function (type: PetitionFieldType) {
+      const parentFieldId = newFieldPlaceholderParentFieldId;
+      const { fieldsWithIndices } = fieldsRef.current!;
+
+      let position = undefined as number | undefined;
+      if (isDefined(parentFieldId)) {
+        const parentField = fieldsWithIndices.find(([f]) => f.id === parentFieldId)![0];
+        const childIndex = parentField.children?.findIndex(
+          (f) => f.id === newFieldPlaceholderFieldId,
+        );
+        try {
+          position = await validateNewFieldPosition(
+            type,
+            childIndex === -1 ? undefined : childIndex,
+          );
+        } catch {
+          return;
+        }
+      } else {
+        const fieldIndex = fieldsWithIndices.findIndex(
+          ([f]) => f.id === newFieldPlaceholderFieldId,
+        );
+
+        if (fieldIndex !== -1) {
+          position = fieldIndex + 1;
+        }
+      }
       const { data } = await createPetitionField({
         variables: { petitionId, type, position, parentFieldId },
         update: (cache, { data }) => {
@@ -713,11 +812,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
         },
       });
-
       setActiveFieldId(data!.createPetitionField.id);
-      focusFieldTitle(data!.createPetitionField.id);
+      setTimeout(() => scrollToField(data!.createPetitionField.id));
+
+      if (type === "FIELD_GROUP") {
+        setNewFieldPlaceholderFieldId(undefined);
+        setNewFieldPlaceholderParentFieldId(data?.createPetitionField.id);
+      } else {
+        setNewFieldPlaceholderFieldId(data!.createPetitionField.id);
+      }
     }),
-    [petitionId],
+    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
   );
 
   const showErrorDialog = useErrorDialog();
@@ -780,12 +885,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showConfirmLinkDialog = useConfirmLinkFieldDialog();
   const handleLinkField = useCallback(
     wrapper(async function (parentFieldId: string, childrenFieldIds: string[]) {
-      try {
+      const fieldId = childrenFieldIds[0];
+      const linkField = async (force?: boolean) => {
         await linkPetitionFieldChild({
           variables: {
             petitionId,
             parentFieldId,
             childrenFieldIds,
+            force,
           },
           update: (cache, { data }) => {
             if (isTemplate && isDefined(data)) {
@@ -813,6 +920,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             }
           },
         });
+
+        if (newFieldPlaceholderFieldId === fieldId) {
+          setNewFieldPlaceholderParentFieldId(parentFieldId);
+        }
+      };
+      try {
+        await linkField();
       } catch (error) {
         if (isApolloError(error, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
           await checkReferencedFieldInBackgroundCheck(
@@ -821,39 +935,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         } else if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
           try {
             await showConfirmLinkDialog();
-            await linkPetitionFieldChild({
-              variables: {
-                petitionId,
-                parentFieldId,
-                childrenFieldIds,
-                force: true,
-              },
-              update: (cache, { data }) => {
-                if (isTemplate && isDefined(data)) {
-                  for (const fieldId of childrenFieldIds) {
-                    updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
-                      return replies.map((r) => {
-                        return {
-                          ...r,
-                          children: [
-                            ...(r.children ?? []),
-                            {
-                              field: {
-                                __typename: "PetitionField",
-                                id: fieldId,
-                                replies: [],
-                              },
-                              replies: [],
-                              __typename: "PetitionFieldGroupChildReply",
-                            },
-                          ],
-                        };
-                      });
-                    });
-                  }
-                }
-              },
-            });
+            await linkField(true);
           } catch {}
         } else if (isApolloError(error, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
           await withError(
@@ -893,7 +975,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId],
+    [petitionId, newFieldPlaceholderFieldId],
   );
 
   const [unlinkPetitionFieldChild] = useMutation(
@@ -926,6 +1008,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               }
           },
         });
+
+        if (newFieldPlaceholderFieldId === fieldId) {
+          setNewFieldPlaceholderParentFieldId(undefined);
+        }
       };
       try {
         await unlinkChild();
@@ -966,7 +1052,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId],
+    [petitionId, newFieldPlaceholderFieldId],
   );
 
   const handleNextClick = useSendPetitionHandler(
@@ -976,15 +1062,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     validPetitionFields,
   );
 
-  const handleIndexFieldClick = useCallback(async (fieldId: string) => {
-    const fieldElement = document.querySelector(`#field-${fieldId}`);
+  const highlight = useHighlightElement();
+  const scrollToField = useCallback(async (fieldId: string) => {
+    const fieldElement = await waitForElement(`#field-${fieldId}`);
     if (fieldElement) {
       focusFieldTitle(fieldId);
-      await scrollIntoView(fieldElement, {
-        block: "center",
-        behavior: "smooth",
-        scrollMode: "if-needed",
-      });
+      highlight(fieldElement);
     }
   }, []);
 
@@ -1041,6 +1124,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onClick={handleNextClick}
             />
           ) : null
+        }
+        hasLeftPane
+        isLeftPaneActive={isLeftPaneActive}
+        leftPane={
+          <PetitionComposeNewFieldDrawer
+            ref={fieldDrawerRef}
+            user={me}
+            onClose={handleCloseFieldDrawer}
+            onAddField={handleAddField}
+            isFieldGroupChild={Boolean(newFieldPlaceholderParentFieldId)}
+          />
         }
         hasRightPane
         isRightPaneActive={Boolean(activeFieldId)}
@@ -1107,7 +1201,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
                   <PetitionComposeContents
                     fieldsWithIndices={allFieldsWithIndices as any}
-                    onFieldClick={handleIndexFieldClick}
+                    onFieldClick={scrollToField}
                     onFieldEdit={handleFieldEdit}
                     isReadOnly={isReadOnly}
                   />
@@ -1148,22 +1242,29 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           zIndex={1}
           backgroundColor={petition.__typename === "PetitionTemplate" ? "primary.50" : undefined}
         >
-          <PetitionComposeFieldList
-            showErrors={showErrors}
-            user={me}
-            petition={petition}
-            activeFieldId={activeFieldId}
-            onAddField={handleAddField}
-            onCloneField={handleCloneField}
-            onDeleteField={handleDeleteField}
-            onUpdateFieldPositions={handleUpdateFieldPositions}
-            onFieldEdit={handleFieldEdit}
-            onFieldSettingsClick={handleFieldSettingsClick}
-            onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
-            onLinkField={handleLinkField}
-            onUnlinkField={handleUnlinkField}
-            isReadOnly={isReadOnly}
-          />
+          <AddNewFieldPlaceholderProvider
+            value={{
+              newFieldPlaceholderFieldId,
+              newFieldPlaceholderParentFieldId,
+            }}
+          >
+            <PetitionComposeFieldList
+              showErrors={showErrors}
+              user={me}
+              petition={petition}
+              activeFieldId={activeFieldId}
+              onCloneField={handleCloneField}
+              onDeleteField={handleDeleteField}
+              onUpdateFieldPositions={handleUpdateFieldPositions}
+              onFieldEdit={handleFieldEdit}
+              onFieldSettingsClick={handleFieldSettingsClick}
+              onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
+              onLinkField={handleLinkField}
+              onUnlinkField={handleUnlinkField}
+              showAddField={handleOpenFieldDrawer}
+              isReadOnly={isReadOnly}
+            />
+          </AddNewFieldPlaceholderProvider>
           {petition.isDocumentGenerationEnabled ? (
             <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
           ) : null}
@@ -1318,6 +1419,7 @@ const _fragments = {
             }
           }
           ...PetitionComposeFieldSettings_User
+          ...PetitionComposeNewFieldDrawer_User
         }
       }
       ${PetitionLayout.fragments.Query}
@@ -1325,6 +1427,7 @@ const _fragments = {
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
       ${PetitionComposeFieldSettings.fragments.User}
+      ${PetitionComposeNewFieldDrawer.fragments.User}
     `;
   },
 };
@@ -1388,6 +1491,7 @@ const _mutations = [
           ...PetitionLayout_PetitionBase
           fields {
             id
+            position
             children {
               id
             }
@@ -1435,6 +1539,7 @@ const _mutations = [
         ...PetitionLayout_PetitionBase
         fields {
           id
+          position
           children {
             id
           }

@@ -217,7 +217,7 @@ export const PetitionHeader = Object.assign(
                     content={
                       <Text fontSize="sm">
                         <FormattedMessage
-                          id="component.petition-header.compose-tab.readonly"
+                          id="component.petition-header.compose-tab-readonly"
                           defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
                         />
                       </Text>
@@ -228,7 +228,7 @@ export const PetitionHeader = Object.assign(
                 ) : undefined,
                 section: "compose",
                 label: intl.formatMessage({
-                  id: "petition.header.compose-tab",
+                  id: "component.petition-header.compose-tab",
                   defaultMessage: "Compose",
                 }),
                 attributes: {
@@ -239,7 +239,7 @@ export const PetitionHeader = Object.assign(
               {
                 section: "preview",
                 label: intl.formatMessage({
-                  id: "petition.header.preview-tab",
+                  id: "component.petition-header.input-tab",
                   defaultMessage: "Input",
                 }),
                 attributes: {
@@ -250,7 +250,7 @@ export const PetitionHeader = Object.assign(
               {
                 section: "replies",
                 label: intl.formatMessage({
-                  id: "petition.header.replies-tab",
+                  id: "component.petition-header.replies-tab",
                   defaultMessage: "Review",
                 }),
                 attributes: {
@@ -261,7 +261,7 @@ export const PetitionHeader = Object.assign(
               {
                 section: "activity",
                 label: intl.formatMessage({
-                  id: "petition.header.activity-tab",
+                  id: "component.petition-header.activity-tab",
                   defaultMessage: "Activity",
                 }),
                 attributes: {
@@ -275,7 +275,7 @@ export const PetitionHeader = Object.assign(
                 rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
                 section: "compose",
                 label: intl.formatMessage({
-                  id: "petition.header.compose-tab",
+                  id: "component.petition-header.compose-tab",
                   defaultMessage: "Compose",
                 }),
                 attributes: {
@@ -288,7 +288,7 @@ export const PetitionHeader = Object.assign(
                     rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
                     section: "messages",
                     label: intl.formatMessage({
-                      id: "petition.header.messages-tab",
+                      id: "component.petition-header.messages-tab",
                       defaultMessage: "Messages",
                     }),
                     attributes: {
@@ -300,7 +300,7 @@ export const PetitionHeader = Object.assign(
               {
                 section: "preview",
                 label: intl.formatMessage({
-                  id: "template.header.preview-tab",
+                  id: "component.petition-header.preview-tab",
                   defaultMessage: "Preview",
                 }),
                 attributes: {
@@ -935,7 +935,7 @@ function EditionRestrictedPopover() {
       content={
         <Text fontSize="sm">
           <FormattedMessage
-            id="component.petition-header.compose-tab.readonly"
+            id="component.petition-header.compose-tab-readonly"
             defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
           />
         </Text>

@@ -49,7 +49,7 @@ import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
-import { Reorder, useDragControls, useMotionValue } from "framer-motion";
+import { MotionConfig, Reorder, useDragControls, useMotionValue } from "framer-motion";
 import pMap from "p-map";
 import { useEffect, useRef, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
@@ -392,46 +392,48 @@ export const PetitionComposeAttachments = Object.assign(
         <Stack paddingY={4} paddingX={2}>
           <input type="file" {...getInputProps()} />
           {allAttachments.length > 0 ? (
-            <Stack spacing={2} divider={<Divider />}>
-              {[
-                ["FRONT", front, setFront] as const,
-                ["ANNEX", annex, setAnnex] as const,
-                ["BACK", back, setBack] as const,
-              ].map(([position, list, setList]) =>
-                list.length > 0 ? (
-                  <Stack
-                    key={position}
-                    listStyleType="none"
-                    as={Reorder.Group}
-                    axis="y"
-                    values={list}
-                    onReorder={setList as any}
-                  >
-                    {list.map((item, i) => {
-                      return (
-                        <AttachmentItem
-                          key={item.id}
-                          item={item}
-                          index={i}
-                          progress={attachmentUploadProgress[item.id]}
-                          isDraggable={list.length > 1}
-                          isDisabled={isReadOnly}
-                          onRemove={handleRemoveAttachment}
-                          onPreview={handleDownloadAttachment}
-                          onChangeType={handleChangeType}
-                          onDragEnd={() =>
-                            handleReorderAttachments(
-                              position,
-                              list.map((item) => item.id),
-                            )
-                          }
-                        />
-                      );
-                    })}
-                  </Stack>
-                ) : null,
-              )}
-            </Stack>
+            <MotionConfig reducedMotion="always">
+              <Stack spacing={2} divider={<Divider />}>
+                {[
+                  ["FRONT", front, setFront] as const,
+                  ["ANNEX", annex, setAnnex] as const,
+                  ["BACK", back, setBack] as const,
+                ].map(([position, list, setList]) =>
+                  list.length > 0 ? (
+                    <Stack
+                      key={position}
+                      listStyleType="none"
+                      as={Reorder.Group}
+                      axis="y"
+                      values={list}
+                      onReorder={setList as any}
+                    >
+                      {list.map((item, i) => {
+                        return (
+                          <AttachmentItem
+                            key={item.id}
+                            item={item}
+                            index={i}
+                            progress={attachmentUploadProgress[item.id]}
+                            isDraggable={list.length > 1}
+                            isDisabled={isReadOnly}
+                            onRemove={handleRemoveAttachment}
+                            onPreview={handleDownloadAttachment}
+                            onChangeType={handleChangeType}
+                            onDragEnd={() =>
+                              handleReorderAttachments(
+                                position,
+                                list.map((item) => item.id),
+                              )
+                            }
+                          />
+                        );
+                      })}
+                    </Stack>
+                  ) : null,
+                )}
+              </Stack>
+            </MotionConfig>
           ) : (
             <Text width="100%" textAlign="center" color="gray.500">
               <FormattedMessage

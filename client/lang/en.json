@@ -4640,11 +4640,6 @@
     "context": "Remove attachment"
   },
   {
-    "term": "component.petition-compose-field-group-children.add-field",
-    "definition": "Add field",
-    "context": "Add field"
-  },
-  {
     "term": "component.petition-compose-field-group-children.drag-field-to-link-error",
     "definition": "This field can not be added to a group",
     "context": "This field can not be added to a group"
@@ -4653,11 +4648,6 @@
     "term": "component.petition-compose-field-group-children.drag-field-to-link-text",
     "definition": "Drag fields here to add them to the group",
     "context": "Drag fields here to add them to the group"
-  },
-  {
-    "term": "component.petition-compose-field-group-children.first-child-is-internal-error",
-    "definition": "The first field of a group cannot be internal if the group is not.",
-    "context": "The first field of a group cannot be internal if the group is not."
   },
   {
     "term": "component.petition-compose-field-group-settings.group-name",
@@ -4678,6 +4668,11 @@
     "term": "component.petition-compose-field-group-settings.input-group-name-placeholder",
     "definition": "E.g., Family member",
     "context": "E.g., Family member"
+  },
+  {
+    "term": "component.petition-compose-field-list.add-field",
+    "definition": "Add field",
+    "context": "Add field"
   },
   {
     "term": "component.petition-compose-field-settings.alias-warning",
@@ -4973,6 +4968,61 @@
     "term": "component.petition-compose-heading-settings.visibility",
     "definition": "Can't add page breaks on headings with visibility conditions",
     "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-files",
+    "definition": "Files and external sources",
+    "context": "Files and external sources"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-headings",
+    "definition": "Headings and groups",
+    "context": "Headings and groups"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-numbers",
+    "definition": "Numbers",
+    "context": "Numbers"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-options",
+    "definition": "Options",
+    "context": "Options"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-text",
+    "definition": "Text",
+    "context": "Text"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.thumbnail-alt",
+    "definition": "Thumbnail for field type \"{type}\"",
+    "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.adding-field",
+    "definition": "Adding {fields}...",
+    "context": "Adding {fields}..."
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.select-field",
+    "definition": "Select the field that you need",
+    "context": "Select the field that you need"
+  },
+  {
+    "term": "component.petition-compose-new-field-placeholder.select-field-group-children",
+    "definition": "Select the field that you need or drag and drop fields from the {isTemplate, select, true {template} other {petition}}",
+    "context": "Select the field that you need or drag and drop fields from the {isTemplate, select, true {template} other {petition}}"
+  },
+  {
+    "term": "component.petition-compose-new-field.empty-search-text",
+    "definition": "No matches found for your search.",
+    "context": "No matches found for your search."
+  },
+  {
+    "term": "component.petition-compose-new-field.what-do-you-need",
+    "definition": "What do you need?",
+    "context": "What do you need?"
   },
   {
     "term": "component.petition-compose-select-settings.list-of-options-description-1",
@@ -5420,6 +5470,11 @@
     "context": "Edit parallel"
   },
   {
+    "term": "component.petition-header.activity-tab",
+    "definition": "Activity",
+    "context": "Activity"
+  },
+  {
     "term": "component.petition-header.add-tags",
     "definition": "Add tags",
     "context": "Add tags"
@@ -5430,7 +5485,12 @@
     "context": "Associate profile"
   },
   {
-    "term": "component.petition-header.compose-tab.readonly",
+    "term": "component.petition-header.compose-tab",
+    "definition": "Compose",
+    "context": "Compose"
+  },
+  {
+    "term": "component.petition-header.compose-tab-readonly",
     "definition": "Edition restricted. To make changes, you can disable the protection on the Settings tab.",
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
   },
@@ -5470,9 +5530,24 @@
     "context": "Replies succesfully imported"
   },
   {
+    "term": "component.petition-header.input-tab",
+    "definition": "Input",
+    "context": "Input"
+  },
+  {
+    "term": "component.petition-header.messages-tab",
+    "definition": "Messages",
+    "context": "Messages"
+  },
+  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "Don't get notifications about this parallel.",
     "context": "Don't get notifications about this parallel."
+  },
+  {
+    "term": "component.petition-header.preview-tab",
+    "definition": "Preview",
+    "context": "Preview"
   },
   {
     "term": "component.petition-header.profile-asociated-toast-description",
@@ -5488,6 +5563,11 @@
     "term": "component.petition-header.reopen-button",
     "definition": "Reopen parallel",
     "context": "Reopen parallel"
+  },
+  {
+    "term": "component.petition-header.replies-tab",
+    "definition": "Review",
+    "context": "Review"
   },
   {
     "term": "component.petition-header.save-as-template-button",
@@ -13060,6 +13140,11 @@
     "context": "Grants users in this team permissions to view the list of users on the organization"
   },
   {
+    "term": "page.petition-compose.first-child-is-internal-error",
+    "definition": "The first field of a group cannot be internal if the group is not.",
+    "context": "The first field of a group cannot be internal if the group is not."
+  },
+  {
     "term": "page.petition-replies.export-pdf",
     "definition": "Export to PDF",
     "context": "Export to PDF"
@@ -14175,11 +14260,6 @@
     "context": "Waiting for signature"
   },
   {
-    "term": "petition.add-another-field-button",
-    "definition": "Add another field",
-    "context": "Add another field"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Add recipient",
     "context": "Add recipient"
@@ -14268,31 +14348,6 @@
     "term": "petition.confirm-delete-theme.header",
     "definition": "Delete theme",
     "context": "Delete theme"
-  },
-  {
-    "term": "petition.header.activity-tab",
-    "definition": "Activity",
-    "context": "Activity"
-  },
-  {
-    "term": "petition.header.compose-tab",
-    "definition": "Compose",
-    "context": "Compose"
-  },
-  {
-    "term": "petition.header.messages-tab",
-    "definition": "Messages",
-    "context": "Messages"
-  },
-  {
-    "term": "petition.header.preview-tab",
-    "definition": "Input",
-    "context": "Input"
-  },
-  {
-    "term": "petition.header.replies-tab",
-    "definition": "Review",
-    "context": "Review"
   },
   {
     "term": "petition.long-batch-send-dialog.header",
@@ -15245,11 +15300,6 @@
     "context": "Write a short description of this template."
   },
   {
-    "term": "template.header.preview-tab",
-    "definition": "Preview",
-    "context": "Preview"
-  },
-  {
     "term": "timeline.access-activated-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
@@ -15773,6 +15823,81 @@
     "term": "util.get-open-sanctions-relationship.wife-father",
     "definition": "Wife's father",
     "context": "Wife's father"
+  },
+  {
+    "term": "util.get-petition-field-type-description.background-check-description",
+    "definition": "Integrate an internal search field for sanctions lists and PEPs.",
+    "context": "Integrate an internal search field for sanctions lists and PEPs."
+  },
+  {
+    "term": "util.get-petition-field-type-description.checkbox",
+    "definition": "Include a list of options to choose from.",
+    "context": "Include a list of options to choose from."
+  },
+  {
+    "term": "util.get-petition-field-type-description.date",
+    "definition": "Create a date selection field.",
+    "context": "Create a date selection field."
+  },
+  {
+    "term": "util.get-petition-field-type-description.date-time",
+    "definition": "Set up a field for date and time entries.",
+    "context": "Set up a field for date and time entries."
+  },
+  {
+    "term": "util.get-petition-field-type-description.dow-jones-kyc-research-description",
+    "definition": "Easily search in Dow Jones to run a background check of an individual or legal entity.",
+    "context": "Easily search in Dow Jones to run a background check of an individual or legal entity."
+  },
+  {
+    "term": "util.get-petition-field-type-description.dynamic-select-description",
+    "definition": "Include cascading dropdowns where each selection dynamically updates the next options list.",
+    "context": "Include cascading dropdowns where each selection dynamically updates the next options list."
+  },
+  {
+    "term": "util.get-petition-field-type-description.field-group-description",
+    "definition": "Group fields to gather information from the same profile, or multiple profiles.",
+    "context": "Group fields to gather information from the same profile, or multiple profiles."
+  },
+  {
+    "term": "util.get-petition-field-type-description.file-upload-description",
+    "definition": "Set up a document or file upload field, with optional PDF annexing.",
+    "context": "Set up a document or file upload field, with optional PDF annexing."
+  },
+  {
+    "term": "util.get-petition-field-type-description.heading-description",
+    "definition": "Insert headings, paragraphs and page breaks.",
+    "context": "Insert headings, paragraphs and page breaks."
+  },
+  {
+    "term": "util.get-petition-field-type-description.number",
+    "definition": "Set up a numeric entry field for amounts, quantities, etc.",
+    "context": "Set up a numeric entry field for amounts, quantities, etc."
+  },
+  {
+    "term": "util.get-petition-field-type-description.phone",
+    "definition": "Create a field for phone number entries.",
+    "context": "Create a field for phone number entries."
+  },
+  {
+    "term": "util.get-petition-field-type-description.select-description",
+    "definition": "Enable selection from a dropdown list of options.",
+    "context": "Enable selection from a dropdown list of options."
+  },
+  {
+    "term": "util.get-petition-field-type-description.short-text-description",
+    "definition": "Create a short-answer field, with optional format validation (e.g., email, IBAN).",
+    "context": "Create a short-answer field, with optional format validation (e.g., email, IBAN)."
+  },
+  {
+    "term": "util.get-petition-field-type-description.tax-documents-description",
+    "definition": "Simplify retrieval of official documents from Spanish authorities (e.g., AEAT, DGT, and Social Security).",
+    "context": "Simplify retrieval of official documents from Spanish authorities (e.g., AEAT, DGT, and Social Security)."
+  },
+  {
+    "term": "util.get-petition-field-type-description.text-description",
+    "definition": "Add a long-answer field for detailed input, such as descriptions, addresses, etc.",
+    "context": "Add a long-answer field for detailed input, such as descriptions, addresses, etc."
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

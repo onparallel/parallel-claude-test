@@ -230,7 +230,7 @@ export function PreviewPetitionFieldCommentsDialog({
                             defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
                             values={{
                               composeTab: intl.formatMessage({
-                                id: "petition.header.compose-tab",
+                                id: "component.petition-header.compose-tab",
                                 defaultMessage: "Compose",
                               }),
                               a: (chunks: any) => (
