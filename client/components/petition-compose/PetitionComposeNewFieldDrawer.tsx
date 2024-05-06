@@ -30,7 +30,7 @@ const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionF
 interface PetitionComposeNewFieldDrawerProps {
   user: PetitionComposeNewFieldDrawer_UserFragment;
   onClose: () => void;
-  onAddField: (type: PetitionFieldType, parentFieldId?: string) => void;
+  onAddField: (type: PetitionFieldType, parentFieldId?: string) => Promise<void>;
   isFieldGroupChild: boolean;
 }
 
@@ -128,9 +128,15 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
 
       const filteredFieldCategories = fieldCategories.filter(({ fields }) => fields.length > 0);
       const isFullScreen = useBreakpointValue({ base: true, lg: false });
+      const isAddingFieldRef = useRef(false);
       const handleAddField = useCallback(
         async (type: PetitionFieldType) => {
+          if (isAddingFieldRef.current) {
+            return;
+          }
+          isAddingFieldRef.current = true;
           await onAddField(type);
+          isAddingFieldRef.current = false;
           if (isFullScreen) {
             onClose();
           }
