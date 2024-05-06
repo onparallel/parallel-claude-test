@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
 const chalk_1 = __importDefault(require("chalk"));
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
-const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 const cw = new client_cloudwatch_1.CloudWatchClient({});
@@ -41,23 +41,13 @@ async function main() {
         if (!liveInstances.includes(instanceId)) {
             const instanceName = (_a = instance.Tags.find((t) => t.Key === "Name")) === null || _a === void 0 ? void 0 : _a.Value;
             const instanceState = instance.State.Name;
-            if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
-                console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
-                if (!dryRun) {
-                    const name = instance.Tags.find((t) => t.Key === "Name").Value;
-                    const alarms = await cw
-                        .send(new client_cloudwatch_1.DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
-                        .then((r) => r.MetricAlarms);
-                    if (alarms.length) {
-                        console.log(`Deleting intance alarms ${alarms.map((a) => a.AlarmName).join(", ")}`);
-                        await cw.send(new client_cloudwatch_1.DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName) }));
-                    }
-                    await ec2.send(new client_ec2_1.TerminateInstancesCommand({ InstanceIds: [instanceId] }));
-                }
-            }
-            else if (instanceState === "running") {
+            if (instanceState === "running") {
                 console.log((0, chalk_1.default) `Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
                 if (!dryRun) {
+                    await ec2.send(new client_ec2_1.CreateTagsCommand({
+                        Resources: [instanceId],
+                        Tags: [{ Key: "Bin", Value: "true" }],
+                    }));
                     await ec2.send(new client_ec2_1.StopInstancesCommand({ InstanceIds: [instanceId] }));
                 }
             }
@@ -70,6 +60,17 @@ async function main() {
                         console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
                         if (!dryRun) {
                             await ec2.send(new client_ec2_1.TerminateInstancesCommand({ InstanceIds: [instanceId] }));
+                        }
+                        const alarms = await cw
+                            .send(new client_cloudwatch_1.DescribeAlarmsCommand({
+                            AlarmNames: [`${instanceName}-cpu-1m`, `${instanceName}-cpu-5m`],
+                        }))
+                            .then((r) => r.MetricAlarms);
+                        if (alarms.length) {
+                            console.log(`Deleting intance alarms ${alarms.map((a) => a.AlarmName).join(", ")}`);
+                            if (!dryRun) {
+                                await cw.send(new client_cloudwatch_1.DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName) }));
+                            }
                         }
                     }
                 }

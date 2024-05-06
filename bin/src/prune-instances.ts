@@ -1,4 +1,10 @@
 import {
+  CloudWatchClient,
+  DeleteAlarmsCommand,
+  DescribeAlarmsCommand,
+} from "@aws-sdk/client-cloudwatch";
+import {
+  CreateTagsCommand,
   DescribeInstancesCommand,
   EC2Client,
   StopInstancesCommand,
@@ -11,11 +17,6 @@ import {
 import chalk from "chalk";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import {
-  CloudWatchClient,
-  DeleteAlarmsCommand,
-  DescribeAlarmsCommand,
-} from "@aws-sdk/client-cloudwatch";
 
 type Environment = "staging" | "production";
 
@@ -54,22 +55,15 @@ async function main() {
     if (!liveInstances.includes(instanceId)) {
       const instanceName = instance.Tags!.find((t) => t.Key === "Name")?.Value;
       const instanceState = instance.State!.Name!;
-      if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
-        console.log(chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
-        if (!dryRun) {
-          const name = instance.Tags!.find((t) => t.Key === "Name")!.Value!;
-          const alarms = await cw
-            .send(new DescribeAlarmsCommand({ AlarmNames: [`${name}-cpu-1m`, `${name}-cpu-5m`] }))
-            .then((r) => r.MetricAlarms!);
-          if (alarms.length) {
-            console.log(`Deleting intance alarms ${alarms.map((a) => a.AlarmName!).join(", ")}`);
-            await cw.send(new DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName!) }));
-          }
-          await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));
-        }
-      } else if (instanceState === "running") {
+      if (instanceState === "running") {
         console.log(chalk`Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
         if (!dryRun) {
+          await ec2.send(
+            new CreateTagsCommand({
+              Resources: [instanceId],
+              Tags: [{ Key: "Bin", Value: "true" }],
+            }),
+          );
           await ec2.send(new StopInstancesCommand({ InstanceIds: [instanceId] }));
         }
       } else if (instanceState === "stopped" || instanceState === "stopping") {
@@ -83,6 +77,21 @@ async function main() {
             );
             if (!dryRun) {
               await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));
+            }
+            const alarms = await cw
+              .send(
+                new DescribeAlarmsCommand({
+                  AlarmNames: [`${instanceName}-cpu-1m`, `${instanceName}-cpu-5m`],
+                }),
+              )
+              .then((r) => r.MetricAlarms!);
+            if (alarms.length) {
+              console.log(`Deleting intance alarms ${alarms.map((a) => a.AlarmName!).join(", ")}`);
+              if (!dryRun) {
+                await cw.send(
+                  new DeleteAlarmsCommand({ AlarmNames: alarms.map((a) => a.AlarmName!) }),
+                );
+              }
             }
           }
         }
