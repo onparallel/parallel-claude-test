@@ -4995,16 +4995,6 @@
     "context": "Text"
   },
   {
-    "term": "component.petition-compose-new-field-drawer.thumbnail-alt",
-    "definition": "Thumbnail for field type \"{type}\"",
-    "context": "Thumbnail for field type \"{type}\""
-  },
-  {
-    "term": "component.petition-compose-new-field-placeholder.adding-field",
-    "definition": "Adding {fields}...",
-    "context": "Adding {fields}..."
-  },
-  {
     "term": "component.petition-compose-new-field-placeholder.select-field",
     "definition": "Select the field that you need",
     "context": "Select the field that you need"

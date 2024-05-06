@@ -4995,16 +4995,6 @@
     "context": "Text"
   },
   {
-    "term": "component.petition-compose-new-field-drawer.thumbnail-alt",
-    "definition": "Previsualización del tipo de campo \"{type}\"",
-    "context": "Thumbnail for field type \"{type}\""
-  },
-  {
-    "term": "component.petition-compose-new-field-placeholder.adding-field",
-    "definition": "Añadiendo {fields}...",
-    "context": "Adding {fields}..."
-  },
-  {
     "term": "component.petition-compose-new-field-placeholder.select-field",
     "definition": "Selecciona el campo que necesites",
     "context": "Select the field that you need"
@@ -10696,7 +10686,7 @@
   },
   {
     "term": "generic.for-example",
-    "definition": "Por ejemplo, {example}",
+    "definition": "P. ej. {example}",
     "context": "E.g. {example}"
   },
   {
