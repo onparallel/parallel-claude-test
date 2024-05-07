@@ -13,7 +13,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { RepeatIcon, SparklesIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionRepliesSummary_PetitionFragment,
   PetitionRepliesSummary_UserFragment,
@@ -35,207 +34,191 @@ interface PetitionRepliesSummaryProps {
   onRefetch: () => void;
 }
 
-export const PetitionRepliesSummary = Object.assign(
-  chakraForwardRef<"div", PetitionRepliesSummaryProps>(function PetitionRepliesSummary(
-    { petition, user, onRefetch }: PetitionRepliesSummaryProps,
-    ref,
-  ) {
-    const intl = useIntl();
-    const [isLoading, setIsLoading] = useState(false);
+export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRepliesSummaryProps) {
+  const intl = useIntl();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const request = petition.latestSummaryRequest;
-    const summary =
-      !isLoading && request?.status !== "PENDING" && isDefined(request?.completion)
-        ? request!.completion
-        : null;
+  const request = petition.latestSummaryRequest;
+  const summary =
+    !isLoading && request?.status !== "PENDING" && isDefined(request?.completion)
+      ? request!.completion
+      : null;
 
-    const hasError = !isLoading && request?.status === "FAILED";
-    const generatePetitionSummaryBackgroundTask = usePetitionSummaryBackgroundTask();
+  const hasError = !isLoading && request?.status === "FAILED";
+  const generatePetitionSummaryBackgroundTask = usePetitionSummaryBackgroundTask();
 
-    const handleGenerateSummary = async () => {
-      setIsLoading(true);
-      try {
-        window.analytics?.track("Petition Summary Generate Click", {
-          petitionId: petition.id,
-          fromTemplateId: petition.fromTemplate?.id,
-        });
-        await generatePetitionSummaryBackgroundTask(
-          { petitionId: petition.id },
-          { timeout: 120_000 },
-        );
-        onRefetch();
-      } catch (e) {
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const handleRegenerateSummary = async () => {
-      setIsLoading(true);
-      try {
-        window.analytics?.track("Petition Summary Regenerate Click", {
-          petitionId: petition.id,
-          fromTemplateId: petition.fromTemplate?.id,
-        });
-        await generatePetitionSummaryBackgroundTask(
-          { petitionId: petition.id },
-          { timeout: 120_000 },
-        );
-        onRefetch();
-      } catch (e) {
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const handleCopySummary = () => {
-      window.analytics?.track("Petition Summary Copy Click", {
+  const handleGenerateSummary = async () => {
+    setIsLoading(true);
+    try {
+      window.analytics?.track("Petition Summary Generate Click", {
         petitionId: petition.id,
         fromTemplateId: petition.fromTemplate?.id,
       });
-    };
+      await generatePetitionSummaryBackgroundTask(
+        { petitionId: petition.id },
+        { timeout: 120_000 },
+      );
+      onRefetch();
+    } catch (e) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return (
-      <Stack padding={4} paddingBottom={0} spacing={4} flex="1">
-        {!user.hasSummaryAccess ? (
-          <>
-            <Stack textAlign="center" align="center">
-              <Image
-                width="125px"
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/summary-ai.svg`}
-              />
-              <Heading size="md" textAlign="center">
-                <FormattedMessage
-                  id="component.petition-replies-summary.no-summary-feature-heading"
-                  defaultMessage="Introducing Mike AI"
-                />
-              </Heading>
-              <Text>
-                <FormattedMessage
-                  id="component.petition-replies-summary.no-summary-feature-body"
-                  defaultMessage="Let Mike AI analyze the answers and draw conclusions from this process. Contact us for more information."
-                />
-              </Text>
-            </Stack>
+  const handleRegenerateSummary = async () => {
+    setIsLoading(true);
+    try {
+      window.analytics?.track("Petition Summary Regenerate Click", {
+        petitionId: petition.id,
+        fromTemplateId: petition.fromTemplate?.id,
+      });
+      await generatePetitionSummaryBackgroundTask(
+        { petitionId: petition.id },
+        { timeout: 120_000 },
+      );
+      onRefetch();
+    } catch (e) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            <Box alignSelf="center">
-              <SupportButton
-                colorScheme="primary"
-                message={intl.formatMessage({
-                  id: "component.petition-replies-summary.activate-petition-summary-support-message",
-                  defaultMessage:
-                    "Hi, I would like to use Mike AI to analyze the replies from a parallel.",
-                })}
-              >
-                <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-              </SupportButton>
-            </Box>
-          </>
-        ) : isLoading ? (
-          <Center padding={4} height="100%">
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="primary.500"
-              size="xl"
+  const handleCopySummary = () => {
+    window.analytics?.track("Petition Summary Copy Click", {
+      petitionId: petition.id,
+      fromTemplateId: petition.fromTemplate?.id,
+    });
+  };
+
+  return (
+    <Box flex="1" display="flex" flexDirection="column" minHeight={0}>
+      {!user.hasSummaryAccess ? (
+        <Stack padding={2} flex="1" justifyContent="center" align="center">
+          <Image
+            width="125px"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/summary-ai.svg`}
+          />
+          <Heading size="md" textAlign="center">
+            <FormattedMessage
+              id="component.petition-replies-summary.no-summary-feature-heading"
+              defaultMessage="Introducing Mike AI"
             />
-          </Center>
-        ) : summary ? (
-          <>
-            <Box>
+          </Heading>
+          <Text textAlign="center">
+            <FormattedMessage
+              id="component.petition-replies-summary.no-summary-feature-body"
+              defaultMessage="Let Mike AI analyze the answers and draw conclusions from this process. Contact us for more information."
+            />
+          </Text>
+          <Box alignSelf="center">
+            <SupportButton
+              colorScheme="primary"
+              message={intl.formatMessage({
+                id: "component.petition-replies-summary.activate-petition-summary-support-message",
+                defaultMessage:
+                  "Hi, I would like to use Mike AI to analyze the replies from a parallel.",
+              })}
+            >
+              <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+            </SupportButton>
+          </Box>
+        </Stack>
+      ) : isLoading ? (
+        <Center flex="1">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="primary.500"
+            size="xl"
+          />
+        </Center>
+      ) : summary ? (
+        <>
+          <Box flex="1" minHeight={0} overflow="auto">
+            <Box padding={4}>
+              {hasError ? <ErrorAlert /> : null}
               <MarkdownRender markdown={summary} />
             </Box>
-            <Stack
-              position="sticky"
-              bottom={0}
-              paddingBottom={4}
-              paddingTop={2}
-              width="100%"
-              background="white"
+          </Box>
+          <HStack height="68px" padding={4}>
+            <CopyToClipboardButton
+              size="sm"
+              text={summary}
+              onClick={handleCopySummary}
+              isDisabled={petition.isAnonymized}
+            />
+            <IconButtonWithTooltip
+              size="sm"
+              label={intl.formatMessage({
+                id: "generic.retry",
+                defaultMessage: "Retry",
+              })}
+              onClick={handleRegenerateSummary}
+              icon={<RepeatIcon />}
+              isDisabled={
+                petition.isAnonymized ||
+                !user.hasSummaryAccess ||
+                !isDefined(petition.summaryConfig)
+              }
+            />
+          </HStack>
+        </>
+      ) : (
+        <Stack padding={4} flex={1} justifyContent="center" alignItems="center">
+          <Text color="gray.500" textAlign="center">
+            <FormattedMessage
+              id="component.petition-replies-summary.no-summary-text"
+              defaultMessage="Mike AI can analyze the answers and draw conclusions from this process."
+            />
+          </Text>
+          <Box>
+            <Button
+              leftIcon={<SparklesIcon />}
+              colorScheme="primary"
+              onClick={handleGenerateSummary}
+              isDisabled={
+                petition.isAnonymized ||
+                !user.hasSummaryAccess ||
+                !isDefined(petition.summaryConfig)
+              }
             >
-              <HStack>
-                <CopyToClipboardButton
-                  size="sm"
-                  text={summary}
-                  onClick={handleCopySummary}
-                  isDisabled={petition.isAnonymized}
-                />
-                <IconButtonWithTooltip
-                  size="sm"
-                  label={intl.formatMessage({
-                    id: "generic.retry",
-                    defaultMessage: "Retry",
-                  })}
-                  onClick={handleRegenerateSummary}
-                  icon={<RepeatIcon />}
-                  isDisabled={
-                    petition.isAnonymized ||
-                    !user.hasSummaryAccess ||
-                    !isDefined(petition.summaryConfig)
-                  }
-                />
-              </HStack>
-              {hasError && <ErrorAlert />}
-            </Stack>
-          </>
-        ) : (
-          <>
-            <Text color="gray.500">
               <FormattedMessage
-                id="component.petition-replies-summary.no-summary-text"
-                defaultMessage="Mike AI can analyze the answers and draw conclusions from this process."
+                id="component.petition-replies-summary.generate-summary"
+                defaultMessage="Analyze"
               />
-            </Text>
-            <Box>
-              <Button
-                leftIcon={<SparklesIcon />}
-                colorScheme="primary"
-                onClick={handleGenerateSummary}
-                isDisabled={
-                  petition.isAnonymized ||
-                  !user.hasSummaryAccess ||
-                  !isDefined(petition.summaryConfig)
-                }
-              >
-                <FormattedMessage
-                  id="component.petition-replies-summary.generate-summary"
-                  defaultMessage="Analyze"
-                />
-              </Button>
-            </Box>
-            {hasError && <ErrorAlert />}
-          </>
-        )}
-      </Stack>
-    );
-  }),
-  {
-    fragments: {
-      Petition: gql`
-        fragment PetitionRepliesSummary_Petition on Petition {
-          id
-          fromTemplate {
-            id
-          }
-          summaryConfig
-          latestSummaryRequest {
-            id
-            status
-            completion
-          }
-          isAnonymized
-        }
-      `,
-      User: gql`
-        fragment PetitionRepliesSummary_User on User {
-          id
-          hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
-        }
-      `,
-    },
-  },
-);
+            </Button>
+          </Box>
+          {hasError ? <ErrorAlert /> : null}
+        </Stack>
+      )}
+    </Box>
+  );
+}
+
+PetitionRepliesSummary.fragments = {
+  Petition: gql`
+    fragment PetitionRepliesSummary_Petition on Petition {
+      id
+      fromTemplate {
+        id
+      }
+      summaryConfig
+      latestSummaryRequest {
+        id
+        status
+        completion
+      }
+      isAnonymized
+    }
+  `,
+  User: gql`
+    fragment PetitionRepliesSummary_User on User {
+      id
+      hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
+    }
+  `,
+};
 
 const _mutations = [
   gql`

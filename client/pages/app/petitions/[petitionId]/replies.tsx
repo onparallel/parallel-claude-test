@@ -609,13 +609,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   }
                 />
               </TabPanel>
-              <TabPanel
-                {...extendFlexColumn}
-                padding={0}
-                overflow="auto"
-                position="relative"
-                paddingBottom="64px"
-              >
+              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
                 <PetitionRepliesSummary petition={petition} user={me} onRefetch={refetch} />
               </TabPanel>
             </TabPanels>
