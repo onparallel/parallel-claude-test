@@ -277,6 +277,7 @@ function PertitionComposeNewFieldDrawerField({
       isOpen={isOpen}
       isDisabled={!showPopover}
       width="container.4xs"
+      isLazy={false}
       content={
         <Box paddingX={1}>
           <Box minHeight="70px">
