@@ -99,6 +99,9 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
         "zas25KHxAByKXKL5aMA",
         "zas25KHxAByKXKJPAzn",
         "zas25KHxAByKXBVeaGh",
+        "6Y8DSH92uxPaJ4BA9cFya",
+        "6Y8DSH92uxPaJ4BA7srgb",
+        "6Y8DSH92uxPaJ4BA2oVXZ",
       ].includes(templateId)
     ) {
       signers.push({
