@@ -347,7 +347,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           { concurrency: 1 },
         );
 
-        const results: Pick<CreatePetitionFieldReply, "content">[] = [];
+        const results: Pick<CreatePetitionFieldReply, "content" | "metadata">[] = [];
         for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
           const path = random(16);
           const res = await this.ctx.storage.fileUploads.uploadFile(
@@ -365,28 +365,29 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
             },
             createdBy,
           );
-
+          const json =
+            // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
+            // actualmente no se puede identificar cuál json corresponde a cada pdf.
+            // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
+            // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
+            // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
+            request.model.type === "CARP_CIUD_CERT_CATASTRO"
+              ? null
+              : documents.json.length === 1
+                ? await this.ctx.bankflip.fetchJsonDocumentContents(
+                    metadata.orgId,
+                    documents.json[0].id,
+                  )
+                : null;
           results.push({
             content: {
               file_upload_id: file.id,
               type: "model-request",
               request,
-              json_contents:
-                // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
-                // actualmente no se puede identificar cuál json corresponde a cada pdf.
-                // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
-                // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
-                // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
-                request.model.type === "CARP_CIUD_CERT_CATASTRO"
-                  ? null
-                  : documents.json.length === 1
-                    ? await this.ctx.bankflip.fetchJsonDocumentContents(
-                        metadata.orgId,
-                        documents.json[0].id,
-                      )
-                    : null,
+              json_contents: json,
               bankflip_session_id: sessionId,
             },
+            metadata: { json_contents: json },
           });
         }
         return results;
