@@ -1194,7 +1194,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onChange={handleTabsChange}
             >
               <TabList marginX="-1px" marginTop="-1px" flex="none">
-                <Tab padding={4} lineHeight={5} fontWeight="bold" borderTopRadius={0}>
+                <Tab
+                  padding={4}
+                  lineHeight={5}
+                  fontWeight="bold"
+                  borderTopRadius={0}
+                  _focusVisible={{ boxShadow: "inline" }}
+                >
                   <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                 </Tab>
@@ -1205,6 +1211,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   lineHeight={5}
                   fontWeight="bold"
                   borderTopRadius={0}
+                  _focusVisible={{ boxShadow: "inline" }}
                 >
                   <SettingsIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
@@ -1219,6 +1226,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   lineHeight={5}
                   fontWeight="bold"
                   borderTopRadius={0}
+                  _focusVisible={{ boxShadow: "inline" }}
                 >
                   <CalculatorIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
                   <FormattedMessage
