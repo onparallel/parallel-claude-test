@@ -244,10 +244,27 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId },
       });
       const field = data!.clonePetitionField;
+
+      if (fieldId === newFieldPlaceholderParentFieldId) {
+        setNewFieldPlaceholderParentFieldId(field.id);
+        if (newFieldPlaceholderFieldId) {
+          const { allFieldsWithIndices } = fieldsRef.current!;
+          const oldParentField = allFieldsWithIndices.find(
+            ([f]) => f.id === newFieldPlaceholderParentFieldId,
+          )![0];
+          const oldChildIndex = oldParentField.children!.findIndex(
+            (f) => f.id === newFieldPlaceholderFieldId,
+          );
+          const newChildId = field.children![oldChildIndex].id;
+          setNewFieldPlaceholderFieldId(newChildId);
+        }
+      } else if (fieldId === newFieldPlaceholderFieldId) {
+        setNewFieldPlaceholderFieldId(field.id);
+      }
       setActiveFieldId(field.id);
       focusFieldTitle(field.id);
     }),
-    [petitionId],
+    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
@@ -426,10 +443,23 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             },
           });
 
-          if (newFieldPlaceholderFieldId === field.id) {
+          if (
+            newFieldPlaceholderFieldId === field.id ||
+            newFieldPlaceholderParentFieldId === field.id
+          ) {
+            const previousField = field.position
+              ? allFieldsWithIndices[fieldIndex - 1][0]
+              : undefined;
+
             setNewFieldPlaceholderFieldId(
-              field.position ? allFieldsWithIndices[fieldIndex - 1][0].id : undefined,
+              newFieldPlaceholderParentFieldId === field.id && previousField?.parent?.id
+                ? previousField.parent.id
+                : previousField?.id,
             );
+
+            if (newFieldPlaceholderParentFieldId === field.id) {
+              setNewFieldPlaceholderParentFieldId(undefined);
+            }
           }
         } catch (e) {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
