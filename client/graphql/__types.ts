@@ -18058,9 +18058,10 @@ export type PetitionRepliesContents_PetitionFieldFragment = {
   options: { [key: string]: any };
   isInternal: boolean;
   alias?: string | null;
+  commentCount: number;
+  unreadCommentCount: number;
   isReadOnly: boolean;
   parent?: { __typename?: "PetitionField"; id: string } | null;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -18085,6 +18086,8 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   optional: boolean;
   options: { [key: string]: any };
   isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -18105,13 +18108,9 @@ export type PetitionRepliesField_PetitionFieldFragment = {
         optional: boolean;
         options: { [key: string]: any };
         isInternal: boolean;
+        commentCount: number;
+        unreadCommentCount: number;
         isReadOnly: boolean;
-        comments: Array<{
-          __typename?: "PetitionFieldComment";
-          id: string;
-          isUnread: boolean;
-          createdAt: string;
-        }>;
         attachments: Array<{
           __typename?: "PetitionFieldAttachment";
           id: string;
@@ -18202,12 +18201,6 @@ export type PetitionRepliesField_PetitionFieldFragment = {
       status: UserStatus;
     } | null;
   }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-    createdAt: string;
-  }>;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
@@ -18241,13 +18234,9 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
       optional: boolean;
       options: { [key: string]: any };
       isInternal: boolean;
+      commentCount: number;
+      unreadCommentCount: number;
       isReadOnly: boolean;
-      comments: Array<{
-        __typename?: "PetitionFieldComment";
-        id: string;
-        isUnread: boolean;
-        createdAt: string;
-      }>;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
         id: string;
@@ -18377,67 +18366,6 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   type: PetitionFieldType;
   isInternal: boolean;
   hasCommentsEnabled: boolean;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content?: any | null;
-    isUnread: boolean;
-    isInternal: boolean;
-    isEdited: boolean;
-    isAnonymized: boolean;
-    contentHtml?: string | null;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        }
-      | {
-          __typename?: "User";
-          id: string;
-          isMe: boolean;
-          fullName?: string | null;
-          status: UserStatus;
-        }
-      | null;
-    mentions: Array<
-      | {
-          __typename?: "PetitionFieldCommentUserGroupMention";
-          mentionedId: string;
-          userGroup?: {
-            __typename?: "UserGroup";
-            id: string;
-            imMember: boolean;
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionFieldCommentUserMention";
-          mentionedId: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-            isMe: boolean;
-          } | null;
-        }
-    >;
-  }>;
-};
-
-export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
 };
 
 export type PetitionRepliesFieldComments_petitionFieldQueryQueryVariables = Exact<{
@@ -18449,11 +18377,6 @@ export type PetitionRepliesFieldComments_petitionFieldQueryQuery = {
   petitionField: {
     __typename?: "PetitionField";
     id: string;
-    title?: string | null;
-    isInternal: boolean;
-    commentCount: number;
-    unreadCommentCount: number;
-    hasCommentsEnabled: boolean;
     comments: Array<{
       __typename?: "PetitionFieldComment";
       id: string;
@@ -35605,6 +35528,7 @@ export type PetitionReplies_PetitionFragment = {
     id: string;
     isReadOnly: boolean;
     requireApproval: boolean;
+    commentCount: number;
     type: PetitionFieldType;
     isInternal: boolean;
     options: { [key: string]: any };
@@ -35612,6 +35536,7 @@ export type PetitionReplies_PetitionFragment = {
     title?: string | null;
     multiple: boolean;
     description?: string | null;
+    unreadCommentCount: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
@@ -35662,14 +35587,10 @@ export type PetitionReplies_PetitionFragment = {
           options: { [key: string]: any };
           title?: string | null;
           description?: string | null;
+          commentCount: number;
+          unreadCommentCount: number;
           multiple: boolean;
           alias?: string | null;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            createdAt: string;
-          }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -35799,61 +35720,6 @@ export type PetitionReplies_PetitionFragment = {
         fullName?: string | null;
         status: UserStatus;
       } | null;
-    }>;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      createdAt: string;
-      content?: any | null;
-      isUnread: boolean;
-      isInternal: boolean;
-      isEdited: boolean;
-      isAnonymized: boolean;
-      contentHtml?: string | null;
-      author?:
-        | {
-            __typename?: "PetitionAccess";
-            id: string;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          }
-        | {
-            __typename?: "User";
-            id: string;
-            isMe: boolean;
-            fullName?: string | null;
-            status: UserStatus;
-          }
-        | null;
-      mentions: Array<
-        | {
-            __typename?: "PetitionFieldCommentUserGroupMention";
-            mentionedId: string;
-            userGroup?: {
-              __typename?: "UserGroup";
-              id: string;
-              imMember: boolean;
-              name: string;
-              localizableName: { [locale in UserLocale]?: string };
-              type: UserGroupType;
-            } | null;
-          }
-        | {
-            __typename?: "PetitionFieldCommentUserMention";
-            mentionedId: string;
-            user?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-              isMe: boolean;
-            } | null;
-          }
-      >;
     }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -36046,6 +35912,8 @@ export type PetitionReplies_PetitionFieldFragment = {
   optional: boolean;
   options: { [key: string]: any };
   isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   alias?: string | null;
   hasCommentsEnabled: boolean;
   visibility?: { [key: string]: any } | null;
@@ -36070,13 +35938,9 @@ export type PetitionReplies_PetitionFieldFragment = {
         title?: string | null;
         description?: string | null;
         isInternal: boolean;
+        commentCount: number;
+        unreadCommentCount: number;
         isReadOnly: boolean;
-        comments: Array<{
-          __typename?: "PetitionFieldComment";
-          id: string;
-          isUnread: boolean;
-          createdAt: string;
-        }>;
         attachments: Array<{
           __typename?: "PetitionFieldAttachment";
           id: string;
@@ -36166,56 +36030,6 @@ export type PetitionReplies_PetitionFieldFragment = {
       fullName?: string | null;
       status: UserStatus;
     } | null;
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content?: any | null;
-    isUnread: boolean;
-    isInternal: boolean;
-    isEdited: boolean;
-    isAnonymized: boolean;
-    contentHtml?: string | null;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        }
-      | {
-          __typename?: "User";
-          id: string;
-          isMe: boolean;
-          fullName?: string | null;
-          status: UserStatus;
-        }
-      | null;
-    mentions: Array<
-      | {
-          __typename?: "PetitionFieldCommentUserGroupMention";
-          mentionedId: string;
-          userGroup?: {
-            __typename?: "UserGroup";
-            id: string;
-            imMember: boolean;
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionFieldCommentUserMention";
-          mentionedId: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-            isMe: boolean;
-          } | null;
-        }
-    >;
   }>;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
@@ -36360,6 +36174,7 @@ export type PetitionReplies_closePetitionMutation = {
       id: string;
       isReadOnly: boolean;
       requireApproval: boolean;
+      commentCount: number;
       type: PetitionFieldType;
       isInternal: boolean;
       options: { [key: string]: any };
@@ -36367,6 +36182,7 @@ export type PetitionReplies_closePetitionMutation = {
       title?: string | null;
       multiple: boolean;
       description?: string | null;
+      unreadCommentCount: number;
       alias?: string | null;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
@@ -36417,14 +36233,10 @@ export type PetitionReplies_closePetitionMutation = {
             options: { [key: string]: any };
             title?: string | null;
             description?: string | null;
+            commentCount: number;
+            unreadCommentCount: number;
             multiple: boolean;
             alias?: string | null;
-            comments: Array<{
-              __typename?: "PetitionFieldComment";
-              id: string;
-              isUnread: boolean;
-              createdAt: string;
-            }>;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
               id: string;
@@ -36554,61 +36366,6 @@ export type PetitionReplies_closePetitionMutation = {
           fullName?: string | null;
           status: UserStatus;
         } | null;
-      }>;
-      comments: Array<{
-        __typename?: "PetitionFieldComment";
-        id: string;
-        createdAt: string;
-        content?: any | null;
-        isUnread: boolean;
-        isInternal: boolean;
-        isEdited: boolean;
-        isAnonymized: boolean;
-        contentHtml?: string | null;
-        author?:
-          | {
-              __typename?: "PetitionAccess";
-              id: string;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            }
-          | {
-              __typename?: "User";
-              id: string;
-              isMe: boolean;
-              fullName?: string | null;
-              status: UserStatus;
-            }
-          | null;
-        mentions: Array<
-          | {
-              __typename?: "PetitionFieldCommentUserGroupMention";
-              mentionedId: string;
-              userGroup?: {
-                __typename?: "UserGroup";
-                id: string;
-                imMember: boolean;
-                name: string;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              } | null;
-            }
-          | {
-              __typename?: "PetitionFieldCommentUserMention";
-              mentionedId: string;
-              user?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-                isMe: boolean;
-              } | null;
-            }
-        >;
       }>;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -36829,6 +36586,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       id: string;
       isReadOnly: boolean;
       requireApproval: boolean;
+      commentCount: number;
       type: PetitionFieldType;
       isInternal: boolean;
       options: { [key: string]: any };
@@ -36836,6 +36594,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       title?: string | null;
       multiple: boolean;
       description?: string | null;
+      unreadCommentCount: number;
       alias?: string | null;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
@@ -36886,14 +36645,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             options: { [key: string]: any };
             title?: string | null;
             description?: string | null;
+            commentCount: number;
+            unreadCommentCount: number;
             multiple: boolean;
             alias?: string | null;
-            comments: Array<{
-              __typename?: "PetitionFieldComment";
-              id: string;
-              isUnread: boolean;
-              createdAt: string;
-            }>;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
               id: string;
@@ -37023,61 +36778,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           fullName?: string | null;
           status: UserStatus;
         } | null;
-      }>;
-      comments: Array<{
-        __typename?: "PetitionFieldComment";
-        id: string;
-        createdAt: string;
-        content?: any | null;
-        isUnread: boolean;
-        isInternal: boolean;
-        isEdited: boolean;
-        isAnonymized: boolean;
-        contentHtml?: string | null;
-        author?:
-          | {
-              __typename?: "PetitionAccess";
-              id: string;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            }
-          | {
-              __typename?: "User";
-              id: string;
-              isMe: boolean;
-              fullName?: string | null;
-              status: UserStatus;
-            }
-          | null;
-        mentions: Array<
-          | {
-              __typename?: "PetitionFieldCommentUserGroupMention";
-              mentionedId: string;
-              userGroup?: {
-                __typename?: "UserGroup";
-                id: string;
-                imMember: boolean;
-                name: string;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              } | null;
-            }
-          | {
-              __typename?: "PetitionFieldCommentUserMention";
-              mentionedId: string;
-              user?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-                isMe: boolean;
-              } | null;
-            }
-        >;
       }>;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -37466,6 +37166,7 @@ export type PetitionReplies_petitionQuery = {
           id: string;
           isReadOnly: boolean;
           requireApproval: boolean;
+          commentCount: number;
           type: PetitionFieldType;
           isInternal: boolean;
           options: { [key: string]: any };
@@ -37473,6 +37174,7 @@ export type PetitionReplies_petitionQuery = {
           title?: string | null;
           multiple: boolean;
           description?: string | null;
+          unreadCommentCount: number;
           alias?: string | null;
           hasCommentsEnabled: boolean;
           visibility?: { [key: string]: any } | null;
@@ -37523,14 +37225,10 @@ export type PetitionReplies_petitionQuery = {
                 options: { [key: string]: any };
                 title?: string | null;
                 description?: string | null;
+                commentCount: number;
+                unreadCommentCount: number;
                 multiple: boolean;
                 alias?: string | null;
-                comments: Array<{
-                  __typename?: "PetitionFieldComment";
-                  id: string;
-                  isUnread: boolean;
-                  createdAt: string;
-                }>;
                 attachments: Array<{
                   __typename?: "PetitionFieldAttachment";
                   id: string;
@@ -37660,61 +37358,6 @@ export type PetitionReplies_petitionQuery = {
               fullName?: string | null;
               status: UserStatus;
             } | null;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            createdAt: string;
-            content?: any | null;
-            isUnread: boolean;
-            isInternal: boolean;
-            isEdited: boolean;
-            isAnonymized: boolean;
-            contentHtml?: string | null;
-            author?:
-              | {
-                  __typename?: "PetitionAccess";
-                  id: string;
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                }
-              | {
-                  __typename?: "User";
-                  id: string;
-                  isMe: boolean;
-                  fullName?: string | null;
-                  status: UserStatus;
-                }
-              | null;
-            mentions: Array<
-              | {
-                  __typename?: "PetitionFieldCommentUserGroupMention";
-                  mentionedId: string;
-                  userGroup?: {
-                    __typename?: "UserGroup";
-                    id: string;
-                    imMember: boolean;
-                    name: string;
-                    localizableName: { [locale in UserLocale]?: string };
-                    type: UserGroupType;
-                  } | null;
-                }
-              | {
-                  __typename?: "PetitionFieldCommentUserMention";
-                  mentionedId: string;
-                  user?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                    isMe: boolean;
-                  } | null;
-                }
-            >;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -42101,7 +41744,7 @@ export type filterPetitionFields_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   isReadOnly: boolean;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+  commentCount: number;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -50826,9 +50469,7 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
     id
     type
     isReadOnly
-    comments {
-      id
-    }
+    commentCount
     replies {
       id
       status
@@ -50848,11 +50489,8 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
         optional
         options
         isInternal
-        comments {
-          id
-          isUnread
-          createdAt
-        }
+        commentCount
+        unreadCommentCount
         attachments {
           id
           file {
@@ -50883,11 +50521,8 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
-    comments {
-      id
-      isUnread
-      createdAt
-    }
+    commentCount
+    unreadCommentCount
     attachments {
       id
       file {
@@ -50909,36 +50544,20 @@ export const PetitionRepliesContents_PetitionFieldFragmentDoc = gql`
     parent {
       id
     }
-    comments {
-      id
-      isUnread
-    }
+    commentCount
+    unreadCommentCount
     ...filterPetitionFields_PetitionField
   }
   ${filterPetitionFields_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesContents_PetitionFieldFragment, unknown>;
-export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-  }
-` as unknown as DocumentNode<PetitionRepliesFieldComments_PetitionFieldReplyFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
     id
     title
     type
     isInternal
-    replies {
-      ...PetitionRepliesFieldComments_PetitionFieldReply
-    }
-    comments {
-      ...PetitionFieldComment_PetitionFieldComment
-    }
     hasCommentsEnabled
   }
-  ${PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc}
-  ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldComments_PetitionFieldFragment, unknown>;
 export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
   fragment ExportRepliesDialog_PetitionField on PetitionField {
@@ -51204,6 +50823,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       id
       isReadOnly
       requireApproval
+      commentCount
       ...PetitionRepliesField_PetitionField
       ...PetitionRepliesContents_PetitionField
       ...PetitionRepliesFieldComments_PetitionField
@@ -54608,10 +54228,13 @@ export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = 
 export const PetitionRepliesFieldComments_petitionFieldQueryDocument = gql`
   query PetitionRepliesFieldComments_petitionFieldQuery($petitionId: GID!, $petitionFieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
+      id
+      comments {
+        ...PetitionFieldComment_PetitionFieldComment
+      }
     }
   }
-  ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
+  ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionRepliesFieldComments_petitionFieldQueryQuery,
   PetitionRepliesFieldComments_petitionFieldQueryQueryVariables

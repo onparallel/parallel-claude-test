@@ -259,7 +259,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       (!f.isReadOnly &&
         ((f.type === "FIELD_GROUP" && f.children?.some((child) => child.replies.length > 0)) ||
           (f.type !== "FIELD_GROUP" && f.replies.length > 0))) ||
-      f.comments.length > 0,
+      f.commentCount > 0,
   );
 
   const handlePrintPdfTask = usePrintPdfTask();
@@ -817,6 +817,7 @@ PetitionReplies.fragments = {
           id
           isReadOnly
           requireApproval
+          commentCount
           ...PetitionRepliesField_PetitionField
           ...PetitionRepliesContents_PetitionField
           ...PetitionRepliesFieldComments_PetitionField

@@ -40,6 +40,7 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { forwardRef } from "react";
@@ -53,7 +54,6 @@ import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
-import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petition: PetitionRepliesField_PetitionFragment;
@@ -147,8 +147,8 @@ export const PetitionRepliesField = Object.assign(
           <CommentsButton
             data-action="see-field-comments"
             isActive={isShowingComments}
-            commentCount={field.comments.length}
-            hasUnreadComments={field.comments.some((c) => c.isUnread)}
+            commentCount={field.commentCount}
+            hasUnreadComments={field.unreadCommentCount > 0}
             onClick={onToggleComments}
           />
         </Box>
@@ -224,8 +224,8 @@ export const PetitionRepliesField = Object.assign(
             <CommentsButton
               data-action="see-field-comments"
               isActive={isShowingComments}
-              commentCount={field.comments.length}
-              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              commentCount={field.commentCount}
+              hasUnreadComments={field.unreadCommentCount > 0}
               onClick={onToggleComments}
             />
           </Box>
@@ -485,8 +485,8 @@ export const PetitionRepliesField = Object.assign(
             <CommentsButton
               data-action="see-field-comments"
               isActive={isShowingComments}
-              commentCount={field.comments.length}
-              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              commentCount={field.commentCount}
+              hasUnreadComments={field.unreadCommentCount > 0}
               onClick={onToggleComments}
             />
           </Box>
@@ -633,11 +633,8 @@ export const PetitionRepliesField = Object.assign(
           replies {
             ...PetitionRepliesField_PetitionFieldReply
           }
-          comments {
-            id
-            isUnread
-            createdAt
-          }
+          commentCount
+          unreadCommentCount
           attachments {
             id
             file {
@@ -657,11 +654,8 @@ export const PetitionRepliesField = Object.assign(
               optional
               options
               isInternal
-              comments {
-                id
-                isUnread
-                createdAt
-              }
+              commentCount
+              unreadCommentCount
               attachments {
                 id
                 file {

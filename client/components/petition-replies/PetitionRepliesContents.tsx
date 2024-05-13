@@ -156,10 +156,8 @@ PetitionRepliesContents.fragments = {
       parent {
         id
       }
-      comments {
-        id
-        isUnread
-      }
+      commentCount
+      unreadCommentCount
       ...filterPetitionFields_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
@@ -240,7 +238,7 @@ function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_Petition
               </Text>
             )}
           </LinkOverlay>
-          {field.comments.length ? (
+          {field.commentCount > 0 ? (
             <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
               <Stack
                 as="span"
@@ -261,15 +259,13 @@ function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_Petition
                       defaultMessage:
                         "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
                     },
-                    { commentCount: field.comments.length },
+                    { commentCount: field.commentCount },
                   )}
                 >
-                  {intl.formatNumber(field.comments.length)}
+                  {intl.formatNumber(field.commentCount)}
                 </Text>
               </Stack>
-              <RecipientViewCommentsBadge
-                hasUnreadComments={field.comments.some((c) => c.isUnread)}
-              />
+              <RecipientViewCommentsBadge hasUnreadComments={field.unreadCommentCount > 0} />
             </Stack>
           ) : null}
           {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}

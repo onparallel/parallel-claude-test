@@ -77,7 +77,7 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
         );
       }
       if (filter.SHOW_WITH_COMMENTS) {
-        conditions.push(field.comments.length > 0);
+        conditions.push(field.commentCount > 0);
       }
       if (conditions.every((x) => x)) {
         filtered.push({
@@ -99,9 +99,7 @@ filterPetitionFields.fragments = {
       id
       type
       isReadOnly
-      comments {
-        id
-      }
+      commentCount
       replies {
         id
         status

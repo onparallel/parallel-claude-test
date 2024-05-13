@@ -45,7 +45,6 @@ export function PetitionRepliesFieldComments({
   onClose,
   isDisabled,
   onlyReadPermission,
-  ...props
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
 
@@ -236,28 +235,15 @@ PetitionRepliesFieldComments.fragments = {
       isInteractionWithRecipientsEnabled
     }
   `,
-  get PetitionField() {
-    return gql`
-      fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
-        id
-        title
-        type
-        isInternal
-        replies {
-          ...PetitionRepliesFieldComments_PetitionFieldReply
-        }
-        comments {
-          ...PetitionFieldComment_PetitionFieldComment
-        }
-        hasCommentsEnabled
-      }
-      fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-      }
-      ${PetitionFieldComment.fragments.PetitionFieldComment}
-    `;
-  },
+  PetitionField: gql`
+    fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+      id
+      title
+      type
+      isInternal
+      hasCommentsEnabled
+    }
+  `,
 };
 
 const _queries = [
@@ -267,9 +253,12 @@ const _queries = [
       $petitionFieldId: GID!
     ) {
       petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...PreviewPetitionFieldCommentsDialog_PetitionField
+        id
+        comments {
+          ...PetitionFieldComment_PetitionFieldComment
+        }
       }
     }
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
+    ${PetitionFieldComment.fragments.PetitionFieldComment}
   `,
 ];
