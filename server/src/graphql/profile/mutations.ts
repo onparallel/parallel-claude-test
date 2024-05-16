@@ -11,7 +11,7 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { differenceWith, groupBy, indexBy, isDefined, pipe, zip } from "remeda";
+import { differenceWith, groupBy, indexBy, isDefined, pipe, uniq, zip } from "remeda";
 import {
   CreateProfileType,
   CreateProfileTypeField,
@@ -1983,50 +1983,78 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
     ),
   },
   resolve: async (_, args, ctx) => {
-    const relationships = await ctx.profiles.createProfileRelationship(
-      args.relationships.map((r) => ({
-        profile_relationship_type_id: r.profileRelationshipTypeId,
-        left_side_profile_id: r.direction === "LEFT_RIGHT" ? args.profileId : r.profileId,
-        right_side_profile_id: r.direction === "RIGHT_LEFT" ? args.profileId : r.profileId,
-      })),
-      ctx.user!,
-    );
-
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-      relationships.map((r) => r.profile_relationship_type_id),
+      uniq(args.relationships.map((r) => r.profileRelationshipTypeId)),
     );
+    await ctx.profiles.withTransaction(async (t) => {
+      try {
+        const relationships = await ctx.profiles.createProfileRelationship(
+          args.relationships.map((r) => {
+            const relationshipType = relationshipTypes.find(
+              (rt) => rt!.id === r.profileRelationshipTypeId,
+            )!;
+            const [leftId, rightId] = relationshipType?.is_reciprocal
+              ? // if relationship is reciprocal, always insert lower profile_id on left and higher on right
+                // this way we can avoid duplicating reciprocal relationships with different directions
+                [args.profileId, r.profileId].sort()
+              : r.direction === "LEFT_RIGHT"
+                ? [args.profileId, r.profileId]
+                : [r.profileId, args.profileId];
+            return {
+              profile_relationship_type_id: r.profileRelationshipTypeId,
+              left_side_profile_id: leftId,
+              right_side_profile_id: rightId,
+            };
+          }),
+          ctx.user!,
+          t,
+        );
 
-    await ctx.profiles.createEvent(
-      relationships.flatMap(
-        (r) =>
-          [
-            {
-              org_id: ctx.user!.org_id,
-              profile_id: r.left_side_profile_id,
-              type: "PROFILE_RELATIONSHIP_CREATED",
-              data: {
-                user_id: ctx.user!.id,
-                profile_relationship_id: r.id,
-                profile_relationship_type_alias: relationshipTypes.find(
-                  (rt) => rt!.id === r.profile_relationship_type_id,
-                )!.alias,
-              },
-            },
-            {
-              org_id: ctx.user!.org_id,
-              profile_id: r.right_side_profile_id,
-              type: "PROFILE_RELATIONSHIP_CREATED",
-              data: {
-                user_id: ctx.user!.id,
-                profile_relationship_id: r.id,
-                profile_relationship_type_alias: relationshipTypes.find(
-                  (rt) => rt!.id === r.profile_relationship_type_id,
-                )!.alias,
-              },
-            },
-          ] satisfies ProfileRelationshipCreatedEvent<true>[],
-      ),
-    );
+        await ctx.profiles.createEvent(
+          relationships.flatMap(
+            (r) =>
+              [
+                {
+                  org_id: ctx.user!.org_id,
+                  profile_id: r.left_side_profile_id,
+                  type: "PROFILE_RELATIONSHIP_CREATED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    profile_relationship_id: r.id,
+                    profile_relationship_type_alias: relationshipTypes.find(
+                      (rt) => rt!.id === r.profile_relationship_type_id,
+                    )!.alias,
+                  },
+                },
+                {
+                  org_id: ctx.user!.org_id,
+                  profile_id: r.right_side_profile_id,
+                  type: "PROFILE_RELATIONSHIP_CREATED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    profile_relationship_id: r.id,
+                    profile_relationship_type_alias: relationshipTypes.find(
+                      (rt) => rt!.id === r.profile_relationship_type_id,
+                    )!.alias,
+                  },
+                },
+              ] satisfies ProfileRelationshipCreatedEvent<true>[],
+          ),
+          t,
+        );
+      } catch (error) {
+        if (
+          error instanceof DatabaseError &&
+          error.constraint === "profile_relationship__avoid_duplicates"
+        ) {
+          throw new ApolloError(
+            "The provided profiles are already associated",
+            "PROFILES_ALREADY_ASSOCIATED_ERROR",
+          );
+        }
+        throw error;
+      }
+    });
 
     return (await ctx.profiles.loadProfile(args.profileId))!;
   },

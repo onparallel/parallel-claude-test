@@ -1932,6 +1932,51 @@ describe("GraphQL/Profile Relationships", () => {
         ],
       });
     });
+
+    it("sends error when trying to create a reciprocal relationship twice with different directions", async () => {
+      const [individualAProfile, individualBProfile] = await mocks.createRandomProfiles(
+        organization.id,
+        0,
+        2,
+        () => ({
+          profile_type_id: individual.id,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $relationships: [CreateProfileRelationshipInput!]!) {
+            createProfileRelationship(profileId: $profileId, relationships: $relationships) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", individualAProfile.id),
+          relationships: [
+            {
+              profileId: toGlobalId("Profile", individualBProfile.id),
+              profileRelationshipTypeId: toGlobalId(
+                "ProfileRelationshipType",
+                relationshipTypes.find((type) => type.alias === "p_close_associate")!.id,
+              ),
+              direction: "LEFT_RIGHT",
+            },
+            {
+              profileId: toGlobalId("Profile", individualBProfile.id),
+              profileRelationshipTypeId: toGlobalId(
+                "ProfileRelationshipType",
+                relationshipTypes.find((type) => type.alias === "p_close_associate")!.id,
+              ),
+              direction: "RIGHT_LEFT",
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILES_ALREADY_ASSOCIATED_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("removeProfileRelationship", () => {

@@ -2196,8 +2196,9 @@ export class ProfileRepository extends BaseRepository {
   async createProfileRelationship(
     data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
     user: User,
+    t?: Knex.Transaction,
   ) {
-    return await this.from("profile_relationship").insert(
+    return await this.from("profile_relationship", t).insert(
       unMaybeArray(data).map((d) => ({
         ...d,
         created_by_user_id: user.id,
