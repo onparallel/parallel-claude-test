@@ -388,6 +388,7 @@ export function PetitionSharingDialog({
                     id: "component.petition-sharing-dialog.message-placeholder",
                     defaultMessage: "Message",
                   })}
+                  maxLength={1_000}
                 />
               </PaddedCollapse>
               {!isTemplate ? (

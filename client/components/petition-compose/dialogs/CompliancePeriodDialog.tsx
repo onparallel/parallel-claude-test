@@ -131,6 +131,7 @@ export function CompliancePeriodDialog({
                 id: "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
                 defaultMessage: "Briefly describe the purpose of the data processing.",
               })}
+              maxLength={10_000}
             />
           </FormControl>
         </Stack>
