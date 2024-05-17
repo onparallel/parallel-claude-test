@@ -288,8 +288,6 @@ ProfileRelationshipsTable.fragments = {
         id
         leftRightName
         rightLeftName
-        allowedLeftRightProfileTypeIds
-        allowedRightLeftProfileTypeIds
       }
     }
   `,

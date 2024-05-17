@@ -20359,8 +20359,6 @@ export type ProfileRelationshipsTable_ProfileRelationshipFragment = {
     id: string;
     leftRightName: { [locale in UserLocale]?: string };
     rightLeftName: { [locale in UserLocale]?: string };
-    allowedLeftRightProfileTypeIds: Array<string>;
-    allowedRightLeftProfileTypeIds: Array<string>;
   };
 };
 
@@ -20421,8 +20419,6 @@ export type ProfileRelationshipsTable_ProfileFragment = {
       alias?: string | null;
       leftRightName: { [locale in UserLocale]?: string };
       rightLeftName: { [locale in UserLocale]?: string };
-      allowedLeftRightProfileTypeIds: Array<string>;
-      allowedRightLeftProfileTypeIds: Array<string>;
     };
   }>;
   profileType: {
@@ -20495,8 +20491,6 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
         alias?: string | null;
         leftRightName: { [locale in UserLocale]?: string };
         rightLeftName: { [locale in UserLocale]?: string };
-        allowedLeftRightProfileTypeIds: Array<string>;
-        allowedRightLeftProfileTypeIds: Array<string>;
       };
     }>;
     profileType: {
@@ -20577,8 +20571,6 @@ export type ProfileRelationshipsTable_profileQuery = {
         alias?: string | null;
         leftRightName: { [locale in UserLocale]?: string };
         rightLeftName: { [locale in UserLocale]?: string };
-        allowedLeftRightProfileTypeIds: Array<string>;
-        allowedRightLeftProfileTypeIds: Array<string>;
       };
     }>;
     profileType: {
@@ -46252,8 +46244,6 @@ export const ProfileRelationshipsTable_ProfileRelationshipFragmentDoc = gql`
       id
       leftRightName
       rightLeftName
-      allowedLeftRightProfileTypeIds
-      allowedRightLeftProfileTypeIds
     }
   }
   ${ProfileRelationshipsTable_RelatedProfileFragmentDoc}
