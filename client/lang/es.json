@@ -11251,8 +11251,8 @@
   },
   {
     "term": "generic.petition-field-type-tax-documents",
-    "definition": "Documentos fiscales",
-    "context": "Tax documents"
+    "definition": "Documentos oficiales (🇪🇸)",
+    "context": "Official documents (🇪🇸)"
   },
   {
     "term": "generic.petition-field-type-text",

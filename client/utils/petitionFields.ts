@@ -92,85 +92,7 @@ export interface FieldOptions {
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
   const intl = useIntl();
   return useMemo(() => {
-    switch (type) {
-      case "FILE_UPLOAD":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-file-upload",
-          defaultMessage: "Documents and files",
-        });
-      case "SHORT_TEXT":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-short-text",
-          defaultMessage: "Short replies",
-        });
-      case "TEXT":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-text",
-          defaultMessage: "Long replies",
-        });
-      case "NUMBER":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-number",
-          defaultMessage: "Numbers",
-        });
-      case "PHONE":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-phone",
-          defaultMessage: "Phone number",
-        });
-      case "HEADING":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-heading",
-          defaultMessage: "Text block",
-        });
-      case "SELECT":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-select",
-          defaultMessage: "Select",
-        });
-      case "DYNAMIC_SELECT":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-conditional-select",
-          defaultMessage: "Conditional select",
-        });
-      case "CHECKBOX":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-checkbox",
-          defaultMessage: "Multiple choice",
-        });
-      case "DATE":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-date",
-          defaultMessage: "Date",
-        });
-      case "DATE_TIME":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-date-and-time",
-          defaultMessage: "Date and time",
-        });
-      case "ES_TAX_DOCUMENTS":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-tax-documents",
-          defaultMessage: "Tax documents",
-        });
-      case "DOW_JONES_KYC":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-dow-jones-kyc-research",
-          defaultMessage: "Search in Dow Jones",
-        });
-      case "BACKGROUND_CHECK":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-background-check",
-          defaultMessage: "Background check",
-        });
-      case "FIELD_GROUP":
-        return intl.formatMessage({
-          id: "generic.petition-field-type-field-group",
-          defaultMessage: "Group of fields",
-        });
-      default:
-        throw new Error(`Missing PetitionFieldType "${type}"`);
-    }
+    return getPetitionFieldTypeLabel(intl, type);
   }, [intl.locale, type]);
 }
 
@@ -234,7 +156,7 @@ export function getPetitionFieldTypeLabel(intl: IntlShape, type: PetitionFieldTy
     case "ES_TAX_DOCUMENTS":
       return intl.formatMessage({
         id: "generic.petition-field-type-tax-documents",
-        defaultMessage: "Tax documents",
+        defaultMessage: "Official documents (🇪🇸)",
       });
     case "DOW_JONES_KYC":
       return intl.formatMessage({
