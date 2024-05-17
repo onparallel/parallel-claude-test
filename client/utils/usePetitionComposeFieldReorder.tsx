@@ -121,13 +121,18 @@ export function usePetitionComposeFieldReorder<
           const position = allFieldIds.indexOf(fieldId);
           const field = byId[fieldId];
 
+          // The first field in a group cannot be internal if the group is not
           const hasFirstChildInternalError =
-            isDefined(field.parent) && !field.parent.isInternal && field.isInternal;
-          if (
-            (isFieldGroup && position === 0 && isDefined(field.visibility)) ||
-            hasFirstChildInternalError
-          ) {
-            // The first field in a group cannot have visibility conditions
+            isDefined(field.parent) &&
+            !field.parent.isInternal &&
+            field.isInternal &&
+            position === 0;
+
+          // The first field in a group cannot have visibility conditions
+          const hasFirstChildVisibilityError =
+            isFieldGroup && position === 0 && isDefined(field.visibility);
+
+          if (hasFirstChildVisibilityError || hasFirstChildInternalError) {
             try {
               setFieldIds(fields.map((f) => f.id));
               await showError({
