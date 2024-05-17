@@ -187,7 +187,7 @@ export function PreviewPetitionFieldCommentsDialog({
           )}
         </ModalHeader>
         <Divider />
-        <ModalBody padding={0} display="flex" minHeight="0">
+        <ModalBody padding={0} display="flex" minHeight="0" flexDirection="column">
           {loading && !comments.length ? (
             <Center minHeight={44} width="100%">
               <Spinner
