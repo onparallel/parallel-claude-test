@@ -266,6 +266,9 @@ function PetitionExportField({
     },
     fieldReplies: {
       marginTop: "3mm",
+      display: "flex",
+      flexDirection: "column",
+      gap: "5mm",
     },
     fieldDescription: {
       textAlign: "justify",
@@ -273,7 +276,7 @@ function PetitionExportField({
     },
     groupName: {
       fontWeight: 400,
-      marginBottom: "2mm",
+      marginBottom: "4mm",
     },
     ...stylesOverwrite,
   });
@@ -447,31 +450,35 @@ function PetitionExportField({
                 ) : field.type === "PHONE" ? (
                   <Text style={[styles.text]}>{reply.content.value}</Text>
                 ) : field.type === "FIELD_GROUP" ? (
-                  <View style={{ ...styles.field, marginBottom: "5mm" }}>
-                    <Text style={[styles.text, styles.groupName]}>
-                      {titleize(field.options.groupName ?? "") ||
-                        intl.formatMessage({
-                          id: "document.petition-export.default-group-name",
-                          defaultMessage: "Reply",
-                        })}{" "}
-                      {replyNumber + 1}
-                    </Text>
-                    {zip(reply.children ?? [], groupLogic!).map(([child, logic]) => (
-                      <LiquidPetitionVariableProvider key={field.id} logic={logic}>
-                        <PetitionExportField
-                          key={`${field.id}-${child.field.id}`}
-                          styles={{ field: { border: "unset" } }}
-                          field={child.field}
-                          replies={child.replies.map((r) => ({
-                            ...r,
-                            children: null,
-                          }))}
-                          isPetition={isPetition}
-                          theme={theme}
-                          includeNetDocumentsLinks={includeNetDocumentsLinks}
-                        />
-                      </LiquidPetitionVariableProvider>
-                    ))}
+                  <View style={styles.field}>
+                    {field.multiple ? (
+                      <Text style={[styles.text, styles.groupName]}>
+                        {titleize(field.options.groupName ?? "") ||
+                          intl.formatMessage({
+                            id: "document.petition-export.default-group-name",
+                            defaultMessage: "Reply",
+                          })}{" "}
+                        {replyNumber + 1}
+                      </Text>
+                    ) : null}
+                    <View style={{ display: "flex", flexDirection: "column", gap: "4mm" }}>
+                      {zip(reply.children ?? [], groupLogic!).map(([child, logic]) => (
+                        <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                          <PetitionExportField
+                            key={`${field.id}-${child.field.id}`}
+                            styles={{ field: { border: "unset" } }}
+                            field={child.field}
+                            replies={child.replies.map((r) => ({
+                              ...r,
+                              children: null,
+                            }))}
+                            isPetition={isPetition}
+                            theme={theme}
+                            includeNetDocumentsLinks={includeNetDocumentsLinks}
+                          />
+                        </LiquidPetitionVariableProvider>
+                      ))}
+                    </View>
                   </View>
                 ) : field.type === "SELECT" ? (
                   <Text style={[styles.text]}>
@@ -656,6 +663,7 @@ PetitionExport.fragments = {
         visibility
         math
         options
+        multiple
       }
     `;
   },

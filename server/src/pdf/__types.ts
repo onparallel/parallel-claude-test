@@ -5805,6 +5805,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
             math: Array<{ [key: string]: any }> | null;
+            multiple: boolean;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5857,6 +5858,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
+      multiple: boolean;
       parent: { id: string } | null;
       replies: Array<{
         id: string;
@@ -5929,6 +5931,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
             math: Array<{ [key: string]: any }> | null;
+            multiple: boolean;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5981,6 +5984,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
+      multiple: boolean;
       parent: { id: string } | null;
       replies: Array<{
         id: string;
@@ -6019,6 +6023,7 @@ export type PetitionExport_PetitionFieldInnerFragment = {
   showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
   math: Array<{ [key: string]: any }> | null;
+  multiple: boolean;
 };
 
 export type PetitionExport_PetitionFieldReplyInnerFragment = {
@@ -6047,6 +6052,7 @@ export type PetitionExport_PetitionFieldFragment = {
   showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
   math: Array<{ [key: string]: any }> | null;
+  multiple: boolean;
   parent: { id: string; showActivityInPdf: boolean } | null;
   children: Array<{
     id: string;
@@ -6058,6 +6064,7 @@ export type PetitionExport_PetitionFieldFragment = {
     showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
     math: Array<{ [key: string]: any }> | null;
+    multiple: boolean;
     parent: { id: string } | null;
     replies: Array<{
       id: string;
@@ -6096,6 +6103,7 @@ export type PetitionExport_PetitionFieldReplyFragment = {
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
+      multiple: boolean;
       parent: { id: string; showActivityInPdf: boolean } | null;
       children: Array<{
         id: string;
@@ -6107,6 +6115,7 @@ export type PetitionExport_PetitionFieldReplyFragment = {
         showActivityInPdf: boolean;
         visibility: { [key: string]: any } | null;
         math: Array<{ [key: string]: any }> | null;
+        multiple: boolean;
         parent: { id: string } | null;
         replies: Array<{
           id: string;
@@ -6210,6 +6219,7 @@ export type PetitionExport_petitionQuery = {
                   showActivityInPdf: boolean;
                   visibility: { [key: string]: any } | null;
                   math: Array<{ [key: string]: any }> | null;
+                  multiple: boolean;
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
@@ -6268,6 +6278,7 @@ export type PetitionExport_petitionQuery = {
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
             math: Array<{ [key: string]: any }> | null;
+            multiple: boolean;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -6339,6 +6350,7 @@ export type PetitionExport_petitionQuery = {
                   showActivityInPdf: boolean;
                   visibility: { [key: string]: any } | null;
                   math: Array<{ [key: string]: any }> | null;
+                  multiple: boolean;
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
@@ -6397,6 +6409,7 @@ export type PetitionExport_petitionQuery = {
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
             math: Array<{ [key: string]: any }> | null;
+            multiple: boolean;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -6495,6 +6508,7 @@ export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
     visibility
     math
     options
+    multiple
   }
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldInnerFragment, unknown>;
 export const UserReference_UserFragmentDoc = gql`

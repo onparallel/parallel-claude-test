@@ -318,7 +318,7 @@ export const PetitionRepliesField = Object.assign(
                   as={Stack}
                   layerStyle="highlightable"
                 >
-                  <HStack spacing={3}>
+                  {field.multiple ? (
                     <Text>
                       {`${
                         field.options.groupName ??
@@ -326,9 +326,9 @@ export const PetitionRepliesField = Object.assign(
                           id: "generic.group-name-fallback-reply",
                           defaultMessage: "Reply",
                         })
-                      }${field.multiple || field.replies.length > 1 ? ` ${index + 1}` : ""}`}
+                      } ${index + 1}`}
                     </Text>
-                  </HStack>
+                  ) : null}
                   <Stack spacing={3}>
                     {filterPetitionFields(
                       zip(
