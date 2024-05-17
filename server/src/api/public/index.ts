@@ -80,6 +80,8 @@ import {
   GetPetitions_petitionsDocument,
   GetProfileEvents_ProfileEventsDocument,
   GetProfileSubscribers_profileDocument,
+  GetProfileType_profileTypeDocument,
+  GetProfileTypes_profileTypesDocument,
   GetProfile_profileDocument,
   GetProfiles_profilesDocument,
   GetSignatures_petitionSignaturesDocument,
@@ -91,6 +93,7 @@ import {
   PetitionReplies_repliesDocument,
   PetitionTagFilter,
   ProfileStatus,
+  ProfileTypeFragmentDoc,
   ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
   RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
@@ -208,6 +211,7 @@ import {
   ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
+  PaginatedProfileTypes,
   PaginatedProfiles,
   PaginatedTags,
   PaginatedTemplates,
@@ -220,6 +224,7 @@ import {
   PetitionFieldReply,
   Profile,
   ProfileSubscriptionInput,
+  ProfileType,
   SendPetition,
   SendReminder,
   SharePetition,
@@ -534,6 +539,10 @@ export function publicApi(container: Container) {
   const profileFieldFileId = idParam({
     type: "ProfileFieldFile",
     description: "The ID of a file uploaded to the profile",
+  });
+  const profileTypeId = idParam({
+    type: "ProfileType",
+    description: "The ID of the profile type",
   });
 
   api.path("/me").get(
@@ -4705,6 +4714,66 @@ export function publicApi(container: Container) {
         return Ok(mapProfile(response.unsubscribeFromProfile[0]));
       },
     );
+
+  api.path("/profile-types").get(
+    {
+      operationId: "GetProfileTypes",
+      summary: "Get profile types",
+      description: outdent`
+        Returns a paginated list of all profile types in the organization.
+      `,
+      responses: {
+        200: SuccessResponse(PaginatedProfileTypes),
+      },
+      query: {
+        ...paginationParams(),
+      },
+      tags: ["Profiles"],
+    },
+    async ({ client, query }) => {
+      const _query = gql`
+        query GetProfileTypes_profileTypes($offset: Int, $limit: Int) {
+          profileTypes(offset: $offset, limit: $limit) {
+            totalCount
+            items {
+              ...ProfileType
+            }
+          }
+        }
+        ${ProfileTypeFragmentDoc}
+      `;
+
+      const result = await client.request(GetProfileTypes_profileTypesDocument, query);
+
+      return Ok(result.profileTypes);
+    },
+  );
+
+  api.path("/profile-types/:profileTypeId", { params: { profileTypeId } }).get(
+    {
+      operationId: "GetProfileType",
+      summary: "Get a profile type",
+      description: "Returns the specified profile type",
+      responses: {
+        200: SuccessResponse(ProfileType),
+      },
+      tags: ["Profiles"],
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query GetProfileType_profileType($profileTypeId: GID!) {
+          profileType(profileTypeId: $profileTypeId) {
+            ...ProfileType
+          }
+        }
+        ${ProfileTypeFragmentDoc}
+      `;
+
+      const result = await client.request(GetProfileType_profileTypeDocument, params);
+
+      return Ok(result.profileType);
+    },
+  );
 
   api.path("/templates/:templateId/send", { params: { templateId } }).post(
     {

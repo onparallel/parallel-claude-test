@@ -2507,3 +2507,24 @@ export const BulkSendTemplateInput = schema({
   additionalProperties: false,
   properties: { file: { type: "object", isFile: true } },
 } as const);
+
+const _ProfileType = {
+  type: "object",
+  required: ["id", "name", "fields"],
+  additionalProperties: false,
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile type",
+      example: toGlobalId("ProfileType", 1),
+    },
+    name: _LocalizableUserText,
+    fields: {
+      type: "array",
+      items: _ProfileTypeField,
+    },
+  },
+} as const;
+
+export const PaginatedProfileTypes = schema(_PaginationOf(_ProfileType as JsonSchema));
+export const ProfileType = schema(_ProfileType as JsonSchema);

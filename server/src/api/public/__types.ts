@@ -6132,7 +6132,18 @@ export type ProfileFieldFileFragment = {
   file: { filename: string; size: number; contentType: string } | null;
 };
 
-export type ProfileTypeFragment = { id: string; name: { [locale in UserLocale]?: string } };
+export type ProfileTypeFragment = {
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  fields: Array<{
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    alias: string | null;
+    type: ProfileTypeFieldType;
+    isExpirable: boolean;
+    options: { [key: string]: any };
+  }>;
+};
 
 export type ProfileFieldPropertyFragment = {
   field: {
@@ -6162,7 +6173,18 @@ export type ProfileFragment = {
   name: string;
   status: ProfileStatus;
   createdAt: string;
-  profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  profileType: {
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    fields: Array<{
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      alias: string | null;
+      type: ProfileTypeFieldType;
+      isExpirable: boolean;
+      options: { [key: string]: any };
+    }>;
+  };
   properties?: Array<{
     field: {
       id: string;
@@ -8294,7 +8316,18 @@ export type GetPetitionProfiles_petitionQuery = {
           name: string;
           status: ProfileStatus;
           createdAt: string;
-          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+          profileType: {
+            id: string;
+            name: { [locale in UserLocale]?: string };
+            fields: Array<{
+              id: string;
+              name: { [locale in UserLocale]?: string };
+              alias: string | null;
+              type: ProfileTypeFieldType;
+              isExpirable: boolean;
+              options: { [key: string]: any };
+            }>;
+          };
           properties?: Array<{
             field: {
               id: string;
@@ -8368,7 +8401,18 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      profileType: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        fields: Array<{
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+          options: { [key: string]: any };
+        }>;
+      };
       properties?: Array<{
         field: {
           id: string;
@@ -9132,7 +9176,18 @@ export type GetProfiles_profilesQuery = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      profileType: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        fields: Array<{
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+          options: { [key: string]: any };
+        }>;
+      };
       properties?: Array<{
         field: {
           id: string;
@@ -9219,7 +9274,18 @@ export type CreateProfile_createProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    profileType: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    };
     properties?: Array<{
       field: {
         id: string;
@@ -9307,7 +9373,18 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      profileType: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        fields: Array<{
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+          options: { [key: string]: any };
+        }>;
+      };
       properties?: Array<{
         field: {
           id: string;
@@ -9377,7 +9454,18 @@ export type GetProfile_profileQuery = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    profileType: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    };
     properties?: Array<{
       field: {
         id: string;
@@ -9446,7 +9534,18 @@ export type UpdateProfileFieldValue_profileQuery = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    profileType: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    };
     properties?: Array<{
       field: {
         id: string;
@@ -9601,7 +9700,18 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    profileType: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    };
     properties?: Array<{
       field: {
         id: string;
@@ -9671,7 +9781,18 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    profileType: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    };
     properties?: Array<{
       field: {
         id: string;
@@ -9726,6 +9847,48 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
       };
     }>;
   }>;
+};
+
+export type GetProfileTypes_profileTypesQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GetProfileTypes_profileTypesQuery = {
+  profileTypes: {
+    totalCount: number;
+    items: Array<{
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options: { [key: string]: any };
+      }>;
+    }>;
+  };
+};
+
+export type GetProfileType_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type GetProfileType_profileTypeQuery = {
+  profileType: {
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    fields: Array<{
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      alias: string | null;
+      type: ProfileTypeFieldType;
+      isExpirable: boolean;
+      options: { [key: string]: any };
+    }>;
+  };
 };
 
 export type BulkSendTemplate_createBulkPetitionSendTaskMutationVariables = Exact<{
@@ -10501,12 +10664,6 @@ export const TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<TaskFragment, unknown>;
-export const ProfileTypeFragmentDoc = gql`
-  fragment ProfileType on ProfileType {
-    id
-    name
-  }
-` as unknown as DocumentNode<ProfileTypeFragment, unknown>;
 export const ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileTypeField on ProfileTypeField {
     id
@@ -10517,6 +10674,16 @@ export const ProfileTypeFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<ProfileTypeFieldFragment, unknown>;
+export const ProfileTypeFragmentDoc = gql`
+  fragment ProfileType on ProfileType {
+    id
+    name
+    fields {
+      ...ProfileTypeField
+    }
+  }
+  ${ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileTypeFragment, unknown>;
 export const ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFieldValue on ProfileFieldValue {
     id
@@ -11959,6 +12126,31 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
 ` as unknown as DocumentNode<
   UnsubscribeFromProfile_unsubscribeFromProfileMutation,
   UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
+>;
+export const GetProfileTypes_profileTypesDocument = gql`
+  query GetProfileTypes_profileTypes($offset: Int, $limit: Int) {
+    profileTypes(offset: $offset, limit: $limit) {
+      totalCount
+      items {
+        ...ProfileType
+      }
+    }
+  }
+  ${ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfileTypes_profileTypesQuery,
+  GetProfileTypes_profileTypesQueryVariables
+>;
+export const GetProfileType_profileTypeDocument = gql`
+  query GetProfileType_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      ...ProfileType
+    }
+  }
+  ${ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfileType_profileTypeQuery,
+  GetProfileType_profileTypeQueryVariables
 >;
 export const BulkSendTemplate_createBulkPetitionSendTaskDocument = gql`
   mutation BulkSendTemplate_createBulkPetitionSendTask($templateId: GID!, $temporaryFileId: GID!) {

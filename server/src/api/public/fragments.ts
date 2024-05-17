@@ -350,7 +350,11 @@ export const ProfileTypeFragment = gql`
   fragment ProfileType on ProfileType {
     id
     name
+    fields {
+      ...ProfileTypeField
+    }
   }
+  ${ProfileTypeFieldFragment}
 `;
 
 export const ProfileFieldPropertyFragment = gql`
