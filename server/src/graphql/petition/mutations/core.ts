@@ -1135,7 +1135,6 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       (args) => args.data.isInternal ?? args.data.showInPdf,
       not(fieldHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK"])),
     ),
-    ifArgDefined((args) => args.data.hasCommentsEnabled, not(fieldHasType("fieldId", ["HEADING"]))),
     ifArgDefined(
       (args) => args.data.alias,
       fieldAliasIsAvailable("petitionId", (args) => args.data.alias!),
