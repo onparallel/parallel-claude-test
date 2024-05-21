@@ -26,6 +26,7 @@ import {
 } from "../../../db/__types";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
+import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgroundCheck";
 import {
   PetitionFieldMath,
   PetitionFieldVisibility,
@@ -2604,8 +2605,52 @@ export const completePetition = mutationField("completePetition", {
   resolve: async (_, args, ctx) => {
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+      const response = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
 
-      let petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
+      let petition = response.petition;
+
+      const backgroundCheckAutoSearchQueries = buildAutomatedBackgroundCheckFieldQueries(
+        response.composedPetition,
+      );
+
+      // run an automated background search for each field that has autoSearchConfig and the "name" field replied
+      // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
+      for (const data of backgroundCheckAutoSearchQueries) {
+        if (isDefined(data.petitionFieldReplyId)) {
+          await ctx.petitions.updatePetitionFieldRepliesContent(
+            args.petitionId,
+            [
+              {
+                id: data.petitionFieldReplyId,
+                content: {
+                  query: data.query,
+                  search: await ctx.backgroundCheck.entitySearch(data.query),
+                  entity: null,
+                },
+              },
+            ],
+            ctx.user!,
+          );
+        } else {
+          await ctx.petitions.createPetitionFieldReply(
+            args.petitionId,
+            {
+              type: "BACKGROUND_CHECK",
+              content: {
+                query: data.query,
+                search: await ctx.backgroundCheck.entitySearch(data.query),
+                entity: null,
+              },
+              user_id: ctx.user!.id,
+              petition_field_id: data.petitionFieldId,
+              parent_petition_field_reply_id: data.parentPetitionFieldReplyId,
+              status: "PENDING",
+            },
+            `User:${ctx.user!.id}`,
+          );
+        }
+      }
+
       await ctx.petitions.createEvent({
         type: "PETITION_COMPLETED",
         petition_id: args.petitionId,

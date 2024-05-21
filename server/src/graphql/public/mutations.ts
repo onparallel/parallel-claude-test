@@ -16,6 +16,7 @@ import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
+import { buildAutomatedBackgroundCheckFieldQueries } from "../../util/backgroundCheck";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
@@ -378,7 +379,55 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
     try {
-      let petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!, {});
+      const response = await ctx.petitions.completePetition(
+        ctx.access!.petition_id,
+        ctx.access!,
+        {},
+      );
+      let petition = response.petition;
+
+      const backgroundCheckAutoSearchQueries = buildAutomatedBackgroundCheckFieldQueries(
+        response.composedPetition,
+      );
+
+      // run an automated background search for each field that has autoSearchConfig and the "name" field replied
+      // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
+      for (const data of backgroundCheckAutoSearchQueries) {
+        if (isDefined(data.petitionFieldReplyId)) {
+          await ctx.petitions.updatePetitionFieldRepliesContent(
+            ctx.access!.petition_id,
+            [
+              {
+                id: data.petitionFieldReplyId,
+                content: {
+                  query: data.query,
+                  search: await ctx.backgroundCheck.entitySearch(data.query),
+                  entity: null,
+                },
+              },
+            ],
+            ctx.access!,
+          );
+        } else {
+          await ctx.petitions.createPetitionFieldReply(
+            ctx.access!.petition_id,
+            {
+              type: "BACKGROUND_CHECK",
+              content: {
+                query: data.query,
+                search: await ctx.backgroundCheck.entitySearch(data.query),
+                entity: null,
+              },
+              petition_access_id: ctx.access!.id,
+              petition_field_id: data.petitionFieldId,
+              parent_petition_field_reply_id: data.parentPetitionFieldReplyId,
+              status: "PENDING",
+            },
+            `Contact:${ctx.contact!.id}`,
+          );
+        }
+      }
+
       await ctx.petitions.createEvent({
         type: "PETITION_COMPLETED",
         petition_id: ctx.access!.petition_id,
