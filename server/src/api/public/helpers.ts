@@ -5,7 +5,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import pMap from "p-map";
 import { performance } from "perf_hooks";
-import { isDefined, omit, pick, pipe, uniq, zip } from "remeda";
+import { filter, isDefined, map, omit, pick, pipe, uniq, zip } from "remeda";
 import { promisify } from "util";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
@@ -546,11 +546,9 @@ function mapProfilePropertyOptions(field: Pick<ProfileTypeFieldFragment, "type" 
   return {};
 }
 
-function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "values">>(
-  profile: T,
-) {
+function mapProfileFields<T extends ProfileFragment>(profile: T) {
   return {
-    ...omit(profile, ["properties"]),
+    ...profile,
     fields: profile.properties?.map((prop) => {
       return {
         field: {
@@ -560,29 +558,62 @@ function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "va
         ...(prop.field.type === "FILE" ? { files: prop.files } : { value: prop.value }),
       };
     }),
-    values: fillPropertiesByAlias(profile.values),
   };
 }
 
-function fillPropertiesByAlias(props: ProfileFragment["values"]) {
-  return props.reduce(
-    (acc, prop) => {
-      if (isDefined(prop.field.alias)) {
-        if (prop.field.type === "FILE") {
-          acc[prop.field.alias] = prop.files?.map((f) => ({ id: f.id, ...f.file })) ?? null;
-        } else {
-          acc[prop.field.alias] = prop.value?.content?.value ?? null;
-        }
-      }
-
-      return acc;
-    },
-    {} as Record<string, any>,
-  );
+function mapProfileValues<T extends ProfileFragment>(profile: T) {
+  return {
+    ...profile,
+    values: pipe(
+      profile.properties,
+      filter((p) => isDefined(p.field.alias)),
+      map(
+        (p) =>
+          [
+            p.field.alias,
+            p.field.type === "FILE"
+              ? p.files?.map((f) => ({ id: f.id, ...f.file })) ?? null
+              : p.value?.content?.value ?? null,
+          ] as const,
+      ),
+      Object.fromEntries,
+    ),
+  };
 }
 
-export function mapProfile<T extends Pick<ProfileFragment, "properties" | "values">>(profile: T) {
-  return pipe(profile, mapProfileProperties);
+export function mapProfileRelationships<T extends Pick<ProfileFragment, "id" | "relationships">>(
+  profile: T,
+) {
+  return {
+    ...profile,
+    relationships: profile.relationships?.map((r) => {
+      const inverse = r.leftSideProfile.id === profile.id ? false : true;
+      return {
+        id: r.id,
+        relationshipType: {
+          id: r.relationshipType.id,
+          alias: r.relationshipType.alias,
+          name: r.relationshipType.leftRightName,
+          inverseName: r.relationshipType.rightLeftName,
+        },
+        inverse,
+        profile: inverse ? r.leftSideProfile : r.rightSideProfile,
+      };
+    }),
+  };
+}
+
+export function mapProfile<T extends ProfileFragment>(
+  profile: T,
+  { includeFields }: { includeFields?: boolean } = {},
+) {
+  return pipe(
+    profile,
+    mapProfileValues,
+    (p) => (includeFields ? mapProfileFields(p) : p),
+    mapProfileRelationships,
+    omit(["properties"]),
+  );
 }
 
 export function flattenPetitionFields<T extends { children?: any[] | null }>(

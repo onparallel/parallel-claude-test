@@ -79,6 +79,7 @@ import {
   GetPetition_petitionDocument,
   GetPetitions_petitionsDocument,
   GetProfileEvents_ProfileEventsDocument,
+  GetProfileRelationships_profileDocument,
   GetProfileSubscribers_profileDocument,
   GetProfileType_profileTypeDocument,
   GetProfileTypes_profileTypesDocument,
@@ -157,6 +158,7 @@ import {
   PetitionTagFragment,
   ProfileEventSubscriptionFragment,
   ProfileFragment,
+  ProfileRelationship,
   TaskFragment,
   TemplateFragment,
   UserFragment,
@@ -174,6 +176,7 @@ import {
   mapPetitionFieldComment,
   mapPetitionFieldRepliesContent,
   mapProfile,
+  mapProfileRelationships,
   mapReplyResponse,
   mapSignatureRequest,
   mapSubscription,
@@ -205,6 +208,7 @@ import {
   ListOfPetitionFieldComments,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileEvents,
+  ListOfProfileRelationships,
   ListOfProfileSubscriptions,
   ListOfProfiles,
   ListOfSignatureRequests,
@@ -481,7 +485,7 @@ export function publicApi(container: Container) {
       description: "Include optional fields in the response",
       array: true,
       required: false,
-      values: ["fields", "subscribers"],
+      values: ["fields", "subscribers", "relationships"],
     }),
   };
 
@@ -492,6 +496,7 @@ export function publicApi(container: Container) {
   >(query: Q) {
     return {
       includeFields: query.include?.includes("fields") ?? false,
+      includeRelationships: query.include?.includes("relationships") ?? false,
       includeSubscribers: query.include?.includes("subscribers") ?? false,
     };
   }
@@ -3135,7 +3140,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query GetPetitionProfiles_petition(
             $petitionId: GID!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             petition(id: $petitionId) {
@@ -3150,9 +3155,10 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
+        const includes = getProfileIncludesFromQuery(query);
         const response = await client.request(GetPetitionProfiles_petitionDocument, {
           petitionId: params.petitionId,
-          ...getProfileIncludesFromQuery(query),
+          ...includes,
         });
 
         if (response.petition?.__typename !== "Petition") {
@@ -3162,7 +3168,7 @@ export function publicApi(container: Container) {
         return Ok(
           response.petition.profiles
             .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
-            .map(mapProfile),
+            .map((p) => mapProfile(p, includes)),
         );
       },
     )
@@ -3188,7 +3194,7 @@ export function publicApi(container: Container) {
           mutation AssociatePetitionToProfile_associateProfileToPetition(
             $profileId: GID!
             $petitionId: GID!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
@@ -3899,7 +3905,7 @@ export function publicApi(container: Container) {
             $search: String
             $profileTypeIds: [GID!]
             $status: [ProfileStatus!]
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profiles(
@@ -3918,14 +3924,15 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
+        const includes = getProfileIncludesFromQuery(query);
         const result = await client.request(GetProfiles_profilesDocument, {
           ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
           status: query.status as ProfileStatus[] | undefined,
-          ...getProfileIncludesFromQuery(query),
+          ...includes,
         });
         return Ok({
           totalCount: result.profiles.totalCount,
-          items: result.profiles.items.map(mapProfile),
+          items: result.profiles.items.map((p) => mapProfile(p, includes)),
         });
       },
     )
@@ -4016,7 +4023,7 @@ export function publicApi(container: Container) {
               $profileTypeId: GID!
               $subscribe: Boolean
               $fields: [UpdateProfileFieldValueInput!]
-              $includeFields: Boolean!
+              $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
             ) {
               createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
@@ -4055,7 +4062,7 @@ export function publicApi(container: Container) {
               $profileId: GID!
               $profileTypeFieldId: GID!
               $profileFieldFileIds: [GID!]!
-              $includeFields: Boolean!
+              $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
             ) {
               profileFieldFileUploadComplete(
@@ -4113,11 +4120,12 @@ export function publicApi(container: Container) {
             throw e;
           }
 
+          const includes = getProfileIncludesFromQuery(query);
           const result = await client.request(CreateProfile_createProfileDocument, {
             profileTypeId: body.profileTypeId,
             subscribe: body.subscribe === true || body.subscribe === "true",
             fields: createFields,
-            ...getProfileIncludesFromQuery(query),
+            ...includes,
           });
           assert("id" in result.createProfile);
 
@@ -4141,21 +4149,22 @@ export function publicApi(container: Container) {
               await uploadFile(file, uploadData.presignedPostData);
             }
 
+            const includes = getProfileIncludesFromQuery(query);
             const { profileFieldFileUploadComplete: uploadComplete } = await client.request(
               CreateProfile_profileFieldFileUploadCompleteDocument,
               {
                 profileId: result.createProfile.id,
                 profileTypeFieldId: profileTypeField.id,
                 profileFieldFileIds: uploads.map((upload) => upload.file.id),
-                ...getProfileIncludesFromQuery(query),
+                ...includes,
               },
             );
 
             assert("id" in uploadComplete[0].profile);
-            return Created(mapProfile(uploadComplete[0].profile));
+            return Created(mapProfile(uploadComplete[0].profile, includes));
           }
 
-          return Created(mapProfile(result.createProfile));
+          return Created(mapProfile(result.createProfile, includes));
         } catch (error) {
           if (containsGraphQLError(error, "EXPIRY_ON_NON_EXPIRABLE_FIELD")) {
             throw new BadRequestError("You can't set an expiry date on a non-expirable field");
@@ -4191,7 +4200,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query GetProfile_profile(
             $profileId: GID!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profile(profileId: $profileId) {
@@ -4201,12 +4210,13 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
+        const includes = getProfileIncludesFromQuery(query);
         const result = await client.request(GetProfile_profileDocument, {
           profileId: params.profileId,
-          ...getProfileIncludesFromQuery(query),
+          ...includes,
         });
         assert("id" in result.profile);
-        return Ok(mapProfile(result.profile));
+        return Ok(mapProfile(result.profile, includes));
       },
     )
     .put(
@@ -4281,17 +4291,18 @@ export function publicApi(container: Container) {
             `,
           },
         ),
+        query: profileIncludeParam,
         responses: {
           200: SuccessResponse(Profile),
           400: ErrorResponse({ description: "Invalid request body" }),
           403: ErrorResponse({ description: "You don't have access to this resource" }),
         },
       },
-      async ({ client, params, body }) => {
+      async ({ client, params, body, query }) => {
         const _query = gql`
           query UpdateProfileFieldValue_profile(
             $profileId: GID!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             profile(profileId: $profileId) {
@@ -4362,15 +4373,15 @@ export function publicApi(container: Container) {
           `,
         ];
 
+        const includes = getProfileIncludesFromQuery(query);
         const { profile } = await client.request(UpdateProfileFieldValue_profileDocument, {
           profileId: params.profileId,
-          includeFields: true,
-          includeSubscribers: false,
+          ...includes,
         });
 
-        const profileTypeFields = profile.values
-          .filter((v) => isDefined(v.field.alias))
-          .map((v) => v.field);
+        const profileTypeFields = profile.properties
+          .filter((p) => isDefined(p.field.alias))
+          .map((p) => p.field);
 
         const updateFields: UpdateProfileFieldValueInput[] = [];
         const deleteFileFields: { id: string }[] = [];
@@ -4414,8 +4425,8 @@ export function publicApi(container: Container) {
           }
 
           for (const fileField of uploadFiles) {
-            const profileTypeField = profile.values.find(
-              (v) => v.field.alias === fileField.alias,
+            const profileTypeField = profile.properties.find(
+              (p) => p.field.alias === fileField.alias,
             )!.field;
 
             const {
@@ -4471,11 +4482,11 @@ export function publicApi(container: Container) {
 
         const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {
           profileId: params.profileId,
-          ...getProfileIncludesFromQuery({ include: ["fields"] }),
+          ...includes,
         });
 
         assert("id" in profileQuery.profile);
-        return Ok(mapProfile(profileQuery.profile));
+        return Ok(mapProfile(profileQuery.profile, includes));
       },
     );
 
@@ -4603,6 +4614,34 @@ export function publicApi(container: Container) {
       },
     );
 
+  api.path("/profiles/:profileId/relationships", { params: { profileId } }).get(
+    {
+      operationId: "GetProfileRelationships",
+      summary: "List profile relationships",
+      description: "Returns a list with all the relationships of the specified profile",
+      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(ListOfProfileRelationships) },
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query GetProfileRelationships_profile($profileId: GID!) {
+          profile(profileId: $profileId) {
+            id
+            relationships {
+              ...ProfileRelationship
+            }
+          }
+        }
+        ${ProfileRelationship}
+      `;
+
+      const result = await client.request(GetProfileRelationships_profileDocument, {
+        profileId: params.profileId,
+      });
+      return Ok(mapProfileRelationships(result.profile).relationships);
+    },
+  );
+
   api
     .path("/profiles/:profileId/subscribers", { params: { profileId } })
     .get(
@@ -4651,7 +4690,7 @@ export function publicApi(container: Container) {
           mutation SubscribeToProfile_subscribeToProfile(
             $profileId: GID!
             $userIds: [GID!]!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
@@ -4660,16 +4699,17 @@ export function publicApi(container: Container) {
           }
           ${ProfileFragment}
         `;
+        const includes = getProfileIncludesFromQuery(query);
         const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
           profileId: params.profileId,
           userIds: body.userIds,
-          ...getProfileIncludesFromQuery(query),
+          ...includes,
         });
 
         assert(response.subscribeToProfile.length === 1);
         assert("id" in response.subscribeToProfile[0]);
 
-        return Created(mapProfile(response.subscribeToProfile[0]));
+        return Created(mapProfile(response.subscribeToProfile[0], includes));
       },
     )
     .delete(
@@ -4689,7 +4729,7 @@ export function publicApi(container: Container) {
           mutation UnsubscribeFromProfile_unsubscribeFromProfile(
             $profileId: GID!
             $userIds: [GID!]!
-            $includeFields: Boolean!
+            $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
             unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
@@ -4699,19 +4739,20 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
+        const includes = getProfileIncludesFromQuery(query);
         const response = await client.request(
           UnsubscribeFromProfile_unsubscribeFromProfileDocument,
           {
             profileId: params.profileId,
             userIds: body.userIds,
-            ...getProfileIncludesFromQuery(query),
+            ...includes,
           },
         );
 
         assert(response.unsubscribeFromProfile.length === 1);
         assert("id" in response.unsubscribeFromProfile[0]);
 
-        return Ok(mapProfile(response.unsubscribeFromProfile[0]));
+        return Ok(mapProfile(response.unsubscribeFromProfile[0], includes));
       },
     );
 

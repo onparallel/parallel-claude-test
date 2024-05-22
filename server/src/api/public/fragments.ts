@@ -374,29 +374,56 @@ export const ProfileFieldPropertyFragment = gql`
   ${ProfileFieldFileFragment}
 `;
 
-export const ProfileFragment = gql`
-  fragment Profile on Profile {
+const ProfileBase = gql`
+  fragment ProfileBase on Profile {
     id
     name
     status
     profileType {
-      ...ProfileType
+      id
+      name
     }
-    properties @include(if: $includeFields) {
+    createdAt
+  }
+`;
+
+export const ProfileRelationship = gql`
+  fragment ProfileRelationship on ProfileRelationship {
+    id
+    leftSideProfile {
+      ...ProfileBase
+    }
+    rightSideProfile {
+      ...ProfileBase
+    }
+    relationshipType {
+      alias
+      id
+      leftRightName
+      rightLeftName
+    }
+  }
+  ${ProfileBase}
+`;
+
+export const ProfileFragment = gql`
+  fragment Profile on Profile {
+    ...ProfileBase
+    properties {
       ...ProfileFieldProperty
     }
-    values: properties {
-      ...ProfileFieldProperty
+    relationships @include(if: $includeRelationships) {
+      ...ProfileRelationship
     }
     subscribers @include(if: $includeSubscribers) {
       user {
         ...User
       }
     }
-    createdAt
   }
-  ${ProfileTypeFragment}
+  ${ProfileBase}
   ${ProfileFieldPropertyFragment}
+  ${ProfileRelationship}
   ${UserFragment}
 `;
 

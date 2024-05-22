@@ -12,6 +12,7 @@ import {
 import { toGlobalId } from "../../../util/globalId";
 import { JsonSchema, JsonSchemaFor, schema } from "../../rest/schemas";
 import { PetitionEvent, ProfileEvent } from "./events";
+import { UserLocale } from "../__types";
 
 function _ListOf<T extends JsonSchema>(item: T) {
   return {
@@ -2087,7 +2088,9 @@ const _LocalizableUserText = {
   type: "object",
   additionalProperties: false,
   anyOf: UserLocaleValues.map((key) => ({ required: [key] })),
-  properties: Object.fromEntries(UserLocaleValues.map((key) => [key, { type: "string" }])),
+  properties: Object.fromEntries(
+    UserLocaleValues.map((key) => [key, { type: "string" }]),
+  ) as Record<UserLocale, { type: "string" }>,
   example: { es: "Persona Jurídica", en: "Legal Entity" },
 } as const;
 
@@ -2267,21 +2270,11 @@ const _ProfileFieldProperty = {
   ],
 } as const;
 
-const _ProfileSubscription = {
-  title: "ProfileSubscription",
-  type: "object",
-  additionalProperties: false,
-  required: ["user"],
-  properties: {
-    user: _User,
-  },
-} as const;
-
-const _Profile = {
+const _ProfileBase = {
   title: "Profile",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "status", "profileType", "values", "createdAt"],
+  required: ["id", "name", "status", "profileType", "createdAt"],
   properties: {
     id: {
       type: "string",
@@ -2313,6 +2306,75 @@ const _Profile = {
         name: _LocalizableUserText,
       },
     },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Date and time when the profile was created",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+  },
+} as const;
+
+const _ProfileRelationship = {
+  title: "ProfileSubscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "inverse", "relationshipType", "profile"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile relationship",
+      example: toGlobalId("ProfileRelationship", 101),
+    },
+    inverse: {
+      type: "boolean",
+      description: outdent`
+        When obtaining relationships of profile A and a relationship with profile B appears:
+        - If inverse is false A is [relationshipType.name] of B
+        - If inverse is true A is [relationshipType.inverseName] of B
+      `,
+      example: "false",
+    },
+    relationshipType: {
+      title: "ProfileRelationshipType",
+      type: "object",
+      additionalProperties: false,
+      required: ["id", "alias", "name", "inverseName"],
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the profile relationship type",
+          example: toGlobalId("ProfileRelationshipType", 1),
+        },
+        alias: {
+          type: ["string", "null"],
+          description: "Readable identifier of the relationship type",
+          example: "p_parent__child",
+        },
+        name: { ..._LocalizableUserText, example: { es: "Padre/Madre", en: "Parent" } },
+        inverseName: { ..._LocalizableUserText, example: { es: "Hijo/Hija", en: "Child" } },
+      },
+    },
+    profile: _ProfileBase,
+  },
+} as const;
+
+const _ProfileSubscription = {
+  title: "ProfileSubscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["user"],
+  properties: {
+    user: _User,
+  },
+} as const;
+
+const _Profile = {
+  ..._ProfileBase,
+  required: [..._ProfileBase.required, "values"],
+  additionalProperties: false,
+  properties: {
+    ..._ProfileBase.properties,
     fields: {
       ...ListOf(_ProfileFieldProperty as any),
       description:
@@ -2331,11 +2393,11 @@ const _Profile = {
         "If parameter `include` contains `subscribers`, this will be the list of users subscribed to the profile",
       items: _ProfileSubscription,
     },
-    createdAt: {
-      type: "string",
-      format: "date-time",
-      description: "Date and time when the profile was created",
-      example: new Date(2020, 2, 15).toISOString(),
+    relationships: {
+      type: "array",
+      description:
+        "If parameter `include` contains `relationships`, this will be the list of relationships of the profile",
+      items: _ProfileRelationship,
     },
   },
 } as const;
@@ -2413,6 +2475,7 @@ export const CreateProfile = schema({
   },
 } as const);
 
+export const ListOfProfileRelationships = ListOf(_ProfileRelationship);
 export const ListOfProfileSubscriptions = ListOf(_ProfileSubscription);
 
 export const ProfileSubscriptionInput = (subscribe: boolean) =>

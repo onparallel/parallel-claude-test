@@ -6189,24 +6189,44 @@ export type ProfileFieldPropertyFragment = {
   }> | null;
 };
 
+export type ProfileBaseFragment = {
+  id: string;
+  name: string;
+  status: ProfileStatus;
+  createdAt: string;
+  profileType: { id: string; name: { [locale in UserLocale]?: string } };
+};
+
+export type ProfileRelationshipFragment = {
+  id: string;
+  leftSideProfile: {
+    id: string;
+    name: string;
+    status: ProfileStatus;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  };
+  rightSideProfile: {
+    id: string;
+    name: string;
+    status: ProfileStatus;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  };
+  relationshipType: {
+    alias: string | null;
+    id: string;
+    leftRightName: { [locale in UserLocale]?: string };
+    rightLeftName: { [locale in UserLocale]?: string };
+  };
+};
+
 export type ProfileFragment = {
   id: string;
   name: string;
   status: ProfileStatus;
   createdAt: string;
-  profileType: {
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    fields: Array<{
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      alias: string | null;
-      type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      options: { [key: string]: any };
-    }>;
-  };
-  properties?: Array<{
+  properties: Array<{
     field: {
       id: string;
       name: { [locale in UserLocale]?: string };
@@ -6228,27 +6248,28 @@ export type ProfileFragment = {
       file: { filename: string; size: number; contentType: string } | null;
     }> | null;
   }>;
-  values: Array<{
-    field: {
+  relationships?: Array<{
+    id: string;
+    leftSideProfile: {
       id: string;
-      name: { [locale in UserLocale]?: string };
-      alias: string | null;
-      type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      options: { [key: string]: any };
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
     };
-    value: {
+    rightSideProfile: {
       id: string;
-      content: { [key: string]: any } | null;
-      expiresAt: string | null;
+      name: string;
+      status: ProfileStatus;
       createdAt: string;
-    } | null;
-    files: Array<{
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    };
+    relationshipType: {
+      alias: string | null;
       id: string;
-      expiresAt: string | null;
-      createdAt: string;
-      file: { filename: string; size: number; contentType: string } | null;
-    }> | null;
+      leftRightName: { [locale in UserLocale]?: string };
+      rightLeftName: { [locale in UserLocale]?: string };
+    };
   }>;
   subscribers?: Array<{
     user: {
@@ -6259,6 +6280,7 @@ export type ProfileFragment = {
       lastName: string | null;
     };
   }>;
+  profileType: { id: string; name: { [locale in UserLocale]?: string } };
 };
 
 export type PetitionFieldCommentFragment = {
@@ -8324,7 +8346,7 @@ export type DownloadSignedDocument_downloadAuditTrailMutation = {
 
 export type GetPetitionProfiles_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -8337,19 +8359,7 @@ export type GetPetitionProfiles_petitionQuery = {
           name: string;
           status: ProfileStatus;
           createdAt: string;
-          profileType: {
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            fields: Array<{
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              alias: string | null;
-              type: ProfileTypeFieldType;
-              isExpirable: boolean;
-              options: { [key: string]: any };
-            }>;
-          };
-          properties?: Array<{
+          properties: Array<{
             field: {
               id: string;
               name: { [locale in UserLocale]?: string };
@@ -8371,27 +8381,28 @@ export type GetPetitionProfiles_petitionQuery = {
               file: { filename: string; size: number; contentType: string } | null;
             }> | null;
           }>;
-          values: Array<{
-            field: {
+          relationships?: Array<{
+            id: string;
+            leftSideProfile: {
               id: string;
-              name: { [locale in UserLocale]?: string };
-              alias: string | null;
-              type: ProfileTypeFieldType;
-              isExpirable: boolean;
-              options: { [key: string]: any };
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
             };
-            value: {
+            rightSideProfile: {
               id: string;
-              content: { [key: string]: any } | null;
-              expiresAt: string | null;
+              name: string;
+              status: ProfileStatus;
               createdAt: string;
-            } | null;
-            files: Array<{
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            };
+            relationshipType: {
+              alias: string | null;
               id: string;
-              expiresAt: string | null;
-              createdAt: string;
-              file: { filename: string; size: number; contentType: string } | null;
-            }> | null;
+              leftRightName: { [locale in UserLocale]?: string };
+              rightLeftName: { [locale in UserLocale]?: string };
+            };
           }>;
           subscribers?: Array<{
             user: {
@@ -8402,6 +8413,7 @@ export type GetPetitionProfiles_petitionQuery = {
               lastName: string | null;
             };
           }>;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
         }>;
       }
     | { __typename: "PetitionTemplate" }
@@ -8411,7 +8423,7 @@ export type GetPetitionProfiles_petitionQuery = {
 export type AssociatePetitionToProfile_associateProfileToPetitionMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -8422,19 +8434,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: {
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        fields: Array<{
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
-        }>;
-      };
-      properties?: Array<{
+      properties: Array<{
         field: {
           id: string;
           name: { [locale in UserLocale]?: string };
@@ -8456,27 +8456,28 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
           file: { filename: string; size: number; contentType: string } | null;
         }> | null;
       }>;
-      values: Array<{
-        field: {
+      relationships?: Array<{
+        id: string;
+        leftSideProfile: {
           id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
         };
-        value: {
+        rightSideProfile: {
           id: string;
-          content: { [key: string]: any } | null;
-          expiresAt: string | null;
+          name: string;
+          status: ProfileStatus;
           createdAt: string;
-        } | null;
-        files: Array<{
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        };
+        relationshipType: {
+          alias: string | null;
           id: string;
-          expiresAt: string | null;
-          createdAt: string;
-          file: { filename: string; size: number; contentType: string } | null;
-        }> | null;
+          leftRightName: { [locale in UserLocale]?: string };
+          rightLeftName: { [locale in UserLocale]?: string };
+        };
       }>;
       subscribers?: Array<{
         user: {
@@ -8487,6 +8488,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
           lastName: string | null;
         };
       }>;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
     };
   };
 };
@@ -9185,7 +9187,7 @@ export type GetProfiles_profilesQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9197,19 +9199,7 @@ export type GetProfiles_profilesQuery = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: {
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        fields: Array<{
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
-        }>;
-      };
-      properties?: Array<{
+      properties: Array<{
         field: {
           id: string;
           name: { [locale in UserLocale]?: string };
@@ -9231,27 +9221,28 @@ export type GetProfiles_profilesQuery = {
           file: { filename: string; size: number; contentType: string } | null;
         }> | null;
       }>;
-      values: Array<{
-        field: {
+      relationships?: Array<{
+        id: string;
+        leftSideProfile: {
           id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
         };
-        value: {
+        rightSideProfile: {
           id: string;
-          content: { [key: string]: any } | null;
-          expiresAt: string | null;
+          name: string;
+          status: ProfileStatus;
           createdAt: string;
-        } | null;
-        files: Array<{
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        };
+        relationshipType: {
+          alias: string | null;
           id: string;
-          expiresAt: string | null;
-          createdAt: string;
-          file: { filename: string; size: number; contentType: string } | null;
-        }> | null;
+          leftRightName: { [locale in UserLocale]?: string };
+          rightLeftName: { [locale in UserLocale]?: string };
+        };
       }>;
       subscribers?: Array<{
         user: {
@@ -9262,6 +9253,7 @@ export type GetProfiles_profilesQuery = {
           lastName: string | null;
         };
       }>;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
     }>;
   };
 };
@@ -9285,7 +9277,7 @@ export type CreateProfile_createProfileMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
   fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9295,19 +9287,7 @@ export type CreateProfile_createProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: {
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      }>;
-    };
-    properties?: Array<{
+    properties: Array<{
       field: {
         id: string;
         name: { [locale in UserLocale]?: string };
@@ -9329,27 +9309,28 @@ export type CreateProfile_createProfileMutation = {
         file: { filename: string; size: number; contentType: string } | null;
       }> | null;
     }>;
-    values: Array<{
-      field: {
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
         id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
       };
-      value: {
+      rightSideProfile: {
         id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
+        name: string;
+        status: ProfileStatus;
         createdAt: string;
-      } | null;
-      files: Array<{
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
         id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
     }>;
     subscribers?: Array<{
       user: {
@@ -9360,6 +9341,7 @@ export type CreateProfile_createProfileMutation = {
         lastName: string | null;
       };
     }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
   };
 };
 
@@ -9383,7 +9365,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutationVariables = Exac
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
   profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9394,19 +9376,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
       name: string;
       status: ProfileStatus;
       createdAt: string;
-      profileType: {
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        fields: Array<{
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
-        }>;
-      };
-      properties?: Array<{
+      properties: Array<{
         field: {
           id: string;
           name: { [locale in UserLocale]?: string };
@@ -9428,27 +9398,28 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
           file: { filename: string; size: number; contentType: string } | null;
         }> | null;
       }>;
-      values: Array<{
-        field: {
+      relationships?: Array<{
+        id: string;
+        leftSideProfile: {
           id: string;
-          name: { [locale in UserLocale]?: string };
-          alias: string | null;
-          type: ProfileTypeFieldType;
-          isExpirable: boolean;
-          options: { [key: string]: any };
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
         };
-        value: {
+        rightSideProfile: {
           id: string;
-          content: { [key: string]: any } | null;
-          expiresAt: string | null;
+          name: string;
+          status: ProfileStatus;
           createdAt: string;
-        } | null;
-        files: Array<{
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        };
+        relationshipType: {
+          alias: string | null;
           id: string;
-          expiresAt: string | null;
-          createdAt: string;
-          file: { filename: string; size: number; contentType: string } | null;
-        }> | null;
+          leftRightName: { [locale in UserLocale]?: string };
+          rightLeftName: { [locale in UserLocale]?: string };
+        };
       }>;
       subscribers?: Array<{
         user: {
@@ -9459,13 +9430,14 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
           lastName: string | null;
         };
       }>;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
     };
   }>;
 };
 
 export type GetProfile_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9475,19 +9447,7 @@ export type GetProfile_profileQuery = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: {
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      }>;
-    };
-    properties?: Array<{
+    properties: Array<{
       field: {
         id: string;
         name: { [locale in UserLocale]?: string };
@@ -9509,27 +9469,28 @@ export type GetProfile_profileQuery = {
         file: { filename: string; size: number; contentType: string } | null;
       }> | null;
     }>;
-    values: Array<{
-      field: {
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
         id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
       };
-      value: {
+      rightSideProfile: {
         id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
+        name: string;
+        status: ProfileStatus;
         createdAt: string;
-      } | null;
-      files: Array<{
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
         id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
     }>;
     subscribers?: Array<{
       user: {
@@ -9540,12 +9501,13 @@ export type GetProfile_profileQuery = {
         lastName: string | null;
       };
     }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
   };
 };
 
 export type UpdateProfileFieldValue_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9555,19 +9517,7 @@ export type UpdateProfileFieldValue_profileQuery = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: {
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      }>;
-    };
-    properties?: Array<{
+    properties: Array<{
       field: {
         id: string;
         name: { [locale in UserLocale]?: string };
@@ -9589,27 +9539,28 @@ export type UpdateProfileFieldValue_profileQuery = {
         file: { filename: string; size: number; contentType: string } | null;
       }> | null;
     }>;
-    values: Array<{
-      field: {
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
         id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
       };
-      value: {
+      rightSideProfile: {
         id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
+        name: string;
+        status: ProfileStatus;
         createdAt: string;
-      } | null;
-      files: Array<{
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
         id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
     }>;
     subscribers?: Array<{
       user: {
@@ -9620,6 +9571,7 @@ export type UpdateProfileFieldValue_profileQuery = {
         lastName: string | null;
       };
     }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
   };
 };
 
@@ -9690,6 +9642,39 @@ export type DownloadProfileFieldFile_profileFieldFileDownloadLinkMutation = {
   profileFieldFileDownloadLink: { url: string | null };
 };
 
+export type GetProfileRelationships_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type GetProfileRelationships_profileQuery = {
+  profile: {
+    id: string;
+    relationships: Array<{
+      id: string;
+      leftSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      rightSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
+        id: string;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
+    }>;
+  };
+};
+
 export type GetProfileSubscribers_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
 }>;
@@ -9711,7 +9696,7 @@ export type GetProfileSubscribers_profileQuery = {
 export type SubscribeToProfile_subscribeToProfileMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9721,19 +9706,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: {
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      }>;
-    };
-    properties?: Array<{
+    properties: Array<{
       field: {
         id: string;
         name: { [locale in UserLocale]?: string };
@@ -9755,27 +9728,28 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
         file: { filename: string; size: number; contentType: string } | null;
       }> | null;
     }>;
-    values: Array<{
-      field: {
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
         id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
       };
-      value: {
+      rightSideProfile: {
         id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
+        name: string;
+        status: ProfileStatus;
         createdAt: string;
-      } | null;
-      files: Array<{
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
         id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
     }>;
     subscribers?: Array<{
       user: {
@@ -9786,13 +9760,14 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
         lastName: string | null;
       };
     }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
   }>;
 };
 
 export type UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  includeFields: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
 
@@ -9802,19 +9777,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
     name: string;
     status: ProfileStatus;
     createdAt: string;
-    profileType: {
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
-      }>;
-    };
-    properties?: Array<{
+    properties: Array<{
       field: {
         id: string;
         name: { [locale in UserLocale]?: string };
@@ -9836,27 +9799,28 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
         file: { filename: string; size: number; contentType: string } | null;
       }> | null;
     }>;
-    values: Array<{
-      field: {
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
         id: string;
-        name: { [locale in UserLocale]?: string };
-        alias: string | null;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        options: { [key: string]: any };
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
       };
-      value: {
+      rightSideProfile: {
         id: string;
-        content: { [key: string]: any } | null;
-        expiresAt: string | null;
+        name: string;
+        status: ProfileStatus;
         createdAt: string;
-      } | null;
-      files: Array<{
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
         id: string;
-        expiresAt: string | null;
-        createdAt: string;
-        file: { filename: string; size: number; contentType: string } | null;
-      }> | null;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
     }>;
     subscribers?: Array<{
       user: {
@@ -9867,6 +9831,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
         lastName: string | null;
       };
     }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
   }>;
 };
 
@@ -10705,6 +10670,18 @@ export const ProfileTypeFragmentDoc = gql`
   }
   ${ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileTypeFragment, unknown>;
+export const ProfileBaseFragmentDoc = gql`
+  fragment ProfileBase on Profile {
+    id
+    name
+    status
+    profileType {
+      id
+      name
+    }
+    createdAt
+  }
+` as unknown as DocumentNode<ProfileBaseFragment, unknown>;
 export const ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFieldValue on ProfileFieldValue {
     id
@@ -10741,29 +10718,42 @@ export const ProfileFieldPropertyFragmentDoc = gql`
   ${ProfileFieldValueFragmentDoc}
   ${ProfileFieldFileFragmentDoc}
 ` as unknown as DocumentNode<ProfileFieldPropertyFragment, unknown>;
+export const ProfileRelationshipFragmentDoc = gql`
+  fragment ProfileRelationship on ProfileRelationship {
+    id
+    leftSideProfile {
+      ...ProfileBase
+    }
+    rightSideProfile {
+      ...ProfileBase
+    }
+    relationshipType {
+      alias
+      id
+      leftRightName
+      rightLeftName
+    }
+  }
+  ${ProfileBaseFragmentDoc}
+` as unknown as DocumentNode<ProfileRelationshipFragment, unknown>;
 export const ProfileFragmentDoc = gql`
   fragment Profile on Profile {
-    id
-    name
-    status
-    profileType {
-      ...ProfileType
-    }
-    properties @include(if: $includeFields) {
+    ...ProfileBase
+    properties {
       ...ProfileFieldProperty
     }
-    values: properties {
-      ...ProfileFieldProperty
+    relationships @include(if: $includeRelationships) {
+      ...ProfileRelationship
     }
     subscribers @include(if: $includeSubscribers) {
       user {
         ...User
       }
     }
-    createdAt
   }
-  ${ProfileTypeFragmentDoc}
+  ${ProfileBaseFragmentDoc}
   ${ProfileFieldPropertyFragmentDoc}
+  ${ProfileRelationshipFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileFragment, unknown>;
 export const PetitionFieldCommentFragmentDoc = gql`
@@ -11631,7 +11621,7 @@ export const DownloadSignedDocument_downloadAuditTrailDocument = gql`
 export const GetPetitionProfiles_petitionDocument = gql`
   query GetPetitionProfiles_petition(
     $petitionId: GID!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     petition(id: $petitionId) {
@@ -11652,7 +11642,7 @@ export const AssociatePetitionToProfile_associateProfileToPetitionDocument = gql
   mutation AssociatePetitionToProfile_associateProfileToPetition(
     $profileId: GID!
     $petitionId: GID!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
@@ -11866,7 +11856,7 @@ export const GetProfiles_profilesDocument = gql`
     $search: String
     $profileTypeIds: [GID!]
     $status: [ProfileStatus!]
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     profiles(
@@ -11904,7 +11894,7 @@ export const CreateProfile_createProfileDocument = gql`
     $profileTypeId: GID!
     $subscribe: Boolean
     $fields: [UpdateProfileFieldValueInput!]
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
@@ -11949,7 +11939,7 @@ export const CreateProfile_profileFieldFileUploadCompleteDocument = gql`
     $profileId: GID!
     $profileTypeFieldId: GID!
     $profileFieldFileIds: [GID!]!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     profileFieldFileUploadComplete(
@@ -11970,7 +11960,7 @@ export const CreateProfile_profileFieldFileUploadCompleteDocument = gql`
 export const GetProfile_profileDocument = gql`
   query GetProfile_profile(
     $profileId: GID!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     profile(profileId: $profileId) {
@@ -11982,7 +11972,7 @@ export const GetProfile_profileDocument = gql`
 export const UpdateProfileFieldValue_profileDocument = gql`
   query UpdateProfileFieldValue_profile(
     $profileId: GID!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     profile(profileId: $profileId) {
@@ -12101,6 +12091,20 @@ export const DownloadProfileFieldFile_profileFieldFileDownloadLinkDocument = gql
   DownloadProfileFieldFile_profileFieldFileDownloadLinkMutation,
   DownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables
 >;
+export const GetProfileRelationships_profileDocument = gql`
+  query GetProfileRelationships_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      id
+      relationships {
+        ...ProfileRelationship
+      }
+    }
+  }
+  ${ProfileRelationshipFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfileRelationships_profileQuery,
+  GetProfileRelationships_profileQueryVariables
+>;
 export const GetProfileSubscribers_profileDocument = gql`
   query GetProfileSubscribers_profile($profileId: GID!) {
     profile(profileId: $profileId) {
@@ -12120,7 +12124,7 @@ export const SubscribeToProfile_subscribeToProfileDocument = gql`
   mutation SubscribeToProfile_subscribeToProfile(
     $profileId: GID!
     $userIds: [GID!]!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
@@ -12136,7 +12140,7 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
   mutation UnsubscribeFromProfile_unsubscribeFromProfile(
     $profileId: GID!
     $userIds: [GID!]!
-    $includeFields: Boolean!
+    $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
     unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
