@@ -286,7 +286,7 @@ describe("GraphQL/Profiles", () => {
     profileType2Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[2].id,
-      4,
+      5,
       (i) =>
         [
           {
@@ -312,6 +312,12 @@ describe("GraphQL/Profiles", () => {
             type: "TEXT" as const,
             alias: "BANK_ID",
             permission: "READ" as const,
+          },
+          {
+            name: json({ en: "Contract Value", es: "Valor del contrato" }),
+            type: "NUMBER" as const,
+            alias: "CONTRACT_VALUE",
+            permission: "WRITE" as const,
           },
         ][i],
     );
@@ -381,6 +387,261 @@ describe("GraphQL/Profiles", () => {
 
   afterAll(async () => {
     await testClient.stop();
+  });
+
+  describe("profiles", () => {
+    let harryPotterId: number;
+    let harveySpecterId: number;
+    let contractId: number;
+
+    beforeEach(async () => {
+      const harryPotter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+      ]);
+      const harveySpecter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Specter" },
+        },
+      ]);
+
+      const contract = await createProfile(toGlobalId("ProfileType", profileTypes[2].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+          content: { value: "1234 Main St" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+          content: { value: 1000 },
+        },
+      ]);
+
+      harryPotterId = harryPotter.id;
+      harveySpecterId = harveySpecter.id;
+      contractId = contract.id;
+    });
+
+    it("queries profiles filtering by its current values", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            values: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                operator: "START_WITH",
+                value: "Har",
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("queries profiles with multiple value filters", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            values: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                operator: "START_WITH",
+                value: "Har",
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+                operator: "EQUAL",
+                value: "Potter",
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
+
+    it("queries profiles with numerical value filter", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            values: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+                operator: "GREATER_THAN_OR_EQUAL",
+                value: 1000,
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+                operator: "CONTAIN",
+                value: "Main St",
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: contractId }],
+      });
+    });
+
+    it("queries profiles with an array of possible values", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            values: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                operator: "IS_ONE_OF",
+                value: ["Harry", "Harvey"],
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("sends error if using IS_ONE_OF or NOT_IS_ONE_OF condition with a non-array value", async () => {
+      for (const operator of ["IS_ONE_OF", "NOT_IS_ONE_OF"]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($filter: ProfileFilter) {
+              profiles(limit: 100, offset: 0, filter: $filter) {
+                totalCount
+                items {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            filter: {
+              values: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                  operator,
+                  value: "Harry",
+                },
+              ],
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      }
+    });
+
+    it("sends error if using array values with a non-array condition", async () => {
+      for (const operator of [
+        "EQUAL",
+        "NOT_EQUAL",
+        "START_WITH",
+        "END_WITH",
+        "CONTAIN",
+        "NOT_CONTAIN",
+        "LESS_THAN",
+        "LESS_THAN_OR_EQUAL",
+        "GREATER_THAN",
+        "GREATER_THAN_OR_EQUAL",
+      ]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($filter: ProfileFilter) {
+              profiles(limit: 100, offset: 0, filter: $filter) {
+                totalCount
+                items {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            filter: {
+              values: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                  operator,
+                  value: ["Harry", "Harvey"],
+                },
+              ],
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      }
+    });
   });
 
   describe("profile", () => {
@@ -857,6 +1118,10 @@ describe("GraphQL/Profiles", () => {
               {
                 name: { en: "Bank ID", es: "ID de Banco" },
                 position: 3,
+              },
+              {
+                name: { en: "Contract Value", es: "Valor del contrato" },
+                position: 4,
               },
             ],
           },
@@ -5521,6 +5786,7 @@ describe("GraphQL/Profiles", () => {
           { files: [{ id: expect.any(String) }] },
           { files: null },
           { files: null },
+          { files: null },
         ],
       });
 
@@ -5649,6 +5915,7 @@ describe("GraphQL/Profiles", () => {
           },
           { files: null },
           { files: null },
+          { files: null },
         ],
       });
 
@@ -5708,7 +5975,13 @@ describe("GraphQL/Profiles", () => {
 
       expect(profileEventsQueryErrors).toBeUndefined();
       expect(profileEventsQueryData.profile).toEqual({
-        properties: [{ files: null }, { files: null }, { files: null }, { files: null }],
+        properties: [
+          { files: null },
+          { files: null },
+          { files: null },
+          { files: null },
+          { files: null },
+        ],
         events: {
           totalCount: 5,
           items: [
@@ -5787,6 +6060,7 @@ describe("GraphQL/Profiles", () => {
         properties: [
           { files: null },
           { files: [{ id: expect.any(String) }] },
+          { files: null },
           { files: null },
           { files: null },
         ],

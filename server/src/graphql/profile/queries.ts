@@ -1,4 +1,5 @@
-import { arg, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
+import Ajv from "ajv";
+import { arg, enumType, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
 import { isDefined } from "remeda";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
@@ -88,8 +89,90 @@ export const profiles = queryField((t) => {
           t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
           t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
+          t.nullable.list.nonNull.field("values", {
+            type: inputObjectType({
+              name: "ProfileFieldValuesFilter",
+              definition(t) {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nonNull.field("operator", {
+                  type: enumType({
+                    name: "ProfileFieldValuesFilterOperator",
+                    members: [
+                      "EQUAL",
+                      "NOT_EQUAL",
+                      "START_WITH",
+                      "END_WITH",
+                      "CONTAIN",
+                      "NOT_CONTAIN",
+                      "IS_ONE_OF",
+                      "NOT_IS_ONE_OF",
+                      "LESS_THAN",
+                      "LESS_THAN_OR_EQUAL",
+                      "GREATER_THAN",
+                      "GREATER_THAN_OR_EQUAL",
+                    ],
+                  }),
+                });
+                t.nonNull.json("value");
+              },
+            }),
+          });
         },
       }),
+    },
+    validateArgs: (_, args, ctx, info) => {
+      if (isDefined(args.filter?.values)) {
+        for (const valueFilter of args.filter.values) {
+          if (valueFilter.operator === "IS_ONE_OF" || valueFilter.operator === "NOT_IS_ONE_OF") {
+            if (!Array.isArray(valueFilter.value)) {
+              throw new ArgValidationError(
+                info,
+                "filter.values",
+                `Value must be an array for operator ${valueFilter.operator}`,
+              );
+            }
+          } else {
+            if (Array.isArray(valueFilter.value)) {
+              throw new ArgValidationError(
+                info,
+                "filter.values",
+                `Value must be a single value for operator ${valueFilter.operator}`,
+              );
+            }
+          }
+        }
+
+        const ajv = new Ajv({ allowUnionTypes: true });
+        const valid = ajv.validate(
+          {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                value: {
+                  oneOf: [
+                    {
+                      type: ["string", "number"],
+                    },
+                    {
+                      type: "array",
+                      items: {
+                        type: ["string", "number"],
+                      },
+                      minItems: 1,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          args.filter.values,
+        );
+
+        if (!valid) {
+          throw new ArgValidationError(info, "filter.values", ajv.errorsText());
+        }
+      }
     },
     resolve: async (_, { limit, offset, search, sortBy, filter }, ctx) => {
       const columnMap = {

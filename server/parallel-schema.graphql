@@ -5317,10 +5317,32 @@ type ProfileFieldValueUpdatedEvent implements ProfileEvent {
   user: User
 }
 
+input ProfileFieldValuesFilter {
+  operator: ProfileFieldValuesFilterOperator!
+  profileTypeFieldId: GID!
+  value: JSON!
+}
+
+enum ProfileFieldValuesFilterOperator {
+  CONTAIN
+  END_WITH
+  EQUAL
+  GREATER_THAN
+  GREATER_THAN_OR_EQUAL
+  IS_ONE_OF
+  LESS_THAN
+  LESS_THAN_OR_EQUAL
+  NOT_CONTAIN
+  NOT_EQUAL
+  NOT_IS_ONE_OF
+  START_WITH
+}
+
 input ProfileFilter {
   profileId: [GID!]
   profileTypeId: [GID!]
   status: [ProfileStatus!]
+  values: [ProfileFieldValuesFilter!]
 }
 
 type ProfilePagination {

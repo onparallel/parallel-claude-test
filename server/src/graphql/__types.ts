@@ -261,11 +261,18 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  ProfileFieldValuesFilter: {
+    // input type
+    operator: NexusGenEnums["ProfileFieldValuesFilterOperator"]; // ProfileFieldValuesFilterOperator!
+    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    value: NexusGenScalars["JSON"]; // JSON!
+  };
   ProfileFilter: {
     // input type
     profileId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
     status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
+    values?: NexusGenInputs["ProfileFieldValuesFilter"][] | null; // [ProfileFieldValuesFilter!]
   };
   ProfilePropertyFilter: {
     // input type
@@ -507,6 +514,19 @@ export interface NexusGenEnums {
   PetitionTagFilterLogicalOperator: "AND" | "OR";
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   ProfileEventType: db.ProfileEventType;
+  ProfileFieldValuesFilterOperator:
+    | "CONTAIN"
+    | "END_WITH"
+    | "EQUAL"
+    | "GREATER_THAN"
+    | "GREATER_THAN_OR_EQUAL"
+    | "IS_ONE_OF"
+    | "LESS_THAN"
+    | "LESS_THAN_OR_EQUAL"
+    | "NOT_CONTAIN"
+    | "NOT_EQUAL"
+    | "NOT_IS_ONE_OF"
+    | "START_WITH";
   ProfileRelationshipDirection: "LEFT_RIGHT" | "RIGHT_LEFT";
   ProfileStatus: db.ProfileStatus;
   ProfileTypeFieldPermissionType: db.ProfileTypeFieldPermissionType;

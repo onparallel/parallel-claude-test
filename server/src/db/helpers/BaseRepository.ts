@@ -131,7 +131,7 @@ export class BaseRepository {
   }
 
   protected from<TName extends TableNames, TResult extends {} = TableTypes[TName]>(
-    tableName: TName,
+    tableName: TName | Record<string, TName>,
     transaction?: Knex.Transaction,
   ) {
     return transaction ? transaction<TResult>(tableName) : this.knex<TResult>(tableName);

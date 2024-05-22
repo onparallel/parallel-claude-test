@@ -4154,10 +4154,31 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
   user: Maybe<User>;
 };
 
+export type ProfileFieldValuesFilter = {
+  operator: ProfileFieldValuesFilterOperator;
+  profileTypeFieldId: Scalars["GID"]["input"];
+  value: Scalars["JSON"]["input"];
+};
+
+export type ProfileFieldValuesFilterOperator =
+  | "CONTAIN"
+  | "END_WITH"
+  | "EQUAL"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "NOT_CONTAIN"
+  | "NOT_EQUAL"
+  | "NOT_IS_ONE_OF"
+  | "START_WITH";
+
 export type ProfileFilter = {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
+  values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
 };
 
 export type ProfilePagination = {

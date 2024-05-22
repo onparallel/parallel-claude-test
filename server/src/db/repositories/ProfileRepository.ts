@@ -68,6 +68,33 @@ import {
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
+type ProfileFilterValueOperator =
+  | "EQUAL"
+  | "NOT_EQUAL"
+  | "START_WITH"
+  | "END_WITH"
+  | "CONTAIN"
+  | "NOT_CONTAIN"
+  | "IS_ONE_OF"
+  | "NOT_IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL";
+
+interface ProfileFilter {
+  profileId?: number[] | null;
+  profileTypeId?: number[] | null;
+  status?: ProfileStatus[] | null;
+  values?:
+    | {
+        profileTypeFieldId: number;
+        operator: ProfileFilterValueOperator;
+        value: MaybeArray<number | string>;
+      }[]
+    | null;
+}
+
 @injectable()
 export class ProfileRepository extends BaseRepository {
   private readonly PROFILE_UPDATED_EVENT_DELAY_SECONDS = 15;
@@ -581,31 +608,103 @@ export class ProfileRepository extends BaseRepository {
     orgId: number,
     opts: {
       search?: string | null;
-      filter?: {
-        profileId?: number[] | null;
-        profileTypeId?: number[] | null;
-        status?: ProfileStatus[] | null;
-      } | null;
+      filter?: ProfileFilter | null;
       sortBy?: SortBy<"created_at" | "name">[];
     } & PageOpts,
   ) {
     return this.getPagination<Profile>(
-      this.from("profile")
-        .where("org_id", orgId)
-        .whereNull("deleted_at")
+      this.from({ p: "profile" })
+        .where("p.org_id", orgId)
+        .whereNull("p.deleted_at")
         .mmodify((q) => {
           const { search, sortBy, filter } = opts;
           if (search) {
-            q.whereSearch("name", search);
+            q.whereSearch("p.name", search);
           }
           if (isDefined(filter?.profileId)) {
-            q.whereIn("id", filter!.profileId);
+            q.whereIn("p.id", filter!.profileId);
           }
           if (isDefined(filter?.profileTypeId)) {
-            q.whereIn("profile_type_id", filter!.profileTypeId);
+            q.whereIn("p.profile_type_id", filter!.profileTypeId);
           }
           if (isDefined(filter?.status) && filter!.status.length > 0) {
-            q.whereIn("status", filter!.status);
+            q.whereIn("p.status", filter!.status);
+          }
+
+          if (isDefined(filter?.values) && filter.values.length > 0) {
+            const entries = Object.entries(groupBy(filter.values, (v) => v.profileTypeFieldId));
+            for (const entry of entries) {
+              const index = entries.indexOf(entry);
+              const profileTypeFieldId = parseInt(entry[0]);
+              const conditions = entry[1];
+              q.joinRaw(
+                /* sql */ `
+                join profile_field_value pfv_${index} 
+                  on pfv_${index}.profile_id = p.id
+                  and pfv_${index}.profile_type_field_id = ?
+                  and pfv_${index}.deleted_at is null 
+                  and pfv_${index}.removed_at is null
+              `,
+                [profileTypeFieldId],
+              ).andWhere((q) => {
+                for (const condition of conditions) {
+                  switch (condition.operator) {
+                    case "EQUAL":
+                    case "NOT_EQUAL":
+                      q = condition.operator.startsWith("NOT_") ? q.not : q;
+                      q.whereRaw(/* sql*/ `pfv_${index}.content->>'value' = ?`, [condition.value]);
+                      break;
+                    case "START_WITH":
+                      q.whereRaw(/* sql*/ `starts_with(pfv_${index}.content->>'value', ?)`, [
+                        condition.value,
+                      ]);
+                      break;
+                    case "END_WITH":
+                      q.whereRaw(/* sql*/ `right(pfv_${index}.content->>'value', length(?)) = ?`, [
+                        condition.value,
+                        condition.value,
+                      ]);
+                      break;
+                    case "CONTAIN":
+                    case "NOT_CONTAIN":
+                      q = condition.operator.startsWith("NOT_") ? q.not : q;
+                      q.whereRaw(/* sql*/ `strpos(pfv_${index}.content->>'value', ?) > 0`, [
+                        condition.value,
+                      ]);
+                      break;
+                    case "IS_ONE_OF":
+                    case "NOT_IS_ONE_OF":
+                      q = condition.operator.startsWith("NOT_") ? q.not : q;
+                      q.whereRaw(/* sql*/ `pfv_${index}.content->>'value' in ?`, [
+                        this.sqlIn(condition.value as (string | number)[]),
+                      ]);
+                      break;
+                    case "LESS_THAN":
+                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int < ?`, [
+                        condition.value,
+                      ]);
+                      break;
+                    case "LESS_THAN_OR_EQUAL":
+                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int <= ?`, [
+                        condition.value,
+                      ]);
+                      break;
+                    case "GREATER_THAN":
+                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int > ?`, [
+                        condition.value,
+                      ]);
+                      break;
+                    case "GREATER_THAN_OR_EQUAL":
+                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int >= ?`, [
+                        condition.value,
+                      ]);
+                      break;
+                    default:
+                      throw new Error(`Operator ${condition.operator} not implemented`);
+                  }
+                }
+              });
+            }
           }
           if (isDefined(sortBy)) {
             q.orderBy(
@@ -615,8 +714,8 @@ export class ProfileRepository extends BaseRepository {
             );
           }
         })
-        .orderBy("id")
-        .select("*"),
+        .orderBy("p.id")
+        .select("p.*"),
       opts,
     );
   }
