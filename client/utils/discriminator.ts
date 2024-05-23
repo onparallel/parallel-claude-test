@@ -1,6 +1,6 @@
 import { MaybeArray, Prettify, unMaybeArray } from "./types";
 
-export function discriminator<T, K extends string & keyof T, V extends T[K]>(
+export function discriminator<T, const K extends string & keyof T, const V extends T[K]>(
   prop: K,
   value: MaybeArray<V>,
 ): (item: T) => item is Prettify<T & { [key in K]: V }> {
