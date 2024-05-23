@@ -374,7 +374,7 @@ export const ProfileFieldPropertyFragment = gql`
   ${ProfileFieldFileFragment}
 `;
 
-const ProfileBase = gql`
+const ProfileBaseFragment = gql`
   fragment ProfileBase on Profile {
     id
     name
@@ -387,7 +387,7 @@ const ProfileBase = gql`
   }
 `;
 
-export const ProfileRelationship = gql`
+export const ProfileRelationshipFragment = gql`
   fragment ProfileRelationship on ProfileRelationship {
     id
     leftSideProfile {
@@ -403,7 +403,7 @@ export const ProfileRelationship = gql`
       rightLeftName
     }
   }
-  ${ProfileBase}
+  ${ProfileBaseFragment}
 `;
 
 export const ProfileFragment = gql`
@@ -421,9 +421,9 @@ export const ProfileFragment = gql`
       }
     }
   }
-  ${ProfileBase}
+  ${ProfileBaseFragment}
   ${ProfileFieldPropertyFragment}
-  ${ProfileRelationship}
+  ${ProfileRelationshipFragment}
   ${UserFragment}
 `;
 

@@ -6347,6 +6347,7 @@ type Query {
     before: GID
     eventTypes: [ProfileEventType!]
   ): [ProfileEvent!]!
+  profileRelationshipTypes: [ProfileRelationshipType!]!
   profileRelationshipTypesWithDirection(
     otherSideProfileTypeId: GID
   ): [ProfileRelationshipTypeWithDirection!]!

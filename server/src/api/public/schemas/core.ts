@@ -2358,6 +2358,63 @@ const _ProfileRelationship = {
     profile: _ProfileBase,
   },
 } as const;
+export const ProfileRelationship = schema(_ProfileRelationship);
+export const CreateProfileRelationship = schema({
+  title: "CreateProfileRelationship",
+  type: "object",
+  oneOf: [
+    {
+      required: ["relationshipTypeId", "profileId", "inverse"],
+      additionalProperties: false,
+      properties: {
+        relationshipTypeId: {
+          type: "string",
+          description: "ID of the profile relationship type",
+          example: toGlobalId("ProfileRelationshipType", 1),
+        },
+        profileId: {
+          type: "string",
+          description: "ID of the profile to create the relationship with",
+          example: toGlobalId("Profile", 1),
+        },
+        inverse: {
+          type: "boolean",
+          description: outdent`
+            When obtaining relationships of profile A and a relationship with profile B appears:
+            - If inverse is false A is [relationshipType.name] of B
+            - If inverse is true A is [relationshipType.inverseName] of B
+          `,
+          example: "false",
+        },
+      },
+    },
+    {
+      required: ["relationshipTypeAlias", "profileId", "inverse"],
+      additionalProperties: false,
+      properties: {
+        relationshipTypeAlias: {
+          type: "string",
+          description: "Alias of the profile relationship type",
+          example: "p_parent__child",
+        },
+        profileId: {
+          type: "string",
+          description: "ID of the profile to create the relationship with",
+          example: toGlobalId("Profile", 1),
+        },
+        inverse: {
+          type: "boolean",
+          description: outdent`
+            When obtaining relationships of profile A and a relationship with profile B appears:
+            - If inverse is false A is [relationshipType.name] of B
+            - If inverse is true A is [relationshipType.inverseName] of B
+          `,
+          example: "false",
+        },
+      },
+    },
+  ],
+} as const);
 
 const _ProfileSubscription = {
   title: "ProfileSubscription",

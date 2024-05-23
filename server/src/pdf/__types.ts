@@ -4688,6 +4688,7 @@ export type Query = {
   petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
+  profileRelationshipTypes: Array<ProfileRelationshipType>;
   profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;

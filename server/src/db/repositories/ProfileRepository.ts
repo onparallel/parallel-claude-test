@@ -2218,6 +2218,12 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
+  readonly loadProfileRelationshipTypesByOrgId = this.buildLoadMultipleBy(
+    "profile_relationship_type",
+    "org_id",
+    (q) => q.whereNull("deleted_at"),
+  );
+
   readonly loadProfileRelationshipType = this.buildLoadBy("profile_relationship_type", "id", (q) =>
     q.whereNull("deleted_at"),
   );

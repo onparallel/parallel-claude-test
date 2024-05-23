@@ -241,6 +241,14 @@ export const expiringProfileProperties = queryField((t) => {
   });
 });
 
+export const profileRelationshipTypes = queryField("profileRelationshipTypes", {
+  type: nonNull(list(nonNull("ProfileRelationshipType"))),
+  authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+  resolve: async (_, args, ctx) => {
+    return await ctx.profiles.loadProfileRelationshipTypesByOrgId(ctx.user!.org_id);
+  },
+});
+
 export const profileRelationshipTypesWithDirection = queryField(
   "profileRelationshipTypesWithDirection",
   {

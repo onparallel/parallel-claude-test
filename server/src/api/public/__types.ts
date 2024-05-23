@@ -4688,6 +4688,7 @@ export type Query = {
   petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
+  profileRelationshipTypes: Array<ProfileRelationshipType>;
   profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
@@ -9675,6 +9676,56 @@ export type GetProfileRelationships_profileQuery = {
   };
 };
 
+export type CreateProfileRelationship_profileRelationshipTypesQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type CreateProfileRelationship_profileRelationshipTypesQuery = {
+  profileRelationshipTypes: Array<{ id: string; alias: string | null }>;
+};
+
+export type CreateProfileRelationship_createProfileRelationshipMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  relationships: Array<CreateProfileRelationshipInput> | CreateProfileRelationshipInput;
+}>;
+
+export type CreateProfileRelationship_createProfileRelationshipMutation = {
+  createProfileRelationship: {
+    id: string;
+    relationships: Array<{
+      id: string;
+      leftSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      rightSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
+        id: string;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
+    }>;
+  };
+};
+
+export type DeleteProfileRelationship_removeProfileRelationshipMutationVariables = Exact<{
+  profileRelationshipId: Scalars["GID"]["input"];
+}>;
+
+export type DeleteProfileRelationship_removeProfileRelationshipMutation = {
+  removeProfileRelationship: Success;
+};
+
 export type GetProfileSubscribers_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
 }>;
@@ -12104,6 +12155,42 @@ export const GetProfileRelationships_profileDocument = gql`
 ` as unknown as DocumentNode<
   GetProfileRelationships_profileQuery,
   GetProfileRelationships_profileQueryVariables
+>;
+export const CreateProfileRelationship_profileRelationshipTypesDocument = gql`
+  query CreateProfileRelationship_profileRelationshipTypes {
+    profileRelationshipTypes {
+      id
+      alias
+    }
+  }
+` as unknown as DocumentNode<
+  CreateProfileRelationship_profileRelationshipTypesQuery,
+  CreateProfileRelationship_profileRelationshipTypesQueryVariables
+>;
+export const CreateProfileRelationship_createProfileRelationshipDocument = gql`
+  mutation CreateProfileRelationship_createProfileRelationship(
+    $profileId: GID!
+    $relationships: [CreateProfileRelationshipInput!]!
+  ) {
+    createProfileRelationship(profileId: $profileId, relationships: $relationships) {
+      id
+      relationships {
+        ...ProfileRelationship
+      }
+    }
+  }
+  ${ProfileRelationshipFragmentDoc}
+` as unknown as DocumentNode<
+  CreateProfileRelationship_createProfileRelationshipMutation,
+  CreateProfileRelationship_createProfileRelationshipMutationVariables
+>;
+export const DeleteProfileRelationship_removeProfileRelationshipDocument = gql`
+  mutation DeleteProfileRelationship_removeProfileRelationship($profileRelationshipId: GID!) {
+    removeProfileRelationship(profileRelationshipIds: [$profileRelationshipId])
+  }
+` as unknown as DocumentNode<
+  DeleteProfileRelationship_removeProfileRelationshipMutation,
+  DeleteProfileRelationship_removeProfileRelationshipMutationVariables
 >;
 export const GetProfileSubscribers_profileDocument = gql`
   query GetProfileSubscribers_profile($profileId: GID!) {

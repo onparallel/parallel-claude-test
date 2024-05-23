@@ -3265,6 +3265,7 @@ export interface NexusGenFieldTypes {
     petitionsSharingInfo: NexusGenRootTypes["PetitionSharingInfo"]; // PetitionSharingInfo!
     profile: NexusGenRootTypes["Profile"]; // Profile!
     profileEvents: NexusGenRootTypes["ProfileEvent"][]; // [ProfileEvent!]!
+    profileRelationshipTypes: NexusGenRootTypes["ProfileRelationshipType"][]; // [ProfileRelationshipType!]!
     profileRelationshipTypesWithDirection: NexusGenRootTypes["ProfileRelationshipTypeWithDirection"][]; // [ProfileRelationshipTypeWithDirection!]!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     profileTypes: NexusGenRootTypes["ProfileTypePagination"]; // ProfileTypePagination!
@@ -5758,6 +5759,7 @@ export interface NexusGenFieldTypeNames {
     petitionsSharingInfo: "PetitionSharingInfo";
     profile: "Profile";
     profileEvents: "ProfileEvent";
+    profileRelationshipTypes: "ProfileRelationshipType";
     profileRelationshipTypesWithDirection: "ProfileRelationshipTypeWithDirection";
     profileType: "ProfileType";
     profileTypes: "ProfileTypePagination";

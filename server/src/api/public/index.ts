@@ -45,6 +45,8 @@ import {
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_userByEmailDocument,
   CreatePetition_petitionDocument,
+  CreateProfileRelationship_createProfileRelationshipDocument,
+  CreateProfileRelationship_profileRelationshipTypesDocument,
   CreateProfile_createProfileDocument,
   CreateProfile_createProfileFieldFileUploadLinkDocument,
   CreateProfile_profileFieldFileUploadCompleteDocument,
@@ -52,6 +54,7 @@ import {
   DeactivatePetitionRecipient_deactivateAccessesDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
+  DeleteProfileRelationship_removeProfileRelationshipDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
@@ -158,7 +161,7 @@ import {
   PetitionTagFragment,
   ProfileEventSubscriptionFragment,
   ProfileFragment,
-  ProfileRelationship,
+  ProfileRelationshipFragment,
   TaskFragment,
   TemplateFragment,
   UserFragment,
@@ -200,6 +203,7 @@ import {
   CreatePetition,
   CreatePetitionFieldComment,
   CreateProfile,
+  CreateProfileRelationship,
   EventSubscription,
   FileDownload,
   ListOfPermissions,
@@ -4614,33 +4618,141 @@ export function publicApi(container: Container) {
       },
     );
 
-  api.path("/profiles/:profileId/relationships", { params: { profileId } }).get(
-    {
-      operationId: "GetProfileRelationships",
-      summary: "List profile relationships",
-      description: "Returns a list with all the relationships of the specified profile",
-      tags: ["Profiles"],
-      responses: { 200: SuccessResponse(ListOfProfileRelationships) },
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query GetProfileRelationships_profile($profileId: GID!) {
-          profile(profileId: $profileId) {
-            id
-            relationships {
-              ...ProfileRelationship
+  api
+    .path("/profiles/:profileId/relationships", { params: { profileId } })
+    .get(
+      {
+        operationId: "GetProfileRelationships",
+        summary: "List profile relationships",
+        description: "Returns a list with all the relationships of the specified profile",
+        tags: ["Profiles"],
+        responses: { 200: SuccessResponse(ListOfProfileRelationships) },
+      },
+      async ({ client, params }) => {
+        const _query = gql`
+          query GetProfileRelationships_profile($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              relationships {
+                ...ProfileRelationship
+              }
             }
           }
-        }
-        ${ProfileRelationship}
-      `;
+          ${ProfileRelationshipFragment}
+        `;
 
-      const result = await client.request(GetProfileRelationships_profileDocument, {
-        profileId: params.profileId,
-      });
-      return Ok(mapProfileRelationships(result.profile).relationships);
-    },
-  );
+        const result = await client.request(GetProfileRelationships_profileDocument, {
+          profileId: params.profileId,
+        });
+        return Ok(mapProfileRelationships(result.profile).relationships);
+      },
+    )
+    .post(
+      {
+        operationId: "CreateProfileRelationship",
+        summary: "Create a profile relationship",
+        description: "Creates a relationships with the specified profile",
+        tags: ["Profiles"],
+        body: JsonBody(CreateProfileRelationship),
+        responses: { 201: SuccessResponse(ListOfProfileRelationships) },
+      },
+      async ({ client, body, params }) => {
+        let relationshipTypeId = "relationshipTypeId" in body ? body.relationshipTypeId : undefined;
+        if ("relationshipTypeAlias" in body && body.relationshipTypeAlias !== "") {
+          const _query = gql`
+            query CreateProfileRelationship_profileRelationshipTypes {
+              profileRelationshipTypes {
+                id
+                alias
+              }
+            }
+          `;
+          const result = await client.request(
+            CreateProfileRelationship_profileRelationshipTypesDocument,
+            {},
+          );
+          relationshipTypeId = result.profileRelationshipTypes.find(
+            (rt) => rt.alias === body.relationshipTypeAlias,
+          )?.id;
+        }
+        if (!isDefined(relationshipTypeId)) {
+          throw new BadRequestError("Unknown relationship type");
+        }
+        const _mutation = gql`
+          mutation CreateProfileRelationship_createProfileRelationship(
+            $profileId: GID!
+            $relationships: [CreateProfileRelationshipInput!]!
+          ) {
+            createProfileRelationship(profileId: $profileId, relationships: $relationships) {
+              id
+              relationships {
+                ...ProfileRelationship
+              }
+            }
+          }
+          ${ProfileRelationshipFragment}
+        `;
+        try {
+          const result = await client.request(
+            CreateProfileRelationship_createProfileRelationshipDocument,
+            {
+              profileId: params.profileId,
+              relationships: [
+                {
+                  profileId: body.profileId,
+                  profileRelationshipTypeId: relationshipTypeId,
+                  direction: body.inverse ? "RIGHT_LEFT" : "LEFT_RIGHT",
+                },
+              ],
+            },
+          );
+          return Ok(mapProfileRelationships(result.createProfileRelationship).relationships);
+        } catch (error) {
+          if (containsGraphQLError(error, "PROFILES_ALREADY_ASSOCIATED_ERROR")) {
+            throw new BadRequestError("The relationship already exists");
+          }
+          if (containsGraphQLError(error, "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR")) {
+            throw new BadRequestError(
+              "The profiles cannot be associated with the given relationship type",
+            );
+          }
+          throw error;
+        }
+      },
+    );
+
+  api
+    .path("/profiles/:profileId/relationships/:relationshipId", {
+      params: {
+        profileId,
+        relationshipId: idParam({
+          type: "ProfileRelationship",
+          description: "The ID of the relationship",
+        }),
+      },
+    })
+    .delete(
+      {
+        operationId: "DeleteProfileRelationship",
+        summary: "Delete a profile relationship",
+        description: "Deletes the specified relationships",
+        tags: ["Profiles"],
+        responses: { 204: SuccessResponse() },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation DeleteProfileRelationship_removeProfileRelationship(
+            $profileRelationshipId: GID!
+          ) {
+            removeProfileRelationship(profileRelationshipIds: [$profileRelationshipId])
+          }
+        `;
+        await client.request(DeleteProfileRelationship_removeProfileRelationshipDocument, {
+          profileRelationshipId: params.relationshipId,
+        });
+        return NoContent();
+      },
+    );
 
   api
     .path("/profiles/:profileId/subscribers", { params: { profileId } })
