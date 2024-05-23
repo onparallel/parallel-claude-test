@@ -7,13 +7,5 @@ Sentry.init({
   release: process.env.BUILD_ID,
   debug: false,
   tracesSampleRate: 1,
-  replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: 0.01,
   normalizeDepth: 7,
-  integrations: [
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
 });
