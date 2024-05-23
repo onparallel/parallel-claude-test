@@ -251,8 +251,8 @@ export function PreviewPetitionFieldBackgroundCheck({
         .trim();
 
       const date =
-        petition.fields.find((f) => f.id === options.autoSearchConfig!.date)?.replies[0]?.content
-          .value ?? "";
+        fields.find((f) => f.id === options.autoSearchConfig!.date)?.replies[0]?.content.value ??
+        "";
 
       if (name || date) {
         if (name) {
