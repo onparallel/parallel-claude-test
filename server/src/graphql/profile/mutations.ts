@@ -79,7 +79,7 @@ import {
   profileTypeIsNotStandard,
   profilesCanBeAssociated,
   userHasAccessToProfile,
-  userHasAccessToProfileRelationship,
+  relationshipBelongsToProfile,
   userHasAccessToProfileRelationshipsInput,
   userHasAccessToProfileType,
   userHasPermissionOnProfileTypeField,
@@ -2065,9 +2065,11 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfileRelationship("profileRelationshipIds"),
+    userHasAccessToProfile("profileId"),
+    relationshipBelongsToProfile("profileId", "profileRelationshipIds"),
   ),
   args: {
+    profileId: nonNull(globalIdArg("Profile")),
     profileRelationshipIds: nonNull(list(nonNull(globalIdArg("ProfileRelationship")))),
   },
   validateArgs: notEmptyArray((args) => args.profileRelationshipIds, "profileRelationshipIds"),

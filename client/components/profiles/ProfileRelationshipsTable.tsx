@@ -97,7 +97,7 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
       });
 
       await removeProfileRelationship({
-        variables: { profileRelationshipIds: selectedIds },
+        variables: { profileId: profile.id, profileRelationshipIds: selectedIds },
       });
 
       await refetch();
@@ -317,8 +317,14 @@ const _mutations = [
     ${ProfileRelationshipsTable.fragments.Profile}
   `,
   gql`
-    mutation ProfileRelationshipsTable_removeProfileRelationship($profileRelationshipIds: [GID!]!) {
-      removeProfileRelationship(profileRelationshipIds: $profileRelationshipIds)
+    mutation ProfileRelationshipsTable_removeProfileRelationship(
+      $profileId: GID!
+      $profileRelationshipIds: [GID!]!
+    ) {
+      removeProfileRelationship(
+        profileId: $profileId
+        profileRelationshipIds: $profileRelationshipIds
+      )
     }
   `,
 ];

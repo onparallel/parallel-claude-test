@@ -2030,11 +2030,15 @@ describe("GraphQL/Profile Relationships", () => {
     it("disassociates two related profiles", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileRelationshipIds: [GID!]!) {
-            removeProfileRelationship(profileRelationshipIds: $profileRelationshipIds)
+          mutation ($profileId: GID!, $profileRelationshipIds: [GID!]!) {
+            removeProfileRelationship(
+              profileId: $profileId
+              profileRelationshipIds: $profileRelationshipIds
+            )
           }
         `,
         {
+          profileId: toGlobalId("Profile", individualAProfile.id),
           profileRelationshipIds: [
             toGlobalId("ProfileRelationship", legalRepresentativeRelationship.id),
           ],
@@ -2101,11 +2105,15 @@ describe("GraphQL/Profile Relationships", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileRelationshipIds: [GID!]!) {
-            removeProfileRelationship(profileRelationshipIds: $profileRelationshipIds)
+          mutation ($profileId: GID!, $profileRelationshipIds: [GID!]!) {
+            removeProfileRelationship(
+              profileId: $profileId
+              profileRelationshipIds: $profileRelationshipIds
+            )
           }
         `,
         {
+          profileId: toGlobalId("Profile", privateProfileB.id),
           profileRelationshipIds: [toGlobalId("ProfileRelationship", relationship.id)],
         },
       );
@@ -2117,11 +2125,15 @@ describe("GraphQL/Profile Relationships", () => {
     it("creates events on both profiles", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileRelationshipIds: [GID!]!) {
-            removeProfileRelationship(profileRelationshipIds: $profileRelationshipIds)
+          mutation ($profileId: GID!, $profileRelationshipIds: [GID!]!) {
+            removeProfileRelationship(
+              profileId: $profileId
+              profileRelationshipIds: $profileRelationshipIds
+            )
           }
         `,
         {
+          profileId: toGlobalId("Profile", legalEntityProfile.id),
           profileRelationshipIds: [
             toGlobalId("ProfileRelationship", legalRepresentativeRelationship.id),
           ],

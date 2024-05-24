@@ -2016,6 +2016,7 @@ export interface MutationremovePetitionPasswordArgs {
 }
 
 export interface MutationremoveProfileRelationshipArgs {
+  profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
 }
 
@@ -4300,10 +4301,31 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   user?: Maybe<User>;
 }
 
+export interface ProfileFieldValuesFilter {
+  operator: ProfileFieldValuesFilterOperator;
+  profileTypeFieldId: Scalars["GID"]["input"];
+  value: Scalars["JSON"]["input"];
+}
+
+export type ProfileFieldValuesFilterOperator =
+  | "CONTAIN"
+  | "END_WITH"
+  | "EQUAL"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "NOT_CONTAIN"
+  | "NOT_EQUAL"
+  | "NOT_IS_ONE_OF"
+  | "START_WITH";
+
 export interface ProfileFilter {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
+  values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
 }
 
 export interface ProfilePagination {
@@ -4451,6 +4473,7 @@ export type ProfileTypeFieldType =
 
 export interface ProfileTypeFilter {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
 export interface ProfileTypePagination {
@@ -4848,6 +4871,7 @@ export interface Query {
   petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
+  profileRelationshipTypes: Array<ProfileRelationshipType>;
   profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
@@ -20502,6 +20526,7 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
 };
 
 export type ProfileRelationshipsTable_removeProfileRelationshipMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
@@ -54505,8 +54530,14 @@ export const ProfileRelationshipsTable_createProfileRelationshipDocument = gql`
   ProfileRelationshipsTable_createProfileRelationshipMutationVariables
 >;
 export const ProfileRelationshipsTable_removeProfileRelationshipDocument = gql`
-  mutation ProfileRelationshipsTable_removeProfileRelationship($profileRelationshipIds: [GID!]!) {
-    removeProfileRelationship(profileRelationshipIds: $profileRelationshipIds)
+  mutation ProfileRelationshipsTable_removeProfileRelationship(
+    $profileId: GID!
+    $profileRelationshipIds: [GID!]!
+  ) {
+    removeProfileRelationship(
+      profileId: $profileId
+      profileRelationshipIds: $profileRelationshipIds
+    )
   }
 ` as unknown as DocumentNode<
   ProfileRelationshipsTable_removeProfileRelationshipMutation,

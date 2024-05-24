@@ -1957,6 +1957,7 @@ export type MutationremovePetitionPasswordArgs = {
 };
 
 export type MutationremoveProfileRelationshipArgs = {
+  profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
 };
 

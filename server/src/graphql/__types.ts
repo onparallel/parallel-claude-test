@@ -7122,6 +7122,7 @@ export interface NexusGenArgTypes {
     };
     removeProfileRelationship: {
       // args
+      profileId: NexusGenScalars["GID"]; // GID!
       profileRelationshipIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     removeUsersFromGroup: {

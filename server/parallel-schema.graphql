@@ -1907,7 +1907,7 @@ type Mutation {
   """
   Disassociates two profiles with a relationship.
   """
-  removeProfileRelationship(profileRelationshipIds: [GID!]!): Success!
+  removeProfileRelationship(profileId: GID!, profileRelationshipIds: [GID!]!): Success!
 
   """
   Removes users from a user group

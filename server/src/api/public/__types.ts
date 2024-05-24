@@ -1957,6 +1957,7 @@ export type MutationremovePetitionPasswordArgs = {
 };
 
 export type MutationremoveProfileRelationshipArgs = {
+  profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
 };
 
@@ -9733,6 +9734,7 @@ export type CreateProfileRelationship_createProfileRelationshipMutation = {
 };
 
 export type DeleteProfileRelationship_removeProfileRelationshipMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
   profileRelationshipId: Scalars["GID"]["input"];
 }>;
 
@@ -12213,8 +12215,14 @@ export const CreateProfileRelationship_createProfileRelationshipDocument = gql`
   CreateProfileRelationship_createProfileRelationshipMutationVariables
 >;
 export const DeleteProfileRelationship_removeProfileRelationshipDocument = gql`
-  mutation DeleteProfileRelationship_removeProfileRelationship($profileRelationshipId: GID!) {
-    removeProfileRelationship(profileRelationshipIds: [$profileRelationshipId])
+  mutation DeleteProfileRelationship_removeProfileRelationship(
+    $profileId: GID!
+    $profileRelationshipId: GID!
+  ) {
+    removeProfileRelationship(
+      profileId: $profileId
+      profileRelationshipIds: [$profileRelationshipId]
+    )
   }
 ` as unknown as DocumentNode<
   DeleteProfileRelationship_removeProfileRelationshipMutation,

@@ -4865,12 +4865,17 @@ export function publicApi(container: Container) {
       async ({ client, params }) => {
         const _mutation = gql`
           mutation DeleteProfileRelationship_removeProfileRelationship(
+            $profileId: GID!
             $profileRelationshipId: GID!
           ) {
-            removeProfileRelationship(profileRelationshipIds: [$profileRelationshipId])
+            removeProfileRelationship(
+              profileId: $profileId
+              profileRelationshipIds: [$profileRelationshipId]
+            )
           }
         `;
         await client.request(DeleteProfileRelationship_removeProfileRelationshipDocument, {
+          profileId: params.profileId,
           profileRelationshipId: params.relationshipId,
         });
         return NoContent();

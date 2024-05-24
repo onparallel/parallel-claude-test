@@ -455,19 +455,27 @@ export function profilesCanBeAssociated<
   };
 }
 
-export function userHasAccessToProfileRelationship<
+export function relationshipBelongsToProfile<
   TypeName extends string,
   FieldName extends string,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
   TProfileRelationshipIdArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
+  profileIdArg: TProfileIdArg,
   profileRelationshipIdArg: TProfileRelationshipIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
     const profileRelationshipIds = unMaybeArray(
       args[profileRelationshipIdArg] as unknown as MaybeArray<number>,
     );
 
     const relationships = await ctx.profiles.loadProfileRelationship(profileRelationshipIds);
-    return relationships.every((r) => isDefined(r) && r.org_id === ctx.user!.org_id);
+    return relationships.every(
+      (r) =>
+        isDefined(r) &&
+        r.org_id === ctx.user!.org_id &&
+        (r.left_side_profile_id === profileId || r.right_side_profile_id === profileId),
+    );
   };
 }
