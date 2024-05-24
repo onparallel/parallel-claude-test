@@ -282,6 +282,7 @@ export interface NexusGenInputs {
   ProfileTypeFilter: {
     // input type
     onlyArchived?: boolean | null; // Boolean
+    profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
   PublicPetitionSignerDataInput: {
     // input type

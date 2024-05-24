@@ -41,7 +41,7 @@ export type RestParameters<T> = {
 };
 
 export interface RestParameter<T> {
-  parse(value?: string | string[]): MaybePromise<T>;
+  parse(value?: any): MaybePromise<T>;
   spec: OpenAPIV3.ParameterBaseObject;
 }
 
@@ -241,26 +241,14 @@ const _PathResolver: any = (function () {
               operationOptions.query ?? ({} as RestParameters<any>),
               async (param, name) => {
                 const value = req.query[name as string];
-                if (
-                  value === undefined ||
-                  typeof value === "string" ||
-                  (Array.isArray(value) && typeof value[0] === "string")
-                ) {
-                  try {
-                    return await param.parse(value as string | string[] | undefined);
-                  } catch (e) {
-                    if (e instanceof ParseError) {
-                      throw new InvalidParameterError(name as string, value, "query", e.message);
-                    }
-                    throw e;
+
+                try {
+                  return await param.parse(value);
+                } catch (e) {
+                  if (e instanceof ParseError) {
+                    throw new InvalidParameterError(name as string, value, "query", e.message);
                   }
-                } else {
-                  throw new InvalidParameterError(
-                    name as string,
-                    value,
-                    "query",
-                    "Object or nested array params are not supported",
-                  );
+                  throw e;
                 }
               },
             );

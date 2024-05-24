@@ -23,7 +23,7 @@ import {
   ResourceNotFoundError,
   UnauthorizedError,
 } from "../rest/errors";
-import { booleanParam, enumParam, stringParam } from "../rest/params";
+import { booleanParam, enumParam, objectParam, stringParam } from "../rest/params";
 import {
   Created,
   ErrorResponse,
@@ -87,6 +87,7 @@ import {
   GetProfileType_profileTypeDocument,
   GetProfileTypes_profileTypesDocument,
   GetProfile_profileDocument,
+  GetProfiles_profileTypesDocument,
   GetProfiles_profilesDocument,
   GetSignatures_petitionSignaturesDocument,
   GetTags_tagsDocument,
@@ -3896,11 +3897,84 @@ export function publicApi(container: Container) {
             required: false,
             array: true,
           }),
+          values: objectParam({
+            description: outdent`
+            Example: \`values[0][profileTypeId]=6YHC3CN5M8QLoqmV9dvSy&values[0][alias]=p_first_name&values[0][operator]=EQUAL&values[0][value]=Harvey\`
+
+            Filter profiles by field values`,
+            required: false,
+            array: true,
+            schema: {
+              anyOf: ["alias", "profileTypeFieldId"].map((field) => ({
+                title: `Filter by ${field}`,
+                type: "object",
+                required: [field, "profileTypeId", "operator", "value"],
+                additionalProperties: false,
+                properties: {
+                  [field]: { type: "string" },
+                  profileTypeId: { type: "string" },
+                  operator: {
+                    type: "string",
+                    enum: [
+                      "EQUAL",
+                      "NOT_EQUAL",
+                      "START_WITH",
+                      "END_WITH",
+                      "CONTAIN",
+                      "NOT_CONTAIN",
+                      "IS_ONE_OF",
+                      "NOT_IS_ONE_OF",
+                      "LESS_THAN",
+                      "LESS_THAN_OR_EQUAL",
+                      "GREATER_THAN",
+                      "GREATER_THAN_OR_EQUAL",
+                    ],
+                  },
+                  value: {
+                    oneOf: [
+                      { type: "string" },
+                      { type: "number" },
+                      {
+                        type: "array",
+                        minItems: 1,
+                        items: { oneOf: [{ type: "string" }, { type: "number" }] },
+                      },
+                    ],
+                  },
+                },
+              })),
+            },
+            validate(key, value) {
+              if (key === "profileTypeFieldId" && !isGlobalId(value, "ProfileTypeField")) {
+                throw new Error(`${value} is not a valid ProfileTypeField id`);
+              }
+              if (key === "profileTypeId" && !isGlobalId(value, "ProfileType")) {
+                throw new Error(`${value} is not a valid ProfileType id`);
+              }
+            },
+          }),
         },
         responses: { 200: SuccessResponse(PaginatedProfiles) },
         tags: ["Profiles"],
       },
       async ({ client, query }) => {
+        const _profileTypes = gql`
+          query GetProfiles_profileTypes($offset: Int, $limit: Int, $profileTypeIds: [GID!]) {
+            profileTypes(
+              offset: $offset
+              limit: $limit
+              filter: { profileTypeId: $profileTypeIds }
+            ) {
+              items {
+                id
+                fields {
+                  id
+                  alias
+                }
+              }
+            }
+          }
+        `;
         const _query = gql`
           query GetProfiles_profiles(
             $offset: Int
@@ -3909,6 +3983,7 @@ export function publicApi(container: Container) {
             $search: String
             $profileTypeIds: [GID!]
             $status: [ProfileStatus!]
+            $values: [ProfileFieldValuesFilter!]
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -3917,7 +3992,7 @@ export function publicApi(container: Container) {
               limit: $limit
               sortBy: $sortBy
               search: $search
-              filter: { profileTypeId: $profileTypeIds, status: $status }
+              filter: { profileTypeId: $profileTypeIds, status: $status, values: $values }
             ) {
               totalCount
               items {
@@ -3928,10 +4003,58 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
+        const profileTypeFieldAliases = (query.values ?? [])
+          .filter((v) => isDefined(v.alias))
+          .map((v) => ({ alias: v.alias as string, profileTypeId: v.profileTypeId as string }));
+
+        const resolvedProfileTypeFields: { id: string; alias: string }[] = [];
+        if (profileTypeFieldAliases.length > 0) {
+          const profileTypeIds = uniq(profileTypeFieldAliases.map((v) => v.profileTypeId));
+          const profileTypesResult = await client.request(GetProfiles_profileTypesDocument, {
+            profileTypeIds,
+            limit: profileTypeIds.length,
+            offset: 0,
+          });
+
+          for (const profileType of profileTypesResult.profileTypes.items) {
+            resolvedProfileTypeFields.push(
+              ...(profileTypeFieldAliases
+                .filter((f) => f.profileTypeId === profileType.id)
+                .map(({ alias }) => ({
+                  alias,
+                  id: profileType.fields.find((f) => f.alias === alias)?.id,
+                }))
+                .filter((v) => isDefined(v.id)) as typeof resolvedProfileTypeFields),
+            );
+          }
+        }
+        const valuesFilter = query.values?.map((valueFilter) => {
+          if (isDefined(valueFilter.alias)) {
+            const profileTypeField = resolvedProfileTypeFields.find(
+              (f) => f.alias === valueFilter.alias,
+            );
+            if (!isDefined(profileTypeField)) {
+              throw new BadRequestError(`Field with alias ${valueFilter.alias} not found`);
+            }
+            return {
+              profileTypeFieldId: profileTypeField.id,
+              operator: valueFilter.operator,
+              value: valueFilter.value,
+            };
+          }
+
+          return {
+            profileTypeFieldId: valueFilter.profileTypeFieldId,
+            operator: valueFilter.operator,
+            value: valueFilter.value,
+          };
+        });
+
         const includes = getProfileIncludesFromQuery(query);
         const result = await client.request(GetProfiles_profilesDocument, {
           ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
           status: query.status as ProfileStatus[] | undefined,
+          values: valuesFilter,
           ...includes,
         });
         return Ok({

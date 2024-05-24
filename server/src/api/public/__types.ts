@@ -4314,6 +4314,7 @@ export type ProfileTypeFieldType =
 
 export type ProfileTypeFilter = {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type ProfileTypePagination = {
@@ -9181,6 +9182,18 @@ export type GetProfileEvents_ProfileEventsQuery = {
   >;
 };
 
+export type GetProfiles_profileTypesQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type GetProfiles_profileTypesQuery = {
+  profileTypes: {
+    items: Array<{ id: string; fields: Array<{ id: string; alias: string | null }> }>;
+  };
+};
+
 export type GetProfiles_profilesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
@@ -9188,6 +9201,7 @@ export type GetProfiles_profilesQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
+  values?: InputMaybe<Array<ProfileFieldValuesFilter> | ProfileFieldValuesFilter>;
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -11899,6 +11913,19 @@ export const GetProfileEvents_ProfileEventsDocument = gql`
   GetProfileEvents_ProfileEventsQuery,
   GetProfileEvents_ProfileEventsQueryVariables
 >;
+export const GetProfiles_profileTypesDocument = gql`
+  query GetProfiles_profileTypes($offset: Int, $limit: Int, $profileTypeIds: [GID!]) {
+    profileTypes(offset: $offset, limit: $limit, filter: { profileTypeId: $profileTypeIds }) {
+      items {
+        id
+        fields {
+          id
+          alias
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<GetProfiles_profileTypesQuery, GetProfiles_profileTypesQueryVariables>;
 export const GetProfiles_profilesDocument = gql`
   query GetProfiles_profiles(
     $offset: Int
@@ -11907,6 +11934,7 @@ export const GetProfiles_profilesDocument = gql`
     $search: String
     $profileTypeIds: [GID!]
     $status: [ProfileStatus!]
+    $values: [ProfileFieldValuesFilter!]
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -11915,7 +11943,7 @@ export const GetProfiles_profilesDocument = gql`
       limit: $limit
       sortBy: $sortBy
       search: $search
-      filter: { profileTypeId: $profileTypeIds, status: $status }
+      filter: { profileTypeId: $profileTypeIds, status: $status, values: $values }
     ) {
       totalCount
       items {

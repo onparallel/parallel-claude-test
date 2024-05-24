@@ -1,11 +1,13 @@
+import Ajv from "ajv";
 import { OpenAPIV3 } from "openapi-types";
+import { isDefined } from "remeda";
 import { If, MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
 
 export class ParseError extends Error {
   constructor(
-    public readonly value: string | string[] | undefined,
+    public readonly value: any,
     message: string,
   ) {
     super(message);
@@ -59,7 +61,7 @@ export interface ParameterParser<
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > {
-  (value?: string): MaybePromise<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>>;
+  (value?: unknown): MaybePromise<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>>;
 }
 
 export function buildParse<
@@ -69,9 +71,9 @@ export function buildParse<
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 >(
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
-  parser: (value: string) => MaybePromise<T>,
+  parser: (value: unknown) => MaybePromise<T>,
 ): ParameterParser<T, TRequired, TArray, TDefaultValue> {
-  return async function (value: string | string[] | undefined) {
+  return async function (value: any) {
     const { required = true, array = false, defaultValue } = options;
     if (value === undefined) {
       if (required) {
@@ -83,11 +85,15 @@ export function buildParse<
         if (value === "") {
           return [];
         } else {
-          return await Promise.all(
-            (Array.isArray(value) ? value : value.split(/(?<!\\),/)).map(async (part) => {
-              return await parser(part.replace(/\\,/g, ","));
-            }),
-          );
+          if (Array.isArray(value)) {
+            return await Promise.all(value.map(async (item: any) => await parser(item)));
+          } else if (typeof value === "string") {
+            return await Promise.all(
+              value.split(/(?<!\\),/).map(async (part) => await parser(part.replace(/\\,/g, ","))),
+            );
+          } else {
+            throw new ParseError(value, "Expected an array but something else was received");
+          }
         }
       } else {
         if (Array.isArray(value)) {
@@ -149,6 +155,9 @@ function _numberParam(integer: boolean) {
     const { minimum, exclusiveMinimum, maximum, exclusiveMaximum, multipleOf } = options;
     return {
       parse: buildParse(options, (value) => {
+        if (typeof value !== "string") {
+          throw new ParseError(value, "Raw value must be a string");
+        }
         const result = integer ? parseInt(value) : parseFloat(value);
         if (Number.isNaN(result)) {
           throw new ParseError(value, `Value must be ${integer ? "an integer" : "a float"}`);
@@ -209,6 +218,9 @@ export function stringParam<
   const { pattern, maxLength, minLength } = options;
   return {
     parse: buildParse(options, (value) => {
+      if (typeof value !== "string") {
+        throw new ParseError(value, "Value must be a string");
+      }
       if (pattern !== undefined && !pattern.test(value)) {
         throw new ParseError(
           value,
@@ -252,7 +264,10 @@ export function enumParam<
 ): RestParameter<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>> {
   const { values, schemaTitle } = options;
   return {
-    parse: buildParse(options, (value: string) => {
+    parse: buildParse(options, (value) => {
+      if (value && typeof value !== "string") {
+        throw new ParseError(value, "Value must be a string");
+      }
       if (!values.includes(value as T)) {
         throw new ParseError(
           value,
@@ -284,7 +299,10 @@ export function booleanParam<
   options: ParameterOptions<boolean, TRequired, TArray, TDefaultValue>,
 ): RestParameter<GeneratedParameterType<boolean, TRequired, TArray, TDefaultValue>> {
   return {
-    parse: buildParse(options, (value: string) => {
+    parse: buildParse(options, (value) => {
+      if (typeof value !== "string") {
+        throw new ParseError(value, "Raw value must be a string");
+      }
       if (!["true", "false"].includes(value)) {
         throw new ParseError(value, `Value must be "true" or "false"`);
       }
@@ -293,5 +311,49 @@ export function booleanParam<
     spec: buildDefinition(options, {
       type: "string",
     }),
+  };
+}
+
+export type ObjectParameterOptions<
+  TRequired extends boolean = true,
+  TArray extends boolean | undefined = undefined,
+> = ParameterOptions<any, TRequired, TArray, undefined> & {
+  schema: JsonSchema;
+  validate?: (key: string, value: any) => void;
+};
+
+export function objectParam<
+  TRequired extends boolean = true,
+  TArray extends boolean | undefined = undefined,
+>(
+  options: ObjectParameterOptions<TRequired, TArray>,
+): RestParameter<GeneratedParameterType<any, TRequired, TArray>> {
+  const ajv = new Ajv({ allowUnionTypes: true });
+  return {
+    parse: buildParse(options, (value) => {
+      if (typeof value !== "object" || value === null) {
+        throw new ParseError(value, "Value must be an object");
+      }
+      const isValid = ajv.validate(options.schema, value);
+      if (!isValid) {
+        throw new ParseError(value, ajv.errorsText());
+      }
+
+      if (isDefined(options.validate)) {
+        try {
+          for (const [key, val] of Object.entries(value)) {
+            options.validate(key, val);
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            throw new ParseError(value, e.message);
+          }
+          throw e;
+        }
+      }
+
+      return value;
+    }),
+    spec: buildDefinition(options, options.schema),
   };
 }

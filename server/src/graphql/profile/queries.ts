@@ -21,6 +21,7 @@ export const profileTypes = queryField((t) => {
         name: "ProfileTypeFilter",
         definition(t) {
           t.nullable.boolean("onlyArchived");
+          t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
         },
       }),
     },

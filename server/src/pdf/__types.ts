@@ -4314,6 +4314,7 @@ export type ProfileTypeFieldType =
 
 export type ProfileTypeFilter = {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type ProfileTypePagination = {

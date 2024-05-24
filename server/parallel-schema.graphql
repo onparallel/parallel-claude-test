@@ -5503,6 +5503,7 @@ enum ProfileTypeFieldType {
 
 input ProfileTypeFilter {
   onlyArchived: Boolean
+  profileTypeId: [GID!]
 }
 
 type ProfileTypePagination {

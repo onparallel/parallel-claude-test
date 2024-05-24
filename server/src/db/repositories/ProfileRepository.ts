@@ -144,6 +144,7 @@ export class ProfileRepository extends BaseRepository {
       sortBy?: SortBy<"created_at" | "name">[];
       filter?: {
         onlyArchived?: boolean | null;
+        profileTypeId?: number[] | null;
       } | null;
     } & PageOpts,
   ) {
@@ -158,6 +159,10 @@ export class ProfileRepository extends BaseRepository {
             q.whereNotNull("archived_at");
           } else {
             q.whereNull("archived_at");
+          }
+
+          if (filter?.profileTypeId && filter.profileTypeId.length > 0) {
+            q.whereIn("id", filter.profileTypeId);
           }
 
           if (search) {
