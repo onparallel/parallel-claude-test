@@ -103,6 +103,9 @@ export function idParam<
   return {
     parse: buildParse(options, (value) => {
       try {
+        if (typeof value !== "string") {
+          throw new Error();
+        }
         const parsed = fromGlobalId(value);
         if (!prefixes.includes(parsed.type)) {
           throw new Error();
