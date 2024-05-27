@@ -3,7 +3,7 @@ import { IntlShape } from "react-intl";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
 import { ZipFileInput } from "../../util/createZipFile";
 import { FORMATS } from "../../util/dates";
 import { Maybe, UnwrapArray } from "../../util/types";

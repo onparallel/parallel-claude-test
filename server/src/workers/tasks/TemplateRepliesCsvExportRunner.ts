@@ -2,7 +2,7 @@ import Excel from "exceljs";
 import { isDefined, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import { PetitionField, PetitionFieldReply, PetitionFieldType } from "../../db/__types";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
 import { applyFieldVisibility } from "../../util/fieldLogic";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";

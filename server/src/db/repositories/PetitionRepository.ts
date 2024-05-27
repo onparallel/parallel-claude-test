@@ -122,36 +122,6 @@ import {
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
 
-interface ComposedInnerPetitionField
-  extends Pick<PetitionField, "id" | "type" | "options" | "visibility" | "math"> {}
-interface ComposedInnerPetitionFieldReply
-  extends Pick<
-    PetitionFieldReply,
-    "id" | "content" | "anonymized_at" | "parent_petition_field_reply_id"
-  > {}
-interface ComposedPetitionField extends ComposedInnerPetitionField {
-  children: Maybe<
-    (ComposedInnerPetitionField & {
-      parent: Maybe<ComposedInnerPetitionField>;
-      replies: ComposedInnerPetitionFieldReply[]; // children replies NOT GROUPED
-    })[]
-  >;
-  replies: (ComposedInnerPetitionFieldReply & {
-    children: Maybe<
-      {
-        field: ComposedInnerPetitionField;
-        replies: ComposedInnerPetitionFieldReply[]; // children replies grouped by parentReplyId
-      }[]
-    >;
-  })[];
-}
-
-export interface ComposedPetition {
-  fields: ComposedPetitionField[];
-  variables: PetitionVariable[];
-  custom_lists: PetitionCustomList[];
-}
-
 export interface PetitionVariable {
   name: string;
   default_value: number;
@@ -2894,8 +2864,7 @@ export class PetitionRepository extends BaseRepository {
           );
         return updated;
       }, t);
-
-      return { petition, composedPetition };
+      return petition;
     } else {
       throw new Error("CANT_COMPLETE_PETITION_ERROR");
     }
