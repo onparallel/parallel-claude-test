@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, uniq } from "remeda";
-import { SignaturitBrandingIdKey } from "../../integrations/SignaturitIntegration";
+import { SignaturitBrandingIdKey } from "../../integrations/signature/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";

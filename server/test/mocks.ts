@@ -16,7 +16,7 @@ import {
   IDowJonesClient,
   RiskEntityProfilePdfResult,
   RiskEntityProfileResult,
-} from "../src/services/DowJonesClient";
+} from "../src/integrations/dow-jones/DowJonesClient";
 import { IEmailsService } from "../src/services/EmailsService";
 import { IFetchService } from "../src/services/FetchService";
 import { IQueuesService } from "../src/services/QueuesService";

@@ -23,7 +23,7 @@ import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
-import { AiCompletionPrompt } from "../../services/ai-clients/AiCompletionClient";
+import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { average, unMaybeArray, zipX } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {

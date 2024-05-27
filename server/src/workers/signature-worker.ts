@@ -5,12 +5,9 @@ import { WorkerContext } from "../context";
 import { ContactLocale, OrgIntegration } from "../db/__types";
 import { IntegrationProvider, IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
-import { InvalidCredentialsError } from "../integrations/GenericIntegration";
-import {
-  CancelAbortedError,
-  SignatureResponse,
-} from "../services/signature-clients/SignatureClient";
-import { SignaturitRequestError } from "../services/signature-clients/SignaturitClient";
+import { InvalidCredentialsError } from "../integrations/helpers/GenericIntegration";
+import { CancelAbortedError, SignatureResponse } from "../integrations/signature/SigantureClient";
+import { SignaturitRequestError } from "../integrations/signature/SignaturitClient";
 import { fullName } from "../util/fullName";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";

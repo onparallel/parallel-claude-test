@@ -6,12 +6,12 @@ import {
   IntegrationCredentials,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
-import { AzureOpenAiIntegration } from "../integrations/AzureOpenAiIntegration";
-import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
+import { AzureOpenAiIntegration } from "../integrations/ai-completion/AzureOpenAiIntegration";
+import { DowJonesIntegration } from "../integrations/dow-jones/DowJonesIntegration";
 import {
   SignaturitEnvironment,
   SignaturitIntegration,
-} from "../integrations/SignaturitIntegration";
+} from "../integrations/signature/SignaturitIntegration";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");

@@ -3,13 +3,13 @@ import { inject, injectable } from "inversify";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
-} from "../db/repositories/IntegrationRepository";
-import { ENCRYPTION_SERVICE, EncryptionService } from "../services/EncryptionService";
+} from "../../db/repositories/IntegrationRepository";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../../services/EncryptionService";
 import {
   GenericIntegration,
   InvalidCredentialsError,
   InvalidRequestError,
-} from "./GenericIntegration";
+} from "../helpers/GenericIntegration";
 
 export type AzureOpenAiModel = "gpt-4-turbo" | "gpt-35-turbo";
 

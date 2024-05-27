@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
-import { ExpiredCredentialsError } from "../integrations/ExpirableCredentialsIntegration";
-import { InvalidCredentialsError } from "../integrations/GenericIntegration";
-import { Maybe } from "../util/types";
-import { FETCH_SERVICE, IFetchService } from "./FetchService";
+import { DowJonesIntegration } from "./DowJonesIntegration";
+import { ExpiredCredentialsError } from "../helpers/ExpirableCredentialsIntegration";
+import { InvalidCredentialsError } from "../helpers/GenericIntegration";
+import { Maybe } from "../../util/types";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 
 export const DOW_JONES_CLIENT = Symbol.for("DOW_JONES_CLIENT");
 

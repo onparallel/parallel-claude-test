@@ -11,7 +11,7 @@ import {
 import pMap from "p-map";
 import { isDefined, uniq } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
-import { InvalidCredentialsError } from "../../../integrations/GenericIntegration";
+import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";

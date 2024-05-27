@@ -7,12 +7,15 @@ import {
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { InvalidCredentialsError, InvalidRequestError } from "../integrations/GenericIntegration";
+import {
+  InvalidCredentialsError,
+  InvalidRequestError,
+} from "../integrations/helpers/GenericIntegration";
 import {
   AI_COMPLETION_CLIENT,
   AiCompletionPrompt,
   IAiCompletionClient,
-} from "./ai-clients/AiCompletionClient";
+} from "../integrations/ai-completion/AiCompletionClient";
 
 export const AI_COMPLETION_SERVICE = Symbol.for("AI_COMPLETION_SERVICE");
 

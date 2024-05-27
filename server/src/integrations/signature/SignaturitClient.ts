@@ -7,6 +7,7 @@ import pMap from "p-map";
 import { flatten } from "q-flat";
 import { isDefined, omit } from "remeda";
 import { URLSearchParams } from "url";
+import { CONFIG, Config } from "../../config";
 import { ContactLocale } from "../../db/__types";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
@@ -15,37 +16,37 @@ import SignatureCancelledEmail from "../../emails/emails/recipient/SignatureCanc
 import SignatureCompletedEmail from "../../emails/emails/recipient/SignatureCompletedEmail";
 import SignatureReminderEmail from "../../emails/emails/recipient/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/recipient/SignatureRequestedEmail";
-import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
-import {
-  SignaturitBrandingIdKey,
-  SignaturitIntegration,
-  SignaturitIntegrationContext,
-} from "../../integrations/SignaturitIntegration";
-import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
-import { toGlobalId } from "../../util/globalId";
-import { downloadImageBase64 } from "../../util/images";
-import { retry } from "../../util/retry";
-import { CONFIG, Config } from "../../config";
-import { EMAILS, IEmailsService } from "../EmailsService";
-import { FETCH_SERVICE, IFetchService } from "../FetchService";
-import { I18N_SERVICE, II18nService } from "../I18nService";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
+import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
-} from "../OrganizationCreditsService";
+} from "../../services/OrganizationCreditsService";
 import {
   IOrganizationLayoutService,
   ORGANIZATION_LAYOUT_SERVICE,
   OrganizationLayout,
-} from "../OrganizationLayoutService";
-import { SIGNATURE, SignatureService } from "../SignatureService";
+} from "../../services/OrganizationLayoutService";
+import { SIGNATURE, SignatureService } from "../../services/SignatureService";
+import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
+import { toGlobalId } from "../../util/globalId";
+import { downloadImageBase64 } from "../../util/images";
+import { retry } from "../../util/retry";
+import { BaseClient } from "../helpers/BaseClient";
+import { InvalidCredentialsError } from "../helpers/GenericIntegration";
 import {
   CancelAbortedError,
   ISignatureClient,
   Recipient,
   SignatureOptions,
   SignatureResponse,
-} from "./SignatureClient";
+} from "./SigantureClient";
+import {
+  SignaturitBrandingIdKey,
+  SignaturitIntegration,
+  SignaturitIntegrationContext,
+} from "./SignaturitIntegration";
 
 interface SignaturitError {
   status_code: number;
@@ -62,7 +63,7 @@ export class SignaturitRequestError extends Error {
 }
 
 @injectable()
-export class SignaturitClient implements ISignatureClient {
+export class SignaturitClient extends BaseClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
@@ -74,11 +75,8 @@ export class SignaturitClient implements ISignatureClient {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(SignaturitIntegration) private signaturitApiKey: SignaturitIntegration,
-  ) {}
-  private integrationId!: number;
-
-  configure(integrationId: number) {
-    this.integrationId = integrationId;
+  ) {
+    super();
   }
 
   private async withSignaturitSDK<TResult>(

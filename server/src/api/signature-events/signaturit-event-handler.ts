@@ -6,7 +6,7 @@ import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
 } from "../../db/repositories/PetitionRepository";
-import { SignaturitEvents } from "../../services/signature-clients/SignaturitClient";
+import { SignaturitEvents } from "../../integrations/signature/SignaturitClient";
 import { fromGlobalId } from "../../util/globalId";
 import { Replace } from "../../util/types";
 

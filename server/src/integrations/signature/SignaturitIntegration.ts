@@ -1,14 +1,14 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { ContactLocale, ContactLocaleValues } from "../db/__types";
+import { ContactLocale, ContactLocaleValues } from "../../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
   IntegrationSettings,
-} from "../db/repositories/IntegrationRepository";
-import { Tone } from "../emails/utils/types";
-import { ENCRYPTION_SERVICE, EncryptionService } from "../services/EncryptionService";
-import { GenericIntegration } from "./GenericIntegration";
+} from "../../db/repositories/IntegrationRepository";
+import { Tone } from "../../emails/utils/types";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../../services/EncryptionService";
+import { GenericIntegration } from "../helpers/GenericIntegration";
 
 export type SignaturitBrandingIdKey = `${Uppercase<ContactLocale>}_${Tone}_BRANDING_ID`;
 

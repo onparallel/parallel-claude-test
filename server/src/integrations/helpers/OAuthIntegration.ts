@@ -1,18 +1,18 @@
 import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { isDefined } from "remeda";
-import { authenticate } from "../api/helpers/authenticate";
-import { IntegrationType } from "../db/__types";
+import { authenticate } from "../../api/helpers/authenticate";
+import { IntegrationType } from "../../db/__types";
 import {
   IntegrationProvider,
   IntegrationRepository,
   IntegrationSettings,
-} from "../db/repositories/IntegrationRepository";
-import { EncryptionService } from "../services/EncryptionService";
-import { IRedis } from "../services/Redis";
-import { fromGlobalId } from "../util/globalId";
-import { random } from "../util/token";
-import { MaybePromise } from "../util/types";
+} from "../../db/repositories/IntegrationRepository";
+import { EncryptionService } from "../../services/EncryptionService";
+import { IRedis } from "../../services/Redis";
+import { fromGlobalId } from "../../util/globalId";
+import { random } from "../../util/token";
+import { MaybePromise } from "../../util/types";
 import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
 
 export interface OauthCredentials {

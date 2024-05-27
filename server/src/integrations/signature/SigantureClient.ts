@@ -1,4 +1,5 @@
 import { ContactLocale } from "../../db/__types";
+import { BaseClient } from "../helpers/BaseClient";
 
 interface Document {
   id: string;
@@ -42,9 +43,8 @@ export interface Recipient {
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
-export interface ISignatureClient {
+export interface ISignatureClient extends BaseClient {
   getSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
-  configure(integrationId: number): void;
   startSignatureRequest: (
     petitionId: number,
     orgId: number,

@@ -5,7 +5,7 @@ import {
   BACKGROUND_CHECK_SERVICE,
   IBackgroundCheckService,
 } from "../src/services/BackgroundCheckService";
-import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/services/DowJonesClient";
+import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/integrations/dow-jones/DowJonesClient";
 import { EMAILS, IEmailsService } from "../src/services/EmailsService";
 import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
 import { ILogger, LOGGER } from "../src/services/Logger";

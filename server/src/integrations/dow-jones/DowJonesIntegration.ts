@@ -1,15 +1,15 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { CreateOrgIntegration } from "../db/__types";
+import { CreateOrgIntegration } from "../../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
   IntegrationRepository,
-} from "../db/repositories/IntegrationRepository";
-import { ENCRYPTION_SERVICE, EncryptionService } from "../services/EncryptionService";
-import { FETCH_SERVICE, FetchService } from "../services/FetchService";
-import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
-import { InvalidCredentialsError } from "./GenericIntegration";
+} from "../../db/repositories/IntegrationRepository";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../../services/EncryptionService";
+import { FETCH_SERVICE, FetchService } from "../../services/FetchService";
+import { ExpirableCredentialsIntegration } from "../helpers/ExpirableCredentialsIntegration";
+import { InvalidCredentialsError } from "../helpers/GenericIntegration";
 
 type DowJonesCredentials = IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">;
 @injectable()

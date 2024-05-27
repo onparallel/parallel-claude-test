@@ -3,9 +3,7 @@ import { CONFIG, Config, buildConfig } from "./config";
 import { ApiContext, WorkerContext } from "./context";
 import { dbModule } from "./db/module";
 import { integrationsModule } from "./integrations/module";
-import { aiCompletionClientsModule } from "./services/ai-clients/module";
 import { servicesModule } from "./services/module";
-import { signatureClientsModule } from "./services/signature-clients/module";
 import { backgroundCheckClientsModule } from "./services/background-check-clients/module";
 
 export function createContainer() {
@@ -15,10 +13,8 @@ export function createContainer() {
   container.bind<WorkerContext>(WorkerContext).toSelf();
   container.load(dbModule);
   container.load(servicesModule);
-  container.load(signatureClientsModule);
   container.load(backgroundCheckClientsModule);
   container.load(integrationsModule);
-  container.load(aiCompletionClientsModule);
   container.bind<Container>(Container).toConstantValue(container);
   return container;
 }

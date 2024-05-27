@@ -1,13 +1,11 @@
 import { BigNumber } from "bignumber.js";
 import { inject, injectable } from "inversify";
-import {
-  AzureOpenAiIntegration,
-  AzureOpenAiModel,
-} from "../../integrations/AzureOpenAiIntegration";
 import { StopRetryError, retry } from "../../util/retry";
 import { withStopwatch } from "../../util/stopwatch";
+import { BaseClient } from "../helpers/BaseClient";
+import { InvalidRequestError } from "../helpers/GenericIntegration";
 import { AiCompletionOptions, AiCompletionPrompt, IAiCompletionClient } from "./AiCompletionClient";
-import { InvalidRequestError } from "../../integrations/GenericIntegration";
+import { AzureOpenAiIntegration, AzureOpenAiModel } from "./AzureOpenAiIntegration";
 
 interface AzureOpenAiClientParams {
   model: AzureOpenAiModel;
@@ -15,13 +13,12 @@ interface AzureOpenAiClientParams {
 }
 
 @injectable()
-export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientParams> {
-  constructor(@inject(AzureOpenAiIntegration) private openAi: AzureOpenAiIntegration) {}
-
-  private integrationId!: number;
-
-  configure(integrationId: number) {
-    this.integrationId = integrationId;
+export class AzureOpenAiClient
+  extends BaseClient
+  implements IAiCompletionClient<AzureOpenAiClientParams>
+{
+  constructor(@inject(AzureOpenAiIntegration) private openAi: AzureOpenAiIntegration) {
+    super();
   }
 
   // PRICES IN EUROS

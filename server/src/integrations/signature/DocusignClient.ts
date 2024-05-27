@@ -4,37 +4,32 @@ import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
 import { CONFIG, Config } from "../../config";
-import {
-  DocusignIntegration,
-  DocusignIntegrationContext,
-} from "../../integrations/DocusignIntegration";
-import { ExpiredCredentialsError } from "../../integrations/ExpirableCredentialsIntegration";
-import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
+import { DocusignIntegration, DocusignIntegrationContext } from "./DocusignIntegration";
+import { ExpiredCredentialsError } from "../helpers/ExpirableCredentialsIntegration";
+import { InvalidCredentialsError } from "../helpers/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { I18N_SERVICE, II18nService } from "../I18nService";
+import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import {
   ISignatureClient,
   Recipient,
   SignatureOptions,
   SignatureResponse,
-} from "./SignatureClient";
+} from "./SigantureClient";
+import { BaseClient } from "../helpers/BaseClient";
 
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];
 }
 @injectable()
-export class DocuSignClient implements ISignatureClient {
+export class DocusignClient extends BaseClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(DocusignIntegration) private docusignOauth: DocusignIntegration,
-  ) {}
-
-  private integrationId!: number;
-  configure(integrationId: number) {
-    this.integrationId = integrationId;
+  ) {
+    super();
   }
 
   private isAccessTokenExpiredError(error: any) {

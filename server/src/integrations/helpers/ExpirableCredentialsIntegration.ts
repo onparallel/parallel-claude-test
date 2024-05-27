@@ -1,11 +1,11 @@
 import { injectable } from "inversify";
-import { IntegrationType } from "../db/__types";
+import { IntegrationType } from "../../db/__types";
 import {
   IntegrationCredentials,
   IntegrationProvider,
   IntegrationRepository,
-} from "../db/repositories/IntegrationRepository";
-import { EncryptionService } from "../services/EncryptionService";
+} from "../../db/repositories/IntegrationRepository";
+import { EncryptionService } from "../../services/EncryptionService";
 
 import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
 

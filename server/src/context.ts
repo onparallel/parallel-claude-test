@@ -30,7 +30,7 @@ import {
   BackgroundCheckService,
 } from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
-import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
+import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService } from "./services/EncryptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";

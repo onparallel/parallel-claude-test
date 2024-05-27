@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import { DocusignIntegration } from "../integrations/DocusignIntegration";
+import { DocusignIntegration } from "../integrations/signature/DocusignIntegration";
 
 export function oauth(container: Container) {
   return Router().use("/docusign", (req, res, next) => {

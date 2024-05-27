@@ -17,7 +17,6 @@ import {
   IBackgroundCheckService,
 } from "./BackgroundCheckService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
-import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./DowJonesClient";
 import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService, IEncryptionService } from "./EncryptionService";
 import {
@@ -86,7 +85,6 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
-  bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
     PetitionImportExportService,

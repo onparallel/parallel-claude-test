@@ -1,6 +1,6 @@
 import { idArg, nonNull, nullable, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
-import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
+import { InvalidCredentialsError } from "../../integrations/helpers/GenericIntegration";
 import {
   EntityDetailsResponse,
   EntitySearchResponse,

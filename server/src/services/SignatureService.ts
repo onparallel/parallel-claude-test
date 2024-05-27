@@ -23,7 +23,7 @@ import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
-import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/SignatureClient";
+import { ISignatureClient, SIGNATURE_CLIENT } from "../integrations/signature/SigantureClient";
 
 interface UpdateBrandingOpts {
   integrationId?: number;

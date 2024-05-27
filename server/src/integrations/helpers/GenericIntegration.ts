@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, omit } from "remeda";
 import { assert } from "ts-essentials";
-import { IntegrationType } from "../db/__types";
+import { IntegrationType } from "../../db/__types";
 import {
   EnhancedCreateOrgIntegration,
   EnhancedIntegrationSettings,
@@ -12,9 +12,9 @@ import {
   IntegrationCredentials,
   IntegrationProvider,
   IntegrationRepository,
-} from "../db/repositories/IntegrationRepository";
-import { EncryptionService } from "../services/EncryptionService";
-import { Replace } from "../util/types";
+} from "../../db/repositories/IntegrationRepository";
+import { EncryptionService } from "../../services/EncryptionService";
+import { Replace } from "../../util/types";
 
 @injectable()
 export abstract class GenericIntegration<
