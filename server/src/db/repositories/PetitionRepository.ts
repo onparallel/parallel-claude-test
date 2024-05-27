@@ -704,6 +704,7 @@ export class PetitionRepository extends BaseRepository {
                   q.where("p.path", filters.path);
                 }
               })
+              // this group by is necessary for some of the builders to work
               .groupBy("p.id")
               .select(this.knex.raw(/* sql */ `distinct p.id`)),
           )
@@ -722,6 +723,7 @@ export class PetitionRepository extends BaseRepository {
                     filters.path,
                     filters.path,
                   ])
+                  // this group by is necessary for some of the builders to work
                   .groupBy("p.id")
                   .select(
                     this.knex.raw(/* sql */ `distinct get_folder_after_prefix(p.path, ?)`, [
