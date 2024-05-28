@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { waitFor } from "./promises/waitFor";
 
 export function useHighlightElement() {
   return useCallback(async (element: Element | null) => {
@@ -10,9 +11,8 @@ export function useHighlightElement() {
       });
 
       element.setAttribute("data-highlighted", "true");
-      setTimeout(() => {
-        element.removeAttribute("data-highlighted");
-      }, 1000);
+      await waitFor(1000);
+      element.removeAttribute("data-highlighted");
     }
   }, []);
 }

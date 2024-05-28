@@ -75,6 +75,7 @@ import {
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
@@ -1096,8 +1097,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const scrollToField = useCallback(async (fieldId: string) => {
     const fieldElement = await waitForElement(`#field-${fieldId}`);
     if (fieldElement) {
+      await waitFor(250);
+      await highlight(fieldElement);
       focusFieldTitle(fieldId);
-      highlight(fieldElement);
     }
   }, []);
 
