@@ -42,7 +42,12 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
   const profile = data?.profile;
 
   const columns = useProfileRelationshipsTableColumns({ profileId });
-  const rows = data?.profile.relationships;
+  const rows = data?.profile.relationships.filter((r) => {
+    // filter out "deleted" profiles
+    const otherProfile =
+      r.leftSideProfile.id === profileId ? r.rightSideProfile : r.leftSideProfile;
+    return otherProfile.status !== "DELETION_SCHEDULED";
+  });
   const { page, items } = state;
 
   const [tableRows, totalCount] = useMemo(() => {
