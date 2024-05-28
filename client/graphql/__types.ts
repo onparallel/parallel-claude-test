@@ -42472,7 +42472,16 @@ export type useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus
         __typename?: "CommentCreatedUserNotification";
         id: string;
         isRead: boolean;
-        comment: { __typename?: "PetitionFieldComment"; id: string };
+        comment: {
+          __typename?: "PetitionFieldComment";
+          id: string;
+          field: {
+            __typename?: "PetitionField";
+            id: string;
+            commentCount: number;
+            unreadCommentCount: number;
+          };
+        };
       }
     | { __typename?: "MessageEmailBouncedUserNotification"; id: string; isRead: boolean }
     | { __typename?: "PetitionCompletedUserNotification"; id: string; isRead: boolean }
@@ -58257,6 +58266,11 @@ export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatu
       ... on CommentCreatedUserNotification {
         comment {
           id
+          field {
+            id
+            commentCount
+            unreadCommentCount
+          }
         }
       }
     }

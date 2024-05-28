@@ -93,6 +93,11 @@ useUpdateIsReadNotification.mutations = [
         ... on CommentCreatedUserNotification {
           comment {
             id
+            field {
+              id
+              commentCount
+              unreadCommentCount
+            }
           }
         }
       }
