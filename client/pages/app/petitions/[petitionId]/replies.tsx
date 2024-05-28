@@ -427,17 +427,21 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         f.replies.some((r) => r.status === "PENDING" && f.requireApproval),
       );
 
-      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog() : "APPROVE";
+      const option =
+        petition.isReviewFlowEnabled && hasUnreviewedReplies
+          ? await showSolveUnreviewedRepliesDialog()
+          : "NOTHING";
 
       await handleFinishPetition({ requiredMessage: false });
 
-      if (hasUnreviewedReplies && option !== "NOTHING")
+      if (hasUnreviewedReplies && option !== "NOTHING") {
         await approveOrRejectReplies({
           variables: {
             petitionId,
             status: option === "APPROVE" ? "APPROVED" : "REJECTED",
           },
         });
+      }
 
       await closePetition({
         variables: {
@@ -808,6 +812,7 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_Petition on Petition {
         id
         isDocumentGenerationEnabled
+        isReviewFlowEnabled
         accesses {
           id
           status

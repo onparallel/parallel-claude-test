@@ -35516,6 +35516,7 @@ export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isDocumentGenerationEnabled: boolean;
+  isReviewFlowEnabled: boolean;
   isAnonymized: boolean;
   name?: string | null;
   status: PetitionStatus;
@@ -35524,7 +35525,6 @@ export type PetitionReplies_PetitionFragment = {
   summaryConfig?: { [key: string]: any } | null;
   isInteractionWithRecipientsEnabled: boolean;
   path: string;
-  isReviewFlowEnabled: boolean;
   deadline?: string | null;
   isRestricted: boolean;
   lastChangeAt: string;
@@ -36162,6 +36162,7 @@ export type PetitionReplies_closePetitionMutation = {
     __typename?: "Petition";
     id: string;
     isDocumentGenerationEnabled: boolean;
+    isReviewFlowEnabled: boolean;
     isAnonymized: boolean;
     name?: string | null;
     status: PetitionStatus;
@@ -36170,7 +36171,6 @@ export type PetitionReplies_closePetitionMutation = {
     summaryConfig?: { [key: string]: any } | null;
     isInteractionWithRecipientsEnabled: boolean;
     path: string;
-    isReviewFlowEnabled: boolean;
     deadline?: string | null;
     isRestricted: boolean;
     lastChangeAt: string;
@@ -36574,6 +36574,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     __typename?: "Petition";
     id: string;
     isDocumentGenerationEnabled: boolean;
+    isReviewFlowEnabled: boolean;
     isAnonymized: boolean;
     name?: string | null;
     status: PetitionStatus;
@@ -36582,7 +36583,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     summaryConfig?: { [key: string]: any } | null;
     isInteractionWithRecipientsEnabled: boolean;
     path: string;
-    isReviewFlowEnabled: boolean;
     deadline?: string | null;
     isRestricted: boolean;
     lastChangeAt: string;
@@ -37154,6 +37154,7 @@ export type PetitionReplies_petitionQuery = {
         __typename?: "Petition";
         id: string;
         isDocumentGenerationEnabled: boolean;
+        isReviewFlowEnabled: boolean;
         isAnonymized: boolean;
         name?: string | null;
         status: PetitionStatus;
@@ -37162,7 +37163,6 @@ export type PetitionReplies_petitionQuery = {
         summaryConfig?: { [key: string]: any } | null;
         isInteractionWithRecipientsEnabled: boolean;
         path: string;
-        isReviewFlowEnabled: boolean;
         deadline?: string | null;
         isRestricted: boolean;
         lastChangeAt: string;
@@ -50829,6 +50829,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
     isDocumentGenerationEnabled
+    isReviewFlowEnabled
     accesses {
       id
       status
