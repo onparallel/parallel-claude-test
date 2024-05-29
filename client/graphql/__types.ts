@@ -29705,6 +29705,20 @@ export type PetitionCompose_QueryFragment = {
   };
 };
 
+export type PetitionCompose_updatePetitionFieldAutoSearchConfigMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
+}>;
+
+export type PetitionCompose_updatePetitionFieldAutoSearchConfigMutation = {
+  updatePetitionFieldAutoSearchConfig: {
+    __typename?: "PetitionField";
+    id: string;
+    options: { [key: string]: any };
+  };
+};
+
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   data: UpdatePetitionInput;
@@ -56498,6 +56512,25 @@ export const PetitionActivity_userDocument = gql`
   }
   ${PetitionActivity_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_userQuery, PetitionActivity_userQueryVariables>;
+export const PetitionCompose_updatePetitionFieldAutoSearchConfigDocument = gql`
+  mutation PetitionCompose_updatePetitionFieldAutoSearchConfig(
+    $petitionId: GID!
+    $fieldId: GID!
+    $config: UpdatePetitionFieldAutoSearchConfigInput
+  ) {
+    updatePetitionFieldAutoSearchConfig(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      config: $config
+    ) {
+      id
+      options
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionCompose_updatePetitionFieldAutoSearchConfigMutation,
+  PetitionCompose_updatePetitionFieldAutoSearchConfigMutationVariables
+>;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {

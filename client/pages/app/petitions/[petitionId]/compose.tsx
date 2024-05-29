@@ -58,6 +58,7 @@ import {
   PetitionCompose_unlinkPetitionFieldChildrenDocument,
   PetitionCompose_updateFieldPositionsDocument,
   PetitionCompose_updatePetitionDocument,
+  PetitionCompose_updatePetitionFieldAutoSearchConfigDocument,
   PetitionCompose_updatePetitionFieldDocument,
   PetitionCompose_userDocument,
   PetitionFieldType,
@@ -366,6 +367,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   };
 
+  const [updatePetitionFieldAutoSearchConfig] = useMutation(
+    PetitionCompose_updatePetitionFieldAutoSearchConfigDocument,
+  );
+
   const checkReferencedFieldInBackgroundCheck = async (fieldId: string) => {
     const { allFieldsWithIndices } = fieldsRef.current;
     const referencedInBackgroundCheck = allFieldsWithIndices.filter(([f]) => {
@@ -382,15 +387,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const [backgroundCheckField] = referencedInBackgroundCheck[0];
       try {
         await showFieldUsedForSearchesDialog();
-        const autoSearchConfig = await showAutomateSearchDialog({
+        const config = await showAutomateSearchDialog({
           petitionId,
           field: backgroundCheckField,
         });
 
-        await _handleFieldEdit(backgroundCheckField.id, {
-          options: {
-            ...backgroundCheckField.options,
-            autoSearchConfig,
+        await updatePetitionFieldAutoSearchConfig({
+          variables: {
+            fieldId: backgroundCheckField.id,
+            petitionId,
+            config,
           },
         });
 
@@ -1473,6 +1479,22 @@ const _fragments = {
 };
 
 const _mutations = [
+  gql`
+    mutation PetitionCompose_updatePetitionFieldAutoSearchConfig(
+      $petitionId: GID!
+      $fieldId: GID!
+      $config: UpdatePetitionFieldAutoSearchConfigInput
+    ) {
+      updatePetitionFieldAutoSearchConfig(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        config: $config
+      ) {
+        id
+        options
+      }
+    }
+  `,
   gql`
     mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
