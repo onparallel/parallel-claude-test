@@ -28,6 +28,7 @@ import { PetitionSelectOption } from "./PetitionSelectOption";
 import { indexBy, isDefined, zip } from "remeda";
 import pMap from "p-map";
 import { Center, Text } from "@chakra-ui/react";
+import { SearchIcon } from "@parallel/chakra/icons";
 
 export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
 
@@ -340,7 +341,8 @@ function NoOptionsMessage(
           <FormattedMessage id="generic.no-results" defaultMessage="No results" />
         </Text>
       ) : (
-        <Text color="gray.400">
+        <Text color="gray.500">
+          <SearchIcon marginEnd={2} position="relative" top="-1px" />
           {type === "TEMPLATE" ? (
             <FormattedMessage
               id="component.petition-select.search-hint-template"
