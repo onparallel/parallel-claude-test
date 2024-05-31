@@ -62,14 +62,14 @@ export function paginationParams() {
     }),
     limit: intParam({
       description:
-        // TODO: remove after 2024-06-01
-        isAfter(new Date(), new Date("2024-06-01"))
+        // TODO: remove after 2024-07-01
+        isAfter(new Date(), new Date("2024-07-01"))
           ? "How many items to return at most"
-          : "How many items to return at most. A hard limit of 100 will be set on June 1st 2024, please use pagination with the `offset` parameter.",
+          : "How many items to return at most. A hard limit of 100 will be set on July 1st 2024, please use pagination with the `offset` parameter.",
       required: true,
       minimum: 0,
-      // TODO: remove after 2024-06-01
-      maximum: isAfter(new Date(), new Date("2024-06-01")) ? 100 : undefined,
+      // TODO: remove after 2024-07-01
+      maximum: isAfter(new Date(), new Date("2024-07-01")) ? 100 : undefined,
       example: 10,
     }),
   };
