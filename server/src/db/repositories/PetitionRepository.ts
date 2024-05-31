@@ -4421,16 +4421,19 @@ export class PetitionRepository extends BaseRepository {
       petitionFieldCommentId,
       `User:${user.id}`,
     );
-    await this.createEvent({
-      type: "COMMENT_DELETED",
-      petition_id: petitionId,
-      data: {
-        petition_field_id: petitionFieldId,
-        petition_field_comment_id: petitionFieldCommentId,
-        user_id: user.id,
-        is_internal: comment.is_internal,
-      },
-    });
+
+    if (isDefined(comment)) {
+      await this.createEvent({
+        type: "COMMENT_DELETED",
+        petition_id: petitionId,
+        data: {
+          petition_field_id: petitionFieldId,
+          petition_field_comment_id: petitionFieldCommentId,
+          user_id: user.id,
+          is_internal: comment.is_internal,
+        },
+      });
+    }
   }
 
   async deletePetitionFieldCommentFromAccess(
@@ -4439,9 +4442,13 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentId: number,
     access: PetitionAccess,
   ) {
-    await Promise.all([
-      this.deletePetitionFieldComment(petitionFieldCommentId, `PetitionAccess:${access.id}`),
-      this.createEvent({
+    const comment = await this.deletePetitionFieldComment(
+      petitionFieldCommentId,
+      `PetitionAccess:${access.id}`,
+    );
+
+    if (isDefined(comment)) {
+      await this.createEvent({
         type: "COMMENT_DELETED",
         petition_id: petitionId,
         data: {
@@ -4449,11 +4456,14 @@ export class PetitionRepository extends BaseRepository {
           petition_field_comment_id: petitionFieldCommentId,
           petition_access_id: access.id,
         },
-      }),
-    ]);
+      });
+    }
   }
 
-  private async deletePetitionFieldComment(petitionFieldCommentId: number, deletedBy: string) {
+  private async deletePetitionFieldComment(
+    petitionFieldCommentId: number,
+    deletedBy: string,
+  ): Promise<PetitionFieldComment | undefined> {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .whereNull("deleted_at")
@@ -4465,7 +4475,9 @@ export class PetitionRepository extends BaseRepository {
         "*",
       );
 
-    await this.deleteCommentCreatedNotifications(comment.petition_id, [comment.id]);
+    if (isDefined(comment)) {
+      await this.deleteCommentCreatedNotifications(comment.petition_id, [comment.id]);
+    }
 
     return comment;
   }
