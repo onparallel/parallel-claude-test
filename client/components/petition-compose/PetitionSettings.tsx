@@ -27,6 +27,7 @@ import {
   ListIcon,
   LockClosedIcon,
   LockOpenIcon,
+  MoreIcon,
   ShieldIcon,
   ShortSearchIcon,
   SignatureIcon,
@@ -55,9 +56,11 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop } from "remeda";
+import { CloseButton } from "../common/CloseButton";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { PathName } from "../common/PathName";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
@@ -87,7 +90,6 @@ import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionD
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
-import { CloseButton } from "../common/CloseButton";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -505,27 +507,37 @@ function _PetitionSettings({
           isDisabled={settingIsDisabled}
           icon={<FolderIcon />}
           label={
-            <>
-              <FormattedMessage
-                id="component.petition-settings.default-path"
-                defaultMessage="Folder for created parallels:"
-              />{" "}
-              <PathName as="strong" type="PETITION" path={petition.defaultPath} />
-            </>
+            <FormattedMessage
+              id="component.petition-settings.default-path"
+              defaultMessage="Default folder"
+            />
           }
         >
-          <Button
-            size="sm"
-            fontSize="md"
-            fontWeight={400}
-            id="default-path"
-            onClick={handleChangeDefaultPath}
-            isDisabled={
-              petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
-            }
-          >
-            <FormattedMessage id="generic.change" defaultMessage="Change" />
-          </Button>
+          <HStack minWidth={0} spacing={2}>
+            <PathName
+              as={Box}
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              type="PETITION"
+              fontWeight={500}
+              path={petition.defaultPath}
+              tooltipPlacement="bottom-start"
+            />
+            <IconButtonWithTooltip
+              size="xs"
+              fontSize="md"
+              placement="bottom-start"
+              fontWeight={400}
+              id="default-path"
+              label={intl.formatMessage({ id: "generic.change", defaultMessage: "Change" })}
+              icon={<MoreIcon />}
+              onClick={handleChangeDefaultPath}
+              isDisabled={
+                petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
+              }
+            />
+          </HStack>
         </SettingsRow>
       ) : null}
       {!petition.isDocumentGenerationEnabled &&

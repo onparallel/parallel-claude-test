@@ -40,8 +40,8 @@ export interface PetitionComposeFieldSettingsProps {
   user: PetitionComposeFieldSettings_UserFragment;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
-  onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
-  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => Promise<void>;
+  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   onClose: () => void;
   isReadOnly?: boolean;
   children?: ReactNode;
@@ -367,12 +367,7 @@ function SettingsRowGroup({
 }: PropsWithChildren<{ label: ReactNode; isReadOnly?: boolean }>) {
   return (
     <Stack spacing={2} as="section">
-      <Heading
-        as="h4"
-        size="sm"
-        overflowWrap="anywhere"
-        textStyle={isReadOnly ? "muted" : undefined}
-      >
+      <Heading as="h4" size="sm" textStyle={isReadOnly ? "muted" : undefined}>
         {label}
       </Heading>
       {children}

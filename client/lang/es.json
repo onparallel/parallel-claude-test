@@ -5031,7 +5031,7 @@
   },
   {
     "term": "component.petition-compose-text-settings.format",
-    "definition": "Formato:",
+    "definition": "Formato",
     "context": "Format:"
   },
   {
@@ -6036,8 +6036,8 @@
   },
   {
     "term": "component.petition-settings.default-path",
-    "definition": "Carpeta para parallels creados:",
-    "context": "Folder for created parallels:"
+    "definition": "Carpeta por defecto",
+    "context": "Default folder"
   },
   {
     "term": "component.petition-settings.delegate-access",

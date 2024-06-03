@@ -52,7 +52,7 @@ export function PetitionComposeSelectSettings({
         }
         controlId="list-of-options"
       >
-        <Box minWidth="200px">
+        <Box flex={1}>
           <StandardListSelect
             size="sm"
             isClearable

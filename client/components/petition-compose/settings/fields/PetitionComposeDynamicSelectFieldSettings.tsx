@@ -60,8 +60,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
     <>
       <SettingsRow
         isDisabled={isReadOnly}
-        flexDirection="column"
-        alignItems="start"
+        isVertical
         label={
           <Text as="strong">
             <FormattedMessage
@@ -80,7 +79,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
         }
         controlId="dynamic-select-options"
       >
-        <Stack alignSelf="stretch">
+        <Stack>
           {fieldOptions.file ? (
             <DynamicSelectLoadedOptions
               options={fieldOptions}

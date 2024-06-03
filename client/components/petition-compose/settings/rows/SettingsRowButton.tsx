@@ -48,7 +48,7 @@ export function SettingsRowButton({
                 id: "component.settings-row-button.remove-setting",
                 defaultMessage: "Remove setting",
               })}
-              placement="bottom"
+              placement="bottom-start"
               size="sm"
               variant="outline"
               onClick={() => onRemove?.()}

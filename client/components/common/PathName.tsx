@@ -1,4 +1,4 @@
-import { Box, Tooltip } from "@chakra-ui/react";
+import { Box, PlacementWithLogical, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { createElement, ReactElement } from "react";
@@ -8,11 +8,19 @@ interface PathNameProps {
   path: string;
   type: PetitionBaseType;
   disableTooltip?: boolean;
+  tooltipPlacement?: PlacementWithLogical | undefined;
   render?: (props: any) => ReactElement;
 }
 
 export const PathName = chakraForwardRef<"span", PathNameProps>(function PathName(
-  { path, type, disableTooltip, render = ({ children }) => <>{children}</>, ...props },
+  {
+    path,
+    type,
+    disableTooltip,
+    tooltipPlacement,
+    render = ({ children }) => <>{children}</>,
+    ...props
+  },
   ref,
 ) {
   const intl = useIntl();
@@ -28,7 +36,7 @@ export const PathName = chakraForwardRef<"span", PathNameProps>(function PathNam
         });
   const label = (`/${root}` + path).slice(0, -1);
   return (
-    <Tooltip label={label} isDisabled={path === "/" || disableTooltip}>
+    <Tooltip label={label} isDisabled={path === "/" || disableTooltip} placement={tooltipPlacement}>
       <Box ref={ref as any} as="span" {...props}>
         {createElement(
           render,

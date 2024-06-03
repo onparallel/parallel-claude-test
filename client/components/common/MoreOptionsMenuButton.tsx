@@ -29,7 +29,7 @@ export const MoreOptionsMenuButton = chakraForwardRef<"button", MoreOptionsMenuB
       });
     return (
       <Menu placement="bottom-end" {...menuProps}>
-        <Tooltip label={_label}>
+        <Tooltip label={_label} placement="bottom-start">
           <MenuButton as={IconButton} icon={<MoreVerticalIcon />} aria-label={_label} {...props} />
         </Tooltip>
         <Portal>{options}</Portal>

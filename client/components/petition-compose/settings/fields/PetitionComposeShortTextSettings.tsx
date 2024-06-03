@@ -1,9 +1,10 @@
-import { Box, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useShortTextFormatsSelectOptions } from "@parallel/utils/useShortTextFormats";
 import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
+import { SettingsRow } from "../rows/SettingsRow";
 
 export function PetitionComposeShortTextSettings({
   field,
@@ -17,15 +18,18 @@ export function PetitionComposeShortTextSettings({
 
   return (
     <>
-      <Stack>
-        <HStack spacing={4}>
-          <Text textStyle={isReadOnly ? "muted" : undefined}>
+      <Stack spacing={1}>
+        <SettingsRow
+          controlId="short-text-format"
+          textStyle={isReadOnly ? "muted" : undefined}
+          label={
             <FormattedMessage
               id="component.petition-compose-text-settings.format"
-              defaultMessage="Format:"
+              defaultMessage="Format"
             />
-          </Text>
-          <Box flex="1" minWidth="0">
+          }
+        >
+          <Box flex={1}>
             <ShortTextFormatSelect
               size="sm"
               data-testid="petition-compose-short-text-format-select"
@@ -40,7 +44,7 @@ export function PetitionComposeShortTextSettings({
               }}
             />
           </Box>
-        </HStack>
+        </SettingsRow>
         {selected ? (
           <Text fontSize="sm" color="gray.500">
             <FormattedMessage

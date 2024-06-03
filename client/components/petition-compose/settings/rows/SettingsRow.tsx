@@ -1,4 +1,12 @@
-import { Center, FormControl, FormControlProps, FormLabel, HStack, Text } from "@chakra-ui/react";
+import {
+  Center,
+  Flex,
+  FormControl,
+  FormControlProps,
+  FormLabel,
+  HStack,
+  Text,
+} from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { ReactNode } from "react";
 
@@ -6,6 +14,7 @@ export interface SettingsRowProps extends Omit<FormControlProps, "label"> {
   label: ReactNode;
   icon?: ReactNode;
   isActive?: boolean;
+  isVertical?: boolean;
   controlId: string;
   children: ReactNode;
   description?: ReactNode;
@@ -15,6 +24,7 @@ export function SettingsRow({
   label,
   icon,
   isActive,
+  isVertical,
   controlId,
   description,
   children,
@@ -23,31 +33,42 @@ export function SettingsRow({
   return (
     <FormControl
       display="flex"
-      alignItems="center"
+      justifyContent="space-between"
       id={controlId}
       data-active-setting={isActive}
+      {...(isVertical
+        ? {
+            flexDirection: "column",
+            alignItems: "stretch",
+          }
+        : { alignItems: "center" })}
       {...props}
     >
       <FormLabel
-        flex="1"
-        alignSelf="flex-start"
         display="flex"
-        alignItems="center"
         fontWeight="normal"
         whiteSpace="nowrap"
         margin={0}
-        marginEnd={4}
-        minHeight={8}
+        {...(isVertical
+          ? {
+              flexDirection: "column",
+              alignItems: "stretch",
+            }
+          : { marginEnd: 4, alignSelf: "flex-start" })}
       >
-        <HStack>
+        <HStack minHeight={8}>
           {icon ? <Center color={isActive ? "primary.600" : undefined}>{icon}</Center> : null}
-          <Text as="span" whiteSpace="break-spaces">
-            {label}
-          </Text>
+          <Text as="span">{label}</Text>
           {description ? <HelpPopover marginStart={0}>{description}</HelpPopover> : null}
         </HStack>
       </FormLabel>
-      {children}
+      <Flex
+        {...(isVertical
+          ? { flexDirection: "column" }
+          : { flex: 1, justifyContent: "flex-end", maxWidth: "250px", minWidth: 0 })}
+      >
+        {children}
+      </Flex>
     </FormControl>
   );
 }

@@ -29,7 +29,7 @@ export type AliasErrorType = "UNIQUE" | "INVALID";
 
 interface SettingsRowAliasProps {
   field: SettingsRowAlias_PetitionFieldFragment;
-  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   isReadOnly?: boolean;
 }
 
@@ -102,9 +102,17 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
         controlId="alias-field"
         isInvalid={isDefined(aliasError)}
       >
-        <Stack width="100%">
+        <Stack flex={1} minWidth={0}>
           <HStack>
-            <Input value={alias} size="sm" onChange={handleAliasChange} maxLength={100} />
+            <Input
+              width="auto"
+              minWidth="100px"
+              flex={1}
+              value={alias}
+              size="sm"
+              onChange={handleAliasChange}
+              maxLength={100}
+            />
             {showAliasButtons ? (
               <>
                 <CopyLiquidReferenceButton

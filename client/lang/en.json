@@ -6036,8 +6036,8 @@
   },
   {
     "term": "component.petition-settings.default-path",
-    "definition": "Folder for created parallels:",
-    "context": "Folder for created parallels:"
+    "definition": "Default folder",
+    "context": "Default folder"
   },
   {
     "term": "component.petition-settings.delegate-access",
