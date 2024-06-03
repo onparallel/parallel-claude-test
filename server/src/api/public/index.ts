@@ -1089,6 +1089,7 @@ export function publicApi(container: Container) {
       tags: ["Tags"],
     },
     async ({ client, params, body, query }) => {
+      const name = body.name.trim();
       const _query = gql`
         query TagPetition_tagsByName($search: String!) {
           tagsByName(offset: 0, limit: 1, search: [$search]) {
@@ -1100,7 +1101,7 @@ export function publicApi(container: Container) {
         ${PetitionTagFragment}
       `;
       const queryResult = await client.request(TagPetition_tagsByNameDocument, {
-        search: body.name,
+        search: name,
       });
       // must have a 100% match on the result
       let tagId = queryResult.tagsByName.items[0]?.id;
@@ -1116,7 +1117,7 @@ export function publicApi(container: Container) {
         `;
 
         const createTagResult = await client.request(TagPetition_createTagDocument, {
-          name: body.name,
+          name: name,
           color: "#E2E8F0",
         });
 
