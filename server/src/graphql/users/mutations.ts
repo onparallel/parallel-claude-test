@@ -300,8 +300,16 @@ export const deactivateUser = mutationField("deactivateUser", {
             );
           }
 
-          await ctx.petitions.removeTemplateDefaultPermissionsForUser(
+          await ctx.petitions.transferTemplateDefaultPermissions(
             userId,
+            transferToUserId,
+            `User:${ctx.user!.id}`,
+            t,
+          );
+
+          await ctx.profiles.transferProfileSubscriptions(
+            userId,
+            transferToUserId,
             `User:${ctx.user!.id}`,
             t,
           );

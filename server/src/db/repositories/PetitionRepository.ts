@@ -5666,18 +5666,36 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async removeTemplateDefaultPermissionsForUser(
-    userId: number,
-    deletedBy: string,
+  async transferTemplateDefaultPermissions(
+    fromUserId: number,
+    toUserId: number,
+    updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    await this.from("template_default_permission", t)
-      .where("user_id", userId)
-      .whereNull("deleted_at")
-      .update({
-        deleted_at: this.now(),
-        deleted_by: deletedBy,
-      });
+    await this.raw(
+      /* sql */ `
+      with deleted_permission as (
+        update template_default_permission
+        set 
+          deleted_at = now(),
+          deleted_by = ?
+        where
+          user_id = ?
+          and deleted_at is null
+        returning *
+      )
+      insert into template_default_permission ("user_id", "template_id", "type", "is_subscribed", "created_by")
+      select ?, "template_id", "type", "is_subscribed", ?
+      from deleted_permission dp
+      on conflict (template_id, user_id) where deleted_at is null
+      do update
+      -- if the new owner already has a permission, we keep the highest one
+      set "type" = least(EXCLUDED.type, template_default_permission.type)
+
+    `,
+      [updatedBy, fromUserId, toUserId, updatedBy],
+      t,
+    );
   }
 
   async createPermissionsFromTemplateDefaultPermissions(

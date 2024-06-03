@@ -6,7 +6,7 @@ import {
   Organization,
   Petition,
   PetitionPermission,
-  TemplateDefaultPermission,
+  Profile,
   User,
   UserData,
   UserGroup,
@@ -379,6 +379,8 @@ describe("GraphQL/Users", () => {
     let otherOrg: Organization;
     let otherOrgUser: User;
 
+    let profiles: Profile[];
+
     beforeAll(async () => {
       await mocks.knex
         .from("organization")
@@ -413,6 +415,15 @@ describe("GraphQL/Users", () => {
       [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1, () => ({
         status: "ACTIVE",
       }));
+
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 3);
+      await mocks.knex.from("profile_subscription").insert(
+        profiles.map((profile) => ({
+          user_id: activeUsers[0].id,
+          profile_id: profile.id,
+        })),
+      );
     });
 
     it("updates user status to inactive and transfers petition to session user", async () => {
@@ -509,25 +520,36 @@ describe("GraphQL/Users", () => {
         },
       ]);
 
-      const permissions = await mocks.knex
+      const petitionPermissions = await mocks.knex
         .from<PetitionPermission>("petition_permission")
         .where("user_id", activeUsers[0].id)
         .whereNull("deleted_at")
         .select("*");
-      expect(permissions).toHaveLength(0);
+      expect(petitionPermissions).toHaveLength(0);
 
       const members = await mocks.knex
         .from("user_group_member")
         .where({ deleted_at: null, user_group_id: group.id });
+
       expect(members).toHaveLength(0);
 
-      const defaultPermission = await mocks.knex
-        .from<TemplateDefaultPermission>("template_default_permission")
-        .whereNull("deleted_at")
-        .where("user_id", activeUsers[0].id)
+      const templateDefaultPermissions = await mocks.knex
+        .from("template_default_permission")
         .where("template_id", user1Template.id)
-        .select("*");
-      expect(defaultPermission).toHaveLength(0);
+        .select("user_id", "template_id", "deleted_at");
+
+      expect(templateDefaultPermissions).toIncludeSameMembers([
+        {
+          user_id: activeUsers[0].id,
+          template_id: user1Template.id,
+          deleted_at: expect.any(Date),
+        },
+        {
+          user_id: activeUsers[2].id,
+          template_id: user1Template.id,
+          deleted_at: null,
+        },
+      ]);
     });
 
     it("updates user status to active", async () => {
@@ -777,6 +799,132 @@ describe("GraphQL/Users", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("transfers every user profile subscription", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+              status
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          transferToUserId: toGlobalId("User", activeUsers[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deactivateUser).toEqual([
+        {
+          id: toGlobalId("User", activeUsers[0].id),
+          status: "INACTIVE",
+        },
+      ]);
+
+      const profileSubscriptions = await mocks.knex
+        .from("profile_subscription")
+        .whereIn(
+          "profile_id",
+          profiles.map((p) => p.id),
+        )
+        .select("profile_id", "user_id", "deleted_at");
+
+      expect(profileSubscriptions).toIncludeSameMembers(
+        profiles.flatMap((profile) => [
+          {
+            profile_id: profile.id,
+            user_id: activeUsers[0].id,
+            deleted_at: expect.any(Date),
+          },
+          {
+            profile_id: profile.id,
+            user_id: activeUsers[2].id,
+            deleted_at: null,
+          },
+        ]),
+      );
+    });
+
+    it("increases permission if the user to transfer to has a lower permission on the template than the user to deactivate", async () => {
+      const [user1DefaultPermission] = await mocks.knex.from("template_default_permission").insert(
+        {
+          user_id: activeUsers[1].id,
+          type: "READ",
+          template_id: user1Template.id,
+        },
+        "*",
+      );
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          transferToUserId: toGlobalId("User", activeUsers[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [updatedDefaultPermission] = await mocks.knex
+        .from("template_default_permission")
+        .where("id", user1DefaultPermission.id)
+        .select("*");
+
+      expect(updatedDefaultPermission).toMatchObject({
+        user_id: activeUsers[1].id,
+        template_id: user1Template.id,
+        type: "WRITE",
+        deleted_at: null,
+      });
+    });
+
+    it("maintains permission if the user to transfer to has a higher permission on the template than the user to deactivate", async () => {
+      const [user1DefaultPermission] = await mocks.knex.from("template_default_permission").insert(
+        {
+          user_id: activeUsers[1].id,
+          type: "OWNER",
+          template_id: user1Template.id,
+        },
+        "*",
+      );
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          transferToUserId: toGlobalId("User", activeUsers[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [updatedDefaultPermission] = await mocks.knex
+        .from("template_default_permission")
+        .where("id", user1DefaultPermission.id)
+        .select("*");
+
+      expect(updatedDefaultPermission).toMatchObject({
+        user_id: activeUsers[1].id,
+        template_id: user1Template.id,
+        type: "OWNER",
+        deleted_at: null,
+      });
     });
   });
 
