@@ -210,7 +210,7 @@ function OrganizationProfileTypes() {
               state={queryState}
               onStateChange={setQueryState}
               onReload={refetch}
-              onCreateType={handleCreateNewProfileType}
+              onCreateType={me.hasCreateProfileType ? handleCreateNewProfileType : undefined}
             />
           }
           body={
@@ -463,6 +463,9 @@ OrganizationProfileTypes.queries = [
   gql`
     query OrganizationProfileTypes_user {
       ...OrganizationProfilesLayout_Query
+      me {
+        hasCreateProfileType: hasFeatureFlag(featureFlag: CREATE_PROFILE_TYPE)
+      }
     }
     ${OrganizationProfilesLayout.fragments.Query}
   `,

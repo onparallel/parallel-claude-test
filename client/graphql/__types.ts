@@ -564,6 +564,7 @@ export type FeatureFlag =
   | "BACKGROUND_CHECK"
   | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
+  | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -27964,6 +27965,7 @@ export type OrganizationProfileTypes_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasCreateProfileType: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     organization: {
@@ -59556,6 +59558,9 @@ export const OrganizationProfileTypes_profileTypesDocument = gql`
 export const OrganizationProfileTypes_userDocument = gql`
   query OrganizationProfileTypes_user {
     ...OrganizationProfilesLayout_Query
+    me {
+      hasCreateProfileType: hasFeatureFlag(featureFlag: CREATE_PROFILE_TYPE)
+    }
   }
   ${OrganizationProfilesLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<

@@ -95,6 +95,7 @@ export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    userHasFeatureFlag("CREATE_PROFILE_TYPE"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {

@@ -14,7 +14,7 @@ interface ProfileTypesListHeaderProps {
   state: ProfileTypesQueryState;
   onStateChange: SetQueryState<Partial<ProfileTypesQueryState>>;
   onReload: () => void;
-  onCreateType: () => void;
+  onCreateType?: () => void;
 }
 
 export function ProfileTypesListHeader({
@@ -62,10 +62,17 @@ export function ProfileTypesListHeader({
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
-      <Spacer />
-      <Button colorScheme="primary" onClick={onCreateType}>
-        <FormattedMessage id="component.profile-types-table.new-type" defaultMessage="New type" />
-      </Button>
+      {onCreateType ? (
+        <>
+          <Spacer />
+          <Button colorScheme="primary" onClick={onCreateType}>
+            <FormattedMessage
+              id="component.profile-types-table.new-type"
+              defaultMessage="New type"
+            />
+          </Button>
+        </>
+      ) : null}
     </HStack>
   );
 }

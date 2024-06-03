@@ -869,6 +869,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       { name: "CLIENT_PORTAL", description: null, isDeprecated: false, deprecationReason: null },
+      {
+        name: "CREATE_PROFILE_TYPE",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
       { name: "CUSTOM_HOST_UI", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "CUSTOM_PROPERTIES",

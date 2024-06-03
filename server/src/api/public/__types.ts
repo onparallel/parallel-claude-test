@@ -523,6 +523,7 @@ export type FeatureFlag =
   | "BACKGROUND_CHECK"
   | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
+  | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -878,6 +879,8 @@ export type Mutation = {
   /** Creates an event subscription for the user's profiles */
   createProfileEventSubscription: ProfileEventSubscription;
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
+  /** Adds a field as child of a field group, linked to a property of the parent field profile type */
+  createProfileLinkedPetitionField: PetitionField;
   /** Associates a profile with one or more relationships. */
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
@@ -970,8 +973,6 @@ export type Mutation = {
   /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
   linkFieldGroupToProfileType: PetitionField;
   linkPetitionFieldChildren: PetitionField;
-  /** Adds a field as child of a field group, linked to a property of the parent field profile type */
-  createProfileLinkedPetitionField: PetitionField;
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
@@ -1529,6 +1530,13 @@ export type MutationcreateProfileFieldFileUploadLinkArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateProfileLinkedPetitionFieldArgs = {
+  parentFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  position?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
@@ -1775,13 +1783,6 @@ export type MutationlinkPetitionFieldChildrenArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   parentFieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
-};
-
-export type MutationcreateProfileLinkedPetitionFieldArgs = {
-  parentFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  position?: InputMaybe<Scalars["Int"]["input"]>;
-  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationloginAsArgs = {

@@ -326,6 +326,17 @@ export function useFeatureFlags() {
             }),
           },
           {
+            name: "CREATE_PROFILE_TYPE",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.create-profile-type-name",
+              defaultMessage: "Create profile types",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.create-profile-type-description",
+              defaultMessage: "Grants access to create profile types",
+            }),
+          },
+          {
             name: "CUSTOM_PROPERTIES",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.custom-properties-name",

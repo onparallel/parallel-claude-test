@@ -3010,6 +3010,16 @@
     "context": "Client portal"
   },
   {
+    "term": "component.feature-flag-descriptions.create-profile-type-description",
+    "definition": "Grants access to create profile types",
+    "context": "Grants access to create profile types"
+  },
+  {
+    "term": "component.feature-flag-descriptions.create-profile-type-name",
+    "definition": "Create profile types",
+    "context": "Create profile types"
+  },
+  {
     "term": "component.feature-flag-descriptions.custom-host-ui-description",
     "definition": "Remove the enterprise banners around the button to request a subdomain change.",
     "context": "Remove the enterprise banners around the button to request a subdomain change."
@@ -5216,8 +5226,8 @@
   },
   {
     "term": "component.petition-compose-text-settings.format",
-    "definition": "Format:",
-    "context": "Format:"
+    "definition": "Format",
+    "context": "Format"
   },
   {
     "term": "component.petition-compose-text-settings.format-placeholder",

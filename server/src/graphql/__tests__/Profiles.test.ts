@@ -120,7 +120,10 @@ describe("GraphQL/Profiles", () => {
       .update({ default_timezone: "Europe/Madrid" })
       .where("id", organization.id);
 
-    await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
+    await mocks.createFeatureFlags([
+      { name: "PROFILES", default_value: true },
+      { name: "CREATE_PROFILE_TYPE", default_value: true },
+    ]);
 
     const [normalUser] = await mocks.createRandomUsers(organization.id);
     const { apiKey } = await mocks.createUserAuthToken("normal-token", normalUser.id);
