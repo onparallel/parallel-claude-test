@@ -25,14 +25,18 @@ interface CreateProfileDialogResult {
   hasValues: boolean;
 }
 
+interface CreateProfileDialogProps {
+  suggestedName?: string;
+  profileTypeId?: string;
+  profileFieldValues?: Record<string, string | number>;
+}
+
 function CreateProfileDialog({
-  defaultProfileTypeId,
-  suggestedName = "",
+  profileTypeId,
+  suggestedName,
+  profileFieldValues,
   ...props
-}: DialogProps<
-  { defaultProfileTypeId?: string | null; suggestedName?: string },
-  CreateProfileDialogResult
->) {
+}: DialogProps<CreateProfileDialogProps, CreateProfileDialogResult>) {
   const intl = useIntl();
 
   const {
@@ -45,42 +49,53 @@ function CreateProfileDialog({
     setValue,
   } = useForm<{ profileTypeId: string | null; fieldValues: UpdateProfileFieldValueInput[] }>({
     defaultValues: {
-      profileTypeId: defaultProfileTypeId ?? null,
+      profileTypeId: profileTypeId ?? null,
       fieldValues: [],
     },
   });
 
   const { fields, replace } = useFieldArray({ name: "fieldValues", control });
-  const profileTypeId = watch("profileTypeId");
 
+  const _profileTypeId = watch("profileTypeId");
   const { data: profileTypeData } = useQuery(useCreateProfileDialog_profileTypeDocument, {
-    variables: { profileTypeId: profileTypeId! },
-    skip: !isDefined(profileTypeId),
+    variables: { profileTypeId: _profileTypeId! },
+    skip: !isDefined(_profileTypeId),
   });
 
   useEffect(() => {
     if (isDefined(profileTypeData)) {
       const fields = profileTypeData.profileType.fields.filter((f) => f.isUsedInProfileName);
-      const suggestions = suggestedName.split(" ");
-      replace(
-        fields.map((field, i, rest) => {
-          const defaultValue = field.type === "SHORT_TEXT" ? "" : null;
-          const moreShortTextsAfterThis = rest.slice(i + 1).some((f) => f.type === "SHORT_TEXT");
-          const value =
-            field.myPermission !== "WRITE"
-              ? defaultValue
-              : moreShortTextsAfterThis
-                ? suggestions.shift() ?? ""
-                : suggestions.join(" ");
-          return {
-            profileTypeFieldId: field.id,
-            content: { value },
-          };
-        }),
-      );
+      if (profileFieldValues) {
+        replace(
+          fields.map((field) => {
+            return {
+              profileTypeFieldId: field.id,
+              content: { value: profileFieldValues[field.id] },
+            };
+          }),
+        );
+      } else {
+        const suggestions = (suggestedName ?? "").split(" ");
+        replace(
+          fields.map((field, i, rest) => {
+            const defaultValue = field.type === "SHORT_TEXT" ? "" : null;
+            const moreShortTextsAfterThis = rest.slice(i + 1).some((f) => f.type === "SHORT_TEXT");
+            const value =
+              field.myPermission !== "WRITE"
+                ? defaultValue
+                : moreShortTextsAfterThis
+                  ? suggestions.shift() ?? ""
+                  : suggestions.join(" ");
+            return {
+              profileTypeFieldId: field.id,
+              content: { value },
+            };
+          }),
+        );
+      }
       setTimeout(() => {
         setFocus(`fieldValues.0.content.value`);
-      });
+      }, 100);
     }
   }, [profileTypeData]);
 
@@ -88,7 +103,9 @@ function CreateProfileDialog({
 
   const [createProfile, { loading }] = useMutation(useCreateProfileDialog_createProfileDocument);
   const selectRef = useRef<Focusable>({
-    focus: () => setFocus("profileTypeId"),
+    focus: () => {
+      setFocus("profileTypeId");
+    },
   });
 
   return (
@@ -137,7 +154,7 @@ function CreateProfileDialog({
       }
       body={
         <Stack spacing={4}>
-          <FormControl isInvalid={!!errors.profileTypeId}>
+          <FormControl isInvalid={!!errors.profileTypeId} isDisabled={isDefined(profileTypeId)}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-profile-dialog.profile-type"

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
-import { isDefined, range, times } from "remeda";
+import { isDefined, range, times, omit } from "remeda";
 import {
   FileUpload,
   Organization,
@@ -135,7 +135,9 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile_event").delete();
     await mocks.knex.from("profile_subscription").delete();
     await mocks.knex.from("petition_profile").delete();
+    await mocks.knex.from("petition_field_reply").update("associated_profile_id", null);
     await mocks.knex.from("profile").delete();
+    await mocks.knex.from("petition_field").update("profile_type_id", null);
     await mocks.knex.from("profile_type").delete();
 
     profileTypes = await mocks.createRandomProfileTypes(
@@ -2425,7 +2427,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(archiveErrors).toBeUndefined();
-      expect(archiveData?.archiveProfileType).toEqual([
+      expect(archiveData?.archiveProfileType).toIncludeSameMembers([
         { id: toGlobalId("ProfileType", profileTypes[1].id) },
         { id: toGlobalId("ProfileType", profileTypes[2].id) },
       ]);
@@ -5171,6 +5173,54 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("removes associated_profile_id from petition replies when deleting a profile", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileTypes[0].id,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          status: "CLOSED",
+          closed_at: new Date(),
+        }),
+      );
+
+      const [reply] = await mocks.createRandomTextReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: sessionUser.id,
+        type: "FIELD_GROUP",
+        associated_profile_id: profile.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            deleteProfile(profileIds: $profileIds)
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", profile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfile).toEqual("SUCCESS");
+
+      const [dbReply] = await mocks.knex
+        .from("petition_field_reply")
+        .where("id", reply.id)
+        .select("*");
+
+      expect(omit(dbReply, ["updated_at", "updated_by"])).toEqual({
+        ...omit(reply, ["updated_at", "updated_by"]),
+        associated_profile_id: null,
+      });
     });
   });
 

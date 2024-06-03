@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 import {
-  PetitionField,
-  useAllFieldsWithIndices_PetitionFieldFragment,
+  PetitionFieldType,
+  useAllFieldsWithIndices_PetitionBaseFragment,
+  useFieldsWithIndices_LandingTemplateFragment,
+  useFieldsWithIndices_PetitionBaseFragment,
+  useFieldsWithIndices_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
@@ -39,9 +42,14 @@ function* numbers() {
   }
 }
 
+type FieldOf<T extends { fields?: any[] | null }> = UnwrapArray<
+  Exclude<T["fields"], null | undefined>
+>;
+
 /** dont export */
 function getFieldIndices<
-  T extends Pick<PetitionField, "type"> & {
+  T extends {
+    type: PetitionFieldType;
     children?: any[] | undefined | null;
   },
 >(fields: T[]): [fieldIndex: PetitionFieldIndex, childrenFieldIndices: string[] | undefined][] {
@@ -55,40 +63,81 @@ function getFieldIndices<
   });
 }
 
+type ChildOf<T extends { children?: any[] | null }> = UnwrapArray<
+  Exclude<T["children"], null | undefined>
+>;
+
 /**
  * Returns an array of tuples [field, fieldIndex, childrenFieldIndices]
  * @param fields fields to iterate.
  */
 export function useFieldsWithIndices<
-  T extends Pick<PetitionField, "type"> & {
-    children?: any[] | undefined | null;
-  },
+  T extends
+    | useFieldsWithIndices_PetitionBaseFragment
+    | useFieldsWithIndices_PublicPetitionFragment
+    | useFieldsWithIndices_LandingTemplateFragment,
 >(
-  fields: T[],
-): [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices: string[] | undefined][] {
+  petition: T,
+): [
+  field: FieldOf<T>,
+  fieldIndex: PetitionFieldIndex,
+  childrenFieldIndices: string[] | undefined,
+][] {
   return useMemo(() => {
-    return zip(fields, getFieldIndices(fields)).map(
+    return zip(petition.fields as any, getFieldIndices(petition.fields as any)).map(
       ([field, [fieldIndex, childrenFieldIndices]]) => {
-        return [field, fieldIndex, childrenFieldIndices];
+        return [field as FieldOf<T>, fieldIndex, childrenFieldIndices];
       },
     );
-  }, [fields]);
+  }, [petition.fields]);
 }
 
-type ChildOf<T extends useAllFieldsWithIndices_PetitionFieldFragment> = UnwrapArray<
-  Exclude<T["children"], null | undefined>
->;
+useFieldsWithIndices.fragments = {
+  PetitionBase: gql`
+    fragment useFieldsWithIndices_PetitionBase on PetitionBase {
+      fields {
+        id
+        type
+        children {
+          id
+        }
+      }
+    }
+  `,
+  PublicPetition: gql`
+    fragment useFieldsWithIndices_PublicPetition on PublicPetition {
+      fields {
+        id
+        type
+        children {
+          id
+        }
+      }
+    }
+  `,
+  LandingTemplate: gql`
+    fragment useFieldsWithIndices_LandingTemplate on LandingTemplate {
+      fields {
+        id
+        type
+      }
+    }
+  `,
+};
 
-export function useAllFieldsWithIndices<T extends useAllFieldsWithIndices_PetitionFieldFragment>(
-  fields: T[],
-): [field: T | ChildOf<T>, fieldIndex: PetitionFieldIndex][] {
-  const fieldsWithIndices = useFieldsWithIndices(fields);
+export function useAllFieldsWithIndices<T extends useAllFieldsWithIndices_PetitionBaseFragment>(
+  petition: T,
+): [field: FieldOf<T> | ChildOf<FieldOf<T>>, fieldIndex: PetitionFieldIndex][] {
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   return useMemo(() => {
     return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
       return [
         [field, fieldIndex],
         ...(isDefined(field.children)
-          ? (zip(field.children, childrenFieldIndices!) as [ChildOf<T>, PetitionFieldIndex][])
+          ? (zip(field.children, childrenFieldIndices!) as [
+              ChildOf<FieldOf<T>>,
+              PetitionFieldIndex,
+            ][])
           : []),
       ];
     });
@@ -96,12 +145,10 @@ export function useAllFieldsWithIndices<T extends useAllFieldsWithIndices_Petiti
 }
 
 useAllFieldsWithIndices.fragments = {
-  PetitionField: gql`
-    fragment useAllFieldsWithIndices_PetitionField on PetitionField {
-      type
-      children {
-        id
-      }
+  PetitionBase: gql`
+    fragment useAllFieldsWithIndices_PetitionBase on PetitionBase {
+      ...useFieldsWithIndices_PetitionBase
     }
+    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };

@@ -119,7 +119,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
-  const allFieldsWithIndices = useAllFieldsWithIndices(petition.fields);
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition);
   const _validatePetitionFields = async () => {
     const { error, message, footer, fieldsWithIndices } = validatePetitionFields(
       allFieldsWithIndices,
@@ -521,7 +521,6 @@ const _fragments = {
       ...useSendPetitionHandler_Petition
       fields {
         id
-        ...useAllFieldsWithIndices_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         children {
@@ -530,6 +529,7 @@ const _fragments = {
           ...FieldErrorDialog_PetitionField
         }
       }
+      ...useAllFieldsWithIndices_PetitionBase
       ...useConfirmSendReminderDialog_Petition
       ...PetitionProfilesTable_Petition
       ...validatePetitionFields_PetitionBase
@@ -540,7 +540,7 @@ const _fragments = {
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
-    ${useAllFieldsWithIndices.fragments.PetitionField}
+    ${useAllFieldsWithIndices.fragments.PetitionBase}
     ${validatePetitionFields.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionBase}
     ${FieldErrorDialog.fragments.PetitionField}

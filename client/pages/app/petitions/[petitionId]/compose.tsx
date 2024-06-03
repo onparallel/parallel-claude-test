@@ -52,6 +52,7 @@ import {
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
+  PetitionCompose_createProfileLinkedPetitionFieldDocument,
   PetitionCompose_deletePetitionFieldDocument,
   PetitionCompose_linkPetitionFieldChildrenDocument,
   PetitionCompose_petitionDocument,
@@ -76,9 +77,9 @@ import {
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
@@ -119,7 +120,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const isSharedByLink = (isTemplate && petition.publicLink?.isActive) ?? false;
 
-  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   const allFieldsWithIndices = useMemo(() => {
     return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
       return [
@@ -143,27 +144,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const wrapper = usePetitionStateWrapper();
 
-  const [isLeftPaneActive, setIsLeftPaneActive] = useState(false);
-  const [newFieldPlaceholderFieldId, setNewFieldPlaceholderFieldId] = useState<
-    string | undefined
-  >();
-  const [newFieldPlaceholderParentFieldId, setNewFieldPlaceholderParentFieldId] = useState<
-    string | undefined
-  >();
   const fieldDrawerRef = useRef<HTMLDivElement>(null);
 
-  const handleCloseFieldDrawer = useCallback(() => {
-    setIsLeftPaneActive(false);
-    setNewFieldPlaceholderFieldId(undefined);
-    setNewFieldPlaceholderParentFieldId(undefined);
-  }, []);
+  const [addFieldAfterId, setAddFieldAfterId] =
+    useState<Maybe<[afterFieldId: string | undefined, inParentFieldId: string | undefined]>>(null);
+  const isAddFieldDrawerOpen = isDefined(addFieldAfterId);
+  const [afterFieldId, inParentFieldId] = addFieldAfterId ?? [];
 
-  const handleOpenFieldDrawer = useCallback(
-    (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => {
-      setIsLeftPaneActive(true);
-      setNewFieldPlaceholderFieldId(fieldId);
-      setNewFieldPlaceholderParentFieldId(parentFieldId);
+  const handleCloseFieldDrawer = useCallback(() => setAddFieldAfterId(null), []);
 
+  const handleShowAddField = useCallback(
+    (afterFieldId?: string, inParentFieldId?: string, focusSearchInput?: boolean) => {
+      setAddFieldAfterId([afterFieldId, inParentFieldId]);
       if (focusSearchInput) {
         fieldDrawerRef.current?.querySelector("input")?.focus();
       }
@@ -202,7 +194,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     setShowErrors(isSharedByLink);
   }, [setShowErrors, isSharedByLink]);
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     // Validate and focus fields when have "tags" in url, because it probably comes from other page when validates petition fields
     const hash = window.location.hash;
     if (hash) {
@@ -212,7 +204,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         const { error, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices, petition);
         if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
           setShowErrors(true);
-          focusFieldTitle(fieldsWithIndices[0][0].id);
+          await focusFieldTitle(fieldsWithIndices[0][0].id);
         }
       }
     }
@@ -246,27 +238,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId },
       });
       const field = data!.clonePetitionField;
-
-      if (fieldId === newFieldPlaceholderParentFieldId) {
-        setNewFieldPlaceholderParentFieldId(field.id);
-        if (newFieldPlaceholderFieldId) {
-          const { allFieldsWithIndices } = fieldsRef.current!;
-          const oldParentField = allFieldsWithIndices.find(
-            ([f]) => f.id === newFieldPlaceholderParentFieldId,
-          )![0];
-          const oldChildIndex = oldParentField.children!.findIndex(
-            (f) => f.id === newFieldPlaceholderFieldId,
-          );
-          const newChildId = field.children![oldChildIndex].id;
-          setNewFieldPlaceholderFieldId(newChildId);
+      if (isAddFieldDrawerOpen) {
+        if (field.type === "FIELD_GROUP") {
+          setAddFieldAfterId([field.id, field.children?.at(-1)?.id]);
+        } else {
+          setAddFieldAfterId([field.id, inParentFieldId]);
         }
-      } else if (fieldId === newFieldPlaceholderFieldId) {
-        setNewFieldPlaceholderFieldId(field.id);
       }
       setActiveFieldId(field.id);
-      focusFieldTitle(field.id);
+      await focusFieldTitle(field.id);
     }),
-    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
+    [petitionId, isAddFieldDrawerOpen],
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
@@ -449,24 +431,23 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               }
             },
           });
+          let _afterFieldId = afterFieldId;
+          let _inParentFieldId = inParentFieldId;
 
-          if (
-            newFieldPlaceholderFieldId === field.id ||
-            newFieldPlaceholderParentFieldId === field.id
-          ) {
+          if (afterFieldId === field.id || inParentFieldId === field.id) {
             const previousField = field.position
               ? allFieldsWithIndices[fieldIndex - 1][0]
               : undefined;
 
-            setNewFieldPlaceholderFieldId(
-              newFieldPlaceholderParentFieldId === field.id && previousField?.parent?.id
+            _afterFieldId =
+              inParentFieldId === field.id && previousField?.parent?.id
                 ? previousField.parent.id
-                : previousField?.id,
-            );
+                : previousField?.id;
 
-            if (newFieldPlaceholderParentFieldId === field.id) {
-              setNewFieldPlaceholderParentFieldId(undefined);
+            if (inParentFieldId === field.id) {
+              _inParentFieldId = undefined;
             }
+            setAddFieldAfterId([_afterFieldId, _inParentFieldId]);
           }
         } catch (e) {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
@@ -509,7 +490,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
+    [petitionId, afterFieldId, inParentFieldId],
   );
 
   const handleFieldSettingsClick = useCallback(
@@ -765,7 +746,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const validateNewFieldPosition = async (type: PetitionFieldType, position?: number) => {
     const { allFieldsWithIndices } = fieldsRef.current!;
-    const field = allFieldsWithIndices.find(([f]) => f.id === newFieldPlaceholderParentFieldId)![0];
+    const field = allFieldsWithIndices.find(([f]) => f.id === inParentFieldId)![0];
     const childrenLength = field.children?.length ?? 0;
     let _position = isDefined(position) && childrenLength > position ? position + 1 : 0;
     if (
@@ -789,7 +770,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       if (
         (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
         childrenLength > 0 &&
-        position === 0 &&
+        _position === 0 &&
         !field.isInternal
       ) {
         _position = 1;
@@ -798,18 +779,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return _position;
   };
 
+  const [createProfileLinkedPetitionField] = useMutation(
+    PetitionCompose_createProfileLinkedPetitionFieldDocument,
+  );
   const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
   const handleAddField = useCallback(
-    wrapper(async function (type: PetitionFieldType) {
-      const parentFieldId = newFieldPlaceholderParentFieldId;
+    wrapper(async function (type: PetitionFieldType, profileTypeFieldId?: string) {
+      const parentFieldId = inParentFieldId;
       const { fieldsWithIndices } = fieldsRef.current!;
 
       let position = undefined as number | undefined;
       if (isDefined(parentFieldId)) {
         const parentField = fieldsWithIndices.find(([f]) => f.id === parentFieldId)![0];
-        const childIndex = parentField.children?.findIndex(
-          (f) => f.id === newFieldPlaceholderFieldId,
-        );
+        const childIndex = parentField.children?.findIndex((f) => f.id === afterFieldId);
         try {
           position = await validateNewFieldPosition(
             type,
@@ -819,47 +801,79 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return;
         }
       } else {
-        const fieldIndex = fieldsWithIndices.findIndex(
-          ([f]) => f.id === newFieldPlaceholderFieldId,
-        );
+        const fieldIndex = fieldsWithIndices.findIndex(([f]) => f.id === afterFieldId);
 
         if (fieldIndex !== -1) {
           position = fieldIndex + 1;
         }
       }
-      const { data } = await createPetitionField({
-        variables: { petitionId, type, position, parentFieldId },
-        update: (cache, { data }) => {
-          if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
-            updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
-              return replies.map((r) => {
-                const children = [...r.children!];
-                children[0].__typename;
-                children.splice(position!, 0, {
-                  __typename: "PetitionFieldGroupChildReply",
-                  field: data.createPetitionField,
-                  replies: [],
+      let newFieldId = "";
+
+      if (profileTypeFieldId && parentFieldId) {
+        const { data } = await createProfileLinkedPetitionField({
+          variables: {
+            petitionId,
+            parentFieldId,
+            profileTypeFieldId,
+            position,
+          },
+          update: (cache, { data }) => {
+            if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
+              // updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+              //   return replies.map((r) => {
+              //     const children = [...r.children!];
+              //     children[0].__typename;
+              //     children.splice(position!, 0, {
+              //       __typename: "PetitionFieldGroupChildReply",
+              //       field: data.createProfileLinkedPetitionField,
+              //       replies: [],
+              //     });
+              //     return {
+              //       ...r,
+              //       children,
+              //     };
+              //   });
+              // });
+            }
+          },
+        });
+        newFieldId = data!.createProfileLinkedPetitionField.id;
+      } else {
+        const { data } = await createPetitionField({
+          variables: { petitionId, type, position, parentFieldId },
+          update: (cache, { data }) => {
+            if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
+              updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+                return replies.map((r) => {
+                  const children = [...r.children!];
+                  children[0].__typename;
+                  children.splice(position!, 0, {
+                    __typename: "PetitionFieldGroupChildReply",
+                    field: data.createPetitionField,
+                    replies: [],
+                  });
+                  return {
+                    ...r,
+                    children,
+                  };
                 });
-                return {
-                  ...r,
-                  children,
-                };
               });
-            });
-          }
-        },
-      });
-      setActiveFieldId(data!.createPetitionField.id);
-      setTimeout(() => scrollToField(data!.createPetitionField.id));
+            }
+          },
+        });
+        newFieldId = data!.createPetitionField.id;
+      }
+      await waitForElement(`#field-${newFieldId}`);
+      setActiveFieldId(newFieldId);
 
       if (type === "FIELD_GROUP") {
-        setNewFieldPlaceholderFieldId(undefined);
-        setNewFieldPlaceholderParentFieldId(data?.createPetitionField.id);
+        setAddFieldAfterId([undefined, newFieldId]);
       } else {
-        setNewFieldPlaceholderFieldId(data!.createPetitionField.id);
+        setAddFieldAfterId([newFieldId, inParentFieldId]);
       }
+      scrollToField(newFieldId).then();
     }),
-    [petitionId, newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId],
+    [petitionId, afterFieldId, inParentFieldId],
   );
 
   const showErrorDialog = useErrorDialog();
@@ -958,8 +972,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         });
 
-        if (newFieldPlaceholderFieldId === fieldId) {
-          setNewFieldPlaceholderParentFieldId(parentFieldId);
+        if (afterFieldId === fieldId) {
+          setAddFieldAfterId([afterFieldId, parentFieldId]);
         }
       };
       try {
@@ -1012,7 +1026,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId, newFieldPlaceholderFieldId],
+    [petitionId, afterFieldId],
   );
 
   const [unlinkPetitionFieldChild] = useMutation(
@@ -1046,8 +1060,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         });
 
-        if (newFieldPlaceholderFieldId === fieldId) {
-          setNewFieldPlaceholderParentFieldId(undefined);
+        if (afterFieldId === fieldId) {
+          setAddFieldAfterId([afterFieldId, undefined]);
         }
       };
       try {
@@ -1089,7 +1103,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
     }),
-    [petitionId, newFieldPlaceholderFieldId],
+    [petitionId, afterFieldId],
   );
 
   const handleNextClick = useSendPetitionHandler(
@@ -1101,19 +1115,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const highlight = useHighlightElement();
   const scrollToField = useCallback(async (fieldId: string) => {
-    const fieldElement = await waitForElement(`#field-${fieldId}`);
-    if (fieldElement) {
-      await waitFor(250);
-      await highlight(fieldElement);
-      focusFieldTitle(fieldId);
-    }
+    await Promise.all([
+      waitForElement(`#field-${fieldId}`).then(highlight),
+      focusFieldTitle(fieldId),
+    ]);
   }, []);
 
-  function focusFieldTitle(fieldId: string) {
-    setTimeout(() => {
-      const title = document.querySelector<HTMLElement>(`#field-title-${fieldId}`);
-      title?.focus();
-    });
+  async function focusFieldTitle(fieldId: string) {
+    const title = await waitForElement<HTMLInputElement>(`#field-title-${fieldId}`);
+    title.focus();
   }
 
   const extendFlexColumn = {
@@ -1164,14 +1174,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           ) : null
         }
         hasLeftPane
-        isLeftPaneActive={isLeftPaneActive}
+        isLeftPaneActive={isAddFieldDrawerOpen}
         leftPane={
           <PetitionComposeNewFieldDrawer
             ref={fieldDrawerRef}
             user={me}
             onClose={handleCloseFieldDrawer}
             onAddField={handleAddField}
-            isFieldGroupChild={Boolean(newFieldPlaceholderParentFieldId)}
+            onFieldEdit={handleFieldEdit}
+            petition={petition}
+            newFieldPlaceholderParentFieldId={inParentFieldId}
           />
         }
         hasRightPane
@@ -1258,7 +1270,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     petition={petition}
                     onUpdatePetition={handleUpdatePetition}
                     validPetitionFields={validPetitionFields}
-                    onRefetch={() => refetch({ id: petitionId })}
+                    onRefetch={() => refetch()}
                   />
                 </TabPanel>
                 <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
@@ -1288,12 +1300,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           zIndex={1}
           backgroundColor={petition.__typename === "PetitionTemplate" ? "primary.50" : undefined}
         >
-          <AddNewFieldPlaceholderProvider
-            value={{
-              newFieldPlaceholderFieldId,
-              newFieldPlaceholderParentFieldId,
-            }}
-          >
+          <AddNewFieldPlaceholderProvider value={{ afterFieldId, inParentFieldId }}>
             <PetitionComposeFieldList
               showErrors={showErrors}
               user={me}
@@ -1307,7 +1314,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
               onLinkField={handleLinkField}
               onUnlinkField={handleUnlinkField}
-              showAddField={handleOpenFieldDrawer}
+              showAddField={handleShowAddField}
               isReadOnly={isReadOnly}
             />
           </AddNewFieldPlaceholderProvider>
@@ -1359,10 +1366,6 @@ const _fragments = {
         id
         isInteractionWithRecipientsEnabled
         isDocumentGenerationEnabled
-        ...PetitionLayout_PetitionBase
-        ...PetitionSettings_PetitionBase
-        ...PetitionComposeFieldList_PetitionBase
-        ...PetitionComposeAttachments_PetitionBase
         organization {
           id
           brandTheme {
@@ -1374,6 +1377,10 @@ const _fragments = {
           id
           ...PetitionCompose_PetitionField
         }
+        myEffectivePermission {
+          permissionType
+        }
+        isAnonymized
         ... on Petition {
           accesses {
             id
@@ -1393,28 +1400,33 @@ const _fragments = {
           isPublic
           description
         }
-        myEffectivePermission {
-          permissionType
-        }
-        isAnonymized
+        ...PetitionLayout_PetitionBase
+        ...PetitionSettings_PetitionBase
+        ...PetitionComposeFieldList_PetitionBase
+        ...PetitionComposeAttachments_PetitionBase
         ...PetitionComposeVariables_PetitionBase
         ...validatePetitionFields_PetitionBase
         ...PetitionComposeFieldSettings_PetitionBase
+        ...useFieldsWithIndices_PetitionBase
+        ...PetitionComposeNewFieldDrawer_PetitionBase
       }
+      ${this.PetitionField}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeFieldList.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
       ${PetitionComposeAttachments.fragments.PetitionBase}
       ${useSendPetitionHandler.fragments.Petition}
       ${PetitionComposeVariables.fragments.PetitionBase}
-      ${this.PetitionField}
       ${validatePetitionFields.fragments.PetitionBase}
       ${PetitionComposeFieldSettings.fragments.PetitionBase}
+      ${useFieldsWithIndices.fragments.PetitionBase}
+      ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
     return gql`
       fragment PetitionCompose_PetitionField on PetitionField {
+        id
         ...PetitionComposeFieldList_PetitionField
         ...PetitionComposeContents_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
@@ -1436,7 +1448,7 @@ const _fragments = {
             id
             position
           }
-          children {
+          replies {
             id
           }
         }
@@ -1551,13 +1563,11 @@ const _mutations = [
         ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
+          ...PetitionComposeNewFieldDrawer_PetitionBase
           fields {
             id
             position
             children {
-              id
-            }
-            parent {
               id
             }
           }
@@ -1566,6 +1576,7 @@ const _mutations = [
     }
     ${updatePreviewFieldReplies.fragments.PetitionField}
     ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
     ${_fragments.PetitionField}
   `,
   gql`
@@ -1675,6 +1686,7 @@ const _mutations = [
           id
           fields {
             id
+            isChild
           }
           lastChangeAt
         }
@@ -1700,6 +1712,7 @@ const _mutations = [
           id
           fields {
             id
+            isChild
             parent {
               id
             }
@@ -1708,6 +1721,41 @@ const _mutations = [
         }
       }
     }
+    ${_fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_createProfileLinkedPetitionField(
+      $petitionId: GID!
+      $parentFieldId: GID!
+      $profileTypeFieldId: GID!
+      $position: Int
+    ) {
+      createProfileLinkedPetitionField(
+        petitionId: $petitionId
+        parentFieldId: $parentFieldId
+        profileTypeFieldId: $profileTypeFieldId
+        position: $position
+      ) {
+        id
+        ...PetitionCompose_PetitionField
+        ...PetitionComposeField_ChildPetitionField
+        ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
+        petition {
+          ...PetitionLayout_PetitionBase
+          ...PetitionComposeNewFieldDrawer_PetitionBase
+          fields {
+            id
+            position
+            children {
+              id
+            }
+          }
+        }
+      }
+    }
+    ${updatePreviewFieldReplies.fragments.PetitionField}
+    ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
     ${_fragments.PetitionField}
   `,
 ];

@@ -24,7 +24,6 @@ import {
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
-  ProfileFieldValueUpdatedEvent,
   ProfileRelationshipCreatedEvent,
   ProfileRelationshipRemovedEvent,
 } from "../../db/events/ProfileEvent";
@@ -42,6 +41,7 @@ import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
 import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
+import { buildProfileUpdatedEventsData } from "../helpers/buildProfileUpdatedEventsData";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -876,42 +876,11 @@ export const createProfile = mutationField("createProfile", {
         ctx.user!.id,
       );
 
-      const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
-
-      const newEventsData = fields.flatMap((f) => {
-        const current = currentByPtfId[f.profileTypeFieldId];
-        return [
-          {
-            org_id: ctx.user!.org_id,
-            profile_id: profile.id,
-            type: "PROFILE_FIELD_VALUE_UPDATED",
-            data: {
-              user_id: ctx.user!.id,
-              profile_type_field_id: f.profileTypeFieldId,
-              current_profile_field_value_id: current.id,
-              previous_profile_field_value_id: null,
-              alias: f.alias,
-            },
-          } satisfies ProfileFieldValueUpdatedEvent<true>,
-          isDefined(f.expiryDate)
-            ? ({
-                org_id: ctx.user!.org_id,
-                profile_id: profile.id,
-                type: "PROFILE_FIELD_EXPIRY_UPDATED",
-                data: {
-                  user_id: ctx.user!.id,
-                  profile_type_field_id: f.profileTypeFieldId,
-                  expiry_date: current.expiry_date,
-                  alias: f.alias,
-                },
-              } satisfies ProfileFieldExpiryUpdatedEvent<true>)
-            : null,
-        ].filter(isDefined);
-      });
-
-      if (newEventsData.length > 0) {
-        await ctx.profiles.createProfileUpdatedEvents(profile.id, newEventsData, ctx.user!);
-      }
+      await ctx.profiles.createProfileUpdatedEvents(
+        profile.id,
+        buildProfileUpdatedEventsData(profile.id, fields, currentValues, [], ctx.user!),
+        ctx.user!,
+      );
 
       return updatedProfile!;
     }
@@ -1145,52 +1114,17 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       previousValues,
     } = await ctx.profiles.updateProfileFieldValue(profileId, fieldsWithZonedExpires, ctx.user!.id);
 
-    const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
-    const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-
-    const newEventsData = fieldsWithZonedExpires.flatMap((f) => {
-      const current = currentByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
-      const previous = previousByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
-      const expiryChanged =
-        f.expiryDate !== undefined &&
-        (previous?.expiry_date?.valueOf() ?? null) !== (f.expiryDate?.valueOf() ?? null);
-      return [
-        ...(isDefined(current) || isDefined(previous)
-          ? [
-              {
-                org_id: ctx.user!.org_id,
-                profile_id: profileId,
-                type: "PROFILE_FIELD_VALUE_UPDATED",
-                data: {
-                  user_id: ctx.user!.id,
-                  profile_type_field_id: f.profileTypeFieldId,
-                  current_profile_field_value_id: current?.id ?? null,
-                  previous_profile_field_value_id: previous?.id ?? null,
-                  alias: f.alias,
-                },
-              } satisfies ProfileFieldValueUpdatedEvent<true>,
-            ]
-          : []),
-        ...(expiryChanged
-          ? [
-              {
-                org_id: ctx.user!.org_id,
-                profile_id: profileId,
-                type: "PROFILE_FIELD_EXPIRY_UPDATED",
-                data: {
-                  user_id: ctx.user!.id,
-                  profile_type_field_id: f.profileTypeFieldId,
-                  expiry_date: current?.expiry_date ?? null,
-                  alias: f.alias,
-                },
-              } satisfies ProfileFieldExpiryUpdatedEvent<true>,
-            ]
-          : []),
-      ];
-    });
-    if (newEventsData.length > 0) {
-      await ctx.profiles.createProfileUpdatedEvents(profileId, newEventsData, ctx.user!);
-    }
+    await ctx.profiles.createProfileUpdatedEvents(
+      profileId,
+      buildProfileUpdatedEventsData(
+        profile.id,
+        fieldsWithZonedExpires,
+        currentValues,
+        previousValues,
+        ctx.user!,
+      ),
+      ctx.user!,
+    );
 
     return updatedProfile!;
   },
@@ -1960,7 +1894,6 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
     profileHasStatus("profileId", ["OPEN", "CLOSED"]),
     profilesCanBeAssociated("profileId", "relationships"),
     userHasAccessToProfileRelationshipsInput("relationships"),
-    (_, { profileId, relationships }) => relationships.every((r) => r.profileId !== profileId),
   ),
   validateArgs: notEmptyArray((args) => args.relationships, "relationships"),
   args: {
@@ -2007,6 +1940,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
             };
           }),
           ctx.user!,
+          false,
           t,
         );
 

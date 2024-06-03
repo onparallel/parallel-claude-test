@@ -39,7 +39,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
   const { options, value } = useMemo(() => {
     const fieldOptions = fieldsWithIndices.flatMap(([field, fieldIndex]) => {
       const options: ConditionSubjectSelectOption[] = [
-        { type: "FIELD", field, fieldIndex, isChild: isDefined(field.parent) },
+        { type: "FIELD", field, fieldIndex, isChild: field.isChild },
       ];
       if (field.type === "DYNAMIC_SELECT") {
         const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
@@ -48,7 +48,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
           ...labels.map((label, index) => ({
             type: "DYNAMIC_SELECT_OPTION" as const,
             field,
-            isChild: isDefined(field.parent),
+            isChild: field.isChild,
             fieldIndex,
             column: columns.next().value!,
             columnIndex: index,

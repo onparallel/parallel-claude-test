@@ -23,12 +23,7 @@ export function LiquidScopeProvider({
   usePreviewReplies?: boolean;
 }>) {
   const intl = useIntl();
-  const fieldsWithIndices = useFieldsWithIndices(
-    petition.fields as (
-      | UnwrapArray<LiquidScopeProvider_PetitionBaseFragment["fields"]>
-      | UnwrapArray<LiquidScopeProvider_PublicPetitionFragment["fields"]>
-    )[],
-  );
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   const scope = useMemo(() => {
     const scope: Record<string, any> = { petitionId: petition.id, _: {} };
     for (const [field, fieldIndex, childrenFieldIndices] of fieldsWithIndices) {
@@ -136,7 +131,9 @@ LiquidScopeProvider.fragments = {
           }
         }
       }
+      ...useFieldsWithIndices_PetitionBase
     }
+
     fragment LiquidScopeProvider_PetitionField on PetitionField {
       id
       type
@@ -144,6 +141,8 @@ LiquidScopeProvider.fragments = {
       alias
       options
     }
+
+    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
   PublicPetition: gql`
     fragment LiquidScopeProvider_PublicPetition on PublicPetition {
@@ -162,7 +161,9 @@ LiquidScopeProvider.fragments = {
           }
         }
       }
+      ...useFieldsWithIndices_PublicPetition
     }
+
     fragment LiquidScopeProvider_PublicPetitionField on PublicPetitionField {
       id
       type
@@ -170,5 +171,7 @@ LiquidScopeProvider.fragments = {
       alias
       options
     }
+
+    ${useFieldsWithIndices.fragments.PublicPetition}
   `,
 };

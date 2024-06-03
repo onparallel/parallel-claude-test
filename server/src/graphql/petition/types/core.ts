@@ -370,6 +370,12 @@ export const PetitionBase = interfaceType({
       description: "Time when the petition or any of its relations were last updated.",
       resolve: (o) => o.last_change_at,
     });
+    t.nonNull.list.nonNull.field("fieldRelationships", {
+      type: "PetitionFieldGroupRelationship",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(o.id);
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",
@@ -807,6 +813,30 @@ export const PetitionField = objectType({
     t.nonNull.boolean("isChild", {
       resolve: (o) => o.parent_petition_field_id !== null,
     });
+    t.nonNull.boolean("isLinkedToProfileType", {
+      resolve: (o) => isDefined(o.profile_type_id),
+    });
+    t.nonNull.boolean("isLinkedToProfileTypeField", {
+      resolve: (o) => isDefined(o.profile_type_field_id),
+    });
+    t.nullable.field("profileType", {
+      type: "ProfileType",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.profile_type_id)) {
+          return await ctx.profiles.loadProfileType(o.profile_type_id);
+        }
+        return null;
+      },
+    });
+    t.nullable.field("profileTypeField", {
+      type: "ProfileTypeField",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.profile_type_field_id)) {
+          return await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
+        }
+        return null;
+      },
+    });
   },
   sourceType: "db.PetitionField",
 });
@@ -1242,6 +1272,16 @@ export const PetitionFieldReply = objectType({
         }));
       },
     });
+    t.nullable.field("associatedProfile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        if (!isDefined(o.associated_profile_id)) {
+          return null;
+        }
+
+        return await ctx.profiles.loadProfile(o.associated_profile_id);
+      },
+    });
   },
 });
 
@@ -1419,4 +1459,30 @@ export const PetitionCustomList = objectType({
     name: string;
     values: string[];
   }`,
+});
+
+export const PetitionFieldGroupRelationship = objectType({
+  name: "PetitionFieldGroupRelationship",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "PetitionFieldGroupRelationship" });
+    t.nonNull.field("leftSidePetitionField", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadField(o.left_side_petition_field_id))!;
+      },
+    });
+    t.nonNull.field("rightSidePetitionField", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadField(o.right_side_petition_field_id))!;
+      },
+    });
+    t.nonNull.field("relationshipTypeWithDirection", {
+      type: "ProfileRelationshipTypeWithDirection",
+      resolve: (o) => ({
+        profile_relationship_type_id: o.profile_relationship_type_id,
+        direction: o.direction,
+      }),
+    });
+  },
 });

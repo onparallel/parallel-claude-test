@@ -22,7 +22,6 @@ import {
   ProfilesIcon,
   RepeatIcon,
   SparklesIcon,
-  ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -58,6 +57,7 @@ import { PetitionRepliesSummary } from "@parallel/components/petition-replies/Pe
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
+import { useArchiveFieldGroupReplyIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveFieldGroupReplyIntoProfileDialog";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
@@ -65,16 +65,13 @@ import {
   useExportRepliesDialog,
 } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
-import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
 import {
-  PetitionFieldReply,
   PetitionFieldReplyStatus,
   PetitionReplies_PetitionFragment,
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_associateProfileToPetitionDocument,
   PetitionReplies_closePetitionDocument,
-  PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
@@ -103,20 +100,20 @@ import {
   useUpdatePetitionFieldComment,
 } from "@parallel/utils/mutations/comments";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { withError } from "@parallel/utils/promises/withError";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useExportRepliesTask } from "@parallel/utils/tasks/useExportRepliesTask";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -238,7 +235,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     try {
       const res = await showExportRepliesDialog({
         user: me,
-        fields: petition.fields,
+        petition,
       });
 
       if (res.type === "DOWNLOAD_ZIP") {
@@ -316,7 +313,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     highlight(variablesRef.current);
   }, []);
 
-  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition);
+  const allFields = useMemo(
+    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
+    [petition.fields],
+  );
+  const hasLinkedToProfileTypeFields = allFields.some((f) => f.isLinkedToProfileTypeField);
 
   const showClosePetitionDialog = useClosePetitionDialog();
   const [sendPetitionClosedNotification] = useMutation(
@@ -325,18 +327,22 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
-      const petitionClosedNotificationToast = {
-        title: intl.formatMessage({
-          id: "page.replies.message-sent-toast-header",
-          defaultMessage: "Message sent",
-        }),
-        description: intl.formatMessage({
-          id: "page.replies.message-sent-toast-description",
-          defaultMessage: "The message is on it's way",
-        }),
-        status: "success" as const,
-        duration: 3000,
-        isClosable: true,
+      const showToast = (includeDescription?: boolean) => {
+        toast({
+          title: intl.formatMessage({
+            id: "page.replies.parallel-closed-toast-header",
+            defaultMessage: "Parallel closed",
+          }),
+          description: includeDescription
+            ? intl.formatMessage({
+                id: "page.replies.parallel-closed-toast-description",
+                defaultMessage: "The recipient has been notified.",
+              })
+            : undefined,
+          status: "success" as const,
+          duration: 3000,
+          isClosable: true,
+        });
       };
 
       let message: Maybe<RichTextEditorValue> = null;
@@ -345,6 +351,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       try {
         const data = await showClosePetitionDialog({
           petition,
+          hasLinkedToProfileTypeFields,
           requiredMessage,
         });
 
@@ -360,8 +367,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               pdfExportTitle,
             },
           });
-          toast(petitionClosedNotificationToast);
         }
+        showToast(!!message);
       } catch (error) {
         // rethrow error to avoid continuing flow on function handleClosePetition
         if (isDialogError(error)) {
@@ -378,12 +385,22 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               force: true,
             },
           });
-          toast(petitionClosedNotificationToast);
+          showToast(!!message);
         }
       }
     },
-    [petition, intl.locale],
+    [petition, intl.locale, hasLinkedToProfileTypeFields],
   );
+
+  const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
+  const handleAssociateAndFillProfile = async () => {
+    try {
+      await showArchiveFieldGroupReplyIntoProfileDialog({
+        petition,
+        onRefetch: () => refetch(),
+      });
+    } catch {}
+  };
 
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
   const [approveOrRejectReplies] = useMutation(
@@ -448,6 +465,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           petitionId,
         },
       });
+
+      if (hasLinkedToProfileTypeFields) {
+        await handleAssociateAndFillProfile();
+      }
     } catch {}
   }, [
     petition,
@@ -455,6 +476,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     closePetition,
     handleFinishPetition,
     cancelSignatureRequest,
+    handleAssociateAndFillProfile,
+    hasLinkedToProfileTypeFields,
   ]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
@@ -487,6 +510,19 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     flex: 1,
     minHeight: 0,
   } as const;
+
+  const repliesFieldGroupsWithProfileTypes = petition.fields
+    .filter(
+      (field) =>
+        field.type === "FIELD_GROUP" && field.isLinkedToProfileType && field.replies.length > 0,
+    )
+    .flatMap((f) => f.replies);
+
+  const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
+
+  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter((r) =>
+    isDefined(r.associatedProfile),
+  ).length;
 
   const [associateProfileToPetition] = useMutation(
     PetitionReplies_associateProfileToPetitionDocument,
@@ -543,7 +579,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             isReadOnly={petition.isAnonymized}
             canAddProfiles={petition.myEffectivePermission?.permissionType !== "READ"}
             petitionId={petitionId}
-            petitionFields={petition.fields}
+            petition={petition}
           />
         ) : null
       }
@@ -656,7 +692,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         myEffectivePermission === "READ" ? null : (
           <Button
             data-action="close-petition"
-            colorScheme="green"
+            colorScheme="primary"
             leftIcon={<CheckIcon />}
             onClick={handleClosePetition}
           >
@@ -668,46 +704,34 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </Text>
           </Button>
         )}
-        {petition.status !== "CLOSED" ||
-        petition.accesses.length === 0 ||
-        petition.isAnonymized ||
-        myEffectivePermission === "READ" ? null : (
-          <Button
-            colorScheme="blue"
-            leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-            onClick={async () => {
-              try {
-                await handleFinishPetition({ requiredMessage: true });
-              } catch {}
-            }}
-          >
-            <FormattedMessage
-              id="page.replies.notify-petition-reviewed-button"
-              defaultMessage="Notify that it is correct"
-            />
-          </Button>
-        )}
         {me.hasProfilesAccess &&
+        petition.status === "CLOSED" &&
         ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
           petition.profiles.length > 0) ? (
           <ResponsiveButtonIcon
-            data-action="associate-profile"
             colorScheme="primary"
+            data-action="associate-profile"
             icon={<ProfilesIcon />}
-            onClick={() =>
-              petition.profiles.length
-                ? setQueryState({
-                    comments: null,
-                    profile: petition.profiles.at(-1)!.id,
-                  })
-                : handleAssociateProfile()
-            }
+            onClick={() => {
+              if (hasLinkedToProfileTypeFields) {
+                handleAssociateAndFillProfile();
+              } else {
+                handleAssociateProfile();
+              }
+            }}
             label={
-              petition.profiles.length
-                ? intl.formatMessage({
-                    id: "page.replies.open-profile-button",
-                    defaultMessage: "Open profile",
-                  })
+              hasLinkedToProfileTypeFields
+                ? intl.formatMessage(
+                    {
+                      id: "page.replies.associate-profile-button-linked-groups",
+                      defaultMessage:
+                        "Associate {total, plural, =1{profile} other{profiles}} {current}/{total}",
+                    },
+                    {
+                      current: fieldGroupsWithProfileTypesLinked,
+                      total: fieldGroupsWithProfileTypesTotal,
+                    },
+                  )
                 : intl.formatMessage({
                     id: "page.replies.associate-profile-button",
                     defaultMessage: "Associate profile",
@@ -826,10 +850,14 @@ PetitionReplies.fragments = {
           ...PetitionRepliesField_PetitionField
           ...PetitionRepliesContents_PetitionField
           ...PetitionRepliesFieldComments_PetitionField
-          ...ExportRepliesDialog_PetitionField
-          ...ProfileDrawer_PetitionField
+
+          isLinkedToProfileType
+          isLinkedToProfileTypeField
+          children {
+            id
+            isLinkedToProfileTypeField
+          }
         }
-        ...ShareButton_PetitionBase
         currentSignatureRequest {
           id
           status
@@ -854,6 +882,11 @@ PetitionReplies.fragments = {
         ...LiquidScopeProvider_PetitionBase
         ...PetitionRepliesSummary_Petition
         ...PetitionRepliesFieldComments_PetitionBase
+        ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
+        ...ProfileDrawer_PetitionBase
+        ...ShareButton_PetitionBase
+        ...ExportRepliesDialog_Petition
+        ...useFieldsWithIndices_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionRepliesField.fragments.Petition}
@@ -865,10 +898,13 @@ PetitionReplies.fragments = {
       ${useFieldLogic.fragments.PetitionBase}
       ${LiquidScopeProvider.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
-      ${ProfileDrawer.fragments.PetitionField}
+      ${ProfileDrawer.fragments.PetitionBase}
       ${PetitionVariablesCard.fragments.PetitionBase}
       ${PetitionRepliesSummary.fragments.Petition}
       ${PetitionRepliesFieldComments.fragments.PetitionBase}
+      ${useArchiveFieldGroupReplyIntoProfileDialog.fragments.Petition}
+      ${ExportRepliesDialog.fragments.Petition}
+      ${useFieldsWithIndices.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -876,15 +912,14 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
         requireApproval
+
         ...PetitionRepliesField_PetitionField
         ...PetitionRepliesContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
-        ...ExportRepliesDialog_PetitionField
         ...useFieldLogic_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
-      ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionRepliesContents.fragments.PetitionField}
     `;
   },
@@ -917,18 +952,6 @@ const _mutations = [
       }
     }
     ${PetitionReplies.fragments.Petition}
-  `,
-  gql`
-    mutation PetitionReplies_fileUploadReplyDownloadLink(
-      $petitionId: GID!
-      $replyId: GID!
-      $preview: Boolean
-    ) {
-      fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId, preview: $preview) {
-        result
-        url
-      }
-    }
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(
@@ -992,33 +1015,6 @@ const _mutations = [
     }
   `,
 ];
-
-function useDownloadReplyFile() {
-  const [mutate] = useMutation(PetitionReplies_fileUploadReplyDownloadLinkDocument);
-  const showFailure = useFailureGeneratingLinkDialog();
-  return useCallback(
-    async function downloadReplyFile(
-      petitionId: string,
-      reply: Pick<PetitionFieldReply, "id" | "content">,
-      preview: boolean,
-    ) {
-      await withError(
-        openNewWindow(async () => {
-          const { data } = await mutate({
-            variables: { petitionId, replyId: reply.id, preview },
-          });
-          const { url, result } = data!.fileUploadReplyDownloadLink;
-          if (result !== "SUCCESS") {
-            await withError(showFailure({ filename: reply.content.filename }));
-            throw new Error();
-          }
-          return url!;
-        }),
-      );
-    },
-    [mutate],
-  );
-}
 
 function useUpdatePetitionFieldRepliesStatus() {
   const [updatePetitionFieldRepliesStatus] = useMutation(

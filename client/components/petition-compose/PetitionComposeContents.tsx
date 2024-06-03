@@ -18,6 +18,7 @@ import {
   AddAliasToFieldDialog,
   useAddAliasToFieldDialog,
 } from "../petition-common/dialogs/AddAliasToFieldDialog";
+import { ProfilesIcon } from "@parallel/chakra/icons";
 
 export interface PetitionComposeContentsProps<
   T extends PetitionComposeContents_PetitionFieldFragment,
@@ -74,6 +75,7 @@ PetitionComposeContents.fragments = {
       isInternal
       alias
       isChild
+      isLinkedToProfileTypeField
       ...MoreLiquidReferencesButton_PetitionField
       ...CopyLiquidReferenceButton_PetitionField
       ...AddAliasToFieldDialog_PetitionField
@@ -170,6 +172,7 @@ function _PetitionComposeContentsItem<T extends PetitionComposeContents_Petition
             )}
           </LinkOverlay>
           {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
+          {field.isLinkedToProfileTypeField ? <ProfilesIcon boxSize={4} /> : null}
           {showAliasButtons ? (
             <>
               <CopyLiquidReferenceButton

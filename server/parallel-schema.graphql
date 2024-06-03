@@ -88,6 +88,25 @@ enum AiCompletionLogStatus {
   PENDING
 }
 
+enum ArchiveFieldGroupReplyIntoProfileConflictResolutionAction {
+  APPEND
+  IGNORE
+  OVERWRITE
+}
+
+"""
+Action to take when the selected profile already has a value on the field. An error will be thrown if no conflictResolution is provided for a field with a value.
+"""
+input ArchiveFieldGroupReplyIntoProfileConflictResolutionInput {
+  action: ArchiveFieldGroupReplyIntoProfileConflictResolutionAction!
+  profileTypeFieldId: GID!
+}
+
+input ArchiveFieldGroupReplyIntoProfileExpirationInput {
+  expiryDate: Date
+  profileTypeFieldId: GID!
+}
+
 type AsyncFieldCompletionResponse {
   type: String!
   url: String!
@@ -879,6 +898,26 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): Petition!
+
+  """
+  Archives the replies of a FIELD_GROUP field into a profile
+  """
+  archiveFieldGroupReplyIntoProfile(
+    conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+    expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+
+    """
+    ID of the FIELD_GROUP reply
+    """
+    parentReplyId: GID!
+    petitionFieldId: GID!
+    petitionId: GID!
+
+    """
+    ID of the profile to archive into.
+    """
+    profileId: GID!
+  ): PetitionFieldReply!
   archiveProfileType(profileTypeIds: [GID!]!): [ProfileType!]!
 
   """
@@ -1273,6 +1312,16 @@ type Mutation {
   ): ProfileFieldPropertyAndFileWithUploadData!
 
   """
+  Adds a field as child of a field group, linked to a property of the parent field profile type
+  """
+  createProfileLinkedPetitionField(
+    parentFieldId: GID!
+    petitionId: GID!
+    position: Int
+    profileTypeFieldId: GID!
+  ): PetitionField!
+
+  """
   Associates a profile with one or more relationships.
   """
   createProfileRelationship(
@@ -1579,6 +1628,15 @@ type Mutation {
     orgId: GID
     userGroupIds: [GID!]
   ): User!
+
+  """
+  Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed
+  """
+  linkFieldGroupToProfileType(
+    petitionFieldId: GID!
+    petitionId: GID!
+    profileTypeId: GID
+  ): PetitionField!
   linkPetitionFieldChildren(
     childrenFieldIds: [GID!]!
     force: Boolean
@@ -2394,6 +2452,10 @@ type Mutation {
     """
     throwOnNoPermission: Boolean
   ): PetitionFieldComment!
+  updatePetitionFieldGroupRelationships(
+    petitionId: GID!
+    relationships: [UpdatePetitionFieldGroupRelationshipInput!]!
+  ): PetitionBase!
 
   """
   Updates multiple replies for a petition at once
@@ -3046,6 +3108,7 @@ type Petition implements PetitionBase {
   The number of fields in the petition.
   """
   fieldCount: Int!
+  fieldRelationships: [PetitionFieldGroupRelationship!]!
 
   """
   The definition of the petition fields.
@@ -3395,6 +3458,7 @@ interface PetitionBase {
   The number of fields in the petition.
   """
   fieldCount: Int!
+  fieldRelationships: [PetitionFieldGroupRelationship!]!
 
   """
   The definition of the petition fields.
@@ -3749,6 +3813,8 @@ type PetitionField {
   Determines if the field is visible by the recipients.
   """
   isInternal: Boolean!
+  isLinkedToProfileType: Boolean!
+  isLinkedToProfileTypeField: Boolean!
 
   """
   Determines if the field accepts replies
@@ -3777,6 +3843,8 @@ type PetitionField {
   parent: PetitionField
   petition: PetitionBase!
   position: Int!
+  profileType: ProfileType
+  profileTypeField: ProfileTypeField
 
   """
   The replies to the petition field
@@ -3913,6 +3981,13 @@ type PetitionFieldGroupChildReply {
   replies: [PetitionFieldReply!]!
 }
 
+type PetitionFieldGroupRelationship {
+  id: GID!
+  leftSidePetitionField: PetitionField!
+  relationshipTypeWithDirection: ProfileRelationshipTypeWithDirection!
+  rightSidePetitionField: PetitionField!
+}
+
 type PetitionFieldMini {
   """
   The ID of the petition field.
@@ -3964,6 +4039,7 @@ type PetitionFieldProgress {
 A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
+  associatedProfile: Profile
   children: [PetitionFieldGroupChildReply!]
 
   """
@@ -4805,6 +4881,7 @@ type PetitionTemplate implements PetitionBase {
   The number of fields in the petition.
   """
   fieldCount: Int!
+  fieldRelationships: [PetitionFieldGroupRelationship!]!
 
   """
   The definition of the petition fields.
@@ -7190,6 +7267,14 @@ input UpdatePetitionFieldAutoSearchConfigInput {
   date: GID
   name: [GID!]!
   type: BackgroundCheckEntitySearchType
+}
+
+input UpdatePetitionFieldGroupRelationshipInput {
+  direction: ProfileRelationshipDirection!
+  id: GID
+  leftSidePetitionFieldId: GID!
+  profileRelationshipTypeId: GID!
+  rightSidePetitionFieldId: GID!
 }
 
 input UpdatePetitionFieldInput {

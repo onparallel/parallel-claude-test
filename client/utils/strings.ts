@@ -5,3 +5,10 @@ export function unCamelCase(value: string) {
 export function isNotEmptyText(value: string) {
   return value.trim().length > 0;
 }
+
+export function removeDiacriticsAndLowercase(text: string) {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}

@@ -175,7 +175,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                         }
                       }
                     }}
-                    isDisabled={isReadOnly || field.isFixed}
+                    isDisabled={isReadOnly || field.isFixed || field.isLinkedToProfileTypeField}
                     user={user}
                     isFieldGroupChild={isFieldGroupChild}
                   />
@@ -190,13 +190,13 @@ export const PetitionComposeFieldSettings = Object.assign(
               {canChangeMultiple ? (
                 field.type === "FILE_UPLOAD" ? (
                   <AllowMultipleFilesSettingsRow
-                    isDisabled={isReadOnly}
+                    isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
                     isChecked={field.multiple}
                     onChange={handleFieldEdit}
                   />
                 ) : (
                   <AllowMultipleRepliesSettingsRow
-                    isDisabled={isReadOnly}
+                    isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
                     isChecked={field.multiple}
                     onChange={handleFieldEdit}
                   />
@@ -317,6 +317,15 @@ export const PetitionComposeFieldSettings = Object.assign(
           isInteractionWithRecipientsEnabled
           isReviewFlowEnabled
           isDocumentGenerationEnabled
+          fieldRelationships {
+            id
+            leftSidePetitionField {
+              id
+            }
+            rightSidePetitionField {
+              id
+            }
+          }
         }
       `,
       PetitionField: gql`
@@ -337,6 +346,12 @@ export const PetitionComposeFieldSettings = Object.assign(
           alias
           hasCommentsEnabled
           requireApproval
+          isLinkedToProfileType
+          profileType {
+            id
+            name
+          }
+          isLinkedToProfileTypeField
           parent {
             id
             showInPdf

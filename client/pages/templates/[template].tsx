@@ -35,7 +35,7 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
@@ -76,7 +76,15 @@ function LandingTemplateDetails({
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 
   const fieldswithIndices = useFieldsWithIndices(
-    template.fields.filter((field) => (field.type === "HEADING" && !field.title ? false : true)),
+    useMemo(
+      () => ({
+        ...template,
+        fields: template.fields.filter((field) =>
+          field.type === "HEADING" && !field.title ? false : true,
+        ),
+      }),
+      [template],
+    ),
   );
 
   function handleClickPreview() {
@@ -368,7 +376,9 @@ LandingTemplateDetails.fragments = {
         type
         title
       }
+      ...useFieldsWithIndices_LandingTemplate
     }
+    ${useFieldsWithIndices.fragments.LandingTemplate}
   `,
 };
 

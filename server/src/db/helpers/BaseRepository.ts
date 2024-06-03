@@ -139,7 +139,7 @@ export class BaseRepository {
 
   protected async raw<TResult>(
     sql: string,
-    bindings?: readonly Knex.RawBinding[],
+    bindings?: readonly Knex.RawBinding[] | Record<string, Knex.RawBinding>,
     transaction?: Knex.Transaction,
   ): Promise<TResult[]> {
     let raw = this.knex.raw<{ rows: TResult[] }>(sql, bindings ?? []);

@@ -21,6 +21,7 @@ import {
   PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
 import {
+  ExportRepliesDialog_PetitionFragment,
   ExportRepliesDialog_PetitionFieldFragment,
   ExportRepliesDialog_UserFragment,
 } from "@parallel/graphql/__types";
@@ -35,7 +36,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export interface ExportRepliesDialogProps {
   user: ExportRepliesDialog_UserFragment;
-  fields: ExportRepliesDialog_PetitionFieldFragment[];
+  petition: ExportRepliesDialog_PetitionFragment;
 }
 
 export type ExportParams =
@@ -52,7 +53,7 @@ export interface ExportOption {
 
 export function ExportRepliesDialog({
   user,
-  fields,
+  petition,
   ...props
 }: DialogProps<ExportRepliesDialogProps, ExportParams>) {
   const intl = useIntl();
@@ -109,7 +110,7 @@ export function ExportRepliesDialog({
   const [externalClientId, setExternalClientId] = useState("");
   const [clientIdError, setClientIdError] = useState(false);
   const clientIdRef = useRef<HTMLInputElement>(null);
-  const placeholdersRename = useFilenamePlaceholdersRename(fields);
+  const placeholdersRename = useFilenamePlaceholdersRename(petition);
   const example = useMemo(() => {
     function hasFileReply(
       field: Pick<ExportRepliesDialog_PetitionFieldFragment, "type" | "replies">,
@@ -120,7 +121,7 @@ export function ExportRepliesDialog({
         field.replies.some((r) => !r.content.error && r.content.uploadComplete)
       );
     }
-    const field = fields.find(
+    const field = petition.fields.find(
       (f) => hasFileReply(f) || (f.type === "FIELD_GROUP" && f.children?.some(hasFileReply)),
     );
 
@@ -130,7 +131,7 @@ export function ExportRepliesDialog({
 
     const reply = fileTypeField.replies.find((r) => !r.content.error && r.content.uploadComplete)!;
     return [reply.content.filename, placeholdersRename(fileTypeField, reply, pattern)];
-  }, [fields, placeholdersRename, pattern]);
+  }, [petition.fields, placeholdersRename, pattern]);
 
   const inputRef = useRef<PlaceholderInputInstance>(null);
   const handleConfirmClick = () => {
@@ -295,6 +296,18 @@ ExportRepliesDialog.fragments = {
       hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
     }
   `,
+  Petition: gql`
+    fragment ExportRepliesDialog_Petition on Petition {
+      ...useFilenamePlaceholdersRename_PetitionBase
+      fields {
+        ...ExportRepliesDialog_PetitionField
+        children {
+          ...ExportRepliesDialog_PetitionField
+        }
+      }
+    }
+    ${useFilenamePlaceholdersRename.fragments.PetitionBase}
+  `,
   PetitionField: gql`
     fragment ExportRepliesDialog_PetitionField on PetitionField {
       id
@@ -303,15 +316,6 @@ ExportRepliesDialog.fragments = {
       replies {
         content
         ...useFilenamePlaceholdersRename_PetitionFieldReply
-      }
-      children {
-        id
-        type
-        ...useFilenamePlaceholdersRename_PetitionField
-        replies {
-          content
-          ...useFilenamePlaceholdersRename_PetitionFieldReply
-        }
       }
     }
     ${useFilenamePlaceholdersRename.fragments.PetitionField}

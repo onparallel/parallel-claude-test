@@ -112,6 +112,22 @@ export type AiCompletionLog = Timestamps & {
 
 export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
 
+export type ArchiveFieldGroupReplyIntoProfileConflictResolutionAction =
+  | "APPEND"
+  | "IGNORE"
+  | "OVERWRITE";
+
+/** Action to take when the selected profile already has a value on the field. An error will be thrown if no conflictResolution is provided for a field with a value. */
+export type ArchiveFieldGroupReplyIntoProfileConflictResolutionInput = {
+  action: ArchiveFieldGroupReplyIntoProfileConflictResolutionAction;
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type ArchiveFieldGroupReplyIntoProfileExpirationInput = {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
 export type AsyncFieldCompletionResponse = {
   type: Scalars["String"]["output"];
   url: Scalars["String"]["output"];
@@ -754,6 +770,8 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
+  /** Archives the replies of a FIELD_GROUP field into a profile */
+  archiveFieldGroupReplyIntoProfile: PetitionFieldReply;
   archiveProfileType: Array<ProfileType>;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
@@ -949,7 +967,11 @@ export type Mutation = {
   importPetitionFromJson: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
+  /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
+  linkFieldGroupToProfileType: PetitionField;
   linkPetitionFieldChildren: PetitionField;
+  /** Adds a field as child of a field group, linked to a property of the parent field profile type */
+  createProfileLinkedPetitionField: PetitionField;
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
@@ -1132,6 +1154,7 @@ export type Mutation = {
   updatePetitionFieldAutoSearchConfig: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
+  updatePetitionFieldGroupRelationships: PetitionBase;
   /** Updates multiple replies for a petition at once */
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
@@ -1208,6 +1231,15 @@ export type MutationanonymizePetitionArgs = {
 export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
   petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
+};
+
+export type MutationarchiveFieldGroupReplyIntoProfileArgs = {
+  conflictResolutions: Array<ArchiveFieldGroupReplyIntoProfileConflictResolutionInput>;
+  expirations: Array<ArchiveFieldGroupReplyIntoProfileExpirationInput>;
+  parentReplyId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
 };
 
 export type MutationarchiveProfileTypeArgs = {
@@ -1732,11 +1764,24 @@ export type MutationinviteUserToOrganizationArgs = {
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
+export type MutationlinkFieldGroupToProfileTypeArgs = {
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
 export type MutationlinkPetitionFieldChildrenArgs = {
   childrenFieldIds: Array<Scalars["GID"]["input"]>;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   parentFieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateProfileLinkedPetitionFieldArgs = {
+  parentFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  position?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationloginAsArgs = {
@@ -2288,6 +2333,11 @@ export type MutationupdatePetitionFieldCommentArgs = {
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
+export type MutationupdatePetitionFieldGroupRelationshipsArgs = {
+  petitionId: Scalars["GID"]["input"];
+  relationships: Array<UpdatePetitionFieldGroupRelationshipInput>;
+};
+
 export type MutationupdatePetitionFieldRepliesArgs = {
   petitionId: Scalars["GID"]["input"];
   replies: Array<UpdatePetitionFieldReplyInput>;
@@ -2743,6 +2793,7 @@ export type Petition = PetitionBase & {
   events: PetitionEventPagination;
   /** The number of fields in the petition. */
   fieldCount: Scalars["Int"]["output"];
+  fieldRelationships: Array<PetitionFieldGroupRelationship>;
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The template used for this petition */
@@ -2931,6 +2982,7 @@ export type PetitionBase = {
   emailSubject: Maybe<Scalars["String"]["output"]>;
   /** The number of fields in the petition. */
   fieldCount: Scalars["Int"]["output"];
+  fieldRelationships: Array<PetitionFieldGroupRelationship>;
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
@@ -3183,6 +3235,8 @@ export type PetitionField = {
   isFixed: Scalars["Boolean"]["output"];
   /** Determines if the field is visible by the recipients. */
   isInternal: Scalars["Boolean"]["output"];
+  isLinkedToProfileType: Scalars["Boolean"]["output"];
+  isLinkedToProfileTypeField: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
   /** A JSON object representing the math to be performed on the field */
@@ -3196,6 +3250,8 @@ export type PetitionField = {
   parent: Maybe<PetitionField>;
   petition: PetitionBase;
   position: Scalars["Int"]["output"];
+  profileType: Maybe<ProfileType>;
+  profileTypeField: Maybe<ProfileTypeField>;
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** Determines if the field requires approval. */
@@ -3273,6 +3329,13 @@ export type PetitionFieldGroupChildReply = {
   replies: Array<PetitionFieldReply>;
 };
 
+export type PetitionFieldGroupRelationship = {
+  id: Scalars["GID"]["output"];
+  leftSidePetitionField: PetitionField;
+  relationshipTypeWithDirection: ProfileRelationshipTypeWithDirection;
+  rightSidePetitionField: PetitionField;
+};
+
 export type PetitionFieldMini = {
   /** The ID of the petition field. */
   id: Scalars["GID"]["output"];
@@ -3298,6 +3361,7 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
+  associatedProfile: Maybe<Profile>;
   children: Maybe<Array<PetitionFieldGroupChildReply>>;
   /** The content of the reply. */
   content: Scalars["JSONObject"]["output"];
@@ -3791,6 +3855,7 @@ export type PetitionTemplate = PetitionBase & {
   emailSubject: Maybe<Scalars["String"]["output"]>;
   /** The number of fields in the petition. */
   fieldCount: Scalars["Int"]["output"];
+  fieldRelationships: Array<PetitionFieldGroupRelationship>;
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
@@ -5452,6 +5517,14 @@ export type UpdatePetitionFieldAutoSearchConfigInput = {
   date?: InputMaybe<Scalars["GID"]["input"]>;
   name: Array<Scalars["GID"]["input"]>;
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
+};
+
+export type UpdatePetitionFieldGroupRelationshipInput = {
+  direction: ProfileRelationshipDirection;
+  id?: InputMaybe<Scalars["GID"]["input"]>;
+  leftSidePetitionFieldId: Scalars["GID"]["input"];
+  profileRelationshipTypeId: Scalars["GID"]["input"];
+  rightSidePetitionFieldId: Scalars["GID"]["input"];
 };
 
 export type UpdatePetitionFieldInput = {

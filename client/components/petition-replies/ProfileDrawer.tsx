@@ -3,7 +3,7 @@ import { Box, Button, Flex, HStack, IconButton } from "@chakra-ui/react";
 import { AddIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
 import {
-  ProfileDrawer_PetitionFieldFragment,
+  ProfileDrawer_PetitionBaseFragment,
   ProfileDrawer_ProfileFragment,
   ProfileDrawer_profileDocument,
 } from "@parallel/graphql/__types";
@@ -21,7 +21,7 @@ interface ProfileDrawerProps {
   profileId: string;
   petitionId: string;
   profiles: ProfileDrawer_ProfileFragment[];
-  petitionFields: ProfileDrawer_PetitionFieldFragment[];
+  petition: ProfileDrawer_PetitionBaseFragment;
   onChangeProfile: (profileId: string | null) => void;
   onAssociateProfile: () => void;
   isReadOnly?: boolean;
@@ -38,7 +38,7 @@ export const ProfileDrawer = Object.assign(
       onAssociateProfile,
       isReadOnly,
       canAddProfiles,
-      petitionFields,
+      petition,
     },
     ref,
   ) {
@@ -98,7 +98,7 @@ export const ProfileDrawer = Object.assign(
             onRefetch={handleRefetchProfile}
             flex={1}
             minHeight={0}
-            petitionFields={petitionFields}
+            petition={petition}
             petitionId={petitionId}
             includeLinkToProfile
           />
@@ -108,30 +108,24 @@ export const ProfileDrawer = Object.assign(
   }),
   {
     fragments: {
-      get Profile() {
-        return gql`
-          fragment ProfileDrawer_Profile on Profile {
+      Profile: gql`
+        fragment ProfileDrawer_Profile on Profile {
+          id
+          name
+          profileType {
             id
             name
-            profileType {
-              id
-              name
-            }
-            ...ProfileSelect_Profile
           }
-          ${ProfileSelect.fragments.Profile}
-        `;
-      },
-      get PetitionField() {
-        return gql`
-          fragment ProfileDrawer_PetitionField on PetitionField {
-            id
-            ...ProfileForm_PetitionField
-          }
-
-          ${ProfileForm.fragments.PetitionField}
-        `;
-      },
+          ...ProfileSelect_Profile
+        }
+        ${ProfileSelect.fragments.Profile}
+      `,
+      PetitionBase: gql`
+        fragment ProfileDrawer_PetitionBase on PetitionBase {
+          ...ProfileForm_PetitionBase
+        }
+        ${ProfileForm.fragments.PetitionBase}
+      `,
     },
   },
 );

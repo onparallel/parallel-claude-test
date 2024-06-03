@@ -12,7 +12,7 @@ export function usePetitionMessagePlaceholderOptions({
   petition: usePetitionMessagePlaceholderOptions_PetitionBaseFragment;
 }): PlaceholderOption[] {
   const intl = useIntl();
-  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   return useMemo(() => {
     return [
       ...[

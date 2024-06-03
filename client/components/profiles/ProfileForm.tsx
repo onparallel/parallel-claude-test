@@ -24,7 +24,7 @@ import { ProfileField } from "@parallel/components/profiles/fields/ProfileField"
 import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
 import {
   PetitionFieldType,
-  ProfileForm_PetitionFieldFragment,
+  ProfileForm_PetitionBaseFragment,
   ProfileForm_ProfileFieldPropertyFragment,
   ProfileForm_ProfileFragment,
   ProfileForm_copyFileReplyToProfileFieldFileDocument,
@@ -61,7 +61,7 @@ export interface ProfileFormData {
 interface ProfileFormProps {
   profile: ProfileForm_ProfileFragment;
   overlapsIntercomBadge?: boolean;
-  petitionFields?: ProfileForm_PetitionFieldFragment[];
+  petition?: ProfileForm_PetitionBaseFragment;
   petitionId?: string;
   onRecover?: () => void;
   onRefetch: () => MaybePromise<void>;
@@ -104,7 +104,7 @@ export const ProfileForm = Object.assign(
       profile,
       onRefetch,
       overlapsIntercomBadge,
-      petitionFields,
+      petition,
       petitionId,
       onRecover,
       includeLinkToProfile,
@@ -168,7 +168,7 @@ export const ProfileForm = Object.assign(
 
     const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
 
-    const fieldsWithIndices = useAllFieldsWithIndices(petitionFields ?? []);
+    const fieldsWithIndices = useAllFieldsWithIndices(petition ?? { fields: [] });
 
     // with property.field.type === "BACKGROUND_CHECK" we don't need to check for alias
     const propertiesWithSuggestedFields = useMemo(
@@ -231,16 +231,10 @@ export const ProfileForm = Object.assign(
                         }
                         return null;
                       } else {
-                        const _content =
-                          prop?.field.type === "DATE"
-                            ? { value: content?.value || null }
-                            : isDefined(content?.value)
-                              ? content
-                              : null;
-
                         return {
                           profileTypeFieldId,
-                          content: _content,
+                          content:
+                            isDefined(content?.value) && content!.value !== "" ? content : null,
                           expiryDate:
                             content?.value && prop?.field.isExpirable
                               ? useValueAsExpiryDate
@@ -628,20 +622,22 @@ export const ProfileForm = Object.assign(
           ${this.ProfileFieldProperty}
         `;
       },
-      get PetitionField() {
+      get PetitionBase() {
         return gql`
-          fragment ProfileForm_PetitionField on PetitionField {
-            id
-            alias
-            ...useAllFieldsWithIndices_PetitionField
-            ...ProfileField_PetitionField
-            children {
+          fragment ProfileForm_PetitionBase on PetitionBase {
+            fields {
               id
               alias
               ...ProfileField_PetitionField
+              children {
+                id
+                alias
+                ...ProfileField_PetitionField
+              }
             }
+            ...useAllFieldsWithIndices_PetitionBase
           }
-          ${useAllFieldsWithIndices.fragments.PetitionField}
+          ${useAllFieldsWithIndices.fragments.PetitionBase}
           ${ProfileField.fragments.PetitionField}
         `;
       },

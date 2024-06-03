@@ -31,6 +31,7 @@ export function PetitionComposeShortTextSettings({
         >
           <Box flex={1}>
             <ShortTextFormatSelect
+              isDisabled={field.isLinkedToProfileTypeField}
               size="sm"
               data-testid="petition-compose-short-text-format-select"
               value={options.format}

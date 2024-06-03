@@ -44,7 +44,6 @@ import {
   ProfileRelationship,
   ProfileRelationshipTypeAllowedProfileType,
   ProfileRelationshipTypeDirection,
-  ProfileRelationshipTypeDirectionValues,
   ProfileStatus,
   ProfileType,
   ProfileTypeFieldPermission,
@@ -925,7 +924,7 @@ export class ProfileRepository extends BaseRepository {
 
     await this.from("petition_profile", t).whereIn("profile_id", ids).delete();
 
-    await this.from("profile_field_value")
+    await this.from("profile_field_value", t)
       .whereIn("profile_id", ids)
       .whereNull("deleted_at")
       .update({
@@ -933,12 +932,22 @@ export class ProfileRepository extends BaseRepository {
         deleted_by: deletedBy,
       });
 
-    await this.from("profile_field_file")
+    await this.from("profile_field_file", t)
       .whereIn("profile_id", ids)
       .whereNull("deleted_at")
       .update({
         deleted_at: this.now(),
         deleted_by: deletedBy,
+      });
+
+    await this.from("petition_field_reply", t)
+      .whereNull("deleted_at")
+      .whereNotNull("associated_profile_id")
+      .whereIn("associated_profile_id", ids)
+      .update({
+        associated_profile_id: null,
+        updated_at: this.now(),
+        updated_by: deletedBy,
       });
 
     await this.from("profile", t).whereIn("id", ids).whereNull("deleted_at").update({
@@ -1223,6 +1232,10 @@ export class ProfileRepository extends BaseRepository {
     user: User | null,
     t?: Knex.Transaction,
   ) {
+    if (unMaybeArray(events).length === 0) {
+      return;
+    }
+
     const profile = (await this.loadProfile(profileId))!;
     const [profileUpdatedEvent] = await this.raw<ProfileUpdatedEvent | null>(
       /* sql */ `
@@ -2261,38 +2274,32 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async profileRelationshipsAreAllowed(
-    profileId: number,
+    orgId: number,
     relationships: {
-      profileId: number;
+      leftSideProfileTypeId: number;
       profileRelationshipTypeId: number;
-      direction: ProfileRelationshipTypeDirection;
+      rightSideProfileTypeId: number;
     }[],
   ) {
-    const profile = (await this.loadProfile(profileId))!;
-    const relationshipProfileTypes = await this.loadProfileTypeForProfileId(
-      relationships.map((r) => r.profileId),
-    );
-
     // for the association to be possible we need to find 2 rows with the same relationship type id.
     // - 1st row will be with the left profile type id and direction LEFT_RIGHT
     // - 2nd row will be with the right profile type id and direction RIGHT_LEFT
     const allowedRelationships = await this.from("profile_relationship_type_allowed_profile_type")
-      .where("org_id", profile.org_id)
+      .where("org_id", orgId)
       .whereIn(
         "profile_relationship_type_id",
         relationships.map((r) => r.profileRelationshipTypeId),
       )
       .whereNull("deleted_at");
 
-    return relationships.every((r, relationshipIndex) => {
+    return relationships.every((r) => {
       const allowed = allowedRelationships.filter(
         (ar) =>
           ar.profile_relationship_type_id === r.profileRelationshipTypeId &&
-          ((ar.allowed_profile_type_id === profile.profile_type_id &&
-            ar.direction === r.direction) ||
-            (ar.allowed_profile_type_id === relationshipProfileTypes[relationshipIndex]!.id &&
-              ar.direction ===
-                ProfileRelationshipTypeDirectionValues.find((d) => d !== r.direction)!)),
+          ((ar.allowed_profile_type_id === r.leftSideProfileTypeId &&
+            ar.direction === "LEFT_RIGHT") ||
+            (ar.allowed_profile_type_id === r.rightSideProfileTypeId &&
+              ar.direction === "RIGHT_LEFT")),
       );
 
       return allowed.length === 2;
@@ -2306,9 +2313,10 @@ export class ProfileRepository extends BaseRepository {
   async createProfileRelationship(
     data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
     user: User,
+    ignoreConflicts = false,
     t?: Knex.Transaction,
   ) {
-    return await this.from("profile_relationship", t).insert(
+    const query = this.from("profile_relationship", t).insert(
       unMaybeArray(data).map((d) => ({
         ...d,
         created_by_user_id: user.id,
@@ -2316,6 +2324,12 @@ export class ProfileRepository extends BaseRepository {
       })),
       "*",
     );
+
+    if (ignoreConflicts) {
+      query.onConflict().ignore();
+    }
+
+    return await query;
   }
 
   async removeProfileRelationships(profileRelationshipIds: number[], user: User) {
@@ -2357,6 +2371,8 @@ export class ProfileRepository extends BaseRepository {
         .where((q) => {
           q.orWhereIn("left_side_profile_id", values).orWhereIn("right_side_profile_id", values);
         })
+        .orderBy("created_at", "asc")
+        .orderBy("id", "asc")
         .select("*");
 
       return values.map(

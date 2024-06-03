@@ -184,9 +184,9 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       const standardList =
         field.type === "SELECT" && field.options.standardList ? field.options.standardList : null;
 
-      return isReadOnly || hasLabels || standardList ? (
+      return field.isLinkedToProfileTypeField || isReadOnly || hasLabels || standardList ? (
         <>
-          {standardList ? (
+          {standardList && !field.isLinkedToProfileTypeField ? (
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.petition-field-options-list-editor.settings-standard-options-description"
@@ -197,7 +197,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
                 (<SettingsIcon />)
               </Text>
             </Text>
-          ) : hasLabels ? (
+          ) : hasLabels && !field.isLinkedToProfileTypeField ? (
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.petition-field-options-list-editor.settings-imported-options-description"
@@ -248,6 +248,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
           type
           optional
           options
+          isLinkedToProfileTypeField
         }
       `,
     },

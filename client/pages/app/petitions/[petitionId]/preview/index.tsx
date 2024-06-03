@@ -197,7 +197,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const goToPetition = useGoToPetition();
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
-  const allFieldsWithIndices = useAllFieldsWithIndices(petition.fields);
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition);
   const _validatePetitionFields = async () => {
     const { error, message, footer, fieldsWithIndices } = validatePetitionFields(
       allFieldsWithIndices,
@@ -730,7 +730,6 @@ const _fragments = {
       fields {
         id
         position
-        ...useAllFieldsWithIndices_PetitionField
         ...PreviewPetitionField_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
@@ -760,6 +759,7 @@ const _fragments = {
         timezone
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
+      ...useAllFieldsWithIndices_PetitionBase
       ...useGetPetitionPages_PetitionBase
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
@@ -779,7 +779,7 @@ const _fragments = {
     ${PetitionLayout.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
-    ${useAllFieldsWithIndices.fragments.PetitionField}
+    ${useAllFieldsWithIndices.fragments.PetitionBase}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
     ${LiquidScopeProvider.fragments.PetitionBase}

@@ -4,6 +4,7 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import {
   countBy,
+  difference,
   filter,
   groupBy,
   indexBy,
@@ -89,6 +90,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
   PetitionUserNotificationType,
+  ProfileRelationshipTypeDirection,
   PublicPetitionLink,
   TemplateDefaultPermission,
   User,
@@ -2242,6 +2244,14 @@ export class PetitionRepository extends BaseRepository {
         `User:${user.id}`,
         t,
       );
+
+      // delete every relationship with this fields
+      await this.deletePetitionFieldRelationshipsByFieldIds(
+        petitionId,
+        fields.map((f) => f.id),
+        `User:${user.id}`,
+        t,
+      );
     });
   }
 
@@ -2468,14 +2478,25 @@ export class PetitionRepository extends BaseRepository {
     return petition;
   }
 
-  async updatePetitionFieldReplyMetadata(replyId: number, metadata: any) {
+  async updatePetitionFieldReply(
+    replyId: number,
+    data: Partial<PetitionFieldReply>,
+    updatedBy: string,
+  ) {
     const field = await this.loadFieldForReply(replyId);
     if (!field) {
       throw new Error("Petition field not found");
     }
     const [reply] = await this.from("petition_field_reply")
       .where("id", replyId)
-      .update({ metadata }, "*");
+      .update(
+        {
+          ...data,
+          updated_by: updatedBy,
+          updated_at: this.now(),
+        },
+        "*",
+      );
     return reply;
   }
 
@@ -2651,65 +2672,17 @@ export class PetitionRepository extends BaseRepository {
       // if not disabled it will seq scan petition_field_reply rather than using the index on petition_field_id
       await t.raw(/* sql */ `set local enable_seqscan = off;`);
       return await this.raw<
-        Pick<
-          PetitionField,
-          | "petition_id"
-          | "id"
-          | "title"
-          | "description"
-          | "from_petition_field_id"
-          | "is_internal"
-          | "position"
-          | "type"
-          | "options"
-          | "visibility"
-          | "math"
-          | "optional"
-          | "parent_petition_field_id"
-          | "alias"
-          | "multiple"
-        > & {
-          replies: Pick<
-            PetitionFieldReply,
-            | "id"
-            | "type"
-            | "status"
-            | "content"
-            | "anonymized_at"
-            | "petition_field_id"
-            | "parent_petition_field_reply_id"
-          >[];
+        PetitionField & {
+          replies: PetitionFieldReply[];
         }
       >(
         /* sql */ `
         select
-          pf.petition_id,
-          pf.id,
-          pf.title,
-          pf.description,
-          pf.from_petition_field_id,
-          pf.is_internal,
-          pf.position,
-          pf.type,
-          pf.options,
-          pf.visibility,
-          pf.math,
-          pf.optional,
-          pf.parent_petition_field_id,
-          pf.alias,
-          pf.multiple,
+          pf.*,
           coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
             case when count(*) filter (where pfr.id is not null) > 0 then
               jsonb_agg(
-                jsonb_build_object(
-                  'id', pfr.id,
-                  'type', pfr.type,
-                  'content', pfr.content,
-                  'status', pfr.status,
-                  'anonymized_at', pfr.anonymized_at,
-                  'petition_field_id', pfr.petition_field_id,
-                  'parent_petition_field_reply_id', pfr.parent_petition_field_reply_id  
-                ) order by pfr.created_at asc
+                pfr.* order by pfr.created_at asc
               ) filter (
                 -- when file field types, filter replies with upload_complete
                 where
@@ -3013,65 +2986,127 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
 
-      const fields = await this.loadAllFieldsByPetitionId(petitionId);
+      const columns = difference(
+        [
+          "id",
+          "petition_id",
+          "position",
+          "type",
+          "title",
+          "description",
+          "optional",
+          "multiple",
+          "options",
+          "created_at",
+          "created_by",
+          "updated_at",
+          "updated_by",
+          "deleted_at",
+          "deleted_by",
+          "is_fixed",
+          "visibility",
+          "from_petition_field_id",
+          "alias",
+          "is_internal",
+          "show_in_pdf",
+          "has_comments_enabled",
+          "show_activity_in_pdf",
+          "require_approval",
+          "parent_petition_field_id",
+          "math",
+          "profile_type_id",
+          "profile_type_field_id",
+        ],
+        [
+          "id",
+          "petition_id",
+          "created_at",
+          "created_by",
+          "updated_at",
+          "updated_by",
+          "deleted_at",
+          "deleted_by",
+          "from_petition_field_id",
+          "parent_petition_field_id",
+        ],
+      );
 
-      const clonedFields =
-        fields.length === 0
-          ? []
-          : await this.insert(
-              "petition_field",
-              fields.map((field) => {
-                let fromPetitionFieldId: Maybe<number>;
-                if (data.is_template ?? sourcePetition.is_template) {
-                  fromPetitionFieldId = null;
-                } else {
-                  fromPetitionFieldId = sourcePetition.is_template
-                    ? field.id
-                    : field.from_petition_field_id;
-                }
-                return {
-                  ...omit(field, ["id", "petition_id", "created_at", "updated_at", "math"]),
-                  math: field.math ? this.json(field.math) : null,
-                  petition_id: cloned.id,
-                  from_petition_field_id: fromPetitionFieldId,
-                  created_by: createdBy,
-                  updated_by: createdBy,
-                };
-              }),
-              t,
-            ).returning("*");
+      const clonedFields = await this.raw<PetitionField & { from_id: number }>(
+        /* sql */ `
+        with all_petition_fields as (
+          select *
+          from petition_field
+          where petition_id = :petitionId and deleted_at is null
+        ),
+        -- insert fields without a parent
+        no_parent_petition_fields as (
+          insert into petition_field(${columns.join(", ")}, petition_id, created_by, updated_by, from_petition_field_id, parent_petition_field_id)
+          select ${columns.map((c) => `apf.${c}`).join(", ")},
+            :newPetitionId as petition_id, :createdBy as created_by, :createdBy as updated_by, :fromPetitionFieldId as from_petition_field_id, null as parent_petition_field_id
+          from all_petition_fields apf
+          where apf.parent_petition_field_id is null
+          returning *
+        ),
+        -- map ids for newly created fields
+        no_parent_petition_fields_map as (
+          select apf.id as old_id, nppf.id as new_id
+          from all_petition_fields apf join no_parent_petition_fields nppf on apf.position = nppf.position
+          where apf.parent_petition_field_id is null
+        ),
+        -- insert fields with a parent
+        child_petition_fields as (
+          insert into petition_field(${columns.join(", ")}, petition_id, created_by, updated_by, from_petition_field_id, parent_petition_field_id)
+          select ${columns.map((c) => `apf.${c}`).join(", ")},
+            :newPetitionId as petition_id, :createdBy as created_by, :createdBy as updated_by, :fromPetitionFieldId as from_petition_field_id, nppfm.new_id as parent_petition_field_id
+          from all_petition_fields apf join no_parent_petition_fields_map nppfm on apf.parent_petition_field_id = nppfm.old_id
+          where apf.parent_petition_field_id is not null
+          returning *
+        ),
+        -- map ids for newly created fields
+        child_petition_fields_map as (
+          select apf.id as old_id, cpf.id as new_id
+          from all_petition_fields apf join no_parent_petition_fields_map nppfm on apf.parent_petition_field_id = nppfm.old_id
+          join child_petition_fields cpf on apf.position = cpf.position and cpf.parent_petition_field_id = nppfm.new_id
+          where apf.parent_petition_field_id is not null
+        ),
+        -- clone any petition_field_group_relationship
+        _pfgr as (
+          insert into petition_field_group_relationship(petition_id, left_side_petition_field_id, right_side_petition_field_id, profile_relationship_type_id, direction, created_by)
+          select
+            :newPetitionId as petition_id,
+            l_nppfm.new_id as left_side_petition_field_id,
+            r_nppfm.new_id as right_side_petition_field_id,
+            pfgr.profile_relationship_type_id,
+            pfgr.direction,
+            :createdBy as created_by
+          from petition_field_group_relationship pfgr
+          join no_parent_petition_fields_map l_nppfm on pfgr.left_side_petition_field_id = l_nppfm.old_id
+          join no_parent_petition_fields_map r_nppfm on pfgr.right_side_petition_field_id = r_nppfm.old_id
+          where pfgr.petition_id = :petitionId and pfgr.deleted_at is null
+        )
+        select nppf.*, nppfm.old_id as from_id from no_parent_petition_fields nppf join no_parent_petition_fields_map nppfm on nppf.id = nppfm.new_id
+        union
+        select cpf.*, cpfm.old_id as from_id from child_petition_fields cpf join child_petition_fields_map cpfm on cpf.id = cpfm.new_id
+      `,
+        {
+          petitionId,
+          newPetitionId: cloned.id,
+          createdBy,
+          fromPetitionFieldId:
+            data.is_template ?? sourcePetition.is_template
+              ? this.knex.raw(`null`)
+              : sourcePetition.is_template
+                ? this.knex.raw(`apf.id`)
+                : this.knex.raw(`apf.from_petition_field_id`),
+        },
+        t,
+      );
 
       if (!cloned.is_template) {
         // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
         await this.createEmptyFieldGroupReply(
           clonedFields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
           owner,
-          t,
-        );
-      }
-
-      // update parent_petition_field_id of new cloned children fields
-      const clonedChildren = clonedFields.filter((f) => isDefined(f.parent_petition_field_id));
-      if (clonedChildren.length > 0) {
-        await this.raw<PetitionField>(
-          /* sql */ `
-          update petition_field as pf set
-            parent_petition_field_id = t.parent_petition_field_id
-          from (?) as t (id, parent_petition_field_id)
-          where t.id = pf.id
-          returning *;
-        `,
-          [
-            this.sqlValues(
-              clonedChildren.map((child) => {
-                const [, newParentField] = zip(fields, clonedFields).find(([field]) => {
-                  return field.id === child.parent_petition_field_id;
-                })!;
-                return [child.id, newParentField.id];
-              }),
-              ["int", "int"],
-            ),
-          ],
           t,
         );
       }
@@ -3127,12 +3162,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       // map[old field id] = cloned field id
-      const newFieldIds = Object.fromEntries(
-        zip(
-          fields.map((f) => f.id),
-          clonedFields.map((f) => f.id),
-        ),
-      );
+      const newFieldIds = Object.fromEntries(clonedFields.map((f) => [f.from_id, f.id]));
 
       // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
       const rteUpdateData: Partial<Petition> = {};
@@ -3285,9 +3315,13 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      if (fields.length > 0) {
+      if (clonedFields.length > 0) {
         // copy field attachments to new fields, making a copy of the file_upload
-        await this.cloneFieldAttachments(fields, newFieldIds, t);
+        await this.cloneFieldAttachments(
+          clonedFields.map((f) => f.from_id),
+          newFieldIds,
+          t,
+        );
       }
 
       await this.clonePetitionAttachments(petitionId, cloned.id, createdBy, t);
@@ -3369,13 +3403,11 @@ export class PetitionRepository extends BaseRepository {
   }
 
   private async cloneFieldAttachments(
-    fields: PetitionField[],
+    fieldIds: number[],
     newIds: Record<string, number>,
     t?: Knex.Transaction,
   ) {
-    const attachmentsByFieldId = (
-      await this.loadFieldAttachmentsByFieldId(fields.map((f) => f.id))
-    ).flat();
+    const attachmentsByFieldId = (await this.loadFieldAttachmentsByFieldId(fieldIds)).flat();
 
     await pMap(attachmentsByFieldId, async (attachment) => {
       // for each existing attachment, clone its file_upload and insert a new field_attachment on the new field
@@ -4504,6 +4536,26 @@ export class PetitionRepository extends BaseRepository {
       comments.map((c) => c.id),
       t,
     );
+  }
+
+  private async deletePetitionFieldRelationshipsByFieldIds(
+    petitionId: number,
+    fieldIds: number[],
+    deletedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    await this.from("petition_field_group_relationship", t)
+      .where("petition_id", petitionId)
+      .whereNull("deleted_at")
+      .where((q) =>
+        q
+          .whereIn("left_side_petition_field_id", fieldIds)
+          .orWhereIn("right_side_petition_field_id", fieldIds),
+      )
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
   }
 
   async deleteCommentCreatedNotifications(
@@ -8070,5 +8122,172 @@ export class PetitionRepository extends BaseRepository {
         isDefined(f?.parent_petition_field_id) &&
         (!isDefined(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
     );
+  }
+
+  readonly loadPetitionFieldGroupRelationshipsByPetitionId = this.buildLoadMultipleBy(
+    "petition_field_group_relationship",
+    "petition_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc").orderBy("id", "asc"),
+  );
+
+  readonly loadPetitionFieldGroupRelationship = this.buildLoadBy(
+    "petition_field_group_relationship",
+    "id",
+    (q) => q.whereNull("deleted_at"),
+  );
+
+  async getPetitionFieldGroupRelationshipsByPetitionFieldId(
+    petitionId: number,
+    petitionFieldId: number,
+  ) {
+    return await this.from("petition_field_group_relationship")
+      .where("petition_id", petitionId)
+      .where((q) =>
+        q
+          .where("left_side_petition_field_id", petitionFieldId)
+          .orWhere("right_side_petition_field_id", petitionFieldId),
+      )
+      .whereNull("deleted_at")
+      .orderBy("created_at", "asc")
+      .orderBy("id", "asc");
+  }
+
+  async resetPetitionFieldGroupRelationships(
+    petitionId: number,
+    relationships: {
+      id?: number | null;
+      leftSidePetitionFieldId: number;
+      rightSidePetitionFieldId: number;
+      profileRelationshipTypeId: number;
+      direction: ProfileRelationshipTypeDirection;
+    }[],
+    updatedBy: string,
+  ) {
+    // if relationships array is empty, remove every relationship
+    if (relationships.length === 0) {
+      await this.from("petition_field_group_relationship")
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .update({
+          deleted_at: this.now(),
+          deleted_by: updatedBy,
+        });
+
+      return;
+    }
+
+    const [relationshipsWithId, relationshipsNoId] = partition(relationships, (r) =>
+      isDefined(r.id),
+    );
+
+    // 1st, remove every relationship not present in array,
+    // excluding the ones with id that will be updated in 2nd step
+    await this.raw(
+      /* sql */ `
+      with rows_for_delete as (
+        select
+          left_side_petition_field_id,
+          right_side_petition_field_id,
+          profile_relationship_type_id,
+          direction
+        from petition_field_group_relationship
+        where 
+          deleted_at is null  
+          and petition_id = ?
+          ${relationshipsWithId.length > 0 ? /* sql */ `and id not in ?` : ""}
+        except
+        select 
+          * 
+        from (?) as t(left_side_petition_field_id, right_side_petition_field_id, profile_relationship_type_id, direction)
+      )
+      update petition_field_group_relationship pfgr
+      set 
+        deleted_at = now(),
+        deleted_by = ?
+      from rows_for_delete rfd
+      where
+        pfgr.left_side_petition_field_id = rfd.left_side_petition_field_id
+        and pfgr.right_side_petition_field_id = rfd.right_side_petition_field_id
+        and pfgr.profile_relationship_type_id = rfd.profile_relationship_type_id
+        and pfgr.direction = rfd.direction
+        and pfgr.deleted_at is null
+        and pfgr.petition_id = ?
+    `,
+      [
+        petitionId,
+        relationshipsWithId.length > 0 ? this.sqlIn(relationshipsWithId.map((r) => r.id!)) : null,
+        this.sqlValues(
+          relationships.map((r) => [
+            r.leftSidePetitionFieldId,
+            r.rightSidePetitionFieldId,
+            r.profileRelationshipTypeId,
+            r.direction,
+          ]),
+          ["int", "int", "int", "profile_relationship_type_direction"],
+        ),
+        updatedBy,
+        petitionId,
+      ].filter(isDefined),
+    );
+
+    // 2nd, update relationships that contain the id
+    if (relationshipsWithId.length > 0) {
+      await this.raw(
+        /* sql */ `
+        with rows_for_update as (
+          select * from (?) as t(id, left_side_petition_field_id, right_side_petition_field_id, profile_relationship_type_id, direction)
+        )
+        update petition_field_group_relationship pfgr
+        set 
+          left_side_petition_field_id = rfu.left_side_petition_field_id,
+          right_side_petition_field_id = rfu.right_side_petition_field_id,
+          profile_relationship_type_id = rfu.profile_relationship_type_id,
+          direction = rfu.direction,
+          updated_at = now(),
+          updated_by = ?
+        from rows_for_update rfu
+        where pfgr.id = rfu.id;
+      `,
+        [
+          this.sqlValues(
+            relationshipsWithId.map((r) => [
+              r.id!,
+              r.leftSidePetitionFieldId,
+              r.rightSidePetitionFieldId,
+              r.profileRelationshipTypeId,
+              r.direction,
+            ]),
+            ["int", "int", "int", "int", "profile_relationship_type_direction"],
+          ),
+          updatedBy,
+        ],
+      );
+    }
+
+    // 3rd, relationships with no id will be inserted, ignoring conflicts
+    if (relationshipsNoId.length > 0) {
+      await this.raw(
+        /* sql */ `
+          ? 
+          on conflict (petition_id, left_side_petition_field_id, right_side_petition_field_id, profile_relationship_type_id, direction) 
+          where deleted_at is null
+          do nothing;
+        `,
+        [
+          this.from("petition_field_group_relationship").insert(
+            relationshipsNoId.map((r) => ({
+              petition_id: petitionId,
+              left_side_petition_field_id: r.leftSidePetitionFieldId,
+              right_side_petition_field_id: r.rightSidePetitionFieldId,
+              profile_relationship_type_id: r.profileRelationshipTypeId,
+              direction: r.direction,
+              created_at: this.now(),
+              created_by: updatedBy,
+              updated_by: updatedBy,
+            })),
+          ),
+        ],
+      );
+    }
   }
 }

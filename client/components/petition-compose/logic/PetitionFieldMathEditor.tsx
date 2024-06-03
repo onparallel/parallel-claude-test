@@ -51,7 +51,7 @@ const MAX_CONDITIONS = 10;
 const MAX_OPERATIONS = 10;
 
 export function PetitionFieldMathEditor({
-  field,
+  field: _field,
   petition,
   onMathChange,
   showErrors,
@@ -62,6 +62,7 @@ export function PetitionFieldMathEditor({
     () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
     [petition.fields],
   );
+  const field = allFields.find((f) => f.id === _field.id)!;
   const getDefaultMath = () => {
     const index = allFields.findIndex((f) => f.id === field.id);
     const referencedField =
@@ -499,15 +500,7 @@ PetitionFieldMathEditor.fragments = {
   PetitionField: gql`
     fragment PetitionFieldMathEditor_PetitionField on PetitionField {
       id
-      type
-      options
-      visibility
       math
-      parent {
-        id
-      }
-      ...PetitionFieldLogicContext_PetitionField
     }
-    ${PetitionFieldLogicContext.fragments.PetitionField}
   `,
 };

@@ -380,6 +380,16 @@
     "context": "Enter a meaningful name for the view"
   },
   {
+    "term": "component.associate-and-fill-profile-to-parallel-dialog.body",
+    "definition": "Selecciona en qué perfil quieres guardar la información de cada grupo.",
+    "context": "Select in which profile you want to save the information of each group."
+  },
+  {
+    "term": "component.associate-and-fill-profile-to-parallel-dialog.header",
+    "definition": "Asociar {count, plural, =1{perfil} other{perfiles}}",
+    "context": "Associate {count, plural, =1{profile} other{profiles}}"
+  },
+  {
     "term": "component.associate-petition-to-profile-dialog.associate",
     "definition": "Asociar",
     "context": "Associate"
@@ -805,6 +815,11 @@
     "context": "When finishing, the parallel will remain closed. You can come back anytime to review the information."
   },
   {
+    "term": "component.close-petition-dialog.subheading-with-profiles",
+    "definition": "Continúa para cerrar el parallel y guardar la información en perfiles.",
+    "context": "Continue to close the parallel and save the information in profiles."
+  },
+  {
     "term": "component.close-profile-dialog.alert-description",
     "definition": "Si un perfil tiene alertas, al cerrarlo se desactivarán.",
     "context": "If a profile has alerts, they will be disabled upon closing it."
@@ -930,6 +945,16 @@
     "context": "Type of search"
   },
   {
+    "term": "component.configure-expirations-date-dialog.body",
+    "definition": "Añade el vencimiento de las siguientes propiedades de <b>{profileName}</b>:",
+    "context": "Adds the expiration date of the following <b>{profileName}</b> properties:"
+  },
+  {
+    "term": "component.configure-expirations-date-dialog.header",
+    "definition": "Configurar vencimientos",
+    "context": "Configure expirations date"
+  },
+  {
     "term": "component.configure-reminder-settings-dialog.header",
     "definition": "Configurar recordatorios automáticos",
     "context": "Configure automatic reminders"
@@ -948,6 +973,21 @@
     "term": "component.confirm-activate-user-dialog.body",
     "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "component.confirm-close-archive-reply-into-profile-dialog.body",
+    "definition": "Tienes perfiles seleccionados sin guardar. Si no guardas ahora podrás volver desde el botón de Asociar perfiles. ¿Quieres continuar sin guardar?",
+    "context": "You have selected profiles without saving. If you don't save now you can go back from the Associate profiles button. Do you want to continue without saving?"
+  },
+  {
+    "term": "component.confirm-close-archive-reply-into-profile-dialog.header",
+    "definition": "Información sin guardar",
+    "context": "Unsaved information"
+  },
+  {
+    "term": "component.confirm-close-archive-reply-into-profile-dialog.reopen-and-save-button",
+    "definition": "Reabrir y guardar",
+    "context": "Reopen and save"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body",
@@ -1903,6 +1943,46 @@
     "term": "component.create-or-update-document-theme-dialog.set-default-label",
     "definition": "Establecer como tema por defecto",
     "context": "Set as default theme"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.add-group",
+    "definition": "Añadir grupo",
+    "context": "Add group"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.body",
+    "definition": "Asocia grupos de {isTemplate, select, true{esta plantilla} other{este parallel}} para crear relaciones automáticamente al crear el perfil.",
+    "context": "Associate groups from this {isTemplate, select, true{template} other{parallel}} to create relationships automatically when creating the profile."
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.duplicated-relationship",
+    "definition": "Esta asociación está duplicada",
+    "context": "This association is duplicated"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.field-group",
+    "definition": "Grupo",
+    "context": "Group"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.header",
+    "definition": "Configurar relaciones entre grupos",
+    "context": "Set up relationships between groups"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.header-updating",
+    "definition": "Grupos asociados",
+    "context": "Associated groups"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.relationship-with",
+    "definition": "Relación con",
+    "context": "Relationship with"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.select-a-group",
+    "definition": "Selecciona un grupo...",
+    "context": "Select a group..."
   },
   {
     "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description",
@@ -3580,6 +3660,51 @@
     "context": "Limit exceeded"
   },
   {
+    "term": "component.link-group-to-profile-type-dialog.body",
+    "definition": "Elige un tipo de perfil para añadir sus campos en este grupo.",
+    "context": "Select a profile type to add its fields to this group."
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.delete-profile-fields",
+    "definition": "Elimina los campos de perfil y las relaciones añadidas para cambiar el tipo de perfil.",
+    "context": "Delete the profile fields and the relationships added to change the profile type."
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.group-name",
+    "definition": "Nombre del grupo",
+    "context": "Group name"
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.group-name-help-popover-1",
+    "definition": "Dale un nombre a los grupos de preguntas para facilitar su identificación.",
+    "context": "Name your question groups for easier identification."
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.group-name-help-popover-2",
+    "definition": "Por ejemplo, si el nombre es \"Administrador\", los grupos se llamarán Administrador 1, Administrador 2, etc. ",
+    "context": "For example, if the name is \"Administrator\", the groups will be called Administrator 1, Administrator 2, and so on."
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.group-name-placeholder",
+    "definition": "Ej: Cliente",
+    "context": "E.g., Client"
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.header",
+    "definition": "Vincular con perfiles",
+    "context": "Link to profiles"
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.more-about-profiles-help-link",
+    "definition": "Más sobre perfiles",
+    "context": "More about profiles"
+  },
+  {
+    "term": "component.link-group-to-profile-type-dialog.profile-type-label",
+    "definition": "Tipo de perfil",
+    "context": "Profile type"
+  },
+  {
     "term": "component.loading-dynamic-text.calculating-average-times",
     "definition": "Calculando tiempos medios con la calculadora...",
     "context": "Calculating average times with a calculator..."
@@ -4665,9 +4790,29 @@
     "context": "If you choose \"Relative\", groups will be labeled “Relative 1”, “Relative 2” and so on. If left unnamed, groups default to “Reply 1”, “Reply 2”, etc."
   },
   {
+    "term": "component.petition-compose-field-group-settings.group-name-linked",
+    "definition": "Grupo vinculado con <b>{profileTypeName}</b>",
+    "context": "Group linked to <b>{profileTypeName}</b>"
+  },
+  {
     "term": "component.petition-compose-field-group-settings.input-group-name-placeholder",
     "definition": "Ej: Familiar",
     "context": "E.g., Family member"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.no-relationships",
+    "definition": "Sin relaciones",
+    "context": "No relationships"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.number-of-relationships",
+    "definition": "{count, plural, =1 {1 relación añadida} other {# relaciónes añadidas}}",
+    "context": "{count, plural, =1 {1 relationship added} other {# relationships added}}"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.set-up-relationships",
+    "definition": "Configurar relaciones",
+    "context": "Set up relationships"
   },
   {
     "term": "component.petition-compose-field-list.add-field",
@@ -4955,6 +5100,11 @@
     "context": "Visibility conditions"
   },
   {
+    "term": "component.petition-compose-group-children.add-field",
+    "definition": "Añadir...",
+    "context": "Add..."
+  },
+  {
     "term": "component.petition-compose-heading-settings.description",
     "definition": "Activar esta opción creará una nueva página que usará este campo como encabezado.",
     "context": "Enabling this will create a new page and use this as the heading of the new page"
@@ -5008,6 +5158,41 @@
     "term": "component.petition-compose-new-field.empty-search-text",
     "definition": "No se han encontrado coincidencias con tu búsqueda.",
     "context": "No matches found for your search."
+  },
+  {
+    "term": "component.petition-compose-new-field.link-to-profile",
+    "definition": "Vincular con perfil",
+    "context": "Link to profile"
+  },
+  {
+    "term": "component.petition-compose-new-field.linked-profile",
+    "definition": "Perfil vinculado",
+    "context": "Linked profile"
+  },
+  {
+    "term": "component.petition-compose-new-field.new-field",
+    "definition": "Nuevo campo",
+    "context": "New field"
+  },
+  {
+    "term": "component.petition-compose-new-field.no-profile-type-body",
+    "definition": "Vincula este grupo con un perfil para añadir sus campos.",
+    "context": "Link this group with a profile to add its fields."
+  },
+  {
+    "term": "component.petition-compose-new-field.no-profile-type-title",
+    "definition": "¿Qué tipo de perfil necesitas?",
+    "context": "What type of profile do you need?"
+  },
+  {
+    "term": "component.petition-compose-new-field.profile-fields",
+    "definition": "Campos de perfil",
+    "context": "Profile fields"
+  },
+  {
+    "term": "component.petition-compose-new-field.set-up-relationships",
+    "definition": "Configurar relaciones",
+    "context": "Set up relationships"
   },
   {
     "term": "component.petition-compose-new-field.what-do-you-need",
@@ -6946,8 +7131,13 @@
   },
   {
     "term": "component.profile-select.create-new-profile",
-    "definition": "Crear nuevo perfil para: <b>{label}</b>",
+    "definition": "Crear perfil nuevo para: <b>{label}</b>",
     "context": "Create new profile for: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-select.create-new-profile-no-name",
+    "definition": "Crear perfil nuevo",
+    "context": "Create new profile"
   },
   {
     "term": "component.profile-select.placeholder",
@@ -8460,6 +8650,11 @@
     "context": "All times are counted from the previous step, not with respect to the total."
   },
   {
+    "term": "component.resolve-profile-properties-conflicts-dialog.no-value",
+    "definition": "Sin valor",
+    "context": "No value"
+  },
+  {
     "term": "component.restrict-petition.optional-password-label",
     "definition": "Contraseña (Opcional)",
     "context": "Password (Optional)"
@@ -8493,6 +8688,16 @@
     "term": "component.restricted-feature-popover.restricted",
     "definition": "Está funcionalidad está limitada.",
     "context": "This feature is restricted."
+  },
+  {
+    "term": "component.restricted-profile-properties-dialog.body",
+    "definition": "Hay algunas propiedades que no tienen permisos de escritura, por lo tanto la información no se guardará ni se actualizará. ¿Deseas continuar?",
+    "context": "There are some properties that do not have write permissions, so the information will neither be saved nor updated. Do you want to continue?"
+  },
+  {
+    "term": "component.restricted-profile-properties-dialog.header",
+    "definition": "Propiedades sin permisos",
+    "context": "Properties without permissions"
   },
   {
     "term": "component.rich-text-editor.add-link-header",
@@ -9645,6 +9850,21 @@
     "context": "Configure expiration date"
   },
   {
+    "term": "component.update-profile-properties-dialog.body",
+    "definition": "Las siguientes propiedades del perfil de <b>{profileName}</b> ya contienen información.",
+    "context": "The following properties of <b>{profileName}</b> profile already contain information."
+  },
+  {
+    "term": "component.update-profile-properties-dialog.body-2",
+    "definition": "Selecciona el valor que quieras conservar:",
+    "context": "Select the value you want to keep:"
+  },
+  {
+    "term": "component.update-profile-properties-dialog.header",
+    "definition": "Actualizar propiedades",
+    "context": "Update properties"
+  },
+  {
     "term": "component.update-profile-type-field-dialog.is-expirable-description",
     "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
     "context": "Select if these properties have an expiration date (e.g., passports and contracts)."
@@ -9813,6 +10033,21 @@
     "term": "component.use-expiration-options.do-not-remember",
     "definition": "No recordar",
     "context": "Do not remember"
+  },
+  {
+    "term": "component.use-profile-properties-columns.current-value",
+    "definition": "Valor actual",
+    "context": "Current value"
+  },
+  {
+    "term": "component.use-profile-properties-columns.new-value",
+    "definition": "Nuevo valor",
+    "context": "New value"
+  },
+  {
+    "term": "component.use-profile-properties-columns.property-name",
+    "definition": "Propiedad",
+    "context": "Property"
   },
   {
     "term": "component.use-start-signature-request.edit-signers",
@@ -13350,6 +13585,11 @@
     "context": "Associate profile"
   },
   {
+    "term": "page.replies.associate-profile-button-linked-groups",
+    "definition": "Asociar {total, plural, =1{perfil} other{perfiles}} {current}/{total}",
+    "context": "Associate {total, plural, =1{profile} other{profiles}} {current}/{total}"
+  },
+  {
     "term": "page.replies.export-replies",
     "definition": "Exportar respuestas",
     "context": "Export replies"
@@ -13365,24 +13605,14 @@
     "context": "List of contents"
   },
   {
-    "term": "page.replies.message-sent-toast-description",
-    "definition": "El mensaje está en camino",
-    "context": "The message is on it's way"
+    "term": "page.replies.parallel-closed-toast-description",
+    "definition": "Se ha notificado al destinatario.",
+    "context": "The recipient has been notified."
   },
   {
-    "term": "page.replies.message-sent-toast-header",
-    "definition": "Mensaje enviado",
-    "context": "Message sent"
-  },
-  {
-    "term": "page.replies.notify-petition-reviewed-button",
-    "definition": "Notificar que está correcto",
-    "context": "Notify that it is correct"
-  },
-  {
-    "term": "page.replies.open-profile-button",
-    "definition": "Abrir perfil",
-    "context": "Open profile"
+    "term": "page.replies.parallel-closed-toast-header",
+    "definition": "Parallel cerrado",
+    "context": "Parallel closed"
   },
   {
     "term": "page.replies.summary-header",

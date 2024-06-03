@@ -21,6 +21,7 @@ import {
   DeleteIcon,
   DragHandleIcon,
   PaperclipIcon,
+  ProfilesIcon,
   SettingsIcon,
   UnlinkIcon,
 } from "@parallel/chakra/icons";
@@ -29,12 +30,10 @@ import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_PetitionBaseFragment,
   PetitionComposeField_PetitionFieldFragment,
-  PetitionComposeField_UserFragment,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
-  PetitionField,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -83,20 +82,26 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { ChevronFilledIcon } from "@parallel/chakra/icons";
+import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import usePrevious from "@react-hook/previous";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
+import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
+export type PetitionComposeFieldSelection =
+  | PetitionComposeField_PetitionFieldFragment
+  | Omit<UnwrapArray<Assert<PetitionComposeField_PetitionFieldFragment["children"]>>, "children">;
+
 export interface PetitionComposeFieldProps {
-  user: PetitionComposeField_UserFragment;
   petition: PetitionComposeField_PetitionBaseFragment;
-  field: PetitionComposeField_PetitionFieldFragment;
+  field: PetitionComposeFieldSelection;
   fieldIndex: PetitionFieldIndex;
   childrenFieldIndices?: string[] | undefined;
   fieldRefs?: MultipleRefObject<PetitionComposeFieldRef>;
@@ -131,7 +136,7 @@ export interface PetitionComposeFieldProps {
   onUpdateFieldPositions: (fieldIds: string[], parentFieldId?: string) => void;
   onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
   onLinkField?: (parentFieldId: string, childrenFieldIds: string[]) => void;
-  showAddField?: (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => void;
+  showAddField: (fieldId?: string, parentFieldId?: string, focusSearchInput?: boolean) => void;
   isReadOnly?: boolean;
 }
 
@@ -147,7 +152,6 @@ const _PetitionComposeField = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeField(
   {
-    user,
     petition,
     field,
     fieldIndex,
@@ -179,12 +183,11 @@ const _PetitionComposeField = chakraForwardRef<
   ref,
 ) {
   const intl = useIntl();
-  const isChildren = field.parent?.id !== undefined;
   const { elementRef, dragRef, previewRef, isDragging, isOverCurrent } = useDragAndDrop(
     field.id,
     index,
     onMove,
-    field.isFixed ? "FIXED_FIELD" : isChildren ? "CHILDREN_FIELD" : "FIELD",
+    field.isFixed ? "FIXED_FIELD" : field.isChild ? "CHILDREN_FIELD" : "FIELD",
     field.type,
   );
 
@@ -438,7 +441,7 @@ const _PetitionComposeField = chakraForwardRef<
           ) : null}
           <Box
             ref={previewRef}
-            className={isChildren ? "petition-compose-field-children" : "petition-compose-field"}
+            className={field.isChild ? "petition-compose-field-children" : "petition-compose-field"}
             display="flex"
             flexDirection="row"
             opacity={isDragging ? 0 : 1}
@@ -535,7 +538,6 @@ const _PetitionComposeField = chakraForwardRef<
                   paddingTop={2}
                   paddingBottom={10}
                   paddingEnd={4}
-                  user={user}
                   petition={petition}
                   field={field}
                   index={index}
@@ -562,7 +564,7 @@ const _PetitionComposeField = chakraForwardRef<
                   field={field}
                   isActive={isActive}
                   canChangeVisibility={
-                    isChildren ? canChangeVisibility && index > 0 : canChangeVisibility
+                    field.isChild ? canChangeVisibility && index > 0 : canChangeVisibility
                   }
                   onCloneField={onCloneField}
                   onSettingsClick={onSettingsClick}
@@ -570,7 +572,7 @@ const _PetitionComposeField = chakraForwardRef<
                   onVisibilityClick={onFieldVisibilityClick}
                   onFieldCalculationsClick={onFieldCalculationsClick}
                   onAttachmentClick={open}
-                  className={isChildren ? "field-actions-children" : "field-actions"}
+                  className={field.isChild ? "field-actions-children" : "field-actions"}
                   position="absolute"
                   bottom={0}
                   insetEnd={2}
@@ -583,8 +585,7 @@ const _PetitionComposeField = chakraForwardRef<
                 <PetitionComposeFieldGroupChildren
                   isReadOnly={isReadOnly}
                   showError={showError}
-                  field={field}
-                  user={user}
+                  field={field as PetitionComposeField_PetitionFieldFragment}
                   childrenFieldIndices={childrenFieldIndices!}
                   fieldRefs={fieldRefs!}
                   petition={petition}
@@ -606,16 +607,7 @@ const _PetitionComposeField = chakraForwardRef<
   );
 });
 
-function approximateFieldHeight(
-  field: Pick<PetitionField, "type" | "description" | "options" | "visibility"> & {
-    attachments: any[];
-    children?:
-      | (Pick<PetitionField, "type" | "description" | "options" | "visibility"> & {
-          attachments: any[];
-        })[]
-      | null;
-  },
-): number {
+function approximateFieldHeight(field: PetitionComposeFieldSelection): number {
   return (
     8 +
     // title
@@ -639,7 +631,9 @@ function approximateFieldHeight(
     // FIELD_GROUP
     (field.type === "FIELD_GROUP"
       ? 4 +
-        (field.children!.length > 0 ? 1 + sumBy(field.children!, approximateFieldHeight) + 48 : 136)
+        ("children" in field && field.children!.length > 0
+          ? 1 + sumBy(field.children!, approximateFieldHeight) + 48
+          : 136)
       : 0)
   );
 }
@@ -659,7 +653,6 @@ function approxTextareaLines(text: string) {
 interface PetitionComposeFieldInnerProps
   extends Pick<
     PetitionComposeFieldProps,
-    | "user"
     | "field"
     | "fieldIndex"
     | "petition"
@@ -692,7 +685,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeFieldInner(
   {
-    user,
     field,
     fieldIndex,
     petition,
@@ -719,7 +711,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   ref,
 ) {
   const intl = useIntl();
-  const isChildren = field.parent?.id !== undefined;
   const [title, setTitle] = useState(field.title);
   const titleRef = useRef<HTMLInputElement>(null);
   const focusTitle = useCallback((atStart?: boolean) => {
@@ -766,8 +757,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
   const letter = letters();
   const previousVisibility = usePrevious(field.visibility);
-  const showRestrictedPetitionFieldAlert =
-    field.type === "BACKGROUND_CHECK" && !user.hasBackgroundCheck;
+  const hasBackgroundCheck = useHasBackgroundCheck();
+  const showRestrictedPetitionFieldAlert = field.type === "BACKGROUND_CHECK" && !hasBackgroundCheck;
 
   return (
     <Stack spacing={1} ref={elementRef} {...props}>
@@ -779,6 +770,57 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           onClick={onTypeIndicatorClick}
         />
         {field.isInternal ? <InternalFieldBadge /> : null}
+        {"isLinkedToProfileTypeField" in field &&
+        field.isLinkedToProfileTypeField &&
+        "profileTypeField" in field &&
+        isDefined(field.profileTypeField) ? (
+          <SmallPopover
+            width="auto"
+            content={
+              <Text fontSize="sm" as="span">
+                <LocalizableUserTextRender
+                  value={field.profileTypeField.name}
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile-type-field",
+                    defaultMessage: "Unnamed property",
+                  })}
+                />{" "}
+                <Text as="span" color="gray.400">
+                  <LocalizableUserTextRender
+                    value={field.profileTypeField.profileType.name}
+                    default={intl.formatMessage({
+                      id: "generic.unnamed-profile-type",
+                      defaultMessage: "Unnamed profile type",
+                    })}
+                  />
+                </Text>
+              </Text>
+            }
+          >
+            <ProfilesIcon color="gray.600" />
+          </SmallPopover>
+        ) : null}
+        {"isLinkedToProfileType" in field &&
+        field.isLinkedToProfileType &&
+        "profileType" in field &&
+        isDefined(field.profileType) ? (
+          <SmallPopover
+            width="auto"
+            content={
+              <Text fontSize="sm" as="span">
+                <LocalizableUserTextRender
+                  value={field.profileType!.name}
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile-type",
+                    defaultMessage: "Unnamed profile type",
+                  })}
+                />
+              </Text>
+            }
+          >
+            <ProfilesIcon color="gray.600" />
+          </SmallPopover>
+        ) : null}
         <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
@@ -838,7 +880,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onKeyUp={(event) => {
               switch (event.key) {
                 case "Enter":
-                  showAddField?.(field.id, field.parent?.id, true);
+                  showAddField(field.id, (field as any).parent?.id, true);
                   break;
               }
             }}
@@ -847,7 +889,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         </Box>
         {field.isReadOnly ? null : (
           <FormControl
-            className={isChildren ? "field-actions-children" : "field-actions"}
+            className={field.isChild ? "field-actions-children" : "field-actions"}
             display="flex"
             alignItems="center"
             width="auto"
@@ -1114,7 +1156,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
     ref,
   ) {
     const intl = useIntl();
-    const isChildren = field.parent?.id !== undefined;
     const hasCondition = field.visibility;
     const hasMath = field.math;
     const buildUrlToSection = useBuildUrlToPetitionSection();
@@ -1151,7 +1192,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             closeDelay={0}
             content={
               <Text fontSize="sm">
-                {isChildren ? (
+                {field.isChild ? (
                   <FormattedMessage
                     id="component.petition-compose-field.conditions-not-available-first-field-group"
                     defaultMessage="You cannot set conditions for the first field in a group. Reorder the fields or add a new one before it to set conditions between them."
@@ -1250,7 +1291,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             defaultMessage: "Clone field",
           })}
           onClick={onCloneField}
-          isDisabled={isReadOnly}
+          isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
         />
         <IconButtonWithTooltip
           data-action="show-field-settings"
@@ -1296,7 +1337,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             })}
           />
         </ConfimationPopover>
-        {isChildren ? (
+        {field.isChild ? (
           <ConfimationPopover
             description={
               <FormattedMessage
@@ -1306,7 +1347,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             }
             confirm={
               <Button
-                onClick={() => onUnlinkField(field.parent!.id, [field.id])}
+                onClick={() => onUnlinkField((field as any).parent!.id, [field.id])}
                 size="sm"
                 colorScheme="red"
               >
@@ -1320,7 +1361,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             <IconButtonWithTooltip
               icon={<UnlinkIcon boxSize={4} />}
               onClick={onSettingsClick}
-              isDisabled={isReadOnly}
+              isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
               size="sm"
               variant="ghost"
               placement="bottom"
@@ -1373,9 +1414,9 @@ const fragments = {
       ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
     `;
   },
-  get PetitionField() {
+  get BasePetitionField() {
     return gql`
-      fragment PetitionComposeField_PetitionField on PetitionField {
+      fragment PetitionComposeField_BasePetitionField on PetitionField {
         id
         type
         title
@@ -1387,29 +1428,48 @@ const fragments = {
         isReadOnly
         visibility
         math
-        children {
-          type
-          description
-          options
-          visibility
-          attachments {
-            id
-          }
-        }
+        isChild
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
-        parent {
-          id
-        }
         ...PetitionFieldOptionsListEditor_PetitionField
-        ...PetitionComposeFieldGroupChildren_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
-      ${PetitionComposeFieldGroupChildren.fragments.PetitionField}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PetitionComposeField_PetitionField on PetitionField {
+        ...PetitionComposeField_BasePetitionField
+        isLinkedToProfileType
+        profileType {
+          id
+          name
+        }
+        children {
+          ...PetitionComposeField_ChildPetitionField
+        }
+      }
+      fragment PetitionComposeField_ChildPetitionField on PetitionField {
+        ...PetitionComposeField_BasePetitionField
+        isLinkedToProfileTypeField
+        profileTypeField {
+          id
+          name
+          profileType {
+            id
+            name
+          }
+        }
+        parent {
+          id
+          isInternal
+        }
+      }
+      ${this.BasePetitionField}
     `;
   },
   get PetitionFieldAttachment() {

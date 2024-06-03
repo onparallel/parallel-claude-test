@@ -145,15 +145,15 @@ export const ProfileTypeSelect = Object.assign(
     }, [
       needsLoading,
       // Rerun when value changes
-      value === null
-        ? null
-        : needsLoading
+      isDefined(value)
+        ? needsLoading
           ? // value is string | string[]
             unMaybeArray(value as any).join(",")
           : // value is ProfileSelection[]
             unMaybeArray(value as any)
               .map((x) => x.id)
-              .join(","),
+              .join(",")
+        : null,
     ]);
 
     const placeholder = useMemo(() => {

@@ -58,7 +58,7 @@ export function GeneratePrefilledPublicLinkDialog({
     } catch {}
   };
 
-  const fieldsWithIndices = useFieldsWithIndices(data!.fields).filter(
+  const fieldsWithIndices = useFieldsWithIndices(data).filter(
     ([field]) =>
       isDefined(field.alias) &&
       !isFileTypeField(field.type) &&
@@ -266,8 +266,10 @@ GeneratePrefilledPublicLinkDialog.fragments = {
         }
         ...PetitionFieldReference_PetitionField
       }
+      ...useFieldsWithIndices_PetitionBase
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };
 

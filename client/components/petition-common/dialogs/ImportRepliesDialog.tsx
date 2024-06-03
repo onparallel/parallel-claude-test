@@ -100,14 +100,6 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     [selectedPetitionData?.petition?.fields],
   );
 
-  const selectedPetitionFields = (selectedPetitionData?.petition?.fields ?? []).map((f) => ({
-    ...f,
-    replies:
-      f.type === "ES_TAX_DOCUMENTS"
-        ? f.replies.filter((r) => !isDefined(r.content.error))
-        : f.replies,
-  }));
-
   const setInitialMapping = (
     sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null,
   ) => {
@@ -354,8 +346,8 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                 render={({ field: { value, onChange } }) => {
                   return (
                     <MapFieldsTable
-                      fields={petitionData?.petition?.fields ?? []}
-                      sourcePetitionFields={selectedPetitionFields}
+                      petition={petitionData!.petition!}
+                      sourcePetition={selectedPetitionData!.petition!}
                       overwriteExisting={overwriteExisting}
                       value={value}
                       onChange={(props) => {
@@ -461,15 +453,15 @@ const _queries = [
     query ImportRepliesDialog_petition($petitionId: GID!) {
       petition(id: $petitionId) {
         id
+        ...MapFieldsTable_PetitionBase
         fields {
-          ...MapFieldsTable_PetitionField
           ...mapReplyContents_PetitionField
           ...ImportRepliesDialog_PetitionField
         }
       }
     }
     ${mapReplyContents.fragments.PetitionField}
-    ${MapFieldsTable.fragments.PetitionField}
+    ${MapFieldsTable.fragments.PetitionBase}
     ${_fragments.PetitionField}
   `,
 ];

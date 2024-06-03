@@ -1,6 +1,5 @@
-import { gql } from "@apollo/client";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { usePetitionComposeFieldReorder_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionComposeFieldSelection } from "@parallel/components/petition-compose/PetitionComposeField";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy, isDefined } from "remeda";
@@ -9,9 +8,7 @@ import { Maybe } from "./types";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
 import { useUpdatingRef } from "./useUpdatingRef";
 
-export function usePetitionComposeFieldReorder<
-  T extends usePetitionComposeFieldReorder_PetitionFieldFragment,
->({
+export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSelection>({
   fields,
   onUpdateFieldPositions,
   isFieldGroup,
@@ -109,11 +106,13 @@ export function usePetitionComposeFieldReorder<
         }
 
         const allFieldIds = fieldIds.flatMap((id) => {
-          return [id, ...(byId[id]?.children?.map((c) => c.id) ?? [])];
+          const field = byId[id];
+          return [id, ...("children" in field ? field?.children?.map((c) => c.id) ?? [] : [])];
         });
 
         const allNewFieldIds = newFieldIds.flatMap((id) => {
-          return [id, ...(byId[id]?.children?.map((c) => c.id) ?? [])];
+          const field = byId[id];
+          return [id, ...("children" in field ? field?.children?.map((c) => c.id) ?? [] : [])];
         });
 
         // check that this order of fields is respecting that visibility only refers to previous fields
@@ -123,6 +122,7 @@ export function usePetitionComposeFieldReorder<
 
           // The first field in a group cannot be internal if the group is not
           const hasFirstChildInternalError =
+            "parent" in field &&
             isDefined(field.parent) &&
             !field.parent.isInternal &&
             field.isInternal &&
@@ -155,10 +155,11 @@ export function usePetitionComposeFieldReorder<
           try {
             await verifyFieldPositions(field, position, allNewFieldIds);
             // do the same checks as before for every child of the moved field
-            for (const child of field.children ?? []) {
-              const childPosition = allFieldIds.indexOf(child.id);
-              await verifyFieldPositions(child as T, childPosition, allNewFieldIds);
-            }
+            if ("children" in field)
+              for (const child of field.children ?? []) {
+                const childPosition = allFieldIds.indexOf(child.id);
+                await verifyFieldPositions(child as T, childPosition, allNewFieldIds);
+              }
           } catch (error) {
             if (error instanceof Error && error.message === "CANCELLED") {
               setFieldIds(fields.map((f) => f.id));
@@ -174,26 +175,3 @@ export function usePetitionComposeFieldReorder<
     }, []),
   };
 }
-
-usePetitionComposeFieldReorder.fragments = {
-  PetitionField: gql`
-    fragment usePetitionComposeFieldReorder_PetitionField on PetitionField {
-      ...usePetitionComposeFieldReorder_PetitionFieldData
-      children {
-        ...usePetitionComposeFieldReorder_PetitionFieldData
-        parent {
-          isInternal
-        }
-      }
-      parent {
-        isInternal
-      }
-    }
-    fragment usePetitionComposeFieldReorder_PetitionFieldData on PetitionField {
-      id
-      visibility
-      math
-      isInternal
-    }
-  `,
-};

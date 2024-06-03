@@ -65,7 +65,7 @@ export function PetitionFieldLogicConditionEditor({
       : undefined;
   const isMultipleValue = isDefined(referencedField)
     ? referencedField.multiple ||
-      (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
+      (isDefined(referencedField.parent) && referencedField.parent.id !== (field as any).parent?.id)
     : false;
   const Wrapper = isReadOnly ? Box : Fragment;
   return (

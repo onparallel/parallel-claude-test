@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  useFilenamePlaceholdersRename_PetitionBaseFragment,
   useFilenamePlaceholdersRename_PetitionFieldFragment,
   useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
@@ -42,10 +43,10 @@ export function useFilenamePlaceholders(): PlaceholderOption[] {
 }
 
 export function useFilenamePlaceholdersRename(
-  fields: useFilenamePlaceholdersRename_PetitionFieldFragment[],
+  petition: useFilenamePlaceholdersRename_PetitionBaseFragment,
 ) {
   const placeholders = useFilenamePlaceholders();
-  const fieldsWithIndices = useFieldsWithIndices(fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   const indicesById: Record<string, string> = useMemo(() => {
     return pipe(
       fieldsWithIndices,
@@ -108,27 +109,25 @@ export function useFilenamePlaceholdersRename(
 }
 
 useFilenamePlaceholdersRename.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
+  PetitionBase: gql`
+    fragment useFilenamePlaceholdersRename_PetitionBase on PetitionBase {
+      ...useFieldsWithIndices_PetitionBase
+      fields {
         id
-        type
-        title
-        parent {
-          id
-        }
-        children {
-          id
-          type
-        }
       }
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment useFilenamePlaceholdersRename_PetitionFieldReply on PetitionFieldReply {
-        content
-      }
-    `;
-  },
+    }
+    ${useFieldsWithIndices.fragments.PetitionBase}
+  `,
+  PetitionField: gql`
+    fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
+      id
+      type
+      title
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment useFilenamePlaceholdersRename_PetitionFieldReply on PetitionFieldReply {
+      content
+    }
+  `,
 };

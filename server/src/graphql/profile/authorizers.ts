@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, isDefined, pick, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, pick, uniq } from "remeda";
 import {
   Profile,
   ProfileStatus,
@@ -207,14 +207,17 @@ export function profileTypeFieldIsOfType<
   FieldName extends string,
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  profileTypeFieldIdArg: TProfileTypeFieldId,
+  profileTypeFieldIdArg:
+    | TProfileTypeFieldId
+    | ((args: core.ArgsValue<TypeName, FieldName>) => number[]),
   types: ProfileTypeFieldType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
-      );
+      const profileTypeFieldIds =
+        typeof profileTypeFieldIdArg === "function"
+          ? profileTypeFieldIdArg(args)
+          : unMaybeArray(args[profileTypeFieldIdArg] as unknown as MaybeArray<number>);
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
 
       return profileTypeFields.every((p) => isDefined(p) && types.includes(p.type));
@@ -411,6 +414,11 @@ export function profilesCanBeAssociated<
       >,
     );
 
+    if (relationshipsData.some((r) => r.profileId === profileId)) {
+      // A profile cannot be associated with itself
+      return false;
+    }
+
     const currentRelationships =
       await ctx.profiles.loadProfileRelationshipsByProfileId.raw(profileId);
 
@@ -444,7 +452,32 @@ export function profilesCanBeAssociated<
       );
     }
 
-    if (!(await ctx.profiles.profileRelationshipsAreAllowed(profileId, relationshipsData))) {
+    const profiles = await ctx.profiles.loadProfile(
+      uniq([profileId, ...relationshipsData.map((r) => r.profileId)]),
+    );
+
+    if (!profiles.every(isDefined)) {
+      return false;
+    }
+
+    const profilesById = indexBy(profiles, (p) => p.id);
+
+    if (
+      !(await ctx.profiles.profileRelationshipsAreAllowed(
+        ctx.user!.org_id,
+        relationshipsData.map((r) => ({
+          leftSideProfileTypeId:
+            r.direction === "RIGHT_LEFT"
+              ? profilesById[r.profileId].profile_type_id
+              : profilesById[profileId].profile_type_id,
+          rightSideProfileTypeId:
+            r.direction === "LEFT_RIGHT"
+              ? profilesById[r.profileId].profile_type_id
+              : profilesById[profileId].profile_type_id,
+          profileRelationshipTypeId: r.profileRelationshipTypeId,
+        })),
+      ))
+    ) {
       throw new ApolloError(
         "The provided profiles cannot be associated",
         "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR",
@@ -477,5 +510,68 @@ export function relationshipBelongsToProfile<
         r.org_id === ctx.user!.org_id &&
         (r.left_side_profile_id === profileId || r.right_side_profile_id === profileId),
     );
+  };
+}
+
+export function profileHasSameProfileTypeAsField<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TPetitionFieldIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  profileIdArg: TProfileIdArg,
+  petitionFieldIdArg: TPetitionFieldIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
+    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+
+    const [profile, petitionField] = await Promise.all([
+      ctx.profiles.loadProfile(profileId),
+      ctx.petitions.loadField(petitionFieldId),
+    ]);
+
+    return (
+      isDefined(profile) &&
+      isDefined(petitionField) &&
+      profile.profile_type_id === petitionField.profile_type_id
+    );
+  };
+}
+
+export function profileTypeFieldBelongsToPetitionFieldProfileType<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionFieldIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  profileTypeFieldIdsArg: (args: core.ArgsValue<TypeName, FieldName>) => number[],
+  petitionFieldIdArg: TPetitionFieldIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileTypeFieldIds = profileTypeFieldIdsArg(args);
+    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+
+    const [profileTypeFields, petitionField] = await Promise.all([
+      ctx.profiles.loadProfileTypeField(profileTypeFieldIds),
+      ctx.petitions.loadField(petitionFieldId),
+    ]);
+
+    return (
+      isDefined(petitionField) &&
+      profileTypeFields.every(
+        (ptf) => isDefined(ptf) && ptf.profile_type_id === petitionField.profile_type_id,
+      )
+    );
+  };
+}
+
+export function profileTypeFieldsAreExpirable<TypeName extends string, FieldName extends string>(
+  profileTypeFieldIdsArg: (args: core.ArgsValue<TypeName, FieldName>) => number[],
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileTypeFieldIds = profileTypeFieldIdsArg(args);
+
+    const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+    return profileTypeFields.every((ptf) => isDefined(ptf) && ptf.is_expirable);
   };
 }

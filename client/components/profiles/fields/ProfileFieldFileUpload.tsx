@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Center, Flex, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -6,10 +6,8 @@ import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument } from "@parallel/graphql/__types";
 import { discriminator } from "@parallel/utils/discriminator";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { withError } from "@parallel/utils/promises/withError";
+import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { nanoid } from "nanoid";
@@ -49,20 +47,11 @@ export function ProfileFieldFileUpload({
 }: ProfileFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
-  const [profileFieldFileDownloadLink] = useMutation(
-    ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument,
-  );
+
+  const downloadProfileFieldFile = useDownloadProfileFieldFile();
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
-    await withError(
-      openNewWindow(async () => {
-        const { data } = await profileFieldFileDownloadLink({
-          variables: { profileId, profileTypeFieldId: field.id, profileFieldFileId, preview },
-        });
-        const { url } = data!.profileFieldFileDownloadLink;
-        return url!;
-      }),
-    );
+    await downloadProfileFieldFile(profileId, field.id, profileFieldFileId, preview);
   };
 
   const downloadLocalFile = async (file: File) => {
@@ -356,30 +345,3 @@ ProfileFieldFileUpload.fragments = {
     `;
   },
 };
-
-const _mutations = [
-  gql`
-    mutation ProfileFieldFileUpload_profileFieldFileDownloadLink(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $profileFieldFileId: GID!
-      $preview: Boolean
-    ) {
-      profileFieldFileDownloadLink(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        profileFieldFileId: $profileFieldFileId
-        preview: $preview
-      ) {
-        file {
-          contentType
-          filename
-          isComplete
-          size
-        }
-        result
-        url
-      }
-    }
-  `,
-];

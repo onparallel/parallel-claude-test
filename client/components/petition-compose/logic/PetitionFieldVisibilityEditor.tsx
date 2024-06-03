@@ -11,7 +11,7 @@ import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityType,
 } from "@parallel/utils/fieldLogic/types";
-import { Fragment, SetStateAction } from "react";
+import { Fragment, SetStateAction, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldLogicAddConditionButton } from "./PetitionFieldLogicAddConditionButton";
 import { PetitionFieldLogicConditionEditor } from "./PetitionFieldLogicConditionEditor";
@@ -28,7 +28,7 @@ export interface PetitionFieldVisibilityProps {
 }
 
 export function PetitionFieldVisibilityEditor({
-  field,
+  field: _field,
   petition,
   onVisibilityEdit,
   showErrors,
@@ -36,6 +36,11 @@ export function PetitionFieldVisibilityEditor({
 }: PetitionFieldVisibilityProps) {
   const intl = useIntl();
 
+  const allFields = useMemo(
+    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
+    [petition.fields],
+  );
+  const field = allFields.find((f) => f.id === _field.id)!;
   const visibility = field.visibility as PetitionFieldVisibility;
   function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
     onVisibilityEdit(dispatch(visibility));
@@ -187,17 +192,25 @@ export function PetitionFieldVisibilityEditor({
 }
 
 PetitionFieldVisibilityEditor.fragments = {
-  PetitionBase: gql`
-    fragment PetitionFieldVisibilityEditor_PetitionBase on PetitionBase {
-      ...PetitionFieldLogicContext_PetitionBase
-    }
-    ${PetitionFieldLogicContext.fragments.PetitionBase}
-  `,
+  get PetitionBase() {
+    return gql`
+      fragment PetitionFieldVisibilityEditor_PetitionBase on PetitionBase {
+        fields {
+          ...PetitionFieldVisibilityEditor_PetitionField
+          children {
+            ...PetitionFieldVisibilityEditor_PetitionField
+          }
+        }
+        ...PetitionFieldLogicContext_PetitionBase
+      }
+      ${PetitionFieldLogicContext.fragments.PetitionBase}
+      ${this.PetitionField}
+    `;
+  },
   PetitionField: gql`
     fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
+      id
       visibility
-      ...PetitionFieldLogicContext_PetitionField
     }
-    ${PetitionFieldLogicContext.fragments.PetitionField}
   `,
 };

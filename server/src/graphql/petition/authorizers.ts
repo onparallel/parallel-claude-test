@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, partition, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -965,6 +965,244 @@ export function fieldAliasIsAvailable<
 
     if (petitionVariables.some((v) => v.name === alias)) {
       throw new ApolloError(`Alias is being used as petition variable`, "ALIAS_ALREADY_EXISTS");
+    }
+
+    return true;
+  };
+}
+
+export function fieldCanBeLinkedToProfileType<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+  TPetitionFieldIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  petitionIdArg: TPetitionIdArg,
+  petitionFieldIdArg: TPetitionFieldIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+
+    const children = await ctx.petitions.loadPetitionFieldChildren(petitionFieldId);
+
+    if (!children.every((c) => c.profile_type_field_id === null)) {
+      // can't link/update the profile_type_id if any of its children has a profile_type_field_id
+      return false;
+    }
+
+    const relationships =
+      await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(petitionId);
+
+    if (
+      relationships.some(
+        (r) =>
+          isDefined(r) &&
+          (r.left_side_petition_field_id === petitionFieldId ||
+            r.right_side_petition_field_id === petitionFieldId),
+      )
+    ) {
+      // field must not have any relationship with other fields
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function profileTypeFieldCanBeLinkedToFieldGroup<
+  TypeName extends string,
+  FieldName extends string,
+  TParentFieldId extends Arg<TypeName, FieldName, number>,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, number>,
+>(
+  parentFieldIdArg: TParentFieldId,
+  profileTypeFieldIdArg: TProfileTypeFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const parentFieldId = args[parentFieldIdArg] as unknown as number;
+    const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
+
+    const parentField = (await ctx.petitions.loadField(parentFieldId))!;
+    if (!isDefined(parentField.profile_type_id)) {
+      // first check if the parent field has a profile_type_id
+      return false;
+    }
+
+    const children = await ctx.petitions.loadPetitionFieldChildren(parentFieldId);
+    if (children.some((c) => c.profile_type_field_id === profileTypeFieldId)) {
+      // profile_type_field_id can't be repeated on the same parent
+      return false;
+    }
+    const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+    if (!profileTypeField || profileTypeField.profile_type_id !== parentField.profile_type_id) {
+      // profile types must match
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function fieldIsLinkedToProfileTypeField<
+  TypeName extends string,
+  FieldName extends string,
+  TFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(fieldIdArg: TFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+
+    const fields = await ctx.petitions.loadField(fieldIds);
+    return fields.every((f) => isDefined(f) && f.profile_type_field_id !== null);
+  };
+}
+
+export function fieldIsLinkedToProfileType<
+  TypeName extends string,
+  FieldName extends string,
+  TFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(fieldIdArg: TFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+
+    const fields = await ctx.petitions.loadField(fieldIds);
+    return fields.every((f) => isDefined(f) && f.profile_type_id !== null);
+  };
+}
+
+export function petitionFieldsCanBeAssociated<
+  TypeName extends string,
+  FieldName extends string,
+  TRelationshipArg extends Arg<
+    TypeName,
+    FieldName,
+    NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][]
+  >,
+>(relationshipArg: TRelationshipArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const relationships = args[
+      relationshipArg
+    ] as unknown as NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][];
+
+    const relationshipTypes = (
+      await ctx.profiles.loadProfileRelationshipType(
+        relationships.map((r) => r.profileRelationshipTypeId),
+      )
+    ).filter(isDefined);
+
+    // if both sides have the same fieldId, the relationship must be reciprocal
+    if (
+      !relationships.every(
+        (r) =>
+          r.leftSidePetitionFieldId !== r.rightSidePetitionFieldId ||
+          relationshipTypes.find((rt) => rt.id === r.profileRelationshipTypeId)?.is_reciprocal,
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      Object.values(
+        groupBy(relationships, (r) => {
+          const relationshipType = relationshipTypes.find(
+            (rt) => rt.id === r.profileRelationshipTypeId,
+          );
+          return r.direction === "LEFT_RIGHT" || relationshipType?.is_reciprocal // if relationship is reciprocal, always force the direction to be LEFT_RIGHT
+            ? `${r.profileRelationshipTypeId}-${r.leftSidePetitionFieldId}-${r.rightSidePetitionFieldId}`
+            : // if direction is RIGHT_LEFT, we need to reorder the fields so we can detect duplicated relationships correctly
+              // e.g.: A -> B (LEFT_RIGHT) and B -> A (RIGHT_LEFT) are the exact same relationship
+              `${r.profileRelationshipTypeId}-${r.rightSidePetitionFieldId}-${r.leftSidePetitionFieldId}`;
+        }),
+      ).some((group) => group.length > 1)
+    ) {
+      // Relationships must be unique
+      return false;
+    }
+
+    const petitionFields = await ctx.petitions.loadField(
+      uniq(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
+    );
+
+    if (
+      !petitionFields.every(
+        (f) => isDefined(f) && f.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+      )
+    ) {
+      // every field must be of type FIELD_GROUP and have a defined profile_type_id
+      return false;
+    }
+
+    const fieldsById = indexBy(petitionFields, (f) => f!.id);
+
+    if (
+      !(await ctx.profiles.profileRelationshipsAreAllowed(
+        ctx.user!.org_id,
+        relationships.map((r) => ({
+          leftSideProfileTypeId:
+            r.direction === "LEFT_RIGHT"
+              ? fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!
+              : fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!,
+          rightSideProfileTypeId:
+            r.direction === "LEFT_RIGHT"
+              ? fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!
+              : fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!,
+          profileRelationshipTypeId: r.profileRelationshipTypeId,
+        })),
+      ))
+    ) {
+      throw new ApolloError(
+        "The provided profiles cannot be associated",
+        "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR",
+      );
+    }
+    return true;
+  };
+}
+
+export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+  TRelationshipsArg extends Arg<
+    TypeName,
+    FieldName,
+    NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][]
+  >,
+>(
+  petitionIdArg: TPetitionIdArg,
+  relationshipsArg: TRelationshipsArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const relationships = unMaybeArray(
+      args[
+        relationshipsArg
+      ] as unknown as NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][],
+    );
+
+    const fieldGroupRelationshipIds = relationships.map((r) => r.id).filter(isDefined);
+    if (fieldGroupRelationshipIds.length > 0) {
+      const fieldGroupRelationships =
+        await ctx.petitions.loadPetitionFieldGroupRelationship(fieldGroupRelationshipIds);
+      if (!fieldGroupRelationships.every((r) => r?.petition_id === petitionId)) {
+        return false;
+      }
+    }
+
+    const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+      uniq(relationships.map((r) => r.profileRelationshipTypeId)),
+    );
+
+    if (!relationshipTypes.every((t) => isDefined(t) && t.org_id === ctx.user!.org_id)) {
+      return false;
+    }
+
+    const petitionFields = await ctx.petitions.loadField(
+      uniq(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
+    );
+
+    if (!petitionFields.every((f) => isDefined(f) && f.petition_id === petitionId)) {
+      return false;
     }
 
     return true;

@@ -5,8 +5,6 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import {
-  BackgroundCheckEntitySearchType,
-  ConfigureAutomateSearchDialog_InnerPetitionFieldFragment,
   ConfigureAutomateSearchDialog_petitionDocument,
   PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldAutoSearchConfigInput,
@@ -33,32 +31,32 @@ export function ConfigureAutomateSearchDialog({
     variables: { id: petitionId },
   });
 
+  const petition = data?.petition ?? { fields: [] };
+
   const { autoSearchConfig } = field.options as FieldOptions["BACKGROUND_CHECK"];
 
   const fieldIsChild = field.parent !== null;
 
-  const fields = data?.petition?.fields ?? [];
-
-  const allFields: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment[] = useMemo(
-    () => fields.flatMap((f) => [f, ...(fieldIsChild ? f.children ?? [] : [])]),
-    [fields],
+  const allFields = useMemo(
+    () => petition.fields.flatMap((f) => [f, ...(fieldIsChild ? f.children ?? [] : [])]),
+    [petition.fields],
   );
 
-  const { handleSubmit, control, watch } = useForm<{
-    name: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment[];
-    date: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment | null;
-    type: BackgroundCheckEntitySearchType | null;
-  }>({
+  const { handleSubmit, control, watch } = useForm({
     mode: "onSubmit",
-    defaultValues: {
-      name: isDefined(autoSearchConfig)
-        ? autoSearchConfig.name.map((id) => allFields.find((f) => f.id === id)).filter(isDefined)
-        : [],
-      date: isDefined(autoSearchConfig)
-        ? allFields.filter((field) => autoSearchConfig.date === field.id)[0]
-        : null,
-      type: autoSearchConfig?.type ?? null,
-    },
+    defaultValues: isDefined(autoSearchConfig)
+      ? {
+          name: autoSearchConfig.name
+            .map((id) => allFields.find((f) => f.id === id))
+            .filter(isDefined),
+          date: allFields.find((field) => autoSearchConfig.date === field.id) ?? null,
+          type: autoSearchConfig.type,
+        }
+      : {
+          name: [],
+          date: null,
+          type: null,
+        },
   });
 
   const textFields = allFields.filter((field) => field.type === "SHORT_TEXT");
@@ -120,12 +118,12 @@ export function ConfigureAutomateSearchDialog({
               control={control}
               render={({ field: { onChange, value }, fieldState }) => (
                 <PetitionFieldSelect
+                  petition={petition}
                   isMulti
                   isLoading={loading}
                   expandFieldGroups={fieldIsChild}
                   isInvalid={fieldState.invalid}
                   value={value}
-                  fields={fields}
                   onChange={onChange}
                   filterFields={(f) =>
                     f.type === "SHORT_TEXT" &&
@@ -167,11 +165,11 @@ export function ConfigureAutomateSearchDialog({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <PetitionFieldSelect
+                  petition={petition}
                   isClearable
                   isLoading={loading}
                   expandFieldGroups={fieldIsChild}
                   value={value}
-                  fields={fields}
                   onChange={onChange}
                   filterFields={(f) =>
                     f.type === "DATE" &&
@@ -226,28 +224,36 @@ export function useConfigureAutomateSearchDialog() {
 }
 
 ConfigureAutomateSearchDialog.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+  PetitionBase: gql`
+    fragment ConfigureAutomateSearchDialog_PetitionBase on PetitionBase {
+      fields {
         ...ConfigureAutomateSearchDialog_InnerPetitionField
         children {
           ...ConfigureAutomateSearchDialog_InnerPetitionField
         }
-        ...PetitionFieldSelect_PetitionField
       }
+      ...PetitionFieldSelect_PetitionBase
+    }
+    ${PetitionFieldSelect.fragments.PetitionBase}
 
-      fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+    fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+      id
+      type
+      options
+      multiple
+      parent {
         id
-        type
-        options
-        multiple
-        parent {
-          id
-        }
       }
-      ${PetitionFieldSelect.fragments.PetitionField}
-    `;
-  },
+    }
+  `,
+  PetitionField: gql`
+    fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+      options
+      parent {
+        id
+      }
+    }
+  `,
 };
 
 const _queries = [
@@ -255,11 +261,9 @@ const _queries = [
     query ConfigureAutomateSearchDialog_petition($id: GID!) {
       petition(id: $id) {
         id
-        fields {
-          ...ConfigureAutomateSearchDialog_PetitionField
-        }
+        ...ConfigureAutomateSearchDialog_PetitionBase
       }
     }
-    ${ConfigureAutomateSearchDialog.fragments.PetitionField}
+    ${ConfigureAutomateSearchDialog.fragments.PetitionBase}
   `,
 ];

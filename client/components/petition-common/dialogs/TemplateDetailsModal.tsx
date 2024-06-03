@@ -70,7 +70,7 @@ export function TemplateDetailsModal({
       ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType),
   );
 
-  const fieldsWithIndices = useFieldsWithIndices(template.fields);
+  const fieldsWithIndices = useFieldsWithIndices(template);
 
   const myId = useGetMyId();
   const userCanClone = useHasPermission("PETITIONS:CREATE_TEMPLATES");
@@ -520,10 +520,12 @@ TemplateDetailsModal.fragments = {
         slug
         url
       }
-      ...TemplateActiveSettingsIcons_PetitionTemplate
       updatedAt
+      ...TemplateActiveSettingsIcons_PetitionTemplate
+      ...useFieldsWithIndices_PetitionBase
     }
     ${PetitionFieldTitleContent.fragments.PetitionField}
     ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
+    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };

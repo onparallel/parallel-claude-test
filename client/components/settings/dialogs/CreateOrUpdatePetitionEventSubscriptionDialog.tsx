@@ -30,8 +30,8 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import {
   CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
   CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment,
+  CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragment,
   CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment,
-  CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragment,
   CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsDocument,
   CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument,
   PetitionEventType,
@@ -39,7 +39,7 @@ import {
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { Maybe } from "@parallel/utils/types";
+import { Assert, Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useEffect, useRef, useState } from "react";
@@ -68,6 +68,10 @@ interface CreateOrUpdatePetitionEventSubscriptionDialogProps {
   onDeleteSignatureKey: (signatureKeyId: string) => Promise<void>;
 }
 
+type PetitionFieldSelection = UnwrapArray<
+  Assert<CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragment["fields"]>
+>;
+
 interface CreateOrUpdatePetitionEventSubscriptionDialogFormData {
   name: Maybe<string>;
   eventsUrl: string;
@@ -76,7 +80,7 @@ interface CreateOrUpdatePetitionEventSubscriptionDialogFormData {
   fromTemplate: Maybe<
     Omit<CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment, "__typename">
   >;
-  fromTemplateFields: CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragment[];
+  fromTemplateFields: PetitionFieldSelection[];
 }
 
 const PETITION_EVENT_TYPES: PetitionEventType[] = [
@@ -263,7 +267,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
     },
   );
 
-  const fields = data?.petition?.fields ?? [];
+  const petition = data?.petition ?? { fields: [] };
 
   useEffectSkipFirst(() => {
     // reset fields when template changes
@@ -277,18 +281,18 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
       if (
         isDefined(eventSubscription) &&
         isDefined(eventSubscription.fromTemplateFields) &&
-        fields.length > 0 &&
+        petition.fields.length > 0 &&
         !initialFieldsSetRef.current
       ) {
         resetField("fromTemplateFields", {
-          defaultValue: fields.filter((field) =>
+          defaultValue: petition.fields.filter((field) =>
             eventSubscription.fromTemplateFields?.some((f) => field.id === f.id),
           ),
         });
         initialFieldsSetRef.current = true;
       }
     });
-  }, [eventSubscription?.fromTemplateFields, fields]);
+  }, [eventSubscription?.fromTemplateFields, petition.fields]);
 
   return (
     <ConfirmDialog
@@ -524,7 +528,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                       <PetitionFieldSelect
                         isMulti
                         value={value}
-                        fields={fields}
+                        petition={petition}
                         onChange={onChange}
                         placeholder={intl.formatMessage({
                           id: "component.create-petition-event-subscription-dialog.filter-fields-placeholder",
@@ -687,10 +691,8 @@ CreateOrUpdatePetitionEventSubscriptionDialog.fragments = {
   get PetitionField() {
     return gql`
       fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField on PetitionField {
-        ...PetitionFieldSelect_PetitionField
         isReadOnly
       }
-      ${PetitionFieldSelect.fragments.PetitionField}
     `;
   },
   get PetitionBaseWithFields() {
@@ -700,8 +702,10 @@ CreateOrUpdatePetitionEventSubscriptionDialog.fragments = {
         fields {
           ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField
         }
+        ...PetitionFieldSelect_PetitionBase
       }
       ${this.PetitionField}
+      ${PetitionFieldSelect.fragments.PetitionBase}
     `;
   },
 };

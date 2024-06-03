@@ -58,7 +58,7 @@ export function ExportRepliesProgressDialog({
   const showExportFailedDialog = useExportFailedDialog();
 
   const rename = useFilenamePlaceholdersRename(
-    data?.petition?.__typename === "Petition" ? data.petition.fields : [],
+    data?.petition?.__typename === "Petition" ? data.petition : { fields: [] },
   );
 
   useEffect(() => {
@@ -342,9 +342,11 @@ ExportRepliesProgressDialog.queries = [
   gql`
     query ExportRepliesProgressDialog_petition($petitionId: GID!) {
       petition(id: $petitionId) {
+        ...useFilenamePlaceholdersRename_PetitionBase
         ...ExportRepliesProgressDialog_Petition
       }
     }
+    ${useFilenamePlaceholdersRename.fragments.PetitionBase}
     ${ExportRepliesProgressDialog.fragments.Petition}
   `,
 ];

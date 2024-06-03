@@ -4,6 +4,7 @@ import {
   PetitionFieldLogicContext_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { UnwrapArray } from "@parallel/utils/types";
 import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 import { pick } from "remeda";
 
@@ -13,16 +14,21 @@ interface PetitionFieldLogicContextProps {
   includeSelf?: boolean;
 }
 
+type FieldOf<T extends { fields?: any[] | null }> = UnwrapArray<
+  Exclude<T["fields"], null | undefined>
+>;
+type ChildOf<T extends { children?: any[] | null }> = UnwrapArray<
+  Exclude<T["children"], null | undefined>
+>;
+
+type PetitionFieldSelection =
+  | FieldOf<PetitionFieldLogicContext_PetitionBaseFragment>
+  | ChildOf<FieldOf<PetitionFieldLogicContext_PetitionBaseFragment>>;
+
 interface UsePetitionFieldLogicContext
   extends Pick<PetitionFieldLogicContext_PetitionBaseFragment, "variables" | "customLists"> {
-  fieldWithIndex: [
-    field: PetitionFieldLogicContext_PetitionFieldFragment,
-    fieldIndex: PetitionFieldIndex,
-  ];
-  fieldsWithIndices: [
-    field: PetitionFieldLogicContext_PetitionFieldFragment,
-    fieldIndex: PetitionFieldIndex,
-  ][];
+  fieldWithIndex: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex];
+  fieldsWithIndices: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex][];
 }
 
 const _PetitionFieldLogicContext = createContext<UsePetitionFieldLogicContext | undefined>(
@@ -35,7 +41,7 @@ export function PetitionFieldLogicContext({
   children,
   includeSelf,
 }: PropsWithChildren<PetitionFieldLogicContextProps>) {
-  const fieldsWithIndices = useAllFieldsWithIndices(petition.fields);
+  const fieldsWithIndices = useAllFieldsWithIndices(petition);
   const fieldIndex = fieldsWithIndices.findIndex(([f]) => f.id === field.id);
   const value = useMemo<UsePetitionFieldLogicContext>(() => {
     return {
@@ -60,8 +66,14 @@ PetitionFieldLogicContext.fragments = {
       fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
         fields {
           ...PetitionFieldLogicContext_PetitionField
+          parent {
+            id
+          }
           children {
             ...PetitionFieldLogicContext_PetitionField
+            parent {
+              id
+            }
           }
         }
         variables {
@@ -72,25 +84,20 @@ PetitionFieldLogicContext.fragments = {
           name
           values
         }
+        ...useAllFieldsWithIndices_PetitionBase
       }
-      ${this.PetitionField}
+      fragment PetitionFieldLogicContext_PetitionField on PetitionField {
+        id
+        title
+        type
+        multiple
+        options
+        isReadOnly
+        isChild
+      }
+      ${useAllFieldsWithIndices.fragments.PetitionBase}
     `;
   },
-  PetitionField: gql`
-    fragment PetitionFieldLogicContext_PetitionField on PetitionField {
-      id
-      title
-      type
-      multiple
-      options
-      isReadOnly
-      parent {
-        id
-      }
-      ...useAllFieldsWithIndices_PetitionField
-    }
-    ${useAllFieldsWithIndices.fragments.PetitionField}
-  `,
 };
 
 export function usePetitionFieldLogicContext() {

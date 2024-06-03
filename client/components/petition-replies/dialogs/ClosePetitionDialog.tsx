@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  Button,
-  Center,
-  Checkbox,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
+import { Button, Checkbox, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { DoubleCheckIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PETITION_CLOSING_DEFAULT_MESSAGE } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
@@ -27,6 +18,7 @@ import { RichTextEditor, RichTextEditorInstance } from "../../common/slate/RichT
 
 interface ClosePetitionDialogInput {
   petition: useClosePetitionDialog_PetitionFragment;
+  hasLinkedToProfileTypeFields: boolean;
   requiredMessage: boolean;
 }
 
@@ -37,6 +29,7 @@ interface ClosePetitionDialogNotification {
 
 export function ClosePetitionDialog({
   petition,
+  hasLinkedToProfileTypeFields,
   requiredMessage,
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
@@ -70,9 +63,7 @@ export function ClosePetitionDialog({
       size="xl"
       header={
         <Stack direction="row" spacing={4} alignItems="center">
-          <Center backgroundColor="blue.500" borderRadius="full" boxSize="36px">
-            <ThumbUpIcon boxSize="20px" color="white" />
-          </Center>
+          <DoubleCheckIcon boxSize={6} color="green.500" />
           <Text>
             <FormattedMessage
               id="component.close-petition-dialog.heading"
@@ -84,10 +75,17 @@ export function ClosePetitionDialog({
       body={
         <Stack spacing={4}>
           <Text>
-            <FormattedMessage
-              id="component.close-petition-dialog.subheading"
-              defaultMessage="When finishing, the parallel will remain closed. You can come back anytime to review the information."
-            />
+            {hasLinkedToProfileTypeFields ? (
+              <FormattedMessage
+                id="component.close-petition-dialog.subheading-with-profiles"
+                defaultMessage="Continue to close the parallel and save the information in profiles."
+              />
+            ) : (
+              <FormattedMessage
+                id="component.close-petition-dialog.subheading"
+                defaultMessage="When finishing, the parallel will remain closed. You can come back anytime to review the information."
+              />
+            )}
           </Text>
           {petition.accesses.length > 0 ? (
             <Stack>

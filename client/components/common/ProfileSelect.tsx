@@ -90,7 +90,9 @@ export interface ProfileSelectProps<
   OptionType extends ProfileSelectSelection = ProfileSelectSelection,
 > extends Omit<CustomAsyncCreatableSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
-  profileTypeId?: string[];
+  profileTypeId?: MaybeArray<string>;
+  defaultCreateProfileName?: string;
+  defaultCreateProfileFieldValues?: Record<string, string | number>;
   excludeProfiles?: string[];
   isSync?: IsSync;
   defaultOptions?: boolean;
@@ -112,6 +114,8 @@ export const ProfileSelect = Object.assign(
       isMulti,
       placeholder,
       profileTypeId,
+      defaultCreateProfileName,
+      defaultCreateProfileFieldValues,
       excludeProfiles,
       canCreateProfiles,
       ...props
@@ -134,7 +138,7 @@ export const ProfileSelect = Object.assign(
             offset: 0,
             limit: 100,
             filter: {
-              profileTypeId,
+              profileTypeId: isDefined(profileTypeId) ? unMaybeArray(profileTypeId) : null,
               status: ["OPEN", "CLOSED"],
             },
             search,
@@ -148,7 +152,7 @@ export const ProfileSelect = Object.assign(
         return result.data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
-      [profileTypeId?.join(",")],
+      [unMaybeArray(profileTypeId ?? []).join(",")],
     );
 
     const getProfiles = useGetProfiles();
@@ -188,12 +192,19 @@ export const ProfileSelect = Object.assign(
 
     const formatCreateLabel = (label: string) => {
       return (
-        <Text as="span">
-          <FormattedMessage
-            id="component.profile-select.create-new-profile"
-            defaultMessage="Create new profile for: <b>{label}</b>"
-            values={{ label }}
-          />
+        <Text as="em">
+          {label || defaultCreateProfileName ? (
+            <FormattedMessage
+              id="component.profile-select.create-new-profile"
+              defaultMessage="Create new profile for: <b>{label}</b>"
+              values={{ label: label || defaultCreateProfileName }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.profile-select.create-new-profile-no-name"
+              defaultMessage="Create new profile"
+            />
+          )}
         </Text>
       );
     };
@@ -204,21 +215,30 @@ export const ProfileSelect = Object.assign(
     const showCreateProfileDialog = useCreateProfileDialog();
     async function handleCreateOption(name: string) {
       try {
-        const { profile } = await showCreateProfileDialog({ suggestedName: name });
+        const allowedProfileTypeIds = unMaybeArray(profileTypeId ?? []);
+        const { profile } = await showCreateProfileDialog({
+          profileTypeId: allowedProfileTypeIds.length === 1 ? allowedProfileTypeIds[0] : undefined,
+          ...(name
+            ? { suggestedName: name }
+            : defaultCreateProfileFieldValues
+              ? { profileFieldValues: defaultCreateProfileFieldValues }
+              : {}),
+        });
         if (profile) {
           rerender();
           if (isMulti) {
             const selectedValues = unMaybeArray(_value);
             onChange([...selectedValues, profile] as any, {
-              action: "select-option",
+              action: "create-option",
               option: profile as any,
             });
           } else {
-            onChange(profile as any, { action: "select-option", option: profile as any });
+            onChange(profile as any, { action: "create-option", option: profile as any });
           }
         }
       } catch (e) {
         if (isDialogError(e)) {
+          rerender();
           setTimeout(() => {
             // this line seems to be needed in some scenarios on FF
             innerRef.current?.controlRef?.closest("form")?.focus();
@@ -229,7 +249,7 @@ export const ProfileSelect = Object.assign(
     }
     useEffectSkipFirst(() => {
       rerender();
-    }, [profileTypeId?.join(",")]);
+    }, [unMaybeArray(profileTypeId ?? [])?.join(",")]);
 
     return isSync ? (
       <Select<OptionType, IsMulti, never>
@@ -268,6 +288,7 @@ export const ProfileSelect = Object.assign(
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         onCreateOption={handleCreateOption}
+        isValidNewOption={isDefined(defaultCreateProfileName) ? () => true : undefined}
         placeholder={
           placeholder ??
           intl.formatMessage(

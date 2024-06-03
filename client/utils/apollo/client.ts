@@ -262,6 +262,9 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 return value ?? [];
               },
             },
+            children: {
+              merge: false,
+            },
           },
         },
         PetitionFieldReply: {

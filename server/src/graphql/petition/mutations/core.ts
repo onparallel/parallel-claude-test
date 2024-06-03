@@ -15,7 +15,20 @@ import {
 import { outdent } from "outdent";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { isDefined, omit, pipe, range, sumBy, uniq, zip, zipWith } from "remeda";
+import {
+  filter,
+  groupBy,
+  isDefined,
+  map,
+  omit,
+  partition,
+  pipe,
+  range,
+  sumBy,
+  uniq,
+  zip,
+  zipWith,
+} from "remeda";
 import {
   CreatePetition,
   CreatePetitionField,
@@ -23,18 +36,29 @@ import {
   CreatePublicPetitionLink,
   Petition,
   PetitionPermission,
+  ProfileTypeFieldType,
 } from "../../../db/__types";
+import {
+  ProfileFieldExpiryUpdatedEvent,
+  ProfileFieldFileAddedEvent,
+} from "../../../db/events/ProfileEvent";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
+import {
+  mapPetitionFieldReplyToProfileFieldValue,
+  mapProfileTypeFieldToPetitionField,
+} from "../../../db/helpers/petitionProfileMapper";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import {
   PetitionFieldMath,
   PetitionFieldVisibility,
+  applyFieldVisibility,
   mapFieldLogicCondition,
   mapFieldMathOperation,
 } from "../../../util/fieldLogic";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
+import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
 import {
@@ -58,6 +82,7 @@ import {
   not,
   or,
 } from "../../helpers/authorize";
+import { buildProfileUpdatedEventsData } from "../../helpers/buildProfileUpdatedEventsData";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
@@ -89,6 +114,16 @@ import {
   organizationHasEnoughPetitionSendCredits,
   userHasAccessToOrganizationTheme,
 } from "../../organization/authorizers";
+import {
+  profileHasSameProfileTypeAsField,
+  profileHasStatus,
+  profileTypeFieldBelongsToPetitionFieldProfileType,
+  profileTypeFieldsAreExpirable,
+  profileTypeIsArchived,
+  userHasAccessToProfile,
+  userHasAccessToProfileType,
+  userHasPermissionOnProfileTypeField,
+} from "../../profile/authorizers";
 import { contextUserHasPermission } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
@@ -99,8 +134,11 @@ import {
   contextUserCanClonePetitions,
   defaultOnBehalfUserBelongsToContextOrganization,
   fieldAliasIsAvailable,
+  fieldCanBeLinkedToProfileType,
   fieldHasParent,
   fieldHasType,
+  fieldIsLinkedToProfileType,
+  fieldIsLinkedToProfileTypeField,
   fieldIsNotBeingReferencedByAnotherFieldLogic,
   fieldIsNotFirstChild,
   fieldIsNotFixed,
@@ -109,6 +147,7 @@ import {
   foldersAreInPath,
   messageBelongToPetition,
   parentFieldIsInternal,
+  petitionFieldsCanBeAssociated,
   petitionHasRepliableFields,
   petitionHasStatus,
   petitionIsNotAnonymized,
@@ -119,16 +158,18 @@ import {
   petitionsAreOfTypeTemplate,
   petitionsArePublicTemplates,
   petitionsHaveEnabledInteractionWithRecipients,
+  profileTypeFieldCanBeLinkedToFieldGroup,
   repliesBelongsToField,
   repliesBelongsToPetition,
   replyStatusCanBeUpdated,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
+  userHasAccessToUpdatePetitionFieldGroupRelationshipsInput,
   userHasFeatureFlag,
   userHasPermissionInFolders,
 } from "../authorizers";
 import { validatePublicPetitionLinkSlug } from "../validations";
-import { ApolloError, ArgValidationError } from "./../../helpers/errors";
+import { ApolloError, ArgValidationError, ForbiddenError } from "./../../helpers/errors";
 import {
   fieldIsNotBeingUsedInAutoSearchConfig,
   fieldIsNotBeingUsedInMathOperation,
@@ -1006,7 +1047,7 @@ export const createPetitionField = mutationField("createPetitionField", {
       ctx.user!,
     );
 
-    await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+    await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
 
     return field;
   },
@@ -1021,6 +1062,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
+    not(fieldIsLinkedToProfileTypeField("fieldId")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1138,6 +1180,15 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ifArgDefined(
       (args) => args.data.alias,
       fieldAliasIsAvailable("petitionId", (args) => args.data.alias!),
+    ),
+    ifArgDefined(
+      (args) =>
+        args.data.multiple ??
+        (args.data.options?.standardList !== undefined ? true : undefined) ??
+        args.data.options?.values ??
+        args.data.options?.labels ??
+        args.data.options?.format,
+      not(fieldIsLinkedToProfileTypeField("fieldId")),
     ),
   ),
   args: {
@@ -2229,6 +2280,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotBeingUsedInMathOperation("petitionId", "fieldId"),
     fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+    not(fieldIsLinkedToProfileTypeField("fieldId")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2388,7 +2440,11 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
     additionalProperties: { type: ["string", "boolean", "number"] },
   })((args) => args.metadata, "metadata"),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updatePetitionFieldReplyMetadata(args.replyId, args.metadata);
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      { metadata: args.metadata },
+      `User:${ctx.user!.id}`,
+    );
   },
 });
 
@@ -2800,16 +2856,16 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldsBelongsToPetition("petitionId", "parentFieldId"),
-    fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
     fieldHasType("parentFieldId", "FIELD_GROUP"),
     ifNotEmptyArray(
       "childrenFieldIds",
       and(
+        fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
         not(fieldHasType("childrenFieldIds", ["FIELD_GROUP", "HEADING"])),
         not(fieldHasParent("childrenFieldIds")),
+        fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "childrenFieldIds"),
       ),
     ),
-    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "childrenFieldIds"),
   ),
   validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
@@ -2869,10 +2925,16 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldsBelongsToPetition("petitionId", "parentFieldId"),
-    fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
     fieldHasType("parentFieldId", "FIELD_GROUP"),
-    fieldHasParent("childrenFieldIds", "parentFieldId"),
-    fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "childrenFieldIds"),
+    ifNotEmptyArray(
+      "childrenFieldIds",
+      and(
+        fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
+        fieldHasParent("childrenFieldIds", "parentFieldId"),
+        fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "childrenFieldIds"),
+        not(fieldIsLinkedToProfileTypeField("childrenFieldIds")),
+      ),
+    ),
   ),
   validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
@@ -2917,3 +2979,748 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
     }
   },
 });
+
+export const linkFieldGroupToProfileType = mutationField("linkFieldGroupToProfileType", {
+  type: "PetitionField",
+  description:
+    "Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    fieldCanBeLinkedToProfileType("petitionId", "petitionFieldId"),
+    ifArgDefined(
+      "profileTypeId",
+      and(
+        userHasAccessToProfileType("profileTypeId" as never),
+        not(profileTypeIsArchived("profileTypeId" as never)),
+      ),
+    ),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    profileTypeId: nullable(globalIdArg("ProfileType")),
+  },
+  resolve: async (_, { petitionId, petitionFieldId, profileTypeId }, ctx) => {
+    const [field] = await ctx.petitions.updatePetitionField(
+      petitionId,
+      petitionFieldId,
+      {
+        profile_type_id: profileTypeId ?? null,
+      },
+      `User:${ctx.user!.id}`,
+    );
+
+    return field;
+  },
+});
+
+export const createProfileLinkedPetitionField = mutationField("createProfileLinkedPetitionField", {
+  type: "PetitionField",
+  description:
+    "Adds a field as child of a field group, linked to a property of the parent field profile type",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    fieldHasType("parentFieldId", "FIELD_GROUP"),
+    fieldsBelongsToPetition("petitionId", "parentFieldId"),
+    profileTypeFieldCanBeLinkedToFieldGroup("parentFieldId", "profileTypeFieldId"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    parentFieldId: nonNull(globalIdArg("PetitionField")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    position: intArg(),
+  },
+  validateArgs: inRange((args) => args.position, "position", 0),
+  resolve: async (_, args, ctx) => {
+    const profileTypeField = (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+
+    const mappedField = mapProfileTypeFieldToPetitionField(
+      profileTypeField,
+      petition!.recipient_locale,
+    );
+
+    const [petitionField] = await ctx.petitions.createPetitionFieldsAtPosition(
+      args.petitionId,
+      mappedField,
+      args.parentFieldId,
+      args.position ?? -1,
+      ctx.user!,
+    );
+
+    await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
+
+    ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
+    ctx.petitions.loadPetitionFieldChildren.dataloader.clear(args.parentFieldId);
+    return petitionField;
+  },
+});
+
+export const archiveFieldGroupReplyIntoProfile = mutationField(
+  "archiveFieldGroupReplyIntoProfile",
+  {
+    type: "PetitionFieldReply",
+    description: "Archives the replies of a FIELD_GROUP field into a profile",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      userHasAccessToProfile("profileId"),
+      profileHasStatus("profileId", ["OPEN"]),
+      profileHasSameProfileTypeAsField("profileId", "petitionFieldId"),
+      userHasAccessToPetitions("petitionId"),
+      petitionsAreNotPublicTemplates("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      petitionHasStatus("petitionId", ["CLOSED"]),
+      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+      fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
+      fieldIsLinkedToProfileType("petitionFieldId"),
+      repliesBelongsToField("petitionFieldId", "parentReplyId"),
+      profileTypeFieldBelongsToPetitionFieldProfileType(
+        (args) => [
+          ...args.conflictResolutions.map((c) => c.profileTypeFieldId),
+          ...args.expirations.map((e) => e.profileTypeFieldId),
+        ],
+        "petitionFieldId",
+      ),
+      userHasPermissionOnProfileTypeField(
+        (args) => [
+          ...args.conflictResolutions.map((c) => c.profileTypeFieldId),
+          ...args.expirations.map((e) => e.profileTypeFieldId),
+        ],
+        "WRITE",
+      ),
+      profileTypeFieldsAreExpirable((args) =>
+        args.expirations.flatMap((e) => e.profileTypeFieldId),
+      ),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      parentReplyId: nonNull(
+        globalIdArg("PetitionFieldReply", { description: "ID of the FIELD_GROUP reply" }),
+      ),
+      profileId: nonNull(
+        globalIdArg("Profile", {
+          description: "ID of the profile to archive into.",
+        }),
+      ),
+      conflictResolutions: nonNull(
+        list(
+          nonNull(
+            inputObjectType({
+              name: "ArchiveFieldGroupReplyIntoProfileConflictResolutionInput",
+              description:
+                "Action to take when the selected profile already has a value on the field. An error will be thrown if no conflictResolution is provided for a field with a value.",
+              definition(t) {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nonNull.field("action", {
+                  type: enumType({
+                    name: "ArchiveFieldGroupReplyIntoProfileConflictResolutionAction",
+                    members: ["IGNORE", "OVERWRITE", "APPEND"],
+                  }),
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+      expirations: nonNull(
+        list(
+          nonNull(
+            inputObjectType({
+              name: "ArchiveFieldGroupReplyIntoProfileExpirationInput",
+              definition(t) {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nullable.date("expiryDate");
+              },
+            }),
+          ),
+        ),
+      ),
+    },
+    validateArgs: (root, args, ctx, info) => {
+      if (!args.expirations.every((e) => e.expiryDate !== undefined)) {
+        throw new ArgValidationError(info, "expirations", "expiryDate cannot be undefined");
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const [composedPetition] = await ctx.petitions.getComposedPetitionFieldsAndVariables([
+        args.petitionId,
+      ]);
+
+      // only need visible fields of type FIELD_GROUP with a profile_type_id and its visible children
+      const fieldGroup = applyFieldVisibility(composedPetition).find(
+        (f) => f.id === args.petitionFieldId,
+      );
+
+      if (!isDefined(fieldGroup)) {
+        // trying to archive a FIELD_GROUP reply that is not visible with the current field visibility
+        throw new ForbiddenError("FORBIDDEN");
+      }
+
+      // get the replies from the children fields that are linked with a property on the profile
+      const groupReplies =
+        fieldGroup.replies
+          .find((r) => r.id === args.parentReplyId)!
+          .children?.filter((c) => isDefined(c.field.profile_type_field_id)) ?? [];
+
+      // load profile and get its values and files
+      const [profile, profileTypeFields, profileFieldValues, profileFieldFiles] = await Promise.all(
+        [
+          ctx.profiles.loadProfile(args.profileId),
+          ctx.profiles.loadProfileTypeFieldsByProfileTypeId(fieldGroup.profile_type_id!),
+          ctx.profiles.loadProfileFieldValuesByProfileId(args.profileId),
+          ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId),
+        ],
+      );
+
+      const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+        groupReplies.map((r) => ({
+          profileTypeFieldId: r.field.profile_type_field_id!,
+          userId: ctx.user!.id,
+        })),
+      );
+
+      const [fileReplies, simpleReplies] = pipe(
+        zip(groupReplies, effectivePermissions),
+        filter(([, permission]) => isAtLeast(permission, "WRITE")), // don't write on fields without WRITE permission
+        map(([{ field, replies }]) => ({
+          field: omit(field, ["replies"]), // omit field.replies to avoid confusions (field.replies contain every reply of the field for every group)
+          replies,
+        })),
+        partition(({ field }) => field.type === "FILE_UPLOAD"),
+      );
+
+      // extract file_upload_ids from every reply and profile value. This way we can load it all at once for later usage
+      const fileUploadIds = uniq([
+        ...groupReplies.flatMap((r) =>
+          r.field.type === "FILE_UPLOAD"
+            ? r.replies.map((r) => r.content.file_upload_id as number).filter(isDefined)
+            : [],
+        ),
+        ...profileFieldFiles.map((pff) => pff.file_upload_id).filter(isDefined),
+      ]);
+
+      const fileUploads = await ctx.files.loadFileUpload(fileUploadIds);
+
+      // we need to iterate replies on petition and check if there are conflicts with current values on the profile
+      // if any conflict exists, push it to this arrays and throw an ApolloError with the conflicted fields, so the user can select what to do on each case
+      const missingConflictResolutions: number[] = [];
+      const missingExpirations: number[] = [];
+
+      // these contain the contents of every profile type field that will be created or updated on the profile.
+      // if content is null, it means the value will be removed from the profile
+      // expiryDate must be defined (or null) if the field is expirable
+      const updateProfileFieldValues: {
+        profileTypeFieldId: number;
+        type: ProfileTypeFieldType;
+        content: any;
+        expiryDate?: string | null;
+        alias: string | null;
+      }[] = [];
+
+      for (const { field, replies } of simpleReplies) {
+        const reply = replies.at(0); // get only 1st reply on non-file fields
+        const profileTypeField = profileTypeFields.find(
+          (f) => f.id === field.profile_type_field_id!,
+        )!;
+        const profileFieldValue = profileFieldValues.find(
+          (v) => v.profile_type_field_id === field.profile_type_field_id!,
+        );
+
+        const resolution = args.conflictResolutions.find(
+          (cr) => cr.profileTypeFieldId === field.profile_type_field_id!,
+        );
+        const expiration = args.expirations.find(
+          (e) => e.profileTypeFieldId === field.profile_type_field_id!,
+        );
+
+        // if already exists a value on the profile, there could be a conflict with reply so we need to check
+        if (isDefined(profileFieldValue)) {
+          // we need to do something only if the reply value is different than current value (or no reply on the field)
+          if (!isDefined(reply) || reply.content.value !== profileFieldValue.content.value) {
+            // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
+            if (
+              isDefined(reply) &&
+              profileTypeField.is_expirable &&
+              !isDefined(expiration) &&
+              (!isDefined(resolution) || resolution.action !== "IGNORE") // if resolution is IGNORE, value will not be updated so we don't want to update the expiryDate
+            ) {
+              missingExpirations.push(field.profile_type_field_id!);
+            }
+            // resolution is required
+            if (!isDefined(resolution)) {
+              missingConflictResolutions.push(field.profile_type_field_id!);
+            } else if (resolution.action === "OVERWRITE") {
+              /**
+               * action could be:
+               * OVERWRITE: will remove the current profile field value and create a new one if the reply is defined. Will try to update field expiryDate if required and provided.
+               * IGNORE/APPEND: will keep the current profile field value and ignore the reply
+               */
+              updateProfileFieldValues.push({
+                ...mapPetitionFieldReplyToProfileFieldValue(
+                  reply ?? { type: field.type, content: null },
+                ),
+                profileTypeFieldId: field.profile_type_field_id!,
+                expiryDate: expiration?.expiryDate,
+                alias: profileTypeField.alias,
+              });
+            }
+          }
+        } else if (isDefined(reply)) {
+          // profile field value is not present in profile, there will be no conflicts
+          // if the field is expirable, we require it to be present on expirations array
+          if (profileTypeField.is_expirable && !isDefined(expiration)) {
+            // expiration is required
+            missingExpirations.push(field.profile_type_field_id!);
+          }
+
+          updateProfileFieldValues.push({
+            ...mapPetitionFieldReplyToProfileFieldValue(reply),
+            profileTypeFieldId: field.profile_type_field_id!,
+            expiryDate: expiration?.expiryDate,
+            alias: profileTypeField.alias,
+          });
+        }
+      }
+
+      const deleteProfileFieldFileIds: number[] = [];
+      const createProfileFieldFiles: {
+        profileTypeFieldId: number;
+        fileUploadId: number;
+        expiryDate?: string | null;
+      }[] = [];
+
+      // same process than before, with FILE_UPLOADS
+      for (const { field, replies } of fileReplies) {
+        const profileTypeField = profileTypeFields.find(
+          (f) => f.id === field.profile_type_field_id!,
+        )!;
+        const profileFieldFileValues = profileFieldFiles.filter(
+          (v) => v.profile_type_field_id === field.profile_type_field_id!,
+        );
+
+        const resolution = args.conflictResolutions.find(
+          (cr) => cr.profileTypeFieldId === field.profile_type_field_id!,
+        );
+
+        const expiration = args.expirations.find(
+          (e) => e.profileTypeFieldId === field.profile_type_field_id!,
+        );
+
+        if (profileFieldFileValues.length > 0) {
+          if (replies.length === 0) {
+            // no replies on field, IGNORE or OVERWRITE?
+            if (!isDefined(resolution)) {
+              // resolution is required
+              missingConflictResolutions.push(field.profile_type_field_id!);
+            }
+
+            /**
+             * action could be:
+             * OVERWRITE: will remove all the current files on the profile field
+             * APPEND/IGNORE: will keep the current profile files
+             */
+            if (resolution?.action === "OVERWRITE") {
+              deleteProfileFieldFileIds.push(...profileFieldFileValues.map((pff) => pff.id));
+            }
+          } else {
+            const replyFileUploads = replies
+              .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+              .map((r) => r.content.file_upload_id as number)
+              .map((id) => fileUploads.find((fu) => fu?.id === id));
+
+            const profileFieldFileUploads = profileFieldFileValues.map((pff) =>
+              fileUploads.find((fu) => fu?.id === pff.file_upload_id),
+            );
+
+            // these are the files that are not present on the profile (compare by file_upload.path)
+            // these will be attached to the existing files on the profile if resolution is APPEND or OVERWRITE
+            const newFileUploads = replyFileUploads.filter(
+              (r) => !profileFieldFileUploads.find((pff) => pff?.path === r?.path),
+            );
+            // these are files that are present on the profile but not on the reply
+            // these will be removed from the profile if resolution is OVERWRITE
+            const currentProfileFieldFileUploads = profileFieldFileUploads.filter(
+              (pff) => !replyFileUploads.find((r) => r?.path === pff?.path),
+            );
+
+            // expiration is required if the field is expirable and the reply has files (meaning profile value will not be removed)
+            if (
+              (!isDefined(resolution) || resolution.action !== "IGNORE") && // don't ask for expiryDate if ignoring this reply
+              profileTypeField.is_expirable &&
+              !isDefined(expiration) &&
+              (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0) // if there is no difference between reply and profile value, no need to update expiryDate
+            ) {
+              missingExpirations.push(field.profile_type_field_id!);
+            }
+
+            if (
+              !isDefined(resolution) &&
+              (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0)
+            ) {
+              // resolution is required only if there is any difference between files on reply and profile
+              missingConflictResolutions.push(field.profile_type_field_id!);
+            } else if (resolution?.action === "APPEND" || resolution?.action === "OVERWRITE") {
+              createProfileFieldFiles.push(
+                ...newFileUploads.filter(isDefined).map((r) => ({
+                  profileTypeFieldId: field.profile_type_field_id!,
+                  fileUploadId: r.id!,
+                  expiryDate: expiration?.expiryDate,
+                })),
+              );
+              if (resolution?.action === "OVERWRITE") {
+                deleteProfileFieldFileIds.push(
+                  ...currentProfileFieldFileUploads
+                    .filter(isDefined)
+                    .map((fu) => profileFieldFiles.find((pf) => pf.file_upload_id === fu?.id)!.id),
+                );
+              }
+            }
+          }
+        } else if (replies.length > 0) {
+          // no files on the profile. we can add the files on replies without checking for conflicts
+
+          // if the field is expirable, we require it to be present on expirations array
+          if (profileTypeField.is_expirable && !isDefined(expiration)) {
+            // expiration is required
+            missingExpirations.push(field.profile_type_field_id!);
+          }
+
+          createProfileFieldFiles.push(
+            ...replies
+              .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+              .map((r) => ({
+                profileTypeFieldId: field.profile_type_field_id!,
+                fileUploadId: r.content.file_upload_id as number,
+                expiryDate: expiration?.expiryDate,
+              })),
+          );
+        }
+      }
+
+      if (missingConflictResolutions.length > 0 || missingExpirations.length > 0) {
+        throw new ApolloError(
+          "There was a conflict with existing values, please provide conflictResolution and/or expirations data",
+          "CONFLICT_RESOLUTION_REQUIRED_ERROR",
+          {
+            conflictResolutions: missingConflictResolutions.map((r) =>
+              toGlobalId("ProfileTypeField", r),
+            ),
+            expirations: missingExpirations.map((e) => toGlobalId("ProfileTypeField", e)),
+          },
+        );
+      }
+
+      const { currentValues, previousValues } = await ctx.profiles.updateProfileFieldValue(
+        profile!.id,
+        updateProfileFieldValues,
+        ctx.user!.id,
+      );
+
+      await ctx.profiles.createProfileUpdatedEvents(
+        profile!.id,
+        buildProfileUpdatedEventsData(
+          profile!.id,
+          updateProfileFieldValues,
+          currentValues,
+          previousValues,
+          ctx.user!,
+        ),
+        ctx.user!,
+      );
+
+      if (deleteProfileFieldFileIds.length > 0) {
+        const deletedProfileFiles = await ctx.profiles.deleteProfileFieldFiles(
+          deleteProfileFieldFileIds,
+          ctx.user!.id,
+        );
+        await ctx.profiles.createProfileUpdatedEvents(
+          profile!.id,
+          deletedProfileFiles.map((f) => ({
+            type: "PROFILE_FIELD_FILE_REMOVED",
+            profile_id: profile!.id,
+            org_id: ctx.user!.org_id,
+            data: {
+              user_id: ctx.user!.id,
+              profile_type_field_id: f.profile_type_field_id,
+              profile_field_file_id: f.id,
+              alias:
+                profileTypeFields.find((ptf) => ptf.id === f.profile_type_field_id)!.alias ?? null,
+            },
+          })),
+          ctx.user!,
+        );
+      }
+
+      if (createProfileFieldFiles.length > 0) {
+        const byProfileTypeFieldId = groupBy(createProfileFieldFiles, (p) => p.profileTypeFieldId);
+        for (const [profileTypeFieldId, values] of Object.entries(byProfileTypeFieldId)) {
+          const clonedFileUploads = await ctx.files.cloneFileUpload(
+            values.map((f) => f.fileUploadId!),
+          );
+          const profileTypeField = profileTypeFields.find(
+            (ptf) => ptf.id === parseInt(profileTypeFieldId),
+          )!;
+          const expiration = args.expirations.find(
+            (e) => e.profileTypeFieldId === profileTypeField.id,
+          );
+          const profileFieldFiles = await ctx.profiles.createProfileFieldFiles(
+            profile!.id,
+            profileTypeField.id,
+            clonedFileUploads.map((fu) => fu.id),
+            expiration?.expiryDate,
+            ctx.user!.id,
+          );
+
+          await ctx.profiles.createProfileUpdatedEvents(
+            profile!.id,
+            [
+              ...profileFieldFiles.map(
+                (pff) =>
+                  ({
+                    org_id: ctx.user!.org_id,
+                    profile_id: pff.profile_id,
+                    type: "PROFILE_FIELD_FILE_ADDED",
+                    data: {
+                      user_id: ctx.user!.id,
+                      profile_type_field_id: pff.profile_type_field_id,
+                      profile_field_file_id: pff.id,
+                      alias: profileTypeField?.alias ?? null,
+                    },
+                  }) satisfies ProfileFieldFileAddedEvent<true>,
+              ),
+              ...(expiration?.expiryDate !== undefined
+                ? [
+                    {
+                      org_id: ctx.user!.org_id,
+                      profile_id: profile!.id,
+                      type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                      data: {
+                        user_id: ctx.user!.id,
+                        profile_type_field_id: profileTypeField.id,
+                        expiry_date: expiration?.expiryDate ?? null,
+                        alias: profileTypeField?.alias ?? null,
+                      },
+                    } satisfies ProfileFieldExpiryUpdatedEvent<true>,
+                  ]
+                : []),
+            ],
+            ctx.user!,
+          );
+        }
+      }
+
+      try {
+        await ctx.profiles.associateProfileToPetition(
+          profile!.id,
+          args.petitionId,
+          `User:${ctx.user!.id}`,
+        );
+        await ctx.petitions.createEvent({
+          type: "PROFILE_ASSOCIATED",
+          petition_id: args.petitionId,
+          data: {
+            user_id: ctx.user!.id,
+            profile_id: profile!.id,
+          },
+        });
+        await ctx.profiles.createEvent({
+          type: "PETITION_ASSOCIATED",
+          org_id: ctx.user!.org_id,
+          profile_id: profile!.id,
+          data: {
+            user_id: ctx.user!.id,
+            petition_id: args.petitionId,
+          },
+        });
+      } catch (error) {
+        if (
+          error instanceof DatabaseError &&
+          error.constraint === "petition_profile__petition_id__profile_id"
+        ) {
+          // profile is already associated to petition, safe to ignore error
+        } else {
+          throw error;
+        }
+      }
+
+      // these are the possible field relationships with petitionFieldId in any of the sides.
+      // we need to look for replies with set associated_profile_id that belong to the field on the other side of the relationship
+      const fieldRelationships =
+        await ctx.petitions.getPetitionFieldGroupRelationshipsByPetitionFieldId(
+          args.petitionId,
+          args.petitionFieldId,
+        );
+
+      if (fieldRelationships.length > 0) {
+        const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+          uniq(fieldRelationships.map((r) => r.profile_relationship_type_id)),
+        );
+
+        // get fieldIds in other side of the relationship
+        const otherFieldIds = uniq(
+          fieldRelationships.map((r) =>
+            r.left_side_petition_field_id === args.petitionFieldId
+              ? r.right_side_petition_field_id
+              : r.left_side_petition_field_id,
+          ),
+        );
+
+        const repliesWithAssociatedProfiles = (
+          await ctx.petitions.loadRepliesForField(otherFieldIds)
+        )
+          .flat()
+          .filter(
+            (r) =>
+              isDefined(r.associated_profile_id) &&
+              r.associated_profile_id !== args.profileId &&
+              r.id !== args.parentReplyId,
+          );
+
+        if (repliesWithAssociatedProfiles.length > 0) {
+          const newRelationships = await ctx.profiles.createProfileRelationship(
+            repliesWithAssociatedProfiles.flatMap((reply) =>
+              // every reply associated with a profile may have one or more possible relationships
+              fieldRelationships
+                .filter(
+                  (r) =>
+                    (r.left_side_petition_field_id === args.petitionFieldId &&
+                      r.right_side_petition_field_id === reply.petition_field_id) ||
+                    (r.right_side_petition_field_id === args.petitionFieldId &&
+                      r.left_side_petition_field_id === reply.petition_field_id),
+                )
+                .map((relationship) => {
+                  const relationshipType = relationshipTypes.find(
+                    (rt) => rt!.id === relationship.profile_relationship_type_id,
+                  )!;
+
+                  if (relationshipType.is_reciprocal) {
+                    const [leftSideId, rightSideId] = [
+                      profile!.id,
+                      reply.associated_profile_id!,
+                    ].sort();
+                    return {
+                      left_side_profile_id: leftSideId,
+                      right_side_profile_id: rightSideId,
+                      profile_relationship_type_id: relationship.profile_relationship_type_id,
+                    };
+                  }
+
+                  if (relationship.direction === "LEFT_RIGHT") {
+                    return {
+                      left_side_profile_id:
+                        relationship.left_side_petition_field_id === args.petitionFieldId
+                          ? profile!.id
+                          : reply.associated_profile_id!,
+                      right_side_profile_id:
+                        relationship.left_side_petition_field_id === args.petitionFieldId
+                          ? reply.associated_profile_id!
+                          : profile!.id,
+                      profile_relationship_type_id: relationship.profile_relationship_type_id,
+                    };
+                  } else {
+                    return {
+                      left_side_profile_id:
+                        relationship.left_side_petition_field_id === args.petitionFieldId
+                          ? reply.associated_profile_id!
+                          : profile!.id,
+                      right_side_profile_id:
+                        relationship.left_side_petition_field_id === args.petitionFieldId
+                          ? profile!.id
+                          : reply.associated_profile_id!,
+                      profile_relationship_type_id: relationship.profile_relationship_type_id,
+                    };
+                  }
+                }),
+            ),
+            ctx.user!,
+            true,
+          );
+
+          if (newRelationships.length > 0) {
+            const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
+              uniq(newRelationships.map((r) => r.profile_relationship_type_id)),
+            );
+
+            await ctx.profiles.createEvent(
+              newRelationships.map((r) => ({
+                type: "PROFILE_RELATIONSHIP_CREATED",
+                org_id: ctx.user!.org_id,
+                profile_id: profile!.id,
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_relationship_id: r.id,
+                  profile_relationship_type_alias: relationshipTypes.find(
+                    (rt) => rt!.id === r.profile_relationship_type_id,
+                  )!.alias,
+                },
+              })),
+            );
+          }
+        }
+      }
+
+      return await ctx.petitions.updatePetitionFieldReply(
+        args.parentReplyId,
+        { associated_profile_id: profile!.id },
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updatePetitionFieldGroupRelationships = mutationField(
+  "updatePetitionFieldGroupRelationships",
+  {
+    type: "PetitionBase",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreEditable("petitionId"),
+      petitionsAreNotPublicTemplates("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      petitionFieldsCanBeAssociated("relationships"),
+      userHasAccessToUpdatePetitionFieldGroupRelationshipsInput("petitionId", "relationships"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      relationships: nonNull(
+        list(
+          nonNull(
+            inputObjectType({
+              name: "UpdatePetitionFieldGroupRelationshipInput",
+              definition(t) {
+                t.nullable.globalId("id", { prefixName: "PetitionFieldGroupRelationship" });
+                t.nonNull.globalId("leftSidePetitionFieldId", { prefixName: "PetitionField" });
+                t.nonNull.globalId("rightSidePetitionFieldId", { prefixName: "PetitionField" });
+                t.nonNull.globalId("profileRelationshipTypeId", {
+                  prefixName: "ProfileRelationshipType",
+                });
+                t.nonNull.field("direction", { type: "ProfileRelationshipDirection" });
+              },
+            }),
+          ),
+        ),
+      ),
+    },
+    resolve: async (_, args, ctx) => {
+      await ctx.petitions.resetPetitionFieldGroupRelationships(
+        args.petitionId,
+        args.relationships,
+        `User:${ctx.user!.id}`,
+      );
+
+      return (await ctx.petitions.loadPetition(args.petitionId))!;
+    },
+  },
+);

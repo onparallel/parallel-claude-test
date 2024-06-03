@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import {
-  PetitionFieldSelect_PetitionFieldFragment,
-  PetitionFieldSelect_PetitionFieldInnerFragment,
-} from "@parallel/graphql/__types";
+import { PetitionFieldSelect_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
@@ -24,35 +21,46 @@ import Select, {
 } from "react-select";
 import { isDefined, zip } from "remeda";
 
-type PetitionFieldSelection = PetitionFieldSelect_PetitionFieldFragment;
+type FieldOf<T extends PetitionFieldSelect_PetitionBaseFragment> = UnwrapArray<
+  Exclude<T["fields"], null | undefined>
+>;
 
-type ChildOf<T extends PetitionFieldSelection> = UnwrapArray<
+type ChildOf<T extends FieldOf<PetitionFieldSelect_PetitionBaseFragment>> = UnwrapArray<
   Exclude<T["children"], null | undefined>
 >;
 
+type AnyFieldOf<T extends PetitionFieldSelect_PetitionBaseFragment> =
+  | FieldOf<T>
+  | ChildOf<FieldOf<T>>;
+
+interface PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionBaseFragment> {
+  field: AnyFieldOf<T>;
+  fieldIndex: PetitionFieldIndex;
+}
+
 export interface PetitionFieldSelectProps<
-  OptionType extends PetitionFieldSelection,
+  T extends PetitionFieldSelect_PetitionBaseFragment,
   IsMulti extends boolean = false,
-> extends CustomSelectProps<Exclude<OptionType, "children">, IsMulti, never> {
-  fields: OptionType[];
-  filterFields?: (field: OptionType | ChildOf<OptionType>) => boolean;
+> extends CustomSelectProps<AnyFieldOf<T>, IsMulti, never> {
+  petition: T;
+  filterFields?: (field: AnyFieldOf<T>) => boolean;
   expandFieldGroups?: boolean;
 }
 
 export function PetitionFieldSelect<
-  OptionType extends PetitionFieldSelection,
+  T extends PetitionFieldSelect_PetitionBaseFragment,
   IsMulti extends boolean = false,
 >({
   value,
   onChange,
-  fields,
+  petition,
   isMulti,
   filterFields,
   expandFieldGroups,
   ...props
-}: PetitionFieldSelectProps<OptionType, IsMulti>) {
+}: PetitionFieldSelectProps<T, IsMulti>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<PetitionFieldSelectOption<OptionType>, IsMulti, never>({
+  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, IsMulti, never>({
     placeholder: intl.formatMessage({
       id: "component.petition-field-select.placeholder",
       defaultMessage: "Select a field",
@@ -72,46 +80,46 @@ export function PetitionFieldSelect<
     },
   });
 
-  const fieldsWithIndices = useFieldsWithIndices(fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition);
   const { options, _value } = useMemo(() => {
-    let options = fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
-      if (field.type === "FIELD_GROUP" && expandFieldGroups) {
-        return [
-          { field: field, fieldIndex },
-          ...zip(field.children!, childrenFieldIndices!).map(([field, fieldIndex]) => ({
-            field: field as ChildOf<OptionType>,
-            fieldIndex,
-          })),
-        ];
-      } else {
-        return { field, fieldIndex };
-      }
-    });
+    let options: PetitionFieldSelectOption<T>[] = fieldsWithIndices.flatMap(
+      ([field, fieldIndex, childrenFieldIndices]) => {
+        if (field.type === "FIELD_GROUP" && expandFieldGroups) {
+          return [
+            { field: field, fieldIndex },
+            ...zip(field.children!, childrenFieldIndices!).map(([field, fieldIndex]) => ({
+              field: field as ChildOf<FieldOf<T>>,
+              fieldIndex,
+            })),
+          ];
+        } else {
+          return { field, fieldIndex };
+        }
+      },
+    );
     if (isDefined(filterFields)) {
       options = options.filter(({ field }) => filterFields(field));
     }
 
     const _value = isMulti
-      ? (value as OptionType[]).map((v) => mapValue(v, options)!)
-      : mapValue(value as OptionType | null, options);
+      ? (value as AnyFieldOf<T>[]).map((v) => mapValue(v, options)!)
+      : mapValue(value as AnyFieldOf<T> | null, options);
     return { options, _value };
-  }, [fields, value]);
+  }, [petition.fields, value]);
 
   const handleChange = useCallback(
     (
-      value: OnChangeValue<PetitionFieldSelectOption<OptionType>, IsMulti>,
-      actionMeta: ActionMeta<PetitionFieldSelectOption<OptionType>>,
+      value: OnChangeValue<PetitionFieldSelectOption<T>, IsMulti>,
+      actionMeta: ActionMeta<PetitionFieldSelectOption<T>>,
     ) => {
       if (isMulti) {
         onChange(
-          (value as PetitionFieldSelectOption<OptionType>[]).map(
-            (value) => value?.field ?? null,
-          ) as any,
+          (value as PetitionFieldSelectOption<T>[]).map((value) => value?.field ?? null) as any,
           actionMeta as any,
         );
       } else {
         onChange(
-          ((value as SV<PetitionFieldSelectOption<OptionType>>)?.field ?? null) as any,
+          ((value as SV<PetitionFieldSelectOption<T>>)?.field ?? null) as any,
           actionMeta as any,
         );
       }
@@ -134,11 +142,13 @@ export function PetitionFieldSelect<
 }
 
 PetitionFieldSelect.fragments = {
-  PetitionField: gql`
-    fragment PetitionFieldSelect_PetitionField on PetitionField {
-      ...PetitionFieldSelect_PetitionFieldInner
-      children {
+  PetitionBase: gql`
+    fragment PetitionFieldSelect_PetitionBase on PetitionBase {
+      fields {
         ...PetitionFieldSelect_PetitionFieldInner
+        children {
+          ...PetitionFieldSelect_PetitionFieldInner
+        }
       }
     }
     fragment PetitionFieldSelect_PetitionFieldInner on PetitionField {
@@ -153,13 +163,8 @@ PetitionFieldSelect.fragments = {
   `,
 };
 
-interface PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionFieldInnerFragment> {
-  field: T;
-  fieldIndex: PetitionFieldIndex;
-}
-
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
-  T extends PetitionFieldSelection,
+  T extends PetitionFieldSelect_PetitionBaseFragment,
 >({
   option,
   highlight,
@@ -204,11 +209,15 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
   );
 });
 
-const getOptionValue = (option: PetitionFieldSelectOption<any>) => {
+const getOptionValue = (
+  option: PetitionFieldSelectOption<PetitionFieldSelect_PetitionBaseFragment>,
+) => {
   return option.field.id;
 };
 
-const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
+const getOptionLabel = (
+  option: PetitionFieldSelectOption<PetitionFieldSelect_PetitionBaseFragment>,
+) => {
   return option.field.title ?? "";
 };
 
@@ -216,7 +225,9 @@ function mapValue<T extends { field: { id: string } }>(value: { id: string } | n
   return value ? options.find((o) => o.field.id === value.id) ?? null : null;
 }
 
-function SingleValue(props: SingleValueProps<PetitionFieldSelectOption<any>>) {
+function SingleValue(
+  props: SingleValueProps<PetitionFieldSelectOption<PetitionFieldSelect_PetitionBaseFragment>>,
+) {
   return (
     <components.SingleValue {...props}>
       <Flex>

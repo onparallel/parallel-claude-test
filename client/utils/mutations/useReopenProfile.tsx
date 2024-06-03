@@ -11,12 +11,14 @@ export function useReopenProfile() {
   return async function ({
     profileIds,
     profileName,
+    confirmText,
   }: {
     profileIds: string[];
     profileName: string;
+    confirmText?: string;
   }) {
     try {
-      await showReopenProfileDialog({ profileCount: profileIds.length, profileName });
+      await showReopenProfileDialog({ profileCount: profileIds.length, profileName, confirmText });
       await reopenProfile({
         variables: {
           profileIds,
@@ -40,8 +42,9 @@ useReopenProfile.mutations = [
 function ReopenProfileDialog({
   profileCount,
   profileName,
+  confirmText,
   ...props
-}: DialogProps<{ profileName: string; profileCount: number }, void>) {
+}: DialogProps<{ profileName: string; profileCount: number; confirmText?: string }, void>) {
   return (
     <ConfirmDialog
       {...props}
@@ -85,10 +88,12 @@ function ReopenProfileDialog({
       }
       confirm={
         <Button type="submit" colorScheme="primary">
-          <FormattedMessage
-            id="component.reopen-profile-dialog.reopen-button"
-            defaultMessage="Reopen"
-          />
+          {confirmText ?? (
+            <FormattedMessage
+              id="component.reopen-profile-dialog.reopen-button"
+              defaultMessage="Reopen"
+            />
+          )}
         </Button>
       }
     />

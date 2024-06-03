@@ -11,8 +11,9 @@ export function useHighlightElement() {
       });
 
       element.setAttribute("data-highlighted", "true");
-      await waitFor(1000);
-      element.removeAttribute("data-highlighted");
+      waitFor(1000).then(() => {
+        element.removeAttribute("data-highlighted");
+      });
     }
   }, []);
 }

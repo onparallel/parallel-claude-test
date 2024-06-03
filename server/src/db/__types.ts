@@ -610,6 +610,7 @@ export interface TableTypes {
   petition_field: PetitionField;
   petition_field_attachment: PetitionFieldAttachment;
   petition_field_comment: PetitionFieldComment;
+  petition_field_group_relationship: PetitionFieldGroupRelationship;
   petition_field_reply: PetitionFieldReply;
   petition_list_view: PetitionListView;
   petition_message: PetitionMessage;
@@ -675,6 +676,7 @@ export interface TableCreateTypes {
   petition_field: CreatePetitionField;
   petition_field_attachment: CreatePetitionFieldAttachment;
   petition_field_comment: CreatePetitionFieldComment;
+  petition_field_group_relationship: CreatePetitionFieldGroupRelationship;
   petition_field_reply: CreatePetitionFieldReply;
   petition_list_view: CreatePetitionListView;
   petition_message: CreatePetitionMessage;
@@ -740,6 +742,7 @@ export interface TablePrimaryKeys {
   petition_field: "id";
   petition_field_attachment: "id";
   petition_field_comment: "id";
+  petition_field_group_relationship: "id";
   petition_field_reply: "id";
   petition_list_view: "id";
   petition_message: "id";
@@ -1398,6 +1401,8 @@ export interface PetitionField {
   require_approval: boolean; // bool
   parent_petition_field_id: Maybe<number>; // int4
   math: Maybe<any>; // jsonb
+  profile_type_id: Maybe<number>; // int4
+  profile_type_field_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionField = PartialProps<
@@ -1424,6 +1429,8 @@ export type CreatePetitionField = PartialProps<
   | "require_approval"
   | "parent_petition_field_id"
   | "math"
+  | "profile_type_id"
+  | "profile_type_field_id"
 >;
 
 export interface PetitionFieldAttachment {
@@ -1473,6 +1480,26 @@ export type CreatePetitionFieldComment = PartialProps<
   | "content_json"
 >;
 
+export interface PetitionFieldGroupRelationship {
+  id: number; // int4
+  petition_id: number; // int4
+  left_side_petition_field_id: number; // int4
+  profile_relationship_type_id: number; // int4
+  direction: ProfileRelationshipTypeDirection; // profile_relationship_type_direction
+  right_side_petition_field_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionFieldGroupRelationship = PartialProps<
+  Omit<PetitionFieldGroupRelationship, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+>;
+
 export interface PetitionFieldReply {
   id: number; // int4
   petition_field_id: number; // int4
@@ -1490,6 +1517,7 @@ export interface PetitionFieldReply {
   user_id: Maybe<number>; // int4
   anonymized_at: Maybe<Date>; // timestamptz
   parent_petition_field_reply_id: Maybe<number>; // int4
+  associated_profile_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -1506,6 +1534,7 @@ export type CreatePetitionFieldReply = PartialProps<
   | "user_id"
   | "anonymized_at"
   | "parent_petition_field_reply_id"
+  | "associated_profile_id"
 >;
 
 export interface PetitionListView {

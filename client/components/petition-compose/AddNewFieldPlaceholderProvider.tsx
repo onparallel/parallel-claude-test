@@ -2,8 +2,8 @@ import { createContext, ReactNode, useContext } from "react";
 
 interface AddNewFieldPlaceholderProviderProps {
   value: {
-    newFieldPlaceholderFieldId?: string;
-    newFieldPlaceholderParentFieldId?: string;
+    afterFieldId?: string;
+    inParentFieldId?: string;
   };
   children: ReactNode;
 }

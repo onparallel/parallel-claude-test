@@ -90,7 +90,13 @@ function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   return (
     <DialogOpenerContext.Provider value={opener}>
       {children}
-      {stack.map((dialog, index) => cloneElement(dialog, { key: index }))}
+      {stack.map((dialog, index) =>
+        cloneElement(dialog, {
+          key: index,
+          // activate this only on the topmost dialog
+          blockScrollOnMount: index === stack.length - 1 ? true : false,
+        }),
+      )}
     </DialogOpenerContext.Provider>
   );
 }

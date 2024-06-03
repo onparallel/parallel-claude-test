@@ -54,6 +54,7 @@ export function PetitionComposeSelectSettings({
       >
         <Box flex={1}>
           <StandardListSelect
+            isDisabled={field.isLinkedToProfileTypeField || isReadOnly}
             size="sm"
             isClearable
             value={options?.standardList ?? null}
@@ -65,7 +66,11 @@ export function PetitionComposeSelectSettings({
           />
         </Box>
       </SettingsRow>
-      <ImportOptionsSettingsRow field={field} onChange={handleFieldEdit} isDisabled={isReadOnly} />
+      <ImportOptionsSettingsRow
+        field={field}
+        onChange={handleFieldEdit}
+        isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+      />
     </>
   );
 }

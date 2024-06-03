@@ -71,14 +71,14 @@ export const PetitionComposeFieldList = Object.assign(
     const intl = useIntl();
     const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
-    const { newFieldPlaceholderFieldId } = useAddNewFieldPlaceholderContext();
+    const { afterFieldId } = useAddNewFieldPlaceholderContext();
 
     const { fields, onFieldMove } = usePetitionComposeFieldReorder({
       fields: petition.fields,
       onUpdateFieldPositions,
     });
 
-    const fieldsWithIndices = useFieldsWithIndices(fields);
+    const fieldsWithIndices = useFieldsWithIndices({ fields });
 
     const allFields = useMemo(
       () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
@@ -215,7 +215,7 @@ export const PetitionComposeFieldList = Object.assign(
               const referencedField =
                 fields
                   .slice(0, index)
-                  .findLast((f) => !f.isReadOnly && f.parent === field.parent) ??
+                  .findLast((f) => !f.isReadOnly && (f as any).parent === (field as any).parent) ??
                 fields.slice(0, index).findLast((f) => !f.isReadOnly)!;
 
               const condition = defaultFieldCondition(
@@ -364,7 +364,7 @@ export const PetitionComposeFieldList = Object.assign(
             const showAddFieldButton =
               [field.id, nextFieldId].some(
                 (id) => id === hoveredFieldId || id === focusedFieldId,
-              ) && newFieldPlaceholderFieldId !== field.id;
+              ) && afterFieldId !== field.id;
 
             return (
               <Fragment key={field.id}>
@@ -402,7 +402,7 @@ export const PetitionComposeFieldList = Object.assign(
                     sx={{
                       visibility: showAddFieldButton ? "visible" : "hidden",
                       "& :hover, & :focus-within": {
-                        visibility: newFieldPlaceholderFieldId !== field.id ? "visible" : undefined,
+                        visibility: afterFieldId !== field.id ? "visible" : undefined,
                       },
                     }}
                   >
@@ -444,15 +444,12 @@ export const PetitionComposeFieldList = Object.assign(
                     />
                   </Box>
                 ) : null}
-                {newFieldPlaceholderFieldId === field.id ? (
-                  <PetitionComposeNewFieldPlaceholder />
-                ) : null}
+                {afterFieldId === field.id ? <PetitionComposeNewFieldPlaceholder /> : null}
               </Fragment>
             );
           })}
         </Card>
-        {!isReadOnly &&
-        fieldsWithIndices[fieldsWithIndices.length - 1][0].id !== newFieldPlaceholderFieldId ? (
+        {!isReadOnly && fieldsWithIndices[fieldsWithIndices.length - 1][0].id !== afterFieldId ? (
           <Flex marginTop={4} justifyContent="center">
             <Button
               leftIcon={<AddIcon />}
@@ -490,22 +487,27 @@ export const PetitionComposeFieldList = Object.assign(
           isReadOnly
           isFixed
           ...PetitionComposeField_PetitionField
-          ...usePetitionComposeFieldReorder_PetitionField
         }
         ${PetitionComposeField.fragments.PetitionField}
-        ${usePetitionComposeFieldReorder.fragments.PetitionField}
       `,
-      PetitionBase: gql`
-        fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
-          id
-          fields {
-            ...PetitionComposeFieldList_PetitionField
+      get PetitionBase() {
+        return gql`
+          fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
+            id
+            fields {
+              ...PetitionComposeFieldList_PetitionField
+              children {
+                parent {
+                  id
+                }
+              }
+            }
+            ...PetitionComposeField_PetitionBase
           }
-          ...PetitionComposeField_PetitionBase
-        }
-        ${PetitionComposeField.fragments.PetitionBase}
-        ${useEditPetitionFieldCalculationsDialog.fragments.PetitionBase}
-      `,
+          ${this.PetitionField}
+          ${PetitionComposeField.fragments.PetitionBase}
+        `;
+      },
     },
   },
 );

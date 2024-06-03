@@ -1,16 +1,20 @@
-import { Input, Text } from "@chakra-ui/react";
+import { Alert, Button, HStack, Input, Text } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { ProfilesIcon } from "@parallel/chakra/icons";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 
 export function PetitionComposeFieldGroupSettings({
+  petition,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["FIELD_GROUP"];
   const [groupName, setGroupName] = useState(options.groupName ?? "");
@@ -28,8 +32,50 @@ export function PetitionComposeFieldGroupSettings({
     });
   };
 
+  const noOfRelationships = petition.fieldRelationships.filter((relationship) => {
+    return (
+      relationship.leftSidePetitionField.id === field.id ||
+      relationship.rightSidePetitionField.id === field.id
+    );
+  }).length;
+
+  const showCreateOrUpdateFieldGroupRelationshipsDialog =
+    useCreateOrUpdateFieldGroupRelationshipsDialog();
+  const handleSetRelationships = async () => {
+    try {
+      await showCreateOrUpdateFieldGroupRelationshipsDialog({
+        isTemplate: petition.__typename === "PetitionTemplate",
+        petitionId: petition.id,
+        petitionFieldId: field.id,
+      });
+    } catch {}
+  };
+
   return (
     <>
+      {field.isLinkedToProfileType ? (
+        <>
+          <Alert status="info" borderRadius="md" as={HStack} paddingY={2} paddingX={4}>
+            <ProfilesIcon color="blue.700" />
+            <Text as="span">
+              <FormattedMessage
+                id="component.petition-compose-field-group-settings.group-name-linked"
+                defaultMessage="Group linked to <b>{profileTypeName}</b>"
+                values={{
+                  profileTypeName: localizableUserTextRender({
+                    intl,
+                    value: field.profileType!.name,
+                    default: intl.formatMessage({
+                      id: "generic.unnamed-profile-type",
+                      defaultMessage: "Unnamed profile type",
+                    }),
+                  }),
+                }}
+              />
+            </Text>
+          </Alert>
+        </>
+      ) : null}
       <SettingsRow
         isDisabled={isReadOnly}
         label={
@@ -67,6 +113,41 @@ export function PetitionComposeFieldGroupSettings({
           })}
         />
       </SettingsRow>
+      {field.isLinkedToProfileType ? (
+        <>
+          <HStack width="100%" justify="space-between">
+            {noOfRelationships === 0 ? (
+              <Text textStyle="hint">
+                <FormattedMessage
+                  id="component.petition-compose-field-group-settings.no-relationships"
+                  defaultMessage="No relationships"
+                />
+              </Text>
+            ) : (
+              <Text>
+                <FormattedMessage
+                  id="component.petition-compose-field-group-settings.number-of-relationships"
+                  defaultMessage="{count, plural, =1 {1 relationship added} other {# relationships added}}"
+                  values={{ count: noOfRelationships }}
+                />
+              </Text>
+            )}
+
+            <Button
+              onClick={handleSetRelationships}
+              fontWeight={400}
+              size="sm"
+              fontSize="md"
+              paddingX={4}
+            >
+              <FormattedMessage
+                id="component.petition-compose-field-group-settings.set-up-relationships"
+                defaultMessage="Set up relationships"
+              />
+            </Button>
+          </HStack>
+        </>
+      ) : null}
     </>
   );
 }

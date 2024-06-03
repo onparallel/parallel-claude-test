@@ -4,6 +4,10 @@ import { Container } from "inversify";
 import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
+import {
+  IProfilesSetupService,
+  PROFILES_SETUP_SERVICE,
+} from "../../../services/ProfilesSetupService";
 import { deleteAllData } from "../../../util/knexUtils";
 import { random } from "../../../util/token";
 import {
@@ -32,6 +36,7 @@ describe("repositories/PetitionRepository", () => {
   let petitions: PetitionRepository;
   let filesRepo: FileRepository;
   let emailLogsRepo: EmailLogRepository;
+  let profilesSetup: IProfilesSetupService;
 
   let organization: Organization;
   let user: User;
@@ -55,6 +60,7 @@ describe("repositories/PetitionRepository", () => {
     petitions = container.get(PetitionRepository);
     filesRepo = container.get(FileRepository);
     emailLogsRepo = container.get(EmailLogRepository);
+    profilesSetup = container.get<IProfilesSetupService>(PROFILES_SETUP_SERVICE);
   });
 
   afterAll(async () => {
@@ -2101,7 +2107,38 @@ describe("repositories/PetitionRepository", () => {
     it("returns a list of fields with replies", async () => {
       const [fields] = await petitions.getPetitionFieldsWithReplies([petition.id]);
 
-      expect(fields).toIncludeSameMembers([
+      expect(
+        fields.map((f) => ({
+          ...pick(f, [
+            "id",
+            "petition_id",
+            "position",
+            "type",
+            "title",
+            "description",
+            "options",
+            "from_petition_field_id",
+            "is_internal",
+            "visibility",
+            "math",
+            "optional",
+            "parent_petition_field_id",
+            "alias",
+            "multiple",
+          ]),
+          replies: f.replies.map(
+            pick([
+              "id",
+              "type",
+              "petition_field_id",
+              "content",
+              "status",
+              "anonymized_at",
+              "parent_petition_field_reply_id",
+            ]),
+          ),
+        })),
+      ).toIncludeSameMembers([
         {
           id: heading.id,
           petition_id: petition.id,
@@ -2449,7 +2486,38 @@ describe("repositories/PetitionRepository", () => {
 
       const [fields] = await petitions.getPetitionFieldsWithReplies([petition.id]);
 
-      expect(fields).toIncludeSameMembers([
+      expect(
+        fields.map((f) => ({
+          ...pick(f, [
+            "id",
+            "petition_id",
+            "position",
+            "type",
+            "title",
+            "description",
+            "options",
+            "from_petition_field_id",
+            "is_internal",
+            "visibility",
+            "math",
+            "optional",
+            "parent_petition_field_id",
+            "alias",
+            "multiple",
+          ]),
+          replies: f.replies.map(
+            pick([
+              "id",
+              "type",
+              "petition_field_id",
+              "content",
+              "status",
+              "anonymized_at",
+              "parent_petition_field_reply_id",
+            ]),
+          ),
+        })),
+      ).toIncludeSameMembers([
         {
           id: heading.id,
           petition_id: petition.id,
@@ -2735,6 +2803,89 @@ describe("repositories/PetitionRepository", () => {
               parent_petition_field_reply_id: fieldGroupReplies[0].id,
             },
           ],
+        },
+      ]);
+    });
+  });
+
+  describe("clonePetition", () => {
+    beforeAll(async () => {
+      await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
+      await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
+    });
+
+    it("copies petition field group relationships when cloning a petition or template", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
+        type: "FIELD_GROUP",
+      }));
+      const relationships = await mocks.knex
+        .from("profile_relationship_type")
+        .where({ org_id: organization.id, deleted_at: null })
+        .select("*");
+
+      const parentChildRelationship = relationships.find((r) => r.alias === "p_parent__child")!;
+      const contractCounterpartyRelationship = relationships.find(
+        (r) => r.alias === "p_contract__counterparty",
+      )!;
+
+      await mocks.knex.from("petition_field_group_relationship").insert([
+        {
+          petition_id: petition.id,
+          left_side_petition_field_id: fields[0].id,
+          right_side_petition_field_id: fields[1].id,
+          profile_relationship_type_id: parentChildRelationship.id,
+          direction: "LEFT_RIGHT",
+        },
+        {
+          petition_id: petition.id,
+          left_side_petition_field_id: fields[2].id,
+          right_side_petition_field_id: fields[1].id,
+          profile_relationship_type_id: contractCounterpartyRelationship.id,
+          direction: "LEFT_RIGHT",
+        },
+      ]);
+
+      const clonedPetition = await petitions.clonePetition(petition.id, user);
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: clonedPetition.id, deleted_at: null })
+        .select("*");
+
+      const fieldIdsMap = fields.reduce(
+        (acc, field) => {
+          acc[field.id] = clonedFields.find((f) => f.position === field.position)!.id;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      const clonedFieldGroupRelationships = await mocks.knex
+        .from("petition_field_group_relationship")
+        .where({ petition_id: clonedPetition.id, deleted_at: null })
+        .select("*");
+
+      expect(
+        clonedFieldGroupRelationships.map(
+          pick([
+            "petition_id",
+            "left_side_petition_field_id",
+            "right_side_petition_field_id",
+            "profile_relationship_type_id",
+          ]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          petition_id: clonedPetition.id,
+          left_side_petition_field_id: fieldIdsMap[fields[0].id],
+          right_side_petition_field_id: fieldIdsMap[fields[1].id],
+          profile_relationship_type_id: parentChildRelationship.id,
+        },
+        {
+          petition_id: clonedPetition.id,
+          left_side_petition_field_id: fieldIdsMap[fields[2].id],
+          right_side_petition_field_id: fieldIdsMap[fields[1].id],
+          profile_relationship_type_id: contractCounterpartyRelationship.id,
         },
       ]);
     });

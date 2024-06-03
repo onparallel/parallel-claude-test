@@ -53,7 +53,7 @@ export function ShareButton({
         )
       }
     >
-      <Button colorScheme="primary" leftIcon={<UserArrowIcon fontSize="18px" />} {...props}>
+      <Button leftIcon={<UserArrowIcon fontSize="18px" />} {...props}>
         <FormattedMessage id="generic.share" defaultMessage="Share" />
       </Button>
     </SmallPopover>

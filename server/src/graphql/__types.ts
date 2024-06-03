@@ -116,6 +116,16 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  ArchiveFieldGroupReplyIntoProfileConflictResolutionInput: {
+    // input type
+    action: NexusGenEnums["ArchiveFieldGroupReplyIntoProfileConflictResolutionAction"]; // ArchiveFieldGroupReplyIntoProfileConflictResolutionAction!
+    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+  };
+  ArchiveFieldGroupReplyIntoProfileExpirationInput: {
+    // input type
+    expiryDate?: NexusGenScalars["Date"] | null; // Date
+    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+  };
   CreateContactInput: {
     // input type
     email: string; // String!
@@ -329,6 +339,14 @@ export interface NexusGenInputs {
     name: NexusGenScalars["GID"][]; // [GID!]!
     type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
   };
+  UpdatePetitionFieldGroupRelationshipInput: {
+    // input type
+    direction: NexusGenEnums["ProfileRelationshipDirection"]; // ProfileRelationshipDirection!
+    id?: NexusGenScalars["GID"] | null; // GID
+    leftSidePetitionFieldId: NexusGenScalars["GID"]; // GID!
+    profileRelationshipTypeId: NexusGenScalars["GID"]; // GID!
+    rightSidePetitionFieldId: NexusGenScalars["GID"]; // GID!
+  };
   UpdatePetitionFieldInput: {
     // input type
     alias?: string | null; // String
@@ -434,6 +452,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   AiCompletionLogStatus: db.AiCompletionLogStatus;
+  ArchiveFieldGroupReplyIntoProfileConflictResolutionAction: "APPEND" | "IGNORE" | "OVERWRITE";
   BackgroundCheckEntitySearchType: "COMPANY" | "PERSON";
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult:
@@ -957,6 +976,7 @@ export interface NexusGenObjects {
     parent_petition_field_reply_id: number;
     petition_field_id: number;
   };
+  PetitionFieldGroupRelationship: db.PetitionFieldGroupRelationship;
   PetitionFieldMini: db.PetitionField;
   PetitionFieldProgress: {
     // root type
@@ -1828,6 +1848,7 @@ export interface NexusGenFieldTypes {
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
+    archiveFieldGroupReplyIntoProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     archiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     associateProfileToPetition: NexusGenRootTypes["PetitionProfile"]; // PetitionProfile!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
@@ -1877,6 +1898,7 @@ export interface NexusGenFieldTypes {
     createProfile: NexusGenRootTypes["Profile"]; // Profile!
     createProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     createProfileFieldFileUploadLink: NexusGenRootTypes["ProfileFieldPropertyAndFileWithUploadData"]; // ProfileFieldPropertyAndFileWithUploadData!
+    createProfileLinkedPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createProfileRelationship: NexusGenRootTypes["Profile"]; // Profile!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -1922,6 +1944,7 @@ export interface NexusGenFieldTypes {
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     importPetitionFromJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     inviteUserToOrganization: NexusGenRootTypes["User"]; // User!
+    linkFieldGroupToProfileType: NexusGenRootTypes["PetitionField"]; // PetitionField!
     linkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
     loginAs: NexusGenEnums["Result"]; // Result!
     markPetitionListViewAsDefault: NexusGenRootTypes["User"]; // User!
@@ -2018,6 +2041,7 @@ export interface NexusGenFieldTypes {
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldAutoSearchConfig: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    updatePetitionFieldGroupRelationships: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -2155,6 +2179,7 @@ export interface NexusGenFieldTypes {
     emailSubject: string | null; // String
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
     fieldCount: number; // Int!
+    fieldRelationships: NexusGenRootTypes["PetitionFieldGroupRelationship"][]; // [PetitionFieldGroupRelationship!]!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     id: NexusGenScalars["GID"]; // GID!
@@ -2375,6 +2400,8 @@ export interface NexusGenFieldTypes {
     isChild: boolean; // Boolean!
     isFixed: boolean; // Boolean!
     isInternal: boolean; // Boolean!
+    isLinkedToProfileType: boolean; // Boolean!
+    isLinkedToProfileTypeField: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
     math: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple: boolean; // Boolean!
@@ -2383,6 +2410,8 @@ export interface NexusGenFieldTypes {
     parent: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     position: number; // Int!
+    profileType: NexusGenRootTypes["ProfileType"] | null; // ProfileType
+    profileTypeField: NexusGenRootTypes["ProfileTypeField"] | null; // ProfileTypeField
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     requireApproval: boolean; // Boolean!
     showActivityInPdf: boolean; // Boolean!
@@ -2433,6 +2462,13 @@ export interface NexusGenFieldTypes {
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
   };
+  PetitionFieldGroupRelationship: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    leftSidePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    relationshipTypeWithDirection: NexusGenRootTypes["ProfileRelationshipTypeWithDirection"]; // ProfileRelationshipTypeWithDirection!
+    rightSidePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
+  };
   PetitionFieldMini: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -2449,6 +2485,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
+    associatedProfile: NexusGenRootTypes["Profile"] | null; // Profile
     children: NexusGenRootTypes["PetitionFieldGroupChildReply"][] | null; // [PetitionFieldGroupChildReply!]
     content: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2676,6 +2713,7 @@ export interface NexusGenFieldTypes {
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
+    fieldRelationships: NexusGenRootTypes["PetitionFieldGroupRelationship"][]; // [PetitionFieldGroupRelationship!]!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     imageUrl: string | null; // String
@@ -3749,6 +3787,7 @@ export interface NexusGenFieldTypes {
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
+    fieldRelationships: NexusGenRootTypes["PetitionFieldGroupRelationship"][]; // [PetitionFieldGroupRelationship!]!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
@@ -4322,6 +4361,7 @@ export interface NexusGenFieldTypeNames {
     addUsersToUserGroup: "UserGroup";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
+    archiveFieldGroupReplyIntoProfile: "PetitionFieldReply";
     archiveProfileType: "ProfileType";
     associateProfileToPetition: "PetitionProfile";
     bulkCreateContacts: "BulkCreateContactsReturnType";
@@ -4371,6 +4411,7 @@ export interface NexusGenFieldTypeNames {
     createProfile: "Profile";
     createProfileEventSubscription: "ProfileEventSubscription";
     createProfileFieldFileUploadLink: "ProfileFieldPropertyAndFileWithUploadData";
+    createProfileLinkedPetitionField: "PetitionField";
     createProfileRelationship: "Profile";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
@@ -4416,6 +4457,7 @@ export interface NexusGenFieldTypeNames {
     getTaskResultFile: "TaskResultFile";
     importPetitionFromJson: "SupportMethodResponse";
     inviteUserToOrganization: "User";
+    linkFieldGroupToProfileType: "PetitionField";
     linkPetitionFieldChildren: "PetitionField";
     loginAs: "Result";
     markPetitionListViewAsDefault: "User";
@@ -4512,6 +4554,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionField: "PetitionField";
     updatePetitionFieldAutoSearchConfig: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
+    updatePetitionFieldGroupRelationships: "PetitionBase";
     updatePetitionFieldReplies: "PetitionFieldReply";
     updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
@@ -4649,6 +4692,7 @@ export interface NexusGenFieldTypeNames {
     emailSubject: "String";
     events: "PetitionEventPagination";
     fieldCount: "Int";
+    fieldRelationships: "PetitionFieldGroupRelationship";
     fields: "PetitionField";
     fromTemplate: "PetitionBaseMini";
     id: "GID";
@@ -4869,6 +4913,8 @@ export interface NexusGenFieldTypeNames {
     isChild: "Boolean";
     isFixed: "Boolean";
     isInternal: "Boolean";
+    isLinkedToProfileType: "Boolean";
+    isLinkedToProfileTypeField: "Boolean";
     isReadOnly: "Boolean";
     math: "JSONObject";
     multiple: "Boolean";
@@ -4877,6 +4923,8 @@ export interface NexusGenFieldTypeNames {
     parent: "PetitionField";
     petition: "PetitionBase";
     position: "Int";
+    profileType: "ProfileType";
+    profileTypeField: "ProfileTypeField";
     replies: "PetitionFieldReply";
     requireApproval: "Boolean";
     showActivityInPdf: "Boolean";
@@ -4927,6 +4975,13 @@ export interface NexusGenFieldTypeNames {
     field: "PetitionField";
     replies: "PetitionFieldReply";
   };
+  PetitionFieldGroupRelationship: {
+    // field return type name
+    id: "GID";
+    leftSidePetitionField: "PetitionField";
+    relationshipTypeWithDirection: "ProfileRelationshipTypeWithDirection";
+    rightSidePetitionField: "PetitionField";
+  };
   PetitionFieldMini: {
     // field return type name
     id: "GID";
@@ -4943,6 +4998,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldReply: {
     // field return type name
+    associatedProfile: "Profile";
     children: "PetitionFieldGroupChildReply";
     content: "JSONObject";
     createdAt: "DateTime";
@@ -5170,6 +5226,7 @@ export interface NexusGenFieldTypeNames {
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
+    fieldRelationships: "PetitionFieldGroupRelationship";
     fields: "PetitionField";
     id: "GID";
     imageUrl: "String";
@@ -6243,6 +6300,7 @@ export interface NexusGenFieldTypeNames {
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
+    fieldRelationships: "PetitionFieldGroupRelationship";
     fields: "PetitionField";
     id: "GID";
     isAnonymized: "Boolean";
@@ -6373,6 +6431,15 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+    };
+    archiveFieldGroupReplyIntoProfile: {
+      // args
+      conflictResolutions: NexusGenInputs["ArchiveFieldGroupReplyIntoProfileConflictResolutionInput"][]; // [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+      expirations: NexusGenInputs["ArchiveFieldGroupReplyIntoProfileExpirationInput"][]; // [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+      parentReplyId: NexusGenScalars["GID"]; // GID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
     };
     archiveProfileType: {
       // args
@@ -6661,6 +6728,13 @@ export interface NexusGenArgTypes {
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    createProfileLinkedPetitionField: {
+      // args
+      parentFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      position?: number | null; // Int
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
     createProfileRelationship: {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
@@ -6895,6 +6969,12 @@ export interface NexusGenArgTypes {
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
       orgId?: NexusGenScalars["GID"] | null; // GID
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    linkFieldGroupToProfileType: {
+      // args
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileTypeId?: NexusGenScalars["GID"] | null; // GID
     };
     linkPetitionFieldChildren: {
       // args
@@ -7451,6 +7531,11 @@ export interface NexusGenArgTypes {
       sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
       sharePetitionSubscribed?: boolean | null; // Boolean
       throwOnNoPermission?: boolean | null; // Boolean
+    };
+    updatePetitionFieldGroupRelationships: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      relationships: NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][]; // [UpdatePetitionFieldGroupRelationshipInput!]!
     };
     updatePetitionFieldReplies: {
       // args

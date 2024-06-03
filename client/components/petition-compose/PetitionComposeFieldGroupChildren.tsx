@@ -1,29 +1,19 @@
-import { gql } from "@apollo/client";
 import { Box, Button, Center, IconButton, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import {
-  PetitionComposeFieldGroupChildren_PetitionFieldFragment,
-  PetitionComposeFieldGroupChildren_UserFragment,
+  PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
 } from "@parallel/graphql/__types";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
-import { useState } from "react";
 import { useDrop } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
-import {
-  PetitionComposeField,
-  PetitionComposeFieldProps,
-  PetitionComposeFieldRef,
-} from "./PetitionComposeField";
-import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
-import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
-import { PetitionFieldOptionsListEditor } from "./PetitionFieldOptionsListEditor";
-import { ReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
-import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
 import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
+import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
+import type { PetitionComposeFieldProps, PetitionComposeFieldRef } from "./PetitionComposeField";
+import { PetitionComposeField } from "./PetitionComposeField";
+import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
 
 interface PetitionComposeFieldGroupChildrenProps
   extends Pick<
@@ -38,10 +28,9 @@ interface PetitionComposeFieldGroupChildrenProps
     | "showAddField"
   > {
   isReadOnly?: boolean;
-  field: PetitionComposeFieldGroupChildren_PetitionFieldFragment;
+  field: PetitionComposeField_PetitionFieldFragment;
   childrenFieldIndices: string[];
   fieldRefs: MultipleRefObject<PetitionComposeFieldRef>;
-  user: PetitionComposeFieldGroupChildren_UserFragment;
 }
 
 export const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
@@ -59,7 +48,6 @@ export function PetitionComposeFieldGroupChildren({
   childrenFieldIndices,
   fieldRefs,
   showError,
-  user,
   activeChildFieldId,
   petition,
   fieldProps,
@@ -76,8 +64,7 @@ export function PetitionComposeFieldGroupChildren({
     isFieldGroup: true,
   });
 
-  const { newFieldPlaceholderFieldId, newFieldPlaceholderParentFieldId } =
-    useAddNewFieldPlaceholderContext();
+  const { afterFieldId, inParentFieldId } = useAddNewFieldPlaceholderContext();
 
   const parentFieldId = field.id;
 
@@ -95,12 +82,12 @@ export function PetitionComposeFieldGroupChildren({
         draggedFieldType: monitor.getItem()?.fieldType,
       }),
     }),
-    [newFieldPlaceholderFieldId],
+    [afterFieldId],
   );
 
   const hasChildren = isDefined(field.children) && field.children.length > 0;
   const hasDropErrors = FIELD_GROUP_EXCLUDED_FIELD_TYPES.includes(draggedFieldType) && isOver;
-  const newFieldPlaceholderIndex = children.findIndex((f) => f.id === newFieldPlaceholderFieldId);
+  const newFieldPlaceholderIndex = children.findIndex((f) => f.id === afterFieldId);
   return (
     <Stack
       textStyle={isReadOnly ? "muted" : undefined}
@@ -152,19 +139,17 @@ export function PetitionComposeFieldGroupChildren({
                   const fieldIdToLink = linkToPreviousField
                     ? children[i - 1]?.id ?? undefined
                     : field.id;
-                  showAddField?.(fieldIdToLink, parentFieldId);
+                  showAddField(fieldIdToLink, parentFieldId);
                 }}
                 newFieldPlaceholderIndex={
-                  newFieldPlaceholderParentFieldId !== parentFieldId
+                  inParentFieldId !== parentFieldId
                     ? undefined
                     : newFieldPlaceholderIndex !== -1
                       ? newFieldPlaceholderIndex + 1
                       : 0
                 }
               >
-                {i === 0 &&
-                newFieldPlaceholderParentFieldId === parentFieldId &&
-                !newFieldPlaceholderFieldId ? (
+                {i === 0 && inParentFieldId === parentFieldId && !afterFieldId ? (
                   <PetitionComposeNewFieldPlaceholder
                     borderTop="none"
                     borderBottom="1px solid"
@@ -182,8 +167,7 @@ export function PetitionComposeFieldGroupChildren({
                   isReadOnly={isReadOnly}
                   showError={showError}
                   onMove={onFieldMove}
-                  user={user}
-                  field={field as any}
+                  field={field}
                   petition={petition}
                   fieldIndex={fieldIndex}
                   index={i}
@@ -223,7 +207,7 @@ export function PetitionComposeFieldGroupChildren({
                   }}
                   {...restFieldProps}
                 />
-                {newFieldPlaceholderFieldId === field.id ? (
+                {afterFieldId === field.id ? (
                   <PetitionComposeNewFieldPlaceholder
                     isGroupChild={true}
                     isTemplate={petition.__typename === "PetitionTemplate"}
@@ -232,7 +216,7 @@ export function PetitionComposeFieldGroupChildren({
               </PetitionComposeFieldWrapper>
             );
           })
-        ) : newFieldPlaceholderParentFieldId === parentFieldId ? (
+        ) : inParentFieldId === parentFieldId ? (
           <PetitionComposeNewFieldPlaceholder
             borderTop="none"
             isGroupChild={true}
@@ -249,21 +233,22 @@ export function PetitionComposeFieldGroupChildren({
           </Center>
         )}
       </Stack>
-      {!hasChildren && newFieldPlaceholderParentFieldId !== parentFieldId ? (
+      {!hasChildren && inParentFieldId !== parentFieldId ? (
         <Button
           leftIcon={<PlusCircleIcon />}
           isDisabled={isReadOnly}
-          fontWeight="normal"
           variant="outline"
+          colorScheme="primary"
           size="sm"
           fontSize="md"
           alignSelf="center"
           transform="translateX(-14px)"
-          onClick={() => showAddField?.(undefined, parentFieldId)}
+          onClick={() => showAddField(undefined, parentFieldId)}
+          fontWeight={500}
         >
           <FormattedMessage
-            id="component.petition-compose-field-list.add-field"
-            defaultMessage="Add field"
+            id="component.petition-compose-group-children.add-field"
+            defaultMessage="Add..."
           />
         </Button>
       ) : null}
@@ -288,7 +273,6 @@ function PetitionComposeFieldWrapper({
   children: React.ReactNode;
 }) {
   const intl = useIntl();
-  const [showAddFieldButton, setShowAddFieldButton] = useState(false);
 
   return (
     <Box
@@ -305,10 +289,6 @@ function PetitionComposeFieldWrapper({
       }}
       onFocus={(e) => {
         e.stopPropagation();
-        setShowAddFieldButton(true);
-      }}
-      onBlur={() => {
-        setShowAddFieldButton(false);
       }}
     >
       {!hideAddButtons && newFieldPlaceholderIndex !== index ? (
@@ -317,7 +297,7 @@ function PetitionComposeFieldWrapper({
           position="relative"
           zIndex="1"
           sx={{
-            visibility: showAddFieldButton ? "visible" : "hidden",
+            visibility: "hidden",
             "& :hover, & :focus-within": {
               visibility: "visible",
             },
@@ -360,7 +340,7 @@ function PetitionComposeFieldWrapper({
           position="relative"
           zIndex="1"
           sx={{
-            visibility: showAddFieldButton ? "visible" : "hidden",
+            visibility: "hidden",
             "& :hover, & :focus-within": {
               visibility: "visible",
             },
@@ -399,49 +379,3 @@ function PetitionComposeFieldWrapper({
     </Box>
   );
 }
-
-PetitionComposeFieldGroupChildren.fragments = {
-  User: gql`
-    fragment PetitionComposeFieldGroupChildren_User on User {
-      id
-      hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-    }
-  `,
-  // Can't reference PetitionComposeField because it generates a recursive dependency
-  PetitionField: gql`
-    fragment PetitionComposeFieldGroupChildren_PetitionField on PetitionField {
-      id
-      visibility
-      isInternal
-      children {
-        id
-        type
-        title
-        description
-        optional
-        multiple
-        isFixed
-        isInternal
-        isReadOnly
-        visibility
-        math
-        attachments {
-          ...PetitionComposeFieldAttachment_PetitionFieldAttachment
-        }
-        parent {
-          id
-        }
-        ...PetitionFieldOptionsListEditor_PetitionField
-        ...PetitionFieldVisibilityEditor_PetitionField
-        ...ReferencedFieldDialog_PetitionField
-        ...usePetitionComposeFieldReorder_PetitionField
-      }
-      ...ReferencedFieldDialog_PetitionField
-    }
-    ${usePetitionComposeFieldReorder.fragments.PetitionField}
-    ${PetitionFieldOptionsListEditor.fragments.PetitionField}
-    ${PetitionComposeFieldAttachment.fragments.PetitionFieldAttachment}
-    ${PetitionFieldVisibilityEditor.fragments.PetitionField}
-    ${ReferencedFieldDialog.fragments.PetitionField}
-  `,
-};

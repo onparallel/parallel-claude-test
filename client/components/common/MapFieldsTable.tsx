@@ -17,8 +17,8 @@ import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import {
+  MapFieldsTable_PetitionBaseFragment,
   MapFieldsTable_PetitionFieldDataFragment,
-  MapFieldsTable_PetitionFieldFragment,
   MapFieldsTable_PetitionFieldReplyFragment,
   PetitionFieldType,
   getReplyContents_PetitionFieldFragment,
@@ -39,8 +39,8 @@ import { OverflownText } from "./OverflownText";
 import { SmallPopover } from "./SmallPopover";
 
 export interface MapFieldsTableProps {
-  fields: MapFieldsTable_PetitionFieldFragment[];
-  sourcePetitionFields: MapFieldsTable_PetitionFieldFragment[];
+  petition: MapFieldsTable_PetitionBaseFragment;
+  sourcePetition: MapFieldsTable_PetitionBaseFragment;
   value: { [key: string]: string };
   onChange: (value: { [key: string]: string }) => void;
   overwriteExisting: boolean;
@@ -61,8 +61,8 @@ export const excludedFieldsOrigin = ["HEADING", "DYNAMIC_SELECT"] as PetitionFie
 export const MapFieldsTable = Object.assign(
   chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(
     {
-      fields,
-      sourcePetitionFields,
+      petition,
+      sourcePetition,
       value,
       onChange,
       overwriteExisting,
@@ -72,9 +72,18 @@ export const MapFieldsTable = Object.assign(
     },
     ref,
   ) {
+    const fields = petition.fields;
+    const sourcePetitionFields = sourcePetition.fields.map((f) => ({
+      ...f,
+      replies:
+        f.type === "ES_TAX_DOCUMENTS"
+          ? f.replies.filter((r) => !isDefined(r.content.error))
+          : f.replies,
+    }));
+
     const containerRef = useRef<HTMLDivElement>(null);
     const _ref = useMergedRef(ref, containerRef);
-    const fieldsWithIndices = useAllFieldsWithIndices(fields);
+    const fieldsWithIndices = useAllFieldsWithIndices(petition);
 
     const allSourcePetitionFields = useMemo(
       () => sourcePetitionFields.flatMap((f) => [f, ...(f.children ?? [])]),
@@ -196,7 +205,7 @@ export const MapFieldsTable = Object.assign(
                         });
                       }
                     }}
-                    sourcePetitionFields={sourcePetitionFields}
+                    sourcePetition={sourcePetition}
                     allSourcePetitionFields={allSourcePetitionFields}
                     allowOverwrite={overwriteExisting}
                     isDisabled={isDisabled}
@@ -262,12 +271,22 @@ export const MapFieldsTable = Object.assign(
             }
             ...isReplyContentCompatible_PetitionField
             ...getReplyContents_PetitionField
-            ...PetitionFieldSelect_PetitionField
           }
           ${this.PetitionFieldReply}
-          ${PetitionFieldSelect.fragments.PetitionField}
           ${isReplyContentCompatible.fragments.PetitionField}
           ${getReplyContents.fragments.PetitionField}
+        `;
+      },
+      get PetitionBase() {
+        return gql`
+          fragment MapFieldsTable_PetitionBase on PetitionBase {
+            fields {
+              ...MapFieldsTable_PetitionField
+            }
+            ...PetitionFieldSelect_PetitionBase
+          }
+          ${this.PetitionField}
+          ${PetitionFieldSelect.fragments.PetitionBase}
         `;
       },
       get ProfileFieldProperty() {
@@ -300,7 +319,7 @@ export const MapFieldsTable = Object.assign(
 function TableRow({
   field,
   fieldIndex,
-  sourcePetitionFields,
+  sourcePetition,
   allSourcePetitionFields,
   selectedFieldId,
   onChange,
@@ -312,7 +331,7 @@ function TableRow({
 }: {
   field: MapFieldsTable_PetitionFieldDataFragment;
   fieldIndex: PetitionFieldIndex;
-  sourcePetitionFields: MapFieldsTable_PetitionFieldDataFragment[];
+  sourcePetition: MapFieldsTable_PetitionBaseFragment;
   allSourcePetitionFields: MapFieldsTable_PetitionFieldDataFragment[];
   selectedFieldId: string;
   onChange: (fieldId: string | null) => void;
@@ -443,7 +462,7 @@ function TableRow({
       <Td padding={2} minWidth="240px">
         <PetitionFieldSelect
           value={selectedField ?? null}
-          fields={sourcePetitionFields}
+          petition={sourcePetition}
           filterFields={filterFields as any}
           onChange={(field) => {
             onChange(field?.id ?? null);
