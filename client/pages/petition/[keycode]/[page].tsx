@@ -45,6 +45,7 @@ import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPet
 import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { withMetadata } from "@parallel/utils/withMetadata";
@@ -105,6 +106,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const showCompletingMessageDialog = useCompletingMessageDialog();
   const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition, true);
+  const showErrorToast = useGenericErrorToast();
   const handleFinalize = useCallback(
     async function () {
       try {
@@ -167,6 +169,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             });
             window.location.reload();
           } catch {}
+        } else {
+          showErrorToast(e);
         }
       }
     },

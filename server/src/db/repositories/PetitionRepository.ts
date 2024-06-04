@@ -124,6 +124,29 @@ import {
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
 
+interface ComposedPetitionField extends PetitionField {
+  children: Maybe<
+    (PetitionField & {
+      parent: Maybe<PetitionField>;
+      replies: PetitionFieldReply[]; // children replies NOT GROUPED
+    })[]
+  >;
+  replies: (PetitionFieldReply & {
+    children: Maybe<
+      {
+        field: PetitionField;
+        replies: PetitionFieldReply[]; // children replies grouped by parentReplyId
+      }[]
+    >;
+  })[];
+}
+
+export interface ComposedPetition {
+  fields: ComposedPetitionField[];
+  variables: PetitionVariable[];
+  custom_lists: PetitionCustomList[];
+}
+
 export interface PetitionVariable {
   name: string;
   default_value: number;
@@ -2839,7 +2862,8 @@ export class PetitionRepository extends BaseRepository {
           );
         return updated;
       }, t);
-      return petition;
+
+      return { petition, composedPetition };
     } else {
       throw new Error("CANT_COMPLETE_PETITION_ERROR");
     }

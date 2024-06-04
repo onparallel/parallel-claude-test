@@ -10,7 +10,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
 } from "../../db/__types";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
 import { FORMATS } from "../../util/dates";
 import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";

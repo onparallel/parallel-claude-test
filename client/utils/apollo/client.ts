@@ -298,7 +298,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         PublicPetitionField: {
           fields: {
             replies: {
-              merge: mergeArraysBy(["id"]),
+              merge: false,
             },
             comments: {
               merge: false,

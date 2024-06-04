@@ -11,6 +11,7 @@ import {
   Petition,
   Task,
   User,
+  PetitionFieldType,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
@@ -18,6 +19,11 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  IBackgroundCheckService,
+} from "../../services/BackgroundCheckService";
+import { pick } from "remeda";
 
 function setCookieHeader(testClient: TestClient, contactId: number, cookieValue: string) {
   testClient.setNextReq({
@@ -3511,68 +3517,832 @@ describe("GraphQL/Public", () => {
     describe("publicCompletePetition", () => {
       let petition: Petition;
 
-      beforeAll(async () => {
-        const [signatureIntegration] = await mocks.createOrgIntegration({
-          org_id: org.id,
-          provider: "SIGNATURIT",
-          type: "SIGNATURE",
-          is_enabled: true,
-          name: "SIGNATURIT TEST",
-          settings: {
-            CREDENTIALS: {
-              API_KEY: "SHARED_PRODUCTION_APIKEY",
+      describe("signature", () => {
+        beforeAll(async () => {
+          const [signatureIntegration] = await mocks.createOrgIntegration({
+            org_id: org.id,
+            provider: "SIGNATURIT",
+            type: "SIGNATURE",
+            is_enabled: true,
+            name: "SIGNATURIT TEST",
+            settings: {
+              CREDENTIALS: {
+                API_KEY: "SHARED_PRODUCTION_APIKEY",
+              },
             },
-          },
+          });
+          [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+            status: "DRAFT",
+            signature_config: {
+              review: false,
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: [
+                { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
+              ],
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+            },
+          }));
+          await mocks.createRandomPetitionFields(
+            petition.id,
+            3,
+            (i) =>
+              [
+                { type: "HEADING", is_fixed: true },
+                { type: "TEXT", optional: true },
+                { type: "FILE_UPLOAD", optional: true },
+              ][i] as Partial<PetitionField>,
+          );
+          [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
         });
-        [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
-          status: "DRAFT",
-          signature_config: {
-            review: false,
-            orgIntegrationId: signatureIntegration.id,
-            signersInfo: [
-              { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
-            ],
-            timezone: "Europe/Madrid",
-            title: "sign this!",
-          },
-        }));
-        await mocks.createRandomPetitionFields(
-          petition.id,
-          3,
-          (i) =>
-            [
-              { type: "HEADING", is_fixed: true },
-              { type: "TEXT", optional: true },
-              { type: "FILE_UPLOAD", optional: true },
-            ][i] as Partial<PetitionField>,
-        );
-        [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
+
+        it("when using our shared apiKey and usage reached limit, complete anyways but don't start signature", async () => {
+          await mocks
+            .knex("organization_usage_limit")
+            .update({ limit: 10, used: 10 })
+            .where("id", limit.id);
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", access.petition_id),
+            status: "COMPLETED",
+          });
+        });
       });
 
-      it("when using our shared apiKey and usage reached limit, complete anyways but don't start signature", async () => {
-        await mocks
-          .knex("organization_usage_limit")
-          .update({ limit: 10, used: 10 })
-          .where("id", limit.id);
+      describe("background check", () => {
+        let petition: Petition;
+        let fields: PetitionField[];
+        let childFields: PetitionField[];
 
-        const { errors, data } = await testClient.execute(
-          gql`
-            mutation ($keycode: ID!) {
-              publicCompletePetition(keycode: $keycode) {
-                id
-                status
+        let access: PetitionAccess;
+
+        let backgroundCheckServiceSpy: jest.SpyInstance;
+
+        beforeEach(async () => {
+          backgroundCheckServiceSpy = jest.spyOn(
+            testClient.container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
+            "entitySearch",
+          );
+
+          [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+          fields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+            type: ["SHORT_TEXT", "BACKGROUND_CHECK", "FIELD_GROUP"][i] as PetitionFieldType,
+            is_internal: i === 1,
+            optional: true,
+          }));
+
+          childFields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+            type: ["SHORT_TEXT", "DATE", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+            parent_petition_field_id: fields[2].id,
+            is_internal: i === 2,
+            optional: true,
+          }));
+
+          await mocks.knex
+            .from("petition_field")
+            .where("id", fields[1].id)
+            .update({
+              options: JSON.stringify({
+                autoSearchConfig: { name: [fields[0].id], date: null, type: "PERSON" },
+              }),
+            });
+
+          await mocks.knex
+            .from("petition_field")
+            .where("id", childFields[2].id)
+            .update({
+              options: JSON.stringify({
+                autoSearchConfig: {
+                  name: [childFields[0].id, fields[0].id],
+                  date: childFields[1].id,
+                  type: "PERSON",
+                },
+              }),
+            });
+
+          [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
+        });
+
+        afterEach(() => {
+          backgroundCheckServiceSpy.mockClear();
+        });
+
+        it("triggers background check search if field is automated and not replied when completing the petition", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson" },
+          }));
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
               }
-            }
-          `,
-          {
-            keycode: access.keycode,
-          },
-        );
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
 
-        expect(errors).toBeUndefined();
-        expect(data?.publicCompletePetition).toEqual({
-          id: toGlobalId("Petition", access.petition_id),
-          status: "COMPLETED",
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Simpson" },
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
+            name: "Simpson",
+            date: null,
+            type: "PERSON",
+          });
+
+          const [dbReply] = await mocks.knex
+            .from("petition_field_reply")
+            .where("id", fromGlobalId(data?.publicCompletePetition.fields[1].replies[0].id).id)
+            .whereNull("deleted_at")
+            .select("*");
+
+          expect(pick(dbReply, ["content", "petition_access_id"])).toEqual({
+            content: {
+              query: {
+                name: "Simpson",
+                date: null,
+                type: "PERSON",
+              },
+              // this reply is mocked
+              search: {
+                totalCount: 1,
+                items: [
+                  {
+                    id: "Q7747",
+                    type: "Person",
+                    name: "Vladimir Vladimirovich PUTIN",
+                    properties: {},
+                  },
+                ],
+                createdAt: expect.any(String),
+              },
+              entity: null,
+            },
+            petition_access_id: access.id,
+          });
+        });
+
+        it("does not trigger background check search if none of its search fields are replied", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+        });
+
+        it("does not trigger background check search if field already has an entity stored", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson, Homer J" },
+          }));
+
+          await mocks.knex.from("petition_field_reply").insert({
+            petition_field_id: fields[1].id,
+            petition_access_id: access.id,
+            content: {
+              query: {
+                name: "Simpson",
+                date: null,
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 1,
+                items: [],
+              },
+              entity: {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+            },
+            type: "BACKGROUND_CHECK",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Simpson, Homer J" },
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+        });
+
+        it("does not trigger background check search if search query is the same as stored", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson, Homer J" },
+          }));
+
+          await mocks.knex.from("petition_field_reply").insert({
+            petition_field_id: fields[1].id,
+            petition_access_id: access.id,
+            content: {
+              query: {
+                name: "Simpson, Homer J",
+                date: null,
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 100,
+                items: [],
+              },
+              entity: null,
+            },
+            type: "BACKGROUND_CHECK",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Simpson, Homer J" },
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+        });
+
+        it("does not trigger background check search if reply is already approved", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson, Homer J" },
+          }));
+
+          await mocks.knex.from("petition_field_reply").insert({
+            petition_field_id: fields[1].id,
+            petition_access_id: access.id,
+            content: {
+              query: {
+                name: "Simpson",
+                date: null,
+                type: null,
+              },
+              search: {
+                totalCount: 100,
+                items: [],
+              },
+              entity: null,
+            },
+            type: "BACKGROUND_CHECK",
+            status: "APPROVED",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Simpson, Homer J" },
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+        });
+
+        it("triggers a background check search where name field is composed of multiple replies inside and outside the field group", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson" },
+          }));
+
+          const groupReplies = await mocks.createFieldGroupReply(fields[2].id, access.id, 3);
+
+          await mocks.createRandomTextReply(childFields[0].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[0].id,
+            type: "SHORT_TEXT",
+            petition_access_id: access.id,
+            content: { value: "Homer" },
+          }));
+
+          await mocks.createRandomTextReply(childFields[0].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[1].id,
+            type: "SHORT_TEXT",
+            petition_access_id: access.id,
+            content: { value: "Bart" },
+          }));
+
+          await mocks.createRandomTextReply(childFields[0].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[2].id,
+            type: "SHORT_TEXT",
+            petition_access_id: access.id,
+            content: { value: "Lisa" },
+          }));
+
+          await mocks.createRandomDateReply(childFields[1].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[0].id,
+            content: { value: "1980-01-01" },
+          }));
+
+          await mocks.createRandomDateReply(childFields[1].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[1].id,
+            content: { value: "1985-01-01" },
+          }));
+
+          await mocks.createRandomDateReply(childFields[1].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: groupReplies[2].id,
+            content: { value: "1990-01-01" },
+          }));
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                      children {
+                        field {
+                          id
+                        }
+                        replies {
+                          id
+                          content
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  { id: expect.any(String), content: { value: "Simpson" }, children: null },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                    children: null,
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {},
+                    children: [
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[0].id) },
+                        replies: [{ id: expect.any(String), content: { value: "Homer" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[1].id) },
+                        replies: [{ id: expect.any(String), content: { value: "1980-01-01" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[2].id) },
+                        replies: [{ id: expect.any(String), content: {} }],
+                      },
+                    ],
+                  },
+                  {
+                    id: expect.any(String),
+                    content: {},
+                    children: [
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[0].id) },
+                        replies: [{ id: expect.any(String), content: { value: "Bart" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[1].id) },
+                        replies: [{ id: expect.any(String), content: { value: "1985-01-01" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[2].id) },
+                        replies: [{ id: expect.any(String), content: {} }],
+                      },
+                    ],
+                  },
+                  {
+                    id: expect.any(String),
+                    content: {},
+                    children: [
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[0].id) },
+                        replies: [{ id: expect.any(String), content: { value: "Lisa" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[1].id) },
+                        replies: [{ id: expect.any(String), content: { value: "1990-01-01" } }],
+                      },
+                      {
+                        field: { id: toGlobalId("PetitionField", childFields[2].id) },
+                        replies: [{ id: expect.any(String), content: {} }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
+            name: "Simpson",
+            date: null,
+            type: "PERSON",
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
+            name: "Homer Simpson",
+            date: "1980-01-01",
+            type: "PERSON",
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(3, {
+            name: "Bart Simpson",
+            date: "1985-01-01",
+            type: "PERSON",
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(4, {
+            name: "Lisa Simpson",
+            date: "1990-01-01",
+            type: "PERSON",
+          });
+        });
+
+        it("updates background check search if petition is completed again with different query", async () => {
+          await mocks.createRandomTextReply(fields[0].id, access.id, 1, () => ({
+            type: "SHORT_TEXT",
+            content: { value: "Simpson, Homer J" },
+          }));
+
+          await mocks.knex.from("petition_field_reply").insert({
+            petition_field_id: fields[1].id,
+            petition_access_id: access.id,
+            content: {
+              query: {
+                name: "Simpson",
+                date: null,
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 100,
+                items: [],
+              },
+              entity: null,
+            },
+            type: "BACKGROUND_CHECK",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                  fields {
+                    id
+                    type
+                    replies {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toEqual({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+            fields: [
+              {
+                id: toGlobalId("PetitionField", fields[0].id),
+                type: "SHORT_TEXT",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Simpson, Homer J" },
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[1].id),
+                type: "BACKGROUND_CHECK",
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {}, // BACKGROUND_CHECK reply is not exposed in public context
+                  },
+                ],
+              },
+              {
+                id: toGlobalId("PetitionField", fields[2].id),
+                type: "FIELD_GROUP",
+                replies: [],
+              },
+            ],
+          });
+
+          expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
+            name: "Simpson, Homer J",
+            date: null,
+            type: "PERSON",
+          });
+
+          const [dbReply] = await mocks.knex
+            .from("petition_field_reply")
+            .where("id", fromGlobalId(data?.publicCompletePetition.fields[1].replies[0].id).id)
+            .whereNull("deleted_at")
+            .select("*");
+
+          expect(pick(dbReply, ["content", "petition_access_id"])).toEqual({
+            content: {
+              query: {
+                name: "Simpson, Homer J",
+                date: null,
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 1,
+                items: [
+                  {
+                    // mocked
+                    id: "Q7747",
+                    type: "Person",
+                    name: "Vladimir Vladimirovich PUTIN",
+                    properties: {},
+                  },
+                ],
+                createdAt: expect.any(String),
+              },
+              entity: null,
+            },
+            petition_access_id: access.id,
+          });
         });
       });
     });
