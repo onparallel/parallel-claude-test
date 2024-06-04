@@ -1,6 +1,5 @@
 import { interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
-import { PetitionField } from "../../db/__types";
 
 export const EventSubscription = interfaceType({
   name: "EventSubscription",
@@ -39,7 +38,7 @@ export const PetitionEventSubscription = objectType({
       type: "PetitionFieldMini",
       resolve: async (o, _, ctx) => {
         return isDefined(o.from_template_field_ids)
-          ? ((await ctx.petitions.loadField(o.from_template_field_ids)) as PetitionField[])
+          ? (await ctx.petitions.loadField(o.from_template_field_ids)).filter(isDefined)
           : null;
       },
     });

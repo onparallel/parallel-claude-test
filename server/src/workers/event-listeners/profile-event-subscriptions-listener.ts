@@ -51,12 +51,16 @@ export const profileEventSubscriptionsListener = listener(
         if (s.from_profile_type_id !== null && s.from_profile_type_id !== profile.profile_type_id) {
           return false;
         }
-        if (
-          isDefined(s.from_profile_type_field_ids) &&
-          "profile_type_field_id" in event.data &&
-          !s.from_profile_type_field_ids.includes(event.data.profile_type_field_id)
-        ) {
-          return false;
+        if (isDefined(s.from_profile_type_field_ids) && "profile_type_field_id" in event.data) {
+          const profileTypeField = await ctx.profiles.loadProfileTypeField(
+            event.data.profile_type_field_id,
+          );
+          if (
+            !isDefined(profileTypeField) ||
+            !s.from_profile_type_field_ids.includes(profileTypeField.id)
+          ) {
+            return false;
+          }
         }
         if ("profile_type_field_id" in event.data) {
           const userPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
