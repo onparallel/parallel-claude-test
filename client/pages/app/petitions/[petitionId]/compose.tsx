@@ -1584,21 +1584,23 @@ const _mutations = [
       clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         id
         ...PetitionCompose_PetitionField
+        ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
+          ...PetitionComposeNewFieldDrawer_PetitionBase
           fields {
             id
+            position
             children {
-              id
-            }
-            parent {
               id
             }
           }
         }
       }
     }
+    ${updatePreviewFieldReplies.fragments.PetitionField}
     ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
     ${_fragments.PetitionField}
   `,
   gql`

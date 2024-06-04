@@ -32151,8 +32151,45 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
+            position: number;
+            title?: string | null;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            isLinkedToProfileType: boolean;
+            isLinkedToProfileTypeField: boolean;
+            children?: Array<{
+              __typename?: "PetitionField";
+              id: string;
+              options: { [key: string]: any };
+              isLinkedToProfileType: boolean;
+              isLinkedToProfileTypeField: boolean;
+              profileType?: {
+                __typename?: "ProfileType";
+                id: string;
+                name: { [locale in UserLocale]?: string };
+                fields: Array<{
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                  name: { [locale in UserLocale]?: string };
+                  type: ProfileTypeFieldType;
+                }>;
+              } | null;
+              profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+            }> | null;
+            profileType?: {
+              __typename?: "ProfileType";
+              id: string;
+              name: { [locale in UserLocale]?: string };
+              fields: Array<{
+                __typename?: "ProfileTypeField";
+                id: string;
+                alias?: string | null;
+                name: { [locale in UserLocale]?: string };
+                type: ProfileTypeFieldType;
+              }>;
+            } | null;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           }>;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -32176,8 +32213,45 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
+            position: number;
+            title?: string | null;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            isLinkedToProfileType: boolean;
+            isLinkedToProfileTypeField: boolean;
+            children?: Array<{
+              __typename?: "PetitionField";
+              id: string;
+              options: { [key: string]: any };
+              isLinkedToProfileType: boolean;
+              isLinkedToProfileTypeField: boolean;
+              profileType?: {
+                __typename?: "ProfileType";
+                id: string;
+                name: { [locale in UserLocale]?: string };
+                fields: Array<{
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                  name: { [locale in UserLocale]?: string };
+                  type: ProfileTypeFieldType;
+                }>;
+              } | null;
+              profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+            }> | null;
+            profileType?: {
+              __typename?: "ProfileType";
+              id: string;
+              name: { [locale in UserLocale]?: string };
+              fields: Array<{
+                __typename?: "ProfileTypeField";
+                id: string;
+                alias?: string | null;
+                name: { [locale in UserLocale]?: string };
+                type: ProfileTypeFieldType;
+              }>;
+            } | null;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           }>;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           myEffectivePermission?: {
@@ -32270,6 +32344,44 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         };
       }>;
     }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      createdAt: string;
+      updatedAt: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      createdAt: string;
+      updatedAt: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
     profileType?: {
       __typename?: "ProfileType";
       id: string;
@@ -59966,14 +60078,14 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
       id
       ...PetitionCompose_PetitionField
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
       petition {
         ...PetitionLayout_PetitionBase
+        ...PetitionComposeNewFieldDrawer_PetitionBase
         fields {
           id
+          position
           children {
-            id
-          }
-          parent {
             id
           }
         }
@@ -59981,7 +60093,9 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
     }
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
+  ${PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionComposeNewFieldDrawer_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompose_clonePetitionFieldMutation,
   PetitionCompose_clonePetitionFieldMutationVariables
