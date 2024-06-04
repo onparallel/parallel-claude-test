@@ -1280,6 +1280,16 @@
     "context": "Opt out from emails"
   },
   {
+    "term": "page.public-petition.invalid-email-toast-description",
+    "definition": "El correu electrònic proporcionat no és vàlid.",
+    "context": "The provided email is invalid."
+  },
+  {
+    "term": "page.public-petition.invalid-email-toast-title",
+    "definition": "Correu electrònic no vàlid",
+    "context": "Invalid email"
+  },
+  {
     "term": "page.update-browser.header",
     "definition": "Navegador no suportat",
     "context": "Unsupported browser"

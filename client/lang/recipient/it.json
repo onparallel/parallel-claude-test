@@ -1280,6 +1280,16 @@
     "context": "Opt out from emails"
   },
   {
+    "term": "page.public-petition.invalid-email-toast-description",
+    "definition": "L'email fornita non è valida.",
+    "context": "The provided email is invalid."
+  },
+  {
+    "term": "page.public-petition.invalid-email-toast-title",
+    "definition": "Email non valida",
+    "context": "Invalid email"
+  },
+  {
     "term": "page.update-browser.header",
     "definition": "Browser non supportato",
     "context": "Unsupported browser"
