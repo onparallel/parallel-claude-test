@@ -240,7 +240,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const field = data!.clonePetitionField;
       if (isAddFieldDrawerOpen) {
         if (field.type === "FIELD_GROUP") {
-          setAddFieldAfterId([field.id, field.children?.at(-1)?.id]);
+          setAddFieldAfterId([undefined, field.id]);
         } else {
           setAddFieldAfterId([field.id, inParentFieldId]);
         }
@@ -248,7 +248,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       setActiveFieldId(field.id);
       await focusFieldTitle(field.id);
     }),
-    [petitionId, isAddFieldDrawerOpen],
+    [petitionId, isAddFieldDrawerOpen, inParentFieldId],
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
