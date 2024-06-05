@@ -7,6 +7,7 @@ import { CONFIG, Config } from "../config";
 import { ILogger, LOGGER } from "../services/Logger";
 import { TableTypes } from "./__types";
 import "./helpers/knexExtensions";
+import { hrtime } from "process";
 
 pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
   const { milliseconds, seconds, ...rest } = parse(value);
@@ -48,9 +49,17 @@ export function createKnex(mode: keyof Config["db"]) {
       },
     });
     if (process.env.NODE_ENV === "development") {
-      instance.on("query", ({ sql, bindings }) => {
-        logger.debug(sql, { bindings });
-      });
+      const times: Record<string, ReturnType<typeof process.hrtime>> = {};
+      instance
+        .on("query", (query) => {
+          times[query.__knexQueryUid] = hrtime();
+        })
+        .on("query-response", (_, query) => {
+          const [seconds, nanoseconds] = process.hrtime(times[query.__knexQueryUid]);
+          delete times[query.__knexQueryUid];
+          const time = seconds * 1000 + Math.round(nanoseconds / 1e6);
+          logger.debug(query.sql, { bindings: query.bindings, time });
+        });
     }
     return instance as any;
   };
