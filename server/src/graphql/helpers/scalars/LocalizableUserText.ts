@@ -1,4 +1,3 @@
-import Ajv from "ajv";
 import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind } from "graphql";
 import { scalarType } from "nexus";
 import { isDefined } from "remeda";
@@ -17,16 +16,32 @@ function ensureLocalizableUserText(value: any, strict: boolean): LocalizableUser
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(`Value is not a valid LocalizableUserText: ${value}`);
   }
-  const ajv = new Ajv();
-  if (
-    !ajv.validate(
-      { ...LOCALIZABLE_USER_TEXT_SCHEMA, additionalProperties: strict === true ? false : true },
-      value,
-    )
-  ) {
+  let valid = false;
+  for (const locale of UserLocaleValues) {
+    if (locale in value) {
+      if (typeof value[locale] === "string") {
+        valid = true;
+      } else {
+        throw new Error(
+          `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} $.${locale} is not a string`,
+        );
+      }
+    }
+  }
+  if (!valid) {
     throw new Error(
-      `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} ${ajv.errorsText()}`,
+      `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} missing at least one locale key (${UserLocaleValues.join(", ")})`,
     );
+  }
+  if (strict) {
+    const unknownKey = Object.keys(value).find(
+      (key) => !(UserLocaleValues as string[]).includes(key),
+    );
+    if (isDefined(unknownKey)) {
+      throw new Error(
+        `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
+      );
+    }
   }
   return Object.fromEntries(
     UserLocaleValues.map((key) => [key, value[key]]).filter(
