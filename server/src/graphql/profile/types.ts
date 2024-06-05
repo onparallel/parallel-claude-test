@@ -153,7 +153,7 @@ export const Profile = objectType({
         );
         return sortBy(fields, (f) => f.position).map((field) => ({
           profile_id: root.id,
-          profile_type_field_id: field.id,
+          profile_type_field: field,
         }));
       },
     });
@@ -286,59 +286,60 @@ export const ProfileFieldProperty = objectType({
     t.field("profile", {
       type: "Profile",
       resolve: async (o, _, ctx) => {
-        return (await ctx.profiles.loadProfile(o.profile_id))!;
+        return "profile" in o ? o.profile : (await ctx.profiles.loadProfile(o.profile_id))!;
       },
     });
     t.field("field", {
       type: "ProfileTypeField",
       resolve: async (o, _, ctx) => {
-        return (await ctx.profiles.loadProfileTypeField(o.profile_type_field_id))!;
+        return "profile_type_field" in o
+          ? o.profile_type_field
+          : (await ctx.profiles.loadProfileTypeField(o.profile_type_field_id))!;
       },
     });
     t.nullable.field("value", {
       type: "ProfileFieldValue",
       resolve: async (o, _, ctx) => {
+        const profileId = "profile" in o ? o.profile.id : o.profile_id;
+        const profileTypeFieldId =
+          "profile_type_field" in o ? o.profile_type_field.id : o.profile_type_field_id;
         const myPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
-          profileTypeFieldId: o.profile_type_field_id,
+          profileTypeFieldId,
           userId: ctx.user!.id,
         });
         if (myPermission === "HIDDEN") {
           return null;
         }
-
-        return await ctx.profiles.loadProfileFieldValue({
-          profileId: o.profile_id,
-          profileTypeFieldId: o.profile_type_field_id,
-        });
+        return await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId });
       },
     });
     t.nullable.list.field("files", {
       type: "ProfileFieldFile",
       resolve: async (o, _, ctx) => {
+        const profileId = "profile" in o ? o.profile.id : o.profile_id;
+        const profileTypeFieldId =
+          "profile_type_field" in o ? o.profile_type_field.id : o.profile_type_field_id;
         const myPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
-          profileTypeFieldId: o.profile_type_field_id,
+          profileTypeFieldId,
           userId: ctx.user!.id,
         });
         if (myPermission === "HIDDEN") {
           return null;
         }
 
-        const field = await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
+        const field = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
         if (field?.type === "FILE") {
-          return await ctx.profiles.loadProfileFieldFiles({
-            profileId: o.profile_id,
-            profileTypeFieldId: o.profile_type_field_id,
-          });
+          return await ctx.profiles.loadProfileFieldFiles({ profileId, profileTypeFieldId });
         } else {
           return null;
         }
       },
     });
   },
-  sourceType: `{
-    profile_id: number;
-    profile_type_field_id: number;
-  }`,
+  sourceType: /* ts */ `
+    ({ profile_id: number } | { profile: db.Profile })
+    & ({ profile_type_field_id: number } | { profile_type_field: db.ProfileTypeField })
+  `,
 });
 
 export const ProfileFieldValue = objectType({

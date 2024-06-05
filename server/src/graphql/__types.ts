@@ -1106,10 +1106,8 @@ export interface NexusGenObjects {
     file: NexusGenRootTypes["ProfileFieldFile"]; // ProfileFieldFile!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  ProfileFieldProperty: {
-    profile_id: number;
-    profile_type_field_id: number;
-  };
+  ProfileFieldProperty: ({ profile_id: number } | { profile: db.Profile }) &
+    ({ profile_type_field_id: number } | { profile_type_field: db.ProfileTypeField });
   ProfileFieldPropertyAndFileWithUploadData: {
     // root type
     property: NexusGenRootTypes["ProfileFieldProperty"]; // ProfileFieldProperty!
