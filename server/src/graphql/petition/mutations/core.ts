@@ -1071,7 +1071,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
   },
   resolve: async (_, { petitionId, fieldId }, ctx) => {
     const field = await ctx.petitions.clonePetitionField(petitionId, fieldId, ctx.user!);
-    await ctx.petitions.updatePetitionLastChangeAt(petitionId);
+    await ctx.petitions.updatePetitionToPendingStatus(petitionId, `User:${ctx.user!.id}`);
 
     return field;
   },

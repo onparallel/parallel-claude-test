@@ -2107,7 +2107,7 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
     const parent = isDefined(parentFieldId) ? await this.loadField(parentFieldId) : null;
-    const { fields, petition } = await this.withTransaction(async (t) => {
+    const fields = await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
         .where({
           petition_id: petitionId,
@@ -2137,27 +2137,23 @@ export class PetitionRepository extends BaseRepository {
           "id",
         );
 
-      const [fields, [petition]] = await Promise.all([
-        this.insert(
-          "petition_field",
-          dataArr.map((field) => ({
-            ...omit(field, ["math"]),
-            is_internal: parent?.is_internal ? true : field.is_internal,
-            math: field.math ? this.json(field.math) : null,
-            parent_petition_field_id: parentFieldId,
-            petition_id: petitionId,
-            position: position++,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          })),
-          t,
-        ),
-        this.updatePetitionToPendingStatus(petitionId, `User:${user.id}`, t),
-      ]);
-
-      return { fields, petition };
+      return await this.insert(
+        "petition_field",
+        dataArr.map((field) => ({
+          ...omit(field, ["math"]),
+          is_internal: parent?.is_internal ? true : field.is_internal,
+          math: field.math ? this.json(field.math) : null,
+          parent_petition_field_id: parentFieldId,
+          petition_id: petitionId,
+          position: position++,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        })),
+        t,
+      );
     }, t);
 
+    const petition = (await this.loadPetition.raw(petitionId))!;
     if (!petition.is_template) {
       // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
       await this.createEmptyFieldGroupReply(
