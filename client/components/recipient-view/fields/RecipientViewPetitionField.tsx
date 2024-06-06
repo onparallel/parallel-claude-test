@@ -136,18 +136,22 @@ export function RecipientViewPetitionField({
   );
   const handleUpdatePetitionFieldReply = useCallback(
     async (replyId: string, content: any) => {
-      await publicUpdatePetitionFieldReplies({
-        variables: {
-          keycode: props.keycode,
-          replies: [
-            {
-              id: replyId,
-              content,
-            },
-          ],
-        },
-      });
-      updateLastSaved();
+      try {
+        await publicUpdatePetitionFieldReplies({
+          variables: {
+            keycode: props.keycode,
+            replies: [
+              {
+                id: replyId,
+                content,
+              },
+            ],
+          },
+        });
+        updateLastSaved();
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [publicUpdatePetitionFieldReplies, updateLastSaved],
   );
@@ -157,20 +161,24 @@ export function RecipientViewPetitionField({
   );
   const handleCreatePetitionFieldReply = useCallback(
     async (content: any, _fieldId?: string, parentReplyId?: string) => {
-      const { data } = await publicCreatePetitionFieldReplies({
-        variables: {
-          keycode: props.keycode,
-          fields: [
-            {
-              id: _fieldId ?? props.field.id,
-              content,
-              parentReplyId,
-            },
-          ],
-        },
-      });
-      updateLastSaved();
-      return data?.publicCreatePetitionFieldReplies?.[0]?.id;
+      try {
+        const { data } = await publicCreatePetitionFieldReplies({
+          variables: {
+            keycode: props.keycode,
+            fields: [
+              {
+                id: _fieldId ?? props.field.id,
+                content,
+                parentReplyId,
+              },
+            ],
+          },
+        });
+        updateLastSaved();
+        return data?.publicCreatePetitionFieldReplies?.[0]?.id;
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [publicCreatePetitionFieldReplies, updateLastSaved],
   );
@@ -178,14 +186,18 @@ export function RecipientViewPetitionField({
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
     async (content: File[], _fieldId?: string, parentReplyId?: string) => {
-      await createFileUploadReply({
-        keycode: props.keycode,
-        fieldId: _fieldId ?? props.field.id,
-        content,
-        uploads,
-        parentReplyId,
-      });
-      updateLastSaved();
+      try {
+        await createFileUploadReply({
+          keycode: props.keycode,
+          fieldId: _fieldId ?? props.field.id,
+          content,
+          uploads,
+          parentReplyId,
+        });
+        updateLastSaved();
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [createFileUploadReply, uploads, updateLastSaved],
   );
@@ -197,8 +209,8 @@ export function RecipientViewPetitionField({
   const apollo = useApolloClient();
   const handleDownloadFileUploadReply = useCallback(
     async (replyId: string) => {
-      await withError(
-        openNewWindow(async () => {
+      try {
+        await openNewWindow(async () => {
           const reply = apollo.cache.readFragment({
             fragment: RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
           });
@@ -215,8 +227,10 @@ export function RecipientViewPetitionField({
             throw new Error();
           }
           return url!;
-        }),
-      );
+        });
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [downloadFileUploadReply],
   );

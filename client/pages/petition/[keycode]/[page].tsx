@@ -209,6 +209,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       await refetchAccess();
     } else if (isApolloError(error, "INVALID_REPLY_ERROR")) {
       // handled in field component
+    } else if (isApolloError(error, "CONTACT_NOT_VERIFIED")) {
+      router.push(`/petition/${keycode}`);
     } else {
       throw error;
     }
