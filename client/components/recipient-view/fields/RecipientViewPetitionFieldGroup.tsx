@@ -432,71 +432,74 @@ export function RecipientViewPetitionFieldGroupCard({
 }: RecipientViewPetitionFieldGroupCardProps) {
   const intl = useIntl();
   const tone = useTone();
-  const showGroupNumber = field.multiple || field.replies.length > 1;
   return (
     <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
-      <HStack minHeight="32px">
-        <Text width="100%">
-          {field.options.groupName ??
-            intl.formatMessage({
-              id: "generic.group-name-fallback-reply",
-              defaultMessage: "Reply",
-            })}
-          {showGroupNumber ? ` ${index + 1}` : ""}
-        </Text>
-        {isDefined(onRemoveReply) ? (
-          <ConfimationPopover
-            description={
-              <FormattedMessage
-                id="component.recipient-view-petition-field-group.confirm-delete-group"
-                defaultMessage="Do you want to remove {groupName}?"
-                values={{
-                  groupName: `${
-                    field.options.groupName ??
-                    intl.formatMessage({
-                      id: "generic.group-name-fallback-reply",
-                      defaultMessage: "Reply",
-                    })
-                  }${showGroupNumber ? ` ${index + 1}` : ""}`,
-                  tone,
-                }}
-              />
-            }
-            confirm={
-              <Button onClick={onRemoveReply} size="sm" colorScheme="red">
+      {field.multiple ? (
+        <HStack minHeight="32px">
+          <Text width="100%">
+            {`${
+              field.options.groupName ??
+              intl.formatMessage({
+                id: "generic.group-name-fallback-reply",
+                defaultMessage: "Reply",
+              })
+            } ${index + 1}`}
+          </Text>
+
+          {isDefined(onRemoveReply) ? (
+            <ConfimationPopover
+              description={
                 <FormattedMessage
-                  id="component.recipient-view-petition-field-group.remove-confirmation-button"
-                  defaultMessage="Remove"
+                  id="component.recipient-view-petition-field-group.confirm-delete-group"
+                  defaultMessage="Do you want to remove {groupName}?"
+                  values={{
+                    groupName: `${
+                      field.options.groupName ??
+                      intl.formatMessage({
+                        id: "generic.group-name-fallback-reply",
+                        defaultMessage: "Reply",
+                      })
+                    } ${index + 1}`,
+                    tone,
+                  }}
                 />
-              </Button>
-            }
-          >
-            <IconButtonWithTooltip
-              icon={<DeleteIcon boxSize={4} />}
-              size="sm"
-              variant="outline"
-              placement="bottom"
-              color="gray.600"
-              label={intl.formatMessage(
-                {
-                  id: "component.recipient-view-petition-field-group.remove-reply-button",
-                  defaultMessage: "Remove {groupName}",
-                },
-                {
-                  groupName: (
-                    field.options.groupName ??
-                    intl.formatMessage({
-                      id: "generic.group-name-fallback-reply",
-                      defaultMessage: "Reply",
-                    })
-                  ).toLowerCase(),
-                },
-              )}
-              isDisabled={isDisabled}
-            />
-          </ConfimationPopover>
-        ) : null}
-      </HStack>
+              }
+              confirm={
+                <Button onClick={onRemoveReply} size="sm" colorScheme="red">
+                  <FormattedMessage
+                    id="component.recipient-view-petition-field-group.remove-confirmation-button"
+                    defaultMessage="Remove"
+                  />
+                </Button>
+              }
+            >
+              <IconButtonWithTooltip
+                icon={<DeleteIcon boxSize={4} />}
+                size="sm"
+                variant="outline"
+                placement="bottom"
+                color="gray.600"
+                label={intl.formatMessage(
+                  {
+                    id: "component.recipient-view-petition-field-group.remove-reply-button",
+                    defaultMessage: "Remove {groupName}",
+                  },
+                  {
+                    groupName: (
+                      field.options.groupName ??
+                      intl.formatMessage({
+                        id: "generic.group-name-fallback-reply",
+                        defaultMessage: "Reply",
+                      })
+                    ).toLowerCase(),
+                  },
+                )}
+                isDisabled={isDisabled}
+              />
+            </ConfimationPopover>
+          ) : null}
+        </HStack>
+      ) : null}
       {children}
     </Card>
   );
