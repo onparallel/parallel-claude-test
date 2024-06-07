@@ -1870,6 +1870,7 @@ export interface NexusGenFieldTypes {
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
+    createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
@@ -4383,6 +4384,7 @@ export interface NexusGenFieldTypeNames {
     createBackgroundCheckProfilePdfTask: "Task";
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
+    createContactlessPetitionAccess: "PetitionAccess";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
@@ -6565,6 +6567,11 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
       force?: boolean | null; // Boolean
+    };
+    createContactlessPetitionAccess: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
     };
     createDowJonesKycIntegration: {
       // args

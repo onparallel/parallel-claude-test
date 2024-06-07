@@ -32,7 +32,6 @@ import {
 import {
   CreatePetition,
   CreatePetitionField,
-  CreatePetitionReminder,
   CreatePublicPetitionLink,
   Petition,
   PetitionPermission,
@@ -1790,8 +1789,10 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   },
 });
 
+/** @deprecated */
 export const createPetitionAccess = mutationField("createPetitionAccess", {
   description: "Creates a contactless petition access",
+  deprecation: "use createContactlessPetitionAccess",
   type: "PetitionAccess",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
@@ -1804,7 +1805,51 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      const access = await ctx.petitions.createContactlessAccess(args.petitionId, ctx.user!);
+      const access = await ctx.petitions.createContactlessAccess(args.petitionId, null, ctx.user!);
+
+      await ctx.petitions.createEvent({
+        type: "ACCESS_ACTIVATED",
+        petition_id: args.petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: ctx.user!.id,
+        },
+      });
+
+      ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
+      return access;
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "petition_access__petition_id_contactless"
+      ) {
+        return (await ctx.petitions.loadContactlessAccessByPetitionId(args.petitionId))!;
+      }
+      throw error;
+    }
+  },
+});
+
+export const createContactlessPetitionAccess = mutationField("createContactlessPetitionAccess", {
+  description: "Creates a contactless petition access",
+  type: "PetitionAccess",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionHasRepliableFields("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsHaveEnabledInteractionWithRecipients("petitionId"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    remindersConfig: nullable("RemindersConfigInput"),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const access = await ctx.petitions.createContactlessAccess(
+        args.petitionId,
+        args.remindersConfig ?? null,
+        ctx.user!,
+      );
 
       await ctx.petitions.createEvent({
         type: "ACCESS_ACTIVATED",
@@ -2123,18 +2168,16 @@ export const sendReminders = mutationField("sendReminders", {
           : null;
 
         return {
-          type: "MANUAL",
-          status: "PROCESSING",
           petition_access_id: accessId,
           sender_id: ctx.user!.id,
           email_body: emailBody,
           created_by: `User:${ctx.user!.id}`,
-        } as CreatePetitionReminder;
+        };
       },
       { concurrency: 1 },
     );
 
-    const reminders = await ctx.petitions.createReminders(remindersData);
+    const reminders = await ctx.petitions.createReminders("MANUAL", remindersData);
 
     await ctx.petitions.createEvent(
       reminders.map((reminder) => ({

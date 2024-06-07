@@ -821,6 +821,8 @@ export type Mutation = {
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a contactless petition access */
+  createContactlessPetitionAccess: PetitionAccess;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /**
@@ -853,7 +855,10 @@ export type Mutation = {
   createOrganizationPdfDocumentTheme: Organization;
   /** Create parallel */
   createPetition: PetitionBase;
-  /** Creates a contactless petition access */
+  /**
+   * Creates a contactless petition access
+   * @deprecated use createContactlessPetitionAccess
+   */
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
@@ -1368,6 +1373,11 @@ export type MutationcreateBulkPetitionSendTaskArgs = {
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type MutationcreateContactlessPetitionAccessArgs = {
+  petitionId: Scalars["GID"]["input"];
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {

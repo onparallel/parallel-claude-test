@@ -880,6 +880,8 @@ export interface Mutation {
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a contactless petition access */
+  createContactlessPetitionAccess: PetitionAccess;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /**
@@ -912,7 +914,10 @@ export interface Mutation {
   createOrganizationPdfDocumentTheme: Organization;
   /** Create parallel */
   createPetition: PetitionBase;
-  /** Creates a contactless petition access */
+  /**
+   * Creates a contactless petition access
+   * @deprecated use createContactlessPetitionAccess
+   */
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
@@ -1427,6 +1432,11 @@ export interface MutationcreateBulkPetitionSendTaskArgs {
 export interface MutationcreateContactArgs {
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
+}
+
+export interface MutationcreateContactlessPetitionAccessArgs {
+  petitionId: Scalars["GID"]["input"];
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
 }
 
 export interface MutationcreateDowJonesKycIntegrationArgs {
@@ -10195,12 +10205,13 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   }>;
 };
 
-export type AddPetitionAccessDialog_createPetitionAccessMutationVariables = Exact<{
+export type AddPetitionAccessDialog_createContactlessPetitionAccessMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
 }>;
 
-export type AddPetitionAccessDialog_createPetitionAccessMutation = {
-  createPetitionAccess: {
+export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
+  createContactlessPetitionAccess: {
     __typename?: "PetitionAccess";
     id: string;
     recipientUrl?: string | null;
@@ -56466,9 +56477,12 @@ export const useProfileTypeFieldPermissionDialog_searchUsersDocument = gql`
   useProfileTypeFieldPermissionDialog_searchUsersQuery,
   useProfileTypeFieldPermissionDialog_searchUsersQueryVariables
 >;
-export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
-  mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
-    createPetitionAccess(petitionId: $petitionId) {
+export const AddPetitionAccessDialog_createContactlessPetitionAccessDocument = gql`
+  mutation AddPetitionAccessDialog_createContactlessPetitionAccess(
+    $petitionId: GID!
+    $remindersConfig: RemindersConfigInput
+  ) {
+    createContactlessPetitionAccess(petitionId: $petitionId, remindersConfig: $remindersConfig) {
       id
       recipientUrl
       petition {
@@ -56478,8 +56492,8 @@ export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   }
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  AddPetitionAccessDialog_createPetitionAccessMutation,
-  AddPetitionAccessDialog_createPetitionAccessMutationVariables
+  AddPetitionAccessDialog_createContactlessPetitionAccessMutation,
+  AddPetitionAccessDialog_createContactlessPetitionAccessMutationVariables
 >;
 export const TimelineMessageScheduledEvent_cancelScheduledMessageDocument = gql`
   mutation TimelineMessageScheduledEvent_cancelScheduledMessage(

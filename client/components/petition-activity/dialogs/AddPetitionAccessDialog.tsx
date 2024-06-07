@@ -37,7 +37,7 @@ import {
   AddPetitionAccessDialog_PetitionFragment,
   AddPetitionAccessDialog_SignatureConfigFragment,
   AddPetitionAccessDialog_UserFragment,
-  AddPetitionAccessDialog_createPetitionAccessDocument,
+  AddPetitionAccessDialog_createContactlessPetitionAccessDocument,
   BulkSendSigningMode,
   RemindersConfig,
   UpdatePetitionInput,
@@ -238,8 +238,11 @@ export function AddPetitionAccessDialog({
     } catch {}
   };
 
-  const [createPetitionAccess] = useMutation(AddPetitionAccessDialog_createPetitionAccessDocument);
+  const [createContactlessPetitionAccess] = useMutation(
+    AddPetitionAccessDialog_createContactlessPetitionAccessDocument,
+  );
   const showContactlessLinkDialog = useContactlessLinkDialog();
+  const remindersConfig = watch("remindersConfig");
   const handleShareByLinkClick = useCallback(async () => {
     try {
       if (isMissingSigners) {
@@ -250,15 +253,16 @@ export function AddPetitionAccessDialog({
       let link = currentAccessLink?.recipientUrl ?? "";
 
       if (!currentAccessLink) {
-        const newAccess = await createPetitionAccess({
+        const newAccess = await createContactlessPetitionAccess({
           variables: {
             petitionId: petition.id,
+            remindersConfig,
           },
         });
 
         if (isDefined(newAccess.data)) {
-          link = newAccess.data.createPetitionAccess.recipientUrl!;
-          setAccesses(newAccess.data.createPetitionAccess.petition!.accesses);
+          link = newAccess.data.createContactlessPetitionAccess.recipientUrl!;
+          setAccesses(newAccess.data.createContactlessPetitionAccess.petition!.accesses);
         }
       }
 
@@ -267,7 +271,7 @@ export function AddPetitionAccessDialog({
         petitionId: petition.id,
       });
     } catch {}
-  }, [accesses, isMissingSigners]);
+  }, [accesses, isMissingSigners, remindersConfig]);
 
   const { petitionsPeriod } = petition.organization;
 
@@ -639,8 +643,11 @@ AddPetitionAccessDialog.fragments = {
 
 AddPetitionAccessDialog.mutations = [
   gql`
-    mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
-      createPetitionAccess(petitionId: $petitionId) {
+    mutation AddPetitionAccessDialog_createContactlessPetitionAccess(
+      $petitionId: GID!
+      $remindersConfig: RemindersConfigInput
+    ) {
+      createContactlessPetitionAccess(petitionId: $petitionId, remindersConfig: $remindersConfig) {
         id
         recipientUrl
         petition {

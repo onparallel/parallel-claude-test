@@ -1067,6 +1067,14 @@ type Mutation {
   ): Contact!
 
   """
+  Creates a contactless petition access
+  """
+  createContactlessPetitionAccess(
+    petitionId: GID!
+    remindersConfig: RemindersConfigInput
+  ): PetitionAccess!
+
+  """
   Creates a new Dow Jones KYC integration on the user's organization
   """
   createDowJonesKycIntegration(
@@ -1183,6 +1191,7 @@ type Mutation {
   Creates a contactless petition access
   """
   createPetitionAccess(petitionId: GID!): PetitionAccess!
+    @deprecated(reason: "use createContactlessPetitionAccess")
 
   """
   Generates and returns a signed url to upload a petition attachment to AWS S3

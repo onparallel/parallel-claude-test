@@ -4,7 +4,7 @@ import { calculateNextReminder } from "../util/reminderUtils";
 import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("reminder-trigger", async (context) => {
-  const accesses = await context.petitions.getRemindableAccesses();
+  const accesses = await context.petitions.getAutomaticRemindableAccesses();
   for (const [, batch] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
     // Update next reminders
     const remindableAccesses = (
@@ -23,10 +23,9 @@ createCronWorker("reminder-trigger", async (context) => {
       )
     ).filter((access) => access.next_reminder_at !== null);
     const reminders = await context.petitions.createReminders(
+      "AUTOMATIC",
       remindableAccesses.map((access) => ({
         petition_access_id: access.id,
-        status: "PROCESSING",
-        type: "AUTOMATIC",
         created_by: `PetitionAccess:${access.id}`,
       })),
     );

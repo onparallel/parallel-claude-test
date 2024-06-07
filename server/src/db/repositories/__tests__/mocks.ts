@@ -786,6 +786,7 @@ export class Mocks {
           status: "ACTIVE",
           keycode: random(16),
           reminders_left: 10,
+          automatic_reminders_left: 10,
           created_by: `User:${createdByUserId}`,
         })),
       )

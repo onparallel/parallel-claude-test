@@ -279,7 +279,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
             )[0];
             try {
               await ctx.petitions.addContactToPetitionAccess(
-                access!.id,
+                access!,
                 ctx.contact!.id,
                 `PetitionAccess:${access!.id}`,
               );
@@ -1009,10 +1009,8 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     }
 
     try {
-      const [reminder] = await ctx.petitions.createReminders([
+      const [reminder] = await ctx.petitions.createReminders("MANUAL", [
         {
-          type: "MANUAL",
-          status: "PROCESSING",
           petition_access_id: access.id,
           sender_id: owner.id,
           email_body: null,

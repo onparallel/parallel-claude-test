@@ -123,6 +123,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                   {
                     contact_id: contact.id,
                     reminders_left: 10,
+                    automatic_reminders_left: 0,
                     reminders_active: false,
                   },
                 ],

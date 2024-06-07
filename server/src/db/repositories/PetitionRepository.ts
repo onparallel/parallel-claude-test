@@ -86,6 +86,7 @@ import {
   PetitionFieldType,
   PetitionPermission,
   PetitionPermissionType,
+  PetitionReminderType,
   PetitionSignatureCancelReason,
   PetitionSignatureRequest,
   PetitionStatus,
@@ -1099,6 +1100,7 @@ export class PetitionRepository extends BaseRepository {
       | "reminders_active"
       | "reminders_config"
       | "reminders_left"
+      | "automatic_reminders_left"
       | "delegate_granter_id"
     >[],
     user: User,
@@ -1148,13 +1150,21 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
-  async createContactlessAccess(petitionId: number, user: User) {
+  async createContactlessAccess(
+    petitionId: number,
+    remindersConfig: Maybe<PetitionAccessReminderConfig>,
+    user: User,
+  ) {
     const [access] = await this.insert("petition_access", {
       petition_id: petitionId,
       granter_id: user.id,
       contact_id: null,
       keycode: random(16),
       reminders_left: 10,
+      automatic_reminders_left: Math.min(remindersConfig?.limit ?? 0, 10),
+      reminders_active: isDefined(remindersConfig),
+      reminders_config: remindersConfig,
+      next_reminder_at: null, // will be set once this access is linked to a specific contact
       status: "ACTIVE",
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
@@ -1181,6 +1191,7 @@ export class PetitionRepository extends BaseRepository {
       contact_id: contactId,
       keycode: random(16),
       reminders_left: 10,
+      automatic_reminders_left: 0, // no automatic reminders when delegating access
       status: "ACTIVE",
       delegator_contact_id: recipient.id,
       created_by: `Contact:${recipient.id}`,
@@ -1393,18 +1404,21 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async addContactToPetitionAccess(
-    accessId: number,
+    access: PetitionAccess,
     contactId: number,
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
     return await this.from("petition_access", t)
-      .where("id", accessId)
+      .where("id", access.id)
       .where("status", "ACTIVE")
       .whereNull("contact_id")
       .update(
         {
           contact_id: contactId,
+          next_reminder_at: isDefined(access.reminders_config)
+            ? calculateNextReminder(new Date(), access.reminders_config)
+            : null,
           updated_at: this.now(),
           updated_by: updatedBy,
         },
@@ -2873,13 +2887,14 @@ export class PetitionRepository extends BaseRepository {
       .update({ status: "PROCESSING" }, "*");
   }
 
-  async getRemindableAccesses() {
+  async getAutomaticRemindableAccesses() {
     return await this.from("petition_access")
       .where("status", "ACTIVE")
       .where("reminders_active", true)
       .whereNotNull("next_reminder_at")
       .where("next_reminder_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"))
-      .where("reminders_left", ">", 0);
+      .where("reminders_left", ">", 0)
+      .where("automatic_reminders_left", ">", 0);
   }
 
   async clonePetition(
@@ -3521,27 +3536,39 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "desc"),
   );
 
-  async createReminders(data: CreatePetitionReminder[]) {
+  async createReminders(
+    type: PetitionReminderType,
+    data: Omit<CreatePetitionReminder, "type" | "status">[],
+  ) {
     if (data.length === 0) {
       return [];
     }
     return await this.withTransaction(async (t) => {
       await this.from("petition_access", t)
-        .whereIn(
-          "id",
-          data.map((r) => r.petition_access_id),
-        )
+        .whereIn("id", uniq(data.map((r) => r.petition_access_id)))
         .update({
           reminders_left: this.knex.raw(`"reminders_left" - 1`),
-          // if only one reminder left, deactivate automatic reminders
+          automatic_reminders_left:
+            type === "AUTOMATIC"
+              ? this.knex.raw(`"automatic_reminders_left" - 1`)
+              : this.knex.raw(`"automatic_reminders_left"`),
+          // if only one automatic reminder left, deactivate automatic reminders
           next_reminder_at: this.knex.raw(/* sql */ `
-            case when "reminders_left" <= 1 then null else "next_reminder_at" end
+            case when "automatic_reminders_left" <= 1 then null else "next_reminder_at" end
           `),
           reminders_active: this.knex.raw(/* sql */ `
-            case when "reminders_left" <= 1 then false else "reminders_active" end
+            case when "automatic_reminders_left" <= 1 then false else "reminders_active" end
           `),
         });
-      return await this.insert("petition_reminder", data, t).returning("*");
+      return await this.insert(
+        "petition_reminder",
+        data.map((d) => ({
+          ...d,
+          type,
+          status: "PROCESSING",
+        })),
+        t,
+      ).returning("*");
     });
   }
 
@@ -3577,16 +3604,24 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async startAccessReminders(accessIds: number[], reminderConfig: PetitionAccessReminderConfig) {
-    return await this.from("petition_access")
-      .whereIn("id", accessIds)
-      .update(
-        {
-          reminders_active: true,
-          reminders_config: reminderConfig,
-          next_reminder_at: calculateNextReminder(new Date(), reminderConfig),
-        },
-        "*",
-      );
+    return await this.raw<PetitionAccess>(
+      /* sql */ `
+      update petition_access
+      set
+        reminders_active = true,
+        reminders_config = ?,
+        next_reminder_at = ?,
+        automatic_reminders_left = least(reminders_left, ?)
+      where id in ?
+      returning *
+    `,
+      [
+        this.json(reminderConfig),
+        calculateNextReminder(new Date(), reminderConfig),
+        reminderConfig.limit ?? 10,
+        this.sqlIn(accessIds),
+      ],
+    );
   }
 
   readonly loadPetitionEventsByPetitionId = this.buildLoadMultipleBy(
@@ -7250,7 +7285,8 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petition.id,
           contact_id: contactId,
           delegate_granter_id: userDelegate ? user.id : null,
-          reminders_left: remindersConfig?.limit ?? 10,
+          automatic_reminders_left: Math.min(remindersConfig?.limit ?? 0, 10),
+          reminders_left: 10,
           reminders_active: Boolean(remindersConfig),
           reminders_config: remindersConfig,
           next_reminder_at: remindersConfig

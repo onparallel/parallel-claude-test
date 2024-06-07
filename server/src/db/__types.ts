@@ -1308,6 +1308,7 @@ export interface PetitionAccess {
   reminders_opt_out: boolean; // bool
   delegator_contact_id: Maybe<number>; // int4
   delegate_granter_id: Maybe<number>; // int4
+  automatic_reminders_left: number; // int4
 }
 
 export type CreatePetitionAccess = PartialProps<
@@ -1324,6 +1325,7 @@ export type CreatePetitionAccess = PartialProps<
   | "reminders_opt_out"
   | "delegator_contact_id"
   | "delegate_granter_id"
+  | "automatic_reminders_left"
 >;
 
 export interface PetitionAttachment {

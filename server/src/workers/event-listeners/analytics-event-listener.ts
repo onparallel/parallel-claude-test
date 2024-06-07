@@ -283,7 +283,7 @@ async function trackReminderSentEvent(event: ReminderSentEvent, ctx: WorkerConte
       company_id: toGlobalId("Organization", petition.org_id),
       user_id: access.granter_id,
       petition_access_id: access.id,
-      sent_count: (access?.reminders_config?.limit ?? 10) - access.reminders_left + 1,
+      sent_count: 10 - access.reminders_left,
       type: reminder.type,
     },
   });
