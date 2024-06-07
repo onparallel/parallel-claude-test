@@ -5,7 +5,7 @@ const helpers_1 = require("./helpers");
 /**
  * This script closes all petitions coming from the same template
  */
-const TEMPLATE_IDS = ["6Y8DSH92uxPaJ4B9vf9XU"];
+const TEMPLATE_IDS = ["6Y8DSH92uxPaJ4BA7uMNQ"];
 async function main() {
     for await (const { item: petition, totalCount, index } of (0, helpers_1.paginatedRequest)("/petitions", {
         query: new URLSearchParams({

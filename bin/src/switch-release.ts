@@ -18,6 +18,7 @@ import {
   ElasticLoadBalancingClient,
   RegisterInstancesWithLoadBalancerCommand,
 } from "@aws-sdk/client-elastic-load-balancing";
+import { ListQueuesCommand, SQSClient, StartMessageMoveTaskCommand } from "@aws-sdk/client-sqs";
 import chalk from "chalk";
 import pMap from "p-map";
 import { zip } from "remeda";
@@ -30,8 +31,10 @@ type Environment = "staging" | "production";
 
 const ec2 = new EC2Client({});
 const elb = new ElasticLoadBalancingClient({});
+const sqs = new SQSClient({});
 const cloudfront = new CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
+const QUEUE_ARN_PREFIX = "arn:aws:sqs:eu-central-1:749273139513:";
 
 async function main() {
   const { commit: _commit, env } = await yargs
@@ -207,6 +210,20 @@ async function main() {
     await executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
     console.log(chalk.green.bold`Workers started on ${instance.InstanceId!} ${instanceName}`);
   });
+
+  const queueUrls = await sqs.send(new ListQueuesCommand()).then((r) => r.QueueUrls!);
+  await pMap(
+    queueUrls.filter((url) => url.endsWith(`-dl-${env}.fifo`) || url.endsWith(`-dl-${env}`)),
+    async (url) => {
+      const queueName = url.match(/[^\/]+$/)![0];
+      await sqs.send(
+        new StartMessageMoveTaskCommand({
+          SourceArn: QUEUE_ARN_PREFIX + queueName,
+          DestinationArn: QUEUE_ARN_PREFIX + queueName.replace("-dl-", "-"),
+        }),
+      );
+    },
+  );
 
   await pMap(oldInstancesFull, async (instance) => {
     const ipAddress = instance.PrivateIpAddress!;
