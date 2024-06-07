@@ -274,7 +274,8 @@ function OrganizationGroups() {
               leftIcon: <DeleteIcon />,
               isDisabled: selectedRows.some(
                 (r) =>
-                  r.type === "ALL_USERS" || (r.type === "INITIAL" && !me.hasPermissionManagement),
+                  r.type === "ALL_USERS" ||
+                  ((r.type === "INITIAL" || r.hasPermissions) && !me.hasPermissionManagement),
               ),
               children: (
                 <FormattedMessage
