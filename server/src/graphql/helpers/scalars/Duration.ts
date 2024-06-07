@@ -1,10 +1,9 @@
-import { arg, core, scalarType } from "nexus";
-import Ajv from "ajv";
-import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind, ValueNode } from "graphql";
-import { ObjMap } from "graphql/jsutils/ObjMap";
-import { Maybe } from "graphql/jsutils/Maybe";
-import { isDefined } from "remeda";
 import type { Duration as _Duration } from "date-fns";
+import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind, ValueNode } from "graphql";
+import { Maybe } from "graphql/jsutils/Maybe";
+import { ObjMap } from "graphql/jsutils/ObjMap";
+import { arg, core, scalarType } from "nexus";
+import { isDefined } from "remeda";
 
 const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"];
 
@@ -19,14 +18,30 @@ function ensureDuration(value: any, strict: boolean): _Duration {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(`Value is not a valid Duration: ${value}`);
   }
-  const ajv = new Ajv();
-  if (
-    !ajv.validate(
-      { ...DURATION_SCHEMA, additionalProperties: strict === true ? false : true },
-      value,
-    )
-  ) {
-    throw new Error(`Value is not a valid Duration: ${value} ${ajv.errorsText()}`);
+  let valid = false;
+  for (const key of KEYS) {
+    if (key in value) {
+      if (typeof value[key] === "number" && !Number.isNaN(value[key])) {
+        valid = true;
+      } else {
+        throw new Error(
+          `Value is not a valid Duration: ${JSON.stringify(value)} $.${key} is not a number`,
+        );
+      }
+    }
+  }
+  if (!valid) {
+    throw new Error(
+      `Value is not a valid Duration: ${JSON.stringify(value)} missing at least one key (${KEYS.join(", ")})`,
+    );
+  }
+  if (strict) {
+    const unknownKey = Object.keys(value).find((key) => !(KEYS as string[]).includes(key));
+    if (isDefined(unknownKey)) {
+      throw new Error(
+        `Value is not a valid Duration: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
+      );
+    }
   }
   return Object.fromEntries(
     KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value !== 0),
