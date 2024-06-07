@@ -367,15 +367,6 @@ function PetitionExportField({
                     >
                       <Text style={[styles.text]}>
                         {`${reply.content.filename} - ${fileSize(intl, reply.content.size)}`}
-                        {reply.status === "APPROVED" ? null : (
-                          <Text style={[styles.text]}>
-                            {" "}
-                            <FormattedMessage
-                              id="document.petition-export.file-pending-review"
-                              defaultMessage="(Pending review)"
-                            />
-                          </Text>
-                        )}
                       </Text>
                       {includeNetDocumentsLinks && reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
                         <NetDocumentsExternalLink
@@ -671,7 +662,6 @@ PetitionExport.fragments = {
     return gql`
       fragment PetitionExport_PetitionFieldReplyInner on PetitionFieldReply {
         id
-        status
         content
         metadata
         isAnonymized
