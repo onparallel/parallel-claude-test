@@ -10116,8 +10116,8 @@
   },
   {
     "term": "component.user-group-layout.permissions-enterprise-explanation",
-    "definition": "Esta es una funcionalidad enterprise. Para saber más <a>contacta con nuestro equipo de soporte</a>.",
-    "context": "This is an enterprise feature. To know more <a>contact our support team</a>."
+    "definition": "Esta es una funcionalidad enterprise. Para saber más contacta con nuestro equipo de soporte.",
+    "context": "This is an enterprise feature. To know more contact our support team."
   },
   {
     "term": "component.user-group-layout.permissions-enterprise-message",

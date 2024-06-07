@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Flex, MenuDivider, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import {
   SettingsTabsInnerLayout,
@@ -26,8 +26,6 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { EditableHeading } from "../common/EditableHeading";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
-import { SmallPopover } from "../common/SmallPopover";
-import { SupportLink } from "../common/SupportLink";
 import { WhenPermission } from "../common/WhenPermission";
 import { OrganizationSettingsLayout } from "./OrganizationSettingsLayout";
 
@@ -69,36 +67,7 @@ export function UserGroupLayout({
           defaultMessage: "Permissions",
         }),
         href: `/app/organization/groups/${groupId}/permissions`,
-        isDisabled: !canReadPermissions || !me.hasPermissionManagement,
-        decorate: !me.hasPermissionManagement
-          ? (tab) => (
-              <SmallPopover
-                content={
-                  <Text fontSize="sm">
-                    <FormattedMessage
-                      id="component.user-group-layout.permissions-enterprise-explanation"
-                      defaultMessage="This is an enterprise feature. To know more <a>contact our support team</a>."
-                      values={{
-                        a: (chunks: any) => (
-                          <SupportLink
-                            message={intl.formatMessage({
-                              id: "component.user-group-layout.permissions-enterprise-message",
-                              defaultMessage:
-                                "Hi, I would like to get more information about permission management.",
-                            })}
-                          >
-                            {chunks}
-                          </SupportLink>
-                        ),
-                      }}
-                    />
-                  </Text>
-                }
-              >
-                <Box>{tab}</Box>
-              </SmallPopover>
-            )
-          : undefined,
+        isDisabled: !canReadPermissions,
       },
     ],
     [intl.locale, canReadPermissions],

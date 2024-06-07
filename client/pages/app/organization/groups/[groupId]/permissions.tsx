@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { CircleCheckIcon, DashIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { HighlightText } from "@parallel/components/common/HighlightText";
@@ -23,7 +24,6 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
-import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
 import {
@@ -67,7 +67,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     },
   });
 
-  const canEdit = useHasPermission("TEAMS:UPDATE_PERMISSIONS");
+  const canEdit = useHasPermission("TEAMS:UPDATE_PERMISSIONS") && me.hasPermissionManagement;
 
   const permissionsCategories = useMemo(
     () => [
@@ -647,6 +647,26 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
       realMe={realMe}
       userGroup={userGroup}
     >
+      {me.hasPermissionManagement ? null : (
+        <Box>
+          <ContactSupportAlert
+            borderRadius="0px"
+            body={
+              <Text>
+                <FormattedMessage
+                  id="component.user-group-layout.permissions-enterprise-explanation"
+                  defaultMessage="This is an enterprise feature. To know more contact our support team."
+                />
+              </Text>
+            }
+            contactMessage={intl.formatMessage({
+              id: "component.user-group-layout.permissions-enterprise-message",
+              defaultMessage:
+                "Hi, I would like to get more information about permission management.",
+            })}
+          />
+        </Box>
+      )}
       <Flex
         padding={4}
         gap={4}
@@ -806,6 +826,7 @@ const _queries = [
         hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
         hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+        hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
         organization {
           id
           status
@@ -895,7 +916,6 @@ PermissionsGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
 
 export default compose(
   withDialogs,
-  withFeatureFlag("PERMISSION_MANAGEMENT", "/app/organization"),
   withPermission("TEAMS:READ_PERMISSIONS", { orPath: "/app/organization" }),
   withApolloData,
 )(PermissionsGroup);

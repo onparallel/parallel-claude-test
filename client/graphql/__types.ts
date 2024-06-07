@@ -59333,6 +59333,7 @@ export const PermissionsGroup_userDocument = gql`
       hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+      hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
       organization {
         id
         status
