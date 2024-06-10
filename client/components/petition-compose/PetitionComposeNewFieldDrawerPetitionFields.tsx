@@ -274,6 +274,7 @@ function PertitionComposeNewFieldDrawerField({
             await onAddField(type);
           }
         }}
+        data-action="add-petition-field"
         data-petition-field-type={type}
       >
         <PetitionFieldTypeLabel type={type} />
