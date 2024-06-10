@@ -402,6 +402,7 @@ const _PetitionComposeField = chakraForwardRef<
       ref={rootRef}
       id={`field-${field.id}`}
       data-section="compose-field"
+      data-petition-field-type={field.type}
       data-testid="compose-field"
       sx={{
         ...(isDragging && generateCssStripe({ size: "1rem", color: "gray.50" })),
