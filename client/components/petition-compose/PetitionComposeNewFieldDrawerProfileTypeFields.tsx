@@ -264,6 +264,7 @@ function NewFieldProfileTypeFieldItem({
           await onAddField();
         }
       }}
+      data-profile-type-field-type={type}
     >
       <ProfileTypeFieldTypeName type={type} name={name} />
     </Button>
