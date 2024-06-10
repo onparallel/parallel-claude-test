@@ -117,6 +117,7 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
                   borderTopRadius={0}
                   _focusVisible={{ boxShadow: "inline" }}
                   fontSize="sm"
+                  data-action="select-profile-linked-fields-tab"
                 >
                   <FormattedMessage
                     id="component.petition-compose-new-field.profile-fields"
@@ -131,6 +132,7 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
                   borderTopRadius={0}
                   _focusVisible={{ boxShadow: "inline" }}
                   fontSize="sm"
+                  data-action="select-regular-fields-tab"
                 >
                   <FormattedMessage
                     id="component.petition-compose-new-field.new-field"

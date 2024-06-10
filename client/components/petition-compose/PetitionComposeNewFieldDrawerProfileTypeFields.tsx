@@ -140,6 +140,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
             variant="link"
             leftIcon={<ProfilesIcon />}
             onClick={handleLinkToProfileType}
+            data-action="link-group-to-profile-type"
           >
             <FormattedMessage
               id="component.petition-compose-new-field.link-to-profile"
@@ -170,6 +171,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               }
               icon={<ProfilesIcon boxSize={5} />}
               onClick={handleLinkToProfileType}
+              data-action="link-group-to-profile-type"
             />
           </HStack>
           {filteredFields?.length ? (
