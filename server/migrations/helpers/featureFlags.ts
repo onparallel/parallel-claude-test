@@ -1,17 +1,26 @@
 import { Knex } from "knex";
 import { FeatureFlagName } from "../../src/db/__types";
+import assert from "assert";
 
-export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultValue: boolean) {
+export async function addFeatureFlag(knex: Knex, featureFlag: string): Promise<void>;
+/**
+ * @deprecated feature flags should be added without default value to avoid issues during deployment
+ */
+export async function addFeatureFlag(
+  knex: Knex,
+  featureFlag: string,
+  defaultValue: boolean,
+): Promise<void>;
+export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultValue?: boolean) {
   // need to commit the transaction before safely using new enum value
+  assert(featureFlag.match(/^[A-Z_]+$/));
   await knex.raw(/* sql */ `
-    start transaction;
-      alter type feature_flag_name add value '${featureFlag}';
-    commit;
+    start transaction; alter type feature_flag_name add value '${featureFlag}'; commit;
   `);
 
   await knex.from("feature_flag").insert({
     name: featureFlag as FeatureFlagName,
-    default_value: defaultValue,
+    default_value: defaultValue ?? false,
   });
 }
 
