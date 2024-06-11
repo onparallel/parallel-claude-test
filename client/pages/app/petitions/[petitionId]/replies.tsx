@@ -113,7 +113,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -511,12 +511,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     minHeight: 0,
   } as const;
 
-  const repliesFieldGroupsWithProfileTypes = petition.fields
+  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
     .filter(
-      (field) =>
-        field.type === "FIELD_GROUP" && field.isLinkedToProfileType && field.replies.length > 0,
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
     )
-    .flatMap((f) => f.replies);
+    .flatMap(([f]) => f.replies);
 
   const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
 

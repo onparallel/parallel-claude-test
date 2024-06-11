@@ -19,13 +19,14 @@ import {
   useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
+import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniq } from "remeda";
+import { isDefined, uniq, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
-import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 
 interface ArchiveFieldGroupReplyIntoProfileDialogProps {
   petition: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment;
@@ -37,10 +38,15 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
   onRefetch,
   ...props
 }: DialogProps<ArchiveFieldGroupReplyIntoProfileDialogProps>) {
-  const fieldGroupsWithProfileTypes = petition.fields.filter(
-    (field) =>
-      field.type === "FIELD_GROUP" && field.isLinkedToProfileType && field.replies.length > 0,
-  );
+  const fieldGroupsWithProfileTypes = zip(petition.fields, useFieldLogic(petition))
+    .filter(
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
+    )
+    .map(([field]) => field);
 
   const fieldGroupsWithProfileTypesTotal = fieldGroupsWithProfileTypes.flatMap(
     (f) => f.replies,
@@ -489,7 +495,9 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
       fields {
         ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionField
       }
+      ...useFieldLogic_PetitionBase
     }
+    ${useFieldLogic.fragments.PetitionBase}
   `,
 };
 

@@ -21023,6 +21023,8 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
     multiple: boolean;
     isLinkedToProfileType: boolean;
     isLinkedToProfileTypeField: boolean;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -21031,13 +21033,9 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
       multiple: boolean;
       isLinkedToProfileType: boolean;
       isLinkedToProfileTypeField: boolean;
-      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-      profileTypeField?: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        expiryAlertAheadTime?: Duration | null;
-      } | null;
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -21094,18 +21092,24 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           };
         } | null;
       }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
+      profileTypeField?: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        expiryAlertAheadTime?: Duration | null;
+      } | null;
     }> | null;
-    profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-    profileTypeField?: {
-      __typename?: "ProfileTypeField";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      expiryAlertAheadTime?: Duration | null;
-    } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
@@ -21113,6 +21117,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
+          optional: boolean;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
@@ -21133,6 +21138,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          isAnonymized: boolean;
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
@@ -21158,7 +21164,39 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         };
       } | null;
     }>;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          id: string;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+          id: string;
+        }>;
+      }> | null;
+    }>;
+    profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      expiryAlertAheadTime?: Duration | null;
+    } | null;
   }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables =
@@ -54134,8 +54172,10 @@ export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragmentDoc = gq
     fields {
       ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionField
     }
+    ...useFieldLogic_PetitionBase
   }
   ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment, unknown>;
 export const ProfileFieldSuggestion_PetitionFieldFragmentDoc = gql`
   fragment ProfileFieldSuggestion_PetitionField on PetitionField {
