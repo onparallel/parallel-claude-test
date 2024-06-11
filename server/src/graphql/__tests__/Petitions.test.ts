@@ -5329,7 +5329,10 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("sends error if access has no reminders left", async () => {
-      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 0);
+      await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .update({ reminders_left: 0, automatic_reminders_left: 0 });
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -5347,7 +5350,10 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
       expect(data).toBeNull();
 
-      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 10);
+      await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .update({ reminders_left: 10, automatic_reminders_left: 10 });
     });
 
     it("sends error if petition is CLOSED", async () => {
@@ -5496,7 +5502,10 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("sends error if starting reminders and access has no reminders left", async () => {
-      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 0);
+      await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .update({ reminders_left: 0, automatic_reminders_left: 0 });
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -5532,7 +5541,10 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
       expect(data).toBeNull();
 
-      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 10);
+      await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .update({ reminders_left: 10, automatic_reminders_left: 10 });
     });
 
     it("sends error if petition is not pending", async () => {

@@ -776,10 +776,11 @@ export class Mocks {
     ownerId: number,
     contactIds: number[] | null[],
     createdByUserId: number,
+    builder?: (i: number) => Partial<CreatePetitionAccess>,
   ) {
     return await this.knex<PetitionAccess>("petition_access")
       .insert(
-        contactIds.map<CreatePetitionAccess>((contactId) => ({
+        contactIds.map<CreatePetitionAccess>((contactId, i) => ({
           petition_id: petitionId,
           granter_id: ownerId,
           contact_id: contactId,
@@ -788,6 +789,7 @@ export class Mocks {
           reminders_left: 10,
           automatic_reminders_left: 10,
           created_by: `User:${createdByUserId}`,
+          ...builder?.(i),
         })),
       )
       .returning("*");

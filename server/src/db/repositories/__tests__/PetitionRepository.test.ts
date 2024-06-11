@@ -451,6 +451,96 @@ describe("repositories/PetitionRepository", () => {
     });
   });
 
+  describe("createReminders", () => {
+    test("manual reminders limit should always be greater than or equal to automatic reminders limit", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [contact] = await mocks.createRandomContacts(organization.id, 1);
+      const [access] = await mocks.createPetitionAccess(
+        petition.id,
+        user.id,
+        [contact.id],
+        user.id,
+        () => ({
+          reminders_left: 6,
+          automatic_reminders_left: 4,
+          next_reminder_at: new Date(),
+          reminders_active: true,
+        }),
+      );
+
+      async function sendManualReminder() {
+        await petitions.createReminders("MANUAL", [
+          { petition_access_id: access.id, sender_id: user.id },
+        ]);
+      }
+
+      async function sendAutomaticReminder() {
+        await petitions.createReminders("AUTOMATIC", [
+          { petition_access_id: access.id, sender_id: user.id },
+        ]);
+      }
+
+      async function loadAccess() {
+        const [dbAccess] = await mocks.knex.from("petition_access").where("id", access.id);
+        return dbAccess;
+      }
+
+      await sendManualReminder();
+      const dbAccess1 = await loadAccess();
+      expect(dbAccess1).toMatchObject({
+        reminders_left: 5,
+        automatic_reminders_left: 4,
+        next_reminder_at: expect.any(Date),
+        reminders_active: true,
+      });
+
+      await sendAutomaticReminder();
+      const dbAccess2 = await loadAccess();
+      expect(dbAccess2).toMatchObject({
+        reminders_left: 4,
+        automatic_reminders_left: 3,
+        next_reminder_at: expect.any(Date),
+        reminders_active: true,
+      });
+
+      await sendAutomaticReminder();
+      const dbAccess3 = await loadAccess();
+      expect(dbAccess3).toMatchObject({
+        reminders_left: 3,
+        automatic_reminders_left: 2,
+        next_reminder_at: expect.any(Date),
+        reminders_active: true,
+      });
+
+      await sendManualReminder();
+      const dbAccess4 = await loadAccess();
+      expect(dbAccess4).toMatchObject({
+        reminders_left: 2,
+        automatic_reminders_left: 2,
+        next_reminder_at: expect.any(Date),
+        reminders_active: true,
+      });
+
+      await sendAutomaticReminder();
+      const dbAccess5 = await loadAccess();
+      expect(dbAccess5).toMatchObject({
+        reminders_left: 1,
+        automatic_reminders_left: 1,
+        next_reminder_at: expect.any(Date),
+        reminders_active: true,
+      });
+
+      await sendAutomaticReminder();
+      const dbAccess6 = await loadAccess();
+      expect(dbAccess6).toMatchObject({
+        reminders_left: 0,
+        automatic_reminders_left: 0,
+        next_reminder_at: null,
+        reminders_active: false,
+      });
+    });
+  });
+
   describe("clonePetitionField", () => {
     let petition: Petition;
     let fields: PetitionField[];
