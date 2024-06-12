@@ -2168,7 +2168,7 @@ export class PetitionRepository extends BaseRepository {
       );
     }, t);
 
-    const petition = (await this.loadPetition.raw(petitionId))!;
+    const petition = (await this.loadPetition.raw(petitionId, t))!;
     if (!petition.is_template) {
       // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
       await this.createEmptyFieldGroupReply(
