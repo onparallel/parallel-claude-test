@@ -105,9 +105,9 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
             <Text>
               <FormattedMessage
                 id="component.profile-type-settings.name-of-each-profile-help"
-                defaultMessage="Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated."
+                defaultMessage="Specify how the name of the profiles of type <b>{ProfileTypeName}</b> will be generated. If you change it, existing profiles of this type will be updated."
                 values={{
-                  ProfileName: (
+                  ProfileTypeName: (
                     <LocalizableUserTextRender
                       value={profileType.name}
                       default={intl.formatMessage({

@@ -6,8 +6,8 @@ import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/com
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  ProfileSelect_ProfileFragment,
   UpdateProfileFieldValueInput,
+  useCreateProfileDialog_ProfileFragment,
   useCreateProfileDialog_createProfileDocument,
   useCreateProfileDialog_profileTypeDocument,
 } from "@parallel/graphql/__types";
@@ -21,7 +21,7 @@ import { isDefined } from "remeda";
 import { ProfileFieldSelectInner } from "../fields/ProfileFieldSelect";
 
 interface CreateProfileDialogResult {
-  profile: ProfileSelect_ProfileFragment;
+  profile: useCreateProfileDialog_ProfileFragment;
   hasValues: boolean;
 }
 
@@ -271,7 +271,7 @@ const _fragments = {
   Profile: gql`
     fragment useCreateProfileDialog_Profile on Profile {
       id
-      name
+      localizableName
       status
       profileType {
         id

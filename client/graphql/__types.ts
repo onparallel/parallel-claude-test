@@ -4153,6 +4153,8 @@ export interface Profile extends Timestamps {
   /** The events for the profile. */
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
+  localizableName: Scalars["LocalizableUserText"]["output"];
+  /** @deprecated Use localizableName */
   name: Scalars["String"]["output"];
   permanentDeletionAt?: Maybe<Scalars["DateTime"]["output"]>;
   petitions: PetitionPagination;
@@ -6798,10 +6800,10 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
       };
 };
 
-export type ProfileLink_ProfileFragment = {
+export type ProfileReference_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
 };
 
@@ -6824,7 +6826,7 @@ export type ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWi
 export type ProfileSelect_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -6848,7 +6850,7 @@ export type ProfileSelect_profilesQuery = {
     items: Array<{
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -6867,7 +6869,7 @@ export type ProfileSelect_profileQuery = {
   profile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -9660,7 +9662,12 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragme
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
@@ -9668,7 +9675,12 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fra
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
@@ -10008,9 +10020,9 @@ export type PetitionFieldReference_PetitionFieldFragment = {
 export type PetitionProfilesTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
   status: ProfileStatus;
   createdAt: string;
+  localizableName: { [locale in UserLocale]?: string };
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -10040,9 +10052,9 @@ export type PetitionProfilesTable_PetitionFragment = {
   profiles: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
     status: ProfileStatus;
     createdAt: string;
+    localizableName: { [locale in UserLocale]?: string };
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -10801,14 +10813,24 @@ export type TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment = {
   __typename?: "ProfileAssociatedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment = {
   __typename?: "ProfileDisassociatedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
@@ -11232,7 +11254,7 @@ export type AddAliasToFieldDialog_PetitionFieldFragment = {
 export type AssociateProfileToPetitionDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -20624,7 +20646,7 @@ export type PetitionVariablesCard_PetitionBaseFragment =
 export type ProfileDrawer_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -20709,9 +20731,9 @@ export type ProfileDrawer_profileQuery = {
   profile: {
     __typename?: "Profile";
     id: string;
-    name: string;
     status: ProfileStatus;
     permanentDeletionAt?: string | null;
+    localizableName: { [locale in UserLocale]?: string };
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -20759,7 +20781,7 @@ export type ProfileDrawer_profileQuery = {
 export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -20808,7 +20830,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -20821,7 +20843,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
     associatedProfile?: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -20889,7 +20911,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
-            name: string;
+            localizableName: { [locale in UserLocale]?: string };
             status: ProfileStatus;
             profileType: {
               __typename?: "ProfileType";
@@ -20902,7 +20924,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
       associatedProfile?: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -20949,7 +20971,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -20962,7 +20984,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
     associatedProfile?: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -20980,7 +21002,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFr
   associatedProfile?: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -21020,7 +21042,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
       associatedProfile?: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -21033,7 +21055,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
   associatedProfile?: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -21101,7 +21123,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
             associatedProfile?: {
               __typename?: "Profile";
               id: string;
-              name: string;
+              localizableName: { [locale in UserLocale]?: string };
               status: ProfileStatus;
               profileType: {
                 __typename?: "ProfileType";
@@ -21114,7 +21136,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -21173,7 +21195,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
-            name: string;
+            localizableName: { [locale in UserLocale]?: string };
             status: ProfileStatus;
             profileType: {
               __typename?: "ProfileType";
@@ -21186,7 +21208,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
       associatedProfile?: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -21275,7 +21297,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -21288,7 +21310,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
     associatedProfile?: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -21660,9 +21682,9 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
 export type ProfileForm_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
   status: ProfileStatus;
   permanentDeletionAt?: string | null;
+  localizableName: { [locale in UserLocale]?: string };
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -21806,9 +21828,9 @@ export type ProfileForm_updateProfileFieldValueMutation = {
   updateProfileFieldValue: {
     __typename?: "Profile";
     id: string;
-    name: string;
     status: ProfileStatus;
     permanentDeletionAt?: string | null;
+    localizableName: { [locale in UserLocale]?: string };
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -21952,7 +21974,7 @@ export type ProfileForm_deleteProfileFieldFileMutation = { deleteProfileFieldFil
 export type ProfilePetitionsTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
 };
 
@@ -22022,7 +22044,7 @@ export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
     profile: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     };
@@ -22048,7 +22070,7 @@ export type ProfilePetitionsTable_petitionsQuery = {
   profile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     petitions: {
       __typename?: "PetitionPagination";
@@ -22115,7 +22137,7 @@ export type ProfilePetitionsTable_petitionsQuery = {
 export type ProfileRelationshipsTable_RelatedProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -22136,7 +22158,7 @@ export type ProfileRelationshipsTable_ProfileRelationshipFragment = {
   leftSideProfile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -22157,7 +22179,7 @@ export type ProfileRelationshipsTable_ProfileRelationshipFragment = {
   rightSideProfile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -22188,14 +22210,14 @@ export type ProfileRelationshipsTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   status: ProfileStatus;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   relationships: Array<{
     __typename?: "ProfileRelationship";
     id: string;
     leftSideProfile: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -22216,7 +22238,7 @@ export type ProfileRelationshipsTable_ProfileFragment = {
     rightSideProfile: {
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -22260,14 +22282,14 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
     __typename?: "Profile";
     id: string;
     status: ProfileStatus;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     relationships: Array<{
       __typename?: "ProfileRelationship";
       id: string;
       leftSideProfile: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -22288,7 +22310,7 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
       rightSideProfile: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -22341,14 +22363,14 @@ export type ProfileRelationshipsTable_profileQuery = {
     __typename?: "Profile";
     id: string;
     status: ProfileStatus;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     relationships: Array<{
       __typename?: "ProfileRelationship";
       id: string;
       leftSideProfile: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -22369,7 +22391,7 @@ export type ProfileRelationshipsTable_profileQuery = {
       rightSideProfile: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -22415,7 +22437,7 @@ export type ProfileSubscribers_UserFragment = {
 export type useCreateProfileDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
@@ -22494,7 +22516,7 @@ export type useCreateProfileDialog_createProfileMutation = {
   createProfile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -22507,7 +22529,7 @@ export type useCreateProfileDialog_createProfileMutation = {
 export type useCreateProfileRelationshipsDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   relationships: Array<{
     __typename?: "ProfileRelationship";
@@ -25588,7 +25610,8 @@ export type Alerts_ProfileFieldPropertyFragment = {
   profile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -25686,7 +25709,8 @@ export type Alerts_expiringProfilePropertiesQuery = {
       profile: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
+        status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
           id: string;
@@ -28570,9 +28594,9 @@ export type PetitionActivity_PetitionFragment = {
   profiles: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
     status: ProfileStatus;
     createdAt: string;
+    localizableName: { [locale in UserLocale]?: string };
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -28990,7 +29014,12 @@ export type PetitionActivity_PetitionEvent_ProfileAssociatedEvent_Fragment = {
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
@@ -28998,7 +29027,12 @@ export type PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment = 
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+  } | null;
 };
 
 export type PetitionActivity_PetitionEvent_RecipientSignedEvent_Fragment = {
@@ -29535,9 +29569,9 @@ export type PetitionActivity_updatePetitionMutation = {
         profiles: Array<{
           __typename?: "Profile";
           id: string;
-          name: string;
           status: ProfileStatus;
           createdAt: string;
+          localizableName: { [locale in UserLocale]?: string };
           profileType: {
             __typename?: "ProfileType";
             id: string;
@@ -30198,7 +30232,7 @@ export type PetitionActivity_eventsQuery = {
                 profile?: {
                   __typename?: "Profile";
                   id: string;
-                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
                   status: ProfileStatus;
                 } | null;
               }
@@ -30215,7 +30249,7 @@ export type PetitionActivity_eventsQuery = {
                 profile?: {
                   __typename?: "Profile";
                   id: string;
-                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
                   status: ProfileStatus;
                 } | null;
               }
@@ -30738,9 +30772,9 @@ export type PetitionActivity_petitionQuery = {
         profiles: Array<{
           __typename?: "Profile";
           id: string;
-          name: string;
           status: ProfileStatus;
           createdAt: string;
+          localizableName: { [locale in UserLocale]?: string };
           profileType: {
             __typename?: "ProfileType";
             id: string;
@@ -38238,7 +38272,7 @@ export type PetitionReplies_PetitionFragment = {
             associatedProfile?: {
               __typename?: "Profile";
               id: string;
-              name: string;
+              localizableName: { [locale in UserLocale]?: string };
               status: ProfileStatus;
               profileType: {
                 __typename?: "ProfileType";
@@ -38251,7 +38285,7 @@ export type PetitionReplies_PetitionFragment = {
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -38435,7 +38469,7 @@ export type PetitionReplies_PetitionFragment = {
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
-            name: string;
+            localizableName: { [locale in UserLocale]?: string };
             status: ProfileStatus;
             profileType: {
               __typename?: "ProfileType";
@@ -38481,7 +38515,7 @@ export type PetitionReplies_PetitionFragment = {
       associatedProfile?: {
         __typename?: "Profile";
         id: string;
-        name: string;
+        localizableName: { [locale in UserLocale]?: string };
         status: ProfileStatus;
         profileType: {
           __typename?: "ProfileType";
@@ -38549,7 +38583,7 @@ export type PetitionReplies_PetitionFragment = {
   profiles: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     profileType: {
       __typename?: "ProfileType";
@@ -38985,7 +39019,7 @@ export type PetitionReplies_closePetitionMutation = {
               associatedProfile?: {
                 __typename?: "Profile";
                 id: string;
-                name: string;
+                localizableName: { [locale in UserLocale]?: string };
                 status: ProfileStatus;
                 profileType: {
                   __typename?: "ProfileType";
@@ -38998,7 +39032,7 @@ export type PetitionReplies_closePetitionMutation = {
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
-            name: string;
+            localizableName: { [locale in UserLocale]?: string };
             status: ProfileStatus;
             profileType: {
               __typename?: "ProfileType";
@@ -39182,7 +39216,7 @@ export type PetitionReplies_closePetitionMutation = {
             associatedProfile?: {
               __typename?: "Profile";
               id: string;
-              name: string;
+              localizableName: { [locale in UserLocale]?: string };
               status: ProfileStatus;
               profileType: {
                 __typename?: "ProfileType";
@@ -39228,7 +39262,7 @@ export type PetitionReplies_closePetitionMutation = {
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -39296,7 +39330,7 @@ export type PetitionReplies_closePetitionMutation = {
     profiles: Array<{
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -39500,7 +39534,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               associatedProfile?: {
                 __typename?: "Profile";
                 id: string;
-                name: string;
+                localizableName: { [locale in UserLocale]?: string };
                 status: ProfileStatus;
                 profileType: {
                   __typename?: "ProfileType";
@@ -39513,7 +39547,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           associatedProfile?: {
             __typename?: "Profile";
             id: string;
-            name: string;
+            localizableName: { [locale in UserLocale]?: string };
             status: ProfileStatus;
             profileType: {
               __typename?: "ProfileType";
@@ -39697,7 +39731,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             associatedProfile?: {
               __typename?: "Profile";
               id: string;
-              name: string;
+              localizableName: { [locale in UserLocale]?: string };
               status: ProfileStatus;
               profileType: {
                 __typename?: "ProfileType";
@@ -39743,7 +39777,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         associatedProfile?: {
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -39811,7 +39845,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     profiles: Array<{
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
@@ -40169,7 +40203,7 @@ export type PetitionReplies_petitionQuery = {
                   associatedProfile?: {
                     __typename?: "Profile";
                     id: string;
-                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
                     status: ProfileStatus;
                     profileType: {
                       __typename?: "ProfileType";
@@ -40182,7 +40216,7 @@ export type PetitionReplies_petitionQuery = {
               associatedProfile?: {
                 __typename?: "Profile";
                 id: string;
-                name: string;
+                localizableName: { [locale in UserLocale]?: string };
                 status: ProfileStatus;
                 profileType: {
                   __typename?: "ProfileType";
@@ -40370,7 +40404,7 @@ export type PetitionReplies_petitionQuery = {
                 associatedProfile?: {
                   __typename?: "Profile";
                   id: string;
-                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
                   status: ProfileStatus;
                   profileType: {
                     __typename?: "ProfileType";
@@ -40416,7 +40450,7 @@ export type PetitionReplies_petitionQuery = {
             associatedProfile?: {
               __typename?: "Profile";
               id: string;
-              name: string;
+              localizableName: { [locale in UserLocale]?: string };
               status: ProfileStatus;
               profileType: {
                 __typename?: "ProfileType";
@@ -40488,7 +40522,7 @@ export type PetitionReplies_petitionQuery = {
         profiles: Array<{
           __typename?: "Profile";
           id: string;
-          name: string;
+          localizableName: { [locale in UserLocale]?: string };
           status: ProfileStatus;
           profileType: {
             __typename?: "ProfileType";
@@ -41592,7 +41626,7 @@ export type ProfileDetail_ProfileSubscriptionFragment = {
 export type ProfileDetail_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   permanentDeletionAt?: string | null;
   subscribers: Array<{
@@ -41707,7 +41741,7 @@ export type ProfileDetail_profileQuery = {
   profile: {
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     permanentDeletionAt?: string | null;
     subscribers: Array<{
@@ -41776,7 +41810,7 @@ export type ProfileDetail_subscribeToProfileMutation = {
   subscribeToProfile: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     permanentDeletionAt?: string | null;
     subscribers: Array<{
@@ -41845,7 +41879,7 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
   unsubscribeFromProfile: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     permanentDeletionAt?: string | null;
     subscribers: Array<{
@@ -41914,7 +41948,7 @@ export type Profiles_ProfileTypeFragment = {
 export type Profiles_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  name: string;
+  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   createdAt: string;
   profileType: {
@@ -41942,7 +41976,7 @@ export type Profiles_ProfilePaginationFragment = {
   items: Array<{
     __typename?: "Profile";
     id: string;
-    name: string;
+    localizableName: { [locale in UserLocale]?: string };
     status: ProfileStatus;
     createdAt: string;
     profileType: {
@@ -42053,7 +42087,7 @@ export type Profiles_profilesQuery = {
     items: Array<{
       __typename?: "Profile";
       id: string;
-      name: string;
+      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
       createdAt: string;
       profileType: {
@@ -48536,7 +48570,7 @@ export const MessageClosingEmailEditor_PetitionBaseFragmentDoc = gql`
 export const ProfileSelect_ProfileFragmentDoc = gql`
   fragment ProfileSelect_Profile on Profile {
     id
-    name
+    localizableName
     status
     profileType {
       id
@@ -49388,12 +49422,21 @@ export const useResolveProfilePropertiesConflictsDialog_ProfileFragmentDoc = gql
   }
   ${useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<useResolveProfilePropertiesConflictsDialog_ProfileFragment, unknown>;
+export const ProfileReference_ProfileFragmentDoc = gql`
+  fragment ProfileReference_Profile on Profile {
+    id
+    localizableName
+    status
+  }
+` as unknown as DocumentNode<ProfileReference_ProfileFragment, unknown>;
 export const ProfilePetitionsTable_ProfileFragmentDoc = gql`
   fragment ProfilePetitionsTable_Profile on Profile {
     id
-    name
+    localizableName
     status
+    ...ProfileReference_Profile
   }
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfilePetitionsTable_ProfileFragment, unknown>;
 export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
   fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
@@ -49491,8 +49534,8 @@ export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
 export const useCreateProfileRelationshipsDialog_ProfileFragmentDoc = gql`
   fragment useCreateProfileRelationshipsDialog_Profile on Profile {
     id
-    name
     ...ProfileSelect_Profile
+    ...ProfileReference_Profile
     relationships {
       leftSideProfile {
         id
@@ -49507,17 +49550,19 @@ export const useCreateProfileRelationshipsDialog_ProfileFragmentDoc = gql`
     }
   }
   ${ProfileSelect_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<useCreateProfileRelationshipsDialog_ProfileFragment, unknown>;
 export const ProfileRelationshipsTable_RelatedProfileFragmentDoc = gql`
   fragment ProfileRelationshipsTable_RelatedProfile on Profile {
     id
-    name
+    ...ProfileReference_Profile
     profileType {
       id
       name
     }
     ...useCreateProfileRelationshipsDialog_Profile
   }
+  ${ProfileReference_ProfileFragmentDoc}
   ${useCreateProfileRelationshipsDialog_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileRelationshipsTable_RelatedProfileFragment, unknown>;
 export const ProfileRelationshipsTable_ProfileRelationshipFragmentDoc = gql`
@@ -49541,19 +49586,21 @@ export const ProfileRelationshipsTable_ProfileRelationshipFragmentDoc = gql`
 export const ProfileRelationshipsTable_ProfileFragmentDoc = gql`
   fragment ProfileRelationshipsTable_Profile on Profile {
     id
+    ...ProfileReference_Profile
     status
     relationships {
       ...ProfileRelationshipsTable_ProfileRelationship
     }
     ...useCreateProfileRelationshipsDialog_Profile
   }
+  ${ProfileReference_ProfileFragmentDoc}
   ${ProfileRelationshipsTable_ProfileRelationshipFragmentDoc}
   ${useCreateProfileRelationshipsDialog_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileRelationshipsTable_ProfileFragment, unknown>;
 export const useCreateProfileDialog_ProfileFragmentDoc = gql`
   fragment useCreateProfileDialog_Profile on Profile {
     id
-    name
+    localizableName
     status
     profileType {
       id
@@ -49896,7 +49943,8 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
     }
     profile {
       id
-      name
+      localizableName
+      status
       profileType {
         id
         name
@@ -50917,17 +50965,9 @@ export const useConfirmSendReminderDialog_PetitionFragmentDoc = gql`
   ${ContactReference_ContactFragmentDoc}
   ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useConfirmSendReminderDialog_PetitionFragment, unknown>;
-export const ProfileLink_ProfileFragmentDoc = gql`
-  fragment ProfileLink_Profile on Profile {
-    id
-    name
-    status
-  }
-` as unknown as DocumentNode<ProfileLink_ProfileFragment, unknown>;
 export const PetitionProfilesTable_ProfileFragmentDoc = gql`
   fragment PetitionProfilesTable_Profile on Profile {
     id
-    name
     status
     profileType {
       id
@@ -50940,10 +50980,10 @@ export const PetitionProfilesTable_ProfileFragmentDoc = gql`
       }
     }
     createdAt
-    ...ProfileLink_Profile
+    ...ProfileReference_Profile
   }
   ${UserAvatarList_UserFragmentDoc}
-  ${ProfileLink_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<PetitionProfilesTable_ProfileFragment, unknown>;
 export const PetitionProfilesTable_PetitionFragmentDoc = gql`
   fragment PetitionProfilesTable_Petition on Petition {
@@ -51764,12 +51804,12 @@ export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = 
       ...UserReference_User
     }
     profile {
-      ...ProfileLink_Profile
+      ...ProfileReference_Profile
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ProfileLink_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment,
   unknown
@@ -51780,12 +51820,12 @@ export const TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment
       ...UserReference_User
     }
     profile {
-      ...ProfileLink_Profile
+      ...ProfileReference_Profile
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ProfileLink_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment,
   unknown
@@ -53911,7 +53951,6 @@ export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
 export const ProfileDrawer_ProfileFragmentDoc = gql`
   fragment ProfileDrawer_Profile on Profile {
     id
-    name
     profileType {
       id
       name
@@ -54821,8 +54860,8 @@ export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
 export const ProfileForm_ProfileFragmentDoc = gql`
   fragment ProfileForm_Profile on Profile {
     id
-    name
     status
+    ...ProfileReference_Profile
     profileType {
       id
       name
@@ -54838,6 +54877,7 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     }
     permanentDeletionAt
   }
+  ${ProfileReference_ProfileFragmentDoc}
   ${ProfileForm_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
 export const ProfileSubscribers_UserFragmentDoc = gql`
@@ -54863,14 +54903,16 @@ export const ProfileDetail_ProfileSubscriptionFragmentDoc = gql`
 export const ProfileDetail_ProfileFragmentDoc = gql`
   fragment ProfileDetail_Profile on Profile {
     id
-    name
+    localizableName
     status
     ...ProfileForm_Profile
+    ...ProfileReference_Profile
     subscribers {
       ...ProfileDetail_ProfileSubscription
     }
   }
   ${ProfileForm_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
   ${ProfileDetail_ProfileSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFragment, unknown>;
 export const Profiles_ProfileTypeFragmentDoc = gql`
@@ -54882,8 +54924,9 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
 export const Profiles_ProfileFragmentDoc = gql`
   fragment Profiles_Profile on Profile {
     id
-    name
+    localizableName
     status
+    ...ProfileReference_Profile
     profileType {
       id
       name
@@ -54898,6 +54941,7 @@ export const Profiles_ProfileFragmentDoc = gql`
     }
     createdAt
   }
+  ${ProfileReference_ProfileFragmentDoc}
   ${UserAvatarList_UserFragmentDoc}
   ${useProfileSubscribersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<Profiles_ProfileFragment, unknown>;
@@ -58165,9 +58209,7 @@ export const ProfilePetitionsTable_disassociatePetitionFromProfileDocument = gql
 export const ProfilePetitionsTable_petitionsDocument = gql`
   query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
     profile(profileId: $profileId) {
-      id
-      name
-      status
+      ...ProfilePetitionsTable_Profile
       petitions(offset: $offset, limit: $limit) {
         items {
           ...ProfilePetitionsTable_Petition
@@ -58179,6 +58221,7 @@ export const ProfilePetitionsTable_petitionsDocument = gql`
       }
     }
   }
+  ${ProfilePetitionsTable_ProfileFragmentDoc}
   ${ProfilePetitionsTable_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
   ProfilePetitionsTable_petitionsQuery,

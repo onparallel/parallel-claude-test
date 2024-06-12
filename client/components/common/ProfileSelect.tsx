@@ -14,6 +14,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRerender } from "@parallel/utils/useRerender";
+import useMergedRef from "@react-hook/merged-ref";
 import pMap from "p-map";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -30,10 +31,9 @@ import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isDefined, zip } from "remeda";
 import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { HighlightText } from "./HighlightText";
-import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
+import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 import { isDialogError } from "./dialogs/DialogProvider";
-import useMergedRef from "@react-hook/merged-ref";
 
 export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 
@@ -46,7 +46,7 @@ const fragments = {
   Profile: gql`
     fragment ProfileSelect_Profile on Profile {
       id
-      name
+      localizableName
       status
       profileType {
         id
@@ -251,6 +251,17 @@ export const ProfileSelect = Object.assign(
       rerender();
     }, [unMaybeArray(profileTypeId ?? [])?.join(",")]);
 
+    const getOptionLabel = useCallback(
+      (option: ProfileSelectSelection) => {
+        if ((option as any).__isNew__) {
+          return (option as any).label;
+        } else {
+          return localizableUserTextRender({ intl, value: option.localizableName, default: "" });
+        }
+      },
+      [intl.locale],
+    );
+
     return isSync ? (
       <Select<OptionType, IsMulti, never>
         ref={_ref as any}
@@ -394,14 +405,6 @@ interface ReactSelectExtraProps {
   hideProfileType?: boolean;
 }
 
-const getOptionLabel = (option: ProfileSelectSelection) => {
-  if ((option as any).__isNew__) {
-    return (option as any).label;
-  } else {
-    return option.name ?? "";
-  }
-};
-
 const getOptionValue = (option: ProfileSelectSelection) => option.id;
 
 function SingleValue(
@@ -433,6 +436,7 @@ function Option({
   children,
   ...props
 }: OptionProps<ProfileSelectSelection> & { selectProps: ReactSelectExtraProps }) {
+  const intl = useIntl();
   if ((props.data as any).__isNew__) {
     return (
       <components.Option
@@ -451,7 +455,11 @@ function Option({
           ...(props.data
             ? {
                 "data-profile-id": props.data.id,
-                "data-profile-name": props.data.name,
+                "data-profile-name": localizableUserTextRender({
+                  intl,
+                  value: props.data.localizableName,
+                  default: "",
+                }),
               }
             : {}),
         }}
@@ -485,11 +493,17 @@ function ProfileSelectOption({
   isSelected,
   hideProfileType,
 }: ProfileSelectOptionProps) {
+  const intl = useIntl();
+  const profileName = localizableUserTextRender({
+    intl,
+    value: data.localizableName,
+    default: "",
+  });
   return (
     <>
-      {data.name ? (
+      {profileName ? (
         <HighlightText search={highlight} as="span">
-          {data.name}
+          {profileName}
         </HighlightText>
       ) : (
         <Text as="span" textStyle="hint">

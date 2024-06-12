@@ -4009,6 +4009,8 @@ export type Profile = Timestamps & {
   /** The events for the profile. */
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
+  localizableName: Scalars["LocalizableUserText"]["output"];
+  /** @deprecated Use localizableName */
   name: Scalars["String"]["output"];
   permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   petitions: PetitionPagination;

@@ -602,8 +602,8 @@ export const ProfileForm = Object.assign(
         return gql`
           fragment ProfileForm_Profile on Profile {
             id
-            name
             status
+            ...ProfileReference_Profile
             profileType {
               id
               name
@@ -619,6 +619,7 @@ export const ProfileForm = Object.assign(
             }
             permanentDeletionAt
           }
+          ${ProfileReference.fragments.Profile}
           ${this.ProfileFieldProperty}
         `;
       },

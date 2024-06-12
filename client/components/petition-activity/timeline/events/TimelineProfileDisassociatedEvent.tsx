@@ -43,7 +43,7 @@ TimelineProfileDisassociatedEvent.fragments = {
         ...UserReference_User
       }
       profile {
-        ...ProfileLink_Profile
+        ...ProfileReference_Profile
       }
       createdAt
     }

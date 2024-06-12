@@ -471,8 +471,8 @@ useCreateProfileRelationshipsDialog.fragments = {
   Profile: gql`
     fragment useCreateProfileRelationshipsDialog_Profile on Profile {
       id
-      name
       ...ProfileSelect_Profile
+      ...ProfileReference_Profile
       relationships {
         leftSideProfile {
           id
@@ -487,6 +487,7 @@ useCreateProfileRelationshipsDialog.fragments = {
       }
     }
     ${ProfileSelect.fragments.Profile}
+    ${ProfileReference.fragments.Profile}
   `,
   ProfileRelationshipTypeWithDirection: gql`
     fragment useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {

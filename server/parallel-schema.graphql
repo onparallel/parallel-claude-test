@@ -5153,7 +5153,8 @@ type Profile implements Timestamps {
     offset: Int
   ): ProfileEventPagination!
   id: GID!
-  name: String!
+  localizableName: LocalizableUserText!
+  name: String! @deprecated(reason: "Use localizableName")
   permanentDeletionAt: DateTime
   petitions(
     """

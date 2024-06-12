@@ -90,11 +90,6 @@
     "context": "(Not found)"
   },
   {
-    "term": "document.petition-export.file-pending-review",
-    "definition": "(Pendent de revisió)",
-    "context": "(Pending review)"
-  },
-  {
     "term": "document.petition-export.identity-verification-header",
     "definition": "Verificació d'identitat",
     "context": "Identity Verification"

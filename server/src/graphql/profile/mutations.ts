@@ -858,7 +858,12 @@ export const createProfile = mutationField("createProfile", {
     }
 
     const profile = await ctx.profiles.createProfile(
-      { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
+      {
+        name: "",
+        localizable_name: { en: "", es: "" },
+        org_id: ctx.user!.org_id,
+        profile_type_id: args.profileTypeId,
+      },
       ctx.user!.id,
     );
 

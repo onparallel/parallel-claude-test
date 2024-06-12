@@ -22,7 +22,7 @@ import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { ProfileReference } from "../common/ProfileReference";
 import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
-import { useConfirmRemoveProfileRelantionshipsDialog } from "./dialogs/ConfirmRemoveProfileRelantionshipsDialog";
+import { useConfirmRemoveProfileRelationshipsDialog } from "./dialogs/ConfirmRemoveProfileRelationshipsDialog";
 import { useCreateProfileRelationshipsDialog } from "./dialogs/CreateProfileRelationshipsDialog";
 
 const QUERY_STATE = {
@@ -84,8 +84,7 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
   const [removeProfileRelationship] = useMutation(
     ProfileRelationshipsTable_removeProfileRelationshipDocument,
   );
-  const showConfirmRemoveProfileRelantionshipsDialog =
-    useConfirmRemoveProfileRelantionshipsDialog();
+  const showConfirmRemoveProfileRelationshipsDialog = useConfirmRemoveProfileRelationshipsDialog();
   const handleRemoveRelationships = async () => {
     try {
       if (!profile || selectedRows.length === 0) return;
@@ -95,9 +94,9 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
           ? selectedRows[0].rightSideProfile
           : selectedRows[0].leftSideProfile;
 
-      await showConfirmRemoveProfileRelantionshipsDialog({
-        relatedProfileName: selectedProfile.name,
-        profileName: profile.name,
+      await showConfirmRemoveProfileRelationshipsDialog({
+        relatedProfileName: <ProfileReference profile={selectedProfile} />,
+        profileName: <ProfileReference profile={profile} />,
         selectedProfiles: selectedIds.length,
       });
 
@@ -270,13 +269,14 @@ ProfileRelationshipsTable.fragments = {
   RelatedProfile: gql`
     fragment ProfileRelationshipsTable_RelatedProfile on Profile {
       id
-      name
+      ...ProfileReference_Profile
       profileType {
         id
         name
       }
       ...useCreateProfileRelationshipsDialog_Profile
     }
+    ${ProfileReference.fragments.Profile}
     ${useCreateProfileRelationshipsDialog.fragments.Profile}
   `,
   ProfileRelationship: gql`
@@ -299,12 +299,14 @@ ProfileRelationshipsTable.fragments = {
   Profile: gql`
     fragment ProfileRelationshipsTable_Profile on Profile {
       id
+      ...ProfileReference_Profile
       status
       relationships {
         ...ProfileRelationshipsTable_ProfileRelationship
       }
       ...useCreateProfileRelationshipsDialog_Profile
     }
+    ${ProfileReference.fragments.Profile}
     ${useCreateProfileRelationshipsDialog.fragments.Profile}
   `,
 };

@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 import { HTMLChakraProps, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { ProfileLink_ProfileFragment } from "@parallel/graphql/__types";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileReference_ProfileFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 import { Link } from "./Link";
 
 interface ProfileReferenceProps {
-  profile?: ProfileLink_ProfileFragment | null;
+  profile?: ProfileReference_ProfileFragment | null;
   asLink?: boolean;
   _notDeleted?: HTMLChakraProps<any>["_active"];
   showNameEvenIfDeleted?: boolean;
@@ -22,18 +23,24 @@ export const ProfileReference = Object.assign(
       isDefined(profile) &&
       (showNameEvenIfDeleted || ["OPEN", "CLOSED"].includes(profile.status))
     ) {
-      const content = profile.name || (
-        <Text textStyle="hint" as="span">
-          <FormattedMessage id="generic.unnamed-profile" defaultMessage="Unnamed profile" />
-        </Text>
+      const Content = (
+        <LocalizableUserTextRender
+          value={profile.localizableName}
+          default={
+            <Text textStyle="hint" as="span">
+              <FormattedMessage id="generic.unnamed-profile" defaultMessage="Unnamed profile" />
+            </Text>
+          }
+        />
       );
+
       return asLink ? (
         <Link ref={ref as any} href={`/app/profiles/${profile.id}`} sx={_notDeleted} {...props}>
-          {content}
+          {Content}
         </Link>
       ) : (
         <Text ref={ref} as="span" {...(props as any)}>
-          {content}
+          {Content}
         </Text>
       );
     } else {
@@ -47,9 +54,9 @@ export const ProfileReference = Object.assign(
   {
     fragments: {
       Profile: gql`
-        fragment ProfileLink_Profile on Profile {
+        fragment ProfileReference_Profile on Profile {
           id
-          name
+          localizableName
           status
         }
       `,

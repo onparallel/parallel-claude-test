@@ -13,7 +13,7 @@ export function useCloseProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: string;
+    profileName: React.ReactNode;
   }) {
     try {
       await showCloseProfileDialog({ profileCount: profileIds.length, profileName });
@@ -41,7 +41,7 @@ function CloseProfileDialog({
   profileCount,
   profileName,
   ...props
-}: DialogProps<{ profileName: string; profileCount: number }, void>) {
+}: DialogProps<{ profileName: React.ReactNode; profileCount: number }, void>) {
   return (
     <ConfirmDialog
       {...props}

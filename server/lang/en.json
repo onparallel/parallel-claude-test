@@ -210,11 +210,6 @@
     "context": "(Not found)"
   },
   {
-    "term": "document.petition-export.file-pending-review",
-    "definition": "(Pending review)",
-    "context": "(Pending review)"
-  },
-  {
     "term": "document.petition-export.identity-verification-header",
     "definition": "Identity Verification",
     "context": "Identity Verification"
@@ -888,6 +883,11 @@
     "term": "profiles-expiring-properties.title",
     "definition": "Your pending alerts",
     "context": "Your pending alerts"
+  },
+  {
+    "term": "profiles-expiring-properties.unnamed-profile",
+    "definition": "Unnamed profile",
+    "context": "Unnamed profile"
   },
   {
     "term": "profiles-expiring-properties.untitled-property",

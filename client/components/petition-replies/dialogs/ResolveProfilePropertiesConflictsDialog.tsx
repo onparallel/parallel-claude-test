@@ -42,7 +42,7 @@ import { isDefined } from "remeda";
 interface ResolveProfilePropertiesConflictsDialogProps {
   petitionId: string;
   profileId: string;
-  profileName: string;
+  profileName: React.ReactNode;
   profileTypeFieldsWithReplies: [
     useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
     useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment[],

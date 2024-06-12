@@ -2803,6 +2803,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     events: NexusGenRootTypes["ProfileEventPagination"]; // ProfileEventPagination!
     id: NexusGenScalars["GID"]; // GID!
+    localizableName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     name: string; // String!
     permanentDeletionAt: NexusGenScalars["DateTime"] | null; // DateTime
     petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
@@ -5328,6 +5329,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     events: "ProfileEventPagination";
     id: "GID";
+    localizableName: "LocalizableUserText";
     name: "String";
     permanentDeletionAt: "DateTime";
     petitions: "PetitionPagination";

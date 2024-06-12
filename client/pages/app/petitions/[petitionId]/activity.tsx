@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -409,12 +410,16 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   );
   const handleDisassociateProfileFromPetition = async (profileIds: string[]) => {
     try {
+      const profile = petition.profiles.find((p) => p.id === profileIds[0]);
+
       await showConfirmDisassociateProfileDialog({
         petitionName: petition.name,
         profileName:
-          profileIds.length === 1
-            ? petition.profiles.find((p) => p.id === profileIds[0])?.name
-            : "",
+          profileIds.length === 1 && isDefined(profile) ? (
+            <ProfileReference profile={profile} />
+          ) : (
+            ""
+          ),
         selectedProfiles: profileIds.length,
       });
       await disassociateProfileFromPetition({

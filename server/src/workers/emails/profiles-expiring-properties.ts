@@ -6,7 +6,7 @@ import { LocalizableUserText } from "../../graphql";
 
 export interface ExpiringProperty {
   profileId: string;
-  profileName: string;
+  profileName: LocalizableUserText;
   profileTypeFieldId: string;
   profileTypeFieldName: LocalizableUserText;
   expiryDate: string;

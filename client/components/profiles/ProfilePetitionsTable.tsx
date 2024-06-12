@@ -25,6 +25,7 @@ import { isDefined, noop } from "remeda";
 import { ContactReference } from "../common/ContactReference";
 import { PetitionSignatureCellContent } from "../common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "../common/PetitionStatusCellContent";
+import { ProfileReference } from "../common/ProfileReference";
 import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
 import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDisassociateProfileDialog";
@@ -76,7 +77,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     try {
       await showConfirmDisassociateProfileDialog({
         petitionName: selectedRows[0].name,
-        profileName: profile?.name,
+        profileName: isDefined(profile) ? <ProfileReference profile={profile} /> : undefined,
         selectedPetitions: selectedRows.length,
       });
 
@@ -324,9 +325,11 @@ const _fragments = {
   Profile: gql`
     fragment ProfilePetitionsTable_Profile on Profile {
       id
-      name
+      localizableName
       status
+      ...ProfileReference_Profile
     }
+    ${ProfileReference.fragments.Profile}
   `,
   Petition: gql`
     fragment ProfilePetitionsTable_Petition on Petition {
@@ -387,9 +390,7 @@ const _queries = [
   gql`
     query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
       profile(profileId: $profileId) {
-        id
-        name
-        status
+        ...ProfilePetitionsTable_Profile
         petitions(offset: $offset, limit: $limit) {
           items {
             ...ProfilePetitionsTable_Petition
@@ -401,6 +402,7 @@ const _queries = [
         }
       }
     }
+    ${_fragments.Profile}
     ${_fragments.Petition}
   `,
 ];

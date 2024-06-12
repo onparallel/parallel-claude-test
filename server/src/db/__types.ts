@@ -1731,6 +1731,9 @@ export interface Profile {
   id: number; // int4
   org_id: number; // int4
   profile_type_id: number; // int4
+  /**
+   * @deprecated
+   */
   name: string; // varchar
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -1742,6 +1745,7 @@ export interface Profile {
   closed_at: Maybe<Date>; // timestamptz
   deletion_scheduled_at: Maybe<Date>; // timestamptz
   anonymized_at: Maybe<Date>; // timestamptz
+  localizable_name: any; // jsonb
 }
 
 export type CreateProfile = PartialProps<
@@ -1756,6 +1760,7 @@ export type CreateProfile = PartialProps<
   | "closed_at"
   | "deletion_scheduled_at"
   | "anonymized_at"
+  | "localizable_name"
 >;
 
 export interface ProfileEvent {

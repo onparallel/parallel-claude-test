@@ -1,16 +1,17 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import React from "react";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmRemoveProfileRelantionshipsDialog({
+export function ConfirmRemoveProfileRelationshipsDialog({
   relatedProfileName,
   profileName,
   selectedProfiles,
   ...props
 }: DialogProps<{
-  relatedProfileName?: string | null;
-  profileName?: string | null;
+  relatedProfileName?: React.ReactNode | null;
+  profileName?: React.ReactNode | null;
   selectedProfiles?: number;
 }>) {
   return (
@@ -38,26 +39,8 @@ export function ConfirmRemoveProfileRelantionshipsDialog({
                 id="component.confirm-remove-profile-relationships-dialog.body"
                 defaultMessage="Are you sure you want to remove the association between {profileName} and profile {relatedProfileName}?"
                 values={{
-                  profileName: profileName ? (
-                    <Text as="strong">{profileName}</Text>
-                  ) : (
-                    <Text as="span" textStyle="hint">
-                      <FormattedMessage
-                        id="generic.unnamed-profile"
-                        defaultMessage="Unnamed profile"
-                      />
-                    </Text>
-                  ),
-                  relatedProfileName: relatedProfileName ? (
-                    <Text as="strong">{relatedProfileName}</Text>
-                  ) : (
-                    <Text as="span" textStyle="hint">
-                      <FormattedMessage
-                        id="generic.unnamed-profile"
-                        defaultMessage="Unnamed profile"
-                      />
-                    </Text>
-                  ),
+                  profileName,
+                  relatedProfileName,
                 }}
               />
             )}
@@ -83,6 +66,6 @@ export function ConfirmRemoveProfileRelantionshipsDialog({
   );
 }
 
-export function useConfirmRemoveProfileRelantionshipsDialog() {
-  return useDialog(ConfirmRemoveProfileRelantionshipsDialog);
+export function useConfirmRemoveProfileRelationshipsDialog() {
+  return useDialog(ConfirmRemoveProfileRelationshipsDialog);
 }

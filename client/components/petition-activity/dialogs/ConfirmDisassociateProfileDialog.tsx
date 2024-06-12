@@ -11,7 +11,7 @@ export function ConfirmDisassociateProfileDialog({
   ...props
 }: DialogProps<{
   petitionName?: string | null;
-  profileName?: string | null;
+  profileName?: React.ReactNode | null;
   selectedPetitions?: number;
   selectedProfiles?: number;
 }>) {
@@ -43,18 +43,9 @@ export function ConfirmDisassociateProfileDialog({
             ) : (
               <FormattedMessage
                 id="component.confirm-disassociate-profile-dialog.body"
-                defaultMessage="Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
+                defaultMessage="Are you sure you want to remove the association between <b>{profileName}</b> and parallel {petitionName}?"
                 values={{
-                  profileName: profileName ? (
-                    <Text as="strong">{profileName}</Text>
-                  ) : (
-                    <Text as="span" textStyle="hint">
-                      <FormattedMessage
-                        id="generic.unnamed-profile"
-                        defaultMessage="Unnamed profile"
-                      />
-                    </Text>
-                  ),
+                  profileName,
                   petitionName: petitionName ? (
                     <Text as="strong">{petitionName}</Text>
                   ) : (

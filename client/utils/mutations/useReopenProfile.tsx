@@ -14,7 +14,7 @@ export function useReopenProfile() {
     confirmText,
   }: {
     profileIds: string[];
-    profileName: string;
+    profileName: React.ReactNode;
     confirmText?: string;
   }) {
     try {
@@ -44,7 +44,10 @@ function ReopenProfileDialog({
   profileName,
   confirmText,
   ...props
-}: DialogProps<{ profileName: string; profileCount: number; confirmText?: string }, void>) {
+}: DialogProps<
+  { profileName: React.ReactNode; profileCount: number; confirmText?: string },
+  void
+>) {
   return (
     <ConfirmDialog
       {...props}

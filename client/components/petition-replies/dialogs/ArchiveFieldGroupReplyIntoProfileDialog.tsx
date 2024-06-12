@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, EditIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import {
   ProfileSelect,
   ProfileSelectInstance,
@@ -206,7 +207,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
       if (profile.status === "CLOSED") {
         await reopenProfile({
           profileIds: [profile.id],
-          profileName: profile.name,
+          profileName: <ProfileReference profile={profile} />,
           confirmText: intl.formatMessage({
             id: "component.confirm-close-archive-reply-into-profile-dialog.reopen-and-save-button",
             defaultMessage: "Reopen and save",
@@ -248,8 +249,6 @@ function ArchiveFieldGroupReplyIntoProfileRow({
 
           let expirations = [] as ArchiveFieldGroupReplyIntoProfileExpirationInput[];
 
-          const profileName = profile!.name;
-
           if (conflicts.length) {
             const profileTypeFieldsWithReplies =
               repliesWithProfileFields!.filter(([field]) =>
@@ -258,7 +257,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             conflictResolutions = await showResolveProfilePropertiesConflictsDialog({
               petitionId,
               profileId: profile!.id,
-              profileName,
+              profileName: <ProfileReference profile={profile} />,
               profileTypeFieldsWithReplies,
             });
           }
@@ -280,7 +279,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
 
             expirations = await showConfigureExpirationsDateDialog({
               petitionId,
-              profileName,
+              profileName: <ProfileReference profile={profile} />,
               profileTypeFieldsWithReplies,
             });
           }

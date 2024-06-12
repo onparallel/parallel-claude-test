@@ -180,7 +180,7 @@ function Profiles() {
       if (status === "DELETION_SCHEDULED") {
         await permanentlyDeleteProfile({
           profileIds: selectedIds,
-          profileName: selectedRows[0].name,
+          profileName: <ProfileReference profile={selectedRows[0]} showNameEvenIfDeleted />,
         });
       } else {
         await deleteProfile({
@@ -236,7 +236,7 @@ function Profiles() {
     try {
       await reopenProfile({
         profileIds: selectedIds,
-        profileName: selectedRows[0].name,
+        profileName: <ProfileReference profile={selectedRows[0]} />,
       });
       refetch();
     } catch {}
@@ -247,7 +247,7 @@ function Profiles() {
     try {
       await recoverProfile({
         profileIds: selectedIds,
-        profileName: selectedRows[0].name,
+        profileName: <ProfileReference profile={selectedRows[0]} showNameEvenIfDeleted />,
       });
       refetch();
     } catch {}
@@ -258,7 +258,7 @@ function Profiles() {
     try {
       await closeProfile({
         profileIds: selectedIds,
-        profileName: selectedRows[0].name,
+        profileName: <ProfileReference profile={selectedRows[0]} />,
       });
       refetch();
     } catch {}
@@ -774,8 +774,9 @@ const _fragments = {
     return gql`
       fragment Profiles_Profile on Profile {
         id
-        name
+        localizableName
         status
+        ...ProfileReference_Profile
         profileType {
           id
           name
@@ -790,6 +791,7 @@ const _fragments = {
         }
         createdAt
       }
+      ${ProfileReference.fragments.Profile}
       ${UserAvatarList.fragments.User}
       ${useProfileSubscribersDialog.fragments.User}
     `;

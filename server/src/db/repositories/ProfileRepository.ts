@@ -9,6 +9,7 @@ import {
   isDefined,
   map,
   mapToObj,
+  mapValues,
   omit,
   partition,
   pick,
@@ -623,7 +624,11 @@ export class ProfileRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, sortBy, filter } = opts;
           if (search) {
-            q.whereSearch("p.name", search);
+            q.where((q1) =>
+              q1
+                .whereSearch(this.knex.raw("p.localizable_name->>'en'"), search)
+                .or.whereSearch(this.knex.raw("p.localizable_name->>'es'"), search),
+            );
           }
           if (isDefined(filter?.profileId)) {
             q.whereIn("p.id", filter!.profileId);
@@ -816,55 +821,79 @@ export class ProfileRepository extends BaseRepository {
   ) {
     const profileTypeFieldIds = pattern.filter((p) => typeof p === "number") as number[];
     const profileTypeFields = await this.loadProfileTypeField.raw(profileTypeFieldIds, t);
-    const selectPatternFields = await pMap(
-      profileTypeFields.filter((f) => f?.type === "SELECT"),
-      async (field) => {
-        return {
-          ...field,
-          options: {
-            values: await profileTypeFieldSelectValues(field!.options),
-          },
-        };
-      },
-      { concurrency: 10 },
+    const selectValuesById = Object.fromEntries(
+      await pMap(
+        profileTypeFields.filter((f) => f?.type === "SELECT"),
+        async (field) => [field!.id, await profileTypeFieldSelectValues(field!.options)] as const,
+        { concurrency: 10 },
+      ),
     );
 
     // on SELECT properties, we need to replace the value with the label.
-    // for now, we will always use label in english
-
-    const hydratedProfileValues = profileValues.map((pv) => ({
+    const profileValuesWithSelectLabels = profileValues.map((pv) => ({
       profileId: pv.profileId,
-      values: JSON.parse(JSON.stringify(pv.values), (key, value) => {
-        const profileTypeFieldId = parseInt(key);
-        const selectField = selectPatternFields.find((f) => f?.id === profileTypeFieldId);
-        const selectValue = selectField?.options.values.find((v) => v.value === value);
-        return selectValue?.label["en"] ?? selectValue?.label["es"] ?? value;
+      values: mapValues(pv.values, (value, fieldId) => {
+        if (isDefined(selectValuesById[fieldId])) {
+          const selectValue = selectValuesById[fieldId].find((v) => v.value === value);
+          return selectValue
+            ? { en: selectValue.label["en"], es: selectValue.label["es"] }
+            : { en: value, es: value };
+        } else {
+          return value;
+        }
       }),
     }));
 
     return await this.raw<Profile>(
       /* sql */ `
+        with pv(id, values) as ( 
+          ?
+        ),
+        names as (
+          select
+            id,
+            substring(trim(both from concat(${times(pattern.length, () => "?::text").join(",")})), 1, 255) as en,
+            substring(trim(both from concat(${times(pattern.length, () => "?::text").join(",")})), 1, 255) as es
+          from pv
+        )
         update "profile" p set
-          "name" = substring(
-            trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
-            1,
-            255
-          ),
+          "name" = en,
+          localizable_name = ?,
           updated_by = ?,
-          updated_at = NOW()
-        from (?) as pv(profileId, values)
-        where pv.profileId = p.id
+          updated_at = now()
+        from names
+        where names.id = p.id
         returning p.*;
       `,
       [
-        ...pattern.map((p) =>
-          typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
-        ),
-        updatedBy,
         this.sqlValues(
-          hydratedProfileValues.map((pv) => [pv.profileId, pv.values]),
+          profileValuesWithSelectLabels.map((pv) => [pv.profileId, JSON.stringify(pv.values)]),
           ["int", "jsonb"],
         ),
+        ...pattern.map((p) =>
+          typeof p === "string"
+            ? p
+            : isDefined(selectValuesById[p])
+              ? this.knex.raw(`coalesce(pv.values->?->>'en', pv.values->?->>'es', '')`, [
+                  `${p}`,
+                  `${p}`,
+                ])
+              : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
+        ),
+        ...pattern.map((p) =>
+          typeof p === "string"
+            ? p
+            : isDefined(selectValuesById[p])
+              ? this.knex.raw(`coalesce(pv.values->?->>'es', pv.values->?->>'en', '')`, [
+                  `${p}`,
+                  `${p}`,
+                ])
+              : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
+        ),
+        Object.keys(selectValuesById).length > 0
+          ? this.knex.raw(`jsonb_build_object('en', en, 'es', es)`)
+          : this.knex.raw(`jsonb_build_object('en', en)`),
+        updatedBy,
       ],
       t,
     );
@@ -1297,7 +1326,7 @@ export class ProfileRepository extends BaseRepository {
     } & PageOpts,
   ): Pagination<{
     profile_id: number;
-    profile_name: string;
+    profile_name: LocalizableUserText;
     profile_type_field_id: number;
     profile_type_field_name: LocalizableUserText;
     in_alert: boolean;
@@ -1306,7 +1335,12 @@ export class ProfileRepository extends BaseRepository {
   }> {
     const filter = (q: Knex.QueryBuilder) => {
       if (isDefined(opts.search)) {
-        q.whereSearch("p.name", opts.search);
+        q.whereExists((q2) =>
+          q2
+            .select(this.knex.raw("1"))
+            .fromRaw(`jsonb_each_text(p.localizable_name) AS t(key, value)`)
+            .whereSearch("value", opts.search!),
+        );
       }
       if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
         q.whereIn("p.profile_type_id", opts.filter!.profileTypeId);
@@ -1374,7 +1408,7 @@ export class ProfileRepository extends BaseRepository {
               .clone()
               .select(
                 "pfx.profile_id",
-                "p.name as profile_name",
+                "p.localizable_name as profile_name",
                 "pfx.profile_type_field_id",
                 "pfx.expiry_date",
                 this.knex.raw(
@@ -1391,7 +1425,7 @@ export class ProfileRepository extends BaseRepository {
               .distinctOn("pfx.profile_id", "pfx.profile_type_field_id")
               .select(
                 "pfx.profile_id",
-                "p.name as profile_name",
+                "p.localizable_name as profile_name",
                 "pfx.profile_type_field_id",
                 "pfx.expiry_date",
                 this.knex.raw(

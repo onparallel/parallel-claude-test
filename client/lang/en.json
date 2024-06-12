@@ -1196,8 +1196,8 @@
   },
   {
     "term": "component.confirm-disassociate-profile-dialog.body",
-    "definition": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?",
-    "context": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
+    "definition": "Are you sure you want to remove the association between <b>{profileName}</b> and parallel {petitionName}?",
+    "context": "Are you sure you want to remove the association between <b>{profileName}</b> and parallel {petitionName}?"
   },
   {
     "term": "component.confirm-disassociate-profile-dialog.body-2",
@@ -7296,8 +7296,8 @@
   },
   {
     "term": "component.profile-type-settings.name-of-each-profile-help",
-    "definition": "Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated.",
-    "context": "Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated."
+    "definition": "Specify how the name of the profiles of type <b>{ProfileTypeName}</b> will be generated. If you change it, existing profiles of this type will be updated.",
+    "context": "Specify how the name of the profiles of type <b>{ProfileTypeName}</b> will be generated. If you change it, existing profiles of this type will be updated."
   },
   {
     "term": "component.profile-type-settings.profile-name-pattern",
@@ -8231,8 +8231,8 @@
   },
   {
     "term": "component.recover-profile-dialog.body",
-    "definition": "Recover the profile {profileName} and its content.",
-    "context": "Recover the profile {profileName} and its content."
+    "definition": "Recover {count, plural, =1 {the profile <b>{profileName}</b>} other {# profiles}} and its content.",
+    "context": "Recover {count, plural, =1 {the profile <b>{profileName}</b>} other {# profiles}} and its content."
   },
   {
     "term": "component.recover-profile-dialog.header",
@@ -9956,8 +9956,8 @@
   },
   {
     "term": "component.use-confirm-permanently-delete-profile-dialog.description",
-    "definition": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it.",
-    "context": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
+    "definition": "If you continue, {profileCount, plural, =1 {the profile <b>{profileName}</b>} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it.",
+    "context": "If you continue, {profileCount, plural, =1 {the profile <b>{profileName}</b>} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
   },
   {
     "term": "component.use-confirm-permanently-delete-profile-dialog.header",

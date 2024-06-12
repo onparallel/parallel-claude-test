@@ -18,7 +18,7 @@ export function useRecoverProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: string;
+    profileName: React.ReactNode;
   }) {
     try {
       const { status } = await showReopenProfileDialog({
@@ -69,7 +69,10 @@ function RecoverProfileDialog({
   profileName,
   profileCount,
   ...props
-}: DialogProps<{ profileName: string; profileCount: number }, RecoverProfileDialogResult>) {
+}: DialogProps<
+  { profileName: React.ReactNode; profileCount: number },
+  RecoverProfileDialogResult
+>) {
   const [status, setStatus] = useState<"CLOSED" | "OPEN">("CLOSED");
   const radioRef = useRef<HTMLInputElement>(null);
 
@@ -96,8 +99,8 @@ function RecoverProfileDialog({
           <Text>
             <FormattedMessage
               id="component.recover-profile-dialog.body"
-              defaultMessage="Recover the profile {profileName} and its content."
-              values={{ profileName }}
+              defaultMessage="Recover {count, plural, =1 {the profile <b>{profileName}</b>} other {# profiles}} and its content."
+              values={{ profileName, count: profileCount }}
             />
           </Text>
           <RadioGroup

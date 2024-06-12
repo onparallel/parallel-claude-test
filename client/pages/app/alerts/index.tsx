@@ -8,6 +8,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { NormalLink } from "@parallel/components/common/Link";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -286,12 +287,12 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           maxWidth: 0,
           minWidth: "240px",
         },
-        CellContent: ({
-          row: {
-            profile: { name },
-          },
-        }) => {
-          return <OverflownText>{name}</OverflownText>;
+        CellContent: ({ row: { profile } }) => {
+          return (
+            <OverflownText>
+              <ProfileReference profile={profile} />
+            </OverflownText>
+          );
         },
       },
       {
@@ -418,7 +419,8 @@ const _fragments = {
       }
       profile {
         id
-        name
+        localizableName
+        status
         profileType {
           id
           name

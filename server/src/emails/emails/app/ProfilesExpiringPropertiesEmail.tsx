@@ -37,7 +37,11 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
     const propertyList = Object.entries(groupBy(properties.items, (p) => p.profileId))
       .map(([_, properties]) =>
         [
-          properties[0].profileName,
+          properties[0].profileName[intl.locale as UserLocale] ??
+            intl.formatMessage({
+              id: "profiles-expiring-properties.unnamed-profile",
+              defaultMessage: "Unnamed profile",
+            }),
           ...properties.map(
             (p) =>
               `- ${
@@ -169,6 +173,7 @@ export function ExpiringPropertyRow({
     dateStyle: "long",
   });
 
+  const profileName = property.profileName[intl.locale as UserLocale];
   const propertyName = property.profileTypeFieldName[intl.locale as UserLocale];
   return (
     <tr
@@ -183,7 +188,12 @@ export function ExpiringPropertyRow({
       </td>
       <td style={{ textAlign: "left", paddingTop: "10px", paddingBottom: "10px" }}>
         <p style={{ padding: "0px", margin: "0px", marginBottom: "3px", fontWeight: 600 }}>
-          {property.profileName}
+          {profileName ?? (
+            <FormattedMessage
+              id="profiles-expiring-properties.unnamed-profile"
+              defaultMessage="Unnamed profile"
+            />
+          )}
         </p>
         <p
           style={{

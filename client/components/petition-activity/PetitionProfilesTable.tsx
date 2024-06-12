@@ -213,7 +213,6 @@ PetitionProfilesTable.fragments = {
     return gql`
       fragment PetitionProfilesTable_Profile on Profile {
         id
-        name
         status
         profileType {
           id
@@ -226,7 +225,7 @@ PetitionProfilesTable.fragments = {
           }
         }
         createdAt
-        ...ProfileLink_Profile
+        ...ProfileReference_Profile
       }
       ${UserAvatarList.fragments.User}
       ${ProfileReference.fragments.Profile}

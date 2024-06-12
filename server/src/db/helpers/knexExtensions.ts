@@ -5,7 +5,7 @@ import ASCIIFolder from "fold-to-ascii";
 (knex as any).QueryBuilder.extend("whereSearch", function <
   TRecord extends {} = any,
   TResult = unknown,
->(this: Knex.QueryBuilder<TRecord, TResult>, columnName: string, search: string) {
+>(this: Knex.QueryBuilder<TRecord, TResult>, columnName: keyof TRecord | Knex.Raw | string, search: string) {
   return this.whereRaw(`unaccent(??) ilike ? escape ?`, [
     columnName,
     `%${escapeLike(ASCIIFolder.foldMaintaining(search), "\\")}%`,

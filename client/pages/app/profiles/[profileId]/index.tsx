@@ -26,6 +26,8 @@ import {
   ProfileDetail_unsubscribeFromProfileDocument,
   ProfileDetail_userDocument,
 } from "@parallel/graphql/__types";
+
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useCloseProfile } from "@parallel/utils/mutations/useCloseProfile";
@@ -72,7 +74,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
       if (profile.status === "DELETION_SCHEDULED") {
         await permanentlyDeleteProfile({
           profileIds: [profile.id],
-          profileName: profile.name,
+          profileName: <ProfileReference profile={profile} showNameEvenIfDeleted />,
         });
         navigate("/app/profiles");
       } else {
@@ -122,21 +124,30 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
   const closeProfile = useCloseProfile();
   const handleCloseProfileClick = async () => {
     try {
-      await closeProfile({ profileIds: [profile.id], profileName: profile.name });
+      await closeProfile({
+        profileIds: [profile.id],
+        profileName: <ProfileReference profile={profile} />,
+      });
     } catch {}
   };
 
   const reopenProfile = useReopenProfile();
   const handleReopenProfileClick = async () => {
     try {
-      await reopenProfile({ profileIds: [profile.id], profileName: profile.name });
+      await reopenProfile({
+        profileIds: [profile.id],
+        profileName: <ProfileReference profile={profile} />,
+      });
     } catch {}
   };
 
   const recoverProfile = useRecoverProfile();
   const handleRecoverProfileClick = async () => {
     try {
-      await recoverProfile({ profileIds: [profile.id], profileName: profile.name });
+      await recoverProfile({
+        profileIds: [profile.id],
+        profileName: <ProfileReference profile={profile} showNameEvenIfDeleted />,
+      });
     } catch {}
   };
 
@@ -322,14 +333,16 @@ const _fragments = {
     return gql`
       fragment ProfileDetail_Profile on Profile {
         id
-        name
+        localizableName
         status
         ...ProfileForm_Profile
+        ...ProfileReference_Profile
         subscribers {
           ...ProfileDetail_ProfileSubscription
         }
       }
       ${ProfileForm.fragments.Profile}
+      ${ProfileReference.fragments.Profile}
       ${this.ProfileSubscription}
     `;
   },

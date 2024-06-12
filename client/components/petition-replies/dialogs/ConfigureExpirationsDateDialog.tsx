@@ -36,7 +36,7 @@ import { isDefined } from "remeda";
 
 interface ConfigureExpirationsDateDialogProps {
   petitionId: string;
-  profileName: string;
+  profileName: React.ReactNode;
   profileTypeFieldsWithReplies: [
     useConfigureExpirationsDateDialog_PetitionFieldFragment,
     useConfigureExpirationsDateDialog_PetitionFieldReplyFragment[],

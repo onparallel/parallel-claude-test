@@ -14,7 +14,7 @@ export function usePermanentlyDeleteProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: string;
+    profileName: React.ReactNode;
   }) {
     try {
       await showConfirmPermanentlyDeleteProfile({
@@ -48,7 +48,13 @@ usePermanentlyDeleteProfile.mutations = [
 function useConfirmPermanentlyDeleteProfileDialog() {
   const showDialog = useConfirmDeleteDialog();
   return useCallback(
-    async ({ profileCount, profileName }: { profileCount: number; profileName: string }) => {
+    async ({
+      profileCount,
+      profileName,
+    }: {
+      profileCount: number;
+      profileName: React.ReactNode;
+    }) => {
       return await showDialog({
         size: "lg",
         header: (
@@ -61,17 +67,10 @@ function useConfirmPermanentlyDeleteProfileDialog() {
           <Text>
             <FormattedMessage
               id="component.use-confirm-permanently-delete-profile-dialog.description"
-              defaultMessage="If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
+              defaultMessage="If you continue, {profileCount, plural, =1 {the profile <b>{profileName}</b>} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
               values={{
                 profileCount,
-                profileName: profileName || (
-                  <Text textStyle="hint" as="span">
-                    <FormattedMessage
-                      id="generic.unnamed-profile"
-                      defaultMessage="Unnamed profile"
-                    />
-                  </Text>
-                ),
+                profileName,
               }}
             />
           </Text>

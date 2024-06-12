@@ -111,7 +111,6 @@ export const ProfileDrawer = Object.assign(
       Profile: gql`
         fragment ProfileDrawer_Profile on Profile {
           id
-          name
           profileType {
             id
             name
