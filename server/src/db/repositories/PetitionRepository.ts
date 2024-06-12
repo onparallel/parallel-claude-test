@@ -2378,8 +2378,13 @@ export class PetitionRepository extends BaseRepository {
         created_by: createdBy,
       })),
     );
+    const petition = (await this.loadPetition(petitionId))!;
 
-    if (fields.some((f) => isDefined(f) && !f.is_internal)) {
+    if (
+      (!petition.enable_interaction_with_recipients &&
+        fields.some((f) => isDefined(f) && f.type !== "BACKGROUND_CHECK")) ||
+      fields.some((f) => isDefined(f) && !f.is_internal)
+    ) {
       await this.updatePetition(
         petitionId,
         {
@@ -2462,11 +2467,13 @@ export class PetitionRepository extends BaseRepository {
       t,
     );
 
-    const [petition] = await this.from("petition")
-      .where("id", petitionId)
-      .select("enable_interaction_with_recipients");
+    const petition = (await this.loadPetition(petitionId))!;
 
-    if (!petition.enable_interaction_with_recipients || fields.some((f) => !f!.is_internal)) {
+    if (
+      (!petition.enable_interaction_with_recipients &&
+        fields.some((f) => isDefined(f) && f.type !== "BACKGROUND_CHECK")) ||
+      fields.some((f) => isDefined(f) && !f.is_internal)
+    ) {
       await this.updatePetition(
         petitionId,
         {
@@ -2551,7 +2558,12 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field reply not found");
     }
 
-    if (!field.is_internal) {
+    const petition = (await this.loadPetition(field.petition_id))!;
+
+    if (
+      (!petition.enable_interaction_with_recipients && field.type !== "BACKGROUND_CHECK") ||
+      !field.is_internal
+    ) {
       await this.updatePetition(
         field.petition_id,
         {
