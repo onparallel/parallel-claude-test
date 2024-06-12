@@ -2124,7 +2124,8 @@ const _ProfileTypeField = {
     },
     options: {
       type: "object",
-      description: "For fields of type `SELECT`, contains the list of possible values",
+      description:
+        "If parameter `include` includes `fields` and `fields.options`, this field will be included. For fields of type `SELECT`, contains the list of possible values.",
       oneOf: [
         {
           title: "SELECT",
@@ -2630,7 +2631,7 @@ export const BulkSendTemplateInput = schema({
 
 const _ProfileType = {
   type: "object",
-  required: ["id", "name", "fields"],
+  required: ["id", "name"],
   additionalProperties: false,
   properties: {
     id: {
@@ -2641,6 +2642,8 @@ const _ProfileType = {
     name: _LocalizableUserText,
     fields: {
       type: "array",
+      description:
+        "If parameter `include` contains `fields`, this will be the list of profile type fields",
       items: _ProfileTypeField,
     },
   },

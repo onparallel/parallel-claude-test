@@ -6224,7 +6224,7 @@ export type ProfileTypeFieldFragment = {
   alias: string | null;
   type: ProfileTypeFieldType;
   isExpirable: boolean;
-  options: { [key: string]: any };
+  options?: { [key: string]: any };
 };
 
 export type ProfileFieldValueFragment = {
@@ -6244,13 +6244,13 @@ export type ProfileFieldFileFragment = {
 export type ProfileTypeFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
-  fields: Array<{
+  fields?: Array<{
     id: string;
     name: { [locale in UserLocale]?: string };
     alias: string | null;
     type: ProfileTypeFieldType;
     isExpirable: boolean;
-    options: { [key: string]: any };
+    options?: { [key: string]: any };
   }>;
 };
 
@@ -6261,7 +6261,7 @@ export type ProfileFieldPropertyFragment = {
     alias: string | null;
     type: ProfileTypeFieldType;
     isExpirable: boolean;
-    options: { [key: string]: any };
+    options?: { [key: string]: any };
   };
   value: {
     id: string;
@@ -6321,7 +6321,7 @@ export type ProfileFragment = {
       alias: string | null;
       type: ProfileTypeFieldType;
       isExpirable: boolean;
-      options: { [key: string]: any };
+      options?: { [key: string]: any };
     };
     value: {
       id: string;
@@ -8434,6 +8434,7 @@ export type DownloadSignedDocument_downloadAuditTrailMutation = {
 
 export type GetPetitionProfiles_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -8454,7 +8455,7 @@ export type GetPetitionProfiles_petitionQuery = {
               alias: string | null;
               type: ProfileTypeFieldType;
               isExpirable: boolean;
-              options: { [key: string]: any };
+              options?: { [key: string]: any };
             };
             value: {
               id: string;
@@ -8511,6 +8512,7 @@ export type GetPetitionProfiles_petitionQuery = {
 export type AssociatePetitionToProfile_associateProfileToPetitionMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -8529,7 +8531,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
-          options: { [key: string]: any };
+          options?: { [key: string]: any };
         };
         value: {
           id: string;
@@ -9288,6 +9290,7 @@ export type GetProfiles_profilesQueryVariables = Exact<{
   profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
   values?: InputMaybe<Array<ProfileFieldValuesFilter> | ProfileFieldValuesFilter>;
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9307,7 +9310,7 @@ export type GetProfiles_profilesQuery = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
-          options: { [key: string]: any };
+          options?: { [key: string]: any };
         };
         value: {
           id: string;
@@ -9378,6 +9381,7 @@ export type CreateProfile_createProfileMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
   fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9395,7 +9399,7 @@ export type CreateProfile_createProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9466,6 +9470,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutationVariables = Exac
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
   profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9484,7 +9489,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
-          options: { [key: string]: any };
+          options?: { [key: string]: any };
         };
         value: {
           id: string;
@@ -9538,6 +9543,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
 
 export type GetProfile_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9555,7 +9561,7 @@ export type GetProfile_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9608,6 +9614,7 @@ export type GetProfile_profileQuery = {
 
 export type UpdateProfileFieldValue_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9625,7 +9632,7 @@ export type UpdateProfileFieldValue_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9848,6 +9855,7 @@ export type GetProfileSubscribers_profileQuery = {
 export type SubscribeToProfile_subscribeToProfileMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9865,7 +9873,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9919,6 +9927,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
 export type UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
 }>;
@@ -9936,7 +9945,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9990,6 +9999,8 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
 export type GetProfileTypes_profileTypesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
 }>;
 
 export type GetProfileTypes_profileTypesQuery = {
@@ -9998,13 +10009,13 @@ export type GetProfileTypes_profileTypesQuery = {
     items: Array<{
       id: string;
       name: { [locale in UserLocale]?: string };
-      fields: Array<{
+      fields?: Array<{
         id: string;
         name: { [locale in UserLocale]?: string };
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
-        options: { [key: string]: any };
+        options?: { [key: string]: any };
       }>;
     }>;
   };
@@ -10012,19 +10023,21 @@ export type GetProfileTypes_profileTypesQuery = {
 
 export type GetProfileType_profileTypeQueryVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
 }>;
 
 export type GetProfileType_profileTypeQuery = {
   profileType: {
     id: string;
     name: { [locale in UserLocale]?: string };
-    fields: Array<{
+    fields?: Array<{
       id: string;
       name: { [locale in UserLocale]?: string };
       alias: string | null;
       type: ProfileTypeFieldType;
       isExpirable: boolean;
-      options: { [key: string]: any };
+      options?: { [key: string]: any };
     }>;
   };
 };
@@ -10809,14 +10822,14 @@ export const ProfileTypeFieldFragmentDoc = gql`
     alias
     type
     isExpirable
-    options
+    options @include(if: $includeFieldOptions)
   }
 ` as unknown as DocumentNode<ProfileTypeFieldFragment, unknown>;
 export const ProfileTypeFragmentDoc = gql`
   fragment ProfileType on ProfileType {
     id
     name
-    fields {
+    fields @include(if: $includeFields) {
       ...ProfileTypeField
     }
   }
@@ -11773,6 +11786,7 @@ export const DownloadSignedDocument_downloadAuditTrailDocument = gql`
 export const GetPetitionProfiles_petitionDocument = gql`
   query GetPetitionProfiles_petition(
     $petitionId: GID!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -11794,6 +11808,7 @@ export const AssociatePetitionToProfile_associateProfileToPetitionDocument = gql
   mutation AssociatePetitionToProfile_associateProfileToPetition(
     $profileId: GID!
     $petitionId: GID!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12022,6 +12037,7 @@ export const GetProfiles_profilesDocument = gql`
     $profileTypeIds: [GID!]
     $status: [ProfileStatus!]
     $values: [ProfileFieldValuesFilter!]
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12060,6 +12076,7 @@ export const CreateProfile_createProfileDocument = gql`
     $profileTypeId: GID!
     $subscribe: Boolean
     $fields: [UpdateProfileFieldValueInput!]
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12105,6 +12122,7 @@ export const CreateProfile_profileFieldFileUploadCompleteDocument = gql`
     $profileId: GID!
     $profileTypeFieldId: GID!
     $profileFieldFileIds: [GID!]!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12126,6 +12144,7 @@ export const CreateProfile_profileFieldFileUploadCompleteDocument = gql`
 export const GetProfile_profileDocument = gql`
   query GetProfile_profile(
     $profileId: GID!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12138,6 +12157,7 @@ export const GetProfile_profileDocument = gql`
 export const UpdateProfileFieldValue_profileDocument = gql`
   query UpdateProfileFieldValue_profile(
     $profileId: GID!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12332,6 +12352,7 @@ export const SubscribeToProfile_subscribeToProfileDocument = gql`
   mutation SubscribeToProfile_subscribeToProfile(
     $profileId: GID!
     $userIds: [GID!]!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12348,6 +12369,7 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
   mutation UnsubscribeFromProfile_unsubscribeFromProfile(
     $profileId: GID!
     $userIds: [GID!]!
+    $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
@@ -12361,7 +12383,12 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
   UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
 >;
 export const GetProfileTypes_profileTypesDocument = gql`
-  query GetProfileTypes_profileTypes($offset: Int, $limit: Int) {
+  query GetProfileTypes_profileTypes(
+    $offset: Int
+    $limit: Int
+    $includeFields: Boolean!
+    $includeFieldOptions: Boolean!
+  ) {
     profileTypes(offset: $offset, limit: $limit) {
       totalCount
       items {
@@ -12375,7 +12402,11 @@ export const GetProfileTypes_profileTypesDocument = gql`
   GetProfileTypes_profileTypesQueryVariables
 >;
 export const GetProfileType_profileTypeDocument = gql`
-  query GetProfileType_profileType($profileTypeId: GID!) {
+  query GetProfileType_profileType(
+    $profileTypeId: GID!
+    $includeFields: Boolean!
+    $includeFieldOptions: Boolean!
+  ) {
     profileType(profileTypeId: $profileTypeId) {
       ...ProfileType
     }

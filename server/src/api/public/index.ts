@@ -490,7 +490,7 @@ export function publicApi(container: Container) {
       description: "Include optional fields in the response",
       array: true,
       required: false,
-      values: ["fields", "subscribers", "relationships"],
+      values: ["fields", "fields.field.options", "subscribers", "relationships"],
     }),
   };
 
@@ -501,8 +501,36 @@ export function publicApi(container: Container) {
   >(query: Q) {
     return {
       includeFields: query.include?.includes("fields") ?? false,
+      includeFieldOptions:
+        (query.include?.includes("fields") ?? false) &&
+        (query.include?.includes("fields.field.options") ?? false),
       includeRelationships: query.include?.includes("relationships") ?? false,
       includeSubscribers: query.include?.includes("subscribers") ?? false,
+    };
+  }
+
+  const profileTypeIncludeParam = {
+    include: enumParam({
+      schemaTitle: "ProfileTypeIncludeInResponse",
+      description: "Include optional fields in the response",
+      array: true,
+      required: false,
+      values: ["fields", "fields.options"],
+    }),
+  };
+
+  function getProfileTypeIncludesFromQuery<
+    Q extends {
+      include: (typeof profileTypeIncludeParam)["include"] extends RestParameter<infer T>
+        ? T
+        : never;
+    },
+  >(query: Q) {
+    return {
+      includeFields: query.include?.includes("fields") ?? false,
+      includeFieldOptions:
+        (query.include?.includes("fields") ?? false) &&
+        (query.include?.includes("fields.options") ?? false),
     };
   }
 
@@ -3146,6 +3174,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query GetPetitionProfiles_petition(
             $petitionId: GID!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -3200,6 +3229,7 @@ export function publicApi(container: Container) {
           mutation AssociatePetitionToProfile_associateProfileToPetition(
             $profileId: GID!
             $petitionId: GID!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -3985,6 +4015,7 @@ export function publicApi(container: Container) {
             $profileTypeIds: [GID!]
             $status: [ProfileStatus!]
             $values: [ProfileFieldValuesFilter!]
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -4151,6 +4182,7 @@ export function publicApi(container: Container) {
               $profileTypeId: GID!
               $subscribe: Boolean
               $fields: [UpdateProfileFieldValueInput!]
+              $includeFieldOptions: Boolean!
               $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
             ) {
@@ -4190,6 +4222,7 @@ export function publicApi(container: Container) {
               $profileId: GID!
               $profileTypeFieldId: GID!
               $profileFieldFileIds: [GID!]!
+              $includeFieldOptions: Boolean!
               $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
             ) {
@@ -4328,6 +4361,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query GetProfile_profile(
             $profileId: GID!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -4430,6 +4464,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query UpdateProfileFieldValue_profile(
             $profileId: GID!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -4931,6 +4966,7 @@ export function publicApi(container: Container) {
           mutation SubscribeToProfile_subscribeToProfile(
             $profileId: GID!
             $userIds: [GID!]!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -4970,6 +5006,7 @@ export function publicApi(container: Container) {
           mutation UnsubscribeFromProfile_unsubscribeFromProfile(
             $profileId: GID!
             $userIds: [GID!]!
+            $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
           ) {
@@ -5009,12 +5046,18 @@ export function publicApi(container: Container) {
       },
       query: {
         ...paginationParams(),
+        ...profileTypeIncludeParam,
       },
       tags: ["Profiles"],
     },
     async ({ client, query }) => {
       const _query = gql`
-        query GetProfileTypes_profileTypes($offset: Int, $limit: Int) {
+        query GetProfileTypes_profileTypes(
+          $offset: Int
+          $limit: Int
+          $includeFields: Boolean!
+          $includeFieldOptions: Boolean!
+        ) {
           profileTypes(offset: $offset, limit: $limit) {
             totalCount
             items {
@@ -5025,7 +5068,10 @@ export function publicApi(container: Container) {
         ${ProfileTypeFragmentDoc}
       `;
 
-      const result = await client.request(GetProfileTypes_profileTypesDocument, query);
+      const result = await client.request(GetProfileTypes_profileTypesDocument, {
+        ...pick(query, ["limit", "offset"]),
+        ...getProfileTypeIncludesFromQuery(query),
+      });
 
       return Ok(result.profileTypes);
     },
@@ -5036,14 +5082,21 @@ export function publicApi(container: Container) {
       operationId: "GetProfileType",
       summary: "Get a profile type",
       description: "Returns the specified profile type",
+      query: {
+        ...profileTypeIncludeParam,
+      },
       responses: {
         200: SuccessResponse(ProfileType),
       },
       tags: ["Profiles"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       const _query = gql`
-        query GetProfileType_profileType($profileTypeId: GID!) {
+        query GetProfileType_profileType(
+          $profileTypeId: GID!
+          $includeFields: Boolean!
+          $includeFieldOptions: Boolean!
+        ) {
           profileType(profileTypeId: $profileTypeId) {
             ...ProfileType
           }
@@ -5051,7 +5104,10 @@ export function publicApi(container: Container) {
         ${ProfileTypeFragmentDoc}
       `;
 
-      const result = await client.request(GetProfileType_profileTypeDocument, params);
+      const result = await client.request(GetProfileType_profileTypeDocument, {
+        ...params,
+        ...getProfileTypeIncludesFromQuery(query),
+      });
 
       return Ok(result.profileType);
     },

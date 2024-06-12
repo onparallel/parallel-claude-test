@@ -320,7 +320,7 @@ export const ProfileTypeFieldFragment = gql`
     alias
     type
     isExpirable
-    options
+    options @include(if: $includeFieldOptions)
   }
 `;
 
@@ -350,7 +350,7 @@ export const ProfileTypeFragment = gql`
   fragment ProfileType on ProfileType {
     id
     name
-    fields {
+    fields @include(if: $includeFields) {
       ...ProfileTypeField
     }
   }

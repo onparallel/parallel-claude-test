@@ -543,7 +543,7 @@ export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content
 
 function mapProfilePropertyOptions(field: Pick<ProfileTypeFieldFragment, "type" | "options">) {
   if (field.type === "SELECT") {
-    return pick(field.options, ["values"]);
+    return pick(field.options ?? {}, ["values"]);
   }
 
   return {};
@@ -556,7 +556,7 @@ function mapProfileFields<T extends ProfileFragment>(profile: T) {
       return {
         field: {
           ...prop.field,
-          options: mapProfilePropertyOptions(prop.field),
+          options: prop.field.options ? mapProfilePropertyOptions(prop.field) : undefined,
         },
         ...(prop.field.type === "FILE" ? { files: prop.files } : { value: prop.value }),
       };
