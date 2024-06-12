@@ -1397,7 +1397,7 @@ export async function seed(knex: Knex): Promise<any> {
             updated_by: `User:${ownerId}`,
           })),
         )
-        .onConflict(["org_id", "alias"])
+        .onConflict(knex.raw('("org_id", "alias") where deleted_at is null'))
         .ignore()
         .returning("*");
 
