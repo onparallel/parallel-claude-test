@@ -139,7 +139,7 @@ function Alerts() {
                   >
                     <Image
                       paddingBottom={2}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/alerts/empty-alerts.svg`}
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/alerts/empty-alerts.svg`}
                     />
                     <Text fontWeight="bold">
                       <FormattedMessage

@@ -51,7 +51,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
   };
 
   const logoSrc =
-    organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
+    organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/emails/logo.png`;
 
   return (
     <Box width="100%" paddingBottom={8}>

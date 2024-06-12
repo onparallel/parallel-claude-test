@@ -129,7 +129,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
             alt={countryName}
             boxSize={6}
             src={`${
-              process.env.NEXT_PUBLIC_ASSETS_URL
+              process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
             }/static/countries/flags/${country.toLowerCase()}.png`}
           />
         ) : (

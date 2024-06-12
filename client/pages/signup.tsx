@@ -150,7 +150,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
         >
           <Flex
             direction="column"
-            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
+            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/signup/signup-bg.svg`}
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
             backgroundSize="cover"
@@ -177,7 +177,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
                               width="460"
                               height="100"
                               role="presentation"
-                              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/${imageName}`}
+                              src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/signup/${imageName}`}
                               opacity={step === 0 ? 0 : 1}
                               marginStart={i === 1 ? "-96px" : 0}
                               animation={animation}
@@ -200,7 +200,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
                           opacity: 1;
                         }
                       `} 1.2s ease 0.12s forwards`}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/check-inbox.svg`}
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/signup/check-inbox.svg`}
                     />
                   </Center>
                 </Steps>

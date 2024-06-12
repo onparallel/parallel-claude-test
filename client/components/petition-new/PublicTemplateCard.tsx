@@ -65,7 +65,7 @@ export const PublicTemplateCard = Object.assign(
               })}
               src={
                 template.imageUrl ??
-                `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`
+                `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/${intl.locale}_radio_button.png`
               }
             />
           </Center>

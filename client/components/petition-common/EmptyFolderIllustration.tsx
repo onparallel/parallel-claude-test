@@ -15,7 +15,7 @@ export const EmptyFolderIllustration = chakraForwardRef<"div", EmptyFolderIllust
             maxWidth="282px"
             height="80px"
             width="100%"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/empty_folder.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/empty_folder.svg`}
           />
           <Text paddingTop={5} fontWeight="600">
             <FormattedMessage

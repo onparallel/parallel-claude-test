@@ -10,7 +10,7 @@ function Maintenance() {
           defaultMessage="Parallel is under maintenance"
         />
       }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_maintenance.svg`}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_maintenance.svg`}
     >
       <FormattedMessage
         id="page.maintenance.description"

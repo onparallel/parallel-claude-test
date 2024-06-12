@@ -25,7 +25,7 @@ export function useLoadCountryNames(locale: string) {
           setData({ countries: null, loading: true, locale });
         }
       }
-      const url = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/countries_${locale}.json?v=2`;
+      const url = `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/countries/countries_${locale}.json?v=2`;
       const promise =
         PROMISE_CACHE[locale] ??
         (PROMISE_CACHE[locale] = fetch(url).then((response) => response.json()));

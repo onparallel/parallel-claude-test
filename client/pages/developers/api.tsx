@@ -43,7 +43,7 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
         <meta name="description" content="Integrate Parallel into your workflow" />
         <link
           rel="stylesheet"
-          href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/styles/api.css`}
+          href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/styles/api.css`}
         />
       </Head>
       <Script

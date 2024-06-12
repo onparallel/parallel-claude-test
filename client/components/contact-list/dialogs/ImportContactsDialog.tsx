@@ -176,7 +176,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
           <Box marginTop={4} marginBottom={2}>
             <NormalLink
               fontWeight="bold"
-              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/documents/contact_import_model_${
+              href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/documents/contact_import_model_${
                 intl.locale ?? "en"
               }.xlsx`}
             >

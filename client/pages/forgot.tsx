@@ -220,7 +220,7 @@ function Forgot() {
         >
           <Flex
             direction="column"
-            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
+            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/signup/signup-bg.svg`}
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
             backgroundSize="cover"
@@ -230,7 +230,7 @@ function Forgot() {
             <PublicSignupRightHeading display="block" />
             <Center height="100%">
               <Image
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/login/illustration.svg`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/login/illustration.svg`}
               />
             </Center>
           </Flex>

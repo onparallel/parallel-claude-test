@@ -25,7 +25,7 @@ export default function UpdateBrowser() {
       header={
         <FormattedMessage id="page.update-browser.header" defaultMessage="Unsupported browser" />
       }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_back_in_the_day.svg`}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_back_in_the_day.svg`}
     >
       <Stack spacing={6}>
         <Text>
@@ -54,7 +54,7 @@ export default function UpdateBrowser() {
               <Stack alignItems="center">
                 <Image
                   boxSize={10}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/browsers/${browser.code}.png`}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/browsers/${browser.code}.png`}
                 />
                 <Text as="span" whiteSpace="nowrap">
                   {browser.name}

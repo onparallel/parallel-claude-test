@@ -166,7 +166,7 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
                 },
                 { type: activePreview.title },
               )}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${activePreview.image}.png`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/${activePreview.image}.png`}
             />
           </Box>
         </HStack>

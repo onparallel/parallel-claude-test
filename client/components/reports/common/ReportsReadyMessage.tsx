@@ -9,7 +9,7 @@ export function ReportsReadyMessage({ title, body }: { title?: string; body?: st
         height="100px"
         width="100%"
         marginBottom={6}
-        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports-empty.svg`}
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports-empty.svg`}
       />
       <Text fontWeight="bold">
         {title ?? (

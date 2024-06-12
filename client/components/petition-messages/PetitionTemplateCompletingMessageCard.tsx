@@ -119,7 +119,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                 />
                 <Image
                   marginTop={2}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/thankyou_message_${intl.locale}.gif`}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/thankyou_message_${intl.locale}.gif`}
                 />
               </HelpPopover>
             </HStack>

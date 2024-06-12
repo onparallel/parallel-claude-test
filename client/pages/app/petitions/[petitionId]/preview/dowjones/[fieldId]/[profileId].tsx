@@ -381,7 +381,7 @@ function ProfileResultPerson({
       alt={countries?.[placeOfBirthCountryCode]}
       boxSize={6}
       src={`${
-        process.env.NEXT_PUBLIC_ASSETS_URL
+        process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
       }/static/countries/flags/${placeOfBirthCountryCode.toLowerCase()}.png`}
     />
   ) : null;
@@ -391,7 +391,7 @@ function ProfileResultPerson({
       alt={getCountryName(citizenshipCountryCode)}
       boxSize={6}
       src={`${
-        process.env.NEXT_PUBLIC_ASSETS_URL
+        process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
       }/static/countries/flags/${citizenshipCountryCode.toLowerCase()}.png`}
     />
   ) : null;
@@ -401,7 +401,7 @@ function ProfileResultPerson({
       alt={getCountryName(residentCountryCode)}
       boxSize={6}
       src={`${
-        process.env.NEXT_PUBLIC_ASSETS_URL
+        process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
       }/static/countries/flags/${residentCountryCode.toLowerCase()}.png`}
     />
   ) : null;
@@ -411,7 +411,7 @@ function ProfileResultPerson({
       alt={getCountryName(jurisdictionCountryCode)}
       boxSize={6}
       src={`${
-        process.env.NEXT_PUBLIC_ASSETS_URL
+        process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
       }/static/countries/flags/${jurisdictionCountryCode.toLowerCase()}.png`}
     />
   ) : null;

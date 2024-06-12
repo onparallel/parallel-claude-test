@@ -19,7 +19,7 @@ export default function CustomError(
       header={
         <FormattedMessage id="error.forbidden-access.header" defaultMessage="Access forbidden" />
       }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_cancel.svg`}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_cancel.svg`}
     >
       <Text>
         <FormattedMessage
@@ -36,7 +36,7 @@ export default function CustomError(
           defaultMessage="An error happened and our developers have already been notified."
         />
       }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_bug_fixing.svg`}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_bug_fixing.svg`}
     >
       <Text>
         <FormattedMessage

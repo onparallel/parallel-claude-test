@@ -96,7 +96,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
           )}
           <NormalLink
             fontWeight="bold"
-            href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/documents/import_model_${
+            href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/documents/import_model_${
               intl.locale ?? "en"
             }.xlsx`}
           >

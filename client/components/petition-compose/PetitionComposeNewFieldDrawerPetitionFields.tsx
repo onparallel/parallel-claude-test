@@ -179,7 +179,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
             maxWidth="135px"
             height="64px"
             width="100%"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
           <Text textAlign="center" paddingX={4}>
             <FormattedMessage
@@ -224,7 +224,7 @@ function PertitionComposeNewFieldDrawerField({
               color="transparent"
               alt=""
               loading="eager"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${type}_${intl.locale}.png`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/field-types/${type}_${intl.locale}.png`}
             />
           </Box>
           <Box fontSize="sm" id={`field-description-${type}`} marginTop={2}>

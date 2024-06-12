@@ -203,7 +203,7 @@ function AddSignatureCredentialsStep1() {
               <Radio value={value} key={i}>
                 <Image
                   src={`${
-                    process.env.NEXT_PUBLIC_ASSETS_URL
+                    process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
                   }/static/logos/${value.toLowerCase()}.png`}
                   alt={value}
                   maxWidth="124px"

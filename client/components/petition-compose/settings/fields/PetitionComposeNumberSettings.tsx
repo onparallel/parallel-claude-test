@@ -233,7 +233,7 @@ export function PetitionComposeNumberSettings({
                 </Text>
                 <Image
                   marginTop={2}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/number_prefix.gif`}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/number_prefix.gif`}
                   role="presentation"
                 />
               </>

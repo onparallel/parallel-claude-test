@@ -118,7 +118,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
             maxWidth="186px"
             width="100%"
             height="40px"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/compose/group-profile-link.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/compose/group-profile-link.svg`}
             marginBottom={2}
           />
           <Stack>
@@ -210,7 +210,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
                 maxWidth="135px"
                 height="64px"
                 width="100%"
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
               />
               <Text textAlign="center" paddingX={4}>
                 <FormattedMessage

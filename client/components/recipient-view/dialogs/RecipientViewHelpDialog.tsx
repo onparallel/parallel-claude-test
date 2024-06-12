@@ -34,7 +34,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           color="transparent"
           role="presentation"
           loading="eager"
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient/auto_save_${intl.locale}.gif`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/recipient/auto_save_${intl.locale}.gif`}
         />
       </Center>
 
@@ -59,7 +59,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           color="transparent"
           role="presentation"
           loading="eager"
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient/copylink.gif`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/recipient/copylink.gif`}
         />
       </Center>
       <Text fontSize="xl" fontWeight="600">
@@ -83,7 +83,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           color="transparent"
           role="presentation"
           loading="eager"
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient/doubts_${intl.locale}.gif`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/recipient/doubts_${intl.locale}.gif`}
         />
       </Center>
       <Text fontSize="xl" fontWeight="600">

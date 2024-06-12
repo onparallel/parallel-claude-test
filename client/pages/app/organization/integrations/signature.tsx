@@ -342,13 +342,13 @@ function useSignatureTokensTableColumns() {
           CellContent: ({ row }) =>
             row.provider === "SIGNATURIT" ? (
               <Image
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/signaturit.png`}
                 alt={untranslated("Signaturit")}
                 maxWidth="80px"
               />
             ) : row.provider === "DOCUSIGN" ? (
               <Image
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/docusign.png`}
                 alt={untranslated("DocuSign")}
                 maxWidth="80px"
               />

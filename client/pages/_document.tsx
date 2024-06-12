@@ -103,14 +103,16 @@ class MyDocument extends Document<MyDocumentProps> {
         ...POLYFILLS_INTL.flatMap((polyfill) => [polyfill, `${polyfill}.~locale.${locale}`]),
       ].join(","),
     )}`;
-    const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${
+    const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/lang/${
       isRecipient ? "recipient/" : ""
     }compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
       <Html>
         <Head>
           <link href={process.env.NEXT_PUBLIC_IMAGES_URL} rel="preconnect" />
-          <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
+          {process.env.NEXT_PUBLIC_ASSETS_URL ? (
+            <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
+          ) : null}
           <link href="https://cdn.segment.com" rel="preconnect" />
           <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
@@ -123,7 +125,7 @@ class MyDocument extends Document<MyDocumentProps> {
               <link
                 key={`${name}-${type}`}
                 rel="preload"
-                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
+                href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/${name}-${type}.woff2`}
                 as="font"
                 type="font/woff2"
                 crossOrigin="anonymous"

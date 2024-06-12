@@ -44,7 +44,7 @@ export function PublicLayout({
               <link
                 key={`${name}-${type}`}
                 rel="preload"
-                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
+                href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/${name}-${type}.woff2`}
                 as="font"
                 type="font/woff2"
                 crossOrigin="anonymous"
@@ -70,7 +70,7 @@ export function PublicLayout({
         <link rel="canonical" href={buildUrl(pathname, query, canonicalLocale ?? locale!)} />
       </Head>
       <Script
-        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/js/consent.js`}
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/js/consent.js`}
         strategy="beforeInteractive"
       />
       <Script
@@ -90,7 +90,7 @@ export function PublicLayout({
           property="og:image"
           content={
             og?.image ??
-            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_software_bg.png?v=${process.env.BUILD_ID}`
+            `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/parallel_software_bg.png?v=${process.env.BUILD_ID}`
           }
         />
         <meta property="og:description" content={og?.description ?? description} />

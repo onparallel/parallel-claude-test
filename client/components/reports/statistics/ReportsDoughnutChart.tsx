@@ -156,7 +156,7 @@ export function ReportsDoughnutChart({
             maxHeight="150px"
             width="100%"
             height="100%"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/empty-doughnut.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/empty-doughnut.svg`}
           />
         )}
       </Center>

@@ -29,7 +29,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
   const objectUrl = useMemo(() => {
     return logo && typeof logo !== "string"
       ? URL.createObjectURL(logo)
-      : logo ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
+      : logo ?? `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/emails/logo.png`;
   }, [logo]);
 
   return (

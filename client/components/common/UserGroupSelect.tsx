@@ -45,7 +45,7 @@ function NoOptionsMessage(props: NoticeProps) {
             maxWidth="166px"
             height="77px"
             width="100%"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
           <Text as="strong">
             <FormattedMessage

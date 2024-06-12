@@ -81,7 +81,7 @@ function OrganizationIntegrations() {
       isDisabled: !userCanEditIntegrations || !me.hasPetitionSignature,
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/signaturit.png`}
           alt={untranslated("Signaturit")}
           maxWidth="124px"
         />
@@ -108,7 +108,7 @@ function OrganizationIntegrations() {
       isDisabled: !userCanEditIntegrations || !me.hasPetitionSignature,
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/docusign.png`}
           alt={untranslated("DocuSign")}
           maxWidth="124px"
         />
@@ -129,7 +129,7 @@ function OrganizationIntegrations() {
       isDisabled: !userCanEditIntegrations,
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/zapier.png`}
           alt={untranslated("Zapier")}
           maxWidth="100px"
         />
@@ -146,7 +146,7 @@ function OrganizationIntegrations() {
       isDisabled: false,
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/open-sanctions.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/open-sanctions.png`}
           alt={untranslated("OpenSanctions")}
           maxWidth="124px"
         />
@@ -219,7 +219,7 @@ function OrganizationIntegrations() {
       ),
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/dow-jones.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/dow-jones.png`}
           alt="Dow Jones"
           maxWidth="124px"
         />
@@ -261,7 +261,7 @@ function OrganizationIntegrations() {
       isDisabled: (!userCanEditIntegrations && !userHasApiAccess) || !userHasApiAccess,
       logo: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/parallel-api.png`}
           alt={intl.formatMessage({
             id: "page.organization-integrations.parallel-api-title",
             defaultMessage: "Parallel API",

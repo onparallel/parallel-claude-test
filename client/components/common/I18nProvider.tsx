@@ -50,7 +50,7 @@ function useTranslations(isRecipientPage: boolean) {
       let messages: IntlConfig["messages"];
       if (process.env.NODE_ENV === "production") {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang` +
+          `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/lang` +
             (isRecipientPage ? "/recipient" : "") +
             `/compiled/${locale}.json?v=${process.env.BUILD_ID}`,
         );

@@ -155,7 +155,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
                   alt={getCountryName(nationCode)}
                   boxSize={6}
                   src={`${
-                    process.env.NEXT_PUBLIC_ASSETS_URL
+                    process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
                   }/static/countries/flags/${nationCode.toLowerCase()}.png`}
                 />
               ) : (

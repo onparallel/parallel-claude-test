@@ -123,7 +123,7 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
         <Image
           alt={current.localizedLabel}
           boxSize={6}
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/flags/${current.flag}.png`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/countries/flags/${current.flag}.png`}
         />
       </MenuButton>
       <Portal>
@@ -133,7 +133,7 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
               <Image
                 alt={locale.localizedLabel}
                 boxSize={6}
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/flags/${locale.flag}.png`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/countries/flags/${locale.flag}.png`}
               />
               <Text as="span">{locale.localizedLabel}</Text>
               <Spacer />

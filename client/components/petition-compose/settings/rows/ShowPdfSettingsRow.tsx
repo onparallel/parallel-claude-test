@@ -32,7 +32,7 @@ export function ShowPdfSettingsRow({
           />
           <Image
             marginTop={2}
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
           />
         </>
       }

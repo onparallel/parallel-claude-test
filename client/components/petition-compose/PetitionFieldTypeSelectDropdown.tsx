@@ -222,7 +222,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                     { type: activeTypeLabel },
                   )}
                   loading="eager"
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/field-types/${activeType}_${locale}.png`}
                 />
               </AspectRatio>
 

@@ -11,7 +11,7 @@ export function Fonts() {
           font-style: normal;
           font-weight: 300;
           font-display: swap;
-          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-300.woff2') format('woff2');
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/ibm-plex-sans-v8-latin-300.woff2') format('woff2');
         }
         
         /* ibm-plex-sans-regular - latin */
@@ -20,7 +20,7 @@ export function Fonts() {
           font-style: normal;
           font-weight: 400;
           font-display: swap;
-          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-regular.woff2') format('woff2');
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/ibm-plex-sans-v8-latin-regular.woff2') format('woff2');
         }
 
         /* ibm-plex-sans-500 - latin */
@@ -29,7 +29,7 @@ export function Fonts() {
           font-style: normal;
           font-weight: 500;
           font-display: swap;
-          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-500.woff2') format('woff2');
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/ibm-plex-sans-v8-latin-500.woff2') format('woff2');
         }
         
         /* ibm-plex-sans-600 - latin */
@@ -38,7 +38,7 @@ export function Fonts() {
           font-style: normal;
           font-weight: 600;
           font-display: swap;
-          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-600.woff2') format('woff2');
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/ibm-plex-sans-v8-latin-600.woff2') format('woff2');
         }
         
         /* source-sans-pro-600 - latin */
@@ -46,7 +46,7 @@ export function Fonts() {
           font-family: 'Source Sans Pro';
           font-style: normal;
           font-weight: 600;
-          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/source-sans-pro-v14-latin-600.woff2') format('woff2');
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/fonts/source-sans-pro-v14-latin-600.woff2') format('woff2');
         }
       `
       }

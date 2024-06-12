@@ -45,7 +45,7 @@ export function Reports() {
     const withAccess = [];
     if (hasOverviewAccess) {
       withAccess.push({
-        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_overview.png`,
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports_overview.png`,
         title: intl.formatMessage({ id: "page.reports.overview", defaultMessage: "Overview" }),
         description: intl.formatMessage({
           id: "page.reports.overview-description",
@@ -57,7 +57,7 @@ export function Reports() {
 
     if (hasTemplateStatisticsAccess) {
       withAccess.push({
-        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_templates.png`,
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports_templates.png`,
         title: intl.formatMessage({
           id: "page.reports.statistics",
           defaultMessage: "Template statistics",
@@ -72,7 +72,7 @@ export function Reports() {
 
     if (hasTemplateRepliesAccess) {
       withAccess.push({
-        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_replies.png`,
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports_replies.png`,
         title: intl.formatMessage({ id: "page.reports.replies", defaultMessage: "Replies" }),
         description: intl.formatMessage({
           id: "page.reports.replies-description",

@@ -11,7 +11,7 @@ export function RecipientViewPageNotAvailableError() {
           defaultMessage="It seems that this page is no longer available."
         />
       }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_road_sign.svg`}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_road_sign.svg`}
     >
       <Text>
         <FormattedMessage

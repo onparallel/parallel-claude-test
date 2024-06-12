@@ -16,7 +16,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
             maxWidth="166px"
             height="77px"
             width="100%"
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
           <Text paddingTop={6}>
             <FormattedMessage

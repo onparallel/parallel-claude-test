@@ -240,13 +240,13 @@ export function RecipientSelectGroups({
                       <HStack>
                         <Text>{untranslated("Parallel 1:")}</Text>
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/multiple-recipient-group.svg`}
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/multiple-recipient-group.svg`}
                         />
                       </HStack>
                       <HStack>
                         <Text>{untranslated("Parallel 2:")}</Text>
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/individual-recipient-group.svg`}
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/individual-recipient-group.svg`}
                         />
                       </HStack>
                     </Stack>

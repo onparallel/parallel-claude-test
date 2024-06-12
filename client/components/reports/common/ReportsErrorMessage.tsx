@@ -11,7 +11,7 @@ export function ReportsErrorMessage() {
         height="108px"
         width="100%"
         marginBottom={6}
-        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports-error.svg`}
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports-error.svg`}
       />
       <Text fontWeight="bold" fontSize="xl">
         <FormattedMessage
