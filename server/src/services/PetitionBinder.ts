@@ -381,7 +381,10 @@ export class PetitionBinder implements IPetitionBinder {
     const fileUploadIds = fileTypeFields
       .flatMap((field) =>
         field.replies.filter(
-          (r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id),
+          (r) =>
+            !isDefined(r.content.error) &&
+            isDefined(r.content.file_upload_id) &&
+            r.status !== "REJECTED",
         ),
       )
       .map((r) => r.content.file_upload_id);

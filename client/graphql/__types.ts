@@ -21353,9 +21353,17 @@ export type ExportRepliesDialog_PetitionFragment = {
       id: string;
       type: PetitionFieldType;
       title?: string | null;
-      replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
+      }>;
     }> | null;
-    replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+    }>;
   }>;
 };
 
@@ -21364,7 +21372,11 @@ export type ExportRepliesDialog_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   title?: string | null;
-  replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+  }>;
 };
 
 export type ExportRepliesProgressDialog_PetitionFragment = {
@@ -38194,6 +38206,7 @@ export type PetitionReplies_PetitionFragment = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
@@ -38289,8 +38302,8 @@ export type PetitionReplies_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
       id: string;
-      isAnonymized: boolean;
       status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
       metadata: { [key: string]: any };
       repliedAt?: string | null;
       lastReviewedAt?: string | null;
@@ -38940,6 +38953,7 @@ export type PetitionReplies_closePetitionMutation = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
           isAnonymized: boolean;
           children?: Array<{
             __typename?: "PetitionFieldGroupChildReply";
@@ -39035,8 +39049,8 @@ export type PetitionReplies_closePetitionMutation = {
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
         id: string;
-        isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
+        isAnonymized: boolean;
         metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
@@ -39454,6 +39468,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
           isAnonymized: boolean;
           children?: Array<{
             __typename?: "PetitionFieldGroupChildReply";
@@ -39549,8 +39564,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
         id: string;
-        isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
+        isAnonymized: boolean;
         metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
@@ -40122,6 +40137,7 @@ export type PetitionReplies_petitionQuery = {
               __typename?: "PetitionFieldReply";
               id: string;
               content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
               isAnonymized: boolean;
               children?: Array<{
                 __typename?: "PetitionFieldGroupChildReply";
@@ -40221,8 +40237,8 @@ export type PetitionReplies_petitionQuery = {
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
             id: string;
-            isAnonymized: boolean;
             status: PetitionFieldReplyStatus;
+            isAnonymized: boolean;
             metadata: { [key: string]: any };
             repliedAt?: string | null;
             lastReviewedAt?: string | null;
@@ -54312,6 +54328,7 @@ export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
     type
     ...useFilenamePlaceholdersRename_PetitionField
     replies {
+      status
       content
       ...useFilenamePlaceholdersRename_PetitionFieldReply
     }

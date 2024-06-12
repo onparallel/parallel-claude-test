@@ -296,9 +296,12 @@ function PetitionExportField({
     // space for separation between replies
     (replies.length > 1 ? (replies.length - 1) * 1 : 0);
 
-  // move FILE replies with errors to the bottom of the card
+  // move FILE replies with errors to the bottom of the card and dont show the REJECTED ones
   const orderedReplies = isFileTypeField(field.type)
-    ? sortBy(replies, (r) => isDefined(r.content.error))
+    ? sortBy(
+        replies.filter((r) => r.status !== "REJECTED"),
+        (r) => isDefined(r.content.error),
+      )
     : replies;
 
   function optionsFieldLabel(
@@ -662,6 +665,7 @@ PetitionExport.fragments = {
     return gql`
       fragment PetitionExport_PetitionFieldReplyInner on PetitionFieldReply {
         id
+        status
         content
         metadata
         isAnonymized

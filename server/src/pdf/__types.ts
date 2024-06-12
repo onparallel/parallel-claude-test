@@ -5885,9 +5885,9 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     replies: Array<{
       content: { [key: string]: any };
       id: string;
+      status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
       repliedAt: string | null;
       lastReviewedAt: string | null;
       children: Array<{
@@ -5918,10 +5918,10 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
             parent: { id: string } | null;
             replies: Array<{
               id: string;
+              status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
               isAnonymized: boolean;
-              status: PetitionFieldReplyStatus;
               repliedAt: string | null;
               lastReviewedAt: string | null;
               repliedBy:
@@ -5935,10 +5935,10 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
         };
         replies: Array<{
           id: string;
+          status: PetitionFieldReplyStatus;
           content: { [key: string]: any };
           metadata: { [key: string]: any };
           isAnonymized: boolean;
-          status: PetitionFieldReplyStatus;
           repliedAt: string | null;
           lastReviewedAt: string | null;
           repliedBy:
@@ -5971,10 +5971,10 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       parent: { id: string } | null;
       replies: Array<{
         id: string;
+        status: PetitionFieldReplyStatus;
         content: { [key: string]: any };
         metadata: { [key: string]: any };
         isAnonymized: boolean;
-        status: PetitionFieldReplyStatus;
         repliedAt: string | null;
         lastReviewedAt: string | null;
         repliedBy:
@@ -6011,9 +6011,9 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
     replies: Array<{
       content: { [key: string]: any };
       id: string;
+      status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
       repliedAt: string | null;
       lastReviewedAt: string | null;
       children: Array<{
@@ -6044,10 +6044,10 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
             parent: { id: string } | null;
             replies: Array<{
               id: string;
+              status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
               isAnonymized: boolean;
-              status: PetitionFieldReplyStatus;
               repliedAt: string | null;
               lastReviewedAt: string | null;
               repliedBy:
@@ -6061,10 +6061,10 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
         };
         replies: Array<{
           id: string;
+          status: PetitionFieldReplyStatus;
           content: { [key: string]: any };
           metadata: { [key: string]: any };
           isAnonymized: boolean;
-          status: PetitionFieldReplyStatus;
           repliedAt: string | null;
           lastReviewedAt: string | null;
           repliedBy:
@@ -6097,10 +6097,10 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       parent: { id: string } | null;
       replies: Array<{
         id: string;
+        status: PetitionFieldReplyStatus;
         content: { [key: string]: any };
         metadata: { [key: string]: any };
         isAnonymized: boolean;
-        status: PetitionFieldReplyStatus;
         repliedAt: string | null;
         lastReviewedAt: string | null;
         repliedBy:
@@ -6137,10 +6137,10 @@ export type PetitionExport_PetitionFieldInnerFragment = {
 
 export type PetitionExport_PetitionFieldReplyInnerFragment = {
   id: string;
+  status: PetitionFieldReplyStatus;
   content: { [key: string]: any };
   metadata: { [key: string]: any };
   isAnonymized: boolean;
-  status: PetitionFieldReplyStatus;
   repliedAt: string | null;
   lastReviewedAt: string | null;
   repliedBy:
@@ -6177,10 +6177,10 @@ export type PetitionExport_PetitionFieldFragment = {
     parent: { id: string } | null;
     replies: Array<{
       id: string;
+      status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       metadata: { [key: string]: any };
       isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
       repliedAt: string | null;
       lastReviewedAt: string | null;
       repliedBy:
@@ -6195,10 +6195,10 @@ export type PetitionExport_PetitionFieldFragment = {
 
 export type PetitionExport_PetitionFieldReplyFragment = {
   id: string;
+  status: PetitionFieldReplyStatus;
   content: { [key: string]: any };
   metadata: { [key: string]: any };
   isAnonymized: boolean;
-  status: PetitionFieldReplyStatus;
   repliedAt: string | null;
   lastReviewedAt: string | null;
   children: Array<{
@@ -6228,10 +6228,10 @@ export type PetitionExport_PetitionFieldReplyFragment = {
         parent: { id: string } | null;
         replies: Array<{
           id: string;
+          status: PetitionFieldReplyStatus;
           content: { [key: string]: any };
           metadata: { [key: string]: any };
           isAnonymized: boolean;
-          status: PetitionFieldReplyStatus;
           repliedAt: string | null;
           lastReviewedAt: string | null;
           repliedBy:
@@ -6245,10 +6245,10 @@ export type PetitionExport_PetitionFieldReplyFragment = {
     };
     replies: Array<{
       id: string;
+      status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       metadata: { [key: string]: any };
       isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
       repliedAt: string | null;
       lastReviewedAt: string | null;
       repliedBy:
@@ -6299,9 +6299,9 @@ export type PetitionExport_petitionQuery = {
           replies: Array<{
             content: { [key: string]: any };
             id: string;
+            status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             isAnonymized: boolean;
-            status: PetitionFieldReplyStatus;
             repliedAt: string | null;
             lastReviewedAt: string | null;
             children: Array<{
@@ -6332,10 +6332,10 @@ export type PetitionExport_petitionQuery = {
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
+                    status: PetitionFieldReplyStatus;
                     content: { [key: string]: any };
                     metadata: { [key: string]: any };
                     isAnonymized: boolean;
-                    status: PetitionFieldReplyStatus;
                     repliedAt: string | null;
                     lastReviewedAt: string | null;
                     repliedBy:
@@ -6352,10 +6352,10 @@ export type PetitionExport_petitionQuery = {
               };
               replies: Array<{
                 id: string;
+                status: PetitionFieldReplyStatus;
                 content: { [key: string]: any };
                 metadata: { [key: string]: any };
                 isAnonymized: boolean;
-                status: PetitionFieldReplyStatus;
                 repliedAt: string | null;
                 lastReviewedAt: string | null;
                 repliedBy:
@@ -6391,10 +6391,10 @@ export type PetitionExport_petitionQuery = {
             parent: { id: string } | null;
             replies: Array<{
               id: string;
+              status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
               isAnonymized: boolean;
-              status: PetitionFieldReplyStatus;
               repliedAt: string | null;
               lastReviewedAt: string | null;
               repliedBy:
@@ -6430,9 +6430,9 @@ export type PetitionExport_petitionQuery = {
           replies: Array<{
             content: { [key: string]: any };
             id: string;
+            status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             isAnonymized: boolean;
-            status: PetitionFieldReplyStatus;
             repliedAt: string | null;
             lastReviewedAt: string | null;
             children: Array<{
@@ -6463,10 +6463,10 @@ export type PetitionExport_petitionQuery = {
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
+                    status: PetitionFieldReplyStatus;
                     content: { [key: string]: any };
                     metadata: { [key: string]: any };
                     isAnonymized: boolean;
-                    status: PetitionFieldReplyStatus;
                     repliedAt: string | null;
                     lastReviewedAt: string | null;
                     repliedBy:
@@ -6483,10 +6483,10 @@ export type PetitionExport_petitionQuery = {
               };
               replies: Array<{
                 id: string;
+                status: PetitionFieldReplyStatus;
                 content: { [key: string]: any };
                 metadata: { [key: string]: any };
                 isAnonymized: boolean;
-                status: PetitionFieldReplyStatus;
                 repliedAt: string | null;
                 lastReviewedAt: string | null;
                 repliedBy:
@@ -6522,10 +6522,10 @@ export type PetitionExport_petitionQuery = {
             parent: { id: string } | null;
             replies: Array<{
               id: string;
+              status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
               isAnonymized: boolean;
-              status: PetitionFieldReplyStatus;
               repliedAt: string | null;
               lastReviewedAt: string | null;
               repliedBy:
@@ -6669,6 +6669,7 @@ export const FieldActivity_PetitionFieldReplyFragmentDoc = gql`
 export const PetitionExport_PetitionFieldReplyInnerFragmentDoc = gql`
   fragment PetitionExport_PetitionFieldReplyInner on PetitionFieldReply {
     id
+    status
     content
     metadata
     isAnonymized

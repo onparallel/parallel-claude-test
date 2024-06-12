@@ -45,7 +45,10 @@ export async function* getPetitionFiles(
 
   const fileReplies = allReplies.filter(
     (r) =>
-      isFileTypeField(r.type) && isDefined(r.content.file_upload_id) && !isDefined(r.content.error),
+      isFileTypeField(r.type) &&
+      isDefined(r.content.file_upload_id) &&
+      !isDefined(r.content.error) &&
+      r.status !== "REJECTED",
   );
 
   const backgroundCheckEntityReplies = allReplies.filter(

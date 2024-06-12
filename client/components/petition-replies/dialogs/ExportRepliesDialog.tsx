@@ -118,7 +118,9 @@ export function ExportRepliesDialog({
       return (
         isFileTypeField(field.type) &&
         field.replies.length > 0 &&
-        field.replies.some((r) => !r.content.error && r.content.uploadComplete)
+        field.replies.some(
+          (r) => !r.content.error && r.content.uploadComplete && r.status !== "REJECTED",
+        )
       );
     }
     const field = petition.fields.find(
@@ -129,7 +131,9 @@ export function ExportRepliesDialog({
     const fileTypeField = field.type === "FIELD_GROUP" ? field.children?.find(hasFileReply) : field;
     if (!fileTypeField) return [null];
 
-    const reply = fileTypeField.replies.find((r) => !r.content.error && r.content.uploadComplete)!;
+    const reply = fileTypeField.replies.find(
+      (r) => !r.content.error && r.content.uploadComplete && r.status !== "REJECTED",
+    )!;
     return [reply.content.filename, placeholdersRename(fileTypeField, reply, pattern)];
   }, [petition.fields, placeholdersRename, pattern]);
 
@@ -314,6 +318,7 @@ ExportRepliesDialog.fragments = {
       type
       ...useFilenamePlaceholdersRename_PetitionField
       replies {
+        status
         content
         ...useFilenamePlaceholdersRename_PetitionFieldReply
       }
