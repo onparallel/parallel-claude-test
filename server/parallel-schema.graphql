@@ -376,6 +376,15 @@ type ContactPagination {
   totalCount: Int!
 }
 
+type ContactlessAccessUsedEvent implements PetitionEvent {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  type: PetitionEventType!
+}
+
 input CreateContactInput {
   email: String!
   firstName: String!
@@ -3295,6 +3304,11 @@ type PetitionAccess implements Timestamps {
   isContactless: Boolean!
 
   """
+  It will be true if the petition access was created by contactless link
+  """
+  isSharedByLink: Boolean!
+
+  """
   When the next reminder will be sent.
   """
   nextReminderAt: DateTime
@@ -3736,6 +3750,7 @@ enum PetitionEventType {
   ACCESS_OPENED
   COMMENT_DELETED
   COMMENT_PUBLISHED
+  CONTACTLESS_ACCESS_USED
   GROUP_PERMISSION_ADDED
   GROUP_PERMISSION_EDITED
   GROUP_PERMISSION_REMOVED

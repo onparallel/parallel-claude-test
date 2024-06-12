@@ -29,6 +29,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionCreatedEvent";
       case "PETITION_COMPLETED":
         return "PetitionCompletedEvent";
+      case "CONTACTLESS_ACCESS_USED":
+        return "ContactlessAccessUsedEvent";
       case "ACCESS_ACTIVATED":
         return "AccessActivatedEvent";
       case "ACCESS_DEACTIVATED":
@@ -147,6 +149,15 @@ export const PetitionCompletedEvent = createPetitionEvent("PetitionCompletedEven
   t.nullable.field("completedBy", {
     type: "UserOrPetitionAccess",
     resolve: userOrPetitionAccessResolver,
+  });
+});
+
+export const ContactlessAccessUsedEvent = createPetitionEvent("ContactlessAccessUsedEvent", (t) => {
+  t.field("access", {
+    type: "PetitionAccess",
+    resolve: async (root, _, ctx) => {
+      return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+    },
   });
 });
 

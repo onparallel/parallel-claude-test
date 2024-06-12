@@ -10,6 +10,7 @@ import {
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
   PETITION_COMPLETED: { petition_access_id?: number; user_id?: number }; //id of the User or PetitionAccess that completed the petition. Only one will be defined
+  CONTACTLESS_ACCESS_USED: { petition_access_id: number; contact_id: number };
   ACCESS_ACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_DEACTIVATED: {
     petition_access_id: number;
@@ -225,6 +226,10 @@ export type PetitionCompletedEvent<IsCreate extends boolean = false> = GenericPe
   "PETITION_COMPLETED",
   IsCreate
 >;
+export type ContactlessAccessUsedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "CONTACTLESS_ACCESS_USED",
+  IsCreate
+>;
 export type AccessActivatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
   "ACCESS_ACTIVATED",
   IsCreate
@@ -410,6 +415,7 @@ export type PetitionUntaggedEvent<IsCreate extends boolean = false> = GenericPet
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
+  | ContactlessAccessUsedEvent<IsCreate>
   | AccessActivatedEvent<IsCreate>
   | AccessDeactivatedEvent<IsCreate>
   | AccessOpenedEvent<IsCreate>

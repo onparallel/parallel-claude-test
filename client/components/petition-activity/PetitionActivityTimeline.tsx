@@ -44,6 +44,7 @@ import { TimelineSignatureStartedEvent } from "./timeline/events/TimelineSignatu
 import { TimelineUserPermissionAddedEvent } from "./timeline/events/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
+import { TimelineContactlessAccessUsedEvent } from "./timeline/events/TimelineContactlessAccessUsedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -145,6 +146,8 @@ export function PetitionActivityTimeline({
             <TimelinePetitionTaggedEvent event={event} userId={userId} />
           ) : event.__typename === "PetitionUntaggedEvent" ? (
             <TimelinePetitionUntaggedEvent event={event} userId={userId} />
+          ) : event.__typename === "ContactlessAccessUsedEvent" ? (
+            <TimelineContactlessAccessUsedEvent event={event} />
           ) : null}
         </Box>
       ))}
@@ -285,6 +288,9 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionUntaggedEvent {
         ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
       }
+      ... on ContactlessAccessUsedEvent {
+        ...TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -329,5 +335,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineProfileDisassociatedEvent.fragments.ProfileDisassociatedEvent}
     ${TimelinePetitionTaggedEvent.fragments.PetitionTaggedEvent}
     ${TimelinePetitionUntaggedEvent.fragments.PetitionUntaggedEvent}
+    ${TimelineContactlessAccessUsedEvent.fragments.ContactlessAccessUsedEvent}
   `,
 };

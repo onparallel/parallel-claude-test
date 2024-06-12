@@ -9565,6 +9565,31 @@
     "context": "Test signature"
   },
   {
+    "term": "component.timeline-access-activated-event.access-activated",
+    "definition": "{userIsYou, select, true {Diste} other {{user} dio}} acceso a {contact} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} sent an access to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-activated-event.access-delegated",
+    "definition": "{delegateIsYou, select, true {Diste} other {{delegate} dió}} acceso a {contact} como {userIsYou, select, true {tú} other {{user}}} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} sent an access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-activated-event.contactless-access-activated",
+    "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} un acceso por enlace {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-activated-event.contactless-access-delegated",
+    "definition": "{delegateIsYou, select, true {Creaste} other {{delegate} creó}} un acceso por enlace como {userIsYou, select, true {tú} other {{user}}} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-contactless-access-used-event.contactless-access-used",
+    "definition": "{contact} accedió al enlace {timeAgo}",
+    "context": "{contact} accessed the link {timeAgo}"
+  },
+  {
     "term": "component.timeline-petition-closed-notified-delegated.description",
     "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} como {senderIsYou, select, true {tú} other {{sender}}} que el parallel está correcto {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
@@ -15540,16 +15565,6 @@
     "context": "Write a short description of this template."
   },
   {
-    "term": "timeline.access-activated-description",
-    "definition": "{userIsYou, select, true {Diste} other {{user} dio}} acceso a {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.access-activated-description.delegated",
-    "definition": "{delegateIsYou, select, true {Diste} other {{delegate} dió}} acceso a {contact} como {userIsYou, select, true {tú} other {{user}}} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} gave access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
-  },
-  {
     "term": "timeline.access-deactivated-auto-description",
     "definition": "El acceso a {contact} fue desactivado porque el correo ha rebotado {timeAgo}",
     "context": "The access for {contact} was removed because the email bounced {timeAgo}"
@@ -15608,16 +15623,6 @@
     "term": "timeline.comment-published.reply",
     "definition": "Responder",
     "context": "Reply"
-  },
-  {
-    "term": "timeline.contactless-access-activated-description",
-    "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} un acceso por enlace {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
-  },
-  {
-    "term": "timeline.contactless-access-activated-description.delegated",
-    "definition": "{delegateIsYou, select, true {Creaste} other {{delegate} creó}} un acceso por enlace como {userIsYou, select, true {tú} other {{user}}} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
   },
   {
     "term": "timeline.contactless-access-deactivated-manual-description",

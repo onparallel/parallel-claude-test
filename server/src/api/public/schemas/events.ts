@@ -799,6 +799,21 @@ const PetitionEventSchemas = {
       },
     },
   },
+  CONTACTLESS_ACCESS_USED: {
+    description: "A contactless access was used",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 10),
+      },
+      contactId: {
+        description: "The ID of the contact that used the access",
+        type: "string",
+        example: toGlobalId("Contact", 10),
+      },
+    },
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 const _PetitionEvent = {

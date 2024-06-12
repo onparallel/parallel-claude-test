@@ -39,6 +39,7 @@ const result: PossibleTypesResultData = {
       "AccessOpenedEvent",
       "CommentDeletedEvent",
       "CommentPublishedEvent",
+      "ContactlessAccessUsedEvent",
       "GroupPermissionAddedEvent",
       "GroupPermissionEditedEvent",
       "GroupPermissionRemovedEvent",

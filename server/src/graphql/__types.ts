@@ -758,6 +758,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  ContactlessAccessUsedEvent: petitionEvents.ContactlessAccessUsedEvent;
   DowJonesKycEntityDate: {
     // root type
     day?: number | null; // Int
@@ -1607,6 +1608,15 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  ContactlessAccessUsedEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
   DowJonesKycEntityDate: {
     // field return type
     day: number | null; // Int
@@ -2228,6 +2238,7 @@ export interface NexusGenFieldTypes {
     granter: NexusGenRootTypes["User"] | null; // User
     id: NexusGenScalars["GID"]; // GID!
     isContactless: boolean; // Boolean!
+    isSharedByLink: boolean; // Boolean!
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     recipientUrl: string | null; // String
@@ -4122,6 +4133,15 @@ export interface NexusGenFieldTypeNames {
     items: "Contact";
     totalCount: "Int";
   };
+  ContactlessAccessUsedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "Petition";
+    type: "PetitionEventType";
+  };
   DowJonesKycEntityDate: {
     // field return type name
     day: "Int";
@@ -4743,6 +4763,7 @@ export interface NexusGenFieldTypeNames {
     granter: "User";
     id: "GID";
     isContactless: "Boolean";
+    isSharedByLink: "Boolean";
     nextReminderAt: "DateTime";
     petition: "Petition";
     recipientUrl: "String";
@@ -8139,6 +8160,7 @@ export interface NexusGenAbstractTypeMembers {
     | "AccessOpenedEvent"
     | "CommentDeletedEvent"
     | "CommentPublishedEvent"
+    | "ContactlessAccessUsedEvent"
     | "GroupPermissionAddedEvent"
     | "GroupPermissionEditedEvent"
     | "GroupPermissionRemovedEvent"
@@ -8240,6 +8262,7 @@ export interface NexusGenTypeInterfaces {
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
+  ContactlessAccessUsedEvent: "PetitionEvent";
   DowJonesKycEntityProfileResultEntity: "DowJonesKycEntityProfileResult";
   DowJonesKycEntityProfileResultPerson: "DowJonesKycEntityProfileResult";
   DowJonesKycEntitySearchResultEntity: "DowJonesKycEntitySearchResult";

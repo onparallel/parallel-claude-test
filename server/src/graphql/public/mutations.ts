@@ -283,6 +283,15 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
                 ctx.contact!.id,
                 `PetitionAccess:${access!.id}`,
               );
+
+              await ctx.petitions.createEvent({
+                type: "CONTACTLESS_ACCESS_USED",
+                petition_id: petition.id,
+                data: {
+                  petition_access_id: ctx.access!.id,
+                  contact_id: ctx.contact!.id,
+                },
+              });
             } catch (e) {
               if (
                 e instanceof DatabaseError &&

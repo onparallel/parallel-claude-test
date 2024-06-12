@@ -1079,6 +1079,12 @@ export const PetitionAccess = objectType({
         return root.contact_id === null;
       },
     });
+    t.boolean("isSharedByLink", {
+      description: "It will be true if the petition access was created by contactless link",
+      resolve: (root) => {
+        return root.is_shared_by_link;
+      },
+    });
   },
 });
 

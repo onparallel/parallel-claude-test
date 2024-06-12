@@ -25,10 +25,10 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         />
       }
     >
-      {event.access.isContactless ? (
+      {event.access.isSharedByLink ? (
         event.access.delegateGranter ? (
           <FormattedMessage
-            id="timeline.contactless-access-activated-description.delegated"
+            id="component.timeline-access-activated-event.contactless-access-delegated"
             defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
             values={{
               delegateIsYou: userId === event.access.delegateGranter.id,
@@ -42,7 +42,7 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
           />
         ) : (
           <FormattedMessage
-            id="timeline.contactless-access-activated-description"
+            id="component.timeline-access-activated-event.contactless-access-activated"
             defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
             values={{
               userIsYou: userId === event.user?.id,
@@ -55,8 +55,8 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         )
       ) : event.access.delegateGranter ? (
         <FormattedMessage
-          id="timeline.access-activated-description.delegated"
-          defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} gave access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+          id="component.timeline-access-activated-event.access-delegated"
+          defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} sent an access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
           values={{
             delegateIsYou: userId === event.access.delegateGranter.id,
             delegate: <UserReference user={event.access.delegateGranter} />,
@@ -70,8 +70,8 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         />
       ) : (
         <FormattedMessage
-          id="timeline.access-activated-description"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
+          id="component.timeline-access-activated-event.access-activated"
+          defaultMessage="{userIsYou, select, true {You} other {{user}}} sent an access to {contact} {timeAgo}"
           values={{
             userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
@@ -100,6 +100,7 @@ TimelineAccessActivatedEvent.fragments = {
           ...ContactReference_Contact
         }
         isContactless
+        isSharedByLink
       }
       createdAt
     }

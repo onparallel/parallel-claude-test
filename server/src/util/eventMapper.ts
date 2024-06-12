@@ -354,6 +354,12 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
         tagNames: event.data.tag_names,
       };
     }
+    case "CONTACTLESS_ACCESS_USED": {
+      return {
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
+        contactId: toGlobalId("Contact", event.data.contact_id),
+      };
+    }
     default:
       return {};
   }

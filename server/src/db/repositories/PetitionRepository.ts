@@ -1166,6 +1166,7 @@ export class PetitionRepository extends BaseRepository {
       reminders_config: remindersConfig,
       next_reminder_at: null, // will be set once this access is linked to a specific contact
       status: "ACTIVE",
+      is_shared_by_link: true,
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
     }).returning("*");

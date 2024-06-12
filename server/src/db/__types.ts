@@ -193,7 +193,8 @@ export type PetitionEventType =
   | "PROFILE_DISASSOCIATED"
   | "SIGNATURE_DELIVERED"
   | "PETITION_TAGGED"
-  | "PETITION_UNTAGGED";
+  | "PETITION_UNTAGGED"
+  | "CONTACTLESS_ACCESS_USED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -241,6 +242,7 @@ export const PetitionEventTypeValues = [
   "SIGNATURE_DELIVERED",
   "PETITION_TAGGED",
   "PETITION_UNTAGGED",
+  "CONTACTLESS_ACCESS_USED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -1309,6 +1311,7 @@ export interface PetitionAccess {
   delegator_contact_id: Maybe<number>; // int4
   delegate_granter_id: Maybe<number>; // int4
   automatic_reminders_left: number; // int4
+  is_shared_by_link: boolean; // bool
 }
 
 export type CreatePetitionAccess = PartialProps<
@@ -1326,6 +1329,7 @@ export type CreatePetitionAccess = PartialProps<
   | "delegator_contact_id"
   | "delegate_granter_id"
   | "automatic_reminders_left"
+  | "is_shared_by_link"
 >;
 
 export interface PetitionAttachment {

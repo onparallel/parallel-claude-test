@@ -378,6 +378,16 @@ export interface ContactPagination {
   totalCount: Scalars["Int"]["output"];
 }
 
+export interface ContactlessAccessUsedEvent extends PetitionEvent {
+  __typename?: "ContactlessAccessUsedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<Petition>;
+  type: PetitionEventType;
+}
+
 export interface CreateContactInput {
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
@@ -2965,6 +2975,8 @@ export interface PetitionAccess extends Timestamps {
   id: Scalars["GID"]["output"];
   /** It will be true if doesn't have contact assigned */
   isContactless: Scalars["Boolean"]["output"];
+  /** It will be true if the petition access was created by contactless link */
+  isSharedByLink: Scalars["Boolean"]["output"];
   /** When the next reminder will be sent. */
   nextReminderAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The petition for this message access. */
@@ -3276,6 +3288,7 @@ export type PetitionEventType =
   | "ACCESS_OPENED"
   | "COMMENT_DELETED"
   | "COMMENT_PUBLISHED"
+  | "CONTACTLESS_ACCESS_USED"
   | "GROUP_PERMISSION_ADDED"
   | "GROUP_PERMISSION_EDITED"
   | "GROUP_PERMISSION_REMOVED"
@@ -9271,6 +9284,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   access: {
     __typename?: "PetitionAccess";
     isContactless: boolean;
+    isSharedByLink: boolean;
     delegateGranter?: {
       __typename?: "User";
       id: string;
@@ -9388,6 +9402,16 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
         }
     >;
   } | null;
+};
+
+export type PetitionActivityTimeline_PetitionEvent_ContactlessAccessUsedEvent_Fragment = {
+  __typename?: "ContactlessAccessUsedEvent";
+  id: string;
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
@@ -9935,6 +9959,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ContactlessAccessUsedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment
@@ -10418,6 +10443,7 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   access: {
     __typename?: "PetitionAccess";
     isContactless: boolean;
+    isSharedByLink: boolean;
     delegateGranter?: {
       __typename?: "User";
       id: string;
@@ -10529,6 +10555,15 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
         }
     >;
   } | null;
+};
+
+export type TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment = {
+  __typename?: "ContactlessAccessUsedEvent";
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
 };
 
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment = {
@@ -28568,6 +28603,7 @@ export type PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment = {
   access: {
     __typename?: "PetitionAccess";
     isContactless: boolean;
+    isSharedByLink: boolean;
     delegateGranter?: {
       __typename?: "User";
       id: string;
@@ -28684,6 +28720,16 @@ export type PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment = {
         }
     >;
   } | null;
+};
+
+export type PetitionActivity_PetitionEvent_ContactlessAccessUsedEvent_Fragment = {
+  __typename?: "ContactlessAccessUsedEvent";
+  id: string;
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
 };
 
 export type PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
@@ -29231,6 +29277,7 @@ export type PetitionActivity_PetitionEventFragment =
   | PetitionActivity_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivity_PetitionEvent_CommentDeletedEvent_Fragment
   | PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ContactlessAccessUsedEvent_Fragment
   | PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment
   | PetitionActivity_PetitionEvent_GroupPermissionEditedEvent_Fragment
   | PetitionActivity_PetitionEvent_GroupPermissionRemovedEvent_Fragment
@@ -29615,6 +29662,7 @@ export type PetitionActivity_eventsQuery = {
                 access: {
                   __typename?: "PetitionAccess";
                   isContactless: boolean;
+                  isSharedByLink: boolean;
                   delegateGranter?: {
                     __typename?: "User";
                     id: string;
@@ -29780,6 +29828,20 @@ export type PetitionActivity_eventsQuery = {
                       }
                   >;
                 } | null;
+              }
+            | {
+                __typename?: "ContactlessAccessUsedEvent";
+                id: string;
+                createdAt: string;
+                access: {
+                  __typename?: "PetitionAccess";
+                  contact?: {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName: string;
+                    email: string;
+                  } | null;
+                };
               }
             | {
                 __typename?: "GroupPermissionAddedEvent";
@@ -50969,6 +51031,7 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
         ...ContactReference_Contact
       }
       isContactless
+      isSharedByLink
     }
     createdAt
   }
@@ -51743,6 +51806,20 @@ export const TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc = gq
   ${UserReference_UserFragmentDoc}
   ${TagReference_TagFragmentDoc}
 ` as unknown as DocumentNode<TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment, unknown>;
+export const TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc = gql`
+  fragment TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent on ContactlessAccessUsedEvent {
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment,
+  unknown
+>;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -51875,6 +51952,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionUntaggedEvent {
       ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
     }
+    ... on ContactlessAccessUsedEvent {
+      ...TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -51919,6 +51999,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc}
   ${TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc}
   ${TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc}
+  ${TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivity_PetitionEventFragmentDoc = gql`
   fragment PetitionActivity_PetitionEvent on PetitionEvent {
