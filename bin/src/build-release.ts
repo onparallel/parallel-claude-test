@@ -13,17 +13,17 @@ import {
   TerminateInstancesCommand,
   VolumeAttachmentState,
 } from "@aws-sdk/client-ec2";
-import assert from "assert";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
 import { isDefined } from "remeda";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
+import { withStopwatch } from "./utils/stopwatch";
 import { timestamp } from "./utils/timestamp";
 import { wait, waitFor } from "./utils/wait";
-import { withStopwatch } from "./utils/stopwatch";
 
 const WORK_DIR = "/home/ec2-user";
 

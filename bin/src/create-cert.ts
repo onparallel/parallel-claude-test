@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
-import { assert } from "console";
 import { resolveCname } from "dns/promises";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 

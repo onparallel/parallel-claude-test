@@ -1,5 +1,5 @@
 import { partition } from "remeda";
-import { assert } from "../assert";
+import { assert } from "ts-essentials";
 import { discriminator } from "../discriminator";
 import { MaybeArray, Prettify } from "../types";
 

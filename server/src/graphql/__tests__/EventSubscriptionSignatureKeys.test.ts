@@ -1,6 +1,6 @@
-import assert from "assert";
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { assert } from "ts-essentials";
 import { EventSubscription, EventSubscriptionSignatureKey, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";

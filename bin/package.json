@@ -51,6 +51,7 @@
     "p-map": "^4.0.0",
     "remeda": "^1.43.0",
     "rimraf": "^5.0.5",
+    "ts-essentials": "^9.4.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

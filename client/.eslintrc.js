@@ -39,18 +39,5 @@ module.exports = {
         ],
       },
     ],
-    "no-restricted-imports": [
-      "error",
-      {
-        paths: [
-          {
-            name: "@chakra-ui/react",
-            importNames: ["useMergeRefs", "CloseButton"],
-            message:
-              'Please use instead useMergedRef from "@react-hook/merged-ref", CloseButton from "@parallel/common/CloseButton"',
-          },
-        ],
-      },
-    ],
   },
 };

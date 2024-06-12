@@ -1,9 +1,9 @@
 import { ApolloServer } from "@apollo/server";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
-import assert from "assert";
 import { serialize as serializeCookie } from "cookie";
 import { DocumentNode } from "graphql";
 import { Knex } from "knex";
+import { assert } from "ts-essentials";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";

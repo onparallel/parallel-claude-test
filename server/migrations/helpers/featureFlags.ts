@@ -1,6 +1,6 @@
 import { Knex } from "knex";
+import { assert } from "ts-essentials";
 import { FeatureFlagName } from "../../src/db/__types";
-import assert from "assert";
 
 export async function addFeatureFlag(knex: Knex, featureFlag: string): Promise<void>;
 /**

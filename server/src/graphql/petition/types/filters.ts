@@ -1,11 +1,11 @@
-import assert, { AssertionError } from "assert";
 import { enumType, inputObjectType } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
 import { isDefined, partition, uniq } from "remeda";
+import { assert } from "ts-essentials";
 import { fromGlobalId } from "../../../util/globalId";
+import { NexusGenInputs } from "../../__types";
 import { ArgValidationError } from "../../helpers/errors";
 import { FieldValidateArgsResolver } from "../../helpers/validateArgsPlugin";
-import { NexusGenInputs } from "../../__types";
 
 export const PetitionSharedWithFilter = inputObjectType({
   name: "PetitionSharedWithFilter",
@@ -65,8 +65,8 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
         "User groups must belong to the same organization",
       );
     } catch (e) {
-      if (e instanceof AssertionError) {
-        throw new ArgValidationError(info, name, e.message);
+      if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
+        throw new ArgValidationError(info, name, e.message.replace("Assertion Error: ", ""));
       }
       throw new ArgValidationError(info, name, "Invalid shared with filter");
     }
@@ -161,8 +161,8 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
         "Tags must belong to the same organization",
       );
     } catch (e) {
-      if (e instanceof AssertionError) {
-        throw new ArgValidationError(info, name, e.message);
+      if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
+        throw new ArgValidationError(info, name, e.message.replace("Assertion Error: ", ""));
       }
       throw new ArgValidationError(info, name, "Invalid tags filter");
     }

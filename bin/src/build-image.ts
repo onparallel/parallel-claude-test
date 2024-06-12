@@ -12,11 +12,11 @@ import {
   Tenancy,
   TerminateInstancesCommand,
 } from "@aws-sdk/client-ec2";
-import assert from "assert";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
 import { isDefined } from "remeda";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { timestamp } from "./utils/timestamp";

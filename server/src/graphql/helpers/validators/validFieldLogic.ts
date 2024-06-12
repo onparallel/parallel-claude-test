@@ -1,10 +1,10 @@
 import Ajv from "ajv";
 import { core } from "nexus";
 import { isDefined } from "remeda";
+import { assert } from "ts-essentials";
 import { PetitionField } from "../../../db/__types";
 import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
 import { PetitionVariable } from "../../../db/repositories/PetitionRepository";
-import { assert } from "../../../util/assert";
 import {
   PetitionFieldLogic,
   PetitionFieldLogicCondition,

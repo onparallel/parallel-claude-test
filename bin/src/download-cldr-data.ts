@@ -1,10 +1,10 @@
-import assert from "assert";
 import cldr from "cldr";
+import ccl from "country-codes-list";
 import { filter, forEach, map, pipe, sort } from "remeda";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { writeJson } from "./utils/json";
 import { run } from "./utils/run";
-import ccl from "country-codes-list";
 
 let CURRENCIES: Set<string> | null = null;
 async function getCurrencies() {
