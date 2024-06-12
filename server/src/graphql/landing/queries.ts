@@ -13,6 +13,16 @@ export const LandingTemplateField = objectType({
     t.globalId("id", { prefixName: "PetitionField" });
     t.field("type", { type: "PetitionFieldType" });
     t.nullable.string("title");
+    t.nullable.list.nonNull.field("children", {
+      type: "LandingTemplateField",
+      description: "The children of this field.",
+      resolve: async (o, _, ctx) => {
+        if (o.type !== "FIELD_GROUP") {
+          return null;
+        }
+        return await ctx.petitions.loadPetitionFieldChildren(o.id);
+      },
+    });
   },
 });
 

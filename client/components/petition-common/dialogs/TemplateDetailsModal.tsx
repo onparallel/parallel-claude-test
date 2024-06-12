@@ -37,6 +37,7 @@ import { RestrictedFeaturePopover } from "@parallel/components/common/Restricted
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
+  PetitionFieldTitleContent_LandingTemplateFieldFragment,
   PetitionFieldTitleContent_PetitionFieldFragment,
   TemplateDetailsModal_PetitionTemplateFragment,
 } from "@parallel/graphql/__types";
@@ -436,7 +437,9 @@ export function TemplateDetailsModal({
 
 export interface PetitionFieldTitleContentProps {
   index: string | PetitionFieldIndex;
-  field: PetitionFieldTitleContent_PetitionFieldFragment;
+  field:
+    | PetitionFieldTitleContent_PetitionFieldFragment
+    | PetitionFieldTitleContent_LandingTemplateFieldFragment;
 }
 
 export const PetitionFieldTitleContent = Object.assign(
@@ -463,6 +466,12 @@ export const PetitionFieldTitleContent = Object.assign(
     fragments: {
       PetitionField: gql`
         fragment PetitionFieldTitleContent_PetitionField on PetitionField {
+          id
+          title
+        }
+      `,
+      LandingTemplateField: gql`
+        fragment PetitionFieldTitleContent_LandingTemplateField on LandingTemplateField {
           id
           title
         }

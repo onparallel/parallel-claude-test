@@ -820,6 +820,10 @@ type LandingTemplateCategorySample {
 A public template field
 """
 type LandingTemplateField {
+  """
+  The children of this field.
+  """
+  children: [LandingTemplateField!]
   id: GID!
   title: String
   type: PetitionFieldType!

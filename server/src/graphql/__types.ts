@@ -1794,6 +1794,7 @@ export interface NexusGenFieldTypes {
   };
   LandingTemplateField: {
     // field return type
+    children: NexusGenRootTypes["LandingTemplateField"][] | null; // [LandingTemplateField!]
     id: NexusGenScalars["GID"]; // GID!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
@@ -4308,6 +4309,7 @@ export interface NexusGenFieldTypeNames {
   };
   LandingTemplateField: {
     // field return type name
+    children: "LandingTemplateField";
     id: "GID";
     title: "String";
     type: "PetitionFieldType";

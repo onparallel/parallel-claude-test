@@ -19,6 +19,7 @@ import { Link, NakedLink } from "@parallel/components/common/Link";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
+import { PetitionFieldTitleContent } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
@@ -35,9 +36,9 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -75,7 +76,7 @@ function LandingTemplateDetails({
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 
-  const fieldswithIndices = useFieldsWithIndices(
+  const fieldsWithIndices = useFieldsWithIndices(
     useMemo(
       () => ({
         ...template,
@@ -278,28 +279,43 @@ function LandingTemplateDetails({
               </Heading>
               <PaddedCollapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
                 <OrderedList>
-                  {fieldswithIndices.map(([field, fieldIndex]) => {
-                    return field.type === "HEADING" ? (
-                      <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                        {fieldIndex}.{" "}
-                        <Text as="span" fontWeight="bold">
-                          {field.title}
-                        </Text>
-                      </Text>
-                    ) : (
-                      <Text key={field.id} marginStart={4} marginBottom={2}>
-                        {fieldIndex}.{" "}
-                        {field.title ? (
-                          <Text as="span">{field.title}</Text>
-                        ) : (
-                          <Text as="span" textStyle="hint">
-                            <FormattedMessage
-                              id="generic.untitled-field"
-                              defaultMessage="Untitled field"
-                            />
+                  {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices]) => {
+                    if (field.type === "HEADING") {
+                      if (!field.title) {
+                        return null;
+                      } else {
+                        return (
+                          <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                            {fieldIndex}.{" "}
+                            <Text as="span" fontWeight="bold">
+                              {field.title}
+                            </Text>
                           </Text>
-                        )}
-                      </Text>
+                        );
+                      }
+                    }
+                    return (
+                      <Fragment key={field.id}>
+                        <PetitionFieldTitleContent
+                          field={field}
+                          index={fieldIndex}
+                          marginStart={4}
+                          marginBottom={2}
+                        />
+                        {field.type === "FIELD_GROUP" && field.children?.length
+                          ? zip(field.children!, childrenFieldIndices!).map(
+                              ([field, fieldIndex]) => (
+                                <PetitionFieldTitleContent
+                                  key={field.id}
+                                  field={field}
+                                  index={fieldIndex}
+                                  marginStart={7}
+                                  marginBottom={2}
+                                />
+                              ),
+                            )
+                          : null}
+                      </Fragment>
                     );
                   })}
                 </OrderedList>
@@ -375,10 +391,16 @@ LandingTemplateDetails.fragments = {
         id
         type
         title
+        ...PetitionFieldTitleContent_LandingTemplateField
+        children {
+          type
+          ...PetitionFieldTitleContent_LandingTemplateField
+        }
       }
       ...useFieldsWithIndices_LandingTemplate
     }
     ${useFieldsWithIndices.fragments.LandingTemplate}
+    ${PetitionFieldTitleContent.fragments.LandingTemplateField}
   `,
 };
 

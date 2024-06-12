@@ -766,6 +766,8 @@ export interface LandingTemplateCategorySampletemplatesArgs {
 /** A public template field */
 export interface LandingTemplateField {
   __typename?: "LandingTemplateField";
+  /** The children of this field. */
+  children?: Maybe<Array<LandingTemplateField>>;
   id: Scalars["GID"]["output"];
   title?: Maybe<Scalars["String"]["output"]>;
   type: PetitionFieldType;
@@ -12061,6 +12063,12 @@ export type TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragme
 
 export type PetitionFieldTitleContent_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+};
+
+export type PetitionFieldTitleContent_LandingTemplateFieldFragment = {
+  __typename?: "LandingTemplateField";
   id: string;
   title?: string | null;
 };
@@ -44105,6 +44113,12 @@ export type LandingTemplateDetails_LandingTemplateFragment = {
     id: string;
     type: PetitionFieldType;
     title?: string | null;
+    children?: Array<{
+      __typename?: "LandingTemplateField";
+      type: PetitionFieldType;
+      id: string;
+      title?: string | null;
+    }> | null;
   }>;
 };
 
@@ -44136,6 +44150,12 @@ export type LandingTemplateDetails_landingTemplateBySlugQuery = {
       id: string;
       type: PetitionFieldType;
       title?: string | null;
+      children?: Array<{
+        __typename?: "LandingTemplateField";
+        type: PetitionFieldType;
+        id: string;
+        title?: string | null;
+      }> | null;
     }>;
   } | null;
 };
@@ -55757,6 +55777,12 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
     allowMultiplePetitions
   }
 ` as unknown as DocumentNode<PublicPetitionLink_PublicPublicPetitionLinkFragment, unknown>;
+export const PetitionFieldTitleContent_LandingTemplateFieldFragmentDoc = gql`
+  fragment PetitionFieldTitleContent_LandingTemplateField on LandingTemplateField {
+    id
+    title
+  }
+` as unknown as DocumentNode<PetitionFieldTitleContent_LandingTemplateFieldFragment, unknown>;
 export const useFieldsWithIndices_LandingTemplateFragmentDoc = gql`
   fragment useFieldsWithIndices_LandingTemplate on LandingTemplate {
     fields {
@@ -55787,9 +55813,15 @@ export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
       id
       type
       title
+      ...PetitionFieldTitleContent_LandingTemplateField
+      children {
+        type
+        ...PetitionFieldTitleContent_LandingTemplateField
+      }
     }
     ...useFieldsWithIndices_LandingTemplate
   }
+  ${PetitionFieldTitleContent_LandingTemplateFieldFragmentDoc}
   ${useFieldsWithIndices_LandingTemplateFragmentDoc}
 ` as unknown as DocumentNode<LandingTemplateDetails_LandingTemplateFragment, unknown>;
 export const LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc = gql`
