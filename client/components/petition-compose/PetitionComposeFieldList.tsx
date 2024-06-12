@@ -9,7 +9,6 @@ import {
 } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
   PetitionComposeFieldList_PetitionBaseFragment,
-  PetitionComposeFieldList_UserFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
@@ -29,12 +28,11 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { intersection, isDefined } from "remeda";
+import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
 import { useEditPetitionFieldCalculationsDialog } from "./dialogs/EditPetitionFieldCalculationsDialog";
-import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 
 export interface PetitionComposeFieldListProps extends BoxProps {
-  user: PetitionComposeFieldList_UserFragment;
   activeFieldId: Maybe<string>;
   petition: PetitionComposeFieldList_PetitionBaseFragment;
   showErrors: boolean;
@@ -52,7 +50,6 @@ export interface PetitionComposeFieldListProps extends BoxProps {
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
-    user,
     petition,
     activeFieldId,
     showErrors,
@@ -371,7 +368,6 @@ export const PetitionComposeFieldList = Object.assign(
                 <PetitionComposeField
                   ref={fieldRefs[field.id]}
                   onMove={onFieldMove}
-                  user={user}
                   field={field}
                   childrenFieldIndices={childrenFieldIndices}
                   fieldRefs={fieldRefs}
@@ -471,12 +467,6 @@ export const PetitionComposeFieldList = Object.assign(
   }),
   {
     fragments: {
-      User: gql`
-        fragment PetitionComposeFieldList_User on User {
-          ...PetitionComposeField_User
-        }
-        ${PetitionComposeField.fragments.User}
-      `,
       PetitionField: gql`
         fragment PetitionComposeFieldList_PetitionField on PetitionField {
           id

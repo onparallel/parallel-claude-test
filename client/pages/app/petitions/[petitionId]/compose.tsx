@@ -1303,7 +1303,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <AddNewFieldPlaceholderProvider value={{ afterFieldId, inParentFieldId }}>
             <PetitionComposeFieldList
               showErrors={showErrors}
-              user={me}
               petition={petition}
               activeFieldId={activeFieldId}
               onCloneField={handleCloneField}

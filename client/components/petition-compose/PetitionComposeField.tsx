@@ -1395,14 +1395,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
 );
 
 const fragments = {
-  get User() {
-    return gql`
-      fragment PetitionComposeField_User on User {
-        id
-        hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-      }
-    `;
-  },
   get PetitionBase() {
     return gql`
       fragment PetitionComposeField_PetitionBase on PetitionBase {

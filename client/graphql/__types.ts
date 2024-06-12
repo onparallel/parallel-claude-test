@@ -13050,12 +13050,6 @@ export type PetitionComposeContents_PetitionFieldFragment = {
   }> | null;
 };
 
-export type PetitionComposeField_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasBackgroundCheck: boolean;
-};
-
 export type PetitionComposeField_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -13381,12 +13375,6 @@ export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
     size: number;
     isComplete: boolean;
   };
-};
-
-export type PetitionComposeFieldList_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasBackgroundCheck: boolean;
 };
 
 export type PetitionComposeFieldList_PetitionFieldFragment = {
@@ -48794,18 +48782,6 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
   ${useFieldsWithIndices_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<TemplateDetailsModal_PetitionTemplateFragment, unknown>;
-export const PetitionComposeField_UserFragmentDoc = gql`
-  fragment PetitionComposeField_User on User {
-    id
-    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-  }
-` as unknown as DocumentNode<PetitionComposeField_UserFragment, unknown>;
-export const PetitionComposeFieldList_UserFragmentDoc = gql`
-  fragment PetitionComposeFieldList_User on User {
-    ...PetitionComposeField_User
-  }
-  ${PetitionComposeField_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeFieldList_UserFragment, unknown>;
 export const FieldErrorDialog_PetitionFieldFragmentDoc = gql`
   fragment FieldErrorDialog_PetitionField on PetitionField {
     id
