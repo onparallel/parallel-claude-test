@@ -2462,7 +2462,11 @@ export class PetitionRepository extends BaseRepository {
       t,
     );
 
-    if (fields.some((f) => !f!.is_internal)) {
+    const [petition] = await this.from("petition")
+      .where("id", petitionId)
+      .select("enable_interaction_with_recipients");
+
+    if (!petition.enable_interaction_with_recipients || fields.some((f) => !f!.is_internal)) {
       await this.updatePetition(
         petitionId,
         {
