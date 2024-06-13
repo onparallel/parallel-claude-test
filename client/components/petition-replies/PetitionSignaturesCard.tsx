@@ -18,7 +18,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, omit, pick } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -67,6 +67,10 @@ const fragments = {
       ...SignatureConfigDialog_PetitionBase
       ...NewSignatureRequestRow_Petition
       signatureRequests {
+        signatureConfig {
+          ...SignatureConfigDialog_SignatureConfig
+          timezone
+        }
         ...CurrentSignatureRequestRow_PetitionSignatureRequest
         ...OlderSignatureRequestRows_PetitionSignatureRequest
       }
@@ -74,6 +78,7 @@ const fragments = {
     }
     ${SignatureConfigDialog.fragments.PetitionBase}
     ${NewSignatureRequestRow.fragments.Petition}
+    ${SignatureConfigDialog.fragments.SignatureConfig}
     ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
     ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
     ${getPetitionSignatureEnvironment.fragments.Petition}
@@ -222,17 +227,36 @@ export const PetitionSignaturesCard = Object.assign(
     async function handleAddNewSignature() {
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       try {
-        if (current?.status === "COMPLETED") {
+        if (current?.status === "COMPLETED" && isDefined(current.signatureConfig.integration)) {
           await showConfirmRestartSignature();
+          await updateSignatureConfig({
+            variables: {
+              petitionId: petition.id,
+              signatureConfig: {
+                orgIntegrationId: current.signatureConfig.integration.id,
+                signersInfo: current.signatureConfig.signers.map((s) => omit(s!, ["__typename"])),
+                ...pick(current.signatureConfig, [
+                  "allowAdditionalSigners",
+                  "minSigners",
+                  "review",
+                  "signingMode",
+                  "timezone",
+                  "instructions",
+                  "title",
+                ]),
+              },
+            },
+          });
+        } else {
+          const signatureConfig = await showSignatureConfigDialog({
+            user,
+            petition,
+            integrations: signatureIntegrations,
+          });
+          await updateSignatureConfig({
+            variables: { petitionId: petition.id, signatureConfig },
+          });
         }
-        const signatureConfig = await showSignatureConfigDialog({
-          user,
-          petition,
-          integrations: signatureIntegrations,
-        });
-        await updateSignatureConfig({
-          variables: { petitionId: petition.id, signatureConfig },
-        });
       } catch {}
     }
 
