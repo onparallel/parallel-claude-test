@@ -239,6 +239,16 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const updateProfileTypeField = useUpdateProfileTypeFieldWithForce();
   const showConfirmDisableMonitoringDialog = useConfirmDisableMonitoringDialog();
 
+  function getDirtyFieldsKeys(obj: Record<string, any>): string[] {
+    return Object.entries(obj)
+      .filter(
+        ([, value]) =>
+          (typeof value === "boolean" && value) ||
+          (typeof value === "object" && value !== null && getDirtyFieldsKeys(value).length > 0),
+      )
+      .map(([key]) => key);
+  }
+
   return (
     <ConfirmDialog
       {...props}
@@ -253,10 +263,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
           let profileField = {} as useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
 
           try {
-            const dirtyFieldsKeys = Object.keys(
-              omit(dirtyFields, ["type"]),
-            ) as (keyof CreateOrUpdateProfileTypeFieldDialogData)[];
-            const dirtyData = pick(formData, dirtyFieldsKeys);
+            const dirtyFieldsKeys = getDirtyFieldsKeys(omit(dirtyFields, ["type"]));
+            const dirtyData = pick(
+              formData,
+              dirtyFieldsKeys as (keyof CreateOrUpdateProfileTypeFieldDialogData)[],
+            );
 
             const expiryAlertAheadTime =
               formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
