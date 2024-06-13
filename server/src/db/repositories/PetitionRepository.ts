@@ -6126,12 +6126,24 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async loadUsersOnPetition(petitionId: number) {
+  async getUsersOnPetition(
+    petitionId: number,
+    opts?: { onlySubscribed?: boolean; excludeUserIds?: number[] },
+  ) {
     return await this.from("user")
       .join("petition_permission", "user.id", "petition_permission.user_id")
       .where("petition_permission.petition_id", petitionId)
       .whereNull("petition_permission.deleted_at")
+      .where("user.status", "ACTIVE")
       .whereNull("user.deleted_at")
+      .mmodify((q) => {
+        if (opts?.onlySubscribed) {
+          q.where("petition_permission.is_subscribed", true);
+        }
+        if (opts?.excludeUserIds && opts.excludeUserIds.length > 0) {
+          q.whereNotIn("user.id", opts.excludeUserIds);
+        }
+      })
       .distinct<User[]>("user.*");
   }
 
@@ -6141,7 +6153,13 @@ export class PetitionRepository extends BaseRepository {
         select pp.*
           from petition_permission pp
           join "user" u on u.id = pp.user_id
-        where pp.user_id = ? and pp.petition_id = ? and pp.is_subscribed and pp.deleted_at is null and u.deleted_at is null
+        where 
+          pp.user_id = ? 
+          and pp.petition_id = ? 
+          and pp.is_subscribed 
+          and pp.deleted_at is null 
+          and u.status = 'ACTIVE'
+          and u.deleted_at is null
     `,
       [userId, petitionId],
     );

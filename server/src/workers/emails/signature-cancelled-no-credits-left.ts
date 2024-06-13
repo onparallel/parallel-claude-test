@@ -17,7 +17,7 @@ export async function signatureCancelledNoCreditsLeft(
   const petition = await context.petitions.loadPetition(signatureRequest.petition_id);
   if (!petition) return;
 
-  const users = await context.petitions.loadUsersOnPetition(petition.id);
+  const users = await context.petitions.getUsersOnPetition(petition.id);
 
   const signatureIntegration = await context.integrations.loadIntegration(
     signatureRequest.signature_config.orgIntegrationId,
