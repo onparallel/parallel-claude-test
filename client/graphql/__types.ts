@@ -55264,6 +55264,7 @@ export const RecipientViewPetitionFieldGroup_PublicPetitionFieldFragmentDoc = gq
         }
         replies {
           id
+          status
           ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
         }
       }

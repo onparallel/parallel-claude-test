@@ -133,7 +133,11 @@ export function PreviewPetitionFieldGroup({
               key={index}
               field={field}
               index={index}
-              isDisabled={groupHasSomeApprovedReply}
+              isDisabled={
+                groupHasSomeApprovedReply ||
+                isDisabled ||
+                (petition.__typename === "Petition" && petition.status === "CLOSED")
+              }
               onRemoveReply={
                 replies.length > 1 || field.optional
                   ? () => {

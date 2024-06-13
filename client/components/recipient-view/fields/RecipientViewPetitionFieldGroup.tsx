@@ -108,6 +108,9 @@ export function RecipientViewPetitionFieldGroup({
       onAddNewGroup={isDisabled || petition.status === "CLOSED" ? undefined : handleAddReply}
     >
       {zip(field.replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
+        const groupHasSomeApprovedReply = group.children!.some((c) =>
+          c.replies.some((r) => r.status === "APPROVED"),
+        );
         return (
           <RecipientViewPetitionFieldGroupCard
             key={index}
@@ -121,6 +124,7 @@ export function RecipientViewPetitionFieldGroup({
                 : undefined
             }
             id={`reply-${group.id}`}
+            isDisabled={groupHasSomeApprovedReply || isDisabled || petition.status === "CLOSED"}
           >
             {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
               return (
@@ -597,6 +601,7 @@ RecipientViewPetitionFieldGroup.fragments = {
           }
           replies {
             id
+            status
             ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
           }
         }
