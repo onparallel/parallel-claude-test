@@ -488,7 +488,7 @@ function PetitionExportField({
                 ) : null}
               </View>
             ))}
-            {replies.length === 0 ? (
+            {orderedReplies.length === 0 ? (
               <Text style={[styles.text, styles.noReplies]}>
                 {isFileTypeField(field.type) ? (
                   <FormattedMessage
