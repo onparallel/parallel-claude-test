@@ -6087,7 +6087,7 @@ type PublicPetitionMessage {
   id: GID!
 
   """
-  Date when the petition was first sent
+  If already sent, the date at which the email was sent.
   """
   sentAt: DateTime
 

@@ -1,6 +1,7 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { isDefined, minBy, pick } from "remeda";
+import { isDefined, pick } from "remeda";
+import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import {
   PetitionFieldMath,
@@ -14,7 +15,6 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
 import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
-import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -318,15 +318,14 @@ export const PublicPetitionMessage = objectType({
       },
     });
     t.nullable.datetime("sentAt", {
-      description: "Date when the petition was first sent",
+      description: "If already sent, the date at which the email was sent.",
       resolve: async (root, _, ctx) => {
-        const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
-        const firstMessage = minBy(
-          messages,
-          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf(),
-        );
-
-        return firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
+        if (root.email_log_id) {
+          const email = await ctx.emailLogs.loadEmailLog(root.email_log_id);
+          return email!.sent_at;
+        } else {
+          return null;
+        }
       },
     });
   },
