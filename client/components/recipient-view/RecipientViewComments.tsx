@@ -1,9 +1,9 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   Center,
-  Circle,
   Flex,
   HStack,
   Heading,
@@ -40,14 +40,14 @@ import {
 
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
+import { useMetadata } from "@parallel/utils/withMetadata";
 import { isDefined } from "remeda";
+import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PublicPetitionFieldCommentExcerpt } from "../common/PublicPetitionFieldCommentExcerpt";
 import { Spacer } from "../common/Spacer";
-import { useMetadata } from "@parallel/utils/withMetadata";
-import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 interface RecipientViewCommentsProps {
   keycode: string;
@@ -392,16 +392,19 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                       </Text>
                     </Box>
                     {unreadCount ? (
-                      <Circle
-                        backgroundColor="primary.500"
+                      <Badge
+                        background="primary.500"
                         color="white"
-                        size="20px"
-                        pointerEvents="none"
-                        outline="1px solid white"
                         fontSize="sm"
+                        borderRadius="full"
+                        minW="18px"
+                        minH="18px"
+                        lineHeight="16px"
+                        border="1px solid white"
+                        pointerEvents="none"
                       >
-                        {unreadCount}
-                      </Circle>
+                        {unreadCount < 100 ? unreadCount : "99+"}
+                      </Badge>
                     ) : null}
                   </HStack>
                 </LinkBox>

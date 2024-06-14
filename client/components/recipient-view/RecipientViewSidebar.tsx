@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import {
+  Badge,
   Box,
   Center,
-  Circle,
   ComponentWithAs,
   Flex,
   FlexProps,
@@ -13,17 +13,17 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { CommentIcon, InfoCircleIcon, ListIcon, UserArrowIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { RecipientViewSidebar_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useIntl } from "react-intl";
+import { sumBy } from "remeda";
 import { RecipientViewComments } from "./RecipientViewComments";
 import { RecipientViewContents } from "./RecipientViewContents";
 import { RecipientViewInformation } from "./RecipientViewInformation";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
 import { useRecipientViewSidebarContext } from "./RecipientViewSidebarContextProvider";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
-import { sumBy } from "remeda";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 const MotionFlex = motion<FlexProps>(Flex);
 const breakpoint = "md";
 
@@ -259,19 +259,22 @@ function SidebarIconButton({
         borderBottomColor={hasBorder ? "gray.200" : undefined}
       />
       {unreadCount ? (
-        <Circle
+        <Badge
           position="absolute"
-          size={5}
           top={2}
           insetEnd={2}
-          bgColor="primary.500"
-          fontSize="sm"
+          background="primary.500"
           color="white"
+          fontSize="sm"
+          borderRadius="full"
+          minW="18px"
+          minH="18px"
+          lineHeight="16px"
+          border="1px solid white"
           pointerEvents="none"
-          outline="1px solid white"
         >
-          {unreadCount}
-        </Circle>
+          {unreadCount < 100 ? unreadCount : "99+"}
+        </Badge>
       ) : null}
     </Box>
   );

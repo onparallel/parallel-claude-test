@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -25,7 +26,6 @@ import {
   RepeatIcon,
   SparklesIcon,
 } from "@parallel/chakra/icons";
-import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -46,6 +46,7 @@ import {
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
 import {
   PetitionRepliesField,
@@ -55,7 +56,6 @@ import { PetitionRepliesFieldComments } from "@parallel/components/petition-repl
 import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
-import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesSummary } from "@parallel/components/petition-replies/PetitionRepliesSummary";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
@@ -116,7 +116,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isDefined, sumBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -143,7 +143,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, []);
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
-
+  const allFieldsUnreadCommentCount = sumBy(petition.fields, (f) => f.unreadCommentCount);
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const fieldLogic = useFieldLogic(petition);
@@ -650,6 +650,21 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               >
                 <CommentIcon fontSize="18px" marginEnd={1.5} aria-hidden="true" />
                 <FormattedMessage id="generic.comments" defaultMessage="Comments" />
+                {allFieldsUnreadCommentCount ? (
+                  <Badge
+                    marginStart={1}
+                    background="primary.500"
+                    color="white"
+                    fontSize="xs"
+                    borderRadius="full"
+                    minW="18px"
+                    minH="18px"
+                    lineHeight="18px"
+                    pointerEvents="none"
+                  >
+                    {allFieldsUnreadCommentCount < 100 ? allFieldsUnreadCommentCount : "99+"}
+                  </Badge>
+                ) : null}
               </Tab>
               <Tab
                 paddingY={4}
@@ -662,14 +677,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               >
                 <SparklesIcon fontSize="18px" marginEnd={1.5} role="presentation" />
                 <FormattedMessage id="page.replies.summary-header" defaultMessage="Mike AI" />
-                <HelpPopover>
-                  <Text fontSize="sm">
-                    <FormattedMessage
-                      id="page.replies.summary-header-help"
-                      defaultMessage="Mike AI analyzes the replies to extract conclusions."
-                    />
-                  </Text>
-                </HelpPopover>
               </Tab>
             </TabList>
             <TabPanels {...extendFlexColumn}>
@@ -904,6 +911,7 @@ PetitionReplies.fragments = {
           id
           isReadOnly
           requireApproval
+          unreadCommentCount
           commentCount
           ...PetitionRepliesField_PetitionField
           ...PetitionRepliesContents_PetitionField

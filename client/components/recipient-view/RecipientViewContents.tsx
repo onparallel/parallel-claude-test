@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   Center,
-  Circle,
   Flex,
   HStack,
   Heading,
@@ -165,17 +165,21 @@ export const RecipientViewContents = Object.assign(
                             />
                           )}
                         </Box>
+
                         {showCommentsNumber ? (
-                          <Circle
-                            backgroundColor="primary.500"
+                          <Badge
+                            background="primary.500"
                             color="white"
-                            size="20px"
-                            pointerEvents="none"
-                            outline="1px solid white"
                             fontSize="sm"
+                            borderRadius="full"
+                            minW="18px"
+                            minH="18px"
+                            lineHeight="16px"
+                            border="1px solid white"
+                            pointerEvents="none"
                           >
-                            {_commentCount}
-                          </Circle>
+                            {_commentCount < 100 ? _commentCount : "99+"}
+                          </Badge>
                         ) : null}
                         {isInternal ? (
                           <Center>
@@ -246,16 +250,21 @@ export const RecipientViewContents = Object.assign(
                                   )}
                                 </Box>
                                 {showCommentsCount(field) ? (
-                                  <Circle
-                                    backgroundColor="primary.500"
+                                  <Badge
+                                    background="primary.500"
                                     color="white"
-                                    size="20px"
-                                    pointerEvents="none"
-                                    outline="1px solid white"
                                     fontSize="sm"
+                                    borderRadius="full"
+                                    minW="18px"
+                                    minH="18px"
+                                    lineHeight="16px"
+                                    border="1px solid white"
+                                    pointerEvents="none"
                                   >
-                                    {field.unreadCommentCount}
-                                  </Circle>
+                                    {field.unreadCommentCount < 100
+                                      ? field.unreadCommentCount
+                                      : "99+"}
+                                  </Badge>
                                 ) : null}
                                 {field.isInternal ? <InternalFieldBadge marginStart={2} /> : null}
                               </Button>

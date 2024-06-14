@@ -4847,7 +4847,7 @@ export interface PublicPetitionMessage {
   __typename?: "PublicPetitionMessage";
   /** The ID of the message. */
   id: Scalars["GID"]["output"];
-  /** Date when the petition was first sent */
+  /** If already sent, the date at which the email was sent. */
   sentAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** Subject of a email. */
   subject?: Maybe<Scalars["String"]["output"]>;
@@ -35268,6 +35268,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
+    unreadCommentCount: number;
     position: number;
     type: PetitionFieldType;
     visibility?: { [key: string]: any } | null;
@@ -35276,7 +35277,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     optional: boolean;
     isReadOnly: boolean;
     title?: string | null;
-    unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     multiple: boolean;
     alias?: string | null;
@@ -35690,6 +35690,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
+    unreadCommentCount: number;
     position: number;
     type: PetitionFieldType;
     visibility?: { [key: string]: any } | null;
@@ -35698,7 +35699,6 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     optional: boolean;
     isReadOnly: boolean;
     title?: string | null;
-    unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     multiple: boolean;
     alias?: string | null;
@@ -36185,6 +36185,7 @@ export type PetitionPreview_updatePetitionMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
           visibility?: { [key: string]: any } | null;
@@ -36193,7 +36194,6 @@ export type PetitionPreview_updatePetitionMutation = {
           optional: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          unreadCommentCount: number;
           hasCommentsEnabled: boolean;
           multiple: boolean;
           alias?: string | null;
@@ -36614,6 +36614,7 @@ export type PetitionPreview_updatePetitionMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
           visibility?: { [key: string]: any } | null;
@@ -36622,7 +36623,6 @@ export type PetitionPreview_updatePetitionMutation = {
           optional: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          unreadCommentCount: number;
           hasCommentsEnabled: boolean;
           multiple: boolean;
           alias?: string | null;
@@ -37056,6 +37056,7 @@ export type PetitionPreview_completePetitionMutation = {
     fields: Array<{
       __typename?: "PetitionField";
       id: string;
+      unreadCommentCount: number;
       position: number;
       type: PetitionFieldType;
       visibility?: { [key: string]: any } | null;
@@ -37064,7 +37065,6 @@ export type PetitionPreview_completePetitionMutation = {
       optional: boolean;
       isReadOnly: boolean;
       title?: string | null;
-      unreadCommentCount: number;
       hasCommentsEnabled: boolean;
       multiple: boolean;
       alias?: string | null;
@@ -37526,6 +37526,7 @@ export type PetitionPreview_petitionQuery = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
           visibility?: { [key: string]: any } | null;
@@ -37534,7 +37535,6 @@ export type PetitionPreview_petitionQuery = {
           optional: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          unreadCommentCount: number;
           hasCommentsEnabled: boolean;
           multiple: boolean;
           alias?: string | null;
@@ -37955,6 +37955,7 @@ export type PetitionPreview_petitionQuery = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
           visibility?: { [key: string]: any } | null;
@@ -37963,7 +37964,6 @@ export type PetitionPreview_petitionQuery = {
           optional: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          unreadCommentCount: number;
           hasCommentsEnabled: boolean;
           multiple: boolean;
           alias?: string | null;
@@ -38416,6 +38416,7 @@ export type PetitionReplies_PetitionFragment = {
     id: string;
     isReadOnly: boolean;
     requireApproval: boolean;
+    unreadCommentCount: number;
     commentCount: number;
     isLinkedToProfileType: boolean;
     isLinkedToProfileTypeField: boolean;
@@ -38427,7 +38428,6 @@ export type PetitionReplies_PetitionFragment = {
     title?: string | null;
     multiple: boolean;
     description?: string | null;
-    unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
@@ -39231,6 +39231,7 @@ export type PetitionReplies_closePetitionMutation = {
       id: string;
       isReadOnly: boolean;
       requireApproval: boolean;
+      unreadCommentCount: number;
       commentCount: number;
       isLinkedToProfileType: boolean;
       isLinkedToProfileTypeField: boolean;
@@ -39242,7 +39243,6 @@ export type PetitionReplies_closePetitionMutation = {
       title?: string | null;
       multiple: boolean;
       description?: string | null;
-      unreadCommentCount: number;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
@@ -39814,6 +39814,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       id: string;
       isReadOnly: boolean;
       requireApproval: boolean;
+      unreadCommentCount: number;
       commentCount: number;
       isLinkedToProfileType: boolean;
       isLinkedToProfileTypeField: boolean;
@@ -39825,7 +39826,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       title?: string | null;
       multiple: boolean;
       description?: string | null;
-      unreadCommentCount: number;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
@@ -40552,6 +40552,7 @@ export type PetitionReplies_petitionQuery = {
           id: string;
           isReadOnly: boolean;
           requireApproval: boolean;
+          unreadCommentCount: number;
           commentCount: number;
           isLinkedToProfileType: boolean;
           isLinkedToProfileTypeField: boolean;
@@ -40563,7 +40564,6 @@ export type PetitionReplies_petitionQuery = {
           title?: string | null;
           multiple: boolean;
           description?: string | null;
-          unreadCommentCount: number;
           hasCommentsEnabled: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
@@ -54241,6 +54241,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     }
     fields {
       id
+      unreadCommentCount
       position
       ...PreviewPetitionField_PetitionField
       ...validatePetitionFields_PetitionField
@@ -54963,6 +54964,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       id
       isReadOnly
       requireApproval
+      unreadCommentCount
       commentCount
       ...PetitionRepliesField_PetitionField
       ...PetitionRepliesContents_PetitionField

@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Center,
-  Circle,
-  HStack,
-  LinkBox,
-  LinkOverlay,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Badge, Box, Center, HStack, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -151,16 +141,19 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                   </Text>
                 </Box>
                 {unreadCount ? (
-                  <Circle
-                    backgroundColor="primary.500"
+                  <Badge
+                    background="primary.500"
                     color="white"
-                    size="20px"
-                    pointerEvents="none"
-                    outline="1px solid white"
                     fontSize="sm"
+                    borderRadius="full"
+                    minW="18px"
+                    minH="18px"
+                    lineHeight="16px"
+                    border="1px solid white"
+                    pointerEvents="none"
                   >
-                    {unreadCount}
-                  </Circle>
+                    {unreadCount < 100 ? unreadCount : "99+"}
+                  </Badge>
                 ) : null}
               </HStack>
             </LinkBox>

@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
+  Badge,
   Box,
   Button,
   Center,
@@ -107,7 +108,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isDefined, omit, sumBy } from "remeda";
 import { noop } from "ts-essentials";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 
@@ -152,6 +153,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   }, []);
 
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
+  const allFieldsUnreadCommentCount = sumBy(petition.fields, (f) => f.unreadCommentCount);
 
   const [activeFieldId, setActiveFieldId] = useFieldCommentsQueryState();
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
@@ -626,6 +628,21 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   >
                     <CommentIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
                     <FormattedMessage id="generic.comments" defaultMessage="Comments" />
+                    {allFieldsUnreadCommentCount ? (
+                      <Badge
+                        marginStart={1}
+                        background="primary.500"
+                        color="white"
+                        fontSize="xs"
+                        borderRadius="full"
+                        minW="18px"
+                        minH="18px"
+                        lineHeight="18px"
+                        pointerEvents="none"
+                      >
+                        {allFieldsUnreadCommentCount < 100 ? allFieldsUnreadCommentCount : "99+"}
+                      </Badge>
+                    ) : null}
                   </Tab>
                 </TabList>
                 <TabPanels {...extendFlexColumn}>
@@ -936,6 +953,7 @@ const _fragments = {
       }
       fields {
         id
+        unreadCommentCount
         position
         ...PreviewPetitionField_PetitionField
         ...validatePetitionFields_PetitionField
