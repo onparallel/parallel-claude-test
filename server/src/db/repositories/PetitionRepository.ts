@@ -3885,15 +3885,63 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_field_comment", t)
+        .modify((q) => {
+          if (!keys.some((k) => k.loadInternalComments)) {
+            q.where("is_internal", false);
+          }
+        })
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
         .whereNull("deleted_at")
-        .select<PetitionFieldComment[]>("petition_field_comment.*");
+        .select<PetitionFieldComment[]>("*");
 
       const byId = groupBy(rows, (r) => r.petition_field_id);
       return keys.map((id) => {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
         return id.loadInternalComments ? comments : comments.filter((c) => c.is_internal === false);
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
+  );
+
+  readonly loadLastPetitionFieldCommentsForField = this.buildLoader<
+    {
+      loadInternalComments?: boolean;
+      petitionId: number;
+      petitionFieldId: number;
+    },
+    PetitionFieldComment | null,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_field_comment", t)
+        .modify((q) => {
+          if (keys.every((k) => k.loadInternalComments)) {
+            q.distinctOn("petition_field_id").orderBy("petition_field_id");
+          } else if (keys.every((k) => !k.loadInternalComments)) {
+            q.where("is_internal", false)
+              .distinctOn("petition_field_id")
+              .orderBy("petition_field_id");
+          } else {
+            // on mixed keys we need to obtain both
+            q.distinctOn("petition_field_id", "is_internal")
+              .orderBy("petition_field_id")
+              .orderBy("is_internal");
+          }
+        })
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereNull("deleted_at")
+        .orderBy("petition_field_id", "desc")
+        .orderBy("created_at", "desc")
+        .select<PetitionFieldComment[]>("*");
+
+      const byId = groupBy(rows, (r) => r.petition_field_id);
+      return keys.map((id) => {
+        const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
+        return id.loadInternalComments
+          ? comments[0] ?? null
+          : comments.filter((c) => c.is_internal === false)[0] ?? null;
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },

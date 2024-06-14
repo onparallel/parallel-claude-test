@@ -3,47 +3,51 @@ import {
   Box,
   Button,
   Center,
+  Circle,
   Flex,
+  HStack,
+  Heading,
   List,
   ListItem,
   Stack,
   Text,
-  VisuallyHidden,
 } from "@chakra-ui/react";
-import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
+import { ChevronFilledIcon, ListIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  RecipientViewContentsCard_PetitionBaseFragment,
-  RecipientViewContentsCard_PublicPetitionFragment,
+  RecipientViewContents_PetitionBaseFragment,
+  RecipientViewContents_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult, useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { ArrayUnionToUnion, Maybe } from "@parallel/utils/types";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useRouter } from "next/router";
-import { useEffect, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { Card, CardHeader } from "../common/Card";
+import { FormattedMessage } from "react-intl";
+import { zip } from "remeda";
+import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
-import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
 type PetitionSelection =
-  | RecipientViewContentsCard_PublicPetitionFragment
-  | RecipientViewContentsCard_PetitionBaseFragment;
+  | RecipientViewContents_PublicPetitionFragment
+  | RecipientViewContents_PetitionBaseFragment;
 
 type PetitionFieldSelection = ArrayUnionToUnion<PetitionSelection["fields"]>;
 
-interface RecipientViewContentsCardProps {
+interface RecipientViewContentsProps {
   currentPage: number;
   petition: PetitionSelection;
+  onClose: () => void;
   usePreviewReplies?: boolean;
+  isPreview?: boolean;
+  closeOnNavigate?: boolean;
 }
 
-export const RecipientViewContentsCard = Object.assign(
-  chakraForwardRef<"section", RecipientViewContentsCardProps>(function RecipientViewContentsCard(
-    { currentPage, petition, usePreviewReplies, ...props },
+export const RecipientViewContents = Object.assign(
+  chakraForwardRef<"section", RecipientViewContentsProps>(function RecipientViewContents(
+    { currentPage, petition, usePreviewReplies, isPreview, closeOnNavigate, onClose, ...props },
     ref,
   ) {
     const router = useRouter();
@@ -53,71 +57,6 @@ export const RecipientViewContentsCard = Object.assign(
       currentPage,
       usePreviewReplies,
     );
-    const allFields = useMemo(() => fields.flatMap((f) => [f, ...(f.children ?? [])]), [fields]);
-
-    useEffect(() => {
-      if (isDefined(router.query.field)) {
-        const { field: fieldId, parentReply: parentReplyId } = router.query;
-
-        const field = (allFields as PetitionFieldSelection[]).find((f) => f.id === fieldId);
-        if (field) {
-          handleFocusField(field, parentReplyId as string | undefined);
-        }
-      }
-    }, [router.query]);
-
-    useEffect(() => {
-      if (isDefined(router.query.reply)) {
-        const replyId = router.query.reply;
-        const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
-
-        if (element) {
-          scrollIntoView(element, { block: "center", behavior: "smooth" });
-          element.focus();
-          if (element.type === "text") {
-            // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-            element.setSelectionRange?.(element.value.length, element.value.length);
-          }
-        }
-      }
-    }, [router.query]);
-
-    const handleFocusField = (field: PetitionFieldSelection, parentReplyId?: string) => {
-      const replies =
-        usePreviewReplies && field.__typename === "PetitionField"
-          ? field.previewReplies.filter((r) => r.parent?.id === parentReplyId)
-          : field.replies.filter((r) => r.parent?.id === parentReplyId);
-
-      const focusFieldContainer = ["HEADING", "FIELD_GROUP"].includes(field.type);
-      let id = "";
-      if (focusFieldContainer || field.type === "CHECKBOX") {
-        id = `field-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}`;
-      } else {
-        id = `reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}${
-          replies[0]?.id ? `-${replies[0].id}` : "-new"
-        }`;
-      }
-
-      if (field.type === "DYNAMIC_SELECT" && replies.length) {
-        id += "-0";
-      }
-
-      const element =
-        field.type === "CHECKBOX"
-          ? (document.querySelector(`#${id} input`) as HTMLInputElement)
-          : (document.getElementById(id) as HTMLInputElement);
-
-      if (element) {
-        scrollIntoView(element, { block: "center", behavior: "smooth" });
-        if (!focusFieldContainer) {
-          element.focus();
-          if (element.type === "text") {
-            // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-            element.setSelectionRange?.(element.value.length, element.value.length);
-          }
-        }
-      }
-    };
 
     const filteredFields = zip(fields as PetitionFieldSelection[], fieldLogic)
       .filter(([field, fieldLogic]) =>
@@ -131,28 +70,51 @@ export const RecipientViewContentsCard = Object.assign(
 
     const showCommentsCount = (field: PetitionFieldSelection) => {
       return (
-        field.commentCount > 0 && (field.__typename === "PetitionField" || field.hasCommentsEnabled)
+        field.unreadCommentCount > 0 &&
+        (field.__typename === "PetitionField" || field.hasCommentsEnabled)
       );
     };
 
+    const highlight = useHighlightElement();
+    const handleClick = (field: PetitionFieldSelection) => {
+      focusPetitionField({ field });
+      if (closeOnNavigate) {
+        onClose();
+      }
+      const element = document.getElementById(`field-${field.id}`);
+      highlight(element, true);
+    };
+
     return (
-      <Card ref={ref} display="flex" flexDirection="column" {...props}>
-        <CardHeader headingLevel="h3" headingSize="sm">
-          <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
-        </CardHeader>
-        <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} overflow="auto">
+      <Flex ref={ref} flexDirection="column" minWidth={0} height="100%" width="100%" {...props}>
+        {isPreview ? null : (
+          <HStack
+            paddingX={4}
+            paddingY={3}
+            borderBottom="1px solid"
+            borderBottomColor="gray.200"
+            justify="space-between"
+            height="56px"
+          >
+            <Heading as="h3" size="md" display="flex">
+              <ListIcon boxSize={6} marginEnd={2.5} />
+              <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
+            </Heading>
+            <CloseButton size="sm" onClick={onClose} />
+          </HStack>
+        )}
+
+        <Stack
+          as={List}
+          spacing={1}
+          paddingY={2.5}
+          paddingX={3}
+          overflow="auto"
+          height="100%"
+          paddingBottom={isPreview ? "64px" : undefined}
+        >
           {pages.map(
-            (
-              {
-                title,
-                commentCount,
-                hasUnreadComments,
-                isInternal,
-                currentFieldCommentCount,
-                currentFieldHasUnreadComments,
-              },
-              index,
-            ) => {
+            ({ title, unreadCommentCount, isInternal, currentFieldUnreadCommentCount }, index) => {
               const url = query.petitionId
                 ? `/app/petitions/${query.petitionId}/preview?page=${index + 1}`
                 : `/petition/${query.keycode}/${index + 1}`;
@@ -160,12 +122,11 @@ export const RecipientViewContentsCard = Object.assign(
               const showPageCommentsCount = index + 1 !== currentPage;
 
               const showCommentsNumber = showPageCommentsCount
-                ? commentCount > 0
-                : currentFieldCommentCount > 0;
-              const _commentCount = showPageCommentsCount ? commentCount : currentFieldCommentCount;
-              const _hasUnreadComments = showPageCommentsCount
-                ? hasUnreadComments
-                : currentFieldHasUnreadComments;
+                ? unreadCommentCount > 0
+                : currentFieldUnreadCommentCount > 0;
+              const _commentCount = showPageCommentsCount
+                ? unreadCommentCount
+                : currentFieldUnreadCommentCount;
 
               return (
                 <ListItem key={index}>
@@ -205,10 +166,16 @@ export const RecipientViewContentsCard = Object.assign(
                           )}
                         </Box>
                         {showCommentsNumber ? (
-                          <RecipientViewContentsIndicators
-                            hasUnreadComments={_hasUnreadComments}
-                            commentCount={_commentCount}
-                          />
+                          <Circle
+                            backgroundColor="primary.500"
+                            color="white"
+                            size="20px"
+                            pointerEvents="none"
+                            outline="1px solid white"
+                            fontSize="sm"
+                          >
+                            {_commentCount}
+                          </Circle>
                         ) : null}
                         {isInternal ? (
                           <Center>
@@ -242,7 +209,9 @@ export const RecipientViewContentsCard = Object.assign(
                                 paddingStart={7}
                                 fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                                 _focus={{ outline: "none" }}
-                                onClick={() => handleFocusField(field)}
+                                onClick={() => {
+                                  handleClick(field);
+                                }}
                               >
                                 <Box
                                   flex="1"
@@ -277,10 +246,16 @@ export const RecipientViewContentsCard = Object.assign(
                                   )}
                                 </Box>
                                 {showCommentsCount(field) ? (
-                                  <RecipientViewContentsIndicators
-                                    hasUnreadComments={field.unreadCommentCount > 0}
-                                    commentCount={field.commentCount}
-                                  />
+                                  <Circle
+                                    backgroundColor="primary.500"
+                                    color="white"
+                                    size="20px"
+                                    pointerEvents="none"
+                                    outline="1px solid white"
+                                    fontSize="sm"
+                                  >
+                                    {field.unreadCommentCount}
+                                  </Circle>
                                 ) : null}
                                 {field.isInternal ? <InternalFieldBadge marginStart={2} /> : null}
                               </Button>
@@ -295,21 +270,21 @@ export const RecipientViewContentsCard = Object.assign(
             },
           )}
         </Stack>
-      </Card>
+      </Flex>
     );
   }),
   {
     fragments: {
       get PublicUser() {
         return gql`
-          fragment RecipientViewContentsCard_PublicUser on PublicUser {
+          fragment RecipientViewContents_PublicUser on PublicUser {
             firstName
           }
         `;
       },
       get PublicPetition() {
         return gql`
-          fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
+          fragment RecipientViewContents_PublicPetition on PublicPetition {
             fields {
               id
               type
@@ -325,21 +300,23 @@ export const RecipientViewContentsCard = Object.assign(
                   id
                 }
               }
-              commentCount
+
               unreadCommentCount
               hasCommentsEnabled
               ...completedFieldReplies_PublicPetitionField
+              ...focusPetitionField_PublicPetitionField
             }
             ...useFieldLogic_PublicPetition
           }
 
           ${useFieldLogic.fragments.PublicPetition}
           ${completedFieldReplies.fragments.PublicPetitionField}
+          ${focusPetitionField.fragments.PublicPetitionField}
         `;
       },
       get PetitionBase() {
         return gql`
-          fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
+          fragment RecipientViewContents_PetitionBase on PetitionBase {
             fields {
               id
               type
@@ -362,55 +339,22 @@ export const RecipientViewContentsCard = Object.assign(
                   id
                 }
               }
-              commentCount
               unreadCommentCount
               hasCommentsEnabled
               ...completedFieldReplies_PetitionField
+              ...focusPetitionField_PetitionField
             }
             ...useFieldLogic_PetitionBase
           }
 
           ${useFieldLogic.fragments.PetitionBase}
           ${completedFieldReplies.fragments.PetitionField}
+          ${focusPetitionField.fragments.PetitionField}
         `;
       },
     },
   },
 );
-
-function RecipientViewContentsIndicators({
-  hasUnreadComments,
-  commentCount,
-}: {
-  hasUnreadComments?: boolean;
-  commentCount: number;
-}) {
-  const intl = useIntl();
-  return (
-    <Flex
-      alignItems="center"
-      color={hasUnreadComments ? "inherit" : "gray.500"}
-      fontWeight="normal"
-    >
-      <RecipientViewCommentsBadge
-        marginEnd={2}
-        boxSize={1.5}
-        hasUnreadComments={hasUnreadComments}
-      />
-      <VisuallyHidden>
-        <FormattedMessage
-          id="component.recipient-view-content-card.comment-count"
-          defaultMessage="{commentCount, plural, =1 {# comment} other {# comments}}"
-          values={{ commentCount: commentCount }}
-        />
-      </VisuallyHidden>
-      <Text as="span" fontSize="sm" aria-hidden height="12px" lineHeight="12px">
-        {intl.formatNumber(commentCount)}
-      </Text>
-      <CommentIcon marginStart={1} role="presentation" fontSize="sm" />
-    </Flex>
-  );
-}
 
 function useGetPagesAndFields<T extends PetitionSelection>(
   petition: T,
@@ -419,11 +363,9 @@ function useGetPagesAndFields<T extends PetitionSelection>(
 ) {
   const pages: {
     title: Maybe<string>;
-    commentCount: number;
-    hasUnreadComments?: boolean;
+    unreadCommentCount: number;
     isInternal: boolean;
-    currentFieldCommentCount: number;
-    currentFieldHasUnreadComments: boolean;
+    currentFieldUnreadCommentCount: number;
   }[] = [];
   const logic = useFieldLogic(petition, usePreviewReplies);
   const _fields: T["fields"] = [] as any;
@@ -437,17 +379,15 @@ function useGetPagesAndFields<T extends PetitionSelection>(
     ) {
       pages.push({
         title: field.title ?? null,
-        commentCount: 0,
+        unreadCommentCount: 0,
         isInternal: field.isInternal,
-        currentFieldCommentCount: field.commentCount,
-        currentFieldHasUnreadComments: field.unreadCommentCount > 0,
+        currentFieldUnreadCommentCount: field.unreadCommentCount,
       });
       page -= 1;
     }
     const currentPage = pages[pages.length - 1];
     if (currentPage) {
-      currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
-      currentPage.commentCount += field.commentCount;
+      currentPage.unreadCommentCount += field.unreadCommentCount;
     }
 
     if (page === 0 && fieldLogic.isVisible) {

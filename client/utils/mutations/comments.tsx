@@ -155,6 +155,9 @@ const _fragments = {
       comments {
         id
       }
+      lastComment {
+        id
+      }
     }
   `,
   PetitionFieldComment: gql`

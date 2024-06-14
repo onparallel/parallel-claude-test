@@ -1,0 +1,339 @@
+import { gql } from "@apollo/client";
+import {
+  Box,
+  Center,
+  Circle,
+  ComponentWithAs,
+  Flex,
+  FlexProps,
+  HStack,
+  Icon,
+  IconButton,
+  IconProps,
+  Stack,
+} from "@chakra-ui/react";
+import { CommentIcon, InfoCircleIcon, ListIcon, UserArrowIcon } from "@parallel/chakra/icons";
+import { RecipientViewSidebar_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
+import { AnimatePresence, motion } from "framer-motion";
+import { useIntl } from "react-intl";
+import { RecipientViewComments } from "./RecipientViewComments";
+import { RecipientViewContents } from "./RecipientViewContents";
+import { RecipientViewInformation } from "./RecipientViewInformation";
+import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
+import { useRecipientViewSidebarContext } from "./RecipientViewSidebarContextProvider";
+import { useDelegateAccess } from "./hooks/useDelegateAccess";
+import { sumBy } from "remeda";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+const MotionFlex = motion<FlexProps>(Flex);
+const breakpoint = "md";
+
+interface RecipientViewSidebarProps {
+  keycode: string;
+  access: RecipientViewSidebar_PublicPetitionAccessFragment;
+  currentPage: number;
+}
+
+export function RecipientViewSidebar({ keycode, access, currentPage }: RecipientViewSidebarProps) {
+  const intl = useIntl();
+
+  const petition = access!.petition!;
+  const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
+  const isOpen = sidebarState !== "CLOSED";
+
+  const unreadedComments = sumBy(petition.fields, (field) => field.unreadCommentCount);
+
+  return (
+    <HStack
+      display={{ base: "none", [breakpoint]: "flex" }}
+      spacing={0}
+      align="top"
+      backgroundColor="white"
+    >
+      <AnimatePresence initial={false}>
+        {isOpen ? (
+          <MotionFlex
+            initial={{ width: "0px" }}
+            maxWidth={{ base: "323px", lg: "350px" }}
+            animate={{
+              width: "350px",
+              transition: { type: "spring", bounce: 0, duration: 0.4 },
+            }}
+            exit={{
+              width: "0px",
+              transition: { type: "spring", bounce: 0, duration: 0.4 },
+            }}
+            position="relative"
+            overflow="hidden"
+            borderEnd="1px solid"
+            borderEndColor="gray.200"
+          >
+            <RecipientViewSidebarBody
+              keycode={keycode}
+              access={access}
+              currentPage={currentPage}
+              isRecipientViewContentsHidden={petition.isRecipientViewContentsHidden}
+              position="absolute"
+              top={0}
+              insetStart={0}
+              height="100%"
+              width={{ base: "323px", lg: "350px" }}
+            />
+          </MotionFlex>
+        ) : null}
+      </AnimatePresence>
+
+      <Stack spacing={0} align="center" height="100%">
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "CONTENTS"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.contents-label",
+            defaultMessage: "Contents",
+          })}
+          icon={ListIcon}
+          onClick={() => setSidebarState("CONTENTS")}
+          hasBorder
+        />
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "COMMENTS"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.comments-label",
+            defaultMessage: "Comments",
+          })}
+          icon={CommentIcon}
+          onClick={() => setSidebarState("COMMENTS")}
+          hasBorder
+          unreadCount={unreadedComments}
+        />
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "INFORMATION"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.information-label",
+            defaultMessage: "Information",
+          })}
+          icon={InfoCircleIcon}
+          onClick={() => setSidebarState("INFORMATION")}
+          hasBorder
+        />
+      </Stack>
+    </HStack>
+  );
+}
+
+export function RecipientViewMobileNavigation({
+  keycode,
+  access,
+  currentPage,
+  pendingPetitions,
+}: RecipientViewSidebarProps & { pendingPetitions: number }) {
+  const intl = useIntl();
+
+  const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
+  const isOpen = sidebarState !== "CLOSED";
+  const petition = access!.petition!;
+  const granter = access!.granter;
+  const contact = access!.contact!;
+
+  const unreadedComments = sumBy(petition.fields, (field) =>
+    field.hasCommentsEnabled ? field.unreadCommentCount : 0,
+  );
+  const delegateAccess = useDelegateAccess();
+
+  const handleDelegateAccess = () => {
+    delegateAccess({
+      keycode,
+      contactName: contact?.fullName ?? "",
+      organizationName: granter?.organization?.name ?? "",
+    });
+  };
+
+  return (
+    <>
+      {isOpen ? (
+        <RecipientViewSidebarBody
+          keycode={keycode}
+          access={access}
+          currentPage={currentPage}
+          isRecipientViewContentsHidden={petition.isRecipientViewContentsHidden}
+          display={{ base: "flex", [breakpoint]: "none" }}
+          height="calc(100% - 57px)"
+          position="absolute"
+          bottom="57px"
+          zIndex={3}
+          width="100%"
+          minHeight={0}
+          bgColor="white"
+        />
+      ) : null}
+
+      <HStack
+        display={{ base: "flex", [breakpoint]: "none" }}
+        backgroundColor="white"
+        spacing={0}
+        justify="space-between"
+        align="center"
+        paddingX={4}
+      >
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "CONTENTS"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.contents-label",
+            defaultMessage: "Contents",
+          })}
+          icon={ListIcon}
+          onClick={() => setSidebarState("CONTENTS")}
+        />
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "COMMENTS"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.comments-label",
+            defaultMessage: "Comments",
+          })}
+          icon={CommentIcon}
+          onClick={() => setSidebarState("COMMENTS")}
+          unreadCount={unreadedComments}
+        />
+        <SidebarIconButton
+          isActive={isOpen && sidebarState === "INFORMATION"}
+          label={intl.formatMessage({
+            id: "component.recipient-view-sidebar.information-label",
+            defaultMessage: "Information",
+          })}
+          icon={InfoCircleIcon}
+          onClick={() => setSidebarState("INFORMATION")}
+        />
+        <IconButton
+          variant="ghost"
+          boxSize={14}
+          borderRadius="0"
+          aria-label={intl.formatMessage({ id: "generic.share", defaultMessage: "Share" })}
+          color="primary.500"
+          icon={<UserArrowIcon boxSize={6} />}
+          onClick={handleDelegateAccess}
+        />
+        <Center boxSize={14}>
+          <RecipientViewMenuButton
+            keycode={keycode}
+            contact={contact}
+            hasClientPortalAccess={access.hasClientPortalAccess}
+            pendingPetitions={pendingPetitions}
+          />
+        </Center>
+      </HStack>
+    </>
+  );
+}
+
+function SidebarIconButton({
+  isActive,
+  label,
+  icon,
+  hasBorder,
+  unreadCount,
+  onClick,
+}: {
+  isActive: boolean;
+  label: string;
+  icon: ComponentWithAs<"svg", IconProps>;
+  hasBorder?: boolean;
+  unreadCount?: number;
+  onClick: () => void;
+}) {
+  return (
+    <Box position="relative">
+      <IconButton
+        variant="ghost"
+        boxSize={14}
+        borderRadius="0"
+        aria-label={label}
+        icon={<Icon as={icon} boxSize={6} />}
+        onClick={onClick}
+        backgroundColor={isActive ? "gray.100" : "inherit"}
+        _hover={{
+          backgroundColor: isActive ? "gray.300" : "gray.200",
+        }}
+        _active={{
+          backgroundColor: isActive ? "gray.300" : "gray.200",
+        }}
+        borderBottom={hasBorder ? "1px solid" : undefined}
+        borderBottomColor={hasBorder ? "gray.200" : undefined}
+      />
+      {unreadCount ? (
+        <Circle
+          position="absolute"
+          size={5}
+          top={2}
+          insetEnd={2}
+          bgColor="primary.500"
+          fontSize="sm"
+          color="white"
+          pointerEvents="none"
+          outline="1px solid white"
+        >
+          {unreadCount}
+        </Circle>
+      ) : null}
+    </Box>
+  );
+}
+
+const RecipientViewSidebarBody = chakraForwardRef<
+  "div",
+  {
+    keycode: string;
+    currentPage: number;
+    access: RecipientViewSidebar_PublicPetitionAccessFragment;
+    isRecipientViewContentsHidden: boolean;
+  }
+>(function RecipientViewSidebarBody(
+  { keycode, currentPage, access, isRecipientViewContentsHidden, ...props },
+  ref,
+) {
+  const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
+
+  const handleClose = () => {
+    setSidebarState("CLOSED");
+  };
+
+  return (
+    <Flex ref={ref} {...props}>
+      {isRecipientViewContentsHidden || sidebarState === "INFORMATION" ? (
+        <RecipientViewInformation keycode={keycode} access={access} onClose={handleClose} />
+      ) : sidebarState === "CONTENTS" ? (
+        <RecipientViewContents
+          currentPage={currentPage}
+          petition={access!.petition!}
+          onClose={handleClose}
+        />
+      ) : (
+        <RecipientViewComments keycode={keycode} access={access} onClose={handleClose} />
+      )}
+    </Flex>
+  );
+});
+
+RecipientViewSidebar.fragments = {
+  PublicPetitionAccess: gql`
+    fragment RecipientViewSidebar_PublicPetitionAccess on PublicPetitionAccess {
+      hasClientPortalAccess
+      petition {
+        id
+        isRecipientViewContentsHidden
+        ...RecipientViewContents_PublicPetition
+        fields {
+          id
+          unreadCommentCount
+        }
+      }
+      contact {
+        id
+        ...RecipientViewMenuButton_PublicContact
+      }
+      ...RecipientViewComments_PublicPetitionAccess
+      ...RecipientViewInformation_PublicPetitionAccess
+    }
+    ${RecipientViewComments.fragments.PublicPetitionAccess}
+    ${RecipientViewContents.fragments.PublicPetition}
+    ${RecipientViewMenuButton.fragments.PublicContact}
+    ${RecipientViewInformation.fragments.PublicPetitionAccess}
+  `,
+};

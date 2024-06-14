@@ -1,23 +1,44 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+import { Box, Link } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PublicPetitionFieldCommentContent_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
-import parse from "html-react-parser";
+import parse, { Element, HTMLReactParserOptions, domToReact } from "html-react-parser";
 import { useMemo } from "react";
 
 interface PublicPetitionFieldCommentContentProps {
   comment: PublicPetitionFieldCommentContent_PetitionFieldCommentFragment;
+  useExcerpt?: boolean;
 }
 
 export const PublicPetitionFieldCommentContent = Object.assign(
   chakraForwardRef<"div", PublicPetitionFieldCommentContentProps>(function CommentContent(
-    { comment, ...props },
+    { comment, useExcerpt, ...props },
     ref,
   ) {
+    const contentHtml = useExcerpt ? comment.excerptHtml : comment.contentHtml;
+    const options: HTMLReactParserOptions = {
+      replace(domNode) {
+        if (domNode instanceof Element && domNode.name === "a") {
+          return (
+            <Link href={domNode.attribs.href} isExternal>
+              {domToReact(domNode.children as any, options)}
+            </Link>
+          );
+        }
+      },
+    };
+
     const memoizedHtml = useMemo(() => {
-      return comment.contentHtml ? parse(sanitizeHtml(comment.contentHtml)) : null;
-    }, [comment.contentHtml]);
+      return contentHtml
+        ? parse(
+            sanitizeHtml(contentHtml, {
+              FORBID_TAGS: useExcerpt ? ["p", "a"] : [],
+            }),
+            options,
+          )
+        : null;
+    }, [contentHtml]);
 
     return (
       <Box ref={ref} {...props}>
@@ -30,6 +51,7 @@ export const PublicPetitionFieldCommentContent = Object.assign(
       PetitionFieldComment: gql`
         fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
           contentHtml
+          excerptHtml
         }
       `,
     },

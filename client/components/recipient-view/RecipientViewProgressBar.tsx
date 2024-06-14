@@ -1,23 +1,23 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  Button,
   Flex,
+  HStack,
   Heading,
+  Text,
+  Button,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
-  Text,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  RecipientViewProgressFooter_PetitionFieldFragment,
-  RecipientViewProgressFooter_PetitionFragment,
-  RecipientViewProgressFooter_PublicPetitionFieldFragment,
-  RecipientViewProgressFooter_PublicPetitionFragment,
+  RecipientViewProgressBar_PetitionFieldFragment,
+  RecipientViewProgressBar_PetitionFragment,
+  RecipientViewProgressBar_PublicPetitionFieldFragment,
+  RecipientViewProgressBar_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { generateCssStripe } from "@parallel/utils/css";
@@ -25,17 +25,17 @@ import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion, UnwrapArray } from "@parallel/utils/types";
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
 
 type PetitionSelection =
-  | RecipientViewProgressFooter_PublicPetitionFragment
-  | RecipientViewProgressFooter_PetitionFragment;
+  | RecipientViewProgressBar_PublicPetitionFragment
+  | RecipientViewProgressBar_PetitionFragment;
 
 type PetitionFieldSelection =
-  | RecipientViewProgressFooter_PublicPetitionFieldFragment
-  | RecipientViewProgressFooter_PetitionFieldFragment;
+  | RecipientViewProgressBar_PublicPetitionFieldFragment
+  | RecipientViewProgressBar_PetitionFieldFragment;
 
 type PetitionFieldReplySelection = ArrayUnionToUnion<PetitionFieldSelection["replies"]>;
 
@@ -43,17 +43,19 @@ type PetitionFieldGroupChildReplySelection = UnwrapArray<
   Exclude<PetitionFieldSelection["replies"][0]["children"], null | undefined>
 >;
 
-export interface RecipientViewProgressFooterProps {
+export interface RecipientViewProgressBarProps {
   petition: PetitionSelection;
-  onFinalize: () => void;
+  canFinalize?: boolean;
   isDisabled?: boolean;
+  onFinalize?: () => void;
 }
 
-export const RecipientViewProgressFooter = Object.assign(
-  chakraForwardRef<"div", RecipientViewProgressFooterProps>(function RecipientViewProgressFooter(
-    { petition, onFinalize, isDisabled, ...props },
+export const RecipientViewProgressBar = Object.assign(
+  chakraForwardRef<"div", RecipientViewProgressBarProps>(function RecipientViewProgressBar(
+    { petition, isDisabled, canFinalize, onFinalize, ...props },
     ref,
   ) {
+    const tone = useTone();
     const fieldLogic = useFieldLogic(petition);
     const [poppoverClosed, setPoppoverClosed] = useState(false);
     const { replied, optional, total } = useMemo(() => {
@@ -98,17 +100,13 @@ export const RecipientViewProgressFooter = Object.assign(
       return { replied, optional, total };
     }, [petition.fields, fieldLogic]);
 
-    const tone = useTone();
-
     const isCompleted = petition.status === "COMPLETED";
+
     return (
-      <Flex
+      <HStack
         ref={ref}
         as="section"
         backgroundColor="white"
-        boxShadow="short"
-        borderTop="1px solid"
-        borderTopColor="gray.200"
         paddingY={2}
         paddingX={{ base: 2, sm: 4 }}
         alignItems="center"
@@ -117,13 +115,13 @@ export const RecipientViewProgressFooter = Object.assign(
         <Heading as="h3" fontSize="md" fontWeight="normal" data-testid="recipient-view-progress">
           <Text as="span">
             <FormattedMessage
-              id="recipient-view.progress"
+              id="component.recipient-view-progress-bar.progress"
               defaultMessage="Progress {current}/{total}"
               values={{ current: replied, total }}
             />
           </Text>
         </Heading>
-        <Flex flex="1" marginX={4}>
+        <Flex flex="1">
           <ProgressTrack size="lg" min={0} max={total} value={replied} flex="1" borderRadius="1rem">
             <ProgressIndicator min={0} max={total} value={replied} backgroundColor="green.400" />
 
@@ -138,69 +136,65 @@ export const RecipientViewProgressFooter = Object.assign(
               })}
             />
           </ProgressTrack>
-          <Box
-            borderRadius="full"
-            width="1rem"
-            height="1rem"
-            backgroundColor={isCompleted ? "green.400" : "gray.200"}
-            marginStart={2}
-          />
         </Flex>
-        <Popover
-          returnFocusOnClose={false}
-          isOpen={!isDisabled && replied + optional === total && !isCompleted && !poppoverClosed}
-          placement="top-end"
-          closeOnBlur={false}
-          onClose={() => setPoppoverClosed(true)}
-          autoFocus={false}
-        >
-          <PopoverTrigger>
-            <Button
-              data-testid="recipient-view-finalize-button"
-              data-action="finalize"
-              colorScheme="primary"
-              size="sm"
-              isDisabled={isCompleted || isDisabled}
-              onClick={onFinalize}
-            >
-              {petition.signatureConfig?.review === false ? (
-                <FormattedMessage
-                  id="recipient-view.submit-and-sign-button-short"
-                  defaultMessage="Finalize and sign"
-                />
-              ) : (
-                <FormattedMessage
-                  id="recipient-view.submit-button-short"
-                  defaultMessage="Finalize"
-                />
-              )}
-            </Button>
-          </PopoverTrigger>
+        {isDefined(onFinalize) ? (
+          <Popover
+            returnFocusOnClose={false}
+            isOpen={!isDisabled && replied + optional === total && !isCompleted && !poppoverClosed}
+            placement="top-end"
+            closeOnBlur={false}
+            onClose={() => setPoppoverClosed(true)}
+            autoFocus={false}
+          >
+            <PopoverTrigger>
+              <Button
+                data-testid="recipient-view-finalize-button"
+                data-action="finalize"
+                colorScheme="primary"
+                size="sm"
+                isDisabled={isCompleted || isDisabled}
+                onClick={onFinalize}
+              >
+                {canFinalize ? (
+                  petition.signatureConfig?.review === false ? (
+                    <FormattedMessage
+                      id="generic.finalize-and-sign-button"
+                      defaultMessage="Finalize and sign"
+                    />
+                  ) : (
+                    <FormattedMessage id="generic.finalize-button" defaultMessage="Finalize" />
+                  )
+                ) : (
+                  <FormattedMessage id="generic.next-button" defaultMessage="Next" />
+                )}
+              </Button>
+            </PopoverTrigger>
 
-          <PopoverContent backgroundColor="blue.500" color="white" marginEnd={4}>
-            <PopoverArrow backgroundColor="blue.500" />
-            <PopoverCloseButton />
-            <PopoverBody paddingEnd={10}>
-              <FormattedMessage
-                id="component.recipient-view.reminder-submit"
-                defaultMessage="Remember to click Finalize when you finish entering all the information."
-                values={{ tone }}
-              />
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-      </Flex>
+            <PopoverContent backgroundColor="blue.500" color="white" marginEnd={4}>
+              <PopoverArrow backgroundColor="blue.500" />
+              <PopoverCloseButton />
+              <PopoverBody paddingEnd={10}>
+                <FormattedMessage
+                  id="component.recipient-view-progress-bar.reminder-submit"
+                  defaultMessage="Remember to click Finalize when you finish entering all the information."
+                  values={{ tone }}
+                />
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+        ) : null}
+      </HStack>
     );
   }),
   {
     fragments: {
       get Petition() {
         return gql`
-          fragment RecipientViewProgressFooter_Petition on Petition {
+          fragment RecipientViewProgressBar_Petition on Petition {
             status
             fields {
               id
-              ...RecipientViewProgressFooter_PetitionField
+              ...RecipientViewProgressBar_PetitionField
             }
             signatureConfig {
               review
@@ -208,7 +202,7 @@ export const RecipientViewProgressFooter = Object.assign(
             ...useFieldLogic_PetitionBase
           }
 
-          fragment RecipientViewProgressFooter_PetitionField on PetitionField {
+          fragment RecipientViewProgressBar_PetitionField on PetitionField {
             id
             type
             optional
@@ -239,11 +233,11 @@ export const RecipientViewProgressFooter = Object.assign(
       },
       get PublicPetition() {
         return gql`
-          fragment RecipientViewProgressFooter_PublicPetition on PublicPetition {
+          fragment RecipientViewProgressBar_PublicPetition on PublicPetition {
             status
             fields {
               id
-              ...RecipientViewProgressFooter_PublicPetitionField
+              ...RecipientViewProgressBar_PublicPetitionField
             }
             signatureConfig {
               review
@@ -251,7 +245,7 @@ export const RecipientViewProgressFooter = Object.assign(
             ...useFieldLogic_PublicPetition
           }
 
-          fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
+          fragment RecipientViewProgressBar_PublicPetitionField on PublicPetitionField {
             id
             type
             optional

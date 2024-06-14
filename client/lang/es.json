@@ -2320,19 +2320,9 @@
     "context": "Deactivate integration"
   },
   {
-    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-1",
-    "definition": "{tone, select, INFORMAL{Completa los datos de la persona a la que quieras invitar como colaborador.} other{Por favor, rellene los datos de la persona a la que quiere delegar su acceso.}}",
-    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
-  },
-  {
-    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-2",
-    "definition": "{tone, select, INFORMAL{Le enviaremos un correo electrónico con instrucciones para que pueda acceder.} other{Le enviaremos un correo electrónico con instrucciones sobre cómo proceder.}}",
-    "context": "We will send them an email with instructions on how to proceed."
-  },
-  {
-    "term": "component.delegate-access-dialog.invite-collaborator-title",
-    "definition": "Invitar colaborador",
-    "context": "Invite collaborator"
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
+    "definition": "{tone, select, INFORMAL{Invita} other{Invite}} a un colaborador a completar o revisar la información que falta.",
+    "context": "Invite a collaborator to complete or review the missing information."
   },
   {
     "term": "component.delete-petitions.confirm-delete-folders.part-folders",
@@ -6040,6 +6030,11 @@
     "context": "This field only accepts notes"
   },
   {
+    "term": "component.petition-replies-field-comments.template-read-only-alert",
+    "definition": "<b>Solo previsualización</b> - Los comentarios están desactivados.",
+    "context": "<b>Preview only</b> - Comments are disabled."
+  },
+  {
     "term": "component.petition-replies-field-reply.approve",
     "definition": "Aprobar",
     "context": "Approve"
@@ -7850,6 +7845,36 @@
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
+    "term": "component.recipient-view-comments.ask-here",
+    "definition": "{tone, select, INFORMAL{Pregunta por aquí} other{Pregunte por aquí}}",
+    "context": "Ask here"
+  },
+  {
+    "term": "component.recipient-view-comments.ask-with-name",
+    "definition": "{tone, select, INFORMAL{Pregúntale aquí a {name}} other{Pregunte aquí a {name}}}",
+    "context": "Ask {name} here"
+  },
+  {
+    "term": "component.recipient-view-comments.heading",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-body",
+    "definition": "Selecciona los botones de {commentsButtonLabel} para añadir un comentario en un campo.",
+    "context": "Select the {commentsButtonLabel} buttons to add a comment in a field."
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-field-title",
+    "definition": "{tone, select, INFORMAL{¿Tienes} other{¿Tiene}} preguntas sobre este campo?",
+    "context": "Do you have questions about this field?"
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-title",
+    "definition": "No hay comentarios todavía.",
+    "context": "There are no comments yet."
+  },
+  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
     "definition": "Añadir firmantes",
     "context": "Add signers"
@@ -7988,6 +8013,31 @@
     "term": "component.recipient-view-content-card.comment-count",
     "definition": "{commentCount, plural, =1 {# comentario} other {# comentarios}}",
     "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-info-date",
+    "definition": "<b>Último guardado:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-time",
+    "definition": "Último guardado {time}",
+    "context": "Last saved {time}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-time-short",
+    "definition": "Guardado {time}",
+    "context": "Saved {time}"
+  },
+  {
+    "term": "component.recipient-view-hearder.last-saved-info",
+    "definition": "Tus respuestas se guardan automáticamente.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "component.recipient-view-information.heading",
+    "definition": "Información",
+    "context": "Information"
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -8210,6 +8260,16 @@
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
+    "term": "component.recipient-view-progress-bar.progress",
+    "definition": "Progreso {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "component.recipient-view-progress-bar.reminder-submit",
+    "definition": "{tone, select, INFORMAL{Recuerda finalizar cuando completes todos los campos.} other{Recuerde finalizar una vez haya completado todos los campos.}}",
+    "context": "Remember to click Finalize when you finish entering all the information."
+  },
+  {
     "term": "component.recipient-view-refresh-replies-alert.description",
     "definition": "Hay una versión más reciente de esa página. {tone, select, INFORMAL{Refresca} other{Refresque}} para ver todas las respuestas añadidas.",
     "context": "There is a more recent version of this page. Refresh to see all added replies."
@@ -8220,14 +8280,39 @@
     "context": "Refresh replies"
   },
   {
+    "term": "component.recipient-view-review-before-sign-dialog.body-1",
+    "definition": "{tone, select, INFORMAL{Para completar este parallel se necesita una <b>firma digital</b>.} other{Este parallel requiere de <b>firma digital</b> para ser completado.}}",
+    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
+  },
+  {
+    "term": "component.recipient-view-review-before-sign-dialog.body-2",
+    "definition": "{tone, select, INFORMAL{Hemos avisado a {name} para que revise las respuestas. Cuando esté todo validado, enviaremos un correo con el documento a firmar a las personas indicadas.} other{Hemos notificado a {name} para que proceda a la revisión de las respuestas y una vez validadas enviaremos un email con el documento a firmar a las personas que correspondan.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
+  },
+  {
+    "term": "component.recipient-view-review-before-sign-dialog.header",
+    "definition": "Revisión y firma",
+    "context": "Review and sign"
+  },
+  {
+    "term": "component.recipient-view-sidebar.comments-label",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
+    "term": "component.recipient-view-sidebar.contents-label",
+    "definition": "Contenido",
+    "context": "Contents"
+  },
+  {
+    "term": "component.recipient-view-sidebar.information-label",
+    "definition": "Información",
+    "context": "Information"
+  },
+  {
     "term": "component.recipient-view-signature-sent-alert.check-status-button",
     "definition": "Ver estado",
     "context": "Check status"
-  },
-  {
-    "term": "component.recipient-view.reminder-submit",
-    "definition": "{tone, select, INFORMAL{Recuerda finalizar cuando completes todos los campos.} other{Recuerde finalizar una vez haya completado todos los campos.}}",
-    "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
     "term": "component.recover-profile-dialog.body",
@@ -10610,6 +10695,11 @@
     "context": "Coming soon"
   },
   {
+    "term": "generic.comments",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {Sin comentarios} =1 {# comentario} other {# comentarios}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
@@ -10688,6 +10778,11 @@
     "term": "generic.created-at",
     "definition": "Fecha de creación",
     "context": "Created at"
+  },
+  {
+    "term": "generic.created-with-parallel",
+    "definition": "Creado con {parallel}",
+    "context": "Created with {parallel}"
   },
   {
     "term": "generic.current-month",
@@ -10915,6 +11010,16 @@
     "context": "File size"
   },
   {
+    "term": "generic.finalize-and-sign-button",
+    "definition": "Finalizar y firmar",
+    "context": "Finalize and sign"
+  },
+  {
+    "term": "generic.finalize-button",
+    "definition": "Finalizar",
+    "context": "Finalize"
+  },
+  {
     "term": "generic.first-child-is-internal-error",
     "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es. Desactiva esta configuración para poder reordenar.",
     "context": "The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
@@ -11018,11 +11123,6 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name"
-  },
-  {
-    "term": "generic.forms.message-label",
-    "definition": "Mensaje",
-    "context": "Message"
   },
   {
     "term": "generic.forms.name-label",
@@ -11325,6 +11425,11 @@
     "context": "New parallel"
   },
   {
+    "term": "generic.next-button",
+    "definition": "Siguiente",
+    "context": "Next"
+  },
+  {
     "term": "generic.next-page",
     "definition": "Página siguiente",
     "context": "Next page"
@@ -11585,6 +11690,16 @@
     "context": "Long text"
   },
   {
+    "term": "generic.recipient-view-export-to-pdf",
+    "definition": "Exportar a PDF",
+    "context": "Export to PDF"
+  },
+  {
+    "term": "generic.recipient-view-guide-me",
+    "definition": "Guíame",
+    "context": "Guide me"
+  },
+  {
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload"
@@ -11745,6 +11860,11 @@
     "context": "Success"
   },
   {
+    "term": "generic.support-faq",
+    "definition": "FAQ - Preguntas más frecuentes",
+    "context": "FAQ"
+  },
+  {
     "term": "generic.template",
     "definition": "Plantilla",
     "context": "Template"
@@ -11853,6 +11973,11 @@
     "term": "generic.template-type-plural",
     "definition": "Plantillas",
     "context": "Templates"
+  },
+  {
+    "term": "generic.terms-and-conditions",
+    "definition": "Términos y condiciones",
+    "context": "Terms & Conditions"
   },
   {
     "term": "generic.test-mode",
@@ -13625,6 +13750,51 @@
     "context": "Invalid email"
   },
   {
+    "term": "page.recipient-view-client-portal.all",
+    "definition": "Todos",
+    "context": "All"
+  },
+  {
+    "term": "page.recipient-view-client-portal.completed",
+    "definition": "Completados",
+    "context": "Completed"
+  },
+  {
+    "term": "page.recipient-view-client-portal.my-processes",
+    "definition": "Mis procesos",
+    "context": "My processes"
+  },
+  {
+    "term": "page.recipient-view-client-portal.no-results",
+    "definition": "No hay resultados para {tone, select, INFORMAL{tu} other{su}} búsqueda",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "page.recipient-view-client-portal.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "page.recipient-view-client-portal.progress",
+    "definition": "Progreso {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "page.recipient-view-client-portal.requested-by",
+    "definition": "Solicitado por {name}, el {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "page.recipient-view-client-portal.search-placeholder",
+    "definition": "Buscar...",
+    "context": "Search..."
+  },
+  {
+    "term": "page.recipient-view.complete-petition-error-message",
+    "definition": "Parece que el parallel ha sido actualizado desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
+    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+  },
+  {
     "term": "page.replies.associate-profile-button",
     "definition": "Asociar perfil",
     "context": "Associate profile"
@@ -13661,8 +13831,8 @@
   },
   {
     "term": "page.replies.summary-header",
-    "definition": "Analizar con Mike",
-    "context": "Analyze with Mike"
+    "definition": "Mike AI",
+    "context": "Mike AI"
   },
   {
     "term": "page.replies.summary-header-help",
@@ -15155,11 +15325,6 @@
     "context": "Create your own <b>Parallel</b>"
   },
   {
-    "term": "public.support.faq",
-    "definition": "FAQ - Preguntas más frecuentes",
-    "context": "FAQ"
-  },
-  {
     "term": "public.support.support-center",
     "definition": "Centro de soporte",
     "context": "Support center"
@@ -15250,11 +15415,6 @@
     "context": "Do you want to use our templates?"
   },
   {
-    "term": "public.terms.title",
-    "definition": "Términos y condiciones",
-    "context": "Terms & Conditions"
-  },
-  {
     "term": "public.try-for-free-button",
     "definition": "Pruébalo gratis",
     "context": "Try for free"
@@ -15270,54 +15430,9 @@
     "context": "Change email"
   },
   {
-    "term": "recipient-view.client-portal.all",
-    "definition": "Todos",
-    "context": "All"
-  },
-  {
-    "term": "recipient-view.client-portal.completed",
-    "definition": "Completados",
-    "context": "Completed"
-  },
-  {
-    "term": "recipient-view.client-portal.my-processes",
-    "definition": "Mis procesos",
-    "context": "My processes"
-  },
-  {
-    "term": "recipient-view.client-portal.no-results",
-    "definition": "No hay resultados para {tone, select, INFORMAL{tu} other{su}} búsqueda",
-    "context": "No results found for your search"
-  },
-  {
-    "term": "recipient-view.client-portal.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
-  },
-  {
-    "term": "recipient-view.client-portal.requested-by",
-    "definition": "Solicitado por {name}, el {date}",
-    "context": "Requested by {name}, on {date}"
-  },
-  {
-    "term": "recipient-view.client-portal.search-placeholder",
-    "definition": "Buscar...",
-    "context": "Search..."
-  },
-  {
-    "term": "recipient-view.complete-petition.error-message",
-    "definition": "Parece que el parallel ha sido actualizado desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
-    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
-  },
-  {
     "term": "recipient-view.contents-header",
     "definition": "Contenido",
     "context": "Contents"
-  },
-  {
-    "term": "recipient-view.created-with",
-    "definition": "Creado con {parallel}",
-    "context": "Created with {parallel}"
   },
   {
     "term": "recipient-view.doubts-button",
@@ -15333,31 +15448,6 @@
     "term": "recipient-view.expired-code-title",
     "definition": "Código caducado",
     "context": "Expired code"
-  },
-  {
-    "term": "recipient-view.export-to-pdf",
-    "definition": "Exportar a PDF",
-    "context": "Export to PDF"
-  },
-  {
-    "term": "recipient-view.field-comments.cta",
-    "definition": "{tone, select, INFORMAL{¿Alguna duda? Pregunta por aquí} other{¿Tiene alguna duda? Pregunte por aquí}}",
-    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
-  },
-  {
-    "term": "recipient-view.field-comments.cta-with-name",
-    "definition": "{tone, select, INFORMAL{¿Alguna duda? Pregúntale aquí a {name}} other{¿Tiene alguna duda? Pregunte por aquí a {name}}}",
-    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
-  },
-  {
-    "term": "recipient-view.field-comments.placeholder",
-    "definition": "{tone, select, INFORMAL{Escribe aquí tus} other{Escriba aquí sus}} dudas y preguntas",
-    "context": "Ask here your questions and doubts"
-  },
-  {
-    "term": "recipient-view.field-comments.undefined-field",
-    "definition": "Ha ocurrido algo inesperado. Por favor, actualice la página e inténtelo de nuevo.",
-    "context": "Something unexpected happened. Please, refresh the page and try again."
   },
   {
     "term": "recipient-view.first-time.finalize-whenever-body",
@@ -15400,54 +15490,9 @@
     "context": "Go to my processes"
   },
   {
-    "term": "recipient-view.guide-me",
-    "definition": "Guíame",
-    "context": "Guide me"
-  },
-  {
     "term": "recipient-view.in-order-to",
     "definition": "Para",
     "context": "To"
-  },
-  {
-    "term": "recipient-view.invite-collaborator",
-    "definition": "Invitar colaborador",
-    "context": "Invite collaborator"
-  },
-  {
-    "term": "recipient-view.invite-collaborator.help",
-    "definition": "Utilice esta opción para solicitar a otra persona que complete la información por usted.",
-    "context": "Use this option to request someone else to complete the information for you."
-  },
-  {
-    "term": "recipient-view.last-saved-info",
-    "definition": "Tus respuestas se guardan automáticamente.",
-    "context": "Your answers are automatically saved."
-  },
-  {
-    "term": "recipient-view.last-saved-info-date",
-    "definition": "<b>Último guardado:</b> {date}",
-    "context": "<b>Last saved:</b> {date}"
-  },
-  {
-    "term": "recipient-view.last-saved-time",
-    "definition": "Último guardado {time}",
-    "context": "Last saved {time}"
-  },
-  {
-    "term": "recipient-view.last-saved-time-short",
-    "definition": "Guardado {time}",
-    "context": "Saved {time}"
-  },
-  {
-    "term": "recipient-view.petition-delegated.toast-body",
-    "definition": "Hemos enviado un email a {email} con instrucciones para acceder a este parallel.",
-    "context": "We have sent an email to {email} with instructions to access this parallel."
-  },
-  {
-    "term": "recipient-view.petition-delegated.toast-header",
-    "definition": "Acceso delegado",
-    "context": "Access delegated"
   },
   {
     "term": "recipient-view.petition-not-available-error.header",
@@ -15465,19 +15510,9 @@
     "context": "Subject"
   },
   {
-    "term": "recipient-view.progress",
-    "definition": "Progreso {current}/{total}",
-    "context": "Progress {current}/{total}"
-  },
-  {
     "term": "recipient-view.remaining-attempts",
     "definition": "Tiene {attempts, plural, =1{un intento más} other{# intentos más}}",
     "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
-  },
-  {
-    "term": "recipient-view.request-information",
-    "definition": "Información",
-    "context": "Information"
   },
   {
     "term": "recipient-view.requested-by",
@@ -15485,34 +15520,9 @@
     "context": "Requested by"
   },
   {
-    "term": "recipient-view.review-before-sign.body-1",
-    "definition": "{tone, select, INFORMAL{Para completar este parallel se necesita una <b>firma digital</b>.} other{Este parallel requiere de <b>firma digital</b> para ser completado.}}",
-    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
-  },
-  {
-    "term": "recipient-view.review-before-sign.body-2",
-    "definition": "{tone, select, INFORMAL{Hemos avisado a {name} para que revise las respuestas. Cuando esté todo validado, enviaremos un correo con el documento a firmar a las personas indicadas.} other{Hemos notificado a {name} para que proceda a la revisión de las respuestas y una vez validadas enviaremos un email con el documento a firmar a las personas que correspondan.}}",
-    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
-  },
-  {
-    "term": "recipient-view.review-before-sign.header",
-    "definition": "Revisión y firma",
-    "context": "Review and sign"
-  },
-  {
     "term": "recipient-view.send-code",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
-  },
-  {
-    "term": "recipient-view.submit-and-sign-button-short",
-    "definition": "Finalizar y firmar",
-    "context": "Finalize and sign"
-  },
-  {
-    "term": "recipient-view.submit-button-short",
-    "definition": "Finalizar",
-    "context": "Finalize"
   },
   {
     "term": "recipient-view.unread-comments",
@@ -16143,6 +16153,16 @@
     "term": "util.get-petition-field-type-description.text-description",
     "definition": "Añade un campo de respuesta larga para respuestas detalladas, como descripciones, direcciones, etc.",
     "context": "Add a long-answer field for detailed input, such as descriptions, addresses, etc."
+  },
+  {
+    "term": "util.recipient-view-delegate-access.toast-body",
+    "definition": "Hemos enviado un email a {email} con instrucciones para acceder a este parallel.",
+    "context": "We have sent an email to {email} with instructions to access this parallel."
+  },
+  {
+    "term": "util.recipient-view-delegate-access.toast-header",
+    "definition": "Acceso delegado",
+    "context": "Access delegated"
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

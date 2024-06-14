@@ -110,9 +110,35 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
         }
       });
 
+    let lastCompletedFieldIndex = -1;
+    let latestReplyDate = new Date(0);
+
+    visibleFields.forEach((field, index) => {
+      field.replies.forEach((reply) => {
+        const replyDate = new Date(reply.updatedAt ?? reply.createdAt);
+        if (replyDate > latestReplyDate) {
+          latestReplyDate = replyDate;
+          lastCompletedFieldIndex = index;
+        }
+      });
+    });
+
+    const nextIncompleteField =
+      incompleteFields.find((field) => {
+        const fieldIndex = visibleFields.findIndex(
+          (visibleField) =>
+            visibleField.id === field.id ||
+            visibleField.children?.some((child) => child.id === field.id),
+        );
+
+        return fieldIndex > lastCompletedFieldIndex;
+      }) || incompleteFields[0];
+
     return {
       canFinalize: incompleteFields.length === 0,
-      incompleteFields: incompleteFields.map((f) => pick(f, ["id", "page", "parentReplyId"])),
+      nextIncompleteField: nextIncompleteField
+        ? pick(nextIncompleteField, ["id", "page", "parentReplyId"])
+        : null,
     };
   }, [logic]);
 }
@@ -127,6 +153,8 @@ usePetitionCanFinalize.fragments = {
         isReadOnly
         isInternal
         replies {
+          createdAt
+          updatedAt
           children {
             field {
               optional
@@ -137,6 +165,8 @@ usePetitionCanFinalize.fragments = {
             replies {
               content
               isAnonymized
+              createdAt
+              updatedAt
             }
           }
         }
@@ -158,6 +188,8 @@ usePetitionCanFinalize.fragments = {
         replies {
           content
           isAnonymized
+          createdAt
+          updatedAt
           children {
             field {
               optional
@@ -168,6 +200,8 @@ usePetitionCanFinalize.fragments = {
             replies {
               content
               isAnonymized
+              createdAt
+              updatedAt
             }
           }
         }

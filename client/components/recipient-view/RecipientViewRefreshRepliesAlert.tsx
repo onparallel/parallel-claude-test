@@ -12,12 +12,11 @@ export function RecipientViewRefreshRepliesAlert({
   onRefetch,
 }: RecipientViewRefreshRepliesAlertProps) {
   return (
-    <Alert status="info" paddingY={1.5}>
+    <Alert status="info" paddingX={6} paddingY={3}>
       <Flex
-        maxWidth="container.lg"
         margin="auto"
         width="100%"
-        paddingX={2}
+        padding={0}
         flexDirection={{ base: "column", sm: "row" }}
         gap={{ base: 2, sm: 6 }}
       >

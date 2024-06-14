@@ -281,7 +281,7 @@ function useBuildStateUrlInternal<T extends {}>(
   }, []);
 }
 
-export function useQueryStateSlice<T extends {}, K extends keyof T>(
+export function useQueryStateSlice<T extends {}, const K extends keyof T>(
   state: T,
   setState: SetQueryState<Partial<T>>,
   slice: K,

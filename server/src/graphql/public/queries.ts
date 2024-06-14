@@ -87,6 +87,7 @@ export const metadata = queryField("metadata", {
       t.nullable.string("country");
       t.nullable.string("browserName");
       t.nullable.string("browserVersion");
+      t.nullable.string("deviceType");
     },
   }),
   args: {
@@ -107,6 +108,7 @@ export const metadata = queryField("metadata", {
       const browser = ua.getBrowser();
       data.browserName = browser.name;
       data.browserVersion = browser.version;
+      data.deviceType = ua.getDevice().type;
     }
     return data;
   },

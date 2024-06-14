@@ -1,10 +1,10 @@
 import {
   Box,
   Button,
-  Circle,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   Stack,
   Text,
@@ -125,38 +125,26 @@ function DelegateAccessDialog({
         onSubmit: handleSubmit(props.onResolve),
       }}
       header={
-        <Stack direction="row">
-          <Circle role="presentation" size="32px" backgroundColor="primary.500" color="white">
-            <UserArrowIcon />
-          </Circle>
+        <HStack spacing={2.5}>
+          <UserArrowIcon />
           <Text as="div" flex="1">
-            <FormattedMessage
-              id="component.delegate-access-dialog.invite-collaborator-title"
-              defaultMessage="Invite collaborator"
-            />
+            <FormattedMessage id="generic.share" defaultMessage="Share" />
           </Text>
-        </Stack>
+        </HStack>
       }
       body={
-        <Stack>
-          <Box fontSize="sm">
+        <Stack spacing={4}>
+          <Box>
             <Text>
               <FormattedMessage
-                id="component.delegate-access-dialog.invite-collaborator-subtitle-1"
-                defaultMessage="{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
-                values={{ tone }}
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="component.delegate-access-dialog.invite-collaborator-subtitle-2"
-                defaultMessage="We will send them an email with instructions on how to proceed."
+                id="component.delegate-access-dialog.invite-collaborator-subtitle"
+                defaultMessage="Invite a collaborator to complete or review the missing information."
                 values={{ tone }}
               />
             </Text>
           </Box>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
@@ -178,7 +166,7 @@ function DelegateAccessDialog({
             )}
           </FormControl>
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...register("firstName", { required: true })} />
@@ -192,7 +180,7 @@ function DelegateAccessDialog({
             )}
           </FormControl>
           <FormControl id="contact-last-name" isInvalid={!!errors.lastName}>
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
@@ -206,9 +194,6 @@ function DelegateAccessDialog({
             )}
           </FormControl>
           <FormControl isInvalid={!!errors.messageBody} id="delegate-access-message">
-            <FormLabel>
-              <FormattedMessage id="generic.forms.message-label" defaultMessage="Message" />
-            </FormLabel>
             <Controller
               name="messageBody"
               control={control}

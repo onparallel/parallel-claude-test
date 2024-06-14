@@ -55,19 +55,9 @@
     "context": "a moment ago"
   },
   {
-    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-1",
-    "definition": "{tone, select, INFORMAL{Completa les dades de la persona a la qual vols convidar com a col·laborador.} other{Si us plau, ompli les dades de la persona a la qual vol delegar el seu accés.}}",
-    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
-  },
-  {
-    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-2",
-    "definition": "{tone, select, INFORMAL{Li enviarem un correu electrònic amb instruccions perquè pugui accedir.} other{Li enviarem un correu electrònic amb instruccions sobre com procedir.}}",
-    "context": "We will send them an email with instructions on how to proceed."
-  },
-  {
-    "term": "component.delegate-access-dialog.invite-collaborator-title",
-    "definition": "Convidar col·laborador",
-    "context": "Invite collaborator"
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
+    "definition": "{tone, select, INFORMAL{Convida} other{Convidi}} un col·laborador a completar o revisar la informació que falta.",
+    "context": "Invite a collaborator to complete or review the missing information."
   },
   {
     "term": "component.error-dialog.header",
@@ -210,6 +200,16 @@
     "context": "Customizing the initial message improves the response time of the recipients"
   },
   {
+    "term": "component.petition-comments-and-notes-editor.comment-placeholder",
+    "definition": "Escriu un comentari",
+    "context": "Write a comment"
+  },
+  {
+    "term": "component.petition-comments-and-notes-editor.ctrl-enter-help",
+    "definition": "Ctrl + Enter per enviar",
+    "context": "Ctrl + enter to send"
+  },
+  {
     "term": "component.print-pdf-task.confirm",
     "definition": "Descarregar PDF",
     "context": "Download PDF"
@@ -243,6 +243,36 @@
     "term": "component.recipient-portal-petition-status-filter.pending-processes",
     "definition": "Processos pendents",
     "context": "Pending processes"
+  },
+  {
+    "term": "component.recipient-view-comments.ask-here",
+    "definition": "{tone, select, INFORMAL{Pregunta aquí} other{Pregunte aquí}}",
+    "context": "Ask here"
+  },
+  {
+    "term": "component.recipient-view-comments.ask-with-name",
+    "definition": "{tone, select, INFORMAL{Pregunta aquí a {name}} other{Pregunte aquí a {name}}}",
+    "context": "Ask {name} here"
+  },
+  {
+    "term": "component.recipient-view-comments.heading",
+    "definition": "Comentaris",
+    "context": "Comments"
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-body",
+    "definition": "Selecciona els botons de {commentsButtonLabel} per afegir un comentari en un camp.",
+    "context": "Select the {commentsButtonLabel} buttons to add a comment in a field."
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-field-title",
+    "definition": "{tone, select, INFORMAL{Tens} other{Té}} preguntes sobre aquest camp?",
+    "context": "Do you have questions about this field?"
+  },
+  {
+    "term": "component.recipient-view-comments.no-comments-title",
+    "definition": "Encara no hi ha comentaris.",
+    "context": "There are no comments yet."
   },
   {
     "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
@@ -383,6 +413,31 @@
     "term": "component.recipient-view-content-card.comment-count",
     "definition": "{commentCount, plural, =1 {# comentari} other {# comentaris}}",
     "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-info-date",
+    "definition": "<b>Últim guardat:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-time",
+    "definition": "Últim guardat {time}",
+    "context": "Last saved {time}"
+  },
+  {
+    "term": "component.recipient-view-header.last-saved-time-short",
+    "definition": "Guardat {time}",
+    "context": "Saved {time}"
+  },
+  {
+    "term": "component.recipient-view-hearder.last-saved-info",
+    "definition": "Les teves respostes es guarden automàticament.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "component.recipient-view-information.heading",
+    "definition": "Informació",
+    "context": "Information"
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -600,6 +655,16 @@
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
+    "term": "component.recipient-view-progress-bar.progress",
+    "definition": "Progrés {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "component.recipient-view-progress-bar.reminder-submit",
+    "definition": "{tone, select, INFORMAL{Recorda finalitzar quan completis tots els camps.} other{Recordi finalitzar una vegada hagi completat tots els camps.}}",
+    "context": "Remember to click Finalize when you finish entering all the information."
+  },
+  {
     "term": "component.recipient-view-refresh-replies-alert.description",
     "definition": "Hi ha una versió més recent d'aquesta pàgina. {tone, select, INFORMAL{Refresca} other{Refresqui}} per veure totes les respostes afegides.",
     "context": "There is a more recent version of this page. Refresh to see all added replies."
@@ -610,14 +675,39 @@
     "context": "Refresh replies"
   },
   {
+    "term": "component.recipient-view-review-before-sign-dialog.body-1",
+    "definition": "{tone, select, INFORMAL{Per completar aquest parallel es necessita una <b>firma digital</b>.} other{Aquest parallel requereix de <b>firma digital</b> per ser completat.}}",
+    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
+  },
+  {
+    "term": "component.recipient-view-review-before-sign-dialog.body-2",
+    "definition": "{tone, select, INFORMAL{Hem avisat a {name} perquè revisi les respostes. Quan estigui tot validat, enviarem un correu amb el document a signar a les persones indicades.} other{Hem notificat a {name} perquè procedeixi a la revisió de les respostes i un cop validades enviarem un email amb el document a signar a les persones que corresponguin.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
+  },
+  {
+    "term": "component.recipient-view-review-before-sign-dialog.header",
+    "definition": "Revisió i signatura",
+    "context": "Review and sign"
+  },
+  {
+    "term": "component.recipient-view-sidebar.comments-label",
+    "definition": "Comentaris",
+    "context": "Comments"
+  },
+  {
+    "term": "component.recipient-view-sidebar.contents-label",
+    "definition": "Contingut",
+    "context": "Contents"
+  },
+  {
+    "term": "component.recipient-view-sidebar.information-label",
+    "definition": "Informació",
+    "context": "Information"
+  },
+  {
     "term": "component.recipient-view-signature-sent-alert.check-status-button",
     "definition": "Veure estat",
     "context": "Check status"
-  },
-  {
-    "term": "component.recipient-view.reminder-submit",
-    "definition": "{tone, select, INFORMAL{Recorda finalitzar quan completis tots els camps.} other{Recordi finalitzar una vegada hagi completat tots els camps.}}",
-    "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
     "term": "component.rich-text-editor.add-link-header",
@@ -840,6 +930,11 @@
     "context": "Continue"
   },
   {
+    "term": "generic.created-with-parallel",
+    "definition": "Creat amb {parallel}",
+    "context": "Created with {parallel}"
+  },
+  {
     "term": "generic.delete",
     "definition": "Esborrar",
     "context": "Delete"
@@ -848,6 +943,11 @@
     "term": "generic.deleted-field",
     "definition": "Camp eliminat",
     "context": "Deleted field"
+  },
+  {
+    "term": "generic.deleted-user",
+    "definition": "Usuari eliminat",
+    "context": "Deleted user"
   },
   {
     "term": "generic.document-not-available",
@@ -890,6 +990,16 @@
     "context": "Untitled heading"
   },
   {
+    "term": "generic.finalize-and-sign-button",
+    "definition": "Finalitzar i signar",
+    "context": "Finalize and sign"
+  },
+  {
+    "term": "generic.finalize-button",
+    "definition": "Finalitzar",
+    "context": "Finalize"
+  },
+  {
     "term": "generic.for-example",
     "definition": "P. ex. {example}",
     "context": "E.g. {example}"
@@ -928,11 +1038,6 @@
     "term": "generic.forms.last-name-label",
     "definition": "Cognoms",
     "context": "Last name"
-  },
-  {
-    "term": "generic.forms.message-label",
-    "definition": "Missatge",
-    "context": "Message"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -975,9 +1080,9 @@
     "context": "More options..."
   },
   {
-    "term": "generic.n-more",
-    "definition": "{count} més",
-    "context": "{count} more"
+    "term": "generic.next-button",
+    "definition": "Següent",
+    "context": "Next"
   },
   {
     "term": "generic.next-page",
@@ -1085,6 +1190,16 @@
     "context": "Previous page"
   },
   {
+    "term": "generic.recipient-view-export-to-pdf",
+    "definition": "Exportar a PDF",
+    "context": "Export to PDF"
+  },
+  {
+    "term": "generic.recipient-view-guide-me",
+    "definition": "Guia'm",
+    "context": "Guide me"
+  },
+  {
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload"
@@ -1130,6 +1245,11 @@
     "context": "Send"
   },
   {
+    "term": "generic.share",
+    "definition": "Compartir",
+    "context": "Share"
+  },
+  {
     "term": "generic.show-more-less",
     "definition": "Mostrar {more, select, true {més} other {menys}}",
     "context": "Show {more, select, true {more} other {less}}"
@@ -1143,6 +1263,16 @@
     "term": "generic.submit",
     "definition": "Enviar",
     "context": "Submit"
+  },
+  {
+    "term": "generic.support-faq",
+    "definition": "PMF - Preguntes més freqüents",
+    "context": "FAQ"
+  },
+  {
+    "term": "generic.terms-and-conditions",
+    "definition": "Termes i condicions",
+    "context": "Terms & Conditions"
   },
   {
     "term": "generic.thanks",
@@ -1288,6 +1418,51 @@
     "term": "page.public-petition.invalid-email-toast-title",
     "definition": "Correu electrònic no vàlid",
     "context": "Invalid email"
+  },
+  {
+    "term": "page.recipient-view-client-portal.all",
+    "definition": "Tots",
+    "context": "All"
+  },
+  {
+    "term": "page.recipient-view-client-portal.completed",
+    "definition": "Completats",
+    "context": "Completed"
+  },
+  {
+    "term": "page.recipient-view-client-portal.my-processes",
+    "definition": "Els meus processos",
+    "context": "My processes"
+  },
+  {
+    "term": "page.recipient-view-client-portal.no-results",
+    "definition": "No hi ha resultats per la teva cerca",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "page.recipient-view-client-portal.pending",
+    "definition": "Pendents",
+    "context": "Pending"
+  },
+  {
+    "term": "page.recipient-view-client-portal.progress",
+    "definition": "Progrés {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "page.recipient-view-client-portal.requested-by",
+    "definition": "Sol·licitat per {name}, el {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "page.recipient-view-client-portal.search-placeholder",
+    "definition": "Cercar...",
+    "context": "Search..."
+  },
+  {
+    "term": "page.recipient-view.complete-petition-error-message",
+    "definition": "Sembla que el parallel ha estat actualitzat des de l'última vegada que hi vas accedir. Si us plau, actualitza el teu navegador i torna a intentar-ho. No perdràs les teves respostes enviades.",
+    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
   },
   {
     "term": "page.update-browser.header",
@@ -1450,19 +1625,9 @@
     "context": "Create your own <b>Parallel</b>"
   },
   {
-    "term": "public.support.faq",
-    "definition": "PMF - Preguntes més freqüents",
-    "context": "FAQ"
-  },
-  {
     "term": "public.support.support-center",
     "definition": "Centre de suport",
     "context": "Support center"
-  },
-  {
-    "term": "public.terms.title",
-    "definition": "Termes i condicions",
-    "context": "Terms & Conditions"
   },
   {
     "term": "recipient-view.cant-find-email-help",
@@ -1475,54 +1640,9 @@
     "context": "Change email"
   },
   {
-    "term": "recipient-view.client-portal.all",
-    "definition": "Tots",
-    "context": "All"
-  },
-  {
-    "term": "recipient-view.client-portal.completed",
-    "definition": "Completats",
-    "context": "Completed"
-  },
-  {
-    "term": "recipient-view.client-portal.my-processes",
-    "definition": "Els meus processos",
-    "context": "My processes"
-  },
-  {
-    "term": "recipient-view.client-portal.no-results",
-    "definition": "No hi ha resultats per la teva cerca",
-    "context": "No results found for your search"
-  },
-  {
-    "term": "recipient-view.client-portal.pending",
-    "definition": "Pendents",
-    "context": "Pending"
-  },
-  {
-    "term": "recipient-view.client-portal.requested-by",
-    "definition": "Sol·licitat per {name}, el {date}",
-    "context": "Requested by {name}, on {date}"
-  },
-  {
-    "term": "recipient-view.client-portal.search-placeholder",
-    "definition": "Cercar...",
-    "context": "Search..."
-  },
-  {
-    "term": "recipient-view.complete-petition.error-message",
-    "definition": "Sembla que el parallel ha estat actualitzat des de l'última vegada que hi vas accedir. Si us plau, actualitza el teu navegador i torna a intentar-ho. No perdràs les teves respostes enviades.",
-    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
-  },
-  {
     "term": "recipient-view.contents-header",
     "definition": "Contingut",
     "context": "Contents"
-  },
-  {
-    "term": "recipient-view.created-with",
-    "definition": "Creat amb {parallel}",
-    "context": "Created with {parallel}"
   },
   {
     "term": "recipient-view.doubts-button",
@@ -1538,31 +1658,6 @@
     "term": "recipient-view.expired-code-title",
     "definition": "Codi caducat",
     "context": "Expired code"
-  },
-  {
-    "term": "recipient-view.export-to-pdf",
-    "definition": "Exportar a PDF",
-    "context": "Export to PDF"
-  },
-  {
-    "term": "recipient-view.field-comments.cta",
-    "definition": "{tone, select, INFORMAL{Tens alguna pregunta? Pregunta aquí} other{Te alguna pregunta? Pregunte aquí}}",
-    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
-  },
-  {
-    "term": "recipient-view.field-comments.cta-with-name",
-    "definition": "{tone, select, INFORMAL{Tens alguna pregunta? Pregunta aquí a {name}} other{Te alguna pregunta? Pregunte aquí a {name}}}",
-    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
-  },
-  {
-    "term": "recipient-view.field-comments.placeholder",
-    "definition": "{tone, select, INFORMAL{Escriu aquí les teves} other{Escriviu aquí les seves}} preguntes i dubtes",
-    "context": "Ask here your questions and doubts"
-  },
-  {
-    "term": "recipient-view.field-comments.undefined-field",
-    "definition": "Ha succeït alguna cosa inesperada. Si us plau, actualitza la pàgina i prova-ho de nou.",
-    "context": "Something unexpected happened. Please, refresh the page and try again."
   },
   {
     "term": "recipient-view.first-time.finalize-whenever-body",
@@ -1605,54 +1700,9 @@
     "context": "Go to my processes"
   },
   {
-    "term": "recipient-view.guide-me",
-    "definition": "Guia'm",
-    "context": "Guide me"
-  },
-  {
     "term": "recipient-view.in-order-to",
     "definition": "Per a",
     "context": "To"
-  },
-  {
-    "term": "recipient-view.invite-collaborator",
-    "definition": "Convidar col·laborador",
-    "context": "Invite collaborator"
-  },
-  {
-    "term": "recipient-view.invite-collaborator.help",
-    "definition": "Utilitza aquesta opció per sol·licitar a una altra persona que completi la informació per tu.",
-    "context": "Use this option to request someone else to complete the information for you."
-  },
-  {
-    "term": "recipient-view.last-saved-info",
-    "definition": "Les teves respostes es guarden automàticament.",
-    "context": "Your answers are automatically saved."
-  },
-  {
-    "term": "recipient-view.last-saved-info-date",
-    "definition": "<b>Últim guardat:</b> {date}",
-    "context": "<b>Last saved:</b> {date}"
-  },
-  {
-    "term": "recipient-view.last-saved-time",
-    "definition": "Últim guardat {time}",
-    "context": "Last saved {time}"
-  },
-  {
-    "term": "recipient-view.last-saved-time-short",
-    "definition": "Guardat {time}",
-    "context": "Saved {time}"
-  },
-  {
-    "term": "recipient-view.petition-delegated.toast-body",
-    "definition": "Hem enviat un email a {email} amb instruccions per accedir a aquest parallel.",
-    "context": "We have sent an email to {email} with instructions to access this parallel."
-  },
-  {
-    "term": "recipient-view.petition-delegated.toast-header",
-    "definition": "Accés delegat",
-    "context": "Access delegated"
   },
   {
     "term": "recipient-view.petition-not-available-error.header",
@@ -1670,19 +1720,9 @@
     "context": "Subject"
   },
   {
-    "term": "recipient-view.progress",
-    "definition": "Progrés {current}/{total}",
-    "context": "Progress {current}/{total}"
-  },
-  {
     "term": "recipient-view.remaining-attempts",
     "definition": "Té {attempts, plural, =1{un intent més} other{# intents més}}",
     "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
-  },
-  {
-    "term": "recipient-view.request-information",
-    "definition": "Informació",
-    "context": "Information"
   },
   {
     "term": "recipient-view.requested-by",
@@ -1690,34 +1730,9 @@
     "context": "Requested by"
   },
   {
-    "term": "recipient-view.review-before-sign.body-1",
-    "definition": "{tone, select, INFORMAL{Per completar aquest parallel es necessita una <b>firma digital</b>.} other{Aquest parallel requereix de <b>firma digital</b> per ser completat.}}",
-    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
-  },
-  {
-    "term": "recipient-view.review-before-sign.body-2",
-    "definition": "{tone, select, INFORMAL{Hem avisat a {name} perquè revisi les respostes. Quan estigui tot validat, enviarem un correu amb el document a signar a les persones indicades.} other{Hem notificat a {name} perquè procedeixi a la revisió de les respostes i un cop validades enviarem un email amb el document a signar a les persones que corresponguin.}}",
-    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
-  },
-  {
-    "term": "recipient-view.review-before-sign.header",
-    "definition": "Revisió i signatura",
-    "context": "Review and sign"
-  },
-  {
     "term": "recipient-view.send-code",
     "definition": "Enviar codi de verificació",
     "context": "Send verification code"
-  },
-  {
-    "term": "recipient-view.submit-and-sign-button-short",
-    "definition": "Finalitzar i signar",
-    "context": "Finalize and sign"
-  },
-  {
-    "term": "recipient-view.submit-button-short",
-    "definition": "Finalitzar",
-    "context": "Finalize"
   },
   {
     "term": "recipient-view.unread-comments",
@@ -1743,6 +1758,16 @@
     "term": "recipient-view.verify-title",
     "definition": "{tone, select, INFORMAL{Introdueix} other{Introdueixi}} el codi de verificació",
     "context": "Enter verification code"
+  },
+  {
+    "term": "util.recipient-view-delegate-access.toast-body",
+    "definition": "Hem enviat un email a {email} amb instruccions per accedir a aquest parallel.",
+    "context": "We have sent an email to {email} with instructions to access this parallel."
+  },
+  {
+    "term": "util.recipient-view-delegate-access.toast-header",
+    "definition": "Accés delegat",
+    "context": "Access delegated"
   },
   {
     "term": "util.use-short-text-formats.email",

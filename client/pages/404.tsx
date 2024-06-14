@@ -35,7 +35,7 @@ export default function Custom404() {
         </ListItem>
         <ListItem>
           <NormalLink href={`https://help.onparallel.com/${intl.locale}/collections/3391072`}>
-            <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
+            <FormattedMessage id="generic.support-faq" defaultMessage="FAQ" />
           </NormalLink>
         </ListItem>
       </List>

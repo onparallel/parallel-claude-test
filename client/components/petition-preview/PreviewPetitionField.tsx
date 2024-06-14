@@ -2,11 +2,11 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   PetitionPermissionType,
   PreviewPetitionField_PetitionBaseFragment,
-  PreviewPetitionField_queryDocument,
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   PreviewPetitionField_UserFragment,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
+  PreviewPetitionField_queryDocument,
   PreviewPetitionField_retryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
@@ -14,9 +14,9 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useCallback, useEffect, useRef } from "react";
 import { pick } from "remeda";
-import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
@@ -42,14 +42,10 @@ import {
   useStartAsyncFieldCompletion,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
-import {
-  PreviewPetitionFieldCommentsDialog,
-  usePreviewPetitionFieldCommentsDialog,
-} from "./dialogs/PreviewPetitionFieldCommentsDialog";
+import { PreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -76,14 +72,12 @@ export function PreviewPetitionField({
   myEffectivePermission,
   showErrors,
   fieldLogic,
+  onCommentsButtonClick,
   ...props
 }: PreviewPetitionFieldProps) {
   const petitionId = petition.id;
   const uploads = useRef<Record<string, AbortController>>({});
   const fieldId = field.id;
-  const tone = useTone();
-
-  const isInvalid = showErrors && !field.optional && completedFieldReplies(field).length === 0;
 
   useEffect(() => {
     if (
@@ -117,20 +111,6 @@ export function PreviewPetitionField({
     },
     [petitionId],
   );
-
-  const showFieldComments = usePreviewPetitionFieldCommentsDialog();
-  async function handleCommentsButtonClick() {
-    try {
-      await showFieldComments({
-        petition,
-        field,
-        isTemplate: isCacheOnly,
-        isDisabled,
-        tone,
-        onlyReadPermission: myEffectivePermission === "READ",
-      });
-    } catch {}
-  }
 
   const deletePetitionReply = useDeletePetitionReply();
   const handleDeletePetitionReply = useCallback(
@@ -266,7 +246,7 @@ export function PreviewPetitionField({
 
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
-    onCommentsButtonClick: handleCommentsButtonClick,
+    onCommentsButtonClick: onCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment(field.id),
     onDeleteReply: handleDeletePetitionReply,
     onUpdateReply: handleUpdatePetitionFieldReply,
@@ -279,7 +259,7 @@ export function PreviewPetitionField({
       <RecipientViewPetitionFieldHeading
         field={field}
         onDownloadAttachment={handleDownloadAttachment(field.id)}
-        onCommentsButtonClick={handleCommentsButtonClick}
+        onCommentsButtonClick={onCommentsButtonClick}
       />
     );
   } else if (field.type === "FIELD_GROUP") {
@@ -303,7 +283,7 @@ export function PreviewPetitionField({
   }
 
   return (
-    <RecipientViewPetitionFieldCard isInvalid={isInvalid} field={field}>
+    <RecipientViewPetitionFieldCard field={field}>
       {field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText {...props} {...commonProps} />
       ) : field.type === "SHORT_TEXT" ? (

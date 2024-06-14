@@ -305,6 +305,7 @@ type ConnectionMetadata {
   browserName: String
   browserVersion: String
   country: String
+  deviceType: String
   ip: String
 }
 
@@ -3851,6 +3852,11 @@ type PetitionField {
   isReadOnly: Boolean!
 
   """
+  The last comment from this field.
+  """
+  lastComment: PetitionFieldComment
+
+  """
   A JSON object representing the math to be performed on the field
   """
   math: [JSONObject!]
@@ -3953,6 +3959,11 @@ type PetitionFieldComment {
   Time when the comment was created.
   """
   createdAt: DateTime!
+
+  """
+  The HTML content of the comment.
+  """
+  excerptHtml: String
   field: PetitionField!
 
   """
@@ -5899,6 +5910,11 @@ type PublicPetitionField {
   isReadOnly: Boolean!
 
   """
+  The last comment from this field.
+  """
+  lastComment: PublicPetitionFieldComment
+
+  """
   A JSON object representing the math to be performed on the field
   """
   math: [JSONObject!]
@@ -5965,6 +5981,11 @@ type PublicPetitionFieldComment {
   Time when the comment was created.
   """
   createdAt: DateTime!
+
+  """
+  The HTML content of the comment.
+  """
+  excerptHtml: String
   field: PublicPetitionField!
 
   """

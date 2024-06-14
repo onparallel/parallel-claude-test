@@ -311,6 +311,7 @@ export type ConnectionMetadata = {
   browserName: Maybe<Scalars["String"]["output"]>;
   browserVersion: Maybe<Scalars["String"]["output"]>;
   country: Maybe<Scalars["String"]["output"]>;
+  deviceType: Maybe<Scalars["String"]["output"]>;
   ip: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -346,6 +347,15 @@ export type ContactPagination = {
   items: Array<Contact>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
+};
+
+export type ContactlessAccessUsedEvent = PetitionEvent & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  type: PetitionEventType;
 };
 
 export type CreateContactInput = {
@@ -713,6 +723,8 @@ export type LandingTemplateCategorySampletemplatesArgs = {
 
 /** A public template field */
 export type LandingTemplateField = {
+  /** The children of this field. */
+  children: Maybe<Array<LandingTemplateField>>;
   id: Scalars["GID"]["output"];
   title: Maybe<Scalars["String"]["output"]>;
   type: PetitionFieldType;
@@ -2893,6 +2905,8 @@ export type PetitionAccess = Timestamps & {
   id: Scalars["GID"]["output"];
   /** It will be true if doesn't have contact assigned */
   isContactless: Scalars["Boolean"]["output"];
+  /** It will be true if the petition access was created by contactless link */
+  isSharedByLink: Scalars["Boolean"]["output"];
   /** When the next reminder will be sent. */
   nextReminderAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The petition for this message access. */
@@ -3251,6 +3265,8 @@ export type PetitionField = {
   isLinkedToProfileTypeField: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** The last comment from this field. */
+  lastComment: Maybe<PetitionFieldComment>;
   /** A JSON object representing the math to be performed on the field */
   math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
@@ -3305,6 +3321,8 @@ export type PetitionFieldComment = {
   contentHtml: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"]["output"];
+  /** The HTML content of the comment. */
+  excerptHtml: Maybe<Scalars["String"]["output"]>;
   field: PetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"]["output"];
@@ -4557,6 +4575,8 @@ export type PublicPetitionField = {
   isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** The last comment from this field. */
+  lastComment: Maybe<PublicPetitionFieldComment>;
   /** A JSON object representing the math to be performed on the field */
   math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
@@ -8846,6 +8866,13 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
 
 export type GetPetitionEvents_PetitionEventsQuery = {
   petitionEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };

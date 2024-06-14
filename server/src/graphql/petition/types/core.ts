@@ -739,6 +739,17 @@ export const PetitionField = objectType({
         });
       },
     });
+    t.nullable.field("lastComment", {
+      type: "PetitionFieldComment",
+      description: "The last comment from this field.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadLastPetitionFieldCommentsForField({
+          loadInternalComments: true,
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
+      },
+    });
     t.int("position");
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",

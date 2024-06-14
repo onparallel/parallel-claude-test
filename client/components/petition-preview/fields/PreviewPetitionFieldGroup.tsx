@@ -94,7 +94,6 @@ export function PreviewPetitionFieldGroup({
   onStartAsyncFieldCompletion,
   onRetryAsyncFieldCompletion,
   onRefreshField,
-  showErrors,
   onError,
   fieldLogic,
 }: PreviewPetitionFieldGroupProps) {
@@ -103,8 +102,6 @@ export function PreviewPetitionFieldGroup({
     await onCreateReply({});
   };
   const buildUrlToSection = useBuildUrlToPetitionSection();
-
-  const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition);
 
   const replies =
     isCacheOnly && field.__typename === "PetitionField" ? field.previewReplies : field.replies;
@@ -155,13 +152,6 @@ export function PreviewPetitionFieldGroup({
                       parentReplyId={group.id}
                       field={{ ...field, replies }}
                       petition={petition}
-                      isInvalid={
-                        showErrors &&
-                        !canFinalize &&
-                        incompleteFields.some(
-                          ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
-                        )
-                      }
                       isDisabled={isDisabled}
                       isCacheOnly={isCacheOnly}
                       onDownloadAttachment={onDownloadAttachment(field.id)}
@@ -222,7 +212,6 @@ function PreviewPetitionFieldGroupField(props: {
   user: PreviewPetitionFieldGroup_UserFragment;
   field: PreviewPetitionFieldGroup_PetitionFieldDataFragment;
   petition: PreviewPetitionFieldGroup_PetitionBaseFragment;
-  isInvalid: boolean;
   isDisabled: boolean;
   isCacheOnly: boolean;
   onDownloadAttachment: (attachmentId: string) => void;

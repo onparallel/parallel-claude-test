@@ -20,16 +20,11 @@ import { Divider } from "@parallel/components/common/Divider";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import {
-  Tone,
-  useCompletingMessageDialog_PublicPetitionFragment,
-  useCompletingMessageDialog_PublicUserFragment,
-} from "@parallel/graphql/__types";
+import { Tone, useCompletingMessageDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function CompletingMessageDialog({
   petition,
-  granter,
   hasClientPortalAccess,
   pendingPetitions,
   keycode,
@@ -38,7 +33,6 @@ function CompletingMessageDialog({
 }: DialogProps<
   {
     petition: useCompletingMessageDialog_PublicPetitionFragment;
-    granter: useCompletingMessageDialog_PublicUserFragment;
     hasClientPortalAccess: boolean;
     pendingPetitions: number;
     keycode: string;
@@ -60,14 +54,13 @@ function CompletingMessageDialog({
             alignItems="center"
             justifyContent="space-between"
             width="100%"
-            maxWidth="container.lg"
             paddingX={4}
             margin="0 auto"
           >
-            {granter.organization.logoUrl ? (
+            {petition.organization.logoUrl ? (
               <Img
-                src={granter.organization.logoUrl}
-                aria-label={granter.organization.name}
+                src={petition.organization.logoUrl}
+                aria-label={petition.organization.name}
                 width="auto"
                 height="40px"
               />
@@ -115,7 +108,7 @@ function CompletingMessageDialog({
             <>
               <Divider borderColor="gray.200" width="100%" />
               <Flex padding={6} gap={6} wrap="wrap" justify="center">
-                {pendingPetitions ? (
+                {pendingPetitions > 0 ? (
                   <HStack>
                     <TimeIcon color="yellow.600" />
                     <Text>
@@ -131,7 +124,7 @@ function CompletingMessageDialog({
                   href={`/petition/${keycode}/home${pendingPetitions ? "?status=PENDING" : ""}`}
                 >
                   <Button colorScheme="primary">
-                    {pendingPetitions ? (
+                    {pendingPetitions > 0 ? (
                       <FormattedMessage
                         id="component.completing-message-dialog.go-to-pending-processes-button"
                         defaultMessage="Go to my pending processes"
@@ -154,7 +147,6 @@ function CompletingMessageDialog({
             alignItems="center"
             justifyContent="space-between"
             width="100%"
-            maxWidth="container.lg"
             gridGap={{ base: 8, lg: 4 }}
             direction={{ base: "column-reverse", lg: "row" }}
           >
@@ -170,7 +162,7 @@ function CompletingMessageDialog({
                   href={`https://help.onparallel.com/${intl.locale}/collections/3391072?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
                   isExternal
                 >
-                  <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
+                  <FormattedMessage id="generic.support-faq" defaultMessage="FAQ" />
                 </NormalLink>
               </ListItem>
               <ListItem>
@@ -178,7 +170,10 @@ function CompletingMessageDialog({
                   href={`https://www.onparallel.com/${intl.locale}/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
                   target="_blank"
                 >
-                  <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />
+                  <FormattedMessage
+                    id="generic.terms-and-conditions"
+                    defaultMessage="Terms & Conditions"
+                  />
                 </Link>
               </ListItem>
             </Flex>
@@ -216,17 +211,13 @@ useCompletingMessageDialog.fragments = {
         id
         completingMessageBody
         completingMessageSubject
+        organization {
+          name
+          logoUrl(options: { resize: { height: 80 } })
+        }
       }
     `;
   },
-  PublicUser: gql`
-    fragment useCompletingMessageDialog_PublicUser on PublicUser {
-      organization {
-        name
-        logoUrl(options: { resize: { height: 80 } })
-      }
-    }
-  `,
 };
 
 export function useCompletingMessageDialog() {

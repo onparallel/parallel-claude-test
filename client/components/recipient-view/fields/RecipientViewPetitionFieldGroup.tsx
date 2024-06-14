@@ -30,6 +30,8 @@ import {
   RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldGroup_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -38,8 +40,7 @@ import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
-import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -69,7 +70,6 @@ export interface RecipientViewPetitionFieldGroupProps
     type: string;
     url: string;
   }>;
-  showErrors: boolean;
   petition: RecipientViewPetitionFieldGroup_PublicPetitionFragment;
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
@@ -89,7 +89,6 @@ export function RecipientViewPetitionFieldGroup({
   onCreateFileReply,
   onStartAsyncFieldCompletion,
   onRetryAsyncFieldCompletion,
-  showErrors,
   petition,
   onError,
   fieldLogic,
@@ -97,8 +96,6 @@ export function RecipientViewPetitionFieldGroup({
   const handleAddReply = async () => {
     await onCreateReply({});
   };
-
-  const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition);
 
   return (
     <RecipientViewPetitionFieldGroupLayout
@@ -132,13 +129,6 @@ export function RecipientViewPetitionFieldGroup({
                   <RecipientViewPetitionFieldGroupField
                     parentReplyId={group.id}
                     field={{ ...field, replies }}
-                    isInvalid={
-                      showErrors &&
-                      !canFinalize &&
-                      incompleteFields.some(
-                        ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
-                      )
-                    }
                     isDisabled={isDisabled}
                     onDownloadAttachment={onDownloadAttachment(field.id)}
                     onDeleteReply={onDeleteReply}
@@ -164,7 +154,7 @@ export function RecipientViewPetitionFieldGroup({
 function RecipientViewPetitionFieldGroupField(props: {
   parentReplyId: string;
   field: RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment;
-  isInvalid: boolean;
+  isInvalid?: boolean;
   isDisabled: boolean;
   onDownloadAttachment: (attachmentId: string) => void;
   onDeleteReply: (replyId: string, fieldId: string, parentReplyId: string) => void;
@@ -297,6 +287,7 @@ export function RecipientViewPetitionFieldGroupLayout({
 }: RecipientViewPetitionFieldGroupLayoutProps) {
   const intl = useIntl();
   const isPetitionField = field.__typename === "PetitionField";
+  const [commentsFieldId] = useFieldCommentsQueryState();
 
   return (
     <Stack spacing={4} as="section" id={`field-${field.id}`}>
@@ -330,6 +321,7 @@ export function RecipientViewPetitionFieldGroupLayout({
               commentCount={field.commentCount}
               hasUnreadComments={field.unreadCommentCount > 0}
               onClick={onCommentsButtonClick}
+              backgroundColor={commentsFieldId === field.id ? "gray.300" : undefined}
             />
           ) : null}
         </Flex>

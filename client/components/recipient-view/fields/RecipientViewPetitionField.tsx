@@ -1,11 +1,9 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
-import { useTone } from "@parallel/components/common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionAccessFragment,
-  RecipientViewPetitionField_queryDocument,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
   RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument,
@@ -13,16 +11,17 @@ import {
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument,
+  RecipientViewPetitionField_queryDocument,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useCallback, useRef } from "react";
+import { pick } from "remeda";
 import { useLastSaved } from "../LastSavedProvider";
-import {
-  RecipientViewPetitionFieldCommentsDialog,
-  usePetitionFieldCommentsDialog,
-} from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "./RecipientViewPetitionFieldDate";
@@ -42,9 +41,6 @@ import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFiel
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
-import { pick } from "remeda";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -55,7 +51,7 @@ export interface RecipientViewPetitionFieldProps
   keycode: string;
   access: RecipientViewPetitionField_PublicPetitionAccessFragment;
   isDisabled: boolean;
-  showErrors: boolean;
+
   fieldLogic?: FieldLogicResult;
   onError: (error: any) => void;
 }
@@ -66,12 +62,8 @@ export function RecipientViewPetitionField({
 }: RecipientViewPetitionFieldProps) {
   const uploads = useRef<Record<string, AbortController>>({});
   const { updateLastSaved } = useLastSaved();
-  const tone = useTone();
 
-  const { showErrors, ...rest } = props;
-
-  const isInvalid =
-    showErrors && !props.field.optional && completedFieldReplies(props.field).length === 0;
+  const { ...rest } = props;
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
@@ -94,17 +86,9 @@ export function RecipientViewPetitionField({
     },
     [props.keycode],
   );
-
-  const showFieldComments = usePetitionFieldCommentsDialog();
+  const [, setFieldId] = useFieldCommentsQueryState();
   async function handleCommentsButtonClick() {
-    try {
-      await showFieldComments({
-        keycode: props.keycode,
-        access: props.access,
-        fieldId: props.field.id,
-        tone,
-      });
-    } catch {}
+    setFieldId(props.field.id);
   }
 
   const [publicDeletePetitionFieldReply] = useMutation(
@@ -306,7 +290,7 @@ export function RecipientViewPetitionField({
   }
 
   return (
-    <RecipientViewPetitionFieldCard isInvalid={isInvalid} field={props.field}>
+    <RecipientViewPetitionFieldCard field={props.field}>
       {props.field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText {...rest} {...commonProps} />
       ) : props.field.type === "SHORT_TEXT" ? (
@@ -350,12 +334,10 @@ export function RecipientViewPetitionField({
 RecipientViewPetitionField.fragments = {
   PublicPetitionAccess: gql`
     fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
-      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
       petition {
         ...RecipientViewPetitionFieldGroup_PublicPetition
       }
     }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionAccess}
     ${RecipientViewPetitionFieldGroup.fragments.PublicPetition}
   `,
   PublicPetitionField: gql`

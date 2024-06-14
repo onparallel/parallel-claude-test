@@ -1,7 +1,17 @@
 import { gql, useQuery } from "@apollo/client";
-import { Box, Center, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
-import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
-import { CloseableCardHeader } from "@parallel/components/common/Card";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Heading,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { ChevronLeftIcon, CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import {
   PetitionRepliesFieldComments_PetitionBaseFragment,
   PetitionRepliesFieldComments_PetitionFieldFragment,
@@ -15,7 +25,10 @@ import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
 import usePrevious from "@react-hook/previous";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { CloseButton } from "../common/CloseButton";
 import { Divider } from "../common/Divider";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link } from "../common/Link";
 import { PetitionFieldComment } from "../common/PetitionFieldComment";
 import {
@@ -53,6 +66,7 @@ export function PetitionRepliesFieldComments({
     : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled;
 
   const petitionId = petition.id;
+  const isTemplate = petition.__typename === "PetitionTemplate";
   const commentsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
   const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
@@ -114,13 +128,58 @@ export function PetitionRepliesFieldComments({
 
   return (
     <>
-      <CloseableCardHeader onClose={onClose}>
-        {field.title || (
-          <Text fontWeight="normal" textStyle="hint">
-            <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+      <HStack
+        paddingY={2}
+        paddingX={{ base: 4, lg: 2 }}
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        position="relative"
+        height="49px"
+      >
+        <IconButtonWithTooltip
+          variant="ghost"
+          size="sm"
+          icon={<ChevronLeftIcon boxSize={6} />}
+          label={intl.formatMessage({ id: "generic.go-back", defaultMessage: "Go back" })}
+          onClick={() => onClose()}
+          display={{ base: "none", lg: "flex" }}
+        />
+        <Heading
+          as="h3"
+          size="sm"
+          fontWeight={500}
+          noOfLines={2}
+          sx={
+            isDefined(field.title)
+              ? {}
+              : { color: "gray.500", fontWeight: "normal", fontStyle: "italic" }
+          }
+        >
+          {field.title ??
+            intl.formatMessage({
+              id: "generic.untitled-field",
+              defaultMessage: "Untitled field",
+            })}
+        </Heading>
+        <CloseButton
+          onClick={onClose}
+          display={{ base: "flex", lg: "none" }}
+          position="absolute"
+          insetEnd={4}
+        />
+      </HStack>
+
+      {isTemplate ? (
+        <Alert status="info" paddingY={0}>
+          <AlertIcon />
+          <Text flex={1} paddingY={3}>
+            <FormattedMessage
+              id="component.petition-replies-field-comments.template-read-only-alert"
+              defaultMessage="<b>Preview only</b> - Comments are disabled."
+            />
           </Text>
-        )}
-      </CloseableCardHeader>
+        </Alert>
+      ) : null}
       <Box overflow="auto" flex={1} ref={commentsRef}>
         {loading && !comments.length ? (
           <Center minHeight={44} height="100%">

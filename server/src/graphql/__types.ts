@@ -750,6 +750,7 @@ export interface NexusGenObjects {
     browserName?: string | null; // String
     browserVersion?: string | null; // String
     country?: string | null; // String
+    deviceType?: string | null; // String
     ip?: string | null; // String
   };
   Contact: db.Contact;
@@ -1589,6 +1590,7 @@ export interface NexusGenFieldTypes {
     browserName: string | null; // String
     browserVersion: string | null; // String
     country: string | null; // String
+    deviceType: string | null; // String
     ip: string | null; // String
   };
   Contact: {
@@ -2414,6 +2416,7 @@ export interface NexusGenFieldTypes {
     isLinkedToProfileType: boolean; // Boolean!
     isLinkedToProfileTypeField: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
+    lastComment: NexusGenRootTypes["PetitionFieldComment"] | null; // PetitionFieldComment
     math: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
@@ -2450,6 +2453,7 @@ export interface NexusGenFieldTypes {
     content: NexusGenScalars["JSON"] | null; // JSON
     contentHtml: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    excerptHtml: string | null; // String
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
@@ -3173,6 +3177,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
+    lastComment: NexusGenRootTypes["PublicPetitionFieldComment"] | null; // PublicPetitionFieldComment
     math: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
@@ -3191,6 +3196,7 @@ export interface NexusGenFieldTypes {
     content: NexusGenScalars["JSON"] | null; // JSON
     contentHtml: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    excerptHtml: string | null; // String
     field: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
@@ -4115,6 +4121,7 @@ export interface NexusGenFieldTypeNames {
     browserName: "String";
     browserVersion: "String";
     country: "String";
+    deviceType: "String";
     ip: "String";
   };
   Contact: {
@@ -4940,6 +4947,7 @@ export interface NexusGenFieldTypeNames {
     isLinkedToProfileType: "Boolean";
     isLinkedToProfileTypeField: "Boolean";
     isReadOnly: "Boolean";
+    lastComment: "PetitionFieldComment";
     math: "JSONObject";
     multiple: "Boolean";
     optional: "Boolean";
@@ -4976,6 +4984,7 @@ export interface NexusGenFieldTypeNames {
     content: "JSON";
     contentHtml: "String";
     createdAt: "DateTime";
+    excerptHtml: "String";
     field: "PetitionField";
     id: "GID";
     isAnonymized: "Boolean";
@@ -5699,6 +5708,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isInternal: "Boolean";
     isReadOnly: "Boolean";
+    lastComment: "PublicPetitionFieldComment";
     math: "JSONObject";
     multiple: "Boolean";
     optional: "Boolean";
@@ -5717,6 +5727,7 @@ export interface NexusGenFieldTypeNames {
     content: "JSON";
     contentHtml: "String";
     createdAt: "DateTime";
+    excerptHtml: "String";
     field: "PublicPetitionField";
     id: "GID";
     isAnonymized: "Boolean";

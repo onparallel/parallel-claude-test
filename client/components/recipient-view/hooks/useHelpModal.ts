@@ -1,7 +1,7 @@
 import { Tone } from "@parallel/graphql/__types";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect } from "react";
-import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
+import { useRecipientViewHelpDialog } from "../dialogs/RecipientViewHelpDialog";
 
 export function useHelpModal({ tone }: { tone: Tone }) {
   const [firstTime, setFirstTime] = useUserPreference("recipient-first-time-check", "");

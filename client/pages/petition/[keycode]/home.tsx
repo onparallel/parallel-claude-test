@@ -88,7 +88,6 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
   } = useAssertQuery(RecipientPortal_accessDocument, { variables: { keycode } });
 
   const petition = access!.petition!;
-  const granter = access!.granter!;
   const contact = access!.contact!;
   const { status } = state;
 
@@ -164,19 +163,19 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
     debouncedSearch(search);
   };
 
-  const titleOrgName = granter.organization.hasRemoveParallelBranding
-    ? granter.organization.name
+  const titleOrgName = petition.organization.hasRemoveParallelBranding
+    ? petition.organization.name
     : "Parallel";
 
   return (
     <ToneProvider value={petition.tone}>
       <OverrideWithOrganizationTheme
         cssVarsRoot="body"
-        brandTheme={granter.organization.brandTheme}
+        brandTheme={petition.organization.brandTheme}
       >
         <Head>
           <title>{`${intl.formatMessage({
-            id: "recipient-view.client-portal.my-processes",
+            id: "page.recipient-view-client-portal.my-processes",
             defaultMessage: "My processes",
           })} | ${titleOrgName}`}</title>
         </Head>
@@ -186,12 +185,15 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
           zIndex={1}
           flexDirection="column"
           alignItems="center"
-          paddingX={1.5}
           ref={mainRef}
         >
-          <RecipientPortalHeader sender={granter} contact={contact} keycode={keycode} />
+          <RecipientPortalHeader
+            organization={petition.organization}
+            contact={contact}
+            keycode={keycode}
+          />
           <Flex width="100%" justifyContent="center">
-            <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={2.5}>
+            <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={4}>
               <HStack>
                 <NakedLink href={`/petition/${keycode}`}>
                   <IconButtonWithTooltip
@@ -207,7 +209,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
 
                 <Heading as="h1" size="md">
                   <FormattedMessage
-                    id="recipient-view.client-portal.my-processes"
+                    id="page.recipient-view-client-portal.my-processes"
                     defaultMessage="My processes"
                   />
                 </Heading>
@@ -233,7 +235,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     onChange={(event) => handleSearchChange(event?.target.value)}
                     backgroundColor="white"
                     placeholder={intl.formatMessage({
-                      id: "recipient-view.client-portal.search-placeholder",
+                      id: "page.recipient-view-client-portal.search-placeholder",
                       defaultMessage: "Search...",
                     })}
                   />
@@ -269,7 +271,10 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     <PaperPlaneIcon boxSize={6} color="gray.600" />
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
-                    <FormattedMessage id="recipient-view.client-portal.all" defaultMessage="All" />
+                    <FormattedMessage
+                      id="page.recipient-view-client-portal.all"
+                      defaultMessage="All"
+                    />
                   </Text>
                 </RadioCard>
                 <RadioCard {...getRadioProps({ value: "PENDING" })}>
@@ -281,7 +286,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
                     <FormattedMessage
-                      id="recipient-view.client-portal.pending"
+                      id="page.recipient-view-client-portal.pending"
                       defaultMessage="Pending"
                     />
                   </Text>
@@ -295,7 +300,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
                     <FormattedMessage
-                      id="recipient-view.client-portal.completed"
+                      id="page.recipient-view-client-portal.completed"
                       defaultMessage="Completed"
                     />
                   </Text>
@@ -333,7 +338,7 @@ function Petitions({
         />
         <Text>
           <FormattedMessage
-            id="recipient-view.client-portal.no-results"
+            id="page.recipient-view-client-portal.no-results"
             defaultMessage="No results found for your search"
             values={{
               tone,
@@ -435,10 +440,15 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
             </NakedLink>
             <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all" zIndex={1}>
               <FormattedMessage
-                id="recipient-view.client-portal.requested-by"
+                id="page.recipient-view-client-portal.requested-by"
                 defaultMessage="Requested by {name}, on {date}"
                 values={{
-                  name: granter?.fullName ?? "",
+                  name:
+                    granter?.fullName ??
+                    intl.formatMessage({
+                      id: "generic.deleted-user",
+                      defaultMessage: "Deleted user",
+                    }),
                   date: (
                     <DateTime
                       value={date}
@@ -459,7 +469,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
             <Text fontSize="sm" as="span">
               <Text as="span" display={{ base: "none", md: "inline-block" }}>
                 <FormattedMessage
-                  id="recipient-view.progress"
+                  id="page.recipient-view-client-portal.progress"
                   defaultMessage="Progress {current}/{total}"
                   values={{ current: replied, total }}
                 />
@@ -535,7 +545,18 @@ const _fragments = {
           replied
           optional
         }
+        organization {
+          id
+          name
+          hasRemoveParallelBranding
+          brandTheme {
+            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+          }
+          ...RecipientPortalHeader_PublicOrganization
+        }
       }
+      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
+      ${RecipientPortalHeader.fragments.PublicOrganization}
     `;
   },
   get PublicPetitionMessage() {
@@ -552,18 +573,7 @@ const _fragments = {
       fragment RecipientPortal_PublicUser on PublicUser {
         id
         fullName
-        ...RecipientPortalHeader_PublicUser
-        organization {
-          id
-          name
-          hasRemoveParallelBranding
-          brandTheme {
-            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
-          }
-        }
       }
-      ${RecipientPortalHeader.fragments.PublicUser}
-      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     `;
   },
   get PublicPetitionAccess() {

@@ -403,6 +403,16 @@ export const PublicPetitionField = objectType({
         });
       },
     });
+    t.nullable.field("lastComment", {
+      type: "PublicPetitionFieldComment",
+      description: "The last comment from this field.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadLastPetitionFieldCommentsForField({
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
+      },
+    });
     t.nonNull.int("commentCount", {
       resolve: async (root, _, ctx) => {
         return (
@@ -773,6 +783,14 @@ export const PublicPetitionFieldComment = objectType({
       resolve: (root) => {
         if (!isDefined(root.content_json)) return null;
         return renderSlateWithMentionsToHtml(root.content_json);
+      },
+    });
+    t.nullable.string("excerptHtml", {
+      description: "The HTML content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return isDefined(root.content_json)
+          ? renderSlateWithMentionsToHtml(root.content_json[0])
+          : null;
       },
     });
     t.datetime("createdAt", {

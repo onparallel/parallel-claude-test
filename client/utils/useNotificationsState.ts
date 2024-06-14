@@ -14,11 +14,9 @@ const QUERY_STATE = {
   ]),
 };
 
-const key = "notifications" as const;
-
 export function useNotificationsState() {
   const [state, setState] = useQueryState(QUERY_STATE);
-  const [filter, onFilterChange] = useQueryStateSlice(state, setState, key);
+  const [filter, onFilterChange] = useQueryStateSlice(state, setState, "notifications");
 
   return {
     isOpen: filter !== null,

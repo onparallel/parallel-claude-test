@@ -1,14 +1,20 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Box, Button, Flex, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  HStack,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+  Stack,
+} from "@chakra-ui/react";
+import { Divider } from "@parallel/components/common/Divider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/dialogs/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   RedirectError,
@@ -16,46 +22,53 @@ import {
   withApolloData,
 } from "@parallel/components/common/withApolloData";
 import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
-import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
+import { RecipientViewContents } from "@parallel/components/recipient-view/RecipientViewContents";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
-import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
 import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
+import {
+  RecipientViewMobileNavigation,
+  RecipientViewSidebar,
+} from "@parallel/components/recipient-view/RecipientViewSidebar";
+import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
 import { RecipientViewSignatureSentAlert } from "@parallel/components/recipient-view/RecipientViewSignatureSentAlert";
 import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
 import {
   RecipientViewConfirmPetitionSignersDialogResult,
   useRecipientViewConfirmPetitionSignersDialog,
 } from "@parallel/components/recipient-view/dialogs/RecipientViewConfirmPetitionSignersDialog";
+import { useRecipientViewReviewBeforeSignDialog } from "@parallel/components/recipient-view/dialogs/RecipientViewReviewBeforeSignDialog";
+
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import {
-  RecipientView_PublicUserFragment,
   RecipientView_accessDocument,
   RecipientView_accessesDocument,
   RecipientView_publicCompletePetitionDocument,
-  Tone,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery, withAssertApolloQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
+import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { withMetadata } from "@parallel/utils/withMetadata";
-import useResizeObserver from "@react-hook/resize-observer";
 import { AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -80,14 +93,28 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     : 0;
 
   useEffect(() => {
+    if (isDefined(router.query.reply)) {
+      const replyId = router.query.reply;
+      const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
+
+      if (element) {
+        smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
+        element.focus();
+        if (element.type === "text") {
+          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+          element.setSelectionRange?.(element.value.length, element.value.length);
+        }
+      }
+    }
+  }, [router.query]);
+
+  useEffect(() => {
     refetchAccessesCount();
   }, [access.petition.status]);
 
   const petition = access!.petition!;
-  const granter = access!.granter!;
+  const granter = access!.granter;
   const contact = access!.contact!;
-
-  const recipients = petition!.recipients;
   const message = access!.message;
 
   const pages = useGetPetitionPages(petition, { hideInternalFields: true });
@@ -98,19 +125,40 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     petition.isCompletingMessageEnabled &&
     (petition.completingMessageBody || petition.completingMessageSubject);
 
+  const allFields = useMemo(
+    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
+    [petition.fields],
+  );
+
+  const highlight = useHighlightElement();
+  useEffect(() => {
+    if (isDefined(router.query.field)) {
+      const { field: fieldId, parentReply: parentReplyId } = router.query;
+
+      const field = allFields.find((f) => f.id === fieldId);
+      if (field) {
+        focusPetitionField({
+          field,
+          parentReplyId: parentReplyId as string | undefined,
+        });
+        const element = document.getElementById(`field-${field.id}`);
+        highlight(element, true);
+      }
+    }
+  }, [router.query]);
+
   const showErrorDialog = useErrorDialog();
-  const [showErrors, setShowErrors] = useState(false);
+
   const [showRefreshRepliesAlert, setShowRefreshRepliesAlert] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
-  const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
+  const showReviewBeforeSigningDialog = useRecipientViewReviewBeforeSignDialog();
   const showCompletingMessageDialog = useCompletingMessageDialog();
-  const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition, true);
+  const { canFinalize, nextIncompleteField } = usePetitionCanFinalize(petition, true);
   const showErrorToast = useGenericErrorToast();
   const handleFinalize = useCallback(
     async function () {
       try {
-        setShowErrors(true);
         if (canFinalize) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
@@ -118,7 +166,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               recipients: petition.recipients,
               signatureConfig: petition.signatureConfig,
               keycode,
-              organization: granter.organization.name,
+              organization: petition.organization.name,
               contact,
               tone,
             });
@@ -131,13 +179,20 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             },
           });
           if (petition.signatureConfig?.review) {
-            await showReviewBeforeSigningDialog({ granter, tone });
+            await showReviewBeforeSigningDialog({
+              name: isDefined(granter)
+                ? granter.fullName
+                : intl.formatMessage({
+                    id: "generic.deleted-user",
+                    defaultMessage: "Deleted user",
+                  }),
+              tone,
+            });
           }
           if (showFullScreenDialog && isDefined(data)) {
             await withError(
               showCompletingMessageDialog({
                 petition: data!.publicCompletePetition,
-                granter,
                 hasClientPortalAccess: access.hasClientPortalAccess,
                 pendingPetitions: pending,
                 keycode,
@@ -147,22 +202,24 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           }
         } else {
           // go to first repliable field without replies
-
-          const field = incompleteFields[0];
-          const { keycode } = router.query;
-          router.push(
-            `/petition/${keycode}/${field.page}?${new URLSearchParams({
-              field: field.id,
-              ...(field.parentReplyId ? { parentReply: field.parentReplyId } : {}),
-            })}`,
-          );
+          if (nextIncompleteField) {
+            const { keycode } = router.query;
+            router.push(
+              `/petition/${keycode}/${nextIncompleteField.page}?${new URLSearchParams({
+                field: nextIncompleteField.id,
+                ...(nextIncompleteField.parentReplyId
+                  ? { parentReply: nextIncompleteField.parentReplyId }
+                  : {}),
+              })}`,
+            );
+          }
         }
       } catch (e) {
         if (isApolloError(e, "CANT_COMPLETE_PETITION_ERROR")) {
           try {
             await showErrorDialog({
               message: intl.formatMessage({
-                id: "recipient-view.complete-petition.error-message",
+                id: "page.recipient-view.complete-petition-error-message",
                 defaultMessage:
                   "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
               }),
@@ -176,25 +233,19 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     },
     [
       canFinalize,
-      incompleteFields?.[0]?.id,
-      incompleteFields?.[0]?.parentReplyId,
-      incompleteFields?.[0]?.page,
+      nextIncompleteField?.id,
+      nextIncompleteField?.parentReplyId,
+      nextIncompleteField?.page,
       granter,
       router.query,
       pending,
     ],
   );
 
-  const [sidebarTop, setSidebarTop] = useState(0);
-  const alertsBoxRef = useRef<HTMLDivElement>(null);
-  useResizeObserver(alertsBoxRef, (entry) => {
-    setSidebarTop(entry.contentRect.height + 16);
-  });
-
   const breakpoint = "md";
 
-  const titleOrgName = granter.organization.hasRemoveParallelBranding
-    ? granter.organization.name
+  const titleOrgName = petition!.organization.hasRemoveParallelBranding
+    ? petition!.organization.name
     : "Parallel";
 
   async function handleRefetchPetition() {
@@ -216,195 +267,170 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     }
   }, []);
 
+  const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
+  const hasSignature = petition.signatureConfig?.review === false;
+
   return (
     <LastSavedProvider>
-      <ToneProvider value={tone}>
-        <OverrideWithOrganizationTheme
-          cssVarsRoot="body"
-          brandTheme={granter.organization.brandTheme}
-        >
-          <Head>
-            {isDefined(message) ? (
-              <title>{`${message.subject!} | ${titleOrgName}`}</title>
-            ) : (
-              <title>{titleOrgName}</title>
-            )}
-          </Head>
-          <Flex
-            backgroundColor="primary.50"
-            minHeight="100vh"
-            zIndex={1}
-            flexDirection="column"
-            alignItems="center"
+      <RecipientViewSidebarContextProvider>
+        <ToneProvider value={tone}>
+          <OverrideWithOrganizationTheme
+            cssVarsRoot="body"
+            brandTheme={petition.organization.brandTheme}
           >
-            <RecipientViewHeader
-              sender={granter}
-              contact={contact}
-              message={message}
-              recipients={recipients}
-              hasClientPortalAccess={access.hasClientPortalAccess}
-              showDelegateAccess={access.petition.isDelegateAccessEnabled}
-              pendingPetitions={pending}
-              keycode={keycode}
-              isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
-            />
-            <Box
-              ref={alertsBoxRef}
-              position="sticky"
-              top={0}
-              width="100%"
-              zIndex={2}
-              marginBottom={4}
-            >
-              {["COMPLETED", "CLOSED"].includes(petition.status) ? (
-                !petition.signatureConfig ||
-                (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
-                  <RecipientViewPetitionStatusAlert
-                    petition={petition}
-                    granter={granter}
-                    tone={tone}
-                  />
-                ) : (
-                  <RecipientViewSignatureSentAlert
-                    petition={petition}
-                    tone={tone}
-                    onRefetch={handleRefetchPetition}
-                  />
-                )
-              ) : null}
-              {showRefreshRepliesAlert ? (
-                <RecipientViewRefreshRepliesAlert
-                  tone={tone}
-                  onRefetch={async () => {
-                    await refetchAccess();
-                    setShowRefreshRepliesAlert(false);
-                  }}
+            <Head>
+              {isDefined(message) ? (
+                <title>{`${message.subject!} | ${titleOrgName}`}</title>
+              ) : (
+                <title>{titleOrgName}</title>
+              )}
+            </Head>
+            <Flex direction="column" height="100vh">
+              {/* Header  */}
+              <Stack spacing={0} divider={<Divider />}>
+                {/* Navbar with logo  */}
+                <RecipientViewHeader
+                  keycode={keycode}
+                  access={access}
+                  hasSignature={hasSignature}
+                  pendingPetitions={pending}
+                  isClosed={isClosed}
+                  onFinalize={handleFinalize}
+                  canFinalize={canFinalize}
                 />
-              ) : null}
-            </Box>
-            <Flex
-              flex="1"
-              flexDirection={{ base: "column", [breakpoint]: "row" }}
-              width="100%"
-              maxWidth="container.lg"
-              paddingX={4}
-              zIndex={1}
-            >
-              <Box
-                flex={{ base: 0, [breakpoint]: 1 }}
-                minWidth={0}
-                marginEnd={{ base: 0, [breakpoint]: 4 }}
-                marginBottom={4}
-                display={{ base: "none", [breakpoint]: "block" }}
+                {/* Progress bar */}
+                {petition.status !== "CLOSED" && (
+                  <RecipientViewProgressBar petition={petition} width="100%" />
+                )}
+              </Stack>
+              {/* End Header  */}
+              {/* Main content */}
+              <Stack
+                flex="1"
+                direction={{ base: "column", [breakpoint]: "row" }}
+                overflow="hidden"
+                borderTop="1px solid "
+                borderTopColor="gray.200"
+                spacing={0}
+                divider={<Divider />}
               >
-                <Stack
-                  spacing={4}
-                  position={{ base: "relative", [breakpoint]: "sticky" }}
-                  top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
+                <Flex
+                  flex="1"
+                  overflow="auto"
+                  backgroundColor="primary.50"
+                  zIndex={1}
+                  flexDirection="column"
+                  alignItems="center"
+                  height="100%"
                 >
-                  {petition.isRecipientViewContentsHidden ? null : (
-                    <RecipientViewContentsCard
-                      currentPage={currentPage}
-                      petition={petition}
-                      minHeight="12rem"
-                      maxHeight="calc(100vh - 17rem)"
-                    />
-                  )}
-                </Stack>
-              </Box>
-              <Flex flexDirection="column" flex="2" minWidth={0}>
-                <Stack spacing={4} key={currentPage}>
-                  <LiquidScopeProvider petition={petition}>
-                    <AnimatePresence initial={false}>
-                      {fieldsWithLogic.map(({ field, logic }) => {
-                        return (
-                          <LiquidPetitionVariableProvider key={field.id} logic={logic}>
-                            <RecipientViewPetitionField
-                              keycode={keycode}
-                              access={access!}
-                              field={field}
-                              isDisabled={petition.status === "CLOSED"}
-                              showErrors={showErrors && !canFinalize}
-                              fieldLogic={logic}
-                              onError={handleErrorFromFields}
-                            />
-                          </LiquidPetitionVariableProvider>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </LiquidScopeProvider>
-                </Stack>
-                <Spacer />
-                {pages.length > 1 ? (
-                  <RecipientViewPagination
-                    marginTop={8}
-                    currentPage={currentPage}
-                    pageCount={pages.length}
-                  />
-                ) : null}
-                <RecipientViewFooter marginTop={12} petition={petition} />
-              </Flex>
-            </Flex>
+                  {/* Alerts container */}
+                  <Box position="sticky" top={0} width="100%" zIndex={2}>
+                    {["COMPLETED", "CLOSED"].includes(petition.status) ? (
+                      !petition.signatureConfig ||
+                      (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
+                        <RecipientViewPetitionStatusAlert
+                          petition={petition}
+                          granter={granter}
+                          tone={tone}
+                        />
+                      ) : (
+                        <RecipientViewSignatureSentAlert
+                          petition={petition}
+                          tone={tone}
+                          onRefetch={handleRefetchPetition}
+                        />
+                      )
+                    ) : null}
 
-            {petition.status !== "CLOSED" && (
-              <RecipientViewProgressFooter
-                petition={petition}
-                onFinalize={handleFinalize}
-                zIndex={2}
-                position="sticky"
-                bottom={0}
-                width="100%"
+                    {showRefreshRepliesAlert ? (
+                      <RecipientViewRefreshRepliesAlert
+                        tone={tone}
+                        onRefetch={async () => {
+                          await refetchAccess();
+                          setShowRefreshRepliesAlert(false);
+                        }}
+                      />
+                    ) : null}
+                  </Box>
+                  {/* End Alerts container */}
+                  {/* Content */}
+                  <Flex flex="1" width="100%" padding={4} justify="center">
+                    <Flex flexDirection="column" minWidth={0} maxWidth="container.sm" width="100%">
+                      <Stack spacing={4} key={currentPage}>
+                        <LiquidScopeProvider petition={petition}>
+                          <AnimatePresence initial={false}>
+                            {fieldsWithLogic.map(({ field, logic }) => {
+                              return (
+                                <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                                  <RecipientViewPetitionField
+                                    keycode={keycode}
+                                    access={access!}
+                                    field={field}
+                                    isDisabled={petition.status === "CLOSED"}
+                                    fieldLogic={logic}
+                                    onError={handleErrorFromFields}
+                                  />
+                                </LiquidPetitionVariableProvider>
+                              );
+                            })}
+                          </AnimatePresence>
+                        </LiquidScopeProvider>
+                        {pages.length === currentPage ? (
+                          <Center paddingTop={4}>
+                            <Button
+                              colorScheme="primary"
+                              onClick={handleFinalize}
+                              isDisabled={isClosed}
+                            >
+                              {hasSignature ? (
+                                <FormattedMessage
+                                  id="generic.finalize-and-sign-button"
+                                  defaultMessage="Finalize and sign"
+                                />
+                              ) : (
+                                <FormattedMessage
+                                  id="generic.finalize-button"
+                                  defaultMessage="Finalize"
+                                />
+                              )}
+                            </Button>
+                          </Center>
+                        ) : null}
+                      </Stack>
+
+                      <Spacer />
+                      {pages.length > 1 ? (
+                        <RecipientViewPagination
+                          marginTop={8}
+                          currentPage={currentPage}
+                          pageCount={pages.length}
+                        />
+                      ) : null}
+                      <RecipientViewFooter marginTop={12} petition={petition} />
+                    </Flex>
+                  </Flex>
+                  {/* End Content */}
+                </Flex>
+                {/* Sidebar */}
+                <RecipientViewSidebar
+                  keycode={keycode}
+                  access={access!}
+                  currentPage={currentPage}
+                />
+              </Stack>
+              {/* End Main content */}
+              {/* Mobile navigation */}
+              <RecipientViewMobileNavigation
+                keycode={keycode}
+                access={access!}
+                currentPage={currentPage}
+                pendingPetitions={pending}
               />
-            )}
-          </Flex>
-        </OverrideWithOrganizationTheme>
-      </ToneProvider>
+            </Flex>
+          </OverrideWithOrganizationTheme>
+        </ToneProvider>
+      </RecipientViewSidebarContextProvider>
     </LastSavedProvider>
-  );
-}
-
-function ReviewBeforeSignDialog({
-  granter,
-  tone,
-  ...props
-}: DialogProps<{ granter: RecipientView_PublicUserFragment; tone: Tone }>) {
-  return (
-    <ConfirmDialog
-      closeOnEsc={false}
-      closeOnOverlayClick={false}
-      size="lg"
-      header={
-        <FormattedMessage
-          id="recipient-view.review-before-sign.header"
-          defaultMessage="Review and sign"
-        />
-      }
-      body={
-        <>
-          <FormattedMessage
-            id="recipient-view.review-before-sign.body-1"
-            defaultMessage="This parallel requires an <b>eSignature</b> in order to be completed."
-            values={{ tone }}
-          />
-          <Spacer marginTop={2} />
-          <FormattedMessage
-            id="recipient-view.review-before-sign.body-2"
-            defaultMessage="{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
-            values={{
-              name: <b>{granter.fullName}</b>,
-              tone,
-            }}
-          />
-        </>
-      }
-      confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.accept" defaultMessage="Accept" />
-        </Button>
-      }
-      cancel={<></>}
-      {...props}
-    />
   );
 }
 
@@ -418,9 +444,6 @@ const _fragments = {
           recipients {
             ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
           }
-        }
-        granter {
-          ...RecipientView_PublicUser
           organization {
             id
             name
@@ -430,22 +453,27 @@ const _fragments = {
             }
           }
         }
+        granter {
+          ...RecipientView_PublicUser
+        }
         contact {
-          ...RecipientViewHeader_PublicContact
           ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
         }
         message {
           ...RecipientView_PublicPetitionMessage
         }
         ...RecipientViewPetitionField_PublicPetitionAccess
+        ...RecipientViewSidebar_PublicPetitionAccess
+        ...RecipientViewHeader_PublicPetitionAccess
       }
       ${this.PublicPetition}
       ${this.PublicUser}
-      ${RecipientViewHeader.fragments.PublicContact}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
       ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
+      ${RecipientViewSidebar.fragments.PublicPetitionAccess}
+      ${RecipientViewHeader.fragments.PublicPetitionAccess}
     `;
   },
   get PublicPetitionMessage() {
@@ -462,12 +490,12 @@ const _fragments = {
         id
         status
         deadline
-        isRecipientViewContentsHidden
         tone
         fields {
           id
           ...RecipientViewPetitionField_PublicPetitionField
           ...completedFieldReplies_PublicPetitionField
+          ...focusPetitionField_PublicPetitionField
         }
         signatureConfig {
           review
@@ -486,8 +514,8 @@ const _fragments = {
         }
         signatureStatus
         isCompletingMessageEnabled
-        ...RecipientViewContentsCard_PublicPetition
-        ...RecipientViewProgressFooter_PublicPetition
+        ...RecipientViewContents_PublicPetition
+        ...RecipientViewProgressBar_PublicPetition
         ...useGetPetitionPages_PublicPetition
         ...LiquidScopeProvider_PublicPetition
         ...useCompletingMessageDialog_PublicPetition
@@ -496,11 +524,11 @@ const _fragments = {
         ...RecipientViewSignatureSentAlert_PublicPetition
         ...usePetitionCanFinalize_PublicPetition
       }
-
+      ${focusPetitionField.fragments.PublicPetitionField}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PetitionSigner}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicSignatureConfig}
-      ${RecipientViewContentsCard.fragments.PublicPetition}
-      ${RecipientViewProgressFooter.fragments.PublicPetition}
+      ${RecipientViewContents.fragments.PublicPetition}
+      ${RecipientViewProgressBar.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
       ${RecipientViewFooter.fragments.PublicPetition}
       ${useGetPetitionPages.fragments.PublicPetition}
@@ -509,7 +537,6 @@ const _fragments = {
       ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
       ${RecipientViewSignatureSentAlert.fragments.PublicPetition}
       ${usePetitionCanFinalize.fragments.PublicPetition}
-
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${completedFieldReplies.fragments.PublicPetitionField}
     `;
@@ -517,14 +544,10 @@ const _fragments = {
   get PublicUser() {
     return gql`
       fragment RecipientView_PublicUser on PublicUser {
-        ...RecipientViewHeader_PublicUser
-        ...RecipientViewContentsCard_PublicUser
-        ...useCompletingMessageDialog_PublicUser
+        ...RecipientViewContents_PublicUser
         ...RecipientViewPetitionStatusAlert_PublicUser
       }
-      ${RecipientViewHeader.fragments.PublicUser}
-      ${RecipientViewContentsCard.fragments.PublicUser}
-      ${useCompletingMessageDialog.fragments.PublicUser}
+      ${RecipientViewContents.fragments.PublicUser}
       ${RecipientViewPetitionStatusAlert.fragments.PublicUser}
     `;
   },
@@ -532,6 +555,7 @@ const _fragments = {
     fragment RecipientView_ConnectionMetadata on ConnectionMetadata {
       country
       browserName
+      deviceType
     }
   `,
 };
@@ -621,4 +645,117 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
   }
 };
 
-export default compose(withMetadata, withDialogs, withApolloData)(RecipientView);
+export default compose(
+  withAssertApolloQuery({
+    query: RecipientView_accessDocument,
+    variables: ({ keycode }: RecipientViewProps) => ({
+      keycode,
+    }),
+    IfLoading: () => (
+      <Stack
+        padding={0}
+        spacing={0}
+        align="stretch"
+        divider={<Divider />}
+        width="100%"
+        height="100vh"
+        overflow="hidden"
+      >
+        {/* Header */}
+        <Stack spacing={0} divider={<Divider />}>
+          <HStack justify="space-between" align="center" paddingX={4} paddingY={2}>
+            <Skeleton height="36px" width="150px" />
+            <HStack>
+              <Skeleton display={{ base: "none", md: "flex" }} height="40px" width="120px" />
+              <Skeleton height="40px" width="100px" />
+              <SkeletonCircle height="40px" width="40px" />
+            </HStack>
+          </HStack>
+          {/* Progress Bar */}
+          <HStack paddingY={1.5} paddingX={4}>
+            <Skeleton height="16px" width="100px" /> <Skeleton height="12px" width="full" />
+          </HStack>
+        </Stack>
+
+        {/* Main Content */}
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          divider={<Divider />}
+          width="100%"
+          height="100%"
+          spacing={0}
+          minHeight={0}
+        >
+          {/* Form Content */}
+          <Stack
+            flex="1"
+            padding={6}
+            width="100%"
+            align="center"
+            backgroundColor="gray.50"
+            height="100%"
+            overflow="hidden"
+          >
+            <Stack maxWidth="container.md" width="100%" spacing={8}>
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="40%" />
+                <SkeletonText height="40px" />
+                <Skeleton height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="50%" />
+                <Skeleton height="40px" />
+                <Skeleton height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="20%" />
+                <SkeletonText height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="70%" />
+                <Skeleton height="40px" />
+                <Skeleton height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="50%" />
+                <Skeleton height="40px" />
+                <Skeleton height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="20%" />
+                <SkeletonText height="40px" />
+              </Stack>
+
+              <Stack spacing={4}>
+                <Skeleton height="20px" width="70%" />
+                <Skeleton height="40px" />
+                <Skeleton height="40px" />
+              </Stack>
+            </Stack>
+          </Stack>
+          {/* Sidebar */}
+          <Stack
+            direction={{ base: "row", md: "column" }}
+            padding={4}
+            spacing={6}
+            justify={{ base: "space-between", md: "inherit" }}
+          >
+            <Skeleton height="24px" width="24px" />
+            <Skeleton height="24px" width="24px" />
+            <Skeleton height="24px" width="24px" />
+            <Skeleton display={{ base: "flex", md: "none" }} height="24px" width="24px" />
+            <SkeletonCircle display={{ base: "flex", md: "none" }} height="24px" width="24px" />
+          </Stack>
+        </Stack>
+      </Stack>
+    ),
+  }),
+  withMetadata,
+  withDialogs,
+  withApolloData,
+)(RecipientView);

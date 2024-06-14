@@ -114,6 +114,14 @@ export const PetitionFieldComment = objectType({
           : null;
       },
     });
+    t.nullable.string("excerptHtml", {
+      description: "The HTML content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return isDefined(root.content_json)
+          ? renderSlateWithMentionsToHtml(root.content_json[0])
+          : null;
+      },
+    });
     t.list.field("mentions", {
       type: "PetitionFieldCommentMention",
       description: "The mentions of the comments.",

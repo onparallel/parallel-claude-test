@@ -2764,3 +2764,21 @@ export const RelationshipIcon = createIcon({
     </g>
   ),
 });
+
+export const InfoCircleIcon = createIcon({
+  displayName: "InfoCircleIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m12 22c5.5228 0 10-4.4772 10-10 0-5.52285-4.4772-10-10-10-5.52285 0-10 4.47715-10 10 0 5.5228 4.47715 10 10 10z" />
+      <path d="m12 16v-4" />
+      <path d="m12 8h.01" />
+    </g>
+  ),
+});

@@ -12,13 +12,11 @@ export type RecipientViewPetitionFieldCard_PetitionFieldSelection =
 
 export interface RecipientViewPetitionFieldCardProps {
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  isInvalid: boolean;
   children: ReactNode;
 }
 
 export function RecipientViewPetitionFieldCard({
   field,
-  isInvalid,
   children,
 }: RecipientViewPetitionFieldCardProps) {
   return (
@@ -28,12 +26,7 @@ export function RecipientViewPetitionFieldCard({
       data-field-type={field.type}
       padding={4}
       overflow="hidden"
-      {...(isInvalid
-        ? {
-            border: "2px solid",
-            borderColor: "red.500",
-          }
-        : {})}
+      layerStyle="highlightable"
     >
       {children}
     </Card>

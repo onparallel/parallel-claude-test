@@ -12,6 +12,7 @@ import {
   RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -48,7 +49,7 @@ export function RecipientViewPetitionFieldLayout({
 }: RecipientViewPetitionFieldLayoutProps) {
   const intl = useIntl();
   const isPetitionField = field.__typename === "PetitionField";
-
+  const [commentsFieldId] = useFieldCommentsQueryState();
   return (
     <>
       <Flex alignItems="baseline" minHeight={6}>
@@ -80,6 +81,7 @@ export function RecipientViewPetitionFieldLayout({
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}
             onClick={onCommentsButtonClick}
+            backgroundColor={commentsFieldId === field.id ? "gray.300" : undefined}
           />
         ) : null}
       </Flex>

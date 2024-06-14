@@ -25,7 +25,7 @@ export const RecipientViewFooter = Object.assign(
         {props.petition.organization.hasRemoveParallelBranding ? null : (
           <Flex fontSize="sm" alignItems="center">
             <FormattedMessage
-              id="recipient-view.created-with"
+              id="generic.created-with-parallel"
               defaultMessage="Created with {parallel}"
               values={{
                 parallel: (
@@ -45,8 +45,7 @@ export const RecipientViewFooter = Object.assign(
         <Stack
           as={List}
           textAlign="center"
-          marginTop={4}
-          marginBottom={8}
+          marginY={4}
           direction={{ base: "column", sm: "row" }}
           spacing={{ base: 4, sm: 8 }}
         >
@@ -55,7 +54,7 @@ export const RecipientViewFooter = Object.assign(
               href={`https://help.onparallel.com/${intl.locale}/collections/3391072?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
               isExternal
             >
-              <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
+              <FormattedMessage id="generic.support-faq" defaultMessage="FAQ" />
             </NormalLink>
           </ListItem>
           <ListItem>
@@ -63,7 +62,10 @@ export const RecipientViewFooter = Object.assign(
               href={`https://www.onparallel.com/${intl.locale}/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
               target="_blank"
             >
-              <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />
+              <FormattedMessage
+                id="generic.terms-and-conditions"
+                defaultMessage="Terms & Conditions"
+              />
             </Link>
           </ListItem>
         </Stack>

@@ -134,7 +134,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         backgroundColor={tabIsNotes ? "yellow.100" : undefined}
         alignItems="flex-start"
       >
-        <Stack flex={1} spacing={1}>
+        <Stack flex={1} spacing={1} minWidth={0}>
           <CommentEditor
             id={`comment-editor-${id}`}
             ref={editorRef}

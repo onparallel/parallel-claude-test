@@ -46,14 +46,12 @@ export function RecipientViewSignatureSentAlert({
   const isPendingStart =
     petition.signatureConfig?.review === true && !isDefined(petition.latestSignatureRequest);
   return (
-    <Alert status={isPendingStart ? "warning" : "success"} zIndex={2}>
+    <Alert status={isPendingStart ? "warning" : "success"} zIndex={2} paddingX={6}>
       <Flex
-        maxWidth="container.lg"
         alignItems={{ base: "end", md: "center" }}
         justifyContent="flex-start"
         marginX="auto"
         width="100%"
-        paddingStart={4}
         flexDirection={{ base: "column", md: "row" }}
         gap={{ base: 2, md: 6 }}
       >

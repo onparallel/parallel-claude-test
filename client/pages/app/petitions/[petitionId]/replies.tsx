@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
+  Flex,
   HStack,
   Heading,
   Stack,
@@ -16,6 +17,7 @@ import {
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
+  CommentIcon,
   DownloadIcon,
   FilePdfIcon,
   ListIcon,
@@ -53,6 +55,7 @@ import { PetitionRepliesFieldComments } from "@parallel/components/petition-repl
 import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
+import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesSummary } from "@parallel/components/petition-replies/PetitionRepliesSummary";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
@@ -153,6 +156,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     "comments",
   );
   const [profileId, setProfileId] = useQueryStateSlice(queryState, setQueryState, "profile");
+
+  const [tabIndex, setTabIndex] = useState(activeFieldId ? 1 : 0);
+
+  useEffect(() => {
+    if (activeFieldId) {
+      setTabIndex(1);
+    }
+  }, [activeFieldId]);
 
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
   const fieldRefs = useMultipleRefs<HTMLElement>();
@@ -590,44 +601,67 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       hasRightPane
       isRightPaneActive={Boolean(activeFieldId)}
       rightPane={
-        activeFieldId && !!activeField ? (
-          <PetitionRepliesFieldComments
-            key={activeFieldId}
-            petition={petition}
-            field={activeField}
-            isDisabled={petition.isAnonymized}
-            onClose={() => setActiveFieldId(null)}
-            onAddComment={handleAddComment}
-            onUpdateComment={handleUpdateComment}
-            onDeleteComment={handleDeleteComment}
-            onMarkAsUnread={handleMarkAsUnread}
-            onlyReadPermission={myEffectivePermission === "READ"}
-          />
-        ) : (
-          <Tabs variant="enclosed" overflow="hidden" {...extendFlexColumn}>
-            <TabList marginX="-1px" marginTop="-1px" flex="none">
+        <>
+          <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
+            {activeFieldId && !!activeField ? (
+              <PetitionRepliesFieldComments
+                key={activeFieldId}
+                petition={petition}
+                field={activeField}
+                isDisabled={petition.isAnonymized}
+                onClose={() => setActiveFieldId(null)}
+                onAddComment={handleAddComment}
+                onUpdateComment={handleUpdateComment}
+                onDeleteComment={handleDeleteComment}
+                onMarkAsUnread={handleMarkAsUnread}
+                onlyReadPermission={myEffectivePermission === "READ"}
+              />
+            ) : null}
+          </Flex>
+          <Tabs
+            index={tabIndex}
+            onChange={(index) => setTabIndex(index)}
+            variant="enclosed"
+            overflow="hidden"
+            {...extendFlexColumn}
+          >
+            <TabList marginX="-1px" marginTop="-1px" flex="none" fontSize="sm">
               <Tab
-                padding={4}
+                paddingY={4}
+                paddingX={3.5}
                 lineHeight={5}
                 fontWeight="bold"
                 borderTopRadius={0}
                 _focusVisible={{ boxShadow: "inline" }}
+                fontSize="sm"
               >
-                <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
+                <ListIcon fontSize="18px" marginEnd={1.5} aria-hidden="true" />
                 <FormattedMessage id="generic.contents" defaultMessage="Contents" />
               </Tab>
+
               <Tab
-                padding={4}
+                paddingY={4}
+                paddingX={3.5}
                 lineHeight={5}
                 fontWeight="bold"
                 borderTopRadius={0}
                 _focusVisible={{ boxShadow: "inline" }}
+                fontSize="sm"
               >
-                <SparklesIcon fontSize="18px" marginEnd={2} role="presentation" />
-                <FormattedMessage
-                  id="page.replies.summary-header"
-                  defaultMessage="Analyze with Mike"
-                />
+                <CommentIcon fontSize="18px" marginEnd={1.5} aria-hidden="true" />
+                <FormattedMessage id="generic.comments" defaultMessage="Comments" />
+              </Tab>
+              <Tab
+                paddingY={4}
+                paddingX={3.5}
+                lineHeight={5}
+                fontWeight="bold"
+                borderTopRadius={0}
+                _focusVisible={{ boxShadow: "inline" }}
+                fontSize="sm"
+              >
+                <SparklesIcon fontSize="18px" marginEnd={1.5} role="presentation" />
+                <FormattedMessage id="page.replies.summary-header" defaultMessage="Mike AI" />
                 <HelpPopover>
                   <Text fontSize="sm">
                     <FormattedMessage
@@ -665,11 +699,32 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 />
               </TabPanel>
               <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
+                {activeFieldId && !!activeField ? (
+                  <PetitionRepliesFieldComments
+                    key={activeFieldId}
+                    petition={petition}
+                    field={activeField}
+                    isDisabled={petition.isAnonymized}
+                    onClose={() => setActiveFieldId(null)}
+                    onAddComment={handleAddComment}
+                    onUpdateComment={handleUpdateComment}
+                    onDeleteComment={handleDeleteComment}
+                    onMarkAsUnread={handleMarkAsUnread}
+                    onlyReadPermission={myEffectivePermission === "READ"}
+                  />
+                ) : (
+                  <PetitionComments
+                    petition={petition}
+                    onSelectField={(fieldId: string) => setActiveFieldId(fieldId)}
+                  />
+                )}
+              </TabPanel>
+              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
                 <PetitionRepliesSummary petition={petition} user={me} onRefetch={refetch} />
               </TabPanel>
             </TabPanels>
           </Tabs>
-        )
+        </>
       }
     >
       <HStack
@@ -890,6 +945,7 @@ PetitionReplies.fragments = {
         ...ShareButton_PetitionBase
         ...ExportRepliesDialog_Petition
         ...useFieldsWithIndices_PetitionBase
+        ...PetitionComments_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionRepliesField.fragments.Petition}
@@ -908,6 +964,7 @@ PetitionReplies.fragments = {
       ${useArchiveFieldGroupReplyIntoProfileDialog.fragments.Petition}
       ${ExportRepliesDialog.fragments.Petition}
       ${useFieldsWithIndices.fragments.PetitionBase}
+      ${PetitionComments.fragments.PetitionBase}
     `;
   },
   get PetitionField() {

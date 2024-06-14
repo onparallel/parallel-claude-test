@@ -5,12 +5,13 @@ import {
   RecipientViewPetitionStatusAlert_PublicUserFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { CloseableAlert } from "../common/CloseableAlert";
+import { isDefined } from "remeda";
 
 interface RecipientViewPetitionStatusAlertProps {
   petition: RecipientViewPetitionStatusAlert_PublicPetitionFragment;
-  granter: RecipientViewPetitionStatusAlert_PublicUserFragment;
+  granter?: RecipientViewPetitionStatusAlert_PublicUserFragment | null;
   tone: Tone;
 }
 
@@ -19,17 +20,22 @@ export function RecipientViewPetitionStatusAlert({
   granter,
   tone,
 }: RecipientViewPetitionStatusAlertProps) {
+  const intl = useIntl();
+
+  const name = isDefined(granter) ? (
+    <b>{granter.fullName}</b>
+  ) : (
+    <i>
+      {intl.formatMessage({
+        id: "generic.deleted-user",
+        defaultMessage: "Deleted user",
+      })}
+    </i>
+  );
+
   return (
-    <CloseableAlert status="success" variant="subtle" zIndex={2}>
-      <Flex
-        maxWidth="container.lg"
-        alignItems="center"
-        justifyContent="flex-start"
-        marginX="auto"
-        width="100%"
-        paddingStart={4}
-        paddingEnd={12}
-      >
+    <CloseableAlert status="success" variant="subtle" zIndex={2} paddingX={6}>
+      <Flex alignItems="center" justifyContent="flex-start" marginX="auto" width="100%">
         <AlertIcon />
         <AlertDescription>
           {petition.status === "COMPLETED" ? (
@@ -39,7 +45,7 @@ export function RecipientViewPetitionStatusAlert({
                   id="component.recipient-view-petition-status-alert.petition-completed-alert-1"
                   defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
                   values={{
-                    name: <b>{granter.fullName}</b>,
+                    name,
                     tone,
                   }}
                 />
@@ -57,7 +63,7 @@ export function RecipientViewPetitionStatusAlert({
               id="component.recipient-view-petition-status-alert.petition-closed-alert"
               defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
               values={{
-                name: <b>{granter.fullName}</b>,
+                name,
               }}
             />
           )}
