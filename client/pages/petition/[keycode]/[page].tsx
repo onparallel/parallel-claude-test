@@ -14,7 +14,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   RedirectError,
@@ -55,7 +55,6 @@ import { compose } from "@parallel/utils/compose";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
-import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
@@ -190,15 +189,13 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             });
           }
           if (showFullScreenDialog && isDefined(data)) {
-            await withError(
-              showCompletingMessageDialog({
-                petition: data!.publicCompletePetition,
-                hasClientPortalAccess: access.hasClientPortalAccess,
-                pendingPetitions: pending,
-                keycode,
-                tone,
-              }),
-            );
+            showCompletingMessageDialog({
+              petition: data!.publicCompletePetition,
+              hasClientPortalAccess: access.hasClientPortalAccess,
+              pendingPetitions: pending,
+              keycode,
+              tone,
+            });
           }
         } else {
           // go to first repliable field without replies
@@ -226,6 +223,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             });
             window.location.reload();
           } catch {}
+        } else if (isDialogError(e)) {
+          return;
         } else {
           showErrorToast(e);
         }

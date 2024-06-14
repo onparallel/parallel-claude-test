@@ -73,6 +73,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
+    const firstFieldWithCommentsId = fields[0].id;
 
     return outdent`
       ${greetingUser({ name: userName }, intl)}
@@ -109,7 +110,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
         id: "petition-comments-user-notification.access-click-link",
         defaultMessage: "Follow the link below link to read and reply to the comments.",
       })}
-      ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
+      ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies?comments=${firstFieldWithCommentsId}
 
       ${closing({}, intl)}
     `;
@@ -137,6 +138,8 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
+
+    const firstFieldWithCommentsId = fields[0].id;
 
     return (
       <Layout
@@ -177,7 +180,9 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
 
         <MjmlSection>
           <MjmlColumn>
-            <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}>
+            <Button
+              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies?comments=${firstFieldWithCommentsId}`}
+            >
               <FormattedMessage
                 id="petition-comments-user-notification.access-button"
                 defaultMessage="Reply to the comments"

@@ -42,7 +42,6 @@ import {
   useStartAsyncFieldCompletion,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
-import { PreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
@@ -358,18 +357,15 @@ PreviewPetitionField.fragments = {
       ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...PreviewPetitionFieldGroup_PetitionBase
-      ...PreviewPetitionFieldCommentsDialog_PetitionBase
     }
     ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
     ${PreviewPetitionFieldGroup.fragments.PetitionBase}
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldLayout_PetitionField
       ...RecipientViewPetitionFieldCard_PetitionField
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
       ...PreviewPetitionFieldGroup_PetitionField
       replies {
         ...RecipientViewPetitionFieldLayout_PetitionFieldReply
@@ -385,7 +381,6 @@ PreviewPetitionField.fragments = {
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
     ${PreviewPetitionFieldGroup.fragments.PetitionField}
     ${completedFieldReplies.fragments.PetitionField}
   `,

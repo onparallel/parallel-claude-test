@@ -47,7 +47,7 @@ export function RecipientViewInformation({
         justify="space-between"
         height="56px"
       >
-        <Heading as="h3" size="md" display="flex">
+        <Heading as="h3" size="sm" display="flex" alignItems="center">
           <InfoCircleIcon boxSize={6} marginEnd={2.5} />
           <FormattedMessage
             id="component.recipient-view-information.heading"

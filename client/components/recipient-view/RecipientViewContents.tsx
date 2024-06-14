@@ -96,7 +96,7 @@ export const RecipientViewContents = Object.assign(
             justify="space-between"
             height="56px"
           >
-            <Heading as="h3" size="md" display="flex">
+            <Heading as="h3" size="sm" display="flex" alignItems="center">
               <ListIcon boxSize={6} marginEnd={2.5} />
               <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
             </Heading>

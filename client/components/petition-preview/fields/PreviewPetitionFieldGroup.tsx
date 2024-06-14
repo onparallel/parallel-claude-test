@@ -29,13 +29,13 @@ import {
   PreviewPetitionFieldGroup_PetitionFieldFragment,
   PreviewPetitionFieldGroup_UserFragment,
 } from "@parallel/graphql/__types";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
 import { zip } from "remeda";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
-import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
 export interface PreviewPetitionFieldGroupProps
@@ -359,7 +359,6 @@ PreviewPetitionFieldGroup.fragments = {
   PetitionField: gql`
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
       ...PreviewPetitionFieldGroup_PetitionFieldData
       children {
         ...RecipientViewPetitionFieldLayout_PetitionField

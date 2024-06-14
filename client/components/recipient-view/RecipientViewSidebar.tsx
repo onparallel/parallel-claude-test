@@ -162,6 +162,7 @@ export function RecipientViewMobileNavigation({
           width="100%"
           minHeight={0}
           bgColor="white"
+          closeOnNavigate
         />
       ) : null}
 
@@ -283,9 +284,10 @@ const RecipientViewSidebarBody = chakraForwardRef<
     currentPage: number;
     access: RecipientViewSidebar_PublicPetitionAccessFragment;
     isRecipientViewContentsHidden: boolean;
+    closeOnNavigate?: boolean;
   }
 >(function RecipientViewSidebarBody(
-  { keycode, currentPage, access, isRecipientViewContentsHidden, ...props },
+  { keycode, currentPage, access, isRecipientViewContentsHidden, closeOnNavigate, ...props },
   ref,
 ) {
   const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
@@ -303,6 +305,7 @@ const RecipientViewSidebarBody = chakraForwardRef<
           currentPage={currentPage}
           petition={access!.petition!}
           onClose={handleClose}
+          closeOnNavigate={closeOnNavigate}
         />
       ) : (
         <RecipientViewComments keycode={keycode} access={access} onClose={handleClose} />

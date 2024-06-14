@@ -47,6 +47,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PublicPetitionFieldCommentExcerpt } from "../common/PublicPetitionFieldCommentExcerpt";
 import { Spacer } from "../common/Spacer";
 import { useMetadata } from "@parallel/utils/withMetadata";
+import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 interface RecipientViewCommentsProps {
   keycode: string;
@@ -81,6 +82,15 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
       fetchPolicy: "cache-and-network",
     },
   );
+
+  useEffect(() => {
+    if (isDefined(fieldId)) {
+      const element = document.getElementById(`field-${fieldId}`);
+      if (element) {
+        smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
+      }
+    }
+  }, [fieldId]);
 
   const field = fieldId ? data?.publicPetitionField : null;
 
@@ -187,10 +197,11 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
     }
   }, [comments, previousCommentCount]);
 
-  // Scroll to bottom when open a field comments view
+  // Scroll to bottom when open a field comments view and focus the editor
   useEffect(() => {
     if (isDefined(fieldId)) {
       commentsRef.current?.scrollTo({ top: 99999 });
+      setTimeout(() => editorRef.current?.focus());
     }
   }, [fieldId, commentsRef.current]);
 
@@ -237,7 +248,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
             )}
           </HStack>
         ) : (
-          <Heading as="h3" size="md" display="flex">
+          <Heading as="h3" size="sm" display="flex" alignItems="center">
             <CommentIcon boxSize={6} marginEnd={2.5} />
             <FormattedMessage
               id="component.recipient-view-comments.heading"
@@ -433,7 +444,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                     <FormattedMessage
                       id="component.recipient-view-comments.ask-with-name"
                       defaultMessage="Ask {name} here"
-                      values={{ name: access.granter!.fullName }}
+                      values={{ name: access.granter!.fullName, tone }}
                     />
                   ) : (
                     <FormattedMessage
