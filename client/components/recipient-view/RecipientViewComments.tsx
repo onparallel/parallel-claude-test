@@ -46,6 +46,7 @@ import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PublicPetitionFieldCommentExcerpt } from "../common/PublicPetitionFieldCommentExcerpt";
 import { Spacer } from "../common/Spacer";
+import { useMetadata } from "@parallel/utils/withMetadata";
 
 interface RecipientViewCommentsProps {
   keycode: string;
@@ -192,6 +193,8 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
       commentsRef.current?.scrollTo({ top: 99999 });
     }
   }, [fieldId, commentsRef.current]);
+
+  const { deviceType } = useMetadata();
 
   return (
     <Flex flexDirection="column" minWidth={0} height="100%" width="100%">
@@ -480,12 +483,15 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                   onKeyDown={handleKeyDown}
                   onChange={setDraft}
                 />
-                <Text fontSize="sm" color="gray.600">
-                  <FormattedMessage
-                    id="component.petition-comments-and-notes-editor.ctrl-enter-help"
-                    defaultMessage="Ctrl + enter to send"
-                  />
-                </Text>
+                {deviceType === null ? (
+                  // show only on desktop
+                  <Text fontSize="sm" color="gray.600">
+                    <FormattedMessage
+                      id="component.petition-comments-and-notes-editor.ctrl-enter-help"
+                      defaultMessage="Ctrl + enter to send"
+                    />
+                  </Text>
+                ) : null}
               </Stack>
               <Box>
                 <Button
