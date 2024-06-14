@@ -4,8 +4,9 @@ import pAll from "p-all";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
+import { withError } from "../../util/promises/withError";
 import { KeysOfType } from "../../util/types";
-import { AuthenticationError } from "./errors";
+import { ApolloError, AuthenticationError, ForbiddenError } from "./errors";
 
 export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
   TypeName extends string,
@@ -56,28 +57,21 @@ function _all<TypeName extends string, FieldName extends string>(
   concurrency: number,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    try {
-      await pAll(
-        resolvers.map((resolver) => async () => {
-          const passes = await resolver(root, args, ctx, info);
+    await pAll(
+      resolvers.map((resolver) => async () => {
+        const [error, passes] = await withError(Promise.resolve(resolver(root, args, ctx, info)));
+        if (typeof passes === "boolean" && passes) {
+          return true;
+        } else {
           if (typeof passes === "boolean") {
-            if (!passes) {
-              throw new Error("Not authorized");
-            }
-            return true;
+            throw new ForbiddenError("Not authorized");
           } else {
-            throw passes;
+            throw passes ?? error;
           }
-        }),
-        { concurrency },
-      );
-    } catch (e: any) {
-      // recapture "Not authorized" error, rethrow otherwise
-      if (e.message === "Not authorized") {
-        return false;
-      }
-      throw e;
-    }
+        }
+      }),
+      { concurrency },
+    );
     return true;
   };
 }
@@ -98,12 +92,18 @@ export function or<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
+    const results = [];
     for (const resolver of resolvers) {
-      if (await resolver(root, args, ctx, info)) {
+      const [error, passes] = await withError(Promise.resolve(resolver(root, args, ctx, info)));
+      if (typeof passes === "boolean" && passes) {
         return true;
+      } else {
+        results.push(passes ?? error);
       }
     }
-    return false;
+    throw new ForbiddenError("No conditions passed", {
+      conditions: results.map((r) => (r instanceof ApolloError ? [r.message, r.extensions] : r)),
+    });
   };
 }
 

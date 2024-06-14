@@ -18,10 +18,11 @@ import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
   predicate: (petition: Petition, ...rest: TRest) => boolean,
+  message?: string,
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
@@ -30,7 +31,14 @@ function createPetitionAuthorizer<TRest extends any[] = []>(
         return true;
       }
       const petitions = await ctx.petitions.loadPetition(petitionIds);
-      return petitions.every((petition) => isDefined(petition) && predicate(petition, ...rest));
+      const result = petitions.every(
+        (petition) => isDefined(petition) && predicate(petition, ...rest),
+      );
+      if (!result && isDefined(message)) {
+        throw new ForbiddenError(message);
+      } else {
+        return result;
+      }
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
@@ -67,13 +75,13 @@ export function userHasAccessToPetitions<
       if (petitionIds.length === 0) {
         return true;
       }
-      return await ctx.petitions.userHasAccessToPetitions(
-        ctx.user!.id,
-        petitionIds,
-        permissionTypes,
-      );
+      if (
+        await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds, permissionTypes)
+      ) {
+        return true;
+      }
     } catch {}
-    return false;
+    throw new ForbiddenError("User has no access to petition");
   };
 }
 
@@ -108,6 +116,7 @@ export function userHasAccessToSignatureRequest<
 
 export const petitionsArePublicTemplates = createPetitionAuthorizer(
   (p) => p.is_template && p.template_public,
+  "Petition is not public template",
 );
 
 export const petitionsAreNotPublicTemplates = createPetitionAuthorizer((p) => !p.template_public);

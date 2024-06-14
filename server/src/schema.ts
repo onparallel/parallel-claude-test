@@ -1,7 +1,7 @@
 import { fieldAuthorizePlugin, makeSchema } from "nexus";
 import path from "path";
 import * as allTypes from "./graphql";
-import { ForbiddenError } from "./graphql/helpers/errors";
+import { ApolloError, ForbiddenError } from "./graphql/helpers/errors";
 import { globalIdPlugin } from "./graphql/helpers/globalIdPlugin";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
 import { validateArgsPlugin } from "./graphql/helpers/validateArgsPlugin";
@@ -23,10 +23,12 @@ export const schema = makeSchema({
     globalIdPlugin(),
     fieldAuthorizePlugin({
       formatError: ({ error }) => {
-        if (error.message === "Not authorized") {
-          return new ForbiddenError(error.message);
+        if (error instanceof ApolloError) {
+          return error;
         }
-        return error;
+        // no deberian llegar cosas aqui, cada authorizer debería retornar un ApolloError explicativo
+        console.warn("Not ApolloError", error);
+        return new ForbiddenError(error.message);
       },
     }),
     validateArgsPlugin(),

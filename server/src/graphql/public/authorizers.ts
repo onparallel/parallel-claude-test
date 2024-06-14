@@ -9,7 +9,7 @@ import { verify } from "../../util/jwt";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
-import { ApolloError, ArgValidationError } from "../helpers/errors";
+import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { core } from "nexus";
 
 export function authenticatePublicAccess<
@@ -19,8 +19,11 @@ export function authenticatePublicAccess<
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-    if (petition.anonymized_at !== null || petition.enable_interaction_with_recipients === false) {
-      return false;
+    if (petition.anonymized_at !== null) {
+      throw new ForbiddenError("Petition is anonymized");
+    }
+    if (petition.enable_interaction_with_recipients === false) {
+      throw new ForbiddenError("Petition does not allow interaction with recipients");
     }
 
     if (petition.skip_forward_security) {
@@ -48,10 +51,11 @@ export function publicPetitionIsNotClosed<
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async function (_, args, ctx) {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-    if (petition.status !== "CLOSED") {
-      return true;
+    if (petition.status === "CLOSED") {
+      throw new ForbiddenError("Petition is closed");
     }
-    return false;
+
+    return true;
   };
 }
 
@@ -110,17 +114,18 @@ export function fieldBelongsToAccess<
   argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      const fieldIds = uniq(
-        unMaybeArray(
-          (typeof argFieldId === "function"
-            ? (argFieldId as any)(args)
-            : (args as any)[argFieldId]) as MaybeArray<number>,
-        ),
-      );
-      return await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, fieldIds);
-    } catch {}
-    return false;
+    const fieldIds = uniq(
+      unMaybeArray(
+        (typeof argFieldId === "function"
+          ? (argFieldId as any)(args)
+          : (args as any)[argFieldId]) as MaybeArray<number>,
+      ),
+    );
+    const passes = await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, fieldIds);
+    if (!passes) {
+      throw new ForbiddenError("Field does not belong to access");
+    }
+    return true;
   };
 }
 
@@ -132,19 +137,20 @@ export function fieldIsExternal<
   argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      const fieldIds = uniq(
-        unMaybeArray(
-          (typeof argFieldId === "function"
-            ? (argFieldId as any)(args)
-            : (args as any)[argFieldId]) as MaybeArray<number>,
-        ),
-      );
+    const fieldIds = uniq(
+      unMaybeArray(
+        (typeof argFieldId === "function"
+          ? (argFieldId as any)(args)
+          : (args as any)[argFieldId]) as MaybeArray<number>,
+      ),
+    );
 
-      const fields = await ctx.petitions.loadField(fieldIds);
-      return fields.every((field) => field?.is_internal === false);
-    } catch {}
-    return false;
+    const fields = await ctx.petitions.loadField(fieldIds);
+    if (!fields.every((field) => field?.is_internal === false)) {
+      throw new ForbiddenError("Field is not external");
+    }
+
+    return true;
   };
 }
 
@@ -156,20 +162,21 @@ export function replyBelongsToAccess<
   argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      const replyIds = uniq(
-        unMaybeArray(
-          (typeof argReplyId === "function"
-            ? (argReplyId as any)(args)
-            : (args as any)[argReplyId]) as MaybeArray<number>,
-        ),
-      );
-      if (replyIds.length === 0) {
-        return true;
-      }
-      return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, replyIds);
-    } catch {}
-    return false;
+    const replyIds = uniq(
+      unMaybeArray(
+        (typeof argReplyId === "function"
+          ? (argReplyId as any)(args)
+          : (args as any)[argReplyId]) as MaybeArray<number>,
+      ),
+    );
+    if (replyIds.length === 0) {
+      return true;
+    }
+    const passes = await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, replyIds);
+    if (!passes) {
+      throw new ForbiddenError("Reply does not belong to access");
+    }
+    return true;
   };
 }
 
@@ -181,18 +188,19 @@ export function replyBelongsToExternalField<
   argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      const replyIds = uniq(
-        unMaybeArray(
-          (typeof argReplyId === "function"
-            ? (argReplyId as any)(args)
-            : (args as any)[argReplyId]) as MaybeArray<number>,
-        ),
-      );
-      const fields = await ctx.petitions.loadFieldForReply(replyIds);
-      return fields.every((f) => f?.is_internal === false);
-    } catch {}
-    return false;
+    const replyIds = uniq(
+      unMaybeArray(
+        (typeof argReplyId === "function"
+          ? (argReplyId as any)(args)
+          : (args as any)[argReplyId]) as MaybeArray<number>,
+      ),
+    );
+    const fields = await ctx.petitions.loadFieldForReply(replyIds);
+    if (!fields.every((f) => f?.is_internal === false)) {
+      throw new ForbiddenError("Reply does not belong to external field");
+    }
+
+    return true;
   };
 }
 
@@ -202,13 +210,14 @@ export function commentsBelongsToAccess<
   TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argCommentId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      return await ctx.petitions.commentsBelongToPetition(
-        ctx.access!.petition_id,
-        unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>),
-      );
-    } catch {}
-    return false;
+    const passes = await ctx.petitions.commentsBelongToPetition(
+      ctx.access!.petition_id,
+      unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>),
+    );
+    if (!passes) {
+      throw new ForbiddenError("Comment does not belong to access");
+    }
+    return true;
   };
 }
 
@@ -221,15 +230,27 @@ export function validPublicPetitionLinkSlug<
     const slug = args[argSlug] as unknown as string;
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
     if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
-      return false;
+      throw new ForbiddenError("Public link not found or inactive");
     }
     const template = await ctx.petitions.loadPetition(publicPetitionLink.template_id);
-    return (
-      isDefined(template) &&
-      template.is_template &&
-      template.anonymized_at === null &&
-      template.enable_interaction_with_recipients
-    );
+
+    if (!isDefined(template)) {
+      throw new ForbiddenError("Template not found");
+    }
+
+    if (!template.is_template) {
+      throw new ForbiddenError("Template is not a template");
+    }
+
+    if (template.anonymized_at !== null) {
+      throw new ForbiddenError("Template is anonymized");
+    }
+
+    if (!template.enable_interaction_with_recipients) {
+      throw new ForbiddenError("Template does not allow interaction with recipients");
+    }
+
+    return true;
   };
 }
 
@@ -249,7 +270,7 @@ export function validPublicPetitionLinkPrefill<
         return true;
       }
     } catch {}
-    return false;
+    throw new ForbiddenError("Public link prefill is not valid");
   };
 }
 
@@ -259,23 +280,20 @@ export function validPublicPetitionLinkPrefillDataKeycode<
   TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      const keycode = args[argKeycode] as unknown as string;
-      const publicPrefillData =
-        await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(keycode);
-      if (!publicPrefillData) {
-        return false;
-      }
+    const keycode = args[argKeycode] as unknown as string;
+    const publicPrefillData =
+      await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(keycode);
+    if (!publicPrefillData) {
+      throw new ForbiddenError("Public prefill data not found");
+    }
 
-      const template = await ctx.petitions.loadPetition(publicPrefillData.template_id);
+    const template = await ctx.petitions.loadPetition(publicPrefillData.template_id);
 
-      if (!template || !template.is_template) {
-        return false;
-      }
+    if (!template || !template.is_template) {
+      throw new ForbiddenError("Template not found or not a template");
+    }
 
-      return true;
-    } catch {}
-    return false;
+    return true;
   };
 }
 
@@ -285,13 +303,14 @@ export function taskBelongsToAccess<
   TArg extends Arg<TypeName, FieldName, number>,
 >(taskIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      return await ctx.tasks.taskBelongsToAccess(
-        args[taskIdArg] as unknown as number,
-        ctx.access!.id,
-      );
-    } catch {}
-    return false;
+    const passes = await ctx.tasks.taskBelongsToAccess(
+      args[taskIdArg] as unknown as number,
+      ctx.access!.id,
+    );
+    if (!passes) {
+      throw new ForbiddenError("Task does not belong to access");
+    }
+    return true;
   };
 }
 
@@ -310,7 +329,7 @@ export function validPetitionFieldCommentContent<
     const fieldId = args[argFieldId] as unknown as number;
     const ajv = new Ajv();
     if (!content) {
-      return false;
+      throw new ForbiddenError("comment content is not defined");
     }
     const valid = ajv.validate(
       {
@@ -378,11 +397,14 @@ export function validPetitionFieldCommentContent<
       const petition = (await ctx.petitions.loadPetition(field.petition_id))!;
       const mentions = collectMentionsFromSlate(content);
       const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
-      return await ctx.petitions.canBeMentionedInPetitionFieldComment(
+      const passes = await ctx.petitions.canBeMentionedInPetitionFieldComment(
         petition.org_id,
         userMentions.map((m) => m.id),
         userGroupMentions.map((m) => m.id),
       );
+      if (!passes) {
+        throw new ForbiddenError("Mention not allowed");
+      }
     }
     return true;
   };

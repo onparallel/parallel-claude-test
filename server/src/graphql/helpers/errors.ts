@@ -1,5 +1,4 @@
 import { GraphQLError, GraphQLResolveInfo } from "graphql";
-import {} from "@apollo/server/errors";
 
 export class ApolloError extends GraphQLError {
   override readonly name: string = "ApolloError";
