@@ -120,7 +120,9 @@ function CreateProfileDialog({
             const profile = await createProfile({
               variables: {
                 profileTypeId: profileTypeId!,
-                fields: fieldValues,
+                fields: fieldValues.filter(
+                  (value) => isDefined(value?.content?.value) && value!.content!.value !== "",
+                ),
               },
             });
             props.onResolve({
