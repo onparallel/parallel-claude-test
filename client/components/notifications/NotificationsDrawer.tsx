@@ -26,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
+import { NotificationsButton } from "./NotificationsButton";
 
 const NOTIFICATIONS_LIMIT = 16;
 const POLL_INTERVAL = 30_000;
@@ -221,7 +222,7 @@ NotificationsDrawer.queries = [
     ) {
       me {
         id
-        unreadNotificationIds
+        ...NotificationsButton_User
         notifications(limit: $limit, before: $before, filter: $filter) {
           items {
             ...NotificationsDrawer_PetitionUserNotification
@@ -230,6 +231,7 @@ NotificationsDrawer.queries = [
         }
       }
     }
+    ${NotificationsButton.fragments.User}
     ${NotificationsDrawer.fragments.PetitionUserNotification}
   `,
 ];

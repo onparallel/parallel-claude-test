@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Badge, Box, BoxProps } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Notifications_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
+import { NotificationsButton_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
@@ -13,11 +13,11 @@ const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 
 const POLL_INTERVAL = 30_000;
 
-export const NotificationsButton = chakraForwardRef<"button", {}>(
-  function NotificationsBell(props, ref) {
+export const NotificationsButton = Object.assign(
+  chakraForwardRef<"button", {}>(function NotificationsBell(props, ref) {
     const intl = useIntl();
     const { data, startPolling, stopPolling } = useQuery(
-      Notifications_UnreadPetitionUserNotificationIdsDocument,
+      NotificationsButton_UnreadPetitionUserNotificationIdsDocument,
       { pollInterval: POLL_INTERVAL },
     );
     const { isOpen, onOpen } = useNotificationsState();
@@ -31,7 +31,10 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(
       return () => stopPolling();
     }, [isOpen]);
 
-    const unreadCount = data?.me.unreadNotificationIds.length ?? 0;
+    const unreadCount =
+      (data?.me.unreadNotificationIds.length && data?.me.unreadNotificationIds.length > 0
+        ? data?.me.unreadNotificationIds.length
+        : data?.me.unreadNotificationCount) ?? 0;
 
     const bellAnimation = {
       rotate: [0, 5, -5, 4, -4, 2, -2, 1, 0].map((x) => x * 3),
@@ -102,16 +105,27 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(
         {...props}
       />
     );
+  }),
+  {
+    fragments: {
+      User: gql`
+        fragment NotificationsButton_User on User {
+          unreadNotificationIds
+          unreadNotificationCount
+        }
+      `,
+    },
   },
 );
 
 const _queries = [
   gql`
-    query Notifications_UnreadPetitionUserNotificationIds {
+    query NotificationsButton_UnreadPetitionUserNotificationIds {
       me {
         id
-        unreadNotificationIds
+        ...NotificationsButton_User
       }
     }
+    ${NotificationsButton.fragments.User}
   `,
 ];

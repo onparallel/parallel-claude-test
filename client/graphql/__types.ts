@@ -5908,6 +5908,7 @@ export interface User extends Timestamps {
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
+  unreadNotificationCount: Scalars["Int"]["output"];
   unreadNotificationIds: Array<Scalars["GID"]["output"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -7985,12 +7986,23 @@ export type UserSettingsLayout_QueryFragment = {
   };
 };
 
-export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
+export type NotificationsButton_UserFragment = {
+  __typename?: "User";
+  unreadNotificationIds: Array<string>;
+  unreadNotificationCount: number;
+};
+
+export type NotificationsButton_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
-  me: { __typename?: "User"; id: string; unreadNotificationIds: Array<string> };
+export type NotificationsButton_UnreadPetitionUserNotificationIdsQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
+  };
 };
 
 export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
@@ -8163,6 +8175,7 @@ export type NotificationsDrawer_notificationsQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     notifications: {
       __typename?: "UserNotifications_Pagination";
       hasMore: boolean;
@@ -29596,6 +29609,7 @@ export type PetitionActivity_QueryFragment = {
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -31047,6 +31061,7 @@ export type PetitionActivity_userQuery = {
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -31798,6 +31813,7 @@ export type PetitionCompose_QueryFragment = {
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -33745,6 +33761,7 @@ export type PetitionCompose_userQuery = {
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -40445,6 +40462,7 @@ export type PetitionReplies_userQuery = {
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
+    unreadNotificationCount: number;
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
@@ -46080,6 +46098,7 @@ export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
+  unreadNotificationCount: number;
 };
 
 export type useUpdateIsReadNotification_PetitionFieldCommentFragment = {
@@ -48608,6 +48627,12 @@ export const UserGroupLayout_QueryFragmentDoc = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<UserGroupLayout_QueryFragment, unknown>;
+export const NotificationsButton_UserFragmentDoc = gql`
+  fragment NotificationsButton_User on User {
+    unreadNotificationIds
+    unreadNotificationCount
+  }
+` as unknown as DocumentNode<NotificationsButton_UserFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
   fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
     id
@@ -52585,6 +52610,7 @@ export const useUpdateIsReadNotification_UserFragmentDoc = gql`
   fragment useUpdateIsReadNotification_User on User {
     id
     unreadNotificationIds
+    unreadNotificationCount
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_UserFragment, unknown>;
 export const AddPetitionAccessDialog_UserFragmentDoc = gql`
@@ -57133,16 +57159,17 @@ export const UserGroupLayout_cloneUserGroupsDocument = gql`
   UserGroupLayout_cloneUserGroupsMutation,
   UserGroupLayout_cloneUserGroupsMutationVariables
 >;
-export const Notifications_UnreadPetitionUserNotificationIdsDocument = gql`
-  query Notifications_UnreadPetitionUserNotificationIds {
+export const NotificationsButton_UnreadPetitionUserNotificationIdsDocument = gql`
+  query NotificationsButton_UnreadPetitionUserNotificationIds {
     me {
       id
-      unreadNotificationIds
+      ...NotificationsButton_User
     }
   }
+  ${NotificationsButton_UserFragmentDoc}
 ` as unknown as DocumentNode<
-  Notifications_UnreadPetitionUserNotificationIdsQuery,
-  Notifications_UnreadPetitionUserNotificationIdsQueryVariables
+  NotificationsButton_UnreadPetitionUserNotificationIdsQuery,
+  NotificationsButton_UnreadPetitionUserNotificationIdsQueryVariables
 >;
 export const NotificationsDrawer_notificationsDocument = gql`
   query NotificationsDrawer_notifications(
@@ -57152,7 +57179,7 @@ export const NotificationsDrawer_notificationsDocument = gql`
   ) {
     me {
       id
-      unreadNotificationIds
+      ...NotificationsButton_User
       notifications(limit: $limit, before: $before, filter: $filter) {
         items {
           ...NotificationsDrawer_PetitionUserNotification
@@ -57161,6 +57188,7 @@ export const NotificationsDrawer_notificationsDocument = gql`
       }
     }
   }
+  ${NotificationsButton_UserFragmentDoc}
   ${NotificationsDrawer_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<
   NotificationsDrawer_notificationsQuery,

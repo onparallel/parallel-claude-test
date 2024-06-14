@@ -140,11 +140,20 @@ export const User = objectType({
         return await ctx.userAuthentication.loadUserAuthenticationTokens(root.id);
       },
     });
+    t.int("unreadNotificationCount", {
+      authorize: rootIsContextUser(),
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadUnreadPetitionUserNotificationCountByUserId(o.id);
+      },
+    });
     t.list.globalId("unreadNotificationIds", {
       prefixName: "PetitionUserNotification",
       authorize: rootIsContextUser(),
       resolve: async (o, _, ctx) => {
-        return await ctx.petitions.loadUnreadPetitionUserNotificationsIdsByUserId(o.id);
+        const count = await ctx.petitions.loadUnreadPetitionUserNotificationCountByUserId(o.id);
+        return count < 1000
+          ? await ctx.petitions.loadUnreadPetitionUserNotificationsIdsByUserId(o.id)
+          : [];
       },
     });
     t.paginationField("notifications", {

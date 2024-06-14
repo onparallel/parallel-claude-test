@@ -6,9 +6,10 @@ import {
   useUpdateIsReadNotification_UserFragmentDoc,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { difference, uniq } from "remeda";
+import { difference, isDefined, uniq } from "remeda";
 import { getMyId } from "../apollo/getMyId";
 import { updateFragment } from "../apollo/updateFragment";
+import { assert } from "ts-essentials";
 
 export function useUpdateIsReadNotification() {
   const [updateIsReadNotification] = useMutation(
@@ -30,12 +31,17 @@ export function useUpdateIsReadNotification() {
           updateFragment(cache, {
             fragment: useUpdateIsReadNotification_UserFragmentDoc,
             id: getMyId(cache),
-            data: (user) => ({
-              ...user!,
-              unreadNotificationIds: variables.isRead
-                ? difference(user!.unreadNotificationIds, notificationIds)
-                : uniq([...user!.unreadNotificationIds, ...notificationIds]),
-            }),
+            data: (user) => {
+              assert(isDefined(user), "User exists in cache");
+              return {
+                ...user,
+                unreadNotificationIds: variables.isRead
+                  ? difference(user.unreadNotificationIds, notificationIds)
+                  : user.unreadNotificationCount > 0 && user.unreadNotificationIds.length === 0
+                    ? []
+                    : uniq([...user.unreadNotificationIds, ...notificationIds]),
+              };
+            },
           });
 
           for (const notification of notifications) {
@@ -62,6 +68,7 @@ useUpdateIsReadNotification.fragments = {
     fragment useUpdateIsReadNotification_User on User {
       id
       unreadNotificationIds
+      unreadNotificationCount
     }
   `,
   PetitionFieldComment: gql`

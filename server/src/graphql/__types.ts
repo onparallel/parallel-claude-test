@@ -3636,6 +3636,7 @@ export interface NexusGenFieldTypes {
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
+    unreadNotificationCount: number; // Int!
     unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
@@ -6167,6 +6168,7 @@ export interface NexusGenFieldTypeNames {
     preferredLocale: "UserLocale";
     status: "UserStatus";
     tokens: "UserAuthenticationToken";
+    unreadNotificationCount: "Int";
     unreadNotificationIds: "GID";
     updatedAt: "DateTime";
     userGroups: "UserGroup";

@@ -4124,6 +4124,18 @@ export class PetitionRepository extends BaseRepository {
     },
   );
 
+  readonly loadUnreadPetitionUserNotificationCountByUserId = this.buildLoader<number, number>(
+    async (keys, t) => {
+      const notifications = await this.from("petition_user_notification", t)
+        .whereIn("user_id", keys)
+        .whereNull("read_at")
+        .groupBy("user_id")
+        .select<{ user_id: number; count: number }[]>(["user_id", this.count()]);
+      const byUserId = indexBy(notifications, (n) => n.user_id);
+      return keys.map((k) => byUserId[k]?.count ?? 0);
+    },
+  );
+
   async markOldPetitionUserNotificationsAsRead(months: number) {
     await this.from("petition_user_notification")
       .whereNull("read_at")
