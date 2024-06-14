@@ -151,7 +151,7 @@ export const User = objectType({
       authorize: rootIsContextUser(),
       resolve: async (o, _, ctx) => {
         const count = await ctx.petitions.loadUnreadPetitionUserNotificationCountByUserId(o.id);
-        return count < 1000
+        return count > 0 && count < 1000
           ? await ctx.petitions.loadUnreadPetitionUserNotificationsIdsByUserId(o.id)
           : [];
       },
