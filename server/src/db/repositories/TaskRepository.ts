@@ -79,6 +79,9 @@ export type TaskInput<TName extends TaskName> = {
     | AddPetitionPermissionsInput
     | EditPetitionPermissionsInput
     | RemovePetitionPermissionsInput;
+  PROFILE_NAME_PATTERN_UPDATED: {
+    profile_type_id: number;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -205,6 +208,10 @@ export type TaskOutput<TName extends TaskName> = {
     temporary_file_id: number;
   };
   PETITION_SHARING: {
+    success: boolean;
+    error?: any;
+  };
+  PROFILE_NAME_PATTERN_UPDATED: {
     success: boolean;
     error?: any;
   };

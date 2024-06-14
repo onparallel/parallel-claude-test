@@ -13,6 +13,7 @@ import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
 import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
+import { ProfileNamePatternUpdatedRunner } from "./tasks/ProfileNamePatternUpdatedRunner";
 import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
@@ -32,6 +33,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   PETITION_SUMMARY: PetitionSummaryRunner,
   BACKGROUND_CHECK_PROFILE_PDF: BackgroundCheckProfilePdfRunner,
   PETITION_SHARING: PetitionSharingRunner,
+  PROFILE_NAME_PATTERN_UPDATED: ProfileNamePatternUpdatedRunner,
 };
 
 export interface TaskWorkerPayload {

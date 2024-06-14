@@ -83,13 +83,12 @@ export class ProfilesSetupService implements IProfilesSetupService {
         createdBy,
         t,
       );
-      await this.profiles.updateProfileTypeProfileNamePattern(
+      return await this.profiles.updateProfileType(
         profileType.id,
-        [field.id],
+        { profile_name_pattern: [field.id] },
         createdBy,
         t,
       );
-      return profileType;
     });
   }
 
@@ -1091,9 +1090,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
     const counterParty = contractFields.find((f) => f.alias === "p_counterparty")!;
     const contractType = contractFields.find((f) => f.alias === "p_contract_type")!;
 
-    await this.profiles.updateProfileTypeProfileNamePattern(
+    await this.profiles.updateProfileType(
       contract.id,
-      [counterParty.id, " - ", contractType.id],
+      { profile_name_pattern: [counterParty.id, " - ", contractType.id] },
       createdBy,
       t,
     );
@@ -1122,9 +1121,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
     const firstName = individualFields.find((f) => f.alias === "p_first_name")!;
     const lastName = individualFields.find((f) => f.alias === "p_last_name")!;
 
-    await this.profiles.updateProfileTypeProfileNamePattern(
+    await this.profiles.updateProfileType(
       individual.id,
-      [firstName.id, " ", lastName.id],
+      { profile_name_pattern: [firstName.id, " ", lastName.id] },
       createdBy,
       t,
     );
@@ -1156,9 +1155,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
 
     const entityName = legalEntityFields.find((f) => f.alias === "p_entity_name")!;
 
-    await this.profiles.updateProfileTypeProfileNamePattern(
+    await this.profiles.updateProfileType(
       legalEntity.id,
-      [entityName.id],
+      { profile_name_pattern: [entityName.id] },
       createdBy,
       t,
     );

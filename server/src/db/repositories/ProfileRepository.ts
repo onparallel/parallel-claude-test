@@ -220,7 +220,10 @@ export class ProfileRepository extends BaseRepository {
       .whereNull("deleted_at")
       .update(
         {
-          ...data,
+          ...omit(data, ["profile_name_pattern"]),
+          profile_name_pattern: data.profile_name_pattern
+            ? this.json(data.profile_name_pattern)
+            : undefined,
           updated_by: updatedBy,
           updated_at: this.now(),
         },
@@ -899,7 +902,7 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async updateProfileTypeProfileNamePattern(
+  async updateProfileNamesByProfileTypePattern(
     profileTypeId: number,
     pattern: (string | number)[],
     updatedBy: string,
@@ -933,15 +936,17 @@ export class ProfileRepository extends BaseRepository {
       );
 
       if (profileValues.length > 0) {
-        await this.updateProfileNamesWithPattern(pattern, profileValues, updatedBy, t);
+        await pMapChunk(
+          profileValues,
+          async (chunk) => {
+            await this.updateProfileNamesWithPattern(pattern, chunk, updatedBy, t);
+          },
+          {
+            concurrency: 1,
+            chunkSize: 100,
+          },
+        );
       }
-
-      return await this.updateProfileType(
-        profileTypeId,
-        { profile_name_pattern: this.json(pattern) },
-        updatedBy,
-        t,
-      );
     }, t);
   }
 

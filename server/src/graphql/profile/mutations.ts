@@ -78,8 +78,8 @@ import {
   profileTypeIsArchived,
   profileTypeIsNotStandard,
   profilesCanBeAssociated,
-  userHasAccessToProfile,
   relationshipBelongsToProfile,
+  userHasAccessToProfile,
   userHasAccessToProfileRelationshipsInput,
   userHasAccessToProfileType,
   userHasPermissionOnProfileTypeField,
@@ -133,18 +133,31 @@ export const updateProfileType = mutationField("updateProfileType", {
     if (isDefined(name)) {
       updateData.name = name;
     }
-    await ctx.profiles.updateProfileType(profileTypeId, updateData, `User:${ctx.user!.id}`);
     if (isDefined(profileNamePattern)) {
-      const pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
+      updateData.profile_name_pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
         p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text,
       );
-      await ctx.profiles.updateProfileTypeProfileNamePattern(
-        profileTypeId,
-        pattern,
+    }
+    const profileType = await ctx.profiles.updateProfileType(
+      profileTypeId,
+      updateData,
+      `User:${ctx.user!.id}`,
+    );
+
+    if (isDefined(updateData.profile_name_pattern)) {
+      await ctx.tasks.createTask(
+        {
+          name: "PROFILE_NAME_PATTERN_UPDATED",
+          input: {
+            profile_type_id: profileTypeId,
+          },
+          user_id: ctx.user!.id,
+        },
         `User:${ctx.user!.id}`,
       );
     }
-    return (await ctx.profiles.loadProfileType(profileTypeId, { refresh: true }))!;
+
+    return profileType;
   },
 });
 
@@ -527,73 +540,81 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     try {
-      return await ctx.profiles.withTransaction(async (t) => {
-        if (updateData.is_expirable === false) {
-          const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
-            args.profileTypeFieldId,
-            profileTypeField.type,
-            t,
-          );
-          if (repliesHaveExpirySet && !args.force) {
-            throw new ApolloError(
-              `Cannot remove expiry date from field because some profiles have expiry dates set for this field.`,
-              "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR",
-            );
-          }
-          // if removing caducity, remove expiry dates from all profile replies
-          const pfvs = await ctx.profiles.removeProfileFieldValuesExpiryDateByProfileTypeFieldId(
-            args.profileTypeFieldId,
-            t,
-          );
-          const pffs = await ctx.profiles.removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
-            args.profileTypeFieldId,
-            t,
-          );
-
-          const byProfileId = groupBy([...pfvs, ...pffs], (v) => v.profile_id);
-          for (const [profileId, values] of Object.entries(byProfileId)) {
-            await ctx.profiles.createProfileUpdatedEvents(
-              parseInt(profileId),
-              values.map((v) => ({
-                type: "PROFILE_FIELD_EXPIRY_UPDATED",
-                profile_id: v.profile_id,
-                org_id: ctx.user!.org_id,
-                data: {
-                  alias: profileTypeField.alias,
-                  expiry_date: null,
-                  profile_type_field_id: profileTypeField.id,
-                  user_id: ctx.user!.id,
-                },
-              })),
-              ctx.user!,
+      const { updatedProfileTypeField, isProfileNamePatternUpdated } =
+        await ctx.profiles.withTransaction(async (t) => {
+          if (updateData.is_expirable === false) {
+            const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
+              args.profileTypeFieldId,
+              profileTypeField.type,
               t,
             );
-          }
-        }
-        const updatedProfileTypeField = await ctx.profiles.updateProfileTypeField(
-          args.profileTypeFieldId,
-          updateData,
-          `User:${ctx.user!.id}`,
-          t,
-        );
+            if (repliesHaveExpirySet && !args.force) {
+              throw new ApolloError(
+                `Cannot remove expiry date from field because some profiles have expiry dates set for this field.`,
+                "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR",
+              );
+            }
+            // if removing caducity, remove expiry dates from all profile replies
+            const pfvs = await ctx.profiles.removeProfileFieldValuesExpiryDateByProfileTypeFieldId(
+              args.profileTypeFieldId,
+              t,
+            );
+            const pffs = await ctx.profiles.removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
+              args.profileTypeFieldId,
+              t,
+            );
 
-        // if the profile type field is a SELECT, it is included in profileType name pattern and its options were updated, update all profile names
-        const profileType = await ctx.profiles.loadProfileType.raw(args.profileTypeId, t);
-        if (
-          profileTypeField.type === "SELECT" &&
-          isDefined(updateData.options) &&
-          profileType?.profile_name_pattern.includes(profileTypeField.id)
-        ) {
-          await ctx.profiles.updateProfileTypeProfileNamePattern(
-            profileType.id,
-            profileType.profile_name_pattern,
+            const byProfileId = groupBy([...pfvs, ...pffs], (v) => v.profile_id);
+            for (const [profileId, values] of Object.entries(byProfileId)) {
+              await ctx.profiles.createProfileUpdatedEvents(
+                parseInt(profileId),
+                values.map((v) => ({
+                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                  profile_id: v.profile_id,
+                  org_id: ctx.user!.org_id,
+                  data: {
+                    alias: profileTypeField.alias,
+                    expiry_date: null,
+                    profile_type_field_id: profileTypeField.id,
+                    user_id: ctx.user!.id,
+                  },
+                })),
+                ctx.user!,
+                t,
+              );
+            }
+          }
+          const updatedProfileTypeField = await ctx.profiles.updateProfileTypeField(
+            args.profileTypeFieldId,
+            updateData,
             `User:${ctx.user!.id}`,
             t,
           );
-        }
 
-        return updatedProfileTypeField;
-      });
+          // if the profile type field is a SELECT, it is included in profileType name pattern and its options were updated, update all profile names
+          const profileType = await ctx.profiles.loadProfileType.raw(args.profileTypeId, t);
+          const isProfileNamePatternUpdated =
+            profileTypeField.type === "SELECT" &&
+            isDefined(updateData.options) &&
+            profileType?.profile_name_pattern.includes(profileTypeField.id);
+
+          return { updatedProfileTypeField, isProfileNamePatternUpdated };
+        });
+
+      if (isProfileNamePatternUpdated) {
+        await ctx.tasks.createTask(
+          {
+            name: "PROFILE_NAME_PATTERN_UPDATED",
+            input: {
+              profile_type_id: args.profileTypeId,
+            },
+            user_id: ctx.user!.id,
+          },
+          `User:${ctx.user!.id}`,
+        );
+      }
+
+      return updatedProfileTypeField;
     } catch (e) {
       if (
         e instanceof DatabaseError &&

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
-import { isDefined, range, times, omit } from "remeda";
+import { isDefined, omit, range, times } from "remeda";
 import {
   FileUpload,
   Organization,
@@ -12,8 +12,8 @@ import {
   Profile,
   ProfileType,
   ProfileTypeField,
-  ProfileTypeFieldType,
   ProfileTypeFieldPermission,
+  ProfileTypeFieldType,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -1787,6 +1787,10 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("createProfileType", () => {
+    beforeEach(async () => {
+      await mocks.knex.from("task").delete();
+    });
+
     it("creates a new profile type on organization", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -1879,7 +1883,7 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("updates profile names when changing the profile name pattern", async () => {
+    it("creates a task to update profile names when changing the profile name pattern", async () => {
       async function createIndividualProfile(firstName?: string, lastName?: string, risk?: string) {
         const { data } = await testClient.execute(
           gql`
@@ -1976,94 +1980,25 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toBeUndefined();
+
+      const dbTask = await mocks.knex
+        .from("task")
+        .where("name", "PROFILE_NAME_PATTERN_UPDATED")
+        .select("*");
+
+      expect(dbTask).toHaveLength(1);
+      expect(dbTask[0]).toMatchObject({
+        name: "PROFILE_NAME_PATTERN_UPDATED",
+        input: {
+          profile_type_id: profileTypes[0].id,
+        },
+        user_id: sessionUser.id,
+        processed_at: null,
+      });
+
       expect(data2.updateProfileType).toEqual({
         id: toGlobalId("ProfileType", profileTypes[0].id),
         profileNamePattern: `{{ ${lastName} }}, {{ ${firstName} }}`,
-      });
-
-      const { data: data3 } = await testClient.execute(
-        gql`
-          query ($limit: Int, $offset: Int, $sortBy: [QueryProfiles_OrderBy!]) {
-            profiles(limit: $limit, offset: $offset, sortBy: $sortBy) {
-              totalCount
-              items {
-                id
-                name
-              }
-            }
-          }
-        `,
-        {
-          limit: 10,
-          offset: 0,
-          sortBy: ["name_DESC"],
-          locale: "en",
-        },
-      );
-      expect(data3.profiles).toEqual({
-        totalCount: 5,
-        items: [
-          { id: expect.any(String), name: ", Trump" },
-          { id: expect.any(String), name: "Obama," },
-          { id: expect.any(String), name: "Mouse, Mickey" },
-          { id: expect.any(String), name: "Duck, Donald" },
-          { id: expect.any(String), name: "," },
-        ],
-      });
-
-      const emptyField = toGlobalId("ProfileTypeField", profileType0Fields[5].id);
-      const { errors: errorsEmptyField, data: dataEmptyField } = await testClient.execute(
-        gql`
-          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
-            updateProfileType(
-              profileTypeId: $profileTypeId
-              profileNamePattern: $profileNamePattern
-            ) {
-              id
-              profileNamePattern
-            }
-          }
-        `,
-        {
-          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileNamePattern: `{{${emptyField}}}-static-text`,
-        },
-      );
-
-      expect(errorsEmptyField).toBeUndefined();
-      expect(dataEmptyField.updateProfileType).toEqual({
-        id: toGlobalId("ProfileType", profileTypes[0].id),
-        profileNamePattern: `{{ ${emptyField} }}-static-text`,
-      });
-
-      const { data: dataProfilesEmptyField } = await testClient.execute(
-        gql`
-          query ($limit: Int, $offset: Int, $sortBy: [QueryProfiles_OrderBy!]) {
-            profiles(limit: $limit, offset: $offset, sortBy: $sortBy) {
-              totalCount
-              items {
-                id
-                name
-              }
-            }
-          }
-        `,
-        {
-          limit: 10,
-          offset: 0,
-          sortBy: ["name_DESC"],
-          locale: "en",
-        },
-      );
-      expect(dataProfilesEmptyField.profiles).toEqual({
-        totalCount: 5,
-        items: [
-          { id: expect.any(String), name: "-static-text" },
-          { id: expect.any(String), name: "-static-text" },
-          { id: expect.any(String), name: "-static-text" },
-          { id: expect.any(String), name: "-static-text" },
-          { id: expect.any(String), name: "-static-text" },
-        ],
       });
     });
 

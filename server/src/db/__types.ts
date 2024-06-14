@@ -481,7 +481,8 @@ export type TaskName =
   | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "PETITION_SUMMARY"
   | "BACKGROUND_CHECK_PROFILE_PDF"
-  | "PETITION_SHARING";
+  | "PETITION_SHARING"
+  | "PROFILE_NAME_PATTERN_UPDATED";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -497,6 +498,7 @@ export const TaskNameValues = [
   "PETITION_SUMMARY",
   "BACKGROUND_CHECK_PROFILE_PDF",
   "PETITION_SHARING",
+  "PROFILE_NAME_PATTERN_UPDATED",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
