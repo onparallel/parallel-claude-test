@@ -64,9 +64,9 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, omit } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
@@ -92,22 +92,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     : 0;
 
   useEffect(() => {
-    if (isDefined(router.query.reply)) {
-      const replyId = router.query.reply;
-      const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
-
-      if (element) {
-        smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
-        element.focus();
-        if (element.type === "text") {
-          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-          element.setSelectionRange?.(element.value.length, element.value.length);
-        }
-      }
-    }
-  }, [router.query]);
-
-  useEffect(() => {
     refetchAccessesCount();
   }, [access.petition.status]);
 
@@ -124,13 +108,22 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     petition.isCompletingMessageEnabled &&
     (petition.completingMessageBody || petition.completingMessageSubject);
 
-  const allFields = useMemo(
-    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
-    [petition.fields],
-  );
-
   const highlight = useHighlightElement();
   useEffect(() => {
+    if (isDefined(router.query.reply)) {
+      const replyId = router.query.reply;
+      const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
+
+      if (element) {
+        smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
+        element.focus();
+        if (element.type === "text") {
+          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+          element.setSelectionRange?.(element.value.length, element.value.length);
+        }
+      }
+    }
+    const allFields = petition.fields.flatMap((f) => [f, ...(f.children ?? [])]);
     if (isDefined(router.query.field)) {
       const { field: fieldId, parentReply: parentReplyId } = router.query;
 
@@ -144,8 +137,20 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         highlight(element, true);
       }
     }
-  }, [router.query]);
-
+    if (isDefined(router.query.comments)) {
+      // when navigating from comments email, it will always go to page 1 but field might be in another page
+      const fieldId = router.query.comments as string;
+      const page =
+        pages.findIndex((p) =>
+          p.some((f) => f.field.id === fieldId || f.field.children?.some((f) => f.id === fieldId)),
+        ) + 1 || 1;
+      if (currentPage !== page) {
+        router.push(
+          `/petition/${keycode}/${page}?${new URLSearchParams(omit(router.query as Record<string, string>, ["keycode", "page"]))}`,
+        );
+      }
+    }
+  }, [router.query, currentPage]);
   const showErrorDialog = useErrorDialog();
 
   const [showRefreshRepliesAlert, setShowRefreshRepliesAlert] = useState(false);

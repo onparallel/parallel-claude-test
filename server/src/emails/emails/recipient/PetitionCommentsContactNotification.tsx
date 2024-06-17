@@ -10,6 +10,7 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../../components/PetitionFieldAndCommentsList";
 import { closing, greetingContact } from "../../components/texts";
+import { toGlobalId } from "../../../util/globalId";
 
 export type PetitionCommentsContactNotificationProps = {
   contactFullName: string;
@@ -48,6 +49,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     intl: IntlShape,
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
+    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
     return outdent`
       ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
 
@@ -64,7 +66,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         id: "petition-comments-contact-notification.access-click-link",
         defaultMessage: "Follow the link below link to read and reply to the comments.",
       })}
-      ${parallelUrl}/${intl.locale}/petition/${keycode}
+      ${parallelUrl}/${intl.locale}/petition/${keycode}?comments=${firstFieldWithCommentsId}
 
       ${closing({}, intl)}
     `;
@@ -84,6 +86,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
   }: PetitionCommentsContactNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
+    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
 
     return (
       <Layout
@@ -119,7 +122,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         <MjmlSection>
           <MjmlColumn>
             <Button
-              href={`${parallelUrl}/${locale}/petition/${keycode}`}
+              href={`${parallelUrl}/${locale}/petition/${keycode}?comments=${firstFieldWithCommentsId}`}
               fontWeight="500"
               fontSize={"16px"}
             >

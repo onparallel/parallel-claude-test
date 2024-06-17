@@ -35,8 +35,6 @@ import {
   PetitionCommentsAndNotesEditor,
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
-import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
-
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
@@ -107,10 +105,6 @@ export function PetitionRepliesFieldComments({
         setTabIsNotes(true);
       }
       setTimeout(() => editorRef.current?.focus());
-    }
-    const element = document.getElementById(`field-${field.id}`);
-    if (element) {
-      smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
     }
   }, [field.id, loading]);
 

@@ -62,8 +62,8 @@ import {
   GeneratePrefilledPublicLinkDialog,
   useGeneratePrefilledPublicLinkDialog,
 } from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
-import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
+import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { RecipientViewContents } from "@parallel/components/recipient-view/RecipientViewContents";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
@@ -101,16 +101,17 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { waitForElement } from "@parallel/utils/waitForElement";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit, sumBy } from "remeda";
 import { noop } from "ts-essentials";
-import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -171,23 +172,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, [activeFieldId]);
 
-  const highlight = useHighlightElement();
-  useEffect(() => {
-    if (isDefined(router.query.field)) {
-      const { field: fieldId, parentReply: parentReplyId } = router.query;
-
-      const field = allFields.find((f) => f.id === fieldId);
-      if (field) {
-        focusPetitionField({
-          field,
-          parentReplyId: parentReplyId as string | undefined,
-        });
-        const element = document.getElementById(`field-${field.id}`);
-        highlight(element, true);
-      }
-    }
-  }, [router.query]);
-
   const isClosed =
     petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
   const isPetition = petition.__typename === "Petition";
@@ -223,6 +207,43 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   }, [query.page]);
 
   const fieldsWithLogic = pages[currentPage - 1];
+
+  const highlight = useHighlightElement();
+  useEffect(() => {
+    if (isDefined(router.query.field)) {
+      const { field: fieldId, parentReply: parentReplyId } = router.query;
+
+      const field = allFields.find((f) => f.id === fieldId);
+      if (field) {
+        focusPetitionField({
+          field,
+          parentReplyId: parentReplyId as string | undefined,
+        });
+        const element = document.getElementById(`field-${field.id}`);
+        highlight(element, true);
+      }
+    }
+
+    if (isDefined(router.query.comments)) {
+      // when navigating from comments email, it will always go to page 1 but field might be in another page
+      const fieldId = router.query.comments as string;
+      const page =
+        pages.findIndex((p) =>
+          p.some((f) => f.field.id === fieldId || f.field.children?.some((f) => f.id === fieldId)),
+        ) + 1 || 1;
+      if (currentPage !== page) {
+        router.push(
+          `/app/petitions/${petitionId}/preview?page=${page}&${new URLSearchParams(
+            omit(router.query as Record<string, string>, ["petitionId", "page"]),
+          )}`,
+        );
+      } else {
+        waitForElement(`#field-${fieldId}`).then((element) => {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      }
+    }
+  }, [router.query]);
 
   const pageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
