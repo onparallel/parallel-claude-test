@@ -133,7 +133,13 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                     )}
                     {`: `}
                     {comment.isInternal ? (
-                      <Badge color="gray.600" variant="outline" cursor="default" marginEnd={1}>
+                      <Badge
+                        color="gray.600"
+                        variant="outline"
+                        cursor="default"
+                        marginEnd={1}
+                        verticalAlign="baseline"
+                      >
                         <FormattedMessage id="generic.note" defaultMessage="Note" />
                       </Badge>
                     ) : null}
