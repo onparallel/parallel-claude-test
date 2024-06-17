@@ -49,7 +49,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     intl: IntlShape,
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
-    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
+    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
     return outdent`
       ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
 
@@ -86,7 +86,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
   }: PetitionCommentsContactNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
-    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
+    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
 
     return (
       <Layout

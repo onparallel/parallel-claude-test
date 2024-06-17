@@ -74,7 +74,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
-    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
+    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
 
     return outdent`
       ${greetingUser({ name: userName }, intl)}
@@ -140,7 +140,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
 
-    const firstFieldWithCommentsId = toGlobalId("PetitionFieldComment", fields[0].id);
+    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
 
     return (
       <Layout
