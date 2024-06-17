@@ -7218,6 +7218,7 @@ describe("GraphQL/Petition Fields", () => {
       let individualField: PetitionField;
       let legalEntityField: PetitionField;
       let contractField: PetitionField;
+      let contractChildFields: PetitionField[];
 
       let individualChildFields: PetitionField[];
       let legalEntityChildFields: PetitionField[];
@@ -7779,7 +7780,7 @@ describe("GraphQL/Petition Fields", () => {
         [contractReply] = await mocks.createFieldGroupReply(contractField.id, undefined, 1, () => ({
           user_id: user.id,
         }));
-        const contractChildFields = await mocks.knex
+        contractChildFields = await mocks.knex
           .from("petition_field")
           .where({
             petition_id: petition.id,
@@ -8873,15 +8874,7 @@ describe("GraphQL/Petition Fields", () => {
             parentReplyId: toGlobalId("PetitionFieldReply", contractReply.id),
             profileId: toGlobalId("Profile", profile.id),
             conflictResolutions: [],
-            expirations: [
-              {
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  contractProfileTypeFields["p_expiration_date"].id,
-                ),
-                expiryDate: null,
-              },
-            ],
+            expirations: [], // should not ask for expiration on p:expiry_date field as it is already defined and has option useReplyAsExpiryDate
           },
         );
 
@@ -8908,7 +8901,7 @@ describe("GraphQL/Petition Fields", () => {
           associatedProfile: {
             id: data!.archiveFieldGroupReplyIntoProfile.associatedProfile.id,
             events: {
-              totalCount: 24,
+              totalCount: 25,
               items: [
                 {
                   type: "PROFILE_UPDATED",
@@ -8952,6 +8945,30 @@ describe("GraphQL/Petition Fields", () => {
                   "p_contract_currency",
                   "p_contract_value",
                   "p_jurisdiction",
+                ].map((alias) => ({
+                  type: "PROFILE_FIELD_VALUE_UPDATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                    profileTypeFieldId: toGlobalId(
+                      "ProfileTypeField",
+                      contractProfileTypeFields[alias].id,
+                    ),
+                    alias,
+                  },
+                })),
+                {
+                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                    profileTypeFieldId: toGlobalId(
+                      "ProfileTypeField",
+                      contractProfileTypeFields["p_expiration_date"].id,
+                    ),
+                    alias: "p_expiration_date",
+                    expiryDate: "2022-01-01",
+                  },
+                },
+                ...[
                   "p_expiration_date",
                   "p_effective_date",
                   "p_contract_type",
@@ -9015,7 +9032,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   id: expect.any(String),
                   content: { value: "2022-01-01" },
-                  expiryDate: null,
+                  expiryDate: "2022-01-01",
                 },
               },
               {
@@ -9233,6 +9250,17 @@ describe("GraphQL/Petition Fields", () => {
 
       it("sends error when expiration info is required and not provided", async () => {
         const [profile] = await mocks.createRandomProfiles(organization.id, contract.id, 1);
+
+        await mocks.knex
+          .from("profile_type_field")
+          .where("id", contractProfileTypeFields["p_expiration_date"].id)
+          .update({
+            options: JSON.stringify({
+              ...contractProfileTypeFields["p_expiration_date"].options,
+              useReplyAsExpiryDate: false,
+            }),
+          });
+
         const { errors, data } = await testClient.execute(
           gql`
             mutation (
@@ -9272,6 +9300,16 @@ describe("GraphQL/Petition Fields", () => {
           ],
         });
         expect(data).toBeNull();
+
+        await mocks.knex
+          .from("profile_type_field")
+          .where("id", contractProfileTypeFields["p_expiration_date"].id)
+          .update({
+            options: JSON.stringify({
+              ...contractProfileTypeFields["p_expiration_date"].options,
+              useReplyAsExpiryDate: true,
+            }),
+          });
       });
 
       it("sends error when a conflict exists with a current value in the profile and conflictResolution is not provided", async () => {
@@ -9348,9 +9386,7 @@ describe("GraphQL/Petition Fields", () => {
             toGlobalId("ProfileTypeField", contractProfileTypeFields["p_counterparty"].id),
             toGlobalId("ProfileTypeField", contractProfileTypeFields["p_contract_type"].id),
           ],
-          expirations: [
-            toGlobalId("ProfileTypeField", contractProfileTypeFields["p_expiration_date"].id),
-          ],
+          expirations: [],
         });
         expect(data).toBeNull();
       });

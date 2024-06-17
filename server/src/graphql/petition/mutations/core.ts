@@ -3340,6 +3340,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             if (
               isDefined(reply) &&
               profileTypeField.is_expirable &&
+              !profileTypeField.options.useReplyAsExpiryDate &&
               !isDefined(expiration) &&
               (!isDefined(resolution) || resolution.action !== "IGNORE") // if resolution is IGNORE, value will not be updated so we don't want to update the expiryDate
             ) {
@@ -3359,7 +3360,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   reply ?? { type: field.type, content: null },
                 ),
                 profileTypeFieldId: field.profile_type_field_id!,
-                expiryDate: expiration?.expiryDate,
+                expiryDate:
+                  reply && profileTypeField.options.useReplyAsExpiryDate
+                    ? reply.content.value
+                    : expiration?.expiryDate,
                 alias: profileTypeField.alias,
               });
             }
@@ -3367,7 +3371,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         } else if (isDefined(reply)) {
           // profile field value is not present in profile, there will be no conflicts
           // if the field is expirable, we require it to be present on expirations array
-          if (profileTypeField.is_expirable && !isDefined(expiration)) {
+          if (
+            profileTypeField.is_expirable &&
+            !profileTypeField.options.useReplyAsExpiryDate &&
+            !isDefined(expiration)
+          ) {
             // expiration is required
             missingExpirations.push(field.profile_type_field_id!);
           }
@@ -3375,7 +3383,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           updateProfileFieldValues.push({
             ...mapPetitionFieldReplyToProfileFieldValue(reply),
             profileTypeFieldId: field.profile_type_field_id!,
-            expiryDate: expiration?.expiryDate,
+            expiryDate:
+              reply && profileTypeField.options.useReplyAsExpiryDate
+                ? reply.content.value
+                : expiration?.expiryDate,
             alias: profileTypeField.alias,
           });
         }
