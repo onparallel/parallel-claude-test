@@ -1215,25 +1215,27 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             >
               <TabList marginX="-1px" marginTop="-1px" flex="none">
                 <Tab
-                  padding={4}
+                  paddingY={4}
+                  paddingX={3.5}
                   lineHeight={5}
                   fontWeight="bold"
                   borderTopRadius={0}
                   _focusVisible={{ boxShadow: "inline" }}
                 >
-                  <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
+                  <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
                   <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                 </Tab>
                 <Tab
                   data-action="petition-settings"
                   className="petition-settings"
-                  padding={4}
+                  paddingY={4}
+                  paddingX={3.5}
                   lineHeight={5}
                   fontWeight="bold"
                   borderTopRadius={0}
                   _focusVisible={{ boxShadow: "inline" }}
                 >
-                  <SettingsIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
+                  <SettingsIcon fontSize="16px" marginEnd={1} aria-hidden="true" />
                   <FormattedMessage
                     id="page.compose.petition-settings-header"
                     defaultMessage="Settings"
@@ -1242,13 +1244,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 <Tab
                   data-action="petition-settings"
                   className="petition-settings"
-                  padding={4}
+                  paddingY={4}
+                  paddingX={3.5}
                   lineHeight={5}
                   fontWeight="bold"
                   borderTopRadius={0}
                   _focusVisible={{ boxShadow: "inline" }}
                 >
-                  <CalculatorIcon fontSize="16px" marginEnd={2} aria-hidden="true" />
+                  <CalculatorIcon fontSize="16px" marginEnd={1} aria-hidden="true" />
                   <FormattedMessage
                     id="page.compose.petition-variables-header"
                     defaultMessage="Variables"

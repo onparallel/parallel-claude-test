@@ -14,6 +14,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -565,6 +566,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     });
   }
 
+  const isMobile = useBreakpointValue({ base: true, lg: false });
+
   return (
     <RecipientViewSidebarContextProvider>
       <ToneProvider value={petition.organization.brandTheme.preferredTone}>
@@ -605,8 +608,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           isRightPaneActive={Boolean(activeFieldId)}
           rightPane={
             <>
-              <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
-                {activeFieldId && !!activeField ? (
+              {activeFieldId && !!activeField && isMobile ? (
+                <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
                   <PetitionRepliesFieldComments
                     key={activeFieldId}
                     petition={petition}
@@ -619,8 +622,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     onMarkAsUnread={handleMarkAsUnread}
                     onlyReadPermission={myEffectivePermission === "READ"}
                   />
-                ) : null}
-              </Flex>
+                </Flex>
+              ) : null}
               <Tabs
                 index={tabIndex}
                 onChange={(index) => setTabIndex(index)}
@@ -631,23 +634,25 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               >
                 <TabList marginX="-1px" marginTop="-1px" flex="none">
                   <Tab
-                    padding={4}
+                    paddingY={4}
+                    paddingX={3.5}
                     lineHeight={5}
                     fontWeight="bold"
                     borderTopRadius={0}
                     _focusVisible={{ boxShadow: "inline" }}
                   >
-                    <ListIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
+                    <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
                     <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                   </Tab>
                   <Tab
-                    padding={4}
+                    paddingY={4}
+                    paddingX={3.5}
                     lineHeight={5}
                     fontWeight="bold"
                     borderTopRadius={0}
                     _focusVisible={{ boxShadow: "inline" }}
                   >
-                    <CommentIcon fontSize="18px" marginEnd={2} aria-hidden="true" />
+                    <CommentIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
                     <FormattedMessage id="generic.comments" defaultMessage="Comments" />
                     {allFieldsUnreadCommentCount ? (
                       <Badge

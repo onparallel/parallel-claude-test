@@ -170,13 +170,13 @@ export const RecipientViewContents = Object.assign(
                           <Badge
                             background="primary.500"
                             color="white"
-                            fontSize="sm"
+                            fontSize="xs"
                             borderRadius="full"
                             minW="18px"
                             minH="18px"
-                            lineHeight="16px"
-                            border="1px solid white"
+                            lineHeight="18px"
                             pointerEvents="none"
+                            textAlign="center"
                           >
                             {_commentCount < 100 ? _commentCount : "99+"}
                           </Badge>
@@ -253,13 +253,13 @@ export const RecipientViewContents = Object.assign(
                                   <Badge
                                     background="primary.500"
                                     color="white"
-                                    fontSize="sm"
+                                    fontSize="xs"
                                     borderRadius="full"
                                     minW="18px"
                                     minH="18px"
-                                    lineHeight="16px"
-                                    border="1px solid white"
+                                    lineHeight="18px"
                                     pointerEvents="none"
+                                    textAlign="center"
                                   >
                                     {field.unreadCommentCount < 100
                                       ? field.unreadCommentCount

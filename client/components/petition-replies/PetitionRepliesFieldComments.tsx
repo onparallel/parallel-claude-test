@@ -79,15 +79,14 @@ export function PetitionRepliesFieldComments({
   const defaultMentionables = useGetDefaultMentionables(petitionId);
   const comments = data?.petitionField.comments ?? [];
 
-  const [markedAsUnreadIds, setMarkedAsUnreadIds] = useState<string[]>([]);
+  const markedAsUnreadIdsRef = useRef<string[]>([]);
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useTimeoutEffect(
     async (isMounted) => {
       const unreadCommentIds = comments
-        .filter((c) => c.isUnread)
-        .map((c) => c.id)
-        .filter((id) => !markedAsUnreadIds.includes(id));
+        .filter((c) => c.isUnread && !markedAsUnreadIdsRef.current.includes(c.id))
+        .map((c) => c.id);
       if (unreadCommentIds.length > 0 && isMounted()) {
         await updateIsReadNotification({
           petitionFieldCommentIds: unreadCommentIds,
@@ -96,7 +95,7 @@ export function PetitionRepliesFieldComments({
       }
     },
     1000,
-    [comments, markedAsUnreadIds],
+    [comments.length],
   );
 
   useEffect(() => {
@@ -124,6 +123,11 @@ export function PetitionRepliesFieldComments({
     },
     [searchUsers],
   );
+
+  const handleMarkAsUnread = (commentId: string) => {
+    onMarkAsUnread(commentId);
+    markedAsUnreadIdsRef.current = [...markedAsUnreadIdsRef.current, commentId];
+  };
 
   return (
     <>
@@ -249,10 +253,7 @@ export function PetitionRepliesFieldComments({
                   onSearchMentionables={handleSearchMentionables}
                   onEdit={(content) => onUpdateComment(comment.id, content, comment.isInternal)}
                   onDelete={() => onDeleteComment(comment.id)}
-                  onMarkAsUnread={() => {
-                    onMarkAsUnread(comment.id);
-                    setMarkedAsUnreadIds((ids) => [...ids, comment.id]);
-                  }}
+                  onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
                 />
               ))}
             </Stack>
@@ -282,11 +283,6 @@ export function PetitionRepliesFieldComments({
 }
 
 PetitionRepliesFieldComments.fragments = {
-  User: gql`
-    fragment PetitionRepliesFieldComments_User on User {
-      id
-    }
-  `,
   PetitionBase: gql`
     fragment PetitionRepliesFieldComments_PetitionBase on PetitionBase {
       id
@@ -297,7 +293,6 @@ PetitionRepliesFieldComments.fragments = {
     fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
       id
       title
-      type
       isInternal
       hasCommentsEnabled
     }

@@ -13,6 +13,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
@@ -567,7 +568,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
   const drawerInitialRef = useRef<ProfileSelectInstance<false>>(null);
-
+  const isMobile = useBreakpointValue({ base: true, lg: false });
   return (
     <PetitionLayout
       key={petition.id}
@@ -602,8 +603,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       isRightPaneActive={Boolean(activeFieldId)}
       rightPane={
         <>
-          <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
-            {activeFieldId && !!activeField ? (
+          {activeFieldId && !!activeField && isMobile ? (
+            <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
               <PetitionRepliesFieldComments
                 key={activeFieldId}
                 petition={petition}
@@ -616,8 +617,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onMarkAsUnread={handleMarkAsUnread}
                 onlyReadPermission={myEffectivePermission === "READ"}
               />
-            ) : null}
-          </Flex>
+            </Flex>
+          ) : null}
           <Tabs
             index={tabIndex}
             onChange={(index) => setTabIndex(index)}
@@ -625,7 +626,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             overflow="hidden"
             {...extendFlexColumn}
           >
-            <TabList marginX="-1px" marginTop="-1px" flex="none" fontSize="sm">
+            <TabList marginX="-1px" marginTop="-1px" flex="none">
               <Tab
                 paddingY={4}
                 paddingX={3.5}
@@ -633,9 +634,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 fontWeight="bold"
                 borderTopRadius={0}
                 _focusVisible={{ boxShadow: "inline" }}
-                fontSize="sm"
               >
-                <ListIcon fontSize="18px" marginEnd={1.5} aria-hidden="true" />
+                <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
                 <FormattedMessage id="generic.contents" defaultMessage="Contents" />
               </Tab>
 
@@ -646,9 +646,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 fontWeight="bold"
                 borderTopRadius={0}
                 _focusVisible={{ boxShadow: "inline" }}
-                fontSize="sm"
               >
-                <CommentIcon fontSize="18px" marginEnd={1.5} aria-hidden="true" />
+                <CommentIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
                 <FormattedMessage id="generic.comments" defaultMessage="Comments" />
                 {allFieldsUnreadCommentCount ? (
                   <Badge
@@ -661,6 +660,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     minH="18px"
                     lineHeight="18px"
                     pointerEvents="none"
+                    textAlign="center"
                   >
                     {allFieldsUnreadCommentCount < 100 ? allFieldsUnreadCommentCount : "99+"}
                   </Badge>
@@ -673,9 +673,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 fontWeight="bold"
                 borderTopRadius={0}
                 _focusVisible={{ boxShadow: "inline" }}
-                fontSize="sm"
               >
-                <SparklesIcon fontSize="18px" marginEnd={1.5} role="presentation" />
+                <SparklesIcon fontSize="18px" marginEnd={1} role="presentation" />
                 <FormattedMessage id="page.replies.summary-header" defaultMessage="Mike AI" />
               </Tab>
             </TabList>
@@ -1137,7 +1136,6 @@ PetitionReplies.queries = [
           }
         }
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-        ...PetitionRepliesFieldComments_User
         ...ExportRepliesDialog_User
         ...PetitionSignaturesCard_User
         ...useUpdateIsReadNotification_User
@@ -1149,7 +1147,6 @@ PetitionReplies.queries = [
       }
     }
     ${PetitionLayout.fragments.Query}
-    ${PetitionRepliesFieldComments.fragments.User}
     ${ExportRepliesDialog.fragments.User}
     ${PetitionSignaturesCard.fragments.User}
     ${useUpdateIsReadNotification.fragments.User}

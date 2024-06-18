@@ -6745,11 +6745,6 @@
     "context": "No activity yet"
   },
   {
-    "term": "component.preview-comments-dialog.template-no-comments-added",
-    "definition": "<b>Solo previsualización</b> - los comentarios están desactivados.",
-    "context": "<b>Preview only</b> - comments are disabled."
-  },
-  {
     "term": "component.preview-dow-jones-permission-denied-dialog.description-1",
     "definition": "Se requiere autorización para realizar la búsqueda con Dow Jones. Por favor, conecta una cuenta para poder utilizar este campo desde {integrations}.",
     "context": "Authorization is required to search in Dow Jones. Please connect an account to be able to use this field from {integrations}."
@@ -6828,16 +6823,6 @@
     "term": "component.preview-petition-field-background-check.view-results",
     "definition": "Ver resultados",
     "context": "View results"
-  },
-  {
-    "term": "component.preview-petition-field-comments-dialog.enable-comments-settings",
-    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
-    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-  },
-  {
-    "term": "component.preview-petition-field-comments-dialog.only-notes",
-    "definition": "Este campo solo admite notas",
-    "context": "This field only accepts notes"
   },
   {
     "term": "component.preview-petition-field-group.review-reply",
@@ -8008,11 +7993,6 @@
     "term": "component.recipient-view-contactless-help-dialog.header",
     "definition": "¿Por qué pedimos estos datos?",
     "context": "Why do we ask for this data?"
-  },
-  {
-    "term": "component.recipient-view-content-card.comment-count",
-    "definition": "{commentCount, plural, =1 {# comentario} other {# comentarios}}",
-    "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
   },
   {
     "term": "component.recipient-view-header.last-saved-info-date",
@@ -10746,7 +10726,7 @@
   },
   {
     "term": "generic.contents",
-    "definition": "Contenido",
+    "definition": "Índice",
     "context": "Contents"
   },
   {
@@ -13833,11 +13813,6 @@
     "term": "page.replies.summary-header",
     "definition": "Mike AI",
     "context": "Mike AI"
-  },
-  {
-    "term": "page.replies.summary-header-help",
-    "definition": "Mike AI analiza las respuestas para sacar conclusiones del proceso.",
-    "context": "Mike AI analyzes the replies to extract conclusions."
   },
   {
     "term": "page.reports-overview.choose-date-range",

@@ -1,5 +1,17 @@
 import { gql } from "@apollo/client";
-import { Box, Button, HStack, Img, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  Img,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
+  Text,
+} from "@chakra-ui/react";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
@@ -14,6 +26,7 @@ import { useLastSaved } from "./LastSavedProvider";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
 import { useHelpModal } from "./hooks/useHelpModal";
+import { useEffect, useState } from "react";
 
 interface RecipientViewHeaderProps {
   access: RecipientViewHeader_PublicPetitionAccessFragment;
@@ -45,6 +58,11 @@ export const RecipientViewHeader = Object.assign(
     const contact = access.contact!;
     const hasClientPortalAccess = access.hasClientPortalAccess;
     const organization = access.petition.organization;
+    const [poppoverClosed, setPoppoverClosed] = useState(true);
+
+    useEffect(() => {
+      setPoppoverClosed(false);
+    }, []);
 
     const handleHelpClick = useHelpModal({ tone });
     const { lastSaved } = useLastSaved();
@@ -129,26 +147,48 @@ export const RecipientViewHeader = Object.assign(
         </HStack>
 
         <HStack>
-          <Button
-            data-testid="recipient-view-finalize-button"
-            data-action="finalize"
-            colorScheme="primary"
-            onClick={onFinalize}
-            isDisabled={isClosed}
+          <Popover
+            returnFocusOnClose={false}
+            isOpen={canFinalize && !isClosed && !poppoverClosed}
+            placement="top-end"
+            closeOnBlur={false}
+            onClose={() => setPoppoverClosed(true)}
+            autoFocus={false}
           >
-            {canFinalize ? (
-              hasSignature ? (
+            <PopoverTrigger>
+              <Button
+                data-testid="recipient-view-finalize-button"
+                data-action="finalize"
+                colorScheme="primary"
+                onClick={onFinalize}
+                isDisabled={isClosed}
+              >
+                {canFinalize ? (
+                  hasSignature ? (
+                    <FormattedMessage
+                      id="generic.finalize-and-sign-button"
+                      defaultMessage="Finalize and sign"
+                    />
+                  ) : (
+                    <FormattedMessage id="generic.finalize-button" defaultMessage="Finalize" />
+                  )
+                ) : (
+                  <FormattedMessage id="generic.next-button" defaultMessage="Next" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent backgroundColor="blue.500" color="white" marginEnd={4}>
+              <PopoverArrow backgroundColor="blue.500" />
+              <PopoverCloseButton />
+              <PopoverBody paddingEnd={10}>
                 <FormattedMessage
-                  id="generic.finalize-and-sign-button"
-                  defaultMessage="Finalize and sign"
+                  id="component.recipient-view-progress-bar.reminder-submit"
+                  defaultMessage="Remember to click Finalize when you finish entering all the information."
+                  values={{ tone }}
                 />
-              ) : (
-                <FormattedMessage id="generic.finalize-button" defaultMessage="Finalize" />
-              )
-            ) : (
-              <FormattedMessage id="generic.next-button" defaultMessage="Next" />
-            )}
-          </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
 
           <HStack display={{ base: "none", md: "flex" }} spacing={0} gap={2}>
             <Button

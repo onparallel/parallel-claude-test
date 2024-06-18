@@ -265,13 +265,14 @@ function SidebarIconButton({
           insetEnd={2}
           background="primary.500"
           color="white"
-          fontSize="sm"
+          fontSize="xs"
           borderRadius="full"
           minW="18px"
           minH="18px"
           lineHeight="16px"
           border="1px solid white"
           pointerEvents="none"
+          textAlign="center"
         >
           {unreadCount < 100 ? unreadCount : "99+"}
         </Badge>

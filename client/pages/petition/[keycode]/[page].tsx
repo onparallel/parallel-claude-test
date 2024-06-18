@@ -194,7 +194,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             });
           }
           if (showFullScreenDialog && isDefined(data)) {
-            showCompletingMessageDialog({
+            await showCompletingMessageDialog({
               petition: data!.publicCompletePetition,
               hasClientPortalAccess: access.hasClientPortalAccess,
               pendingPetitions: pending,

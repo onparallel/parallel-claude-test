@@ -19391,8 +19391,6 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   };
 };
 
-export type PetitionRepliesFieldComments_UserFragment = { __typename?: "User"; id: string };
-
 export type PetitionRepliesFieldComments_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -19413,7 +19411,6 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   title?: string | null;
-  type: PetitionFieldType;
   isInternal: boolean;
   hasCommentsEnabled: boolean;
 };
@@ -49759,11 +49756,6 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
-export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
-  fragment PetitionRepliesFieldComments_User on User {
-    id
-  }
-` as unknown as DocumentNode<PetitionRepliesFieldComments_UserFragment, unknown>;
 export const PetitionRepliesSummary_UserFragmentDoc = gql`
   fragment PetitionRepliesSummary_User on User {
     id
@@ -54500,7 +54492,6 @@ export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
     id
     title
-    type
     isInternal
     hasCommentsEnabled
   }
@@ -61568,7 +61559,6 @@ export const PetitionReplies_userDocument = gql`
         }
       }
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-      ...PetitionRepliesFieldComments_User
       ...ExportRepliesDialog_User
       ...PetitionSignaturesCard_User
       ...useUpdateIsReadNotification_User
@@ -61580,7 +61570,6 @@ export const PetitionReplies_userDocument = gql`
     }
   }
   ${PetitionLayout_QueryFragmentDoc}
-  ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}

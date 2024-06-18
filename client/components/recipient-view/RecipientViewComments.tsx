@@ -395,13 +395,13 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                       <Badge
                         background="primary.500"
                         color="white"
-                        fontSize="sm"
+                        fontSize="xs"
                         borderRadius="full"
                         minW="18px"
                         minH="18px"
-                        lineHeight="16px"
-                        border="1px solid white"
+                        lineHeight="18px"
                         pointerEvents="none"
+                        textAlign="center"
                       >
                         {unreadCount < 100 ? unreadCount : "99+"}
                       </Badge>

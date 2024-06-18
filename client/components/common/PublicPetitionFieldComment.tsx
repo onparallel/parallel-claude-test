@@ -54,7 +54,7 @@ export function PublicPetitionFieldComment({
 
   return (
     <Box
-      paddingX={6}
+      paddingX={5}
       paddingY={2}
       position="relative"
       backgroundColor={comment.isUnread ? "primary.50" : "white"}

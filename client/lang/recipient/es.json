@@ -410,11 +410,6 @@
     "context": "Why do we ask for this data?"
   },
   {
-    "term": "component.recipient-view-content-card.comment-count",
-    "definition": "",
-    "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
-  },
-  {
     "term": "component.recipient-view-header.last-saved-info-date",
     "definition": "",
     "context": "<b>Last saved:</b> {date}"
