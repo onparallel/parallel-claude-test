@@ -607,9 +607,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           hasRightPane
           isRightPaneActive={Boolean(activeFieldId)}
           rightPane={
-            <>
-              {activeFieldId && !!activeField && isMobile ? (
-                <Flex display={{ base: "flex", lg: "none" }} flex="1" flexDirection="column">
+            isMobile ? (
+              activeFieldId && !!activeField ? (
+                <Flex flex="1" flexDirection="column">
                   <PetitionRepliesFieldComments
                     key={activeFieldId}
                     petition={petition}
@@ -623,14 +623,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     onlyReadPermission={myEffectivePermission === "READ"}
                   />
                 </Flex>
-              ) : null}
+              ) : null
+            ) : (
               <Tabs
                 index={tabIndex}
                 onChange={(index) => setTabIndex(index)}
                 variant="enclosed"
                 overflow="hidden"
                 {...extendFlexColumn}
-                display={{ base: "none", lg: "flex" }}
               >
                 <TabList marginX="-1px" marginTop="-1px" flex="none">
                   <Tab
@@ -706,7 +706,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   </TabPanel>
                 </TabPanels>
               </Tabs>
-            </>
+            )
           }
         >
           {isPetition && petition.status !== "CLOSED" && (
