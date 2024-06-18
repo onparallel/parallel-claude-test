@@ -263,7 +263,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
       authenticatePublicAccess("keycode"),
       replyBelongsToExternalField("replyId"),
       replyIsForFieldOfType("replyId", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
-      and(publicPetitionIsNotClosed(), replyBelongsToAccess("replyId")),
+      replyBelongsToAccess("replyId"),
     ),
     args: {
       keycode: nonNull(idArg()),
