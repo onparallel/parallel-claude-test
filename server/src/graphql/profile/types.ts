@@ -156,7 +156,7 @@ export const Profile = objectType({
           root.profile_type_id,
         );
         return sortBy(fields, (f) => f.position).map((field) => ({
-          profile_id: root.id,
+          profile: root,
           profile_type_field: field,
         }));
       },
@@ -330,8 +330,10 @@ export const ProfileFieldProperty = objectType({
         if (myPermission === "HIDDEN") {
           return null;
         }
-
-        const field = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+        const field =
+          "profile_type_field" in o
+            ? o.profile_type_field
+            : await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
         if (field?.type === "FILE") {
           return await ctx.profiles.loadProfileFieldFiles({ profileId, profileTypeFieldId });
         } else {
