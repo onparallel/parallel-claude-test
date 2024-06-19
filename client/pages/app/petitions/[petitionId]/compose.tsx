@@ -77,6 +77,7 @@ import {
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
@@ -183,7 +184,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
   useTempQueryParam("field", async (fieldId) => {
-    scrollToField(fieldId);
+    // give some time for intersection observers to kick in,
+    // without the delay scroll observer don't work well
+    await waitFor(100);
+    await scrollToField(fieldId);
   });
 
   useTempQueryParam("fromTemplate", () => {
