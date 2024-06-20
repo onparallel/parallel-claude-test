@@ -381,8 +381,8 @@ function Subscriptions() {
         <Stack spacing={4}>
           <Heading as="h3" size="md">
             <FormattedMessage
-              id="page.subscriptions.template-subscriptions-title"
-              defaultMessage="Template subscriptions"
+              id="page.subscriptions.petition-subscriptions-title"
+              defaultMessage="Parallel subscriptions"
             />
           </Heading>
 

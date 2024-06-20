@@ -14340,6 +14340,11 @@
     "context": "You haven't created any subscriptions yet"
   },
   {
+    "term": "page.subscriptions.petition-subscriptions-title",
+    "definition": "Suscripciones a parallels",
+    "context": "Parallel subscriptions"
+  },
+  {
     "term": "page.subscriptions.profiles-subscriptions-title",
     "definition": "Suscripciones a perfiles",
     "context": "Profile subscriptions"
@@ -14348,11 +14353,6 @@
     "term": "page.subscriptions.subscriptions-explanation",
     "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en uno de tus parallels (por ejemplo, cuando un destinatario envía un comentario o cuando se completa el parallel)",
     "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
-  },
-  {
-    "term": "page.subscriptions.template-subscriptions-title",
-    "definition": "Suscripciones a plantillas",
-    "context": "Template subscriptions"
   },
   {
     "term": "page.subscriptions.unnamed-subscription",
