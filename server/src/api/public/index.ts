@@ -846,7 +846,11 @@ export function publicApi(container: Container) {
           petitionId: params.petitionId,
           ...getPetitionIncludesFromQuery(query),
         });
-        assert("id" in result.petition!);
+        try {
+          assert("id" in result.petition!);
+        } catch {
+          throw new ForbiddenError("You don't have access to this resource");
+        }
         return Ok(mapPetition(result.petition!));
       },
     )
@@ -3409,7 +3413,11 @@ export function publicApi(container: Container) {
           includeFields: query.include?.includes("fields") ?? false,
           includeTags: query.include?.includes("tags") ?? false,
         });
-        assert("id" in result.template!);
+        try {
+          assert("id" in result.template!);
+        } catch {
+          throw new ForbiddenError("You don't have access to this resource");
+        }
         return Ok(mapTemplate(result.template!));
       },
     )
