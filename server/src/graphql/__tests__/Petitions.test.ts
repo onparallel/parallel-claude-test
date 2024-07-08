@@ -2543,6 +2543,76 @@ describe("GraphQL/Petitions", () => {
         },
       ]);
     });
+
+    it("copies public link settings and prefill data when cloning a template", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true }),
+      );
+
+      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              id
+              ... on PetitionTemplate {
+                publicLink {
+                  id
+                  title
+                  description
+                  slug
+                  isActive
+                  owner {
+                    id
+                  }
+                  template {
+                    id
+                  }
+                  prefillSecret
+                  allowMultiplePetitions
+                  petitionNamePattern
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: [toGlobalId("Petition", template.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          id: expect.any(String),
+          publicLink: {
+            id: expect.any(String),
+            title: publicLink.title,
+            description: publicLink.description,
+            slug: expect.any(String),
+            isActive: publicLink.is_active,
+            owner: {
+              id: toGlobalId("User", sessionUser.id),
+            },
+            template: {
+              id: data?.clonePetitions[0].id,
+            },
+            prefillSecret: publicLink.prefill_secret,
+            allowMultiplePetitions: publicLink.allow_multiple_petitions,
+            petitionNamePattern: publicLink.petition_name_pattern,
+          },
+        },
+      ]);
+
+      const newTemplate = data?.clonePetitions[0];
+
+      expect(newTemplate.publicLink.slug).toStartWith(publicLink.slug);
+      expect(newTemplate.publicLink.slug.length).toBeGreaterThan(publicLink.slug.length); // new slug will be the same as before with some added suffix
+    });
   });
 
   describe("deletePetitions", () => {

@@ -2,6 +2,7 @@ import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-f
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
+import { DatabaseError } from "pg";
 import {
   countBy,
   difference,
@@ -14,6 +15,7 @@ import {
   minBy,
   omit,
   partition,
+  pick,
   pipe,
   sort,
   sortBy,
@@ -22,9 +24,9 @@ import {
 } from "remeda";
 import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
+import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
-import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { average, unMaybeArray, zipX } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {
@@ -43,7 +45,7 @@ import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { PetitionAccessReminderConfig, calculateNextReminder } from "../../util/reminderUtils";
-import { retry } from "../../util/retry";
+import { StopRetryError, retry } from "../../util/retry";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import {
@@ -3378,6 +3380,10 @@ export class PetitionRepository extends BaseRepository {
 
       await this.clonePetitionAttachments(petitionId, cloned.id, createdBy, t);
 
+      if (sourcePetition.is_template && cloned.is_template) {
+        await this.clonePublicPetitionLinks(petitionId, cloned.id, createdBy, t);
+      }
+
       return cloned;
     }, t);
   }
@@ -3519,6 +3525,54 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
     }, t);
+  }
+
+  private async clonePublicPetitionLinks(
+    fromTemplateId: number,
+    toTemplateId: number,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    const publicLinks = await this.loadPublicPetitionLinksByTemplateId.raw(fromTemplateId, t);
+    // we allow to have more than 1 public link on the same template, but always use the first one
+    const publicLink = publicLinks.at(0);
+
+    if (isDefined(publicLink)) {
+      await retry(
+        async () => {
+          try {
+            await this.insert(
+              "public_petition_link",
+              {
+                template_id: toTemplateId,
+                slug: publicLink.slug.concat(`-${random(4)}`),
+                created_by: createdBy,
+                ...pick(publicLink, [
+                  "title",
+                  "description",
+                  "is_active",
+                  "prefill_secret",
+                  "allow_multiple_petitions",
+                  "petition_name_pattern",
+                ]),
+              },
+              t,
+            );
+          } catch (error) {
+            if (
+              error instanceof DatabaseError &&
+              error.constraint === "public_petition_link__slug__unique"
+            ) {
+              // if slug is already taken, retry with new one
+              throw error;
+            } else {
+              throw new StopRetryError(error);
+            }
+          }
+        },
+        { maxRetries: 5 },
+      );
+    }
   }
 
   private async getDefaultSignatureOrgIntegration(
