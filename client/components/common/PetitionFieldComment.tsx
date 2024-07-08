@@ -200,7 +200,6 @@ PetitionFieldComment.fragments = {
       id
       createdAt
       content
-      content
       ...PetitionFieldCommentContent_PetitionFieldComment
       isUnread
       isInternal

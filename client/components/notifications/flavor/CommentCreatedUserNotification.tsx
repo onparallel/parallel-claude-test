@@ -39,7 +39,7 @@ export const CommentCreatedUserNotification = Object.assign(
               )}
             </Circle>
           }
-          path={`/replies?comments=${notification.field.id}`}
+          path={`/replies?comments=${notification.field?.id ?? ""}`}
         >
           {isMention ? (
             <FormattedMessage
