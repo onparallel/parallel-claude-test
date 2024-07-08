@@ -21359,6 +21359,10 @@ export type useClosePetitionDialog_PetitionFragment = {
   name?: string | null;
   closingEmailBody?: any | null;
   accesses: Array<{ __typename?: "PetitionAccess"; id: string }>;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    status: PetitionSignatureRequestStatus;
+  } | null;
   fields: Array<{
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -54662,6 +54666,9 @@ export const useClosePetitionDialog_PetitionFragmentDoc = gql`
       id
     }
     closingEmailBody
+    currentSignatureRequest {
+      status
+    }
     ...usePetitionMessagePlaceholderOptions_PetitionBase
   }
   ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}

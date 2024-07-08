@@ -1,4 +1,7 @@
+import { HeadObjectOutput } from "@aws-sdk/client-s3";
 import { createReadStream } from "fs";
+import { isDefined } from "remeda";
+import { assert } from "ts-essentials";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { PetitionClosedNotifiedEvent } from "../../db/events/PetitionEvent";
@@ -107,26 +110,45 @@ export async function petitionClosedNotification(
 
     if (payload.attach_pdf_export) {
       const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
-      const owner = await context.petitions.loadPetitionOwner(petition.id);
-      const binderPath = await context.petitionBinder.createBinder(owner!.id, {
-        petitionId: petition.id,
-        documentTitle: payload.pdf_export_title ?? "",
-        maxOutputSize: 18 * 1024 * 1024,
-        outputFileName: filename,
-      });
+
+      const latestSignature = await context.petitions.loadLatestPetitionSignatureByPetitionId(
+        petition.id,
+      );
+
       const path = random(16);
 
-      const res = await context.storage.temporaryFiles.uploadFile(
-        path,
-        "application/pdf",
-        createReadStream(binderPath),
-      );
+      let res: HeadObjectOutput | undefined;
+      // if the parallel has a completed signature request, use that instead of the binder
+      if (latestSignature?.status === "COMPLETED" && isDefined(latestSignature.file_upload_id)) {
+        const fileUpload = await context.files.loadFileUpload(latestSignature.file_upload_id);
+        assert(fileUpload, "Expected FileUpload to be defined on latest signature");
+        res = await context.storage.temporaryFiles.uploadFile(
+          path,
+          "application/pdf",
+          await context.storage.fileUploads.downloadFile(fileUpload.path),
+        );
+      } else {
+        const owner = await context.petitions.loadPetitionOwner(petition.id);
+        const binderPath = await context.petitionBinder.createBinder(owner!.id, {
+          petitionId: petition.id,
+          documentTitle: payload.pdf_export_title ?? "",
+          maxOutputSize: 18 * 1024 * 1024,
+          outputFileName: filename,
+        });
+
+        res = await context.storage.temporaryFiles.uploadFile(
+          path,
+          "application/pdf",
+          createReadStream(binderPath),
+        );
+      }
+
       const attachment = await context.files.createTemporaryFile(
         {
           path,
           content_type: "application/pdf",
           filename,
-          size: res["ContentLength"]!.toString(),
+          size: res?.["ContentLength"]!.toString(),
         },
         `User:${sender.id}`,
       );

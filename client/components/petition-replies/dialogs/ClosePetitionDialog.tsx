@@ -101,7 +101,7 @@ export function ClosePetitionDialog({
                   }}
                 >
                   <FormattedMessage
-                    id="component.close-petition-dialog.notify-recipient.notify-recipient"
+                    id="component.close-petition-dialog.notify-recipient"
                     defaultMessage="Notify the recipient that everything is reviewed."
                   />
                 </Checkbox>
@@ -115,7 +115,7 @@ export function ClosePetitionDialog({
                     value={message}
                     onChange={handleMessageChange}
                     placeholder={intl.formatMessage({
-                      id: "component.close-petition-dialog.notify-recipient.message-placeholder",
+                      id: "component.close-petition-dialog.add-message-placeholder",
                       defaultMessage: "Add a message to include in the email",
                     })}
                     placeholderOptions={placeholders}
@@ -132,21 +132,28 @@ export function ClosePetitionDialog({
                     }}
                     isChecked={attachPdfExport}
                   >
-                    <FormattedMessage
-                      id="component.close-petition-dialog.attach-pdf-export.checkbox"
-                      defaultMessage="Attach a PDF export with the submitted replies"
-                    />
+                    {petition.currentSignatureRequest?.status === "COMPLETED" ? (
+                      <FormattedMessage
+                        id="component.close-petition-dialog.attach-pdf-export-signed"
+                        defaultMessage="Attach the signed document"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.close-petition-dialog.attach-pdf-export"
+                        defaultMessage="Attach a PDF export with the submitted replies"
+                      />
+                    )}
                   </Checkbox>
                   <PaddedCollapse in={attachPdfExport}>
                     <FormControl>
                       <FormLabel display="flex" alignItems="center">
                         <FormattedMessage
-                          id="component.close-petition-dialog.attach-pdf-export.title"
+                          id="component.close-petition-dialog.attach-pdf-export-title"
                           defaultMessage="PDF export title"
                         />
                         <HelpPopover placement="auto">
                           <FormattedMessage
-                            id="component.close-petition-dialog.attach-pdf-export.title.help"
+                            id="component.close-petition-dialog.attach-pdf-export-title-help"
                             defaultMessage="This will be the name of the attached PDF file."
                           />
                         </HelpPopover>
@@ -214,6 +221,9 @@ useClosePetitionDialog.fragments = {
         id
       }
       closingEmailBody
+      currentSignatureRequest {
+        status
+      }
       ...usePetitionMessagePlaceholderOptions_PetitionBase
     }
     ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}

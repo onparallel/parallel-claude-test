@@ -770,17 +770,27 @@
     "context": "Choose up to {max, plural, =1{# option} other{# options}}"
   },
   {
-    "term": "component.close-petition-dialog.attach-pdf-export.checkbox",
+    "term": "component.close-petition-dialog.add-message-placeholder",
+    "definition": "Add a message to include in the email",
+    "context": "Add a message to include in the email"
+  },
+  {
+    "term": "component.close-petition-dialog.attach-pdf-export",
     "definition": "Attach a PDF export with the submitted replies",
     "context": "Attach a PDF export with the submitted replies"
   },
   {
-    "term": "component.close-petition-dialog.attach-pdf-export.title",
+    "term": "component.close-petition-dialog.attach-pdf-export-signed",
+    "definition": "Attach the signed document",
+    "context": "Attach the signed document"
+  },
+  {
+    "term": "component.close-petition-dialog.attach-pdf-export-title",
     "definition": "PDF export title",
     "context": "PDF export title"
   },
   {
-    "term": "component.close-petition-dialog.attach-pdf-export.title.help",
+    "term": "component.close-petition-dialog.attach-pdf-export-title-help",
     "definition": "This will be the name of the attached PDF file.",
     "context": "This will be the name of the attached PDF file."
   },
@@ -800,12 +810,7 @@
     "context": "Close parallel"
   },
   {
-    "term": "component.close-petition-dialog.notify-recipient.message-placeholder",
-    "definition": "Add a message to include in the email",
-    "context": "Add a message to include in the email"
-  },
-  {
-    "term": "component.close-petition-dialog.notify-recipient.notify-recipient",
+    "term": "component.close-petition-dialog.notify-recipient",
     "definition": "Notify the recipient that everything is reviewed.",
     "context": "Notify the recipient that everything is reviewed."
   },
