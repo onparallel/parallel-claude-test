@@ -120,22 +120,18 @@ export function RecipientViewPetitionField({
   );
   const handleUpdatePetitionFieldReply = useCallback(
     async (replyId: string, content: any) => {
-      try {
-        await publicUpdatePetitionFieldReplies({
-          variables: {
-            keycode: props.keycode,
-            replies: [
-              {
-                id: replyId,
-                content,
-              },
-            ],
-          },
-        });
-        updateLastSaved();
-      } catch (e) {
-        props.onError(e);
-      }
+      await publicUpdatePetitionFieldReplies({
+        variables: {
+          keycode: props.keycode,
+          replies: [
+            {
+              id: replyId,
+              content,
+            },
+          ],
+        },
+      });
+      updateLastSaved();
     },
     [publicUpdatePetitionFieldReplies, updateLastSaved],
   );
@@ -145,24 +141,20 @@ export function RecipientViewPetitionField({
   );
   const handleCreatePetitionFieldReply = useCallback(
     async (content: any, _fieldId?: string, parentReplyId?: string) => {
-      try {
-        const { data } = await publicCreatePetitionFieldReplies({
-          variables: {
-            keycode: props.keycode,
-            fields: [
-              {
-                id: _fieldId ?? props.field.id,
-                content,
-                parentReplyId,
-              },
-            ],
-          },
-        });
-        updateLastSaved();
-        return data?.publicCreatePetitionFieldReplies?.[0]?.id;
-      } catch (e) {
-        props.onError(e);
-      }
+      const { data } = await publicCreatePetitionFieldReplies({
+        variables: {
+          keycode: props.keycode,
+          fields: [
+            {
+              id: _fieldId ?? props.field.id,
+              content,
+              parentReplyId,
+            },
+          ],
+        },
+      });
+      updateLastSaved();
+      return data?.publicCreatePetitionFieldReplies?.[0]?.id;
     },
     [publicCreatePetitionFieldReplies, updateLastSaved],
   );

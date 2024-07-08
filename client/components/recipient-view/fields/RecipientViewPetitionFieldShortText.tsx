@@ -94,7 +94,14 @@ export function RecipientViewPetitionFieldShortText({
   const replyProps = useMemoFactory(
     (replyId: string) => ({
       onUpdate: async (value: string) => {
-        await onUpdateReply(replyId, { value });
+        try {
+          await onUpdateReply(replyId, { value });
+        } catch (e) {
+          if (isApolloError(e, "INVALID_REPLY_ERROR")) {
+            handleInvalidReply(field.id, true);
+          }
+          onError(e);
+        }
       },
       onDelete: async (focusPrev?: boolean) => {
         if (isDeletingReplyRef.current[replyId]) {
