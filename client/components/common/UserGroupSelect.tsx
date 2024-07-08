@@ -1,11 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
 import { Image, Stack, Text } from "@chakra-ui/react";
-import {
-  UserGroupType,
-  UserSelect_UserGroupFragment,
-  useSearchUserGroups_searchUserGroupsDocument,
-} from "@parallel/graphql/__types";
-import { useCallback } from "react";
+import { UserSelect_UserGroupFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NoticeProps } from "react-select";
 import { UserSelect, UserSelectProps } from "./UserSelect";
@@ -65,44 +59,3 @@ function NoOptionsMessage(props: NoticeProps) {
     </Stack>
   );
 }
-
-export function useSearchUserGroups() {
-  const client = useApolloClient();
-  return useCallback(
-    async (
-      search: string,
-      options: {
-        excludeUserGroups?: string[];
-        type?: UserGroupType[];
-      } = {},
-    ) => {
-      const { excludeUserGroups, type } = options;
-      const { data } = await client.query({
-        query: useSearchUserGroups_searchUserGroupsDocument,
-        variables: {
-          search,
-          excludeUserGroups,
-          type,
-        },
-        fetchPolicy: "no-cache",
-      });
-      return data!.searchUserGroups as UserSelect_UserGroupFragment[];
-    },
-    [],
-  );
-}
-
-const _queries = [
-  gql`
-    query useSearchUserGroups_searchUserGroups(
-      $search: String!
-      $excludeUserGroups: [GID!]
-      $type: [UserGroupType!]
-    ) {
-      searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups, type: $type) {
-        ...UserSelect_UserGroup
-      }
-    }
-    ${UserSelect.fragments.UserGroup}
-  `,
-];

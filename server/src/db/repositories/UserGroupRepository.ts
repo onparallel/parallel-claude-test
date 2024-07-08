@@ -25,6 +25,8 @@ export class UserGroupRepository extends BaseRepository {
     orgId: number,
     opts: {
       search?: string | null;
+      excludeIds?: number[] | null;
+      type?: UserGroupType[] | null;
       sortBy?: SortBy<keyof Pick<UserGroup, "name" | "created_at">>[];
     } & PageOpts,
   ) {
@@ -41,6 +43,12 @@ export class UserGroupRepository extends BaseRepository {
                   .whereSearch("value", opts.search!),
               );
             });
+          }
+          if (opts.excludeIds && opts.excludeIds.length > 0) {
+            q.whereNotIn("id", opts.excludeIds);
+          }
+          if (opts.type && opts.type.length > 0) {
+            q.whereIn("type", opts.type);
           }
           if (opts.sortBy) {
             q.orderByRaw(opts.sortBy.map((s) => `"${s.field}" ${s.order}`).join(", "));
@@ -296,6 +304,7 @@ export class UserGroupRepository extends BaseRepository {
     }, t);
   }
 
+  /** @deprecated use getPaginatedUserGroupsForOrg */
   async searchUserGroups(
     orgId: number,
     search: string,

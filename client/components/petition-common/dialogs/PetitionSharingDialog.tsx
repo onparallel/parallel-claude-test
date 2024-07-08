@@ -59,6 +59,7 @@ import { UserAvatar } from "../../common/UserAvatar";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 interface PetitionSharingDialogData {
   selection: UserSelectSelection<true>[];
@@ -158,16 +159,21 @@ export function PetitionSharingDialog({
   const groupsToExclude =
     sharingInfo.totalCount === 1 ? groupPermissions.map((p) => p.group.id) : [];
 
-  const _handleSearchUsers = useSearchUsers();
-  const handleSearchUsers = useCallback(
+  const searchUsers = useSearchUsers();
+  const searchUserGroups = useSearchUserGroups();
+
+  const handleSearchUsersAndGroups = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      return await _handleSearchUsers(search, {
-        includeGroups: true,
-        excludeUsers: [...excludeUsers, ...usersToExclude],
-        excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
-      });
+      const [users, groups] = await Promise.all([
+        searchUsers(search, { excludeIds: [...excludeUsers, ...usersToExclude] }),
+        searchUserGroups(search, {
+          excludeIds: [...excludeUserGroups, ...groupsToExclude],
+        }),
+      ]);
+
+      return [...groups, ...users];
     },
-    [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")],
+    [searchUsers, searchUserGroups, usersToExclude.join(","), groupsToExclude.join(",")],
   );
 
   interface PetitionPermissionProps {
@@ -334,7 +340,7 @@ export function PetitionSharingDialog({
                       }}
                       onChange={onChange}
                       onBlur={onBlur}
-                      onSearch={handleSearchUsers}
+                      onSearch={handleSearchUsersAndGroups}
                       isDisabled={sharingInfo.ownedOrWriteIds.length === 0}
                       placeholder={
                         sharingInfo.ownedOrWriteIds.length

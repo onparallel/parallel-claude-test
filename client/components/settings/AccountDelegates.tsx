@@ -42,7 +42,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
     async (search: string, excludeUsers: string[]) => {
       const exclude = delegates.map((d) => d.id) ?? [];
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, ...exclude, user.id],
+        excludeIds: [...excludeUsers, ...exclude, user.id],
       });
     },
     [_handleSearchUsers, delegates],

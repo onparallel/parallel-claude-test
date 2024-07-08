@@ -145,7 +145,7 @@ export function AddPetitionAccessDialog({
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
-      return await _handleSearchUsers(search, { excludeUsers });
+      return await _handleSearchUsers(search, { excludeIds: excludeUsers });
     },
     [_handleSearchUsers],
   );

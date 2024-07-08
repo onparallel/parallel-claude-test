@@ -6552,7 +6552,7 @@ type Query {
     excludeUserGroups: [GID!]
     search: String!
     type: [UserGroupType!]
-  ): [UserGroup!]!
+  ): [UserGroup!]! @deprecated(reason: "use paginated userGroups query instead")
 
   """
   Search users and user groups
@@ -6563,7 +6563,7 @@ type Query {
     includeGroups: Boolean
     includeInactive: Boolean
     search: String!
-  ): [UserOrUserGroup!]!
+  ): [UserOrUserGroup!]! @deprecated(reason: "Use me.organization.users")
   subscriptions: [EventSubscription!]!
 
   """
@@ -6635,6 +6635,8 @@ type Query {
   Paginated list of user groups in the organization
   """
   userGroups(
+    excludeIds: [GID!]
+
     """
     Number of elements to take from the list.
     """
@@ -6654,6 +6656,7 @@ type Query {
     Sorting to use on the collection
     """
     sortBy: [QueryUserGroups_OrderBy!]
+    type: [UserGroupType!]
   ): UserGroupPagination!
 }
 

@@ -1,35 +1,32 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { useSearchUsers_searchUsersDocument } from "@parallel/graphql/__types";
+import { UserSelect_UserFragment, useSearchUsers_usersDocument } from "@parallel/graphql/__types";
 import { UserSelect, UserSelectSelection } from "../components/common/UserSelect";
 import { useDebouncedAsync } from "./useDebouncedAsync";
 
-export interface UserSearchUsersOptions<IncludeGroups extends boolean> {
-  excludeUsers?: string[];
-  excludeUserGroups?: string[];
-  includeGroups?: IncludeGroups;
-  includeInactive?: boolean;
+interface UserSearchUsersOptions {
+  excludeIds?: string[];
 }
 
 export function useSearchUsers() {
   const client = useApolloClient();
   return useDebouncedAsync(
-    async <IncludeGroups extends boolean = false>(
+    async (
       search: string,
-      options: UserSearchUsersOptions<IncludeGroups> = {},
-    ): Promise<UserSelectSelection<IncludeGroups>[]> => {
-      const { excludeUsers, excludeUserGroups, includeGroups, includeInactive } = options;
+      options: UserSearchUsersOptions = {},
+    ): Promise<UserSelectSelection[]> => {
+      const { excludeIds } = options;
       const { data } = await client.query({
-        query: useSearchUsers_searchUsersDocument,
+        query: useSearchUsers_usersDocument,
         variables: {
           search,
-          excludeUsers,
-          excludeUserGroups,
-          includeGroups,
-          includeInactive,
+          exclude: excludeIds,
+          filters: { status: ["ACTIVE"] },
+          limit: 100,
+          offset: 0,
         },
         fetchPolicy: "no-cache",
       });
-      return data!.searchUsers as UserSelectSelection<IncludeGroups>[];
+      return data.me.organization.users.items as UserSelect_UserFragment[];
     },
     150,
     [],
@@ -38,29 +35,29 @@ export function useSearchUsers() {
 
 const _queries = [
   gql`
-    query useSearchUsers_searchUsers(
+    query useSearchUsers_users(
+      $limit: Int
+      $offset: Int
       $search: String!
-      $excludeUsers: [GID!]
-      $excludeUserGroups: [GID!]
-      $includeGroups: Boolean
-      $includeInactive: Boolean
+      $exclude: [GID!]
+      $filters: UserFilter
     ) {
-      searchUsers(
-        search: $search
-        excludeUsers: $excludeUsers
-        excludeUserGroups: $excludeUserGroups
-        includeGroups: $includeGroups
-        includeInactive: $includeInactive
-      ) {
-        ... on User {
-          ...UserSelect_User
-        }
-        ... on UserGroup {
-          ...UserSelect_UserGroup
+      me {
+        organization {
+          users(
+            limit: $limit
+            offset: $offset
+            search: $search
+            exclude: $exclude
+            filters: $filters
+          ) {
+            items {
+              ...UserSelect_User
+            }
+          }
         }
       }
     }
     ${UserSelect.fragments.User}
-    ${UserSelect.fragments.UserGroup}
   `,
 ];

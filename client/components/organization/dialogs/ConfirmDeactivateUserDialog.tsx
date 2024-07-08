@@ -64,7 +64,7 @@ function ConfirmDeactivateUserDialog({
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, ...users.map((user) => user.id)],
+        excludeIds: [...excludeUsers, ...users.map((user) => user.id)],
       });
     },
     [_handleSearchUsers],

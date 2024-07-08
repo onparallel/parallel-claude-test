@@ -8115,10 +8115,12 @@ export interface NexusGenArgTypes {
     };
     userGroups: {
       // args
+      excludeIds?: NexusGenScalars["GID"][] | null; // [GID!]
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryUserGroups_OrderBy"][] | null; // [QueryUserGroups_OrderBy!]
+      type?: NexusGenEnums["UserGroupType"][] | null; // [UserGroupType!]
     };
   };
   User: {

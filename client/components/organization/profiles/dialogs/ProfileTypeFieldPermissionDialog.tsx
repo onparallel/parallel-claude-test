@@ -36,8 +36,10 @@ import {
   UpdateProfileTypeFieldPermissionInput,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
-  useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment,
-  useProfileTypeFieldPermissionDialog_searchUsersDocument,
+  useProfileTypeFieldPermissionDialog_UserFragment,
+  useProfileTypeFieldPermissionDialog_UserGroupFragment,
+  useProfileTypeFieldPermissionDialog_usersDocument,
+  useProfileTypeFieldPermissionDialog_userGroupsDocument,
 } from "@parallel/graphql/__types";
 import { assertTypename, isTypename } from "@parallel/utils/apollo/typename";
 import { Focusable } from "@parallel/utils/types";
@@ -109,24 +111,37 @@ export function ProfileTypeFieldPermissionDialog({
 
   const usersRef =
     useRef<
-      UserSelectInstance<false, true, useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment>
+      UserSelectInstance<
+        false,
+        true,
+        | useProfileTypeFieldPermissionDialog_UserFragment
+        | useProfileTypeFieldPermissionDialog_UserGroupFragment
+      >
     >(null);
 
   const client = useApolloClient();
   const handleSearchUsers = useDebouncedAsync(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      const { data } = await client.query({
-        query: useProfileTypeFieldPermissionDialog_searchUsersDocument,
+      const { data: usersData } = await client.query({
+        query: useProfileTypeFieldPermissionDialog_usersDocument,
         variables: {
           search,
-          excludeUsers: [
+          excludeIds: [
             ...excludeUsers,
             ...permissions
               .map((p) => p.target)
               .filter(isTypename("User"))
               .map((u) => u.id),
           ],
-          excludeUserGroups: [
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      const { data: userGroupsData } = await client.query({
+        query: useProfileTypeFieldPermissionDialog_userGroupsDocument,
+        variables: {
+          search,
+          excludeIds: [
             ...excludeUserGroups,
             ...permissions
               .map((p) => p.target)
@@ -136,7 +151,7 @@ export function ProfileTypeFieldPermissionDialog({
         },
         fetchPolicy: "no-cache",
       });
-      return data!.searchUsers;
+      return [...userGroupsData.userGroups.items, ...usersData.me.organization.users.items];
     },
     150,
     [permissions.map((p) => p.target.id).join(",")],
@@ -369,15 +384,20 @@ export function ProfileTypeFieldPermissionDialog({
 }
 
 useProfileTypeFieldPermissionDialog.fragments = {
-  UserOrUserGroup: gql`
-    fragment useProfileTypeFieldPermissionDialog_UserOrUserGroup on UserOrUserGroup {
-      ... on User {
+  get User() {
+    return gql`
+      fragment useProfileTypeFieldPermissionDialog_User on User {
         id
         fullName
         email
         ...UserAvatar_User
       }
-      ... on UserGroup {
+      ${UserAvatar.fragments.User}
+    `;
+  },
+  get UserGroup() {
+    return gql`
+      fragment useProfileTypeFieldPermissionDialog_UserGroup on UserGroup {
         id
         name
         groupInitials: initials
@@ -385,22 +405,26 @@ useProfileTypeFieldPermissionDialog.fragments = {
         ...UserSelect_UserGroup
         ...UserGroupReference_UserGroup
       }
-    }
-    ${UserAvatar.fragments.User}
-    ${UserSelect.fragments.User}
-    ${UserSelect.fragments.UserGroup}
-    ${UserGroupReference.fragments.UserGroup}
-  `,
+      ${UserSelect.fragments.UserGroup}
+      ${UserGroupReference.fragments.UserGroup}
+    `;
+  },
   get ProfileTypeFieldPermission() {
     return gql`
       fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
         id
         permission
         target {
-          ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+          ... on User {
+            ...useProfileTypeFieldPermissionDialog_User
+          }
+          ... on UserGroup {
+            ...useProfileTypeFieldPermissionDialog_UserGroup
+          }
         }
       }
-      ${this.UserOrUserGroup}
+      ${this.User}
+      ${this.UserGroup}
     `;
   },
   get ProfileTypeField() {
@@ -421,22 +445,34 @@ useProfileTypeFieldPermissionDialog.fragments = {
 
 const _queries = [
   gql`
-    query useProfileTypeFieldPermissionDialog_searchUsers(
-      $search: String!
-      $excludeUsers: [GID!]
-      $excludeUserGroups: [GID!]
-    ) {
-      searchUsers(
-        search: $search
-        excludeUsers: $excludeUsers
-        excludeUserGroups: $excludeUserGroups
-        includeGroups: true
-        includeInactive: false
-      ) {
-        ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+    query useProfileTypeFieldPermissionDialog_users($search: String!, $excludeIds: [GID!]) {
+      me {
+        organization {
+          users(
+            limit: 100
+            offset: 0
+            filters: { status: [ACTIVE] }
+            search: $search
+            exclude: $excludeIds
+          ) {
+            items {
+              ...useProfileTypeFieldPermissionDialog_User
+            }
+          }
+        }
       }
     }
-    ${useProfileTypeFieldPermissionDialog.fragments.UserOrUserGroup}
+    ${useProfileTypeFieldPermissionDialog.fragments.User}
+  `,
+  gql`
+    query useProfileTypeFieldPermissionDialog_userGroups($search: String!, $excludeIds: [GID!]) {
+      userGroups(limit: 100, offset: 0, search: $search, excludeIds: $excludeIds) {
+        items {
+          ...useProfileTypeFieldPermissionDialog_UserGroup
+        }
+      }
+    }
+    ${useProfileTypeFieldPermissionDialog.fragments.UserGroup}
   `,
 ];
 

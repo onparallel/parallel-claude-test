@@ -130,44 +130,10 @@ describe("GraphQL/Users", () => {
       const { errors, data } = await testClient.execute(
         gql`
           query UserSearch($search: String!) {
-            searchUsers(search: $search) {
-              ... on User {
-                id
-                email
-              }
-              ... on UserGroup {
-                id
-              }
-            }
-          }
-        `,
-        {
-          search: "@onparallel.com",
-        },
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.searchUsers).toEqual([
-        { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" },
-        { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" },
-      ]);
-    });
-
-    it("searches users and groups with active members", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          query UserSearch($search: String!) {
-            searchUsers(search: $search, includeGroups: true) {
-              __typename
-              ... on User {
-                id
-                email
-              }
-              ... on UserGroup {
-                id
-                name
-                members {
-                  user {
+            me {
+              organization {
+                users(limit: 100, offset: 0, search: $search, filters: { status: [ACTIVE] }) {
+                  items {
                     id
                     email
                   }
@@ -177,31 +143,14 @@ describe("GraphQL/Users", () => {
           }
         `,
         {
-          search: "onparal",
+          search: "@onparallel.com",
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.searchUsers).toEqual([
-        {
-          __typename: "UserGroup",
-          id: toGlobalId("UserGroup", userGroups[0].id),
-          name: "onparallel",
-          members: [
-            { user: { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" } },
-            { user: { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" } },
-          ],
-        },
-        {
-          __typename: "User",
-          id: toGlobalId("User", users[1].id),
-          email: "user1@onparallel.com",
-        },
-        {
-          __typename: "User",
-          id: toGlobalId("User", users[2].id),
-          email: "user2@onparallel.com",
-        },
+      expect(data?.me.organization.users.items).toEqual([
+        { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" },
+        { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" },
       ]);
     });
 
@@ -209,14 +158,20 @@ describe("GraphQL/Users", () => {
       const { errors, data } = await testClient.execute(
         gql`
           query UserSearch($search: String!) {
-            searchUsers(search: $search, includeInactive: true) {
-              ... on User {
-                id
-                status
-                email
-              }
-              ... on UserGroup {
-                id
+            me {
+              organization {
+                users(
+                  limit: 100
+                  offset: 0
+                  search: $search
+                  filters: { status: [ACTIVE, INACTIVE] }
+                ) {
+                  items {
+                    id
+                    status
+                    email
+                  }
+                }
               }
             }
           }
@@ -227,7 +182,7 @@ describe("GraphQL/Users", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.searchUsers).toEqual([
+      expect(data?.me.organization.users.items).toEqual([
         {
           id: toGlobalId("User", users[0].id),
           email: "user0@onparallel.com",

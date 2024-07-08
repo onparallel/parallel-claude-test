@@ -4989,9 +4989,15 @@ export interface Query {
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut?: Maybe<PublicRemindersOptOut>;
-  /** Search user groups */
+  /**
+   * Search user groups
+   * @deprecated use paginated userGroups query instead
+   */
   searchUserGroups: Array<UserGroup>;
-  /** Search users and user groups */
+  /**
+   * Search users and user groups
+   * @deprecated Use me.organization.users
+   */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
@@ -5276,10 +5282,12 @@ export interface QueryuserGroupArgs {
 }
 
 export interface QueryuserGroupsArgs {
+  excludeIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryUserGroups_OrderBy>>;
+  type?: InputMaybe<Array<UserGroupType>>;
 }
 
 /** Order to use on Query.contacts */
@@ -7146,23 +7154,6 @@ export type UserGroupMembersPopover_getMembersQuery = {
         }>;
       }
   >;
-};
-
-export type useSearchUserGroups_searchUserGroupsQueryVariables = Exact<{
-  search: Scalars["String"]["input"];
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  type?: InputMaybe<Array<UserGroupType> | UserGroupType>;
-}>;
-
-export type useSearchUserGroups_searchUserGroupsQuery = {
-  searchUserGroups: Array<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    memberCount: number;
-    localizableName: { [locale in UserLocale]?: string };
-    type: UserGroupType;
-  }>;
 };
 
 export type UserListPopover_UserFragment = {
@@ -9148,7 +9139,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
   };
 };
 
-export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_User_Fragment = {
+export type useProfileTypeFieldPermissionDialog_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: string | null;
@@ -9157,7 +9148,7 @@ export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_User_Fragment = 
   initials?: string | null;
 };
 
-export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragment = {
+export type useProfileTypeFieldPermissionDialog_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
   name: string;
@@ -9166,10 +9157,6 @@ export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragme
   type: UserGroupType;
   groupInitials: string;
 };
-
-export type useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment =
-  | useProfileTypeFieldPermissionDialog_UserOrUserGroup_User_Fragment
-  | useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragment;
 
 export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment = {
   __typename?: "ProfileTypeFieldPermission";
@@ -9226,32 +9213,49 @@ export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment = {
   }>;
 };
 
-export type useProfileTypeFieldPermissionDialog_searchUsersQueryVariables = Exact<{
+export type useProfileTypeFieldPermissionDialog_usersQueryVariables = Exact<{
   search: Scalars["String"]["input"];
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  excludeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
-export type useProfileTypeFieldPermissionDialog_searchUsersQuery = {
-  searchUsers: Array<
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        email: string;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      }
-    | {
-        __typename?: "UserGroup";
-        id: string;
-        name: string;
-        memberCount: number;
-        localizableName: { [locale in UserLocale]?: string };
-        type: UserGroupType;
-        groupInitials: string;
-      }
-  >;
+export type useProfileTypeFieldPermissionDialog_usersQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      users: {
+        __typename?: "UserPagination";
+        items: Array<{
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        }>;
+      };
+    };
+  };
+};
+
+export type useProfileTypeFieldPermissionDialog_userGroupsQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+  excludeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type useProfileTypeFieldPermissionDialog_userGroupsQuery = {
+  userGroups: {
+    __typename?: "UserGroupPagination";
+    items: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      memberCount: number;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+      groupInitials: string;
+    }>;
+  };
 };
 
 export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
@@ -47587,26 +47591,47 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
   } | null>;
 };
 
-export type useSearchUsers_searchUsersQueryVariables = Exact<{
+export type useSearchUserGroups_userGroupsQueryVariables = Exact<{
   search: Scalars["String"]["input"];
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  includeGroups?: InputMaybe<Scalars["Boolean"]["input"]>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  excludeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  type?: InputMaybe<Array<UserGroupType> | UserGroupType>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type useSearchUsers_searchUsersQuery = {
-  searchUsers: Array<
-    | { __typename?: "User"; id: string; fullName?: string | null; email: string }
-    | {
-        __typename?: "UserGroup";
-        id: string;
-        name: string;
-        memberCount: number;
-        localizableName: { [locale in UserLocale]?: string };
-        type: UserGroupType;
-      }
-  >;
+export type useSearchUserGroups_userGroupsQuery = {
+  userGroups: {
+    __typename?: "UserGroupPagination";
+    items: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      memberCount: number;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    }>;
+  };
+};
+
+export type useSearchUsers_usersQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search: Scalars["String"]["input"];
+  exclude?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  filters?: InputMaybe<UserFilter>;
+}>;
+
+export type useSearchUsers_usersQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      users: {
+        __typename?: "UserPagination";
+        items: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+      };
+    };
+  };
 };
 
 export type useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment = {
@@ -50859,6 +50884,15 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     invalidCredentials
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
+export const useProfileTypeFieldPermissionDialog_UserFragmentDoc = gql`
+  fragment useProfileTypeFieldPermissionDialog_User on User {
+    id
+    fullName
+    email
+    ...UserAvatar_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserFragment, unknown>;
 export const UserSelectOption_UserGroupFragmentDoc = gql`
   fragment UserSelectOption_UserGroup on UserGroup {
     id
@@ -50879,36 +50913,33 @@ export const UserSelect_UserGroupFragmentDoc = gql`
   ${UserSelectOption_UserGroupFragmentDoc}
   ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
-export const useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc = gql`
-  fragment useProfileTypeFieldPermissionDialog_UserOrUserGroup on UserOrUserGroup {
-    ... on User {
-      id
-      fullName
-      email
-      ...UserAvatar_User
-    }
-    ... on UserGroup {
-      id
-      name
-      groupInitials: initials
-      memberCount
-      ...UserSelect_UserGroup
-      ...UserGroupReference_UserGroup
-    }
+export const useProfileTypeFieldPermissionDialog_UserGroupFragmentDoc = gql`
+  fragment useProfileTypeFieldPermissionDialog_UserGroup on UserGroup {
+    id
+    name
+    groupInitials: initials
+    memberCount
+    ...UserSelect_UserGroup
+    ...UserGroupReference_UserGroup
   }
-  ${UserAvatar_UserFragmentDoc}
   ${UserSelect_UserGroupFragmentDoc}
   ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment, unknown>;
+` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserGroupFragment, unknown>;
 export const useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragmentDoc = gql`
   fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
     id
     permission
     target {
-      ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+      ... on User {
+        ...useProfileTypeFieldPermissionDialog_User
+      }
+      ... on UserGroup {
+        ...useProfileTypeFieldPermissionDialog_UserGroup
+      }
     }
   }
-  ${useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc}
+  ${useProfileTypeFieldPermissionDialog_UserFragmentDoc}
+  ${useProfileTypeFieldPermissionDialog_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
   unknown
@@ -56974,21 +57005,6 @@ export const UserGroupMembersPopover_getMembersDocument = gql`
   UserGroupMembersPopover_getMembersQuery,
   UserGroupMembersPopover_getMembersQueryVariables
 >;
-export const useSearchUserGroups_searchUserGroupsDocument = gql`
-  query useSearchUserGroups_searchUserGroups(
-    $search: String!
-    $excludeUserGroups: [GID!]
-    $type: [UserGroupType!]
-  ) {
-    searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups, type: $type) {
-      ...UserSelect_UserGroup
-    }
-  }
-  ${UserSelect_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  useSearchUserGroups_searchUserGroupsQuery,
-  useSearchUserGroups_searchUserGroupsQueryVariables
->;
 export const UserSelect_canCreateUsersDocument = gql`
   query UserSelect_canCreateUsers {
     me {
@@ -57346,26 +57362,41 @@ export const useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocum
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutation,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutationVariables
 >;
-export const useProfileTypeFieldPermissionDialog_searchUsersDocument = gql`
-  query useProfileTypeFieldPermissionDialog_searchUsers(
-    $search: String!
-    $excludeUsers: [GID!]
-    $excludeUserGroups: [GID!]
-  ) {
-    searchUsers(
-      search: $search
-      excludeUsers: $excludeUsers
-      excludeUserGroups: $excludeUserGroups
-      includeGroups: true
-      includeInactive: false
-    ) {
-      ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+export const useProfileTypeFieldPermissionDialog_usersDocument = gql`
+  query useProfileTypeFieldPermissionDialog_users($search: String!, $excludeIds: [GID!]) {
+    me {
+      organization {
+        users(
+          limit: 100
+          offset: 0
+          filters: { status: [ACTIVE] }
+          search: $search
+          exclude: $excludeIds
+        ) {
+          items {
+            ...useProfileTypeFieldPermissionDialog_User
+          }
+        }
+      }
     }
   }
-  ${useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc}
+  ${useProfileTypeFieldPermissionDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<
-  useProfileTypeFieldPermissionDialog_searchUsersQuery,
-  useProfileTypeFieldPermissionDialog_searchUsersQueryVariables
+  useProfileTypeFieldPermissionDialog_usersQuery,
+  useProfileTypeFieldPermissionDialog_usersQueryVariables
+>;
+export const useProfileTypeFieldPermissionDialog_userGroupsDocument = gql`
+  query useProfileTypeFieldPermissionDialog_userGroups($search: String!, $excludeIds: [GID!]) {
+    userGroups(limit: 100, offset: 0, search: $search, excludeIds: $excludeIds) {
+      items {
+        ...useProfileTypeFieldPermissionDialog_UserGroup
+      }
+    }
+  }
+  ${useProfileTypeFieldPermissionDialog_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileTypeFieldPermissionDialog_userGroupsQuery,
+  useProfileTypeFieldPermissionDialog_userGroupsQueryVariables
 >;
 export const AddPetitionAccessDialog_createContactlessPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createContactlessPetitionAccess(
@@ -63192,35 +63223,57 @@ export const useSearchContactsByEmail_contactsByEmailDocument = gql`
   useSearchContactsByEmail_contactsByEmailQuery,
   useSearchContactsByEmail_contactsByEmailQueryVariables
 >;
-export const useSearchUsers_searchUsersDocument = gql`
-  query useSearchUsers_searchUsers(
+export const useSearchUserGroups_userGroupsDocument = gql`
+  query useSearchUserGroups_userGroups(
     $search: String!
-    $excludeUsers: [GID!]
-    $excludeUserGroups: [GID!]
-    $includeGroups: Boolean
-    $includeInactive: Boolean
+    $excludeIds: [GID!]
+    $type: [UserGroupType!]
+    $limit: Int
+    $offset: Int
   ) {
-    searchUsers(
+    userGroups(
       search: $search
-      excludeUsers: $excludeUsers
-      excludeUserGroups: $excludeUserGroups
-      includeGroups: $includeGroups
-      includeInactive: $includeInactive
+      excludeIds: $excludeIds
+      type: $type
+      limit: $limit
+      offset: $offset
     ) {
-      ... on User {
-        ...UserSelect_User
-      }
-      ... on UserGroup {
+      items {
         ...UserSelect_UserGroup
       }
     }
   }
-  ${UserSelect_UserFragmentDoc}
   ${UserSelect_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
-  useSearchUsers_searchUsersQuery,
-  useSearchUsers_searchUsersQueryVariables
+  useSearchUserGroups_userGroupsQuery,
+  useSearchUserGroups_userGroupsQueryVariables
 >;
+export const useSearchUsers_usersDocument = gql`
+  query useSearchUsers_users(
+    $limit: Int
+    $offset: Int
+    $search: String!
+    $exclude: [GID!]
+    $filters: UserFilter
+  ) {
+    me {
+      organization {
+        users(
+          limit: $limit
+          offset: $offset
+          search: $search
+          exclude: $exclude
+          filters: $filters
+        ) {
+          items {
+            ...UserSelect_User
+          }
+        }
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<useSearchUsers_usersQuery, useSearchUsers_usersQueryVariables>;
 export const useStartSignatureRequest_updateSignatureConfigDocument = gql`
   mutation useStartSignatureRequest_updateSignatureConfig(
     $petitionId: GID!

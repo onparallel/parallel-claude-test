@@ -59,7 +59,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
       const handleSearchUsers = useCallback(
         async (search: string, excludeUsers: string[]) => {
           return await _handleSearchUsers(search, {
-            excludeUsers: [...excludeUsers],
+            excludeIds: [...excludeUsers],
           });
         },
         [_handleSearchUsers],

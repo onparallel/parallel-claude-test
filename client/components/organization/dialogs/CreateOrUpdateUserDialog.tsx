@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserGroupSelect, useSearchUserGroups } from "@parallel/components/common/UserGroupSelect";
+import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   useCreateOrUpdateUserDialog_UserFragment,
@@ -10,6 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -49,9 +50,9 @@ function CreateOrUpdateUserDialog({
 
   const _handleSearchUserGroups = useSearchUserGroups();
   const handleSearchUserGroups = useCallback(
-    async (search: string, excludeUserGroups: string[]) => {
+    async (search: string, _excludeUserIds: string[], excludeUserGroupIds: string[]) => {
       return await _handleSearchUserGroups(search, {
-        excludeUserGroups,
+        excludeIds: excludeUserGroupIds,
         type: ["NORMAL", "INITIAL"],
       });
     },

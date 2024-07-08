@@ -1,12 +1,17 @@
 import { Box, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { FilterSharedWithOperator, PetitionSharedWithFilterLine } from "@parallel/graphql/__types";
+import {
+  FilterSharedWithOperator,
+  PetitionSharedWithFilterLine,
+  UserSelect_UserGroupFragment,
+} from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { useSearchUsers } from "../../../../utils/useSearchUsers";
 import { UserSelect } from "../../../common/UserSelect";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 export interface PetitionListSharedWithFilterProps
   extends ValueProps<PetitionSharedWithFilterLine, false> {
@@ -20,16 +25,22 @@ export function PetitionListSharedWithFilterLine({
 }: PetitionListSharedWithFilterProps) {
   const intl = useIntl();
 
-  const _handleSearchUsers = useSearchUsers();
-  const handleSearchUsers = useCallback(
+  const searchUsers = useSearchUsers();
+  const searchUserGroups = useSearchUserGroups();
+  const handleSearchUsersAndGroups = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      return await _handleSearchUsers(search, {
-        includeGroups: value.operator !== "IS_OWNER",
-        excludeUsers: [...excludeUsers],
-        excludeUserGroups: [...excludeUserGroups],
-      });
+      const [users, groups] = await Promise.all([
+        searchUsers(search, {
+          excludeIds: excludeUsers,
+        }),
+        value.operator !== "IS_OWNER"
+          ? searchUserGroups(search, { excludeIds: excludeUserGroups })
+          : ([] as UserSelect_UserGroupFragment[]),
+      ]);
+
+      return [...groups, ...users];
     },
-    [_handleSearchUsers, value.operator],
+    [searchUsers, searchUserGroups, value.operator],
   );
 
   const operators = useMemo<SimpleOption<FilterSharedWithOperator>[]>(() => {
@@ -94,7 +105,7 @@ export function PetitionListSharedWithFilterLine({
           onChange={(userOrGroup) => {
             onChange({ ...value, value: (userOrGroup?.id ?? null) as any });
           }}
-          onSearch={handleSearchUsers}
+          onSearch={handleSearchUsersAndGroups}
           usePortal={false}
         />
       </Box>

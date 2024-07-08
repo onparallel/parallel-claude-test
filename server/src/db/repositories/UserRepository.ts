@@ -380,6 +380,7 @@ export class UserRepository extends BaseRepository {
     return user;
   }
 
+  /** @deprecated */
   async searchUsers(
     orgId: number,
     search: string,

@@ -3,16 +3,19 @@ import { authenticate, authenticateAnd, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasAccessToUserGroups } from "./authorizers";
-import { contextUserHasPermission } from "../users/authorizers";
 
 export const userGroupsQuery = queryField((t) => {
   t.paginationField("userGroups", {
     type: "UserGroup",
     description: "Paginated list of user groups in the organization",
-    authorize: authenticateAnd(contextUserHasPermission("TEAMS:LIST_TEAMS")),
+    authorize: authenticateAnd(userHasAccessToUserGroups("excludeIds")),
     searchable: true,
     sortableBy: ["name", "createdAt"],
-    resolve: (_, { offset, limit, sortBy, search }, ctx) => {
+    extendArgs: {
+      excludeIds: list(nonNull(globalIdArg())),
+      type: list(nonNull("UserGroupType")),
+    },
+    resolve: (_, { offset, limit, sortBy, search, excludeIds, type }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",
@@ -21,6 +24,8 @@ export const userGroupsQuery = queryField((t) => {
         offset,
         limit,
         search,
+        excludeIds,
+        type,
         sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
           return { field: columnMap[field], order };
@@ -41,9 +46,11 @@ export const userGroupsQuery = queryField((t) => {
   });
 });
 
+/** @deprecated use paginated userGroups query */
 export const searchUserGroups = queryField("searchUserGroups", {
   type: list("UserGroup"),
   description: "Search user groups",
+  deprecation: "use paginated userGroups query instead",
   authorize: authenticateAnd(userHasAccessToUserGroups("excludeUserGroups")),
   args: {
     search: nonNull(stringArg()),

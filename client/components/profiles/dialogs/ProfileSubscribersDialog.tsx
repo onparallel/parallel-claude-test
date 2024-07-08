@@ -74,8 +74,7 @@ function ProfileSubscribersDialog({
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        includeGroups: false,
-        excludeUsers: [...excludeUsers, ...listedUsers.map((u) => u.id)],
+        excludeIds: [...excludeUsers, ...listedUsers.map((u) => u.id)],
       });
     },
     [_handleSearchUsers, listedUsers.map((u) => u.id).join(",")],

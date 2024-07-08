@@ -20,6 +20,7 @@ import {
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
 import usePrevious from "@react-hook/previous";
@@ -35,6 +36,7 @@ import {
   PetitionCommentsAndNotesEditor,
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
+
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
@@ -116,12 +118,18 @@ export function PetitionRepliesFieldComments({
   }, [comments, previousCommentCount]);
 
   const searchUsers = useSearchUsers();
+  const searchUserGroups = useSearchUserGroups();
   const myId = useGetMyId();
   const handleSearchMentionables = useCallback(
     async (search: string) => {
-      return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
+      const [users, groups] = await Promise.all([
+        searchUsers(search, { excludeIds: [myId] }),
+        searchUserGroups(search),
+      ]);
+
+      return [...groups, ...users];
     },
-    [searchUsers],
+    [searchUsers, searchUserGroups],
   );
 
   const handleMarkAsUnread = (commentId: string) => {

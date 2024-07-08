@@ -173,7 +173,7 @@ export const Organization = objectType({
       description: "The users in the organization.",
       searchable: true,
       sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt", "lastActiveAt"],
-      authorize: and(isOwnOrgOrSuperAdmin(), contextUserHasPermission("USERS:LIST_USERS")),
+      authorize: isOwnOrgOrSuperAdmin(),
       extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
         searchByEmailOnly: booleanArg(),

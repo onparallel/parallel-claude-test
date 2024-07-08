@@ -43,9 +43,11 @@ export const userQueries = queryField((t) => {
   });
 });
 
+/** @deprecated use me.organization.users */
 export const searchUsers = queryField("searchUsers", {
   type: list("UserOrUserGroup"),
   description: "Search users and user groups",
+  deprecation: "Use me.organization.users",
   authorize: authenticateAnd(
     userHasAccessToUsers("excludeUsers"),
     userHasAccessToUserGroups("excludeUserGroups"),

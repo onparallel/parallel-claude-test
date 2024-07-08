@@ -30,7 +30,7 @@ export function AddMemberGroupDialog({
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, ...exclude],
+        excludeIds: [...excludeUsers, ...exclude],
       });
     },
     [_handleSearchUsers],

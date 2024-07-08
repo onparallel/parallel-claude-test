@@ -33,6 +33,7 @@ import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 export interface TemplateDefaultPermissionsDialogProps {
   petitionId: string;
@@ -91,25 +92,28 @@ export function TemplateDefaultPermissionsDialog({
     }
   }, [editors.length, ownerPermission?.id]);
 
-  const _handleSearchUsers = useSearchUsers();
-  const handleSearchUsers = useCallback(
+  const searchUsers = useSearchUsers();
+  const searchUserGroups = useSearchUserGroups();
+  const handleSearchUsersAndGroups = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      const _excludeUsers = excludeUsers.slice(0);
-      const _excludeUserGroups = excludeUserGroups.slice(0);
+      const excludeUserIds = excludeUsers.slice(0);
+      const excludeUserGroupIds = excludeUserGroups.slice(0);
       for (const permission of defaultPermissions) {
         if (permission.__typename === "TemplateDefaultUserPermission") {
-          _excludeUsers.push(permission.user.id);
+          excludeUserIds.push(permission.user.id);
         } else if (permission.__typename === "TemplateDefaultUserGroupPermission") {
-          _excludeUserGroups.push(permission.group.id);
+          excludeUserGroupIds.push(permission.group.id);
         }
       }
-      return await _handleSearchUsers(search, {
-        excludeUsers: _excludeUsers,
-        excludeUserGroups: _excludeUserGroups,
-        includeGroups: true,
-      });
+
+      const [users, groups] = await Promise.all([
+        searchUsers(search, { excludeIds: excludeUserIds }),
+        searchUserGroups(search, { excludeIds: excludeUserGroupIds }),
+      ]);
+
+      return [...groups, ...users];
     },
-    [_handleSearchUsers, defaultPermissions],
+    [searchUsers, searchUserGroups, defaultPermissions],
   );
 
   function mapPermission(p: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment) {
@@ -238,7 +242,7 @@ export function TemplateDefaultPermissionsDialog({
                       value={value}
                       onChange={(users) => onChange(users)}
                       onBlur={onBlur}
-                      onSearch={handleSearchUsers}
+                      onSearch={handleSearchUsersAndGroups}
                     />
                   )}
                 />

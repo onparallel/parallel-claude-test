@@ -41,7 +41,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers],
+        excludeIds: [...excludeUsers],
       });
     },
     [_handleSearchUsers],
