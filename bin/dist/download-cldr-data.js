@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert_1 = __importDefault(require("assert"));
 const cldr_1 = __importDefault(require("cldr"));
+const country_codes_list_1 = __importDefault(require("country-codes-list"));
 const remeda_1 = require("remeda");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
-const country_codes_list_1 = __importDefault(require("country-codes-list"));
 let CURRENCIES = null;
 async function getCurrencies() {
     if (CURRENCIES) {
@@ -18,7 +18,7 @@ async function getCurrencies() {
     else {
         const tables = await (await fetch("https://www.wikitable2json.com/api/List_of_circulating_currencies?table=0")).json();
         const data = tables[0];
-        (0, assert_1.default)(data[0][3].startsWith("ISO code"));
+        (0, ts_essentials_1.assert)(data[0][3].startsWith("ISO code"));
         return (CURRENCIES = new Set(data
             .slice(1)
             .filter((row) => row[3] !== "(none)")
@@ -47,10 +47,10 @@ async function main() {
         switch (type) {
             case "country-names":
                 const countries = new Set(country_codes_list_1.default.all().map((x) => x.countryCode));
-                return (0, remeda_1.pipe)(cldr_1.default.extractTerritoryDisplayNames(locale), Object.entries, (0, remeda_1.filter)(([code]) => countries.has(code)), (0, remeda_1.forEach)(([, name]) => (0, assert_1.default)(typeof name === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.localeCompare(b)), Object.fromEntries);
+                return (0, remeda_1.pipe)(cldr_1.default.extractTerritoryDisplayNames(locale), Object.entries, (0, remeda_1.filter)(([code]) => countries.has(code)), (0, remeda_1.forEach)(([, name]) => (0, ts_essentials_1.assert)(typeof name === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.localeCompare(b)), Object.fromEntries);
             case "currency-names":
                 const currencies = await getCurrencies();
-                return (0, remeda_1.pipe)(cldr_1.default.extractCurrencyInfoById(locale), Object.entries, (0, remeda_1.filter)(([code]) => currencies.has(code)), (0, remeda_1.forEach)(([, data]) => (0, assert_1.default)(typeof data.displayName === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.displayName.localeCompare(b.displayName)), (0, remeda_1.map)(([code, data]) => [code, [data.displayName, data.symbol]]), Object.fromEntries);
+                return (0, remeda_1.pipe)(cldr_1.default.extractCurrencyInfoById(locale), Object.entries, (0, remeda_1.filter)(([code]) => currencies.has(code)), (0, remeda_1.forEach)(([, data]) => (0, ts_essentials_1.assert)(typeof data.displayName === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.displayName.localeCompare(b.displayName)), (0, remeda_1.map)(([code, data]) => [code, [data.displayName, data.symbol]]), Object.fromEntries);
         }
     }
     for (const locale of locales) {

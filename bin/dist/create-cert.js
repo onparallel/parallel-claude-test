@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
-const console_1 = require("console");
 const promises_1 = require("dns/promises");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
         throw new Error("Run this script with sudo");
     }
     const result = await (0, promises_1.resolveCname)(domain);
-    (0, console_1.assert)(result.length === 1 && result[0] === "lb.onparallel.com", `${domain} is not pointing to lb.onparallel.com`);
+    (0, ts_essentials_1.assert)(result.length === 1 && result[0] === "lb.onparallel.com", `${domain} is not pointing to lb.onparallel.com`);
     (0, child_process_1.execSync)(`certbot certonly \
     --webroot -w /nfs/parallel/www/html \
     -m santi@onparallel.com \

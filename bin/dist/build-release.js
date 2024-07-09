@@ -4,17 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
-const assert_1 = __importDefault(require("assert"));
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
 const remeda_1 = require("remeda");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
+const stopwatch_1 = require("./utils/stopwatch");
 const timestamp_1 = require("./utils/timestamp");
 const wait_1 = require("./utils/wait");
-const stopwatch_1 = require("./utils/stopwatch");
 const WORK_DIR = "/home/ec2-user";
 const BUILDER_IMAGE_ID = "ami-0292d5deba2afa9fc";
 const INSTANCE_TYPE = "c6i.2xlarge";
@@ -129,7 +129,7 @@ async function main() {
             const instance = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0];
             return ((_c = instance === null || instance === void 0 ? void 0 : instance.State) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
         }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-        (0, assert_1.default)((0, remeda_1.isDefined)(ipAddress));
+        (0, ts_essentials_1.assert)((0, remeda_1.isDefined)(ipAddress));
         await waitForInstance(ipAddress);
         await ec2.send(new client_ec2_1.AttachVolumeCommand({
             InstanceId: instanceId,

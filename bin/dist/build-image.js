@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
-const assert_1 = __importDefault(require("assert"));
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
 const remeda_1 = require("remeda");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const timestamp_1 = require("./utils/timestamp");
@@ -85,7 +85,7 @@ async function main() {
             }
             return isRunning;
         }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-        (0, assert_1.default)((0, remeda_1.isDefined)(ipAddress));
+        (0, ts_essentials_1.assert)((0, remeda_1.isDefined)(ipAddress));
         console.log((0, chalk_1.default) `Instance {green ✓ running}`);
         await waitForInstance(ipAddress);
         console.log("Uploading build script to the new instance.");

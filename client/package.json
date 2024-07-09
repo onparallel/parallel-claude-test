@@ -19,6 +19,7 @@
     "generate-i18n-files:app": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
     "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'",
     "download-countries-i18n": "yarn workspace @parallel/bin download-cldr-data --dataset country-names --locales en es ca it pt --output '../client/public/static/countries/countries_#LOCALE#.json'",
+    "download-timezone-list": "yarn workspace @parallel/bin download-timezone-list --output '../client/utils/timezones.json'",
     "why-recipient": "yarn workspace @parallel/bin node dist/why-included.js --cwd ../client --from './pages/{pp,petition}/**/*.{ts,tsx}' './pages/{maintenance,thanks,update,404}.tsx' --to",
     "storybook": "storybook dev --port 6006",
     "_strip-js": "yarn workspace @parallel/bin strip-js"
@@ -112,7 +113,6 @@
     "slate-hyperscript": "^0.100.0",
     "slate-react": "^0.102.0",
     "smooth-scroll-into-view-if-needed": "^2.0.2",
-    "timezone-support": "^3.1.0",
     "to-arraybuffer": "^1.0.1",
     "truncate-utf8-bytes": "^1.0.2",
     "ts-essentials": "^9.4.1",

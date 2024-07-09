@@ -2,7 +2,7 @@ import { prettifyTimezone } from "@parallel/utils/dates";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { concat, filter, groupBy, map, pipe, sort } from "remeda";
-import { listTimeZones } from "timezone-support";
+import timezones from "@parallel/utils/timezones.json";
 import { SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
 interface TimezoneSelectProps extends Omit<SimpleSelectProps, "options"> {}
@@ -10,7 +10,6 @@ interface TimezoneSelectProps extends Omit<SimpleSelectProps, "options"> {}
 export function TimezoneSelect({ value, onChange, ...props }: TimezoneSelectProps) {
   const intl = useIntl();
   const options = useMemo(() => {
-    const timezones = listTimeZones();
     return pipe(
       timezones,
       filter((t) => t.includes("/") && !t.startsWith("Etc/")),
