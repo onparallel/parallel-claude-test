@@ -33,6 +33,7 @@ function ColumnVisibilityDialog<T extends string>({
   const notVisible = columns.filter((c) => !c.isFixed && !currentSelection.includes(c.key as T));
   return (
     <ConfirmDialog
+      scrollBehavior="inside"
       {...props}
       header={
         <FormattedMessage

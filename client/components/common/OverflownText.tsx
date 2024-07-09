@@ -20,8 +20,7 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
   assignRef(isOverflownRef, isOverflown);
   useResizeObserver(innerRef, ({ target }) => {
     const _isOverflown = target.scrollWidth > target.clientWidth;
-    // boolean xor
-    if ((_isOverflown as any) ^ (isOverflownRef.current as any)) {
+    if (_isOverflown !== isOverflownRef.current) {
       setIsOverflown(_isOverflown);
     }
   });

@@ -12,6 +12,7 @@ import {
 import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ScrollShadows } from "../ScrollShadows";
 import { BaseDialog, BaseDialogProps } from "./BaseDialog";
 
 export interface ConfirmDialogProps<TResult> extends Omit<BaseDialogProps<TResult>, "children"> {
@@ -61,7 +62,9 @@ export function ConfirmDialog<TResult = void>({
           />
         ) : null}
         <ModalHeader>{header}</ModalHeader>
-        <ModalBody>{body}</ModalBody>
+        <ModalBody as={props.scrollBehavior === "inside" ? ScrollShadows : undefined}>
+          {body}
+        </ModalBody>
         <ModalFooter
           as={Stack}
           direction={{ base: "column", sm: "row" }}
