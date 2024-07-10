@@ -4051,6 +4051,14 @@ export type ProfilepetitionsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
+export type ProfilepropertiesArgs = {
+  filter?: InputMaybe<Array<ProfileFieldPropertyFilter>>;
+};
+
+export type ProfilerelationshipsArgs = {
+  filter?: InputMaybe<Array<ProfileRelationshipFilter>>;
+};
+
 export type ProfileAnonymizedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -4202,6 +4210,11 @@ export type ProfileFieldPropertyAndFileWithUploadData = {
   uploads: Array<ProfileFieldFileWithUploadData>;
 };
 
+export type ProfileFieldPropertyFilter = {
+  alias?: InputMaybe<Scalars["String"]["input"]>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
 export type ProfileFieldPropertyPagination = {
   /** The requested slice of items. */
   items: Array<ProfileFieldProperty>;
@@ -4310,6 +4323,11 @@ export type ProfileRelationshipCreatedEvent = ProfileEvent & {
 
 export type ProfileRelationshipDirection = "LEFT_RIGHT" | "RIGHT_LEFT";
 
+export type ProfileRelationshipFilter = {
+  fromSide?: InputMaybe<ProfileRelationshipSide>;
+  relationshipTypeId: Scalars["GID"]["input"];
+};
+
 export type ProfileRelationshipRemovedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -4319,6 +4337,8 @@ export type ProfileRelationshipRemovedEvent = ProfileEvent & {
   type: ProfileEventType;
   user: Maybe<User>;
 };
+
+export type ProfileRelationshipSide = "LEFT" | "RIGHT";
 
 export type ProfileRelationshipType = {
   alias: Maybe<Scalars["String"]["output"]>;
@@ -4608,6 +4628,8 @@ export type PublicPetitionFieldComment = {
   contentHtml: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"]["output"];
+  /** The HTML content of the comment. */
+  excerptHtml: Maybe<Scalars["String"]["output"]>;
   field: PublicPetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"]["output"];
@@ -4668,7 +4690,7 @@ export type PublicPetitionLink = {
 export type PublicPetitionMessage = {
   /** The ID of the message. */
   id: Scalars["GID"]["output"];
-  /** Date when the petition was first sent */
+  /** If already sent, the date at which the email was sent. */
   sentAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Subject of a email. */
   subject: Maybe<Scalars["String"]["output"]>;
@@ -4804,9 +4826,15 @@ export type Query = {
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut: Maybe<PublicRemindersOptOut>;
-  /** Search user groups */
+  /**
+   * Search user groups
+   * @deprecated use paginated userGroups query instead
+   */
   searchUserGroups: Array<UserGroup>;
-  /** Search users and user groups */
+  /**
+   * Search users and user groups
+   * @deprecated Use me.organization.users
+   */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
@@ -5091,10 +5119,12 @@ export type QueryuserGroupArgs = {
 };
 
 export type QueryuserGroupsArgs = {
+  excludeIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryUserGroups_OrderBy>>;
+  type?: InputMaybe<Array<UserGroupType>>;
 };
 
 /** Order to use on Query.contacts */
@@ -5468,6 +5498,7 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
+  | "PROFILE_NAME_PATTERN_UPDATED"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
@@ -5694,6 +5725,7 @@ export type User = Timestamps & {
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
+  unreadNotificationCount: Scalars["Int"]["output"];
   unreadNotificationIds: Array<Scalars["GID"]["output"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];

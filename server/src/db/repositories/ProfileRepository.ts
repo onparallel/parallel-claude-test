@@ -47,6 +47,7 @@ import {
   ProfileRelationshipTypeDirection,
   ProfileStatus,
   ProfileType,
+  ProfileTypeField,
   ProfileTypeFieldPermission,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
@@ -118,6 +119,60 @@ export class ProfileRepository extends BaseRepository {
     "profile_type_field",
     "profile_type_id",
     (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
+  );
+
+  readonly loadProfileTypeFieldsByProfileTypeIdFiltered = this.buildLoader<
+    {
+      profileTypeId: number;
+      filter: {
+        alias?: string | null;
+        profileTypeFieldId?: number | null;
+      }[];
+    },
+    ProfileTypeField[],
+    string
+  >(
+    async (keys, t) => {
+      const profileTypeIds = uniq(keys.map((k) => k.profileTypeId));
+      const aliases = uniq(keys.flatMap((k) => k.filter.map((f) => f.alias)).filter(isDefined));
+      const profileTypeFieldIds = uniq(
+        keys.flatMap((k) => k.filter.map((f) => f.profileTypeFieldId)).filter(isDefined),
+      );
+      const rows = await this.from("profile_type_field", t)
+        .whereIn("profile_type_id", profileTypeIds)
+        .where((q) => {
+          if (aliases.length > 0) {
+            q.orWhereIn("alias", aliases);
+          }
+          if (profileTypeFieldIds.length > 0) {
+            q.orWhereIn("id", profileTypeFieldIds);
+          }
+        })
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .select("*");
+
+      const byId = groupBy(rows, (d) => d.profile_type_id);
+      return keys.map((key) => {
+        return (byId[key.profileTypeId] ?? []).filter((field) => {
+          return key.filter.some((filter) => {
+            if (filter.alias !== undefined && field.alias !== filter.alias) {
+              return false;
+            }
+            if (filter.profileTypeFieldId && field.id !== filter.profileTypeFieldId) {
+              return false;
+            }
+            return true;
+          });
+        });
+      });
+    },
+    {
+      cacheKeyFn: keyBuilder([
+        "profileTypeId",
+        (k) => k.filter.map((f) => `${f.alias}-${f.profileTypeFieldId}`).join(";"),
+      ]),
+    },
   );
 
   private readonly loadProfileTypeForProfileId = this.buildLoader<number, ProfileType | null>(
@@ -2420,6 +2475,66 @@ export class ProfileRepository extends BaseRepository {
             (r) => r.left_side_profile_id === profileId || r.right_side_profile_id === profileId,
           ) ?? [],
       );
+    },
+  );
+
+  readonly loadProfileRelationshipsByProfileIdFiltered = this.buildLoader<
+    {
+      profileId: number;
+      filter: {
+        fromSide?: "LEFT" | "RIGHT" | null;
+        relationshipTypeId: number;
+      }[];
+    },
+    ProfileRelationship[],
+    string
+  >(
+    async (keys, t) => {
+      const relationshipTypeIds = uniq(
+        keys.flatMap((k) => k.filter.map((f) => f.relationshipTypeId)),
+      );
+      const profileIds = uniq(keys.map((k) => k.profileId));
+      const rows = await this.from("profile_relationship", t)
+        .whereNull("deleted_at")
+        .whereNull("removed_at")
+        .whereIn("profile_relationship_type_id", relationshipTypeIds)
+        .where((q) => {
+          q.orWhereIn("left_side_profile_id", profileIds).orWhereIn(
+            "right_side_profile_id",
+            profileIds,
+          );
+        })
+        .orderBy("created_at", "asc")
+        .orderBy("id", "asc")
+        .select("*");
+
+      return keys.map((key) => {
+        return (
+          rows.filter((r) =>
+            key.filter.some((filter) => {
+              if (filter.relationshipTypeId !== r.profile_relationship_type_id) {
+                return false;
+              }
+              if (!filter.fromSide) {
+                return true;
+              }
+              if (filter.fromSide === "LEFT" && r.left_side_profile_id === key.profileId) {
+                return true;
+              }
+              if (filter.fromSide === "RIGHT" && r.right_side_profile_id === key.profileId) {
+                return true;
+              }
+              return false;
+            }),
+          ) ?? []
+        );
+      });
+    },
+    {
+      cacheKeyFn: keyBuilder([
+        "profileId",
+        (k) => k.filter.map((f) => `${f.relationshipTypeId}-${f.fromSide}`).join(";"),
+      ]),
     },
   );
 

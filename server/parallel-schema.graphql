@@ -5179,8 +5179,8 @@ type Profile implements Timestamps {
     offset: Int
   ): PetitionPagination!
   profileType: ProfileType!
-  properties: [ProfileFieldProperty!]!
-  relationships: [ProfileRelationship!]!
+  properties(filter: [ProfileFieldPropertyFilter!]): [ProfileFieldProperty!]!
+  relationships(filter: [ProfileRelationshipFilter!]): [ProfileRelationship!]!
   status: ProfileStatus!
   subscribers: [ProfileSubscription!]!
 
@@ -5358,6 +5358,11 @@ type ProfileFieldPropertyAndFileWithUploadData {
   uploads: [ProfileFieldFileWithUploadData!]!
 }
 
+input ProfileFieldPropertyFilter {
+  alias: String
+  profileTypeFieldId: GID
+}
+
 type ProfileFieldPropertyPagination {
   """
   The requested slice of items.
@@ -5502,6 +5507,11 @@ enum ProfileRelationshipDirection {
   RIGHT_LEFT
 }
 
+input ProfileRelationshipFilter {
+  fromSide: ProfileRelationshipSide
+  relationshipTypeId: GID!
+}
+
 type ProfileRelationshipRemovedEvent implements ProfileEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -5510,6 +5520,11 @@ type ProfileRelationshipRemovedEvent implements ProfileEvent {
   reason: String!
   type: ProfileEventType!
   user: User
+}
+
+enum ProfileRelationshipSide {
+  LEFT
+  RIGHT
 }
 
 type ProfileRelationshipType {

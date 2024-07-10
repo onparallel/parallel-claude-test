@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
-import { enumType, interfaceType, nonNull, objectType } from "nexus";
+import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
 import { isDefined, pick, sortBy, uniq } from "remeda";
 import {
   ProfileRelationshipTypeDirectionValues,
@@ -151,10 +151,31 @@ export const Profile = objectType({
     });
     t.list.field("properties", {
       type: "ProfileFieldProperty",
-      resolve: async (root, _, ctx) => {
-        const fields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-          root.profile_type_id,
-        );
+      args: {
+        filter: list(
+          nonNull(
+            inputObjectType({
+              name: "ProfileFieldPropertyFilter",
+              definition(t) {
+                t.nullable.string("alias");
+                t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+              },
+            }),
+          ),
+        ),
+      },
+
+      resolve: async (root, args, ctx) => {
+        const filter = args.filter?.filter((f) => f.alias || f.profileTypeFieldId) ?? [];
+
+        const fields =
+          filter.length === 0
+            ? await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(root.profile_type_id)
+            : await ctx.profiles.loadProfileTypeFieldsByProfileTypeIdFiltered({
+                profileTypeId: root.profile_type_id,
+                filter,
+              });
+
         return sortBy(fields, (f) => f.position).map((field) => ({
           profile: root,
           profile_type_field: field,
@@ -209,8 +230,33 @@ export const Profile = objectType({
     });
     t.nonNull.list.nonNull.field("relationships", {
       type: "ProfileRelationship",
-      resolve: async (o, _, ctx) => {
-        return await ctx.profiles.loadProfileRelationshipsByProfileId(o.id);
+      args: {
+        filter: list(
+          nonNull(
+            inputObjectType({
+              name: "ProfileRelationshipFilter",
+              definition(t) {
+                t.nonNull.globalId("relationshipTypeId", { prefixName: "ProfileRelationshipType" });
+                t.nullable.field("fromSide", {
+                  type: enumType({
+                    name: "ProfileRelationshipSide",
+                    members: ["LEFT", "RIGHT"],
+                  }),
+                });
+              },
+            }),
+          ),
+        ),
+      },
+      resolve: async (o, args, ctx) => {
+        if (isDefined(args.filter) && args.filter.length > 0) {
+          return await ctx.profiles.loadProfileRelationshipsByProfileIdFiltered({
+            profileId: o.id,
+            filter: args.filter,
+          });
+        } else {
+          return await ctx.profiles.loadProfileRelationshipsByProfileId(o.id);
+        }
       },
     });
     t.implements("Timestamps");

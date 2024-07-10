@@ -271,6 +271,11 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  ProfileFieldPropertyFilter: {
+    // input type
+    alias?: string | null; // String
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+  };
   ProfileFieldValuesFilter: {
     // input type
     operator: NexusGenEnums["ProfileFieldValuesFilterOperator"]; // ProfileFieldValuesFilterOperator!
@@ -288,6 +293,11 @@ export interface NexusGenInputs {
     // input type
     profileTypeFieldId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
+  ProfileRelationshipFilter: {
+    // input type
+    fromSide?: NexusGenEnums["ProfileRelationshipSide"] | null; // ProfileRelationshipSide
+    relationshipTypeId: NexusGenScalars["GID"]; // GID!
   };
   ProfileTypeFilter: {
     // input type
@@ -548,6 +558,7 @@ export interface NexusGenEnums {
     | "NOT_IS_ONE_OF"
     | "START_WITH";
   ProfileRelationshipDirection: "LEFT_RIGHT" | "RIGHT_LEFT";
+  ProfileRelationshipSide: "LEFT" | "RIGHT";
   ProfileStatus: db.ProfileStatus;
   ProfileTypeFieldPermissionType: db.ProfileTypeFieldPermissionType;
   ProfileTypeFieldType: db.ProfileTypeFieldType;
@@ -7835,6 +7846,14 @@ export interface NexusGenArgTypes {
       // args
       limit?: number | null; // Int
       offset?: number | null; // Int
+    };
+    properties: {
+      // args
+      filter?: NexusGenInputs["ProfileFieldPropertyFilter"][] | null; // [ProfileFieldPropertyFilter!]
+    };
+    relationships: {
+      // args
+      filter?: NexusGenInputs["ProfileRelationshipFilter"][] | null; // [ProfileRelationshipFilter!]
     };
   };
   PublicOrganization: {
