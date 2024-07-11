@@ -24,6 +24,7 @@ interface ClosePetitionDialogInput {
 
 interface ClosePetitionDialogNotification {
   message: Maybe<RichTextEditorValue>;
+  attachPdfExport: boolean;
   pdfExportTitle: Maybe<string>;
 }
 
@@ -34,6 +35,8 @@ export function ClosePetitionDialog({
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
+  const hasSignedDocument = petition.currentSignatureRequest?.status === "COMPLETED" ?? false;
+
   const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [message, setMessage] = useState(
     petition.closingEmailBody ??
@@ -47,7 +50,9 @@ export function ClosePetitionDialog({
 
   const [attachPdfExport, setAttachPdfExport] = useState(false);
   const pdfExportTitleRef = useRef<HTMLInputElement>(null);
-  const [pdfExportTitle, setPdfExportTitle] = useState(petition.name ?? "");
+  const [pdfExportTitle, setPdfExportTitle] = useState(
+    hasSignedDocument ? null : petition.name ?? "",
+  );
 
   const [isInvalid, setIsInvalid] = useState(false);
 
@@ -124,7 +129,7 @@ export function ClosePetitionDialog({
                     colorScheme="primary"
                     onChange={(e) => {
                       setAttachPdfExport(e.target.checked);
-                      if (e.target.checked) {
+                      if (!hasSignedDocument && e.target.checked) {
                         setTimeout(() => {
                           pdfExportTitleRef.current!.select();
                         });
@@ -144,28 +149,30 @@ export function ClosePetitionDialog({
                       />
                     )}
                   </Checkbox>
-                  <PaddedCollapse in={attachPdfExport}>
-                    <FormControl>
-                      <FormLabel display="flex" alignItems="center">
-                        <FormattedMessage
-                          id="component.close-petition-dialog.attach-pdf-export-title"
-                          defaultMessage="PDF export title"
-                        />
-                        <HelpPopover placement="auto">
+                  {hasSignedDocument ? null : (
+                    <PaddedCollapse in={attachPdfExport}>
+                      <FormControl>
+                        <FormLabel display="flex" alignItems="center">
                           <FormattedMessage
-                            id="component.close-petition-dialog.attach-pdf-export-title-help"
-                            defaultMessage="This will be the name of the attached PDF file."
+                            id="component.close-petition-dialog.attach-pdf-export-title"
+                            defaultMessage="PDF export title"
                           />
-                        </HelpPopover>
-                      </FormLabel>
-                      <Input
-                        ref={pdfExportTitleRef}
-                        value={pdfExportTitle}
-                        isInvalid={attachPdfExport && !pdfExportTitle}
-                        onChange={(e) => setPdfExportTitle(e.target.value)}
-                      />
-                    </FormControl>
-                  </PaddedCollapse>
+                          <HelpPopover placement="auto">
+                            <FormattedMessage
+                              id="component.close-petition-dialog.attach-pdf-export-title-help"
+                              defaultMessage="This will be the name of the attached PDF file."
+                            />
+                          </HelpPopover>
+                        </FormLabel>
+                        <Input
+                          ref={pdfExportTitleRef}
+                          value={pdfExportTitle ?? ""}
+                          isInvalid={attachPdfExport && !pdfExportTitle}
+                          onChange={(e) => setPdfExportTitle(e.target.value)}
+                        />
+                      </FormControl>
+                    </PaddedCollapse>
+                  )}
                 </Stack>
               </PaddedCollapse>
             </Stack>
@@ -177,14 +184,19 @@ export function ClosePetitionDialog({
           leftIcon={sendMessage ? <PaperPlaneIcon /> : undefined}
           colorScheme="primary"
           onClick={() => {
-            if (sendMessage && (isEmptyRTEValue(message) || (attachPdfExport && !pdfExportTitle))) {
+            if (
+              sendMessage &&
+              (isEmptyRTEValue(message) ||
+                (attachPdfExport && !hasSignedDocument && !pdfExportTitle))
+            ) {
               if (isEmptyRTEValue(message)) {
                 setIsInvalid(true);
               }
             } else {
               props.onResolve({
                 message: sendMessage ? message : null,
-                pdfExportTitle: attachPdfExport ? pdfExportTitle : null,
+                attachPdfExport,
+                pdfExportTitle,
               });
             }
           }}

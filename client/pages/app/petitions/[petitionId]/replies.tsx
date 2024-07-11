@@ -359,6 +359,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
       let message: Maybe<RichTextEditorValue> = null;
       let pdfExportTitle: Maybe<string> = null;
+      let attachPdfExport = false;
 
       try {
         const data = await showClosePetitionDialog({
@@ -369,13 +370,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
         message = data.message;
         pdfExportTitle = data.pdfExportTitle;
+        attachPdfExport = data.attachPdfExport;
 
         if (message) {
           await sendPetitionClosedNotification({
             variables: {
               petitionId: petition.id,
               emailBody: message,
-              attachPdfExport: !!pdfExportTitle,
+              attachPdfExport,
               pdfExportTitle,
             },
           });
@@ -392,7 +394,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             variables: {
               petitionId: petition.id,
               emailBody: message,
-              attachPdfExport: !!pdfExportTitle,
+              attachPdfExport,
               pdfExportTitle,
               force: true,
             },

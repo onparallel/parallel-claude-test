@@ -4182,6 +4182,14 @@ export interface ProfilepetitionsArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 }
 
+export interface ProfilepropertiesArgs {
+  filter?: InputMaybe<Array<ProfileFieldPropertyFilter>>;
+}
+
+export interface ProfilerelationshipsArgs {
+  filter?: InputMaybe<Array<ProfileRelationshipFilter>>;
+}
+
 export interface ProfileAnonymizedEvent extends ProfileEvent {
   __typename?: "ProfileAnonymizedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -4347,6 +4355,11 @@ export interface ProfileFieldPropertyAndFileWithUploadData {
   uploads: Array<ProfileFieldFileWithUploadData>;
 }
 
+export interface ProfileFieldPropertyFilter {
+  alias?: InputMaybe<Scalars["String"]["input"]>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+}
+
 export interface ProfileFieldPropertyPagination {
   __typename?: "ProfileFieldPropertyPagination";
   /** The requested slice of items. */
@@ -4461,6 +4474,11 @@ export interface ProfileRelationshipCreatedEvent extends ProfileEvent {
 
 export type ProfileRelationshipDirection = "LEFT_RIGHT" | "RIGHT_LEFT";
 
+export interface ProfileRelationshipFilter {
+  fromSide?: InputMaybe<ProfileRelationshipSide>;
+  relationshipTypeId: Scalars["GID"]["input"];
+}
+
 export interface ProfileRelationshipRemovedEvent extends ProfileEvent {
   __typename?: "ProfileRelationshipRemovedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -4471,6 +4489,8 @@ export interface ProfileRelationshipRemovedEvent extends ProfileEvent {
   type: ProfileEventType;
   user?: Maybe<User>;
 }
+
+export type ProfileRelationshipSide = "LEFT" | "RIGHT";
 
 export interface ProfileRelationshipType {
   __typename?: "ProfileRelationshipType";
@@ -56702,7 +56722,6 @@ export const PetitionFieldComment_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionFieldComment_PetitionFieldComment on PetitionFieldComment {
     id
     createdAt
-    content
     content
     ...PetitionFieldCommentContent_PetitionFieldComment
     isUnread

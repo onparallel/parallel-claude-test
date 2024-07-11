@@ -109,8 +109,6 @@ export async function petitionClosedNotification(
     });
 
     if (payload.attach_pdf_export) {
-      const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
-
       const latestSignature = await context.petitions.loadLatestPetitionSignatureByPetitionId(
         petition.id,
       );
@@ -118,6 +116,7 @@ export async function petitionClosedNotification(
       const path = random(16);
 
       let res: HeadObjectOutput | undefined;
+      let filename: string | undefined;
       // if the parallel has a completed signature request, use that instead of the binder
       if (latestSignature?.status === "COMPLETED" && isDefined(latestSignature.file_upload_id)) {
         const fileUpload = await context.files.loadFileUpload(latestSignature.file_upload_id);
@@ -127,6 +126,7 @@ export async function petitionClosedNotification(
           "application/pdf",
           await context.storage.fileUploads.downloadFile(fileUpload.path),
         );
+        filename = fileUpload.filename;
       } else {
         const owner = await context.petitions.loadPetitionOwner(petition.id);
         const binderPath = await context.petitionBinder.createBinder(owner!.id, {
@@ -141,6 +141,7 @@ export async function petitionClosedNotification(
           "application/pdf",
           createReadStream(binderPath),
         );
+        filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
       }
 
       const attachment = await context.files.createTemporaryFile(
