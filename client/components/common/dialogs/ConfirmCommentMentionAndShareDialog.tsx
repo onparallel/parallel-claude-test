@@ -152,7 +152,7 @@ function ConfirmCommentMentionAndShareDialog({
           ) : null}
 
           <FormControl>
-            <Checkbox {...register("sharePetitionSubscribed")} colorScheme="primary" defaultChecked>
+            <Checkbox {...register("sharePetitionSubscribed")} defaultChecked>
               <FormattedMessage
                 id="component.confirm-comment-mention-and-share-dialog.body-subscribe-to-notifications"
                 defaultMessage="Subscribe to notifications"

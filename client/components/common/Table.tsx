@@ -318,7 +318,6 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
                 onChange={noop}
-                colorScheme="primary"
               />
             </Center>
           </Box>
@@ -331,7 +330,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
             <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleSelection}>
-              <Checkbox isChecked={isSelected} colorScheme="primary" onChange={noop} />
+              <Checkbox isChecked={isSelected} onChange={noop} />
             </Center>
           );
         },

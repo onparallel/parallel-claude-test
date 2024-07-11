@@ -126,7 +126,6 @@ export function ClosePetitionDialog({
                     placeholderOptions={placeholders}
                   />
                   <Checkbox
-                    colorScheme="primary"
                     onChange={(e) => {
                       setAttachPdfExport(e.target.checked);
                       if (!hasSignedDocument && e.target.checked) {

@@ -94,7 +94,6 @@ export function PetitionRemindersConfig({
           <Checkbox
             data-action="enable-reminders"
             data-testid="enable-reminders-checkbox"
-            colorScheme="primary"
             size="lg"
             marginEnd={2}
             isChecked={isActive}
@@ -195,7 +194,6 @@ export function PetitionRemindersConfig({
           <Flex alignItems="center" marginTop={2}>
             <Checkbox
               data-testid="reminders-config-weekdays-only-checkbox"
-              colorScheme="primary"
               size="md"
               marginEnd={2}
               isChecked={value.weekdaysOnly}

@@ -370,12 +370,7 @@ export function PetitionSharingDialog({
               </FormControl>
             </Flex>
             <Stack display={hasUsers ? "flex" : "none"}>
-              <Checkbox
-                {...register("notify")}
-                colorScheme="primary"
-                defaultChecked
-                data-testid="notify-users-checkbox"
-              >
+              <Checkbox {...register("notify")} defaultChecked data-testid="notify-users-checkbox">
                 <FormattedMessage
                   id="component.petition-sharing-dialog.notify-checkbox"
                   defaultMessage="Notify users"
@@ -398,7 +393,7 @@ export function PetitionSharingDialog({
                 />
               </PaddedCollapse>
               {!isTemplate ? (
-                <Checkbox {...register("subscribe")} colorScheme="primary" defaultChecked>
+                <Checkbox {...register("subscribe")} defaultChecked>
                   <FormattedMessage
                     id="component.petition-sharing-dialog.subscribe"
                     defaultMessage="Subscribe to notifications"

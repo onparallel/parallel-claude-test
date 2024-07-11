@@ -136,7 +136,6 @@ export function CheckboxTableFilter<T extends string>({
           tabIndex={activeIndex === i + 1 ? 0 : -1}
         >
           <Checkbox
-            colorScheme="primary"
             pointerEvents="none"
             role="presentation"
             isChecked={value?.includes(option.value) ?? false}

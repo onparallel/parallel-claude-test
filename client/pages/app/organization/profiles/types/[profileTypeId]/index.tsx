@@ -597,7 +597,6 @@ function DraggableList({
             isChecked={anySelected && allSelected}
             isIndeterminate={anySelected && !allSelected}
             onChange={noop}
-            colorScheme="primary"
           />
         </Center>
         {selectedCount.current > 0 ? (
@@ -722,7 +721,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
         paddingX={4}
       >
         <Center cursor="pointer" padding={3} paddingStart={1} onClick={onToggle}>
-          <Checkbox isChecked={isSelected} colorScheme="primary" />
+          <Checkbox isChecked={isSelected} />
         </Center>
         <HStack flex="1" userSelect="none">
           <Box

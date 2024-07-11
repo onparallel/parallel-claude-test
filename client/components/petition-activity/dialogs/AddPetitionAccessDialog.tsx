@@ -401,7 +401,7 @@ export function AddPetitionAccessDialog({
 
               {senderHasPermission ? null : (
                 <FormControl id="subscribeSender">
-                  <Checkbox {...register("subscribeSender")} colorScheme="primary">
+                  <Checkbox {...register("subscribeSender")}>
                     <Flex alignItems="center">
                       <Text as="span">
                         <FormattedMessage

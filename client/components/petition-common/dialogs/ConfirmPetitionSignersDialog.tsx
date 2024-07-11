@@ -364,7 +364,7 @@ export function ConfirmPetitionSignersDialog(
           {props.isUpdate ? (
             !isMaxSignersReached &&
             props.petition.isInteractionWithRecipientsEnabled && (
-              <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
+              <Checkbox marginTop={4} {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage
                     id="component.confirm-petition-signers-dialog.allow-additional-signers-label"
@@ -383,7 +383,6 @@ export function ConfirmPetitionSignersDialog(
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
                 marginY={4}
-                colorScheme="primary"
                 isChecked={showMessage}
                 onChange={(e) => setShowMessage(e.target.checked)}
               >

@@ -15,13 +15,7 @@ export function CheckboxMenuItemOption({ children, value, onChange }: CheckboxMe
       iconSpacing={0}
     >
       <Flex alignItems="center">
-        <Checkbox
-          role="presentation"
-          pointerEvents="none"
-          colorScheme="primary"
-          isChecked={value}
-          marginEnd={2}
-        />
+        <Checkbox role="presentation" pointerEvents="none" isChecked={value} marginEnd={2} />
         {children}
       </Flex>
     </MenuItemOption>

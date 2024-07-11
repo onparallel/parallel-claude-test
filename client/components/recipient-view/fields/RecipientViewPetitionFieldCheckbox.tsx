@@ -212,6 +212,7 @@ export function RecipientViewPetitionFieldCheckbox({
             value={value}
             onChange={handleChange}
             {...(showRadio ? { icon: <CustomIcon />, variant: "radio" } : {})}
+            colorScheme="blue"
           >
             {label}
           </Checkbox>

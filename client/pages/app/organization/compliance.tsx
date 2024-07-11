@@ -171,7 +171,6 @@ function OrganizationCompliance() {
             })}
           >
             <Checkbox
-              colorScheme="primary"
               {...register("isActive", {
                 onChange: (event) => {
                   onPeriodChange({ period: 1, isActive: event.target.checked });

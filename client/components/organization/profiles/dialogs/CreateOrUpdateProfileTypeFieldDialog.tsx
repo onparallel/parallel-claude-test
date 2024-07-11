@@ -649,7 +649,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               <>
                 {selectedType === "DATE" ? (
                   <FormControl isDisabled={isDisabled}>
-                    <Checkbox colorScheme="primary" {...register("options.useReplyAsExpiryDate")}>
+                    <Checkbox {...register("options.useReplyAsExpiryDate")}>
                       <FormattedMessage
                         id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
                         defaultMessage="Use reply as expiry date"

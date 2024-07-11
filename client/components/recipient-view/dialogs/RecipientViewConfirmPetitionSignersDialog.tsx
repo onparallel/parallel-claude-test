@@ -281,7 +281,6 @@ function RecipientViewConfirmPetitionSignersDialog({
               <FormControl isInvalid={!!errors.message}>
                 <Checkbox
                   marginY={4}
-                  colorScheme="primary"
                   isChecked={showMessage}
                   onChange={(e) => setShowMessage(e.target.checked)}
                 >

@@ -497,7 +497,7 @@ function SignatureConfigDialogBodyStep2({
       {!review && !petitionIsCompleted && petition.isInteractionWithRecipientsEnabled ? (
         <FormControl id="allowAdditionalSigners">
           <FormLabel margin={0}>
-            <Checkbox colorScheme="primary" {...register("allowAdditionalSigners")}>
+            <Checkbox {...register("allowAdditionalSigners")}>
               <HStack alignContent="center" fontWeight="normal" spacing={0}>
                 <Text as="span">
                   <FormattedMessage
@@ -518,7 +518,7 @@ function SignatureConfigDialogBodyStep2({
       ) : null}
       <FormControl id="showInstructions">
         <FormLabel fontWeight="normal" margin={0}>
-          <Checkbox colorScheme="primary" {...register("showInstructions")}>
+          <Checkbox {...register("showInstructions")}>
             <HStack alignContent="center" fontWeight="normal" spacing={0}>
               <Text as="span">
                 <FormattedMessage
@@ -553,7 +553,7 @@ function SignatureConfigDialogBodyStep2({
         </FormControl>
       ) : null}
       <FormControl id="includePresetSigners">
-        <Checkbox colorScheme="primary" {...register("includePresetSigners")}>
+        <Checkbox {...register("includePresetSigners")}>
           <FormattedMessage
             id="component.signature-config-dialog.include-fixed-signers-template-label"
             defaultMessage="Include contacts who always sign the document"

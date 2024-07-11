@@ -301,7 +301,6 @@ export function ProfileFieldBackgroundCheckSettings({
           <Stack>
             <FormControl isDisabled={isDisabled}>
               <Checkbox
-                colorScheme="primary"
                 onChange={handleActivationConditionChange}
                 isChecked={hasActivationCondition}
               >

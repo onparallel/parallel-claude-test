@@ -378,7 +378,7 @@ function TextValueRadioGroup({
     <>
       <Td paddingX={2} paddingY={3} verticalAlign="top">
         <HStack>
-          <Radio {...getRadioProps({ value: "IGNORE" })} colorScheme="primary" />
+          <Radio {...getRadioProps({ value: "IGNORE" })} />
           <Flex minWidth={0}>
             <OverflownText as="span">{oldValue}</OverflownText>
           </Flex>
@@ -386,7 +386,7 @@ function TextValueRadioGroup({
       </Td>
       <Td paddingX={2} paddingY={3} verticalAlign="top">
         <HStack>
-          <Radio {...getRadioProps({ value: "OVERWRITE" })} colorScheme="primary" />
+          <Radio {...getRadioProps({ value: "OVERWRITE" })} />
           <Flex minWidth={0}>
             <OverflownText as="span" textStyle={isDefined(newValue) ? undefined : "hint"}>
               {newValue ??

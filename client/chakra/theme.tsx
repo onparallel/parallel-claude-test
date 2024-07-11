@@ -173,6 +173,14 @@ export const theme = extendTheme({
           control: { borderRadius: "50%" },
         },
       },
+      defaultProps: {
+        colorScheme: "primary",
+      },
+    },
+    Radio: {
+      defaultProps: {
+        colorScheme: "primary",
+      },
     },
     Heading: {
       sizes: {

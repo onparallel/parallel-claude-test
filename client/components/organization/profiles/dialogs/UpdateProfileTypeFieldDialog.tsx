@@ -120,7 +120,6 @@ function UpdateProfileTypeFieldDialog({
                       isChecked={value === true}
                       isIndeterminate={value === null}
                       onChange={onChange}
-                      colorScheme="primary"
                     />
                   );
                 }}
