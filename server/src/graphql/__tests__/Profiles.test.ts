@@ -7017,6 +7017,7 @@ describe("GraphQL/Profiles", () => {
                 type: "PROFILE_DISASSOCIATED",
                 data: {
                   userId: toGlobalId("User", sessionUser.id),
+                  petitionAccessId: null,
                   profileId: toGlobalId("Profile", profiles[0].id),
                 },
               },
@@ -7135,6 +7136,7 @@ describe("GraphQL/Profiles", () => {
                 type: "PROFILE_DISASSOCIATED",
                 data: {
                   userId: toGlobalId("User", sessionUser.id),
+                  petitionAccessId: null,
                   profileId: toGlobalId("Profile", profiles[0].id),
                 },
               },

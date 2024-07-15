@@ -8,24 +8,28 @@ import { FormattedMessage } from "react-intl";
 import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
+import { UserOrContactReference } from "../../UserOrContactReference";
 
 export interface TimelineProfileDisassociatedEventProps {
+  userId: string;
   event: TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment;
 }
 
 export function TimelineProfileDisassociatedEvent({
   event,
+  userId,
 }: TimelineProfileDisassociatedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={CloseIconSmall} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
-        id="timeline.profile-disassociated-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}"
+        id="component.timeline-profile-disassociated-event.description"
+        defaultMessage="{authorIsYou, select, true {You} other {{author}}} removed the association with {profileName} {timeAgo}"
         values={{
-          userIsYou: false,
-          user: <UserReference user={event.user} />,
+          authorIsYou:
+            event.disassociatedBy?.__typename === "User" && event.disassociatedBy.id === userId,
+          author: <UserOrContactReference userOrAccess={event.disassociatedBy} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -39,14 +43,15 @@ export function TimelineProfileDisassociatedEvent({
 TimelineProfileDisassociatedEvent.fragments = {
   ProfileDisassociatedEvent: gql`
     fragment TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent on ProfileDisassociatedEvent {
-      user {
-        ...UserReference_User
+      disassociatedBy {
+        ...UserOrContactReference_UserOrPetitionAccess
       }
       profile {
         ...ProfileReference_Profile
       }
       createdAt
     }
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${UserReference.fragments.User}
     ${ProfileReference.fragments.Profile}
   `,

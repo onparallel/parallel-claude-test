@@ -3,7 +3,7 @@ import { UserGroupPermissionName, UserStatus } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeResolver<
   "User",
@@ -90,8 +90,13 @@ export function contextUserHasPermission<TypeName extends string, FieldName exte
   permission: MaybeArray<UserGroupPermissionName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
+    const permissions = unMaybeArray(permission);
     const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
-    return unMaybeArray(permission).every((p) => userPermissions.includes(p));
+    if (!permissions.every((p) => userPermissions.includes(p))) {
+      throw new ForbiddenError(`User does not have permission: ${permissions.join(", ")}`);
+    }
+
+    return true;
   };
 }
 

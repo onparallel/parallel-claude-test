@@ -370,6 +370,14 @@ export type CreatePetitionFieldReplyInput = {
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
+/** Fields to prefill into the petition. petitionFieldId must correspond to a FIELD_GROUP in the template, linked to the same profile type as the provided profileIds. */
+export type CreatePetitionFromProfilePrefillInput = {
+  /** ID of the FIELD_GROUP field to prefill into */
+  petitionFieldId: Scalars["GID"]["input"];
+  /** ID of the profile to prefill into the field. IDs must all belong to the same profile type as the FIELD_GROUP, and can be the main profile or any of its associated profiles */
+  profileIds: Array<Scalars["GID"]["input"]>;
+};
+
 export type CreatePetitionVariableInput = {
   defaultValue: Scalars["Float"]["input"];
   name: Scalars["String"]["input"];
@@ -884,6 +892,8 @@ export type Mutation = {
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates multiple replies for a petition at once */
   createPetitionFieldReplies: Array<PetitionFieldReply>;
+  /** Creates a petition from a profile and a base template, prefilling the field groups linked to profile types with the provided profile and all its current relationships */
+  createPetitionFromProfile: Petition;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
   /** Creates a Task for generating a petition summary with AI */
@@ -1509,6 +1519,12 @@ export type MutationcreatePetitionFieldRepliesArgs = {
   fields: Array<CreatePetitionFieldReplyInput>;
   overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcreatePetitionFromProfileArgs = {
+  prefill: Array<CreatePetitionFromProfilePrefillInput>;
+  profileId: Scalars["GID"]["input"];
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationcreatePetitionListViewArgs = {
@@ -3157,6 +3173,7 @@ export type PetitionDeletedEvent = PetitionEvent & {
 export type PetitionDisassociatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  disassociatedBy: Maybe<UserOrPetitionAccess>;
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -4098,6 +4115,7 @@ export type ProfileCreatedEvent = ProfileEvent & {
 export type ProfileDisassociatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  disassociatedBy: Maybe<UserOrPetitionAccess>;
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   profile: Maybe<Profile>;

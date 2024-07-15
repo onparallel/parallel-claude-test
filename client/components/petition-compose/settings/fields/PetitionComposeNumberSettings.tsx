@@ -126,7 +126,7 @@ export function PetitionComposeNumberSettings({
             }}
             onBlur={handleDecimalsBlur}
             allowMouseWheel={true}
-            isDisabled={isReadOnly}
+            isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
           >
             <NumberInputField />
             <NumberInputStepper>
@@ -160,7 +160,7 @@ export function PetitionComposeNumberSettings({
             flex={1}
             as={HStack}
             alignItems="center"
-            isDisabled={isReadOnly}
+            isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
             isInvalid={isRangeInvalid}
           >
             <FormLabel margin={0} fontSize="sm">
@@ -184,7 +184,7 @@ export function PetitionComposeNumberSettings({
             flex="1"
             as={HStack}
             alignItems="center"
-            isDisabled={isReadOnly}
+            isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
             isInvalid={isRangeInvalid}
           >
             <FormLabel margin={0} fontSize="sm">

@@ -1,13 +1,4 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { ArrowDiagonalRightIcon } from "@parallel/chakra/icons";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -51,15 +42,10 @@ function AssociatePetitionToProfileDialog({
       }
       {...props}
       header={
-        <HStack>
-          <ArrowDiagonalRightIcon />
-          <Text as="span">
-            <FormattedMessage
-              id="component.associate-petition-to-profile-dialog.header"
-              defaultMessage="Associate parallel"
-            />
-          </Text>
-        </HStack>
+        <FormattedMessage
+          id="component.associate-petition-to-profile-dialog.header"
+          defaultMessage="Associate existing parallel"
+        />
       }
       body={
         <Stack>

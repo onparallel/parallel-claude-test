@@ -1,6 +1,17 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Button, Center, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
-import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
+import {
+  Button,
+  ButtonGroup,
+  Center,
+  Flex,
+  HStack,
+  Heading,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { ChevronDownIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link, NormalLink } from "@parallel/components/common/Link";
@@ -10,6 +21,7 @@ import {
   ProfilePetitionsTable_PetitionFragment,
   ProfilePetitionsTable_ProfileFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
+  ProfilePetitionsTable_createPetitionFromProfileDocument,
   ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
   ProfilePetitionsTable_petitionsDocument,
 } from "@parallel/graphql/__types";
@@ -18,17 +30,22 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop } from "remeda";
 import { ContactReference } from "../common/ContactReference";
+import { Divider } from "../common/Divider";
+import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PetitionSignatureCellContent } from "../common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "../common/PetitionStatusCellContent";
 import { ProfileReference } from "../common/ProfileReference";
+import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
 import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDisassociateProfileDialog";
+import { useAssociateNewPetitionToProfileDialog } from "./dialogs/AssociateNewPetitionToProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
 
 const QUERY_STATE = {
@@ -112,6 +129,30 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     onRemoveClick: () => handleRemovePetition(),
   });
 
+  const [createPetitionFromProfile] = useMutation(
+    ProfilePetitionsTable_createPetitionFromProfileDocument,
+  );
+  const showAssociateNewPetitionToProfileDialog = useAssociateNewPetitionToProfileDialog();
+  const handleCreateNewPetition = async () => {
+    try {
+      if (isDefined(profile)) {
+        const { templateId, prefill } = await showAssociateNewPetitionToProfileDialog({
+          profile,
+        });
+
+        const { data } = await createPetitionFromProfile({
+          variables: { profileId, templateId, prefill },
+        });
+
+        if (isDefined(data)) {
+          goToPetition(data.createPetitionFromProfile.id, "preview");
+        }
+      }
+    } catch {}
+  };
+
+  const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
+
   return (
     <TablePage
       flex="1 1 auto"
@@ -140,16 +181,42 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
             />
           </Heading>
           <Spacer />
-          <Button
-            leftIcon={<AddIcon />}
-            onClick={handleAddPetition}
-            isDisabled={profile?.status === "DELETION_SCHEDULED"}
-          >
-            <FormattedMessage
-              id="component.profile-petitions-table.add-petition"
-              defaultMessage="Add parallel"
+
+          <ButtonGroup isAttached>
+            <RestrictedFeaturePopover isRestricted={!userCanCreatePetition}>
+              <Button
+                flex="1"
+                onClick={handleCreateNewPetition}
+                isDisabled={!userCanCreatePetition}
+                borderEndRadius={0}
+              >
+                <FormattedMessage
+                  id="component.profile-petitions-table.new-parallel"
+                  defaultMessage="New parallel"
+                />
+              </Button>
+            </RestrictedFeaturePopover>
+            <Divider isVertical />
+            <MoreOptionsMenuButton
+              icon={<ChevronDownIcon />}
+              borderStartRadius={0}
+              minWidth={"auto"}
+              padding={2}
+              options={
+                <MenuList>
+                  <MenuItem
+                    onClick={handleAddPetition}
+                    isDisabled={profile?.status === "DELETION_SCHEDULED"}
+                  >
+                    <FormattedMessage
+                      id="component.profile-petitions-table.add-petition"
+                      defaultMessage="Associate existing parallel"
+                    />
+                  </MenuItem>
+                </MenuList>
+              }
             />
-          </Button>
+          </ButtonGroup>
         </HStack>
       }
       body={
@@ -162,16 +229,33 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
                   defaultMessage="There are no parallels associated to this profile yet."
                 />
               </Text>
-              <Text>
-                {profile?.status !== "DELETION_SCHEDULED" ? (
-                  <NormalLink onClick={handleAddPetition}>
+              {profile?.status !== "DELETION_SCHEDULED" ? (
+                <Text>
+                  {userCanCreatePetition ? (
                     <FormattedMessage
-                      id="component.profile-petitions-table.add-petition"
-                      defaultMessage="Add parallel"
+                      id="component.profile-petitions-table.create-or-associate-petition"
+                      defaultMessage="<create>Create a new parallel</create> or <associate>Associate existing parallel</associate>"
+                      values={{
+                        create: (chunks: any[]) => {
+                          return (
+                            <NormalLink onClick={handleCreateNewPetition}>{chunks}</NormalLink>
+                          );
+                        },
+                        associate: (chunks: any[]) => {
+                          return <NormalLink onClick={handleAddPetition}>{chunks}</NormalLink>;
+                        },
+                      }}
                     />
-                  </NormalLink>
-                ) : null}
-              </Text>
+                  ) : (
+                    <NormalLink onClick={handleAddPetition}>
+                      <FormattedMessage
+                        id="component.profile-petitions-table.add-petition"
+                        defaultMessage="Associate existing parallel"
+                      />
+                    </NormalLink>
+                  )}
+                </Text>
+              ) : null}
             </Stack>
           </Center>
         ) : null
@@ -328,8 +412,10 @@ const _fragments = {
       localizableName
       status
       ...ProfileReference_Profile
+      ...useAssociateNewPetitionToProfileDialog_Profile
     }
     ${ProfileReference.fragments.Profile}
+    ${useAssociateNewPetitionToProfileDialog.fragments.Profile}
   `,
   Petition: gql`
     fragment ProfilePetitionsTable_Petition on Petition {
@@ -383,6 +469,19 @@ const _mutations = [
     ) {
       disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
     }
+  `,
+  gql`
+    mutation ProfilePetitionsTable_createPetitionFromProfile(
+      $profileId: GID!
+      $templateId: GID!
+      $prefill: [CreatePetitionFromProfilePrefillInput!]!
+    ) {
+      createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
+        id
+        ...ProfilePetitionsTable_Petition
+      }
+    }
+    ${_fragments.Petition}
   `,
 ];
 

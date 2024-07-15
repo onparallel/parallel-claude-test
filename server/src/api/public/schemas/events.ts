@@ -742,12 +742,19 @@ const PetitionEventSchemas = {
     },
   },
   PROFILE_DISASSOCIATED: {
-    description: "A user disassociated a profile from a parallel",
+    description: "A user or recipient disassociated a profile from a parallel",
     properties: {
       userId: {
-        description: "The ID of the user that disassociated the profile",
-        type: "string",
+        description:
+          "The ID of the user that disassociated the profile, or null if a recipient disassociated it",
+        type: ["string", "null"],
         example: toGlobalId("User", 5),
+      },
+      petitionAccessId: {
+        description:
+          "The ID of the access where the profile was disassociated. If set, the profile was disassociated by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
       },
       profileId: {
         description: "The ID of the profile that was disassociated",
@@ -902,9 +909,16 @@ const ProfileEventSchemas = {
         example: toGlobalId("Petition", 1),
       },
       userId: {
-        description: "The ID of the user that disassociated the parallel",
-        type: "string",
+        description:
+          "The ID of the user that disassociated the parallel, or null if a recipient disassociated it",
+        type: ["string", "null"],
         example: toGlobalId("User", 1),
+      },
+      petitionAccessId: {
+        description:
+          "The ID of the access where the parallel was disassociated. If set, the parallel was disassociated by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
       },
     },
   },

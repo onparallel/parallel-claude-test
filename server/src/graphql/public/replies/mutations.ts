@@ -1,5 +1,6 @@
 import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
 import { isDefined, uniq } from "remeda";
+import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { toGlobalId } from "../../../util/globalId";
@@ -165,7 +166,40 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.access!);
+    const { field, reply } = await ctx.petitions.deletePetitionFieldReply(
+      args.replyId,
+      ctx.access!,
+    );
+
+    if (reply.associated_profile_id) {
+      const removedAssociation = await ctx.petitions.safeRemovePetitionProfileAssociation(
+        ctx.access!.petition_id,
+        reply.associated_profile_id,
+      );
+      if (removedAssociation) {
+        await ctx.petitions.createEvent({
+          type: "PROFILE_DISASSOCIATED",
+          petition_id: removedAssociation.petition_id,
+          data: {
+            profile_id: removedAssociation.profile_id,
+            petition_access_id: ctx.access!.id,
+          },
+        });
+        const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
+        assert(petition, "Petition not found");
+        await ctx.profiles.createEvent({
+          type: "PETITION_DISASSOCIATED",
+          profile_id: removedAssociation.profile_id,
+          org_id: petition.org_id,
+          data: {
+            petition_id: removedAssociation.petition_id,
+            petition_access_id: ctx.access!.id,
+          },
+        });
+      }
+    }
+
+    return field;
   },
 });
 

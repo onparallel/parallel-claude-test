@@ -141,7 +141,7 @@ export function PetitionActivityTimeline({
           ) : event.__typename === "ProfileAssociatedEvent" ? (
             <TimelineProfileAssociatedEvent event={event} />
           ) : event.__typename === "ProfileDisassociatedEvent" ? (
-            <TimelineProfileDisassociatedEvent event={event} />
+            <TimelineProfileDisassociatedEvent event={event} userId={userId} />
           ) : event.__typename === "PetitionTaggedEvent" ? (
             <TimelinePetitionTaggedEvent event={event} userId={userId} />
           ) : event.__typename === "PetitionUntaggedEvent" ? (

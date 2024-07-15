@@ -30,7 +30,6 @@ import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
-  CreateProfileEvent,
   CreateProfileRelationship,
   CreateProfileRelationshipType,
   CreateProfileRelationshipTypeAllowedProfileType,
@@ -55,6 +54,7 @@ import {
   UserLocale,
 } from "../__types";
 import {
+  CreateProfileEvent,
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
@@ -1613,18 +1613,25 @@ export class ProfileRepository extends BaseRepository {
     },
   );
 
-  async associateProfileToPetition(profileId: number, petitionId: number, createdBy: string) {
-    const [petitionProfile] = await this.from("petition_profile").insert(
-      {
+  async associateProfilesToPetition(
+    profileId: MaybeArray<number>,
+    petitionId: number,
+    createdBy: string,
+  ) {
+    const profileIds = unMaybeArray(profileId);
+    if (profileIds.length === 0) {
+      return [];
+    }
+
+    return await this.from("petition_profile").insert(
+      profileIds.map((profileId) => ({
         petition_id: petitionId,
         profile_id: profileId,
         created_at: this.now(),
         created_by: createdBy,
-      },
+      })),
       "*",
     );
-
-    return petitionProfile;
   }
 
   async disassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {

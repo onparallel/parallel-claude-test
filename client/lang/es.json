@@ -390,14 +390,64 @@
     "context": "Associate {count, plural, =1{profile} other{profiles}}"
   },
   {
+    "term": "component.associate-new-petition-to-profile-dialog.header-1",
+    "definition": "Nuevo parallel",
+    "context": "New parallel"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.header-2",
+    "definition": "Prerrellenar grupos",
+    "context": "Prefill groups"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.header-3",
+    "definition": "Incluir relaciones",
+    "context": "Include relationships"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.prefill-checkbox-label",
+    "definition": "Prerrellenar con información del perfil y sus relaciones",
+    "context": "Prefill with profile information and relationships"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.relationships-label",
+    "definition": "Selecciona las relaciones del perfil que quieres incluir en el parallel de {templateName}.",
+    "context": "Select the profile relationships you want to include in the {templateName} parallel."
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.select-group-label",
+    "definition": "Selecciona en qué grupo quieres prerrellenar la información del perfil:",
+    "context": "Select in which group you want to pre-fill the profile information:"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.table-header-group",
+    "definition": "Grupo",
+    "context": "Group"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.table-header-profile",
+    "definition": "Perfil",
+    "context": "Profile"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.template-error",
+    "definition": "Por favor, seleccione una plantilla",
+    "context": "Please, select a template"
+  },
+  {
+    "term": "component.associate-new-petition-to-profile-dialog.template-label",
+    "definition": "Plantilla",
+    "context": "Template"
+  },
+  {
     "term": "component.associate-petition-to-profile-dialog.associate",
     "definition": "Asociar",
     "context": "Associate"
   },
   {
     "term": "component.associate-petition-to-profile-dialog.header",
-    "definition": "Asociar parallel",
-    "context": "Associate parallel"
+    "definition": "Asociar parallel existente",
+    "context": "Associate existing parallel"
   },
   {
     "term": "component.associate-petition-to-profile-dialog.parallel-error",
@@ -7076,13 +7126,23 @@
   },
   {
     "term": "component.profile-petitions-table.add-petition",
-    "definition": "Añadir parallel",
-    "context": "Add parallel"
+    "definition": "Asociar parallel existente",
+    "context": "Associate existing parallel"
+  },
+  {
+    "term": "component.profile-petitions-table.create-or-associate-petition",
+    "definition": "<create>Crear nuevo parallel</create> o <associate>Asociar parallel existente</associate>",
+    "context": "<create>Create a new parallel</create> or <associate>Associate existing parallel</associate>"
   },
   {
     "term": "component.profile-petitions-table.header",
     "definition": "Parallels asociados",
     "context": "Associated parallels"
+  },
+  {
+    "term": "component.profile-petitions-table.new-parallel",
+    "definition": "Nuevo parallel",
+    "context": "New parallel"
   },
   {
     "term": "component.profile-petitions-table.no-petitions",
@@ -9678,6 +9738,11 @@
     "term": "component.timeline-petition-untagged-event.description",
     "definition": "{userIsYou, select, true {Quitaste} other {{user} quitó}} {tagCount, plural, =1{la etiqueta} other{las etiquetas}} {tagList} de este parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-profile-disassociated-event.description",
+    "definition": "{authorIsYou, select, true {Quitaste} other {{author} quitó}} la asociación con {profileName} {timeAgo}",
+    "context": "{authorIsYou, select, true {You} other {{author}}} removed the association with {profileName} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description",
@@ -15748,11 +15813,6 @@
     "term": "timeline.profile-associated-description",
     "definition": "{userIsYou, select, true {Asociaste} other {{user} asoció}} el parallel con {profileName} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}"
-  },
-  {
-    "term": "timeline.profile-disassociated-description",
-    "definition": "{userIsYou, select, true {Quitaste} other {{user} quitó}} la asociación con {profileName} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}"
   },
   {
     "term": "timeline.public-petition-link-created-description",

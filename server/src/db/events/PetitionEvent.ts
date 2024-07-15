@@ -192,7 +192,8 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     profile_id: number;
   };
   PROFILE_DISASSOCIATED: {
-    user_id: number;
+    user_id?: number;
+    petition_access_id?: number;
     profile_id: number;
   };
   PETITION_TAGGED: {

@@ -2,6 +2,7 @@ import { core, enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { ProfileEventTypeValues } from "../../db/__types";
 import { mapProfileEventPayload } from "../../util/eventMapper";
+import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
 export const ProfileEvent = interfaceType({
   name: "ProfileEvent",
@@ -136,10 +137,17 @@ export const PetitionAssociatedEvent = createProfileEvent("PetitionAssociatedEve
 });
 
 export const PetitionDisassociatedEvent = createProfileEvent("PetitionDisassociatedEvent", (t) => {
+  t.nullable.field("disassociatedBy", {
+    type: "UserOrPetitionAccess",
+    resolve: userOrPetitionAccessResolver,
+  });
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      return await ctx.users.loadUser(root.data.user_id);
+      if (isDefined(root.data.user_id)) {
+        return await ctx.users.loadUser(root.data.user_id);
+      }
+      return null;
     },
   });
 });

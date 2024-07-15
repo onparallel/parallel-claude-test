@@ -87,7 +87,7 @@ export async function getServerSideProps({
     if (isAllowed) {
       return {
         redirect: {
-          destination: `/${locale}/petition/${keycode}/1` + req.url!.match(/\?.*$/)?.[0] ?? "",
+          destination: `/${locale}/petition/${keycode}/1` + (req.url!.match(/\?.*$/)?.[0] ?? ""),
           permanent: false,
         },
       };

@@ -32,6 +32,7 @@ import {
 import {
   CreatePetition,
   CreatePetitionField,
+  CreatePetitionFieldReply,
   CreatePublicPetitionLink,
   Petition,
   PetitionPermission,
@@ -117,6 +118,7 @@ import {
 import {
   profileHasSameProfileTypeAsField,
   profileHasStatus,
+  profileIsNotAnonymized,
   profileTypeFieldBelongsToPetitionFieldProfileType,
   profileTypeFieldsAreExpirable,
   profileTypeIsArchived,
@@ -163,6 +165,7 @@ import {
   repliesBelongsToPetition,
   replyStatusCanBeUpdated,
   templateDoesNotHavePublicPetitionLink,
+  userHasAccessToCreatePetitionFromProfilePrefillInput,
   userHasAccessToPetitions,
   userHasAccessToUpdatePetitionFieldGroupRelationshipsInput,
   userHasFeatureFlag,
@@ -3163,6 +3166,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       userHasFeatureFlag("PROFILES"),
       userHasAccessToProfile("profileId"),
       profileHasStatus("profileId", ["OPEN"]),
+      profileIsNotAnonymized("profileId"),
       profileHasSameProfileTypeAsField("profileId", "petitionFieldId"),
       userHasAccessToPetitions("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
@@ -3620,7 +3624,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       }
 
       try {
-        await ctx.profiles.associateProfileToPetition(
+        await ctx.profiles.associateProfilesToPetition(
           profile!.id,
           args.petitionId,
           `User:${ctx.user!.id}`,
@@ -3823,3 +3827,165 @@ export const updatePetitionFieldGroupRelationships = mutationField(
     },
   },
 );
+
+export const createPetitionFromProfile = mutationField("createPetitionFromProfile", {
+  type: "Petition",
+  description:
+    "Creates a petition from a profile and a base template, prefilling the field groups linked to profile types with the provided profile and all its current relationships",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
+    userHasAccessToPetitions("templateId"),
+    petitionsAreOfTypeTemplate("templateId"),
+    petitionsAreNotPublicTemplates("templateId"),
+    petitionIsNotAnonymized("templateId"),
+    userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", ["OPEN"]),
+    profileIsNotAnonymized("profileId"),
+    userHasAccessToCreatePetitionFromProfilePrefillInput("profileId", "templateId", "prefill"),
+  ),
+  args: {
+    profileId: nonNull(
+      globalIdArg("Profile", {
+        description: "Main profile to obtain the information from",
+      }),
+    ),
+    templateId: nonNull(
+      globalIdArg("Petition", { description: "Template that will be used to create the petition" }),
+    ),
+    prefill: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "CreatePetitionFromProfilePrefillInput",
+            description:
+              "Fields to prefill into the petition. petitionFieldId must correspond to a FIELD_GROUP in the template, linked to the same profile type as the provided profileIds.",
+            definition(t) {
+              t.nonNull.globalId("petitionFieldId", {
+                prefixName: "PetitionField",
+                description: "ID of the FIELD_GROUP field to prefill into",
+              });
+              t.nonNull.list.nonNull.globalId("profileIds", {
+                prefixName: "Profile",
+                description:
+                  "ID of the profile to prefill into the field. IDs must all belong to the same profile type as the FIELD_GROUP, and can be the main profile or any of its associated profiles",
+              });
+            },
+          }),
+        ),
+      ),
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    const petition = await ctx.petitions.createPetitionFromId(
+      args.templateId,
+      { isTemplate: false },
+      ctx.user!,
+    );
+
+    const associations = await ctx.profiles.associateProfilesToPetition(
+      uniq([args.profileId, ...args.prefill.flatMap((p) => p.profileIds)]),
+      petition.id,
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.petitions.createEvent(
+      associations.map((a) => ({
+        type: "PROFILE_ASSOCIATED",
+        petition_id: a.petition_id,
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: a.profile_id,
+        },
+      })),
+    );
+
+    await ctx.profiles.createEvent(
+      associations.map((a) => ({
+        type: "PETITION_ASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: a.profile_id,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: a.petition_id,
+        },
+      })),
+    );
+
+    if (args.prefill.length === 0) {
+      // nothing to prefill, early return
+      return petition;
+    }
+
+    const fieldGroups = (await ctx.petitions.loadFieldsForPetition(petition.id)).filter(
+      (f) => f!.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+    );
+    const children = await ctx.petitions.loadPetitionFieldChildren(fieldGroups.map((f) => f.id));
+    const groupsWithChildren = zip(fieldGroups, children);
+
+    const replies: CreatePetitionFieldReply[] = [];
+    for (const input of args.prefill) {
+      const [parent, children] = groupsWithChildren.find(
+        ([parent]) => parent!.from_petition_field_id === input.petitionFieldId,
+      )!;
+      // prioritize filling empty groups first
+      const emptyGroupReplies = await ctx.petitions.loadEmptyFieldGroupReplies(parent.id);
+
+      for (const profileId of input.profileIds) {
+        let groupReply = emptyGroupReplies.shift();
+        if (!isDefined(groupReply)) {
+          [groupReply] = await ctx.petitions.createEmptyFieldGroupReply([parent.id], ctx.user!);
+        }
+
+        await ctx.petitions.updatePetitionFieldReply(
+          groupReply.id,
+          { associated_profile_id: profileId },
+          `User:${ctx.user!.id}`,
+        );
+
+        const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
+        const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(profileId);
+
+        for (const child of children) {
+          const profileValue = profileFieldValues.find(
+            (v) => v.profile_type_field_id === child.profile_type_field_id,
+          );
+          const profileFiles = profileFieldFiles.filter(
+            (f) => f.profile_type_field_id === child.profile_type_field_id,
+          );
+
+          const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isDefined);
+          const clonedFileUploads =
+            fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
+
+          if (isDefined(profileValue)) {
+            replies.push({
+              petition_field_id: child.id,
+              parent_petition_field_reply_id: groupReply.id,
+              content: profileValue.content,
+              type: child.type,
+              user_id: ctx.user!.id,
+            });
+          } else if (clonedFileUploads.length > 0) {
+            replies.push(
+              ...clonedFileUploads.map((file) => ({
+                petition_field_id: child.id,
+                parent_petition_field_reply_id: groupReply.id,
+                content: { file_upload_id: file.id },
+                type: child.type,
+                user_id: ctx.user!.id,
+              })),
+            );
+          }
+        }
+      }
+    }
+
+    if (replies.length > 0) {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
+      await ctx.petitions.createPetitionFieldReply(petition.id, replies, `User:${ctx.user!.id}`);
+    }
+
+    return petition;
+  },
+});

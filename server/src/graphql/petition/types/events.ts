@@ -766,10 +766,17 @@ export const ProfileAssociatedEvent = createPetitionEvent("ProfileAssociatedEven
 });
 
 export const ProfileDisassociatedEvent = createPetitionEvent("ProfileDisassociatedEvent", (t) => {
+  t.nullable.field("disassociatedBy", {
+    type: "UserOrPetitionAccess",
+    resolve: userOrPetitionAccessResolver,
+  });
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      return await ctx.users.loadUser(root.data.user_id);
+      if (isDefined(root.data.user_id)) {
+        return await ctx.users.loadUser(root.data.user_id);
+      }
+      return null;
     },
   });
   t.nullable.field("profile", {

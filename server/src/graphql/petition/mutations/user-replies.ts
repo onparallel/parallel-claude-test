@@ -279,7 +279,35 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     ),
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
+    const { field, reply } = await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
+
+    if (reply.associated_profile_id) {
+      const removedAssociation = await ctx.petitions.safeRemovePetitionProfileAssociation(
+        args.petitionId,
+        reply.associated_profile_id,
+      );
+      if (removedAssociation) {
+        await ctx.petitions.createEvent({
+          type: "PROFILE_DISASSOCIATED",
+          petition_id: removedAssociation.petition_id,
+          data: {
+            profile_id: removedAssociation.profile_id,
+            user_id: ctx.user!.id,
+          },
+        });
+        await ctx.profiles.createEvent({
+          type: "PETITION_DISASSOCIATED",
+          profile_id: removedAssociation.profile_id,
+          org_id: ctx.user!.org_id,
+          data: {
+            petition_id: removedAssociation.petition_id,
+            user_id: ctx.user!.id,
+          },
+        });
+      }
+    }
+
+    return field;
   },
 });
 

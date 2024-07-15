@@ -1,6 +1,6 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Box, Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon, EditIcon, SaveIcon } from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon, EditIcon, RepeatIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import {
@@ -18,6 +18,7 @@ import {
   useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment,
   useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment,
   useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileDocument,
+  useArchiveFieldGroupReplyIntoProfileDialog_petitionDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
@@ -25,38 +26,31 @@ import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniq, zip } from "remeda";
+import { difference, isDefined, uniq, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
 
 interface ArchiveFieldGroupReplyIntoProfileDialogProps {
-  petition: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment;
+  petitionId: string;
+  groupsWithProfileTypesCount: number;
   onRefetch: () => void;
 }
 
 function ArchiveFieldGroupReplyIntoProfileDialog({
-  petition,
+  petitionId,
+  groupsWithProfileTypesCount,
   onRefetch,
   ...props
 }: DialogProps<ArchiveFieldGroupReplyIntoProfileDialogProps>) {
-  const fieldGroupsWithProfileTypes = zip(petition.fields, useFieldLogic(petition))
-    .filter(
-      ([field, { isVisible }]) =>
-        isVisible &&
-        field.type === "FIELD_GROUP" &&
-        field.isLinkedToProfileType &&
-        field.replies.length > 0,
-    )
-    .map(([field]) => field);
-
-  const fieldGroupsWithProfileTypesTotal = fieldGroupsWithProfileTypes.flatMap(
-    (f) => f.replies,
-  ).length;
-
-  const unsavedSelectedProfiles = useRef<string[]>([]);
+  const { data, loading } = useQuery(useArchiveFieldGroupReplyIntoProfileDialog_petitionDocument, {
+    variables: { id: petitionId },
+  });
+  const petition = data?.petition;
 
   const showConfirmCloseArchiveReplyIntoProfileDialog =
     useConfirmCloseArchiveReplyIntoProfileDialog();
+
+  const unsavedSelectedProfiles = useRef<string[]>([]);
 
   return (
     <ConfirmDialog
@@ -69,7 +63,7 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
         <FormattedMessage
           id="component.associate-and-fill-profile-to-parallel-dialog.header"
           defaultMessage="Associate {count, plural, =1{profile} other{profiles}}"
-          values={{ count: fieldGroupsWithProfileTypesTotal }}
+          values={{ count: groupsWithProfileTypesCount }}
         />
       }
       body={
@@ -80,33 +74,25 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
               defaultMessage="Select in which profile you want to save the information of each group."
             />
           </Text>
-          <Grid gap={2} templateColumns="2fr 3fr auto" alignItems="center">
-            {fieldGroupsWithProfileTypes.map((field) => {
-              return field.replies.map((reply, index) => {
-                return (
-                  <ArchiveFieldGroupReplyIntoProfileRow
-                    key={field.id + index}
-                    petitionId={petition.id}
-                    field={field}
-                    reply={reply}
-                    index={index}
-                    onSelectProfile={(profileId) => {
-                      unsavedSelectedProfiles.current = uniq([
-                        ...unsavedSelectedProfiles.current,
-                        profileId,
-                      ]);
-                    }}
-                    onSaveProfile={(profileId) => {
-                      unsavedSelectedProfiles.current = unsavedSelectedProfiles.current.filter(
-                        (id) => id !== profileId,
-                      );
-                    }}
-                    onRefetch={onRefetch}
-                  />
+          {!loading && isDefined(petition) && petition.__typename === "Petition" ? (
+            <ArchiveFieldGroupReplyIntoProfileGrid
+              petition={petition}
+              onSelectProfile={(profileId) => {
+                unsavedSelectedProfiles.current = uniq([
+                  ...unsavedSelectedProfiles.current,
+                  profileId,
+                ]);
+              }}
+              onSaveProfile={(profileId) => {
+                unsavedSelectedProfiles.current = unsavedSelectedProfiles.current.filter(
+                  (id) => id !== profileId,
                 );
-              });
-            })}
-          </Grid>
+              }}
+              onRefetch={onRefetch}
+            />
+          ) : (
+            <></>
+          )}
         </Stack>
       }
       cancel={
@@ -125,6 +111,49 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
       }
       confirm={<></>}
     />
+  );
+}
+
+function ArchiveFieldGroupReplyIntoProfileGrid({
+  petition,
+  onRefetch,
+  onSelectProfile,
+  onSaveProfile,
+}: {
+  petition: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment;
+  onRefetch: () => void;
+  onSelectProfile: (profileId: string) => void;
+  onSaveProfile: (profileId: string) => void;
+}) {
+  const fieldGroupsWithProfileTypes = zip(petition.fields, useFieldLogic(petition))
+    .filter(
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
+    )
+    .map(([field]) => field);
+
+  return (
+    <Grid gap={2} templateColumns="2fr 3fr auto" alignItems="center">
+      {fieldGroupsWithProfileTypes.map((field) => {
+        return field.replies.map((reply, index) => {
+          return (
+            <ArchiveFieldGroupReplyIntoProfileRow
+              key={field.id + index}
+              petitionId={petition.id}
+              field={field}
+              reply={reply}
+              index={index}
+              onSelectProfile={onSelectProfile}
+              onSaveProfile={onSaveProfile}
+              onRefetch={onRefetch}
+            />
+          );
+        });
+      })}
+    </Grid>
   );
 }
 
@@ -304,6 +333,48 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     }
   }
 
+  const needUpdateProfile =
+    isDefined(profile) &&
+    repliesWithProfileFields.some(([f, replies]) => {
+      const profileField = profile.properties.find(({ field }) => {
+        return field.id === f.profileTypeField?.id;
+      });
+
+      if (isDefined(profileField)) {
+        if (f.type === "BACKGROUND_CHECK") {
+          const fieldContent = replies?.[0]?.content;
+          const profileFieldContent = profileField.value?.content;
+          return (
+            fieldContent.entity?.id !== profileFieldContent?.entity?.id ||
+            JSON.stringify(fieldContent?.query) !== JSON.stringify(profileFieldContent?.query)
+          );
+        }
+
+        if (f.type === "FILE_UPLOAD") {
+          const petitionFilesToString = replies.map((reply) => {
+            const { filename, size, contentType } = reply.content;
+            return `${filename}-${size}-${contentType})`;
+          });
+          const profileFilesToString =
+            profileField?.files
+              ?.map((file) => {
+                if (!isDefined(file) || !isDefined(file.file)) return null;
+                const { filename, size, contentType } = file.file;
+                return `${filename}-${size}-${contentType})`;
+              })
+              .filter(isDefined) ?? [];
+
+          return (
+            petitionFilesToString.length !== profileFilesToString.length ||
+            difference(petitionFilesToString, profileFilesToString).length > 0
+          );
+        }
+
+        // Check if the value of the profile field is different from the reply only for simple text values like text, number, date, etc.
+        return replies?.[0]?.content?.value !== profileField.value?.content?.value;
+      }
+    });
+
   return (
     <>
       <Box noOfLines={2}>
@@ -380,7 +451,17 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           )
         ) : null}
       </HStack>
-      {isSaved && !isEditing ? (
+      {needUpdateProfile && !isEditing ? (
+        <Button
+          colorScheme="primary"
+          leftIcon={<RepeatIcon />}
+          onClick={() => {
+            archiveProfile(selectedProfile!);
+          }}
+        >
+          <FormattedMessage id="generic.update" defaultMessage="Update" />
+        </Button>
+      ) : isSaved && !isEditing ? (
         <HStack paddingX={4} justifyContent="center">
           <CheckIcon color="green.500" />
           <Box>
@@ -406,6 +487,24 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
     fragment useArchiveFieldGroupReplyIntoProfileDialog_Profile on Profile {
       id
       ...ProfileSelect_Profile
+      properties {
+        field {
+          id
+          type
+        }
+        value {
+          id
+          content
+        }
+        files {
+          id
+          file {
+            size
+            filename
+            contentType
+          }
+        }
+      }
     }
     ${ProfileSelect.fragments.Profile}
   `,
@@ -503,6 +602,17 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
 export function useArchiveFieldGroupReplyIntoProfileDialog() {
   return useDialog(ArchiveFieldGroupReplyIntoProfileDialog);
 }
+
+const _queries = [
+  gql`
+    query useArchiveFieldGroupReplyIntoProfileDialog_petition($id: GID!) {
+      petition(id: $id) {
+        ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
+      }
+    }
+    ${useArchiveFieldGroupReplyIntoProfileDialog.fragments.Petition}
+  `,
+];
 
 const _mutations = [
   gql`

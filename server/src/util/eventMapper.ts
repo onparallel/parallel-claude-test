@@ -336,7 +336,10 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
     }
     case "PROFILE_DISASSOCIATED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        petitionAccessId: event.data.petition_access_id
+          ? toGlobalId("PetitionAccess", event.data.petition_access_id)
+          : null,
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
         profileId: toGlobalId("Profile", event.data.profile_id),
       };
     }
@@ -386,7 +389,10 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PETITION_DISASSOCIATED": {
       return {
         petitionId: toGlobalId("Petition", event.data.petition_id),
-        userId: toGlobalId("User", event.data.user_id),
+        petitionAccessId: event.data.petition_access_id
+          ? toGlobalId("PetitionAccess", event.data.petition_access_id)
+          : null,
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
       };
     }
     case "PROFILE_ANONYMIZED": {

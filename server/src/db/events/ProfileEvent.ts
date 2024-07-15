@@ -35,7 +35,8 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     petition_id: number;
   };
   PETITION_DISASSOCIATED: {
-    user_id: number;
+    user_id?: number;
+    petition_access_id?: number;
     petition_id: number;
   };
   PROFILE_CLOSED: {

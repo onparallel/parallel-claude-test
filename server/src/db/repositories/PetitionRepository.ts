@@ -2609,7 +2609,40 @@ export class PetitionRepository extends BaseRepository {
       await this.files.deleteFileUpload(fileUploadIds, deletedBy);
     }
 
-    return field;
+    return { field, reply: deletedReplies.find((r) => r.id === replyId)! };
+  }
+
+  /**
+   * removes profile association on the petition only if there are no FIELD_GROUP replies that are associated with this profile
+   */
+  async safeRemovePetitionProfileAssociation(petitionId: number, profileId: number) {
+    const groupReplies = await this.from("petition_field_reply")
+      .whereIn(
+        "petition_field_id",
+        this.from("petition_field")
+          .where({
+            petition_id: petitionId,
+            type: "FIELD_GROUP",
+            deleted_at: null,
+          })
+          .whereNotNull("profile_type_id")
+          .select("id"),
+      )
+      .whereNotNull("associated_profile_id")
+      .whereNull("deleted_at")
+      .select("associated_profile_id");
+
+    const activeProfileIds = groupReplies.map((r) => r.associated_profile_id!);
+    if (!activeProfileIds.includes(profileId)) {
+      const [association] = await this.from("petition_profile")
+        .where("petition_id", petitionId)
+        .where("profile_id", profileId)
+        .delete()
+        .returning("*");
+      return association;
+    }
+
+    return undefined;
   }
 
   async deletePetitionFieldRepliesByFieldIds(
@@ -8034,10 +8067,10 @@ export class PetitionRepository extends BaseRepository {
   }
   async createEmptyFieldGroupReply(fieldIds: number[], user: User, t?: Knex.Transaction) {
     if (fieldIds.length === 0) {
-      return;
+      return [];
     }
 
-    await this.insert(
+    return await this.insert(
       "petition_field_reply",
       fieldIds.map((fieldId) => ({
         petition_field_id: fieldId,

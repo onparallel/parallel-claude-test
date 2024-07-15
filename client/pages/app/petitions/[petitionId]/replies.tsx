@@ -406,11 +406,28 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petition, intl.locale, hasLinkedToProfileTypeFields],
   );
 
+  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
+    .filter(
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
+    )
+    .flatMap(([f]) => f.replies);
+
+  const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
+
+  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter((r) =>
+    isDefined(r.associatedProfile),
+  ).length;
+
   const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
   const handleAssociateAndFillProfile = async () => {
     try {
       await showArchiveFieldGroupReplyIntoProfileDialog({
-        petition,
+        petitionId: petition.id,
+        groupsWithProfileTypesCount: fieldGroupsWithProfileTypesTotal,
         onRefetch: () => refetch(),
       });
     } catch {}
@@ -524,22 +541,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     flex: 1,
     minHeight: 0,
   } as const;
-
-  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
-    .filter(
-      ([field, { isVisible }]) =>
-        isVisible &&
-        field.type === "FIELD_GROUP" &&
-        field.isLinkedToProfileType &&
-        field.replies.length > 0,
-    )
-    .flatMap(([f]) => f.replies);
-
-  const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
-
-  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter((r) =>
-    isDefined(r.associatedProfile),
-  ).length;
 
   const [associateProfileToPetition] = useMutation(
     PetitionReplies_associateProfileToPetitionDocument,

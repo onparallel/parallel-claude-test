@@ -1673,7 +1673,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
   },
   resolve: async (_, { petitionId, profileId }, ctx) => {
     try {
-      const petitionProfile = await ctx.profiles.associateProfileToPetition(
+      const [petitionProfile] = await ctx.profiles.associateProfilesToPetition(
         profileId,
         petitionId,
         `User:${ctx.user!.id}`,

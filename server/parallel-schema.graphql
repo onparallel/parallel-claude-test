@@ -398,6 +398,21 @@ input CreatePetitionFieldReplyInput {
   parentReplyId: GID
 }
 
+"""
+Fields to prefill into the petition. petitionFieldId must correspond to a FIELD_GROUP in the template, linked to the same profile type as the provided profileIds.
+"""
+input CreatePetitionFromProfilePrefillInput {
+  """
+  ID of the FIELD_GROUP field to prefill into
+  """
+  petitionFieldId: GID!
+
+  """
+  ID of the profile to prefill into the field. IDs must all belong to the same profile type as the FIELD_GROUP, and can be the main profile or any of its associated profiles
+  """
+  profileIds: [GID!]!
+}
+
 input CreatePetitionVariableInput {
   defaultValue: Float!
   name: String!
@@ -1288,6 +1303,23 @@ type Mutation {
     overwriteExisting: Boolean
     petitionId: GID!
   ): [PetitionFieldReply!]!
+
+  """
+  Creates a petition from a profile and a base template, prefilling the field groups linked to profile types with the provided profile and all its current relationships
+  """
+  createPetitionFromProfile(
+    prefill: [CreatePetitionFromProfilePrefillInput!]!
+
+    """
+    Main profile to obtain the information from
+    """
+    profileId: GID!
+
+    """
+    Template that will be used to create the petition
+    """
+    templateId: GID!
+  ): Petition!
 
   """
   Creates a view with custom filters and ordering on the user's petitions list
@@ -3705,6 +3737,7 @@ type PetitionDeletedEvent implements PetitionEvent {
 type PetitionDisassociatedEvent implements ProfileEvent {
   createdAt: DateTime!
   data: JSONObject!
+  disassociatedBy: UserOrPetitionAccess
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5229,6 +5262,7 @@ type ProfileCreatedEvent implements ProfileEvent {
 type ProfileDisassociatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
+  disassociatedBy: UserOrPetitionAccess
   id: GID!
   petition: Petition
   profile: Profile
