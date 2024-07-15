@@ -15,7 +15,7 @@
             {
               "profileId": "A",
               "profileTypeFieldId": "A",
-              "profileName": "Binford Ltd.",
+              "profileName": { "en": "Binford Ltd." },
               "profileTypeFieldName": { "es": "Fecha de vencimiento del contrato" },
               "expiryDate": "2021-01-01",
               "isExpired": true
@@ -23,7 +23,7 @@
             {
               "profileId": "A",
               "profileTypeFieldId": "B",
-              "profileName": "Binford Ltd.",
+              "profileName": { "en": "Binford Ltd." },
               "profileTypeFieldName": { "es": "Documento de identificación" },
               "expiryDate": "2022-01-01",
               "isExpired": true
@@ -31,7 +31,7 @@
             {
               "profileId": "A",
               "profileTypeFieldId": "C",
-              "profileName": "Binford Ltd.",
+              "profileName": { "en": "Binford Ltd." },
               "profileTypeFieldName": { "en": "Documents" },
               "expiryDate": "2022-02-03",
               "isExpired": true
@@ -39,7 +39,7 @@
             {
               "profileId": "B",
               "profileTypeFieldId": "A",
-              "profileName": "Parallel",
+              "profileName": { "en": "Parallel" },
               "profileTypeFieldName": { "es": "Contrato" },
               "expiryDate": "2022-03-01",
               "isExpired": true
@@ -47,7 +47,7 @@
             {
               "profileId": "B",
               "profileTypeFieldId": "B",
-              "profileName": "Parallel",
+              "profileName": { "en": "Parallel" },
               "profileTypeFieldName": { "en": "ID", "es": "Documento de identificación" },
               "expiryDate": "2024-01-01",
               "isExpired": false
@@ -55,7 +55,7 @@
             {
               "profileId": "C",
               "profileTypeFieldId": "A",
-              "profileName": "Ford",
+              "profileName": { "en": "Ford" },
               "profileTypeFieldName": { "es": "Documentos" },
               "expiryDate": "2024-01-03",
               "isExpired": false
@@ -63,7 +63,7 @@
             {
               "profileId": "C",
               "profileTypeFieldId": "B",
-              "profileName": "Ford",
+              "profileName": { "en": "Ford" },
               "profileTypeFieldName": { "es": "Contrato" },
               "expiryDate": "2024-01-10",
               "isExpired": false
@@ -71,7 +71,7 @@
             {
               "profileId": "C",
               "profileTypeFieldId": "C",
-              "profileName": "Ford",
+              "profileName": { "en": "Ford" },
               "profileTypeFieldName": { "es": "Documento de identificación" },
               "expiryDate": "2024-05-01",
               "isExpired": false
@@ -79,7 +79,7 @@
             {
               "profileId": "D",
               "profileTypeFieldId": "A",
-              "profileName": "Everis",
+              "profileName": { "en": "Everis" },
               "profileTypeFieldName": { "es": "Fecha de vencimiento del contrato" },
               "expiryDate": "2030-10-01",
               "isExpired": false
@@ -87,7 +87,7 @@
             {
               "profileId": "D",
               "profileTypeFieldId": "B",
-              "profileName": "Everis",
+              "profileName": { "en": "Everis" },
               "profileTypeFieldName": { "es": "Fecha de vencimiento del contrato" },
               "expiryDate": "2031-01-01",
               "isExpired": false

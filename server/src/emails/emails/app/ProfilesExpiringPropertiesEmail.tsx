@@ -2,12 +2,15 @@ import { MjmlColumn, MjmlSection, MjmlTable, MjmlText } from "@faire/mjml-react"
 import { outdent } from "outdent";
 import { FormattedDate, FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { groupBy } from "remeda";
-import { UserLocale } from "../../../db/__types";
 import { FORMATS } from "../../../util/dates";
 import { ExpiringProperty } from "../../../workers/emails/profiles-expiring-properties";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
 import { Layout, LayoutProps } from "../../components/Layout";
+import {
+  LocalizableUserTextRender,
+  localizableUserTextRender,
+} from "../../utils/localizableUserTextRender";
 
 export type ProfilesExpiringPropertiesEmailProps = {
   organizationName: string;
@@ -37,20 +40,24 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
     const propertyList = Object.entries(groupBy(properties.items, (p) => p.profileId))
       .map(([_, properties]) =>
         [
-          properties[0].profileName[intl.locale as UserLocale] ??
-            intl.formatMessage({
+          localizableUserTextRender({
+            intl,
+            value: properties[0].profileName,
+            default: intl.formatMessage({
               id: "profiles-expiring-properties.unnamed-profile",
               defaultMessage: "Unnamed profile",
             }),
+          }),
           ...properties.map(
             (p) =>
-              `- ${
-                p.profileTypeFieldName[intl.locale as UserLocale] ??
-                intl.formatMessage({
+              `- ${localizableUserTextRender({
+                intl,
+                value: p.profileTypeFieldName,
+                default: intl.formatMessage({
                   id: "profiles-expiring-properties.untitled-property",
                   defaultMessage: "Untitled property",
-                })
-              } (${intl.formatDate(p.expiryDate, {
+                }),
+              })} (${intl.formatDate(p.expiryDate, {
                 ...FORMATS.LL,
                 timeZone: "UTC",
               })})`,
@@ -173,8 +180,6 @@ export function ExpiringPropertyRow({
     dateStyle: "long",
   });
 
-  const profileName = property.profileName[intl.locale as UserLocale];
-  const propertyName = property.profileTypeFieldName[intl.locale as UserLocale];
   return (
     <tr
       style={{
@@ -188,27 +193,34 @@ export function ExpiringPropertyRow({
       </td>
       <td style={{ textAlign: "left", paddingTop: "10px", paddingBottom: "10px" }}>
         <p style={{ padding: "0px", margin: "0px", marginBottom: "3px", fontWeight: 600 }}>
-          {profileName ?? (
-            <FormattedMessage
-              id="profiles-expiring-properties.unnamed-profile"
-              defaultMessage="Unnamed profile"
-            />
-          )}
+          <LocalizableUserTextRender
+            value={property.profileName}
+            default={
+              <FormattedMessage
+                id="profiles-expiring-properties.unnamed-profile"
+                defaultMessage="Unnamed profile"
+              />
+            }
+          />
         </p>
         <p
           style={{
             padding: "0px",
             margin: "0px",
             fontWeight: 400,
-            fontStyle: propertyName ? "normal" : "italic",
           }}
         >
-          {propertyName ?? (
-            <FormattedMessage
-              id="profiles-expiring-properties.untitled-property"
-              defaultMessage="Untitled property"
-            />
-          )}
+          <LocalizableUserTextRender
+            value={property.profileTypeFieldName}
+            default={
+              <span style={{ fontStyle: "italic" }}>
+                <FormattedMessage
+                  id="profiles-expiring-properties.untitled-property"
+                  defaultMessage="Untitled property"
+                />
+              </span>
+            }
+          />
         </p>
       </td>
       <td
