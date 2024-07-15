@@ -12,6 +12,7 @@ import {
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import { differenceWith, groupBy, indexBy, isDefined, pipe, uniq, zip } from "remeda";
+import { assert } from "ts-essentials";
 import {
   CreateProfileType,
   CreateProfileTypeField,
@@ -19,7 +20,6 @@ import {
   Profile,
   ProfileFieldFile,
   ProfileFieldValue,
-  ProfileTypeField,
 } from "../../db/__types";
 import {
   ProfileFieldExpiryUpdatedEvent,
@@ -1032,28 +1032,28 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     // check profileTypeFieldIds match the profileId
     if (
       !isDefined(profile) ||
-      profileTypeFields.some(
-        (p) =>
-          !isDefined(p) ||
-          p.profile_type_id !== profile!.profile_type_id ||
-          p.type === "FILE" ||
-          p.type === "BACKGROUND_CHECK",
-      )
+      profileTypeFields.some((p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id)
     ) {
-      throw new ForbiddenError("Not authorized");
+      throw new ForbiddenError("invalid properties in fields arg");
     }
+
+    assert(profileTypeFields.every(isDefined), "ProfileTypeField not found");
 
     if (
-      fields.some(
-        (field) =>
-          profileTypeFields.find((ptf) => ptf!.id === field.profileTypeFieldId)!.type ===
-            "BACKGROUND_CHECK" && isDefined(field.content),
-      )
+      fields.some((field) => {
+        const property = profileTypeFields.find((ptf) => ptf.id === field.profileTypeFieldId)!;
+        return (
+          (property.type === "BACKGROUND_CHECK" || property.type === "FILE") &&
+          isDefined(field.content)
+        );
+      })
     ) {
-      throw new ForbiddenError("Cannot update BACKGROUND_CHECK contents with this mutation");
+      throw new ForbiddenError(
+        "Cannot update BACKGROUND_CHECK and FILE contents with this mutation",
+      );
     }
 
-    const profileTypeFieldsById = indexBy(profileTypeFields as ProfileTypeField[], (ptf) => ptf.id);
+    const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
     // validate contents and expiryDate
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
