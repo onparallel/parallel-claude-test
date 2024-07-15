@@ -2359,6 +2359,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     data: MaybeArray<CreatePetitionFieldReply>,
     createdBy: string,
+    delayEvents: boolean = true,
   ) {
     const dataArray = unMaybeArray(data);
     if (dataArray.length === 0) {
@@ -2399,26 +2400,24 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition.dataloader.clear(petitionId);
     }
 
-    await pMap(
-      replies,
-      async (reply) => {
-        await this.createEventWithDelay(
-          {
-            type: "REPLY_CREATED",
-            petition_id: petitionId,
-            data: {
-              ...(createdBy.startsWith("User")
-                ? { user_id: reply.user_id! }
-                : { petition_access_id: reply.petition_access_id! }),
-              petition_field_id: reply.petition_field_id,
-              petition_field_reply_id: reply.id,
-            },
-          },
-          this.REPLY_EVENTS_DELAY_SECONDS,
-        );
+    const events: CreatePetitionEvent[] = replies.map((reply) => ({
+      type: "REPLY_CREATED",
+      petition_id: petitionId,
+      data: {
+        ...(createdBy.startsWith("User")
+          ? { user_id: reply.user_id! }
+          : { petition_access_id: reply.petition_access_id! }),
+        petition_field_id: reply.petition_field_id,
+        petition_field_reply_id: reply.id,
       },
-      { concurrency: 1 },
-    );
+    }));
+
+    if (delayEvents) {
+      await this.createEventWithDelay(events, this.REPLY_EVENTS_DELAY_SECONDS);
+    } else {
+      await this.createEvent(events);
+    }
+
     return replies;
   }
 

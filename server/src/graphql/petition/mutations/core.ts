@@ -3983,7 +3983,12 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
 
     if (replies.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
-      await ctx.petitions.createPetitionFieldReply(petition.id, replies, `User:${ctx.user!.id}`);
+      await ctx.petitions.createPetitionFieldReply(
+        petition.id,
+        replies,
+        `User:${ctx.user!.id}`,
+        false,
+      );
     }
 
     return petition;
