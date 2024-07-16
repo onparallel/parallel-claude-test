@@ -7,7 +7,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../../PetitionFieldReference";
 import { UserOrContactReference } from "../../UserOrContactReference";
-import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -66,7 +65,6 @@ TimelineCommentDeletedEvent.fragments = {
     }
     ${PetitionFieldReference.fragments.PetitionField}
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
   `,
 };
