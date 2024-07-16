@@ -18,6 +18,7 @@ import {
   Tr,
   useRadioGroup,
 } from "@chakra-ui/react";
+import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SimpleFileButton } from "@parallel/components/common/SimpleFileButton";
@@ -32,6 +33,7 @@ import {
   useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragment,
   useResolveProfilePropertiesConflictsDialog_profileDocument,
 } from "@parallel/graphql/__types";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useEffect } from "react";
@@ -248,6 +250,7 @@ function TableRow({
   profileId: string;
   replies: useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment[];
 }) {
+  const intl = useIntl();
   const {
     control,
     watch,
@@ -263,6 +266,18 @@ function TableRow({
         (option: any) => option.value === content?.value,
       )?.label;
       return <LocalizableUserTextRender value={label} default={<></>} />;
+    }
+
+    if (field.type === "BACKGROUND_CHECK") {
+      return content?.entity
+        ? content.entity.name
+        : [
+            getEntityTypeLabel(intl, content?.query?.type),
+            content?.query?.name,
+            content?.query?.date,
+          ]
+            .filter(isDefined)
+            .join(" | ");
     }
 
     return content?.value;
@@ -350,8 +365,30 @@ function TableRow({
           const oldValue = getValue(property.value?.content);
           const newValue = getValue(reply?.content);
 
+          const getBgCheckIcon = (content: any) => {
+            return content?.entity ? (
+              content.entity.type === "Person" ? (
+                <UserIcon marginEnd={1} />
+              ) : (
+                <BusinessIcon marginEnd={1} />
+              )
+            ) : (
+              <SearchIcon marginEnd={1} />
+            );
+          };
+          const oldValueIcon =
+            field.type === "BACKGROUND_CHECK" ? getBgCheckIcon(property.value?.content) : null;
+          const newValueIcon =
+            field.type === "BACKGROUND_CHECK" ? getBgCheckIcon(reply?.content) : null;
+
           return (
-            <TextValueRadioGroup newValue={newValue} oldValue={oldValue} onChange={onChange} />
+            <TextValueRadioGroup
+              newValue={newValue}
+              oldValue={oldValue}
+              oldValueIcon={oldValueIcon}
+              newValueIcon={newValueIcon}
+              onChange={onChange}
+            />
           );
         }}
       />
@@ -363,10 +400,14 @@ function TextValueRadioGroup({
   oldValue,
   newValue,
   onChange,
+  oldValueIcon,
+  newValueIcon,
 }: {
   oldValue: string;
   newValue: string | null;
   onChange: (value: string) => void;
+  oldValueIcon?: React.ReactNode;
+  newValueIcon?: React.ReactNode;
 }) {
   const intl = useIntl();
   const { getRadioProps } = useRadioGroup({
@@ -380,6 +421,7 @@ function TextValueRadioGroup({
         <HStack>
           <Radio {...getRadioProps({ value: "IGNORE" })} />
           <Flex minWidth={0}>
+            {oldValueIcon}
             <OverflownText as="span">{oldValue}</OverflownText>
           </Flex>
         </HStack>
@@ -388,6 +430,7 @@ function TextValueRadioGroup({
         <HStack>
           <Radio {...getRadioProps({ value: "OVERWRITE" })} />
           <Flex minWidth={0}>
+            {newValueIcon}
             <OverflownText as="span" textStyle={isDefined(newValue) ? undefined : "hint"}>
               {newValue ??
                 intl.formatMessage({

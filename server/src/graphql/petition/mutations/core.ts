@@ -44,6 +44,7 @@ import {
 } from "../../../db/events/ProfileEvent";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import {
+  contentsAreEqual,
   mapPetitionFieldReplyToProfileFieldValue,
   mapProfileTypeFieldToPetitionField,
 } from "../../../db/helpers/petitionProfileMapper";
@@ -3256,7 +3257,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       if (!isDefined(fieldGroup)) {
         // trying to archive a FIELD_GROUP reply that is not visible with the current field visibility
-        throw new ForbiddenError("FORBIDDEN");
+        throw new ForbiddenError(
+          "provided field is not visible due to current visibility conditions",
+        );
       }
 
       // get the replies from the children fields that are linked with a property on the profile
@@ -3339,7 +3342,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         // if already exists a value on the profile, there could be a conflict with reply so we need to check
         if (isDefined(profileFieldValue)) {
           // we need to do something only if the reply value is different than current value (or no reply on the field)
-          if (!isDefined(reply) || reply.content.value !== profileFieldValue.content.value) {
+          if (!isDefined(reply) || !contentsAreEqual(profileFieldValue, reply)) {
             // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
             if (
               isDefined(reply) &&

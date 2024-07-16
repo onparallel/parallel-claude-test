@@ -82,3 +82,19 @@ export function mapPetitionFieldReplyToProfileFieldValue(
     content: reply.content,
   };
 }
+
+export function contentsAreEqual(
+  value: Pick<ProfileFieldValue, "content" | "type">,
+  reply: Pick<PetitionFieldReply, "content">,
+) {
+  if (value.type === "BACKGROUND_CHECK") {
+    return (
+      value.content.query?.name === reply.content.query?.name &&
+      value.content.query?.date === reply.content.query?.date &&
+      value.content.query?.type === reply.content.query?.type &&
+      value.content.entity?.id === reply.content.entity?.id
+    );
+  } else {
+    return value.content.value === reply.content.value;
+  }
+}
