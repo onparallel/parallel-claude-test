@@ -29,6 +29,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { difference, isDefined, uniq, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
+import { AlertPopover } from "@parallel/components/common/AlertPopover";
 
 interface ArchiveFieldGroupReplyIntoProfileDialogProps {
   petitionId: string;
@@ -336,17 +337,27 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   const needUpdateProfile =
     isDefined(profile) &&
     repliesWithProfileFields.some(([f, replies]) => {
-      const profileField = profile.properties.find(({ field }) => {
-        return field.id === f.profileTypeField?.id;
-      });
+      const profileField = profile.properties
+        .filter(({ field }) => field.myPermission !== "HIDDEN")
+        .find(({ field }) => {
+          return field.id === f.profileTypeField?.id;
+        });
 
       if (isDefined(profileField)) {
         if (f.type === "BACKGROUND_CHECK") {
           const fieldContent = replies?.[0]?.content;
           const profileFieldContent = profileField.value?.content;
+
+          const { date = "", name = "", type = "" } = fieldContent?.query ?? {};
+          const {
+            date: profileDate = "",
+            name: profileName = "",
+            type: profileType = "",
+          } = profileFieldContent?.query ?? {};
+
           return (
-            fieldContent.entity?.id !== profileFieldContent?.entity?.id ||
-            JSON.stringify(fieldContent?.query) !== JSON.stringify(profileFieldContent?.query)
+            fieldContent?.entity?.id !== profileFieldContent?.entity?.id ||
+            `${date}-${name}-${type}` !== `${profileDate}-${profileName}-${profileType}`
           );
         }
 
@@ -452,15 +463,25 @@ function ArchiveFieldGroupReplyIntoProfileRow({
         ) : null}
       </HStack>
       {needUpdateProfile && !isEditing ? (
-        <Button
-          colorScheme="primary"
-          leftIcon={<RepeatIcon />}
-          onClick={() => {
-            archiveProfile(selectedProfile!);
-          }}
-        >
-          <FormattedMessage id="generic.update" defaultMessage="Update" />
-        </Button>
+        <HStack spacing={0}>
+          <Button
+            colorScheme="primary"
+            leftIcon={<RepeatIcon />}
+            onClick={() => {
+              archiveProfile(selectedProfile!);
+            }}
+          >
+            <FormattedMessage id="generic.update" defaultMessage="Update" />
+          </Button>
+          <AlertPopover boxSize={4}>
+            <Text>
+              <FormattedMessage
+                id="component.associate-and-fill-profile-to-parallel-dialog.need-update-profile-warning"
+                defaultMessage="The information has been saved but some of the answers in this parallel differ from the values saved in the profile."
+              />
+            </Text>
+          </AlertPopover>
+        </HStack>
       ) : isSaved && !isEditing ? (
         <HStack paddingX={4} justifyContent="center">
           <CheckIcon color="green.500" />
@@ -491,6 +512,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
         field {
           id
           type
+          myPermission
         }
         value {
           id

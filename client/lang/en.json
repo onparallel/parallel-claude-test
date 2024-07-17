@@ -390,6 +390,11 @@
     "context": "Associate {count, plural, =1{profile} other{profiles}}"
   },
   {
+    "term": "component.associate-and-fill-profile-to-parallel-dialog.need-update-profile-warning",
+    "definition": "The information has been saved but some of the answers in this parallel differ from the values saved in the profile.",
+    "context": "The information has been saved but some of the answers in this parallel differ from the values saved in the profile."
+  },
+  {
     "term": "component.associate-new-petition-to-profile-dialog.header-1",
     "definition": "New parallel",
     "context": "New parallel"

@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -33,11 +33,13 @@ import {
   useAssociateNewPetitionToProfileDialog_PetitionBaseFragment,
   useAssociateNewPetitionToProfileDialog_ProfileFragment,
   useAssociateNewPetitionToProfileDialog_ProfileInnerFragment,
+  useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   useAssociateNewPetitionToProfileDialog_petitionDocument,
 } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
-import { ForwardedRef, forwardRef, useMemo, useRef } from "react";
+import { ForwardedRef, forwardRef, useEffect, useMemo, useRef } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, uniqBy } from "remeda";
@@ -60,10 +62,9 @@ interface AssociateNewPetitionToProfileDialogData {
 function AssociateNewPetitionToProfileDialog({
   profile,
   ...props
-}: DialogProps<
-  AssociateNewPetitionToProfileDialogProps,
-  { templateId: string; prefill: CreatePetitionFromProfilePrefillInput[] }
->) {
+}: DialogProps<AssociateNewPetitionToProfileDialogProps, {}>) {
+  const goToPetition = useGoToPetition();
+
   const form = useForm<AssociateNewPetitionToProfileDialogData>({
     defaultValues: { templateId: null, fillWithProfileData: true, prefill: [] },
   });
@@ -94,7 +95,10 @@ function AssociateNewPetitionToProfileDialog({
       (f) => f.profileType?.id === profile.profileType.id,
     );
 
-    const selectedGroupId = groupId ?? compatibleFieldGroups[0].id;
+    const selectedGroup = groupId
+      ? compatibleFieldGroups.find((f) => f.id === groupId)
+      : compatibleFieldGroups[0];
+    const selectedGroupId = selectedGroup?.id;
 
     // Filter the compatible relationships that the template has configured with the selected group, by default the first one.
     const compatibleRelationships = template.fieldRelationships.filter((relationship) => {
@@ -105,7 +109,12 @@ function AssociateNewPetitionToProfileDialog({
 
     const fieldsWithCompatibleProfiles =
       profile.relationships.length === 0
-        ? undefined
+        ? isDefined(selectedGroup)
+          ? ([[selectedGroup, [profile]]] as [
+              PetitionFieldSelection,
+              useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+            ][])
+          : undefined
         : (allFieldGroups
             .map((f) => {
               const profiles = uniqBy(
@@ -206,6 +215,20 @@ function AssociateNewPetitionToProfileDialog({
 
   const selectRef = useRef<PetitionSelectInstance<false>>(null);
 
+  useEffect(() => {
+    setValue(
+      "prefill",
+      fieldsWithCompatibleProfiles.map(([field, profiles]) => {
+        const isRadio = !field.multiple;
+
+        return {
+          petitionFieldId: field.id,
+          profileIds: isRadio ? [profiles[0]?.id] : profiles.map((p) => p.id),
+        };
+      }),
+    );
+  }, [templateId, compatibleFieldGroupsIds.join(",")]);
+
   const handleNextClick = async () => {
     if (currentStep === 0 && !(await trigger("templateId"))) return;
     if (currentStep === 1 && !(await trigger("groupId"))) return;
@@ -215,9 +238,12 @@ function AssociateNewPetitionToProfileDialog({
 
   const handlePreviousClick = () => {
     if (!omitStep2 && currentStep === 1) setValue("groupId", undefined);
-    if (!omitStep3 && (currentStep === 2 || currentStep === 1)) setValue("prefill", []);
     previousStep();
   };
+
+  const [createPetitionFromProfile, { loading: creatingPetition }] = useMutation(
+    useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
+  );
 
   return (
     <ConfirmDialog
@@ -229,7 +255,7 @@ function AssociateNewPetitionToProfileDialog({
       content={
         {
           as: "form",
-          onSubmit: handleSubmit((data) => {
+          onSubmit: handleSubmit(async (data) => {
             if (!isDefined(data.templateId)) return;
 
             const groupId = data.groupId ?? compatibleFieldGroupsIds[0];
@@ -240,7 +266,6 @@ function AssociateNewPetitionToProfileDialog({
                     {
                       petitionFieldId: groupId,
                       profileIds: [
-                        profile.id,
                         ...(data.prefill.find((p) => p.petitionFieldId === groupId)?.profileIds ??
                           []),
                       ],
@@ -249,7 +274,15 @@ function AssociateNewPetitionToProfileDialog({
                   ]
                 : [];
 
-            props.onResolve({ templateId: data.templateId, prefill });
+            const res = await createPetitionFromProfile({
+              variables: { profileId: profile.id, templateId: data.templateId, prefill },
+            });
+
+            if (isDefined(res?.data)) {
+              goToPetition(res.data.createPetitionFromProfile.id, "preview");
+            }
+
+            props.onResolve({});
           }),
         } as any
       }
@@ -308,7 +341,12 @@ function AssociateNewPetitionToProfileDialog({
       }
       confirm={
         isLastStep ? (
-          <Button key="accept" colorScheme="primary" type="submit" isLoading={loading}>
+          <Button
+            key="accept"
+            colorScheme="primary"
+            type="submit"
+            isLoading={loading || creatingPetition}
+          >
             <FormattedMessage id="generic.accept" defaultMessage="Accept" />
           </Button>
         ) : (
@@ -340,7 +378,6 @@ const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetit
     control,
     register,
     formState: { errors },
-    setValue,
   } = useFormContext<AssociateNewPetitionToProfileDialogData>();
 
   return (
@@ -364,8 +401,6 @@ const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetit
               permissionTypes={["OWNER", "WRITE"]}
               value={value}
               onChange={(v) => {
-                setValue("groupId", undefined);
-                setValue("prefill", []);
                 onChange(v?.id ?? null);
               }}
             />
@@ -791,6 +826,20 @@ const _queries = [
         allowedLeftRightProfileTypeIds
         allowedRightLeftProfileTypeIds
         isReciprocal
+      }
+    }
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation useAssociateNewPetitionToProfileDialog_createPetitionFromProfile(
+      $profileId: GID!
+      $templateId: GID!
+      $prefill: [CreatePetitionFromProfilePrefillInput!]!
+    ) {
+      createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
+        id
       }
     }
   `,

@@ -3949,7 +3949,19 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
         const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(profileId);
 
-        for (const child of children) {
+        const linkedChildren = children.filter((c) => isDefined(c.profile_type_field_id));
+
+        const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+          linkedChildren.map((child) => ({
+            profileTypeFieldId: child.profile_type_field_id!,
+            userId: ctx.user!.id,
+          })),
+        );
+
+        for (const [child] of zip(linkedChildren, userPermissions).filter(([, permission]) =>
+          // do not prefill petition fields if the user does not have at least READ permission on the profile property
+          isAtLeast(permission, "READ"),
+        )) {
           const profileValue = profileFieldValues.find(
             (v) => v.profile_type_field_id === child.profile_type_field_id,
           );

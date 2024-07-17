@@ -5075,5 +5075,546 @@ describe("GraphQL/Profiles to Petitions", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("ignores hidden properties on profiles", async () => {
+      const updatedFields = await mocks.knex
+        .from("profile_type_field")
+        .whereIn("alias", [
+          "p_email",
+          "p_city",
+          "p_address",
+          "p_proof_of_address_document",
+          "p_id_document",
+          "p_risk",
+          "p_background_check",
+        ])
+        .update({ permission: "HIDDEN" })
+        .returning("*");
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $profileId: GID!
+            $prefill: [CreatePetitionFromProfilePrefillInput!]!
+          ) {
+            createPetitionFromProfile(
+              templateId: $templateId
+              profileId: $profileId
+              prefill: $prefill
+            ) {
+              id
+              fields {
+                type
+                fromPetitionFieldId
+                replies {
+                  associatedProfile {
+                    id
+                  }
+                  children {
+                    field {
+                      type
+                      fromPetitionFieldId
+                      profileTypeField {
+                        id
+                      }
+                    }
+                    replies {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", template.id),
+          profileId: toGlobalId("Profile", mainProfile.id),
+          prefill: [
+            {
+              petitionFieldId: toGlobalId("PetitionField", you.id),
+              profileIds: [toGlobalId("Profile", mainProfile.id)],
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      expect(data?.createPetitionFromProfile.fields[0]).toEqual({
+        type: "FIELD_GROUP",
+        fromPetitionFieldId: toGlobalId("PetitionField", you.id),
+        replies: [
+          {
+            associatedProfile: {
+              id: toGlobalId("Profile", mainProfile.id),
+            },
+            children: [
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_first_name"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_first_name"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "Homer",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_last_name"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_last_name"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "Simpson",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_email"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_email"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "PHONE",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_phone_number"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_phone_number"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "+34611611611",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "PHONE",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_mobile_phone_number"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_mobile_phone_number"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "+34611611612",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "DATE",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_birth_date"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_birth_date"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "1956-05-12",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SELECT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_gender"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_gender"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "M",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_address"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_address"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find((f) => f.profile_type_field_id === individualIdx["p_city"].id)!
+                      .id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_city"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find((f) => f.profile_type_field_id === individualIdx["p_zip"].id)!
+                      .id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_zip"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "12345",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SELECT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_country_of_residence"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_country_of_residence"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "US",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "FILE_UPLOAD",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) =>
+                        f.profile_type_field_id === individualIdx["p_proof_of_address_document"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId(
+                      "ProfileTypeField",
+                      individualIdx["p_proof_of_address_document"].id,
+                    ),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "SELECT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_citizenship"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_citizenship"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "US",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_tax_id"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_tax_id"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "123456789",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "FILE_UPLOAD",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_id_document"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_id_document"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "FILE_UPLOAD",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_passport_document"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_passport_document"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      id: expect.any(String),
+                      filename: "passport_document__homer_simpson",
+                      size: "100",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_passport_number"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_passport_number"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "P123456789",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SELECT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_is_pep"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_is_pep"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "N",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "SELECT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find((f) => f.profile_type_field_id === individualIdx["p_risk"].id)!
+                      .id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_risk"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "FILE_UPLOAD",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_risk_assessment"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_risk_assessment"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      id: expect.any(String),
+                      filename: "risk_assessment__homer_simpson",
+                      size: "100",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_source_of_funds"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_source_of_funds"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "Salary",
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  type: "BACKGROUND_CHECK",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_background_check"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_background_check"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  type: "SHORT_TEXT",
+                  fromPetitionFieldId: toGlobalId(
+                    "PetitionField",
+                    youChildren.find(
+                      (f) => f.profile_type_field_id === individualIdx["p_occupation"].id,
+                    )!.id,
+                  ),
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", individualIdx["p_occupation"].id),
+                  },
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "Nuclear Safety Inspector",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      await mocks.knex
+        .from("profile_type_field")
+        .whereIn(
+          "id",
+          updatedFields.map((f) => f.id),
+        )
+        .update({ permission: "WRITE" });
+    });
   });
 });

@@ -1292,7 +1292,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       throw new ForbiddenError("Invalid profileId");
     }
 
-    const inputProfileIds = input.flatMap((i) => i.profileIds);
+    const inputProfileIds = uniq(input.flatMap((i) => i.profileIds));
     if (!inputProfileIds.every((id) => validProfileIds.includes(id))) {
       throw new ForbiddenError("profiles in prefill must be associated with main profile");
     }
@@ -1300,6 +1300,12 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     const mainProfileFieldId = input.find(
       (i) => i.profileIds.length === 1 && i.profileIds[0] === profileId,
     )?.petitionFieldId;
+
+    if (!mainProfileFieldId) {
+      throw new ForbiddenError(
+        "prefill between main profile and its field is required when providing prefill data",
+      );
+    }
 
     const mainProfileFieldRelationships = (
       await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(petitionId)
@@ -1310,6 +1316,10 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     );
 
     for (const entry of input) {
+      if (entry.profileIds.length === 0) {
+        // nothing to verify
+        continue;
+      }
       const field = inputFields.find((f) => f.id === entry.petitionFieldId)!;
       const profiles = entry.profileIds.map((id) => validProfiles.find((p) => p.id === id)!);
 

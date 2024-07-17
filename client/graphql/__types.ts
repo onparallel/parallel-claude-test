@@ -20870,7 +20870,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
   status: ProfileStatus;
   properties: Array<{
     __typename?: "ProfileFieldProperty";
-    field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      myPermission: ProfileTypeFieldPermissionType;
+    };
     value?: {
       __typename?: "ProfileFieldValue";
       id: string;
@@ -20938,7 +20943,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -20970,7 +20980,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
       status: ProfileStatus;
       properties: Array<{
         __typename?: "ProfileFieldProperty";
-        field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+        field: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          type: ProfileTypeFieldType;
+          myPermission: ProfileTypeFieldPermissionType;
+        };
         value?: {
           __typename?: "ProfileFieldValue";
           id: string;
@@ -21057,7 +21072,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
             status: ProfileStatus;
             properties: Array<{
               __typename?: "ProfileFieldProperty";
-              field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+              field: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                type: ProfileTypeFieldType;
+                myPermission: ProfileTypeFieldPermissionType;
+              };
               value?: {
                 __typename?: "ProfileFieldValue";
                 id: string;
@@ -21089,7 +21109,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
         status: ProfileStatus;
         properties: Array<{
           __typename?: "ProfileFieldProperty";
-          field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+          field: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+            myPermission: ProfileTypeFieldPermissionType;
+          };
           value?: {
             __typename?: "ProfileFieldValue";
             id: string;
@@ -21155,7 +21180,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -21187,7 +21217,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
       status: ProfileStatus;
       properties: Array<{
         __typename?: "ProfileFieldProperty";
-        field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+        field: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          type: ProfileTypeFieldType;
+          myPermission: ProfileTypeFieldPermissionType;
+        };
         value?: {
           __typename?: "ProfileFieldValue";
           id: string;
@@ -21224,7 +21259,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFr
     status: ProfileStatus;
     properties: Array<{
       __typename?: "ProfileFieldProperty";
-      field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+      };
       value?: {
         __typename?: "ProfileFieldValue";
         id: string;
@@ -21283,7 +21323,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
         status: ProfileStatus;
         properties: Array<{
           __typename?: "ProfileFieldProperty";
-          field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+          field: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+            myPermission: ProfileTypeFieldPermissionType;
+          };
           value?: {
             __typename?: "ProfileFieldValue";
             id: string;
@@ -21315,7 +21360,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
     status: ProfileStatus;
     properties: Array<{
       __typename?: "ProfileFieldProperty";
-      field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+      };
       value?: {
         __typename?: "ProfileFieldValue";
         id: string;
@@ -21402,7 +21452,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -21434,7 +21489,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -21512,7 +21572,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
             status: ProfileStatus;
             properties: Array<{
               __typename?: "ProfileFieldProperty";
-              field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+              field: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                type: ProfileTypeFieldType;
+                myPermission: ProfileTypeFieldPermissionType;
+              };
               value?: {
                 __typename?: "ProfileFieldValue";
                 id: string;
@@ -21544,7 +21609,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         status: ProfileStatus;
         properties: Array<{
           __typename?: "ProfileFieldProperty";
-          field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+          field: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+            myPermission: ProfileTypeFieldPermissionType;
+          };
           value?: {
             __typename?: "ProfileFieldValue";
             id: string;
@@ -21675,6 +21745,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                         __typename?: "ProfileTypeField";
                         id: string;
                         type: ProfileTypeFieldType;
+                        myPermission: ProfileTypeFieldPermissionType;
                       };
                       value?: {
                         __typename?: "ProfileFieldValue";
@@ -21711,6 +21782,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                     __typename?: "ProfileTypeField";
                     id: string;
                     type: ProfileTypeFieldType;
+                    myPermission: ProfileTypeFieldPermissionType;
                   };
                   value?: {
                     __typename?: "ProfileFieldValue";
@@ -21797,6 +21869,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                       __typename?: "ProfileTypeField";
                       id: string;
                       type: ProfileTypeFieldType;
+                      myPermission: ProfileTypeFieldPermissionType;
                     };
                     value?: {
                       __typename?: "ProfileFieldValue";
@@ -21829,7 +21902,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -21948,7 +22026,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -21980,7 +22063,12 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
       status: ProfileStatus;
       properties: Array<{
         __typename?: "ProfileFieldProperty";
-        field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+        field: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          type: ProfileTypeFieldType;
+          myPermission: ProfileTypeFieldPermissionType;
+        };
         value?: {
           __typename?: "ProfileFieldValue";
           id: string;
@@ -22797,69 +22885,6 @@ export type ProfilePetitionsTable_disassociatePetitionFromProfileMutation = {
   disassociatePetitionFromProfile: Success;
 };
 
-export type ProfilePetitionsTable_createPetitionFromProfileMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  templateId: Scalars["GID"]["input"];
-  prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
-}>;
-
-export type ProfilePetitionsTable_createPetitionFromProfileMutation = {
-  createPetitionFromProfile: {
-    __typename?: "Petition";
-    id: string;
-    name?: string | null;
-    status: PetitionStatus;
-    createdAt: string;
-    sentAt?: string | null;
-    isAnonymized: boolean;
-    myEffectivePermission?: {
-      __typename?: "EffectivePetitionUserPermission";
-      permissionType: PetitionPermissionType;
-    } | null;
-    accesses: Array<{
-      __typename?: "PetitionAccess";
-      id: string;
-      status: PetitionAccessStatus;
-      nextReminderAt?: string | null;
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-    }>;
-    progress: {
-      __typename?: "PetitionProgress";
-      external: {
-        __typename?: "PetitionFieldProgress";
-        approved: number;
-        replied: number;
-        optional: number;
-        total: number;
-      };
-      internal: {
-        __typename?: "PetitionFieldProgress";
-        approved: number;
-        replied: number;
-        optional: number;
-        total: number;
-      };
-    };
-    currentSignatureRequest?: {
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      cancelReason?: string | null;
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-    signatureConfig?: {
-      __typename?: "SignatureConfig";
-      review: boolean;
-      integration?: {
-        __typename?: "SignatureOrgIntegration";
-        id: string;
-        environment: SignatureOrgIntegrationEnvironment;
-      } | null;
-    } | null;
-  };
-};
-
 export type ProfilePetitionsTable_petitionsQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   offset: Scalars["Int"]["input"];
@@ -23521,6 +23546,17 @@ export type useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQuery
     allowedRightLeftProfileTypeIds: Array<string>;
     isReciprocal: boolean;
   }>;
+};
+
+export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutationVariables =
+  Exact<{
+    profileId: Scalars["GID"]["input"];
+    templateId: Scalars["GID"]["input"];
+    prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
+  }>;
+
+export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutation = {
+  createPetitionFromProfile: { __typename?: "Petition"; id: string };
 };
 
 export type useCreateProfileDialog_ProfileFragment = {
@@ -39556,7 +39592,12 @@ export type PetitionReplies_PetitionFragment = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -39588,7 +39629,12 @@ export type PetitionReplies_PetitionFragment = {
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -39795,7 +39841,12 @@ export type PetitionReplies_PetitionFragment = {
             status: ProfileStatus;
             properties: Array<{
               __typename?: "ProfileFieldProperty";
-              field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+              field: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                type: ProfileTypeFieldType;
+                myPermission: ProfileTypeFieldPermissionType;
+              };
               value?: {
                 __typename?: "ProfileFieldValue";
                 id: string;
@@ -39860,7 +39911,12 @@ export type PetitionReplies_PetitionFragment = {
         status: ProfileStatus;
         properties: Array<{
           __typename?: "ProfileFieldProperty";
-          field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+          field: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+            myPermission: ProfileTypeFieldPermissionType;
+          };
           value?: {
             __typename?: "ProfileFieldValue";
             id: string;
@@ -40451,6 +40507,7 @@ export type PetitionReplies_closePetitionMutation = {
                     __typename?: "ProfileTypeField";
                     id: string;
                     type: ProfileTypeFieldType;
+                    myPermission: ProfileTypeFieldPermissionType;
                   };
                   value?: {
                     __typename?: "ProfileFieldValue";
@@ -40483,7 +40540,12 @@ export type PetitionReplies_closePetitionMutation = {
             status: ProfileStatus;
             properties: Array<{
               __typename?: "ProfileFieldProperty";
-              field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+              field: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                type: ProfileTypeFieldType;
+                myPermission: ProfileTypeFieldPermissionType;
+              };
               value?: {
                 __typename?: "ProfileFieldValue";
                 id: string;
@@ -40690,7 +40752,12 @@ export type PetitionReplies_closePetitionMutation = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -40755,7 +40822,12 @@ export type PetitionReplies_closePetitionMutation = {
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -41114,6 +41186,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                     __typename?: "ProfileTypeField";
                     id: string;
                     type: ProfileTypeFieldType;
+                    myPermission: ProfileTypeFieldPermissionType;
                   };
                   value?: {
                     __typename?: "ProfileFieldValue";
@@ -41146,7 +41219,12 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             status: ProfileStatus;
             properties: Array<{
               __typename?: "ProfileFieldProperty";
-              field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+              field: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                type: ProfileTypeFieldType;
+                myPermission: ProfileTypeFieldPermissionType;
+              };
               value?: {
                 __typename?: "ProfileFieldValue";
                 id: string;
@@ -41353,7 +41431,12 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -41418,7 +41501,12 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           status: ProfileStatus;
           properties: Array<{
             __typename?: "ProfileFieldProperty";
-            field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+            field: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+              myPermission: ProfileTypeFieldPermissionType;
+            };
             value?: {
               __typename?: "ProfileFieldValue";
               id: string;
@@ -41932,6 +42020,7 @@ export type PetitionReplies_petitionQuery = {
                         __typename?: "ProfileTypeField";
                         id: string;
                         type: ProfileTypeFieldType;
+                        myPermission: ProfileTypeFieldPermissionType;
                       };
                       value?: {
                         __typename?: "ProfileFieldValue";
@@ -41968,6 +42057,7 @@ export type PetitionReplies_petitionQuery = {
                     __typename?: "ProfileTypeField";
                     id: string;
                     type: ProfileTypeFieldType;
+                    myPermission: ProfileTypeFieldPermissionType;
                   };
                   value?: {
                     __typename?: "ProfileFieldValue";
@@ -42183,6 +42273,7 @@ export type PetitionReplies_petitionQuery = {
                       __typename?: "ProfileTypeField";
                       id: string;
                       type: ProfileTypeFieldType;
+                      myPermission: ProfileTypeFieldPermissionType;
                     };
                     value?: {
                       __typename?: "ProfileFieldValue";
@@ -42248,7 +42339,12 @@ export type PetitionReplies_petitionQuery = {
               status: ProfileStatus;
               properties: Array<{
                 __typename?: "ProfileFieldProperty";
-                field: { __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType };
+                field: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  type: ProfileTypeFieldType;
+                  myPermission: ProfileTypeFieldPermissionType;
+                };
                 value?: {
                   __typename?: "ProfileFieldValue";
                   id: string;
@@ -56220,6 +56316,7 @@ export const useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragmentDoc = gql
       field {
         id
         type
+        myPermission
       }
       value {
         id
@@ -60432,22 +60529,6 @@ export const ProfilePetitionsTable_disassociatePetitionFromProfileDocument = gql
   ProfilePetitionsTable_disassociatePetitionFromProfileMutation,
   ProfilePetitionsTable_disassociatePetitionFromProfileMutationVariables
 >;
-export const ProfilePetitionsTable_createPetitionFromProfileDocument = gql`
-  mutation ProfilePetitionsTable_createPetitionFromProfile(
-    $profileId: GID!
-    $templateId: GID!
-    $prefill: [CreatePetitionFromProfilePrefillInput!]!
-  ) {
-    createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
-      id
-      ...ProfilePetitionsTable_Petition
-    }
-  }
-  ${ProfilePetitionsTable_PetitionFragmentDoc}
-` as unknown as DocumentNode<
-  ProfilePetitionsTable_createPetitionFromProfileMutation,
-  ProfilePetitionsTable_createPetitionFromProfileMutationVariables
->;
 export const ProfilePetitionsTable_petitionsDocument = gql`
   query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
     profile(profileId: $profileId) {
@@ -60533,6 +60614,20 @@ export const useAssociateNewPetitionToProfileDialog_profileRelationshipTypesDocu
 ` as unknown as DocumentNode<
   useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQuery,
   useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQueryVariables
+>;
+export const useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument = gql`
+  mutation useAssociateNewPetitionToProfileDialog_createPetitionFromProfile(
+    $profileId: GID!
+    $templateId: GID!
+    $prefill: [CreatePetitionFromProfilePrefillInput!]!
+  ) {
+    createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutation,
+  useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutationVariables
 >;
 export const useCreateProfileDialog_profileTypeDocument = gql`
   query useCreateProfileDialog_profileType($profileTypeId: GID!) {

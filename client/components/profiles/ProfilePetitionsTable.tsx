@@ -21,7 +21,6 @@ import {
   ProfilePetitionsTable_PetitionFragment,
   ProfilePetitionsTable_ProfileFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
-  ProfilePetitionsTable_createPetitionFromProfileDocument,
   ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
   ProfilePetitionsTable_petitionsDocument,
 } from "@parallel/graphql/__types";
@@ -129,24 +128,13 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     onRemoveClick: () => handleRemovePetition(),
   });
 
-  const [createPetitionFromProfile] = useMutation(
-    ProfilePetitionsTable_createPetitionFromProfileDocument,
-  );
   const showAssociateNewPetitionToProfileDialog = useAssociateNewPetitionToProfileDialog();
   const handleCreateNewPetition = async () => {
     try {
       if (isDefined(profile)) {
-        const { templateId, prefill } = await showAssociateNewPetitionToProfileDialog({
+        await showAssociateNewPetitionToProfileDialog({
           profile,
         });
-
-        const { data } = await createPetitionFromProfile({
-          variables: { profileId, templateId, prefill },
-        });
-
-        if (isDefined(data)) {
-          goToPetition(data.createPetitionFromProfile.id, "preview");
-        }
       }
     } catch {}
   };
@@ -469,19 +457,6 @@ const _mutations = [
     ) {
       disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
     }
-  `,
-  gql`
-    mutation ProfilePetitionsTable_createPetitionFromProfile(
-      $profileId: GID!
-      $templateId: GID!
-      $prefill: [CreatePetitionFromProfilePrefillInput!]!
-    ) {
-      createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
-        id
-        ...ProfilePetitionsTable_Petition
-      }
-    }
-    ${_fragments.Petition}
   `,
 ];
 
