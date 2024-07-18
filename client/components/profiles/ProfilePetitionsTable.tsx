@@ -64,6 +64,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   });
   const profile = data?.profile;
   const petitions = profile?.petitions;
+  const profileIsDeleted = profile?.status === "DELETION_SCHEDULED";
 
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(petitions?.items, "id");
 
@@ -146,7 +147,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       flex="1 1 auto"
       minHeight={0}
       rowKeyProp="id"
-      isSelectable={profile?.status !== "DELETION_SCHEDULED"}
+      isSelectable={!profileIsDeleted}
       isHighlightable
       loading={loading}
       columns={columns}
@@ -175,7 +176,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
               <Button
                 flex="1"
                 onClick={handleCreateNewPetition}
-                isDisabled={!userCanCreatePetition}
+                isDisabled={!userCanCreatePetition || profileIsDeleted}
                 borderEndRadius={0}
               >
                 <FormattedMessage
@@ -192,10 +193,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
               padding={2}
               options={
                 <MenuList>
-                  <MenuItem
-                    onClick={handleAddPetition}
-                    isDisabled={profile?.status === "DELETION_SCHEDULED"}
-                  >
+                  <MenuItem onClick={handleAddPetition} isDisabled={profileIsDeleted}>
                     <FormattedMessage
                       id="component.profile-petitions-table.add-petition"
                       defaultMessage="Associate existing parallel"

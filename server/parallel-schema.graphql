@@ -1308,6 +1308,10 @@ type Mutation {
   Creates a petition from a profile and a base template, prefilling the field groups linked to profile types with the provided profile and all its current relationships
   """
   createPetitionFromProfile(
+    """
+    If providing prefill, this will be the ID of the petition field that will be associated with the main profile
+    """
+    petitionFieldId: GID
     prefill: [CreatePetitionFromProfilePrefillInput!]!
 
     """

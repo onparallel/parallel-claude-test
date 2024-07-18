@@ -6754,6 +6754,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionFromProfile: {
       // args
+      petitionFieldId?: NexusGenScalars["GID"] | null; // GID
       prefill: NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]; // [CreatePetitionFromProfilePrefillInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
       templateId: NexusGenScalars["GID"]; // GID!

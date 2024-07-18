@@ -1319,10 +1319,12 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $templateId: GID!
             $profileId: GID!
+            $petitionFieldId: GID
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -1353,6 +1355,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", you.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {
@@ -4887,10 +4890,12 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $templateId: GID!
             $profileId: GID!
+            $petitionFieldId: GID
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -4901,6 +4906,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         {
           templateId: toGlobalId("Petition", template.id),
           profileId: toGlobalId("Profile", mainProfile.id),
+          petitionFieldId: null,
           prefill: [],
         },
       );
@@ -4942,11 +4948,13 @@ describe("GraphQL/Profiles to Petitions", () => {
         gql`
           mutation (
             $templateId: GID!
+            $petitionFieldId: GID
             $profileId: GID!
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -4956,6 +4964,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", yourFamily.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {
@@ -4976,10 +4985,12 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $templateId: GID!
             $profileId: GID!
+            $petitionFieldId: GID
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -4989,6 +5000,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", yourFamily.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {
@@ -5009,10 +5021,12 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $templateId: GID!
             $profileId: GID!
+            $petitionFieldId: GID
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -5022,6 +5036,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", you.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {
@@ -5044,11 +5059,13 @@ describe("GraphQL/Profiles to Petitions", () => {
         gql`
           mutation (
             $templateId: GID!
+            $petitionFieldId: GID
             $profileId: GID!
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -5058,6 +5075,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", yourFamily.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {
@@ -5095,11 +5113,13 @@ describe("GraphQL/Profiles to Petitions", () => {
         gql`
           mutation (
             $templateId: GID!
+            $petitionFieldId: GID
             $profileId: GID!
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
           ) {
             createPetitionFromProfile(
               templateId: $templateId
+              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
             ) {
@@ -5130,6 +5150,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", you.id),
           profileId: toGlobalId("Profile", mainProfile.id),
           prefill: [
             {

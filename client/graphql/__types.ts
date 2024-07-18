@@ -1582,6 +1582,7 @@ export interface MutationcreatePetitionFieldRepliesArgs {
 }
 
 export interface MutationcreatePetitionFromProfileArgs {
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   prefill: Array<CreatePetitionFromProfilePrefillInput>;
   profileId: Scalars["GID"]["input"];
   templateId: Scalars["GID"]["input"];
@@ -23553,6 +23554,7 @@ export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMuta
     profileId: Scalars["GID"]["input"];
     templateId: Scalars["GID"]["input"];
     prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
+    petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   }>;
 
 export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutation = {
@@ -60620,8 +60622,14 @@ export const useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDoc
     $profileId: GID!
     $templateId: GID!
     $prefill: [CreatePetitionFromProfilePrefillInput!]!
+    $petitionFieldId: GID
   ) {
-    createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
+    createPetitionFromProfile(
+      profileId: $profileId
+      templateId: $templateId
+      prefill: $prefill
+      petitionFieldId: $petitionFieldId
+    ) {
       id
     }
   }

@@ -3843,14 +3843,33 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     petitionsAreNotPublicTemplates("templateId"),
     petitionIsNotAnonymized("templateId"),
     userHasAccessToProfile("profileId"),
-    profileHasStatus("profileId", ["OPEN"]),
+    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
     profileIsNotAnonymized("profileId"),
-    userHasAccessToCreatePetitionFromProfilePrefillInput("profileId", "templateId", "prefill"),
+    ifArgDefined(
+      "petitionFieldId",
+      and(
+        fieldsBelongsToPetition("templateId", "petitionFieldId" as never),
+        fieldHasType("petitionFieldId" as never, ["FIELD_GROUP"]),
+        profileHasSameProfileTypeAsField("profileId", "petitionFieldId" as never),
+      ),
+    ),
+    userHasAccessToCreatePetitionFromProfilePrefillInput(
+      "profileId",
+      "templateId",
+      "petitionFieldId",
+      "prefill",
+    ),
   ),
   args: {
     profileId: nonNull(
       globalIdArg("Profile", {
         description: "Main profile to obtain the information from",
+      }),
+    ),
+    petitionFieldId: nullable(
+      globalIdArg("PetitionField", {
+        description:
+          "If providing prefill, this will be the ID of the petition field that will be associated with the main profile",
       }),
     ),
     templateId: nonNull(
@@ -3927,7 +3946,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     const groupsWithChildren = zip(fieldGroups, children);
 
     const replies: CreatePetitionFieldReply[] = [];
-    for (const input of args.prefill) {
+    for (const input of args.prefill.filter((p) => p.profileIds.length > 0)) {
       const [parent, children] = groupsWithChildren.find(
         ([parent]) => parent!.from_petition_field_id === input.petitionFieldId,
       )!;

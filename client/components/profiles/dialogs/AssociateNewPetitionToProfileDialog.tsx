@@ -69,7 +69,12 @@ function AssociateNewPetitionToProfileDialog({
     defaultValues: { templateId: null, fillWithProfileData: true, prefill: [] },
   });
 
-  const { handleSubmit, trigger, watch, setValue } = form;
+  const { handleSubmit, trigger, watch, setValue, control } = form;
+
+  const { replace } = useFieldArray({
+    control,
+    name: "prefill",
+  });
 
   const templateId = watch("templateId");
   const fillWithProfileData = watch("fillWithProfileData");
@@ -141,14 +146,6 @@ function AssociateNewPetitionToProfileDialog({
                           ) {
                             return false;
                           }
-                          if (
-                            relationship.relationshipTypeWithDirection.profileRelationshipType
-                              .isReciprocal &&
-                            ((rightId === f.id && leftId === selectedGroupId) ||
-                              (leftId === f.id && rightId === selectedGroupId))
-                          ) {
-                            return true;
-                          }
 
                           if (isLeftRight) {
                             return (
@@ -216,8 +213,7 @@ function AssociateNewPetitionToProfileDialog({
   const selectRef = useRef<PetitionSelectInstance<false>>(null);
 
   useEffect(() => {
-    setValue(
-      "prefill",
+    replace(
       fieldsWithCompatibleProfiles.map(([field, profiles]) => {
         const isRadio = !field.multiple;
 
@@ -227,7 +223,7 @@ function AssociateNewPetitionToProfileDialog({
         };
       }),
     );
-  }, [templateId, compatibleFieldGroupsIds.join(",")]);
+  }, [templateId, groupId]);
 
   const handleNextClick = async () => {
     if (currentStep === 0 && !(await trigger("templateId"))) return;
@@ -275,7 +271,12 @@ function AssociateNewPetitionToProfileDialog({
                 : [];
 
             const res = await createPetitionFromProfile({
-              variables: { profileId: profile.id, templateId: data.templateId, prefill },
+              variables: {
+                profileId: profile.id,
+                templateId: data.templateId,
+                prefill,
+                petitionFieldId: data.fillWithProfileData ? groupId : undefined,
+              },
             });
 
             if (isDefined(res?.data)) {
@@ -837,8 +838,14 @@ const _mutations = [
       $profileId: GID!
       $templateId: GID!
       $prefill: [CreatePetitionFromProfilePrefillInput!]!
+      $petitionFieldId: GID
     ) {
-      createPetitionFromProfile(profileId: $profileId, templateId: $templateId, prefill: $prefill) {
+      createPetitionFromProfile(
+        profileId: $profileId
+        templateId: $templateId
+        prefill: $prefill
+        petitionFieldId: $petitionFieldId
+      ) {
         id
       }
     }

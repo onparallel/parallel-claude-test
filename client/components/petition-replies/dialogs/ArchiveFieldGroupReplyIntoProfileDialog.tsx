@@ -338,7 +338,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     isDefined(profile) &&
     repliesWithProfileFields.some(([f, replies]) => {
       const profileField = profile.properties
-        .filter(({ field }) => field.myPermission !== "HIDDEN")
+        .filter(({ field }) => field.myPermission === "WRITE")
         .find(({ field }) => {
           return field.id === f.profileTypeField?.id;
         });

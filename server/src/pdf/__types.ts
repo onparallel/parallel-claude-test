@@ -1522,6 +1522,7 @@ export type MutationcreatePetitionFieldRepliesArgs = {
 };
 
 export type MutationcreatePetitionFromProfileArgs = {
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   prefill: Array<CreatePetitionFromProfilePrefillInput>;
   profileId: Scalars["GID"]["input"];
   templateId: Scalars["GID"]["input"];

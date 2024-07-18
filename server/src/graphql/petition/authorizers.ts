@@ -1,6 +1,7 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { groupBy, indexBy, isDefined, partition, uniq } from "remeda";
+import { assert } from "ts-essentials";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -1236,7 +1237,8 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
   TypeName extends string,
   FieldName extends string,
   TProfileIdArg extends Arg<TypeName, FieldName, number>,
-  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+  TTemplateIdArg extends Arg<TypeName, FieldName, number>,
+  TTemplateFieldIdArg extends Arg<TypeName, FieldName, number | null | undefined>,
   TInputArg extends Arg<
     TypeName,
     FieldName,
@@ -1244,12 +1246,15 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
   >,
 >(
   profileIdArg: TProfileIdArg,
-  petitionIdArg: TPetitionIdArg,
+  templateIdArg: TTemplateIdArg,
+  templateFieldIdArg: TTemplateFieldIdArg,
   inputArg: TInputArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const profileId = args[profileIdArg] as unknown as number;
-    const petitionId = args[petitionIdArg] as unknown as number;
+    const templateId = args[templateIdArg] as unknown as number;
+    const templateFieldId = args[templateFieldIdArg] as unknown as number | null | undefined;
+
     const input = unMaybeArray(
       args[inputArg] as unknown as NexusGenInputs["CreatePetitionFromProfilePrefillInput"][],
     );
@@ -1259,10 +1264,21 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       return true;
     }
 
+    if (!templateFieldId) {
+      throw new ForbiddenError("templateFieldId arg is required when providing prefill data");
+    }
+
+    const inputEntry = input.find((i) => i.petitionFieldId === templateFieldId);
+    if (!isDefined(inputEntry) || !inputEntry.profileIds.some((id) => id === profileId)) {
+      throw new ForbiddenError(
+        "provided petitionFieldId must be in the prefill input and include the main profileId",
+      );
+    }
+
     const inputFieldIds = input.map((i) => i.petitionFieldId);
 
     if (inputFieldIds.length !== uniq(inputFieldIds).length) {
-      throw new ForbiddenError("fields should be unique");
+      throw new ForbiddenError("petitionFieldId should not repeat in prefill input");
     }
 
     const inputFields = await ctx.petitions.loadField(inputFieldIds);
@@ -1271,49 +1287,108 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       throw new ForbiddenError("Invalid fields");
     }
 
-    if (inputFields.some((f) => f.petition_id !== petitionId)) {
-      throw new ForbiddenError("fields must belong to the petition");
+    if (inputFields.some((f) => f.petition_id !== templateId)) {
+      throw new ForbiddenError("fields must belong to the template");
     }
 
-    if (inputFields.some((f) => f!.type !== "FIELD_GROUP" || f!.profile_type_id === null)) {
+    if (inputFields.some((f) => f.type !== "FIELD_GROUP" || f.profile_type_id === null)) {
       throw new ForbiddenError("fields must have type FIELD_GROUP and have a linked profile type");
+    }
+
+    const templateFieldGroups = (await ctx.petitions.loadFieldsForPetition(templateId)).filter(
+      (f) => isDefined(f) && f.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+    );
+
+    const inputProfileIds = input.flatMap((i) => i.profileIds);
+    const inputProfiles =
+      inputProfileIds.length > 0 ? await ctx.profiles.loadProfile(inputProfileIds) : [];
+
+    if (!inputProfiles.every(isDefined)) {
+      throw new ForbiddenError("Invalid profiles");
+    }
+    if (!inputProfiles.every((p) => ["OPEN", "CLOSED"].includes(p.status))) {
+      throw new ForbiddenError("profiles must be OPEN or CLOSED");
     }
 
     const mainProfileRelationships =
       await ctx.profiles.loadProfileRelationshipsByProfileId(profileId);
 
-    const validProfileIds = uniq([
-      profileId,
-      ...mainProfileRelationships.flatMap((r) => [r.left_side_profile_id, r.right_side_profile_id]),
-    ]);
-
-    const validProfiles = await ctx.profiles.loadProfile(validProfileIds);
-    if (!validProfiles.every(isDefined)) {
-      throw new ForbiddenError("Invalid profileId");
-    }
-
-    const inputProfileIds = uniq(input.flatMap((i) => i.profileIds));
-    if (!inputProfileIds.every((id) => validProfileIds.includes(id))) {
-      throw new ForbiddenError("profiles in prefill must be associated with main profile");
-    }
-
-    const mainProfileFieldId = input.find(
-      (i) => i.profileIds.length === 1 && i.profileIds[0] === profileId,
-    )?.petitionFieldId;
-
-    if (!mainProfileFieldId) {
-      throw new ForbiddenError(
-        "prefill between main profile and its field is required when providing prefill data",
-      );
-    }
-
-    const mainProfileFieldRelationships = (
-      await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(petitionId)
+    const compatibleFieldRelationships = (
+      await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(templateId)
     ).filter(
       (r) =>
-        r.left_side_petition_field_id === mainProfileFieldId ||
-        r.right_side_petition_field_id === mainProfileFieldId,
+        r.left_side_petition_field_id === templateFieldId ||
+        r.right_side_petition_field_id === templateFieldId,
     );
+
+    const relationshipTypes =
+      compatibleFieldRelationships.length > 0
+        ? await ctx.profiles.loadProfileRelationshipType(
+            uniq(compatibleFieldRelationships.map((r) => r.profile_relationship_type_id)),
+          )
+        : [];
+
+    // iterate all FIELD_GROUPs of the template,
+    //and for each get every possible valid profile given their relationships and profile types configuration
+    const fieldsWithCompatibleProfiles =
+      mainProfileRelationships.length === 0
+        ? [{ fieldId: templateFieldId, profileIds: [profileId] }]
+        : templateFieldGroups.map((f) => {
+            const profileIds = uniq([
+              ...(templateFieldId === f.id ? [profileId] : []),
+              ...mainProfileRelationships.map((r) => {
+                const relatedProfileId =
+                  r.left_side_profile_id === profileId
+                    ? r.right_side_profile_id
+                    : r.left_side_profile_id;
+
+                if (
+                  compatibleFieldRelationships.some((relationship) => {
+                    const leftId = relationship.left_side_petition_field_id;
+                    const rightId = relationship.right_side_petition_field_id;
+                    if (
+                      relationship.profile_relationship_type_id !== r.profile_relationship_type_id
+                    ) {
+                      // relationship types are not the same
+                      return false;
+                    }
+
+                    const relationshipType = relationshipTypes.find(
+                      (rt) => rt?.id === relationship.profile_relationship_type_id,
+                    );
+
+                    assert(isDefined(relationshipType), "relationshipType expected to be defined");
+
+                    // get only those profiles that have a valid relationship with the current profile
+                    if (relatedProfileId === r.right_side_profile_id) {
+                      return (
+                        (relationship.direction === "LEFT_RIGHT" &&
+                          rightId === f.id &&
+                          leftId === templateFieldId) ||
+                        (relationship.direction === "RIGHT_LEFT" &&
+                          leftId === f.id &&
+                          rightId === templateFieldId)
+                      );
+                    } else {
+                      return (
+                        (relationship.direction === "LEFT_RIGHT" &&
+                          leftId === f.id &&
+                          rightId === templateFieldId) ||
+                        (relationship.direction === "RIGHT_LEFT" &&
+                          rightId === f.id &&
+                          leftId === templateFieldId)
+                      );
+                    }
+                  })
+                ) {
+                  return relatedProfileId;
+                }
+                return null;
+              }),
+            ]).filter(isDefined);
+
+            return { fieldId: f.id, profileIds };
+          });
 
     for (const entry of input) {
       if (entry.profileIds.length === 0) {
@@ -1321,7 +1396,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
         continue;
       }
       const field = inputFields.find((f) => f.id === entry.petitionFieldId)!;
-      const profiles = entry.profileIds.map((id) => validProfiles.find((p) => p.id === id)!);
+      const profiles = entry.profileIds.map((id) => inputProfiles.find((p) => p.id === id)!);
 
       if (profiles.some((p) => p.profile_type_id !== field.profile_type_id)) {
         throw new ForbiddenError(
@@ -1333,34 +1408,13 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
         throw new ForbiddenError("field does not allow multiple profiles");
       }
 
-      if (field.id === mainProfileFieldId) {
-        if (profiles.length !== 1 || profiles[0].id !== profileId) {
-          throw new ForbiddenError("main field must be linked to the main profile");
-        }
-      } else {
-        const validRelationships = mainProfileFieldRelationships.filter(
-          (r) =>
-            r.left_side_petition_field_id === field.id ||
-            r.right_side_petition_field_id === field.id,
-        );
+      const compatibleProfileIds = fieldsWithCompatibleProfiles.find(
+        (f) => f.fieldId === field.id,
+      )?.profileIds;
+      assert(compatibleProfileIds, "compatibleProfileIds expected to be defined");
 
-        if (validRelationships.length === 0) {
-          throw new ForbiddenError("field must have relationships with the main profile field");
-        }
-
-        const validRelationshipTypeIds = uniq(
-          validRelationships.map((r) => r.profile_relationship_type_id),
-        );
-
-        const validProfileIds = mainProfileRelationships
-          .filter((r) => validRelationshipTypeIds.includes(r.profile_relationship_type_id))
-          .map((r) =>
-            r.left_side_profile_id === profileId ? r.right_side_profile_id : r.left_side_profile_id,
-          );
-
-        if (!profiles.every((p) => validProfileIds.includes(p.id))) {
-          throw new ForbiddenError("profiles must have a valid relationship with the main profile");
-        }
+      if (!profiles.every((p) => compatibleProfileIds.includes(p.id))) {
+        throw new ForbiddenError("profiles in prefill must be compatible with the field");
       }
     }
 
