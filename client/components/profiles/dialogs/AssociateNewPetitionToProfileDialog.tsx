@@ -106,11 +106,11 @@ function AssociateNewPetitionToProfileDialog({
     const selectedGroupId = selectedGroup?.id;
 
     // Filter the compatible relationships that the template has configured with the selected group, by default the first one.
-    const compatibleRelationships = template.fieldRelationships.filter((relationship) => {
-      const leftId = relationship?.leftSidePetitionField?.id;
-      const rightId = relationship?.rightSidePetitionField?.id;
-      return selectedGroupId === rightId || selectedGroupId === leftId;
-    });
+    const templateRelationships = template.fieldRelationships.filter(
+      (r) =>
+        selectedGroupId === r.rightSidePetitionField.id ||
+        selectedGroupId === r.leftSidePetitionField.id,
+    );
 
     const fieldsWithCompatibleProfiles =
       profile.relationships.length === 0
@@ -127,52 +127,39 @@ function AssociateNewPetitionToProfileDialog({
                   ...(selectedGroupId === f.id ? [profile] : []),
                   // filter the available relationships in the profile to suggest the "prefill" in step 3
                   ...profile.relationships
-                    .map((r) => {
-                      const relatedProfile =
-                        r.leftSideProfile.id === profile.id
-                          ? r.rightSideProfile
-                          : r.leftSideProfile;
-
-                      const isLeftRight = relatedProfile.id === r.rightSideProfile.id;
-                      if (
-                        compatibleRelationships.some((relationship) => {
-                          const direction = relationship.relationshipTypeWithDirection.direction;
-                          const leftId = relationship?.leftSidePetitionField?.id;
-                          const rightId = relationship?.rightSidePetitionField?.id;
-
+                    .filter((pr) =>
+                      templateRelationships
+                        .filter(
+                          // relationships of the same type
+                          (tr) =>
+                            tr.relationshipTypeWithDirection.profileRelationshipType.id ===
+                            pr.relationshipType.id,
+                        )
+                        .some((tr) => {
+                          let [leftId, rightId] = [
+                            tr.leftSidePetitionField.id,
+                            tr.rightSidePetitionField.id,
+                          ];
                           if (
-                            relationship.relationshipTypeWithDirection.profileRelationshipType
-                              .id !== r.relationshipType.id
+                            tr.relationshipTypeWithDirection.profileRelationshipType.isReciprocal
                           ) {
-                            return false;
-                          }
-
-                          if (isLeftRight) {
                             return (
-                              (direction === "LEFT_RIGHT" &&
-                                rightId === f.id &&
-                                leftId === selectedGroupId) ||
-                              (direction === "RIGHT_LEFT" &&
-                                leftId === f.id &&
-                                rightId === selectedGroupId)
-                            );
-                          } else {
-                            return (
-                              (direction === "LEFT_RIGHT" &&
-                                leftId === f.id &&
-                                rightId === selectedGroupId) ||
-                              (direction === "RIGHT_LEFT" &&
-                                rightId === f.id &&
-                                leftId === selectedGroupId)
+                              (leftId === selectedGroupId && rightId === f.id) ||
+                              (leftId === f.id && rightId === selectedGroupId)
                             );
                           }
-                        })
-                      ) {
-                        return relatedProfile;
-                      }
-                      return null;
-                    })
-                    .filter(isDefined),
+                          if (pr.rightSideProfile.id === profile.id) {
+                            [leftId, rightId] = [rightId, leftId];
+                          }
+                          if (tr.relationshipTypeWithDirection.direction === "RIGHT_LEFT") {
+                            [leftId, rightId] = [rightId, leftId];
+                          }
+                          return leftId === selectedGroupId && rightId === f.id;
+                        }),
+                    )
+                    .map((r) =>
+                      r.leftSideProfile.id === profile.id ? r.rightSideProfile : r.leftSideProfile,
+                    ),
                 ],
                 (p) => p.id,
               );

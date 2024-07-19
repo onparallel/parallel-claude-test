@@ -1310,10 +1310,9 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       throw new ForbiddenError("profiles must be OPEN or CLOSED");
     }
 
-    const mainProfileRelationships =
-      await ctx.profiles.loadProfileRelationshipsByProfileId(profileId);
+    const profileRelationships = await ctx.profiles.loadProfileRelationshipsByProfileId(profileId);
 
-    const compatibleFieldRelationships = (
+    const templateRelationships = (
       await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(templateId)
     ).filter(
       (r) =>
@@ -1322,70 +1321,64 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     );
 
     const relationshipTypes =
-      compatibleFieldRelationships.length > 0
+      templateRelationships.length > 0
         ? await ctx.profiles.loadProfileRelationshipType(
-            uniq(compatibleFieldRelationships.map((r) => r.profile_relationship_type_id)),
+            uniq(templateRelationships.map((r) => r.profile_relationship_type_id)),
           )
         : [];
 
     // iterate all FIELD_GROUPs of the template,
     //and for each get every possible valid profile given their relationships and profile types configuration
     const fieldsWithCompatibleProfiles =
-      mainProfileRelationships.length === 0
+      profileRelationships.length === 0
         ? [{ fieldId: templateFieldId, profileIds: [profileId] }]
         : templateFieldGroups.map((f) => {
             const profileIds = uniq([
               ...(templateFieldId === f.id ? [profileId] : []),
-              ...mainProfileRelationships.map((r) => {
-                const relatedProfileId =
+              ...profileRelationships
+                .filter((pr) => {
+                  return templateRelationships
+                    .filter(
+                      // relationships of the same type
+                      (tr) => tr.profile_relationship_type_id === pr.profile_relationship_type_id,
+                    )
+                    .some((tr) => {
+                      let [leftId, rightId] = [
+                        tr.left_side_petition_field_id,
+                        tr.right_side_petition_field_id,
+                      ];
+
+                      const relationshipType = relationshipTypes.find(
+                        (rt) => rt?.id === tr.profile_relationship_type_id,
+                      );
+
+                      assert(
+                        isDefined(relationshipType),
+                        "relationshipType expected to be defined",
+                      );
+                      if (relationshipType.is_reciprocal) {
+                        return (
+                          (leftId === templateFieldId && rightId === f.id) ||
+                          (leftId === f.id && rightId === templateFieldId)
+                        );
+                      }
+
+                      if (pr.right_side_profile_id === profileId) {
+                        [leftId, rightId] = [rightId, leftId];
+                      }
+                      if (tr.direction === "RIGHT_LEFT") {
+                        [leftId, rightId] = [rightId, leftId];
+                      }
+
+                      return leftId === templateFieldId && rightId === f.id;
+                    });
+                })
+                .map((r) =>
                   r.left_side_profile_id === profileId
                     ? r.right_side_profile_id
-                    : r.left_side_profile_id;
-
-                if (
-                  compatibleFieldRelationships.some((relationship) => {
-                    const leftId = relationship.left_side_petition_field_id;
-                    const rightId = relationship.right_side_petition_field_id;
-                    if (
-                      relationship.profile_relationship_type_id !== r.profile_relationship_type_id
-                    ) {
-                      // relationship types are not the same
-                      return false;
-                    }
-
-                    const relationshipType = relationshipTypes.find(
-                      (rt) => rt?.id === relationship.profile_relationship_type_id,
-                    );
-
-                    assert(isDefined(relationshipType), "relationshipType expected to be defined");
-
-                    // get only those profiles that have a valid relationship with the current profile
-                    if (relatedProfileId === r.right_side_profile_id) {
-                      return (
-                        (relationship.direction === "LEFT_RIGHT" &&
-                          rightId === f.id &&
-                          leftId === templateFieldId) ||
-                        (relationship.direction === "RIGHT_LEFT" &&
-                          leftId === f.id &&
-                          rightId === templateFieldId)
-                      );
-                    } else {
-                      return (
-                        (relationship.direction === "LEFT_RIGHT" &&
-                          leftId === f.id &&
-                          rightId === templateFieldId) ||
-                        (relationship.direction === "RIGHT_LEFT" &&
-                          rightId === f.id &&
-                          leftId === templateFieldId)
-                      );
-                    }
-                  })
-                ) {
-                  return relatedProfileId;
-                }
-                return null;
-              }),
-            ]).filter(isDefined);
+                    : r.left_side_profile_id,
+                ),
+            ]);
 
             return { fieldId: f.id, profileIds };
           });
