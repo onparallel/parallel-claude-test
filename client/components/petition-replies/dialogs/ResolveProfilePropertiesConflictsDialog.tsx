@@ -265,7 +265,7 @@ function TableRow({
       const label = field.options.values.find(
         (option: any) => option.value === content?.value,
       )?.label;
-      return <LocalizableUserTextRender value={label} default={<></>} />;
+      return label ? <LocalizableUserTextRender value={label} default={<></>} /> : null;
     }
 
     if (field.type === "BACKGROUND_CHECK") {
@@ -403,7 +403,7 @@ function TextValueRadioGroup({
   oldValueIcon,
   newValueIcon,
 }: {
-  oldValue: string;
+  oldValue: string | null;
   newValue: string | null;
   onChange: (value: string) => void;
   oldValueIcon?: React.ReactNode;

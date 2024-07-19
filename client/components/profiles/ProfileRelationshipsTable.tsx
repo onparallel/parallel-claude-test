@@ -234,7 +234,7 @@ function useProfileRelationshipsTableColumns({
           return (
             <Text as="span">
               <LocalizableUserTextRender
-                value={profile.profileType?.name}
+                value={profile.profileType.name}
                 default={intl.formatMessage({
                   id: "generic.unnamed-profile-type",
                   defaultMessage: "Unnamed profile type",
