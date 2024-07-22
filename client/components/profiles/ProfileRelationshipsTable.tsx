@@ -52,7 +52,7 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
 
   const [tableRows, totalCount] = useMemo(() => {
     if (!rows) {
-      return [[], 0];
+      return [undefined, 0];
     }
     return [rows.slice((page - 1) * items, page * items), rows.length];
   }, [rows, page, items]);

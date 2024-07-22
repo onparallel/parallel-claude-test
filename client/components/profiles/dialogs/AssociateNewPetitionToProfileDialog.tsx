@@ -39,6 +39,7 @@ import {
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ForwardedRef, forwardRef, useEffect, useMemo, useRef } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -64,7 +65,7 @@ function AssociateNewPetitionToProfileDialog({
   ...props
 }: DialogProps<AssociateNewPetitionToProfileDialogProps, {}>) {
   const goToPetition = useGoToPetition();
-
+  const showGenericErrorToast = useGenericErrorToast();
   const form = useForm<AssociateNewPetitionToProfileDialogData>({
     defaultValues: { templateId: null, fillWithProfileData: true, prefill: [] },
   });
@@ -198,19 +199,27 @@ function AssociateNewPetitionToProfileDialog({
   } = useCounter({ min: 0, max: maxSteps, defaultValue: 0 });
 
   const selectRef = useRef<PetitionSelectInstance<false>>(null);
-
+  const selectedGroupId = groupId ?? compatibleFieldGroupsIds[0];
   useEffect(() => {
     replace(
-      fieldsWithCompatibleProfiles.map(([field, profiles]) => {
-        const isRadio = !field.multiple;
+      fieldsWithCompatibleProfiles
+        .map(([field, profiles]) => {
+          const isRadio = !field.multiple;
 
-        return {
-          petitionFieldId: field.id,
-          profileIds: isRadio ? [profiles[0]?.id] : profiles.map((p) => p.id),
-        };
-      }),
+          return {
+            petitionFieldId: field.id,
+            profileIds: isRadio ? [profiles[0]?.id] : profiles.map((p) => p.id),
+          };
+        })
+        .sort((fieldA, fieldB) =>
+          fieldA.petitionFieldId === selectedGroupId
+            ? -1
+            : fieldB.petitionFieldId === selectedGroupId
+              ? 1
+              : 0,
+        ),
     );
-  }, [templateId, groupId]);
+  }, [templateId, selectedGroupId]);
 
   const handleNextClick = async () => {
     if (currentStep === 0 && !(await trigger("templateId"))) return;
@@ -245,32 +254,29 @@ function AssociateNewPetitionToProfileDialog({
 
             const prefill =
               data.fillWithProfileData && groupId
-                ? [
-                    {
-                      petitionFieldId: groupId,
-                      profileIds: [
-                        ...(data.prefill.find((p) => p.petitionFieldId === groupId)?.profileIds ??
-                          []),
-                      ],
-                    },
-                    ...data.prefill.filter((p) => p.petitionFieldId !== groupId),
-                  ]
+                ? data.prefill.filter((p) => p.profileIds.length > 0)
                 : [];
 
-            const res = await createPetitionFromProfile({
-              variables: {
-                profileId: profile.id,
-                templateId: data.templateId,
-                prefill,
-                petitionFieldId: data.fillWithProfileData ? groupId : undefined,
-              },
-            });
+            try {
+              const res = await createPetitionFromProfile({
+                variables: {
+                  profileId: profile.id,
+                  templateId: data.templateId,
+                  prefill,
+                  petitionFieldId: data.fillWithProfileData ? groupId : undefined,
+                },
+              });
 
-            if (isDefined(res?.data)) {
-              goToPetition(res.data.createPetitionFromProfile.id, "preview");
+              if (isDefined(res?.data)) {
+                goToPetition(res.data.createPetitionFromProfile.id, "preview");
+              } else {
+                throw new Error("No data in createPetitionFromProfile mutation response");
+              }
+
+              props.onResolve({});
+            } catch {
+              showGenericErrorToast();
             }
-
-            props.onResolve({});
           }),
         } as any
       }
@@ -524,43 +530,12 @@ function AssociateNewPetitionToProfileStep3({
   const fieldsWithIndices = useFieldsWithIndices(template);
 
   const { control, watch } = useFormContext<AssociateNewPetitionToProfileDialogData>();
-  const { fields, append, remove } = useFieldArray({
+  const { fields } = useFieldArray({
     control,
     name: "prefill",
   });
 
   const groupId = watch("groupId");
-
-  const reorderedFieldsWithCompatibleProfiles = useMemo(() => {
-    return fieldsWithCompatibleProfiles.sort(([fieldA], [fieldB]) =>
-      fieldA.id === groupId ? -1 : fieldB.id === groupId ? 1 : 0,
-    );
-  }, [fieldsWithCompatibleProfiles, groupId]);
-
-  const handleCheckboxChange = (
-    fieldId: string,
-    profileId: string,
-    isChecked: boolean,
-    isRadio: boolean,
-  ) => {
-    const fieldIndex = fields.findIndex((item) => item.petitionFieldId === fieldId);
-
-    if (isChecked) {
-      if (fieldIndex !== -1) {
-        remove(fieldIndex);
-      }
-      append({
-        petitionFieldId: fieldId,
-        profileIds: isRadio ? [profileId] : [...(fields[fieldIndex]?.profileIds || []), profileId],
-      });
-    } else if (fieldIndex !== -1) {
-      const newProfileIds = fields[fieldIndex].profileIds.filter((id) => id !== profileId);
-      remove(fieldIndex);
-      if (newProfileIds.length > 0) {
-        append({ petitionFieldId: fieldId, profileIds: newProfileIds });
-      }
-    }
-  };
 
   return (
     <Stack>
@@ -632,13 +607,21 @@ function AssociateNewPetitionToProfileStep3({
             </Tr>
           </Thead>
           <Tbody>
-            {reorderedFieldsWithCompatibleProfiles.map(([field, profiles], i) => {
-              const [_, fieldIndex] = fieldsWithIndices.find(([f]) => f.id === field.id)!;
+            {fields.map((item, index) => {
+              const [field, profiles] = fieldsWithCompatibleProfiles.find(
+                ([field]) => field.id === item.petitionFieldId,
+              ) as [
+                PetitionFieldSelection,
+                useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+              ];
+
               const isRadioButton = !field.multiple;
-              const profileIds =
-                fields.find((item) => item.petitionFieldId === field.id)?.profileIds ?? [];
+              const [_, fieldIndex] = fieldsWithIndices.find(([f]) => f.id === field.id)!;
+
+              if (!isDefined(field) || !isDefined(profiles)) return null;
+
               return (
-                <Tr key={field.id}>
+                <Tr key={item.id}>
                   <Td padding={2}>
                     <HStack>
                       <PetitionFieldTypeIndicator
@@ -654,53 +637,56 @@ function AssociateNewPetitionToProfileStep3({
                     </HStack>
                   </Td>
                   <Td padding={2}>
-                    <CheckboxGroup
-                      key={field.id}
-                      colorScheme="primary"
-                      value={groupId === field.id ? [profile.id, ...profileIds] : profileIds}
-                    >
-                      <Stack>
-                        {profiles.map((compatibleProfile) => {
-                          const isDefaultChecked =
-                            compatibleProfile.id === profile.id && groupId === field.id;
+                    <Controller
+                      name={`prefill.${index}.profileIds` as const}
+                      control={control}
+                      render={({ field: { onChange, value } }) => {
+                        return (
+                          <CheckboxGroup
+                            key={item.id}
+                            colorScheme="primary"
+                            value={value}
+                            onChange={isRadioButton ? undefined : onChange}
+                          >
+                            <Stack>
+                              {profiles.map((compatibleProfile) => {
+                                const isDefaultChecked =
+                                  compatibleProfile.id === profile.id && groupId === field.id;
 
-                          const isDisabled = isRadioButton && i === 0;
-
-                          return (
-                            <Checkbox
-                              key={compatibleProfile.id + field.id}
-                              value={compatibleProfile.id}
-                              isDisabled={isDefaultChecked || isDisabled}
-                              onChange={(e) =>
-                                handleCheckboxChange(
-                                  field.id,
-                                  compatibleProfile.id,
-                                  e.target.checked,
-                                  isRadioButton,
-                                )
-                              }
-                              {...(isRadioButton
-                                ? {
-                                    icon:
-                                      isDisabled && !isDefaultChecked ? undefined : (
-                                        <RadioButtonSelected />
-                                      ),
-                                    variant: "radio",
-                                  }
-                                : {})}
-                            >
-                              <LocalizableUserTextRender
-                                default={intl.formatMessage({
-                                  id: "generic.unnamed-profile",
-                                  defaultMessage: "Unnamed profile",
-                                })}
-                                value={compatibleProfile.localizableName}
-                              />
-                            </Checkbox>
-                          );
-                        })}
-                      </Stack>
-                    </CheckboxGroup>
+                                return (
+                                  <Checkbox
+                                    key={compatibleProfile.id + field.id}
+                                    value={compatibleProfile.id}
+                                    isDisabled={isDefaultChecked}
+                                    onChange={
+                                      isRadioButton
+                                        ? (e) => onChange(e.target.checked ? [e.target.value] : [])
+                                        : undefined
+                                    }
+                                    {...(isRadioButton
+                                      ? {
+                                          icon: !isDefaultChecked ? undefined : (
+                                            <RadioButtonSelected />
+                                          ),
+                                          variant: "radio",
+                                        }
+                                      : {})}
+                                  >
+                                    <LocalizableUserTextRender
+                                      default={intl.formatMessage({
+                                        id: "generic.unnamed-profile",
+                                        defaultMessage: "Unnamed profile",
+                                      })}
+                                      value={compatibleProfile.localizableName}
+                                    />
+                                  </Checkbox>
+                                );
+                              })}
+                            </Stack>
+                          </CheckboxGroup>
+                        );
+                      }}
+                    />
                   </Td>
                 </Tr>
               );
