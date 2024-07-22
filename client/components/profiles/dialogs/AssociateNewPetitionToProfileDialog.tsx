@@ -653,11 +653,13 @@ function AssociateNewPetitionToProfileStep3({
                                 const isDefaultChecked =
                                   compatibleProfile.id === profile.id && groupId === field.id;
 
+                                const isDisabled = isRadioButton && index === 0;
+
                                 return (
                                   <Checkbox
                                     key={compatibleProfile.id + field.id}
                                     value={compatibleProfile.id}
-                                    isDisabled={isDefaultChecked}
+                                    isDisabled={isDefaultChecked || isDisabled}
                                     onChange={
                                       isRadioButton
                                         ? (e) => onChange(e.target.checked ? [e.target.value] : [])
@@ -665,9 +667,10 @@ function AssociateNewPetitionToProfileStep3({
                                     }
                                     {...(isRadioButton
                                       ? {
-                                          icon: !isDefaultChecked ? undefined : (
-                                            <RadioButtonSelected />
-                                          ),
+                                          icon:
+                                            isDisabled && !isDefaultChecked ? undefined : (
+                                              <RadioButtonSelected />
+                                            ),
                                           variant: "radio",
                                         }
                                       : {})}

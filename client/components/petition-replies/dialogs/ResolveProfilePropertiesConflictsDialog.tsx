@@ -36,7 +36,7 @@ import {
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -44,7 +44,7 @@ import { isDefined } from "remeda";
 interface ResolveProfilePropertiesConflictsDialogProps {
   petitionId: string;
   profileId: string;
-  profileName: React.ReactNode;
+  profileName: ReactNode;
   profileTypeFieldsWithReplies: [
     useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
     useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment[],
@@ -193,13 +193,13 @@ function ResolveProfilePropertiesConflictsDialog({
                   <Th width="auto">
                     <FormattedMessage
                       id="component.use-profile-properties-columns.current-value"
-                      defaultMessage="Current value"
+                      defaultMessage="Value in profile"
                     />
                   </Th>
                   <Th width="auto">
                     <FormattedMessage
                       id="component.use-profile-properties-columns.new-value"
-                      defaultMessage="New value"
+                      defaultMessage="Value in parallel"
                     />
                   </Th>
                 </Tr>
@@ -305,15 +305,74 @@ function TableRow({
           };
 
           if (field.type === "FILE") {
-            return (
-              <CheckboxGroup
-                colorScheme="primary"
-                onChange={handleCheckBoxChange}
-                defaultValue={checkedItems}
-              >
-                <Td paddingX={2} paddingY={3} verticalAlign="top">
-                  <HStack alignItems="flex-start">
-                    <Checkbox value="IGNORE" marginTop={1.5} />
+            if (replies.length > 0) {
+              return (
+                <CheckboxGroup
+                  colorScheme="primary"
+                  onChange={handleCheckBoxChange}
+                  defaultValue={checkedItems}
+                >
+                  <Td paddingX={2} paddingY={3} verticalAlign="top">
+                    <HStack alignItems="flex-start">
+                      <Checkbox value="IGNORE" marginTop={1.5} />
+                      <Flex flex="1" gap={2} flexWrap="wrap" minWidth={0}>
+                        {property.files?.map(({ id, file }) => {
+                          if (!file) return null;
+                          return (
+                            <SimpleFileButton
+                              key={id}
+                              onClick={async () => {
+                                await downloadProfileFieldFile(
+                                  profileId,
+                                  property.field.id,
+                                  id,
+                                  true,
+                                );
+                              }}
+                              isDisabled={!file.isComplete}
+                              filename={file.filename}
+                              contentType={file.contentType}
+                            />
+                          );
+                        })}
+                      </Flex>
+                    </HStack>
+                  </Td>
+                  <Td paddingX={2} paddingY={3} verticalAlign="top">
+                    <HStack alignItems="flex-start">
+                      <Checkbox value="OVERWRITE" marginTop={1.5} />
+                      <Flex gap={2} flexWrap="wrap" minWidth={0}>
+                        {replies.map((reply) => {
+                          const file = reply.content;
+                          return (
+                            <SimpleFileButton
+                              key={reply.id}
+                              onClick={async () => {
+                                await downloadReplyFile(petitionId, reply, true);
+                              }}
+                              isDisabled={!file.uploadComplete}
+                              filename={file.filename}
+                              contentType={file.contentType}
+                            />
+                          );
+                        })}
+                      </Flex>
+                    </HStack>
+                  </Td>
+                </CheckboxGroup>
+              );
+            } else {
+              return (
+                <FileRadioGroup
+                  newValue={
+                    <Text as="span" textStyle="hint">
+                      {intl.formatMessage({
+                        id: "component.resolve-profile-properties-conflicts-dialog.no-value",
+                        defaultMessage: "No value",
+                      })}
+                    </Text>
+                  }
+                  oldValue={
                     <Flex flex="1" gap={2} flexWrap="wrap" minWidth={0}>
                       {property.files?.map(({ id, file }) => {
                         if (!file) return null;
@@ -335,31 +394,11 @@ function TableRow({
                         );
                       })}
                     </Flex>
-                  </HStack>
-                </Td>
-                <Td paddingX={2} paddingY={3} verticalAlign="top">
-                  <HStack alignItems="flex-start">
-                    <Checkbox value="OVERWRITE" marginTop={1.5} />
-                    <Flex gap={2} flexWrap="wrap" minWidth={0}>
-                      {replies.map((reply) => {
-                        const file = reply.content;
-                        return (
-                          <SimpleFileButton
-                            key={reply.id}
-                            onClick={async () => {
-                              await downloadReplyFile(petitionId, reply, true);
-                            }}
-                            isDisabled={!file.uploadComplete}
-                            filename={file.filename}
-                            contentType={file.contentType}
-                          />
-                        );
-                      })}
-                    </Flex>
-                  </HStack>
-                </Td>
-              </CheckboxGroup>
-            );
+                  }
+                  onChange={onChange}
+                />
+              );
+            }
           }
 
           const oldValue = getValue(property.value?.content);
@@ -406,8 +445,8 @@ function TextValueRadioGroup({
   oldValue: string | null;
   newValue: string | null;
   onChange: (value: string) => void;
-  oldValueIcon?: React.ReactNode;
-  newValueIcon?: React.ReactNode;
+  oldValueIcon?: ReactNode;
+  newValueIcon?: ReactNode;
 }) {
   const intl = useIntl();
   const { getRadioProps } = useRadioGroup({
@@ -439,6 +478,36 @@ function TextValueRadioGroup({
                 })}
             </OverflownText>
           </Flex>
+        </HStack>
+      </Td>
+    </>
+  );
+}
+
+function FileRadioGroup({
+  oldValue,
+  newValue,
+  onChange,
+}: {
+  oldValue: ReactNode;
+  newValue: ReactNode;
+  onChange: (value: string) => void;
+}) {
+  const { getRadioProps } = useRadioGroup({
+    defaultValue: "OVERWRITE",
+    onChange,
+  });
+
+  return (
+    <>
+      <Td paddingX={2} paddingY={3} verticalAlign="middle">
+        <HStack>
+          <Radio {...getRadioProps({ value: "IGNORE" })}>{oldValue}</Radio>
+        </HStack>
+      </Td>
+      <Td paddingX={2} paddingY={3} verticalAlign="middle">
+        <HStack>
+          <Radio {...getRadioProps({ value: "OVERWRITE" })}>{newValue}</Radio>
         </HStack>
       </Td>
     </>

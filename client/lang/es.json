@@ -10211,13 +10211,13 @@
   },
   {
     "term": "component.use-profile-properties-columns.current-value",
-    "definition": "Valor actual",
-    "context": "Current value"
+    "definition": "Valor en perfil",
+    "context": "Value in profile"
   },
   {
     "term": "component.use-profile-properties-columns.new-value",
-    "definition": "Nuevo valor",
-    "context": "New value"
+    "definition": "Valor en parallel",
+    "context": "Value in parallel"
   },
   {
     "term": "component.use-profile-properties-columns.property-name",
