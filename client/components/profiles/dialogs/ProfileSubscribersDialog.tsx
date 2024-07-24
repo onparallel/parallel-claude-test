@@ -44,6 +44,7 @@ interface ProfileSubscribersDialogProps extends DialogProps {
 
 function ProfileSubscribersDialog({
   profileIds,
+  // TODO cargarse el me de aqui, utilizar el isMe de graphql
   me,
   users,
   isSubscribed,

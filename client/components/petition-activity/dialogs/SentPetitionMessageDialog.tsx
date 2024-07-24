@@ -30,7 +30,7 @@ export function SentPetitionMessageDialog({
                 id="component.sent-petition-message-dialog.message-sent"
                 defaultMessage="Message sent to {recipient} on {date}"
                 values={{
-                  recipient: <ContactReference isFull contact={message.access.contact} />,
+                  recipient: <ContactReference withEmail contact={message.access.contact} />,
                   date: <DateTime value={message.sentAt} format={FORMATS["LLL"]} />,
                 }}
               />
@@ -39,7 +39,7 @@ export function SentPetitionMessageDialog({
                 id="component.sent-petition-message-dialog.message-scheduled"
                 defaultMessage="Message scheduled to be sent to {recipient} on {date}"
                 values={{
-                  recipient: <ContactReference isFull contact={message.access.contact} />,
+                  recipient: <ContactReference withEmail contact={message.access.contact} />,
                   date: <DateTime value={message.scheduledAt!} format={FORMATS["LLL"]} />,
                 }}
               />

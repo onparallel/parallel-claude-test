@@ -15,18 +15,17 @@ import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { UserReference } from "../petition-activity/UserReference";
-import { PetitionFieldCommentContent } from "./PetitionFieldCommentContent";
-import { ContactReference } from "./ContactReference";
+import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 import { DateTime } from "./DateTime";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
+import { PetitionFieldCommentContent } from "./PetitionFieldCommentContent";
+import { SmallPopover } from "./SmallPopover";
 import {
   CommentEditor,
   CommentEditorInstance,
   CommentEditorProps,
   CommentEditorValue,
 } from "./slate/CommentEditor";
-import { SmallPopover } from "./SmallPopover";
 
 interface PetitionFieldCommentProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
@@ -95,19 +94,11 @@ export function PetitionFieldComment({
       ) : null}
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box paddingEnd={2}>
-          {comment.author?.__typename === "PetitionAccess" ? (
-            <ContactReference contact={comment.author.contact} fontWeight="bold" />
-          ) : comment.author?.__typename === "User" ? (
-            comment.author.isMe ? (
-              <Text as="strong" fontStyle="italic">
-                <FormattedMessage id="generic.you" defaultMessage="You" />
-              </Text>
-            ) : (
-              <UserReference user={comment.author} />
-            )
-          ) : (
-            <UserReference user={null} />
-          )}
+          <UserOrContactReference
+            userOrAccess={comment.author}
+            userUseYou
+            _activeContact={{ fontWeight: "bold" }}
+          />
         </Box>
         {comment.isInternal && (
           <SmallPopover
@@ -205,22 +196,11 @@ PetitionFieldComment.fragments = {
       isInternal
       isEdited
       author {
-        ... on User {
-          id
-          isMe
-          ...UserReference_User
-        }
-        ... on PetitionAccess {
-          id
-          contact {
-            ...ContactReference_Contact
-          }
-        }
+        ...UserOrContactReference_UserOrPetitionAccess
       }
       isAnonymized
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${PetitionFieldCommentContent.fragments.PetitionFieldComment}
   `,
 };

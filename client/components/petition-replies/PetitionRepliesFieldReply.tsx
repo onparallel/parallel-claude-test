@@ -395,11 +395,11 @@ export function PetitionRepliesFieldReply({
               divider={<Text as="span">{"·"}</Text>}
             >
               <Text color="gray.500">
-                {reply.repliedBy?.__typename === "User" && reply.repliedBy.isMe ? (
-                  <FormattedMessage id="generic.you" defaultMessage="You" />
-                ) : (
-                  <UserOrContactReference userOrAccess={reply.repliedBy} isLink={false} />
-                )}
+                <UserOrContactReference
+                  userOrAccess={reply.repliedBy}
+                  userUseYou
+                  contactAsLink={false}
+                />
                 {", "}
                 <DateTime as="span" value={reply.repliedAt!} format={FORMATS.LLL} />
               </Text>
@@ -411,11 +411,11 @@ export function PetitionRepliesFieldReply({
                     <CloseIcon color="gray.600" boxSize={3} />
                   )}
                   <Text color="gray.500">
-                    {reply.lastReviewedBy.isMe ? (
-                      <FormattedMessage id="generic.you" defaultMessage="You" />
-                    ) : (
-                      <UserOrContactReference userOrAccess={reply.lastReviewedBy} isLink={false} />
-                    )}
+                    <UserOrContactReference
+                      userOrAccess={reply.lastReviewedBy}
+                      userUseYou
+                      contactAsLink={false}
+                    />
                     {", "}
                     <DateTime as="span" value={reply.lastReviewedAt} format={FORMATS.LLL} />
                   </Text>
@@ -496,12 +496,8 @@ PetitionRepliesFieldReply.fragments = {
       repliedAt
       repliedBy {
         ...UserOrContactReference_UserOrPetitionAccess
-        ... on User {
-          isMe
-        }
       }
       lastReviewedBy {
-        isMe
         ...UserOrContactReference_UserOrPetitionAccess
       }
       lastReviewedAt

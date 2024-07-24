@@ -22,7 +22,7 @@ export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMent
         return (
           <Tooltip
             label={intl.formatMessage({
-              id: "generic.inactive-user.tooltip",
+              id: "generic.inactive-user-tooltip",
               defaultMessage: "This user is inactive",
             })}
             isDisabled={user.status !== "INACTIVE"}

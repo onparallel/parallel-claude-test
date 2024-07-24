@@ -11290,7 +11290,7 @@
     "context": "Import error"
   },
   {
-    "term": "generic.inactive-user.tooltip",
+    "term": "generic.inactive-user-tooltip",
     "definition": "Este usuario está inactivo",
     "context": "This user is inactive"
   },

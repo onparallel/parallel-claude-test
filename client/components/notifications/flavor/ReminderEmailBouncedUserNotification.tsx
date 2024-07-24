@@ -36,7 +36,7 @@ export const ReminderEmailBouncedUserNotification = Object.assign(
                   draggable="false"
                   tabIndex={-1}
                   contact={notification.access.contact}
-                  isFull
+                  withEmail
                 />
               ),
             }}

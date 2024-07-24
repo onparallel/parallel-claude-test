@@ -1,47 +1,50 @@
 import { gql } from "@apollo/client";
-import { Text, TextProps, Tooltip } from "@chakra-ui/react";
+import { SystemStyleObject, Text, Tooltip } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { isDefined } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
 
-export function ContactReference({
-  contact,
-  isFull,
-  isLink = true,
-  ...props
-}: {
-  contact?: Maybe<ContactReference_ContactFragment>;
-  isFull?: boolean;
-  isLink?: boolean;
-} & TextProps) {
-  return contact ? (
-    <Tooltip isDisabled={isFull} label={contact.email}>
-      <Text as="span" {...props}>
-        {isLink ? (
-          <Link href={`/app/contacts/${contact.id}`}>
-            {contact.fullName}
-            {isFull ? `<${contact.email}>` : null}
-          </Link>
-        ) : (
-          <>
-            {contact.fullName}
-            {isFull ? `<${contact.email}>` : null}
-          </>
-        )}
-      </Text>
-    </Tooltip>
-  ) : (
-    <DeletedContact />
-  );
-}
-
-ContactReference.fragments = {
-  Contact: gql`
-    fragment ContactReference_Contact on Contact {
-      id
-      fullName
-      email
+export const ContactReference = Object.assign(
+  chakraForwardRef<
+    "a" | "span",
+    {
+      contact?: Maybe<ContactReference_ContactFragment>;
+      withEmail?: boolean;
+      asLink?: boolean;
+      _activeContact?: SystemStyleObject;
     }
-  `,
-};
+  >(function ContactReference(
+    { contact, withEmail, asLink = true, _activeContact, ...props },
+    ref,
+  ) {
+    return isDefined(contact) ? (
+      <Tooltip isDisabled={withEmail} label={contact.email}>
+        <Text
+          ref={ref}
+          sx={{ ...props.sx, ..._activeContact }}
+          {...(asLink ? { as: Link, href: `/app/contacts/${contact.id}` } : { as: "span" })}
+          {...(props as any)}
+        >
+          {contact.fullName}
+          {withEmail ? ` <${contact.email}>` : null}
+        </Text>
+      </Tooltip>
+    ) : (
+      <DeletedContact />
+    );
+  }),
+  {
+    fragments: {
+      Contact: gql`
+        fragment ContactReference_Contact on Contact {
+          id
+          fullName
+          email
+        }
+      `,
+    },
+  },
+);

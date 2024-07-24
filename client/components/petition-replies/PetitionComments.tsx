@@ -4,10 +4,9 @@ import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { PetitionFieldCommentExcerpt } from "../common/PetitionFieldCommentExcerpt";
-import { UserReference } from "../petition-activity/UserReference";
+import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 
 export interface PetitionCommentsProps {
   petition: PetitionComments_PetitionBaseFragment;
@@ -118,19 +117,11 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
               <HStack color="gray.600" justify="space-between">
                 <Box flex="1">
                   <Text noOfLines={2} fontSize="sm" as="span" wordBreak="break-all">
-                    {comment.author?.__typename === "PetitionAccess" ? (
-                      <ContactReference contact={comment.author.contact} fontWeight="bold" />
-                    ) : comment.author?.__typename === "User" ? (
-                      comment.author.isMe ? (
-                        <Text as="strong" fontStyle="italic">
-                          <FormattedMessage id="generic.you" defaultMessage="You" />
-                        </Text>
-                      ) : (
-                        <UserReference user={comment.author} />
-                      )
-                    ) : (
-                      <UserReference user={null} />
-                    )}
+                    <UserOrContactReference
+                      userOrAccess={comment.author}
+                      userUseYou
+                      _activeContact={{ fontWeight: "bold" }}
+                    />
                     {`: `}
                     {comment.isInternal ? (
                       <Badge
@@ -183,25 +174,13 @@ PetitionComments.fragments = {
         createdAt
         isInternal
         author {
-          ... on User {
-            id
-            isMe
-            fullName
-            ...UserReference_User
-          }
-          ... on PetitionAccess {
-            id
-            contact {
-              ...ContactReference_Contact
-            }
-          }
+          ...UserOrContactReference_UserOrPetitionAccess
         }
         ...PetitionFieldCommentExcerpt_PetitionFieldComment
       }
     }
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${PetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
   `,
   PetitionBase: gql`
     fragment PetitionComments_PetitionBase on PetitionBase {
