@@ -14,21 +14,25 @@ export interface ContactDetailsFormData {
   lastName: string | null;
 }
 
-export interface AskContactDetailsDialogResult {
-  defaultEmail?: string;
+export interface AskContactDetailsDialogProps {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export function AskContactDetailsDialog({
-  defaultEmail,
+  email,
+  firstName,
+  lastName,
   ...props
-}: DialogProps<AskContactDetailsDialogResult, ContactDetailsFormData>) {
+}: DialogProps<AskContactDetailsDialogProps, ContactDetailsFormData>) {
   const intl = useIntl();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<ContactDetailsFormData>({
-    defaultValues: { email: defaultEmail ?? "", firstName: "", lastName: "" },
+    defaultValues: { email: email ?? "", firstName: firstName ?? "", lastName: lastName ?? "" },
   });
   function onCreateContact(data: ContactDetailsFormData) {
     props.onResolve({
@@ -53,7 +57,7 @@ export function AskContactDetailsDialog({
     <ConfirmDialog
       hasCloseButton
       closeOnOverlayClick={false}
-      initialFocusRef={defaultEmail ? firstNameRef : emailRef}
+      initialFocusRef={email ? firstNameRef : emailRef}
       content={{
         as: "form",
         onSubmit: handleSubmit(onCreateContact),
@@ -67,7 +71,7 @@ export function AskContactDetailsDialog({
       body={
         <Stack>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
@@ -87,7 +91,7 @@ export function AskContactDetailsDialog({
             </FormErrorMessage>
           </FormControl>
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input data-testid="create-contact-first-name-input" {...firstNameRegisterProps} />
@@ -99,7 +103,7 @@ export function AskContactDetailsDialog({
             </FormErrorMessage>
           </FormControl>
           <FormControl id="contact-last-name">
-            <FormLabel>
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input data-testid="create-contact-last-name-input" {...register("lastName")} />

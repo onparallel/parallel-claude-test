@@ -69,7 +69,7 @@ export function useSendPetitionHandler(
         senderId,
       } = await showAddPetitionAccessDialog({
         user,
-        petition,
+        petitionId: petition.id,
         onUpdatePetition,
         canAddRecipientGroups: petition.accesses.length === 0, // can only do a bulk send if the petition has no accesses yet
         onSearchContacts: async (search: string, exclude: string[]) =>
@@ -215,6 +215,7 @@ useSendPetitionHandler.fragments = {
       id
       accesses {
         id
+        status
         contact {
           id
         }
@@ -226,9 +227,7 @@ useSendPetitionHandler.fragments = {
           name
         }
       }
-      ...AddPetitionAccessDialog_Petition
     }
-    ${AddPetitionAccessDialog.fragments.Petition}
   `,
 };
 

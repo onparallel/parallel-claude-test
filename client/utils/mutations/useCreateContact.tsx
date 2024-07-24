@@ -17,9 +17,17 @@ export function useCreateContact() {
 
   const showForceClientDialog = useDialog(ForceCreateContactDialog);
 
-  return useCallback(async function ({ defaultEmail }: { defaultEmail?: string }) {
+  return useCallback(async function ({
+    email,
+    firstName,
+    lastName,
+  }: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+  }) {
     try {
-      const details = await askContactDetails({ defaultEmail });
+      const details = await askContactDetails({ email, firstName, lastName });
       try {
         const { data } = await createContact({
           variables: { data: details },

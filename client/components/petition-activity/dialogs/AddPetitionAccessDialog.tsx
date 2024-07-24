@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -9,6 +9,7 @@ import {
   FormControl,
   FormLabel,
   HStack,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -34,10 +35,12 @@ import {
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
 import {
   AddPetitionAccessDialog_DelegateUserFragment,
+  AddPetitionAccessDialog_PetitionAccessFragment,
   AddPetitionAccessDialog_PetitionFragment,
   AddPetitionAccessDialog_SignatureConfigFragment,
   AddPetitionAccessDialog_UserFragment,
   AddPetitionAccessDialog_createContactlessPetitionAccessDocument,
+  AddPetitionAccessDialog_petitionDocument,
   BulkSendSigningMode,
   RemindersConfig,
   UpdatePetitionInput,
@@ -50,9 +53,8 @@ import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { BaseSyntheticEvent, useCallback, useMemo, useRef, useState } from "react";
+import { BaseSyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isDefined, noop, omit } from "remeda";
@@ -66,7 +68,7 @@ export interface AddPetitionAccessDialogProps {
   onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   canAddRecipientGroups?: boolean;
-  petition: AddPetitionAccessDialog_PetitionFragment;
+  petitionId: string;
   user: AddPetitionAccessDialog_UserFragment;
 }
 
@@ -83,7 +85,7 @@ export interface AddPetitionAccessDialogResult {
 
 export function AddPetitionAccessDialog({
   user,
-  petition,
+  petitionId,
   canAddRecipientGroups,
   onUpdatePetition = noop,
   // TODO: fix this
@@ -91,11 +93,20 @@ export function AddPetitionAccessDialog({
   onCreateContact = useCreateContact(),
   ...props
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
-  const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
-
   const userCanSendOnBehalfOfAnyone = useHasPermission("PETITIONS:SEND_ON_BEHALF");
 
-  const { watch, control, handleSubmit, register, setError, clearErrors } = useForm<{
+  const { data, loading } = useQuery(AddPetitionAccessDialog_petitionDocument, {
+    variables: { petitionId },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const petition = data?.petition as Maybe<AddPetitionAccessDialog_PetitionFragment> | undefined;
+
+  const [accesses, setAccesses] = useState<AddPetitionAccessDialog_PetitionAccessFragment[]>([]);
+
+  const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
+
+  const { watch, control, handleSubmit, register, setError, clearErrors, reset } = useForm<{
     signatureConfig: AddPetitionAccessDialog_SignatureConfigFragment | null;
     recipientGroups: ContactSelectSelection[][];
     subject: string;
@@ -105,24 +116,46 @@ export function AddPetitionAccessDialog({
     subscribeSender: boolean;
   }>({
     defaultValues: {
-      signatureConfig: petition.signatureConfig ?? null,
+      signatureConfig: null,
       recipientGroups: [[]],
-      subject: petition.emailSubject ?? "",
-      body: petition.emailBody ?? emptyRTEValue(),
-      remindersConfig: petition.remindersConfig
-        ? omit(petition.remindersConfig, ["__typename"])
-        : null,
-      sendAsUser:
-        // make sure the "send as" is one of the available delegated users
-        // it may not be an allowed user when setting default from the template's Messages tab.
-        isDefined(petition.defaultOnBehalf) &&
-        (userCanSendOnBehalfOfAnyone ||
-          sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id))
-          ? petition.defaultOnBehalf
-          : user,
+      subject: "",
+      body: emptyRTEValue(),
+      remindersConfig: null,
+      sendAsUser: user,
       subscribeSender: false,
     },
   });
+
+  //set the accesses when the petition is loaded
+  useEffect(() => {
+    if (!loading && isDefined(petition)) {
+      setAccesses(petition.accesses);
+    }
+  }, [petition, loading]);
+
+  //reset the form when the petition is loaded
+  useEffect(() => {
+    if (!loading && isDefined(petition)) {
+      reset({
+        signatureConfig: petition.signatureConfig ?? null,
+        recipientGroups: [[]],
+        subject: petition.emailSubject ?? "",
+        body: petition.emailBody ?? emptyRTEValue(),
+        remindersConfig: petition.remindersConfig
+          ? omit(petition.remindersConfig, ["__typename"])
+          : null,
+        sendAsUser:
+          // make sure the "send as" is one of the available delegated users
+          // it may not be an allowed user when setting default from the template's Messages tab.
+          isDefined(petition.defaultOnBehalf) &&
+          (userCanSendOnBehalfOfAnyone ||
+            sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id))
+            ? petition.defaultOnBehalf
+            : user,
+        subscribeSender: false,
+      });
+    }
+  }, [petition, loading]);
 
   const recipientGroups = watch("recipientGroups");
   const signatureConfig = watch("signatureConfig");
@@ -134,13 +167,10 @@ export function AddPetitionAccessDialog({
     !signatureConfig.allowAdditionalSigners &&
     signatureConfig.signers.length < signatureConfig.minSigners;
 
-  const [accesses, setAccesses] = useState(petition.accesses);
-
   const showSendAs =
     user.hasOnBehalfOf && (userCanSendOnBehalfOfAnyone || user.delegateOf.length > 0);
-  const senderHasPermission = petition.effectivePermissions.some(
-    (p) => p.user.id === sendAsUser.id,
-  );
+  const senderHasPermission =
+    petition?.effectivePermissions.some((p) => p.user.id === sendAsUser.id) ?? false;
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
@@ -149,8 +179,6 @@ export function AddPetitionAccessDialog({
     },
     [_handleSearchUsers],
   );
-
-  const handleSearchContactsByEmail = useSearchContactsByEmail();
 
   const [updateSubject, updateBody, updateRemindersConfig, updateSignatureConfig] = [
     useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]),
@@ -206,6 +234,7 @@ export function AddPetitionAccessDialog({
     signatureConfig: AddPetitionAccessDialog_SignatureConfigFragment,
     onChange: (...event: any[]) => void,
   ) => {
+    if (!petition) return;
     try {
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
         user,
@@ -255,7 +284,7 @@ export function AddPetitionAccessDialog({
       if (!currentAccessLink) {
         const newAccess = await createContactlessPetitionAccess({
           variables: {
-            petitionId: petition.id,
+            petitionId,
             remindersConfig,
           },
         });
@@ -268,12 +297,12 @@ export function AddPetitionAccessDialog({
 
       await showContactlessLinkDialog({
         link,
-        petitionId: petition.id,
+        petitionId,
       });
     } catch {}
   }, [accesses, isMissingSigners, remindersConfig]);
 
-  const { petitionsPeriod } = petition.organization;
+  const { petitionsPeriod } = petition?.organization ?? {};
 
   return (
     <ConfirmDialog
@@ -292,222 +321,234 @@ export function AddPetitionAccessDialog({
         </Flex>
       }
       body={
-        <Stack spacing={4}>
-          {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (
-            <Alert status="warning" borderRadius="md">
-              <AlertIcon color="yellow.500" />
-              <Text>
-                {!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit ? (
-                  <FormattedMessage
-                    id="component.add-petition-access-dialog.petition-limit-reached"
-                    defaultMessage="You reached the limit of parallels sent."
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="component.add-petition-access-dialog.petition-limit-near"
-                    defaultMessage="You can send {left, plural, =1{# more parallel} other{# more parallels}}."
-                    values={{ left: petitionsPeriod.limit - petitionsPeriod.used }}
-                  />
-                )}
-              </Text>
-            </Alert>
-          ) : null}
-          {signatureConfig && !signatureConfig.review ? (
-            <FormControl id="signatureConfig">
-              <Controller
-                name="signatureConfig"
-                control={control}
-                rules={{
-                  validate: () => !isMissingSigners,
-                }}
-                render={({ field: { value, onChange }, fieldState: { error } }) => (
-                  <Alert status="info" borderRadius="md">
-                    <AlertIcon />
-                    <HStack justifyContent="space-between" width="100%">
-                      <Text>
-                        {!isMissingSigners ? (
-                          <FormattedMessage
-                            id="component.add-petition-access-dialog.add-signers-text-optional"
-                            defaultMessage="Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
-                          />
-                        ) : (
-                          <FormattedMessage
-                            id="component.add-petition-access-dialog.add-signers-text-required"
-                            defaultMessage="Before sending, <b>include the signers.</b>"
-                          />
-                        )}
-                      </Text>
-                      <Center>
-                        <Button
-                          variant="outline"
-                          backgroundColor="white"
-                          colorScheme="blue"
-                          borderColor={error ? "red.500" : undefined}
-                          borderWidth={error ? 2 : undefined}
-                          onClick={() => handleEditSignatureConfig(value!, onChange)}
-                        >
-                          {value!.signers.length ? (
+        isDefined(petition) ? (
+          <Stack spacing={4}>
+            {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (
+              <Alert status="warning" borderRadius="md">
+                <AlertIcon color="yellow.500" />
+                <Text>
+                  {!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit ? (
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.petition-limit-reached"
+                      defaultMessage="You reached the limit of parallels sent."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.petition-limit-near"
+                      defaultMessage="You can send {left, plural, =1{# more parallel} other{# more parallels}}."
+                      values={{ left: petitionsPeriod.limit - petitionsPeriod.used }}
+                    />
+                  )}
+                </Text>
+              </Alert>
+            ) : null}
+            {signatureConfig && !signatureConfig.review ? (
+              <FormControl id="signatureConfig">
+                <Controller
+                  name="signatureConfig"
+                  control={control}
+                  rules={{
+                    validate: () => !isMissingSigners,
+                  }}
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <Alert status="info" borderRadius="md">
+                      <AlertIcon />
+                      <HStack justifyContent="space-between" width="100%">
+                        <Text>
+                          {!isMissingSigners ? (
                             <FormattedMessage
-                              id="component.add-petition-access-dialog.edit-signers"
-                              defaultMessage="Edit signers"
+                              id="component.add-petition-access-dialog.add-signers-text-optional"
+                              defaultMessage="Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
                             />
                           ) : (
                             <FormattedMessage
-                              id="component.add-petition-access-dialog.add-signers"
-                              defaultMessage="Add signers"
+                              id="component.add-petition-access-dialog.add-signers-text-required"
+                              defaultMessage="Before sending, <b>include the signers.</b>"
                             />
                           )}
-                        </Button>
-                      </Center>
-                    </HStack>
-                  </Alert>
-                )}
-              />
-            </FormControl>
-          ) : null}
-          {showSendAs ? (
-            <Stack>
-              <FormControl id="sendAsId">
-                <FormLabel fontWeight="normal">
-                  <FormattedMessage
-                    id="component.add-petition-access-dialog.send-as"
-                    defaultMessage="Send as..."
-                  />
-                </FormLabel>
-                <Controller
-                  name="sendAsUser"
-                  control={control}
-                  render={({ field: { value, onChange } }) =>
-                    userCanSendOnBehalfOfAnyone ? (
-                      <UserSelect
-                        onSearch={handleSearchUsers}
-                        isSearchable
-                        value={value}
-                        onChange={(user) => onChange(user!)}
-                      />
-                    ) : (
-                      <UserSelect
-                        isSync
-                        onSearch={undefined}
-                        isSearchable
-                        value={value}
-                        onChange={(user) => onChange(user!)}
-                        options={sendAsOptions}
-                      />
-                    )
-                  }
+                        </Text>
+                        <Center>
+                          <Button
+                            variant="outline"
+                            backgroundColor="white"
+                            colorScheme="blue"
+                            borderColor={error ? "red.500" : undefined}
+                            borderWidth={error ? 2 : undefined}
+                            onClick={() => handleEditSignatureConfig(value!, onChange)}
+                          >
+                            {value!.signers.length ? (
+                              <FormattedMessage
+                                id="component.add-petition-access-dialog.edit-signers"
+                                defaultMessage="Edit signers"
+                              />
+                            ) : (
+                              <FormattedMessage
+                                id="component.add-petition-access-dialog.add-signers"
+                                defaultMessage="Add signers"
+                              />
+                            )}
+                          </Button>
+                        </Center>
+                      </HStack>
+                    </Alert>
+                  )}
                 />
               </FormControl>
-
-              {senderHasPermission ? null : (
-                <FormControl id="subscribeSender">
-                  <Checkbox {...register("subscribeSender")}>
-                    <Flex alignItems="center">
-                      <Text as="span">
-                        <FormattedMessage
-                          id="component.add-petition-access-dialog.subscribe-to-notifications"
-                          defaultMessage="Subscribe {name} to notifications"
-                          values={{
-                            name: sendAsUser.fullName,
-                          }}
+            ) : null}
+            {showSendAs ? (
+              <Stack>
+                <FormControl id="sendAsId">
+                  <FormLabel fontWeight="normal">
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.send-as"
+                      defaultMessage="Send as..."
+                    />
+                  </FormLabel>
+                  <Controller
+                    name="sendAsUser"
+                    control={control}
+                    render={({ field: { value, onChange } }) =>
+                      userCanSendOnBehalfOfAnyone ? (
+                        <UserSelect
+                          onSearch={handleSearchUsers}
+                          isSearchable
+                          value={value}
+                          onChange={(user) => onChange(user!)}
                         />
-                      </Text>
-                      <HelpPopover>
-                        <FormattedMessage
-                          id="component.add-petition-access-dialog.subscribe-to-notifications-description"
-                          defaultMessage="Users will receive notifications about the activity of this parallel."
+                      ) : (
+                        <UserSelect
+                          isSync
+                          onSearch={undefined}
+                          isSearchable
+                          value={value}
+                          onChange={(user) => onChange(user!)}
+                          options={sendAsOptions}
                         />
-                      </HelpPopover>
-                    </Flex>
-                  </Checkbox>
+                      )
+                    }
+                  />
                 </FormControl>
-              )}
-            </Stack>
-          ) : null}
 
-          <Controller
-            name="recipientGroups"
-            control={control}
-            rules={{
-              required: true,
-              validate: (recipientGroups) =>
-                recipientGroups.every(
-                  (g) => g.length > 0 && g.every((r) => !r.isDeleted && !r.isInvalid),
-                ),
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <RecipientSelectGroups
-                recipientGroups={value}
-                onChangeRecipientGroups={onChange}
-                onSearchContacts={onSearchContacts}
-                onCreateContact={onCreateContact}
-                onSearchContactsByEmail={handleSearchContactsByEmail}
-                showErrors={!!error}
-                canAddRecipientGroups={canAddRecipientGroups}
-                maxGroups={petitionsPeriod ? petitionsPeriod.limit - petitionsPeriod.used : 0}
-              />
-            )}
-          />
+                {senderHasPermission ? null : (
+                  <FormControl id="subscribeSender">
+                    <Checkbox {...register("subscribeSender")}>
+                      <Flex alignItems="center">
+                        <Text as="span">
+                          <FormattedMessage
+                            id="component.add-petition-access-dialog.subscribe-to-notifications"
+                            defaultMessage="Subscribe {name} to notifications"
+                            values={{
+                              name: sendAsUser.fullName,
+                            }}
+                          />
+                        </Text>
+                        <HelpPopover>
+                          <FormattedMessage
+                            id="component.add-petition-access-dialog.subscribe-to-notifications-description"
+                            defaultMessage="Users will receive notifications about the activity of this parallel."
+                          />
+                        </HelpPopover>
+                      </Flex>
+                    </Checkbox>
+                  </FormControl>
+                )}
+              </Stack>
+            ) : null}
 
-          <Controller
-            name="subject"
-            control={control}
-            rules={{
-              required: true,
-              validate: (subject) => subject.length > 0,
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <MessageEmailSubjectFormControl
-                id={`${petition.id}-subject`}
-                isInvalid={!!error}
-                value={value}
-                onChange={(value) => {
-                  updateSubject({ emailSubject: value || null });
-                  onChange(value);
-                }}
-                petition={petition}
-              />
-            )}
-          />
-
-          <Controller
-            name="body"
-            control={control}
-            rules={{ required: true, validate: (body) => !isEmptyRTEValue(body) }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <MessageEmailBodyFormControl
-                id={`${petition.id}-body`}
-                isInvalid={!!error}
-                value={value}
-                onChange={(value) => {
-                  updateBody({ emailBody: isEmptyRTEValue(value) ? null : value });
-                  onChange(value);
-                }}
-                petition={petition}
-              />
-            )}
-          />
-
-          <FormControl id="remindersConfig">
             <Controller
-              name="remindersConfig"
+              name="recipientGroups"
               control={control}
-              render={({ field: { value, onChange } }) => (
-                <PetitionRemindersConfig
-                  marginTop={2}
-                  value={value}
-                  onChange={(value) => {
-                    updateRemindersConfig({
-                      remindersConfig: value ? omit(value, ["__typename"]) : null,
-                    });
-                    onChange(value);
-                  }}
-                  defaultActive={!!value}
+              rules={{
+                required: true,
+                validate: (recipientGroups) =>
+                  recipientGroups.every(
+                    (g) => g.length > 0 && g.every((r) => !r.isDeleted && !r.isInvalid),
+                  ),
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <RecipientSelectGroups
+                  petition={petition}
+                  recipientGroups={value}
+                  onChangeRecipientGroups={onChange}
+                  onSearchContacts={onSearchContacts}
+                  onCreateContact={onCreateContact}
+                  showErrors={!!error}
+                  canAddRecipientGroups={canAddRecipientGroups}
+                  maxGroups={petitionsPeriod ? petitionsPeriod.limit - petitionsPeriod.used : 0}
                 />
               )}
             />
-          </FormControl>
-        </Stack>
+
+            <Controller
+              name="subject"
+              control={control}
+              rules={{
+                required: true,
+                validate: (subject) => subject.length > 0,
+              }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <MessageEmailSubjectFormControl
+                  id={`${petition.id}-subject`}
+                  isInvalid={!!error}
+                  value={value}
+                  onChange={(value) => {
+                    updateSubject({ emailSubject: value || null });
+                    onChange(value);
+                  }}
+                  petition={petition}
+                />
+              )}
+            />
+
+            <Controller
+              name="body"
+              control={control}
+              rules={{ required: true, validate: (body) => !isEmptyRTEValue(body) }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <MessageEmailBodyFormControl
+                  id={`${petition.id}-body`}
+                  isInvalid={!!error}
+                  value={value}
+                  onChange={(value) => {
+                    updateBody({ emailBody: isEmptyRTEValue(value) ? null : value });
+                    onChange(value);
+                  }}
+                  petition={petition}
+                />
+              )}
+            />
+
+            <FormControl id="remindersConfig">
+              <Controller
+                name="remindersConfig"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <PetitionRemindersConfig
+                    marginTop={2}
+                    value={value}
+                    onChange={(value) => {
+                      updateRemindersConfig({
+                        remindersConfig: value ? omit(value, ["__typename"]) : null,
+                      });
+                      onChange(value);
+                    }}
+                    defaultActive={!!value}
+                  />
+                )}
+              />
+            </FormControl>
+          </Stack>
+        ) : (
+          <Center height="300px">
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="primary.500"
+              size="xl"
+            />
+          </Center>
+        )
       }
       alternative={
         <Button
@@ -542,104 +583,112 @@ export function AddPetitionAccessDialog({
 }
 
 AddPetitionAccessDialog.fragments = {
-  get DelegateUser() {
-    return gql`
-      fragment AddPetitionAccessDialog_DelegateUser on User {
-        id
-        fullName
-        ...UserSelect_User
+  DelegateUser: gql`
+    fragment AddPetitionAccessDialog_DelegateUser on User {
+      id
+      fullName
+      ...UserSelect_User
+    }
+    ${UserSelect.fragments.User}
+  `,
+  User: gql`
+    fragment AddPetitionAccessDialog_User on User {
+      id
+      fullName
+      email
+      delegateOf {
+        ...AddPetitionAccessDialog_DelegateUser
       }
-      ${UserSelect.fragments.User}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment AddPetitionAccessDialog_User on User {
+      hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+      ...ConfirmPetitionSignersDialog_User
+    }
+    ${ConfirmPetitionSignersDialog.fragments.User}
+  `,
+  SignatureConfig: gql`
+    fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
+      review
+      timezone
+      title
+      allowAdditionalSigners
+      minSigners
+      integration {
         id
-        fullName
-        email
-        delegateOf {
-          ...AddPetitionAccessDialog_DelegateUser
-        }
-        hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
-        ...ConfirmPetitionSignersDialog_User
       }
-      ${this.DelegateUser}
-      ${ConfirmPetitionSignersDialog.fragments.User}
-    `;
-  },
-  get SignatureConfig() {
-    return gql`
-      fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
-        review
-        timezone
-        title
-        allowAdditionalSigners
-        minSigners
-        integration {
+      signers {
+        ...CopySignatureConfigDialog_PetitionSigner
+      }
+      ...ConfirmPetitionSignersDialog_SignatureConfig
+    }
+    ${CopySignatureConfigDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
+  `,
+  PetitionAccess: gql`
+    fragment AddPetitionAccessDialog_PetitionAccess on PetitionAccess {
+      id
+      status
+      isContactless
+      recipientUrl
+    }
+  `,
+  Petition: gql`
+    fragment AddPetitionAccessDialog_Petition on Petition {
+      id
+      emailSubject
+      emailBody
+      myEffectivePermission {
+        permissionType
+      }
+      effectivePermissions {
+        isSubscribed
+        user {
           id
         }
-        signers {
-          ...CopySignatureConfigDialog_PetitionSigner
-        }
+      }
+      ...ConfirmPetitionSignersDialog_Petition
+      signatureConfig {
+        timezone
+        ...AddPetitionAccessDialog_SignatureConfig
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
-      ${CopySignatureConfigDialog.fragments.PetitionSigner}
-      ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    `;
-  },
-
-  get Petition() {
-    return gql`
-      fragment AddPetitionAccessDialog_Petition on Petition {
-        id
-        emailSubject
-        emailBody
-        myEffectivePermission {
-          permissionType
-        }
-        effectivePermissions {
-          isSubscribed
-          user {
-            id
-          }
-        }
-        ...ConfirmPetitionSignersDialog_Petition
-        signatureConfig {
-          timezone
-          ...AddPetitionAccessDialog_SignatureConfig
-          ...ConfirmPetitionSignersDialog_SignatureConfig
-        }
-        remindersConfig {
-          ...PetitionRemindersConfig_RemindersConfig
-        }
-        organization {
-          id
-          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-            id
-            limit
-            used
-          }
-        }
-        accesses {
-          id
-          isContactless
-          recipientUrl
-        }
-        defaultOnBehalf {
-          ...AddPetitionAccessDialog_DelegateUser
-        }
-        ...MessageEmailSubjectFormControl_PetitionBase
+      remindersConfig {
+        ...PetitionRemindersConfig_RemindersConfig
       }
-      ${ConfirmPetitionSignersDialog.fragments.Petition}
-      ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-      ${this.SignatureConfig}
-      ${PetitionRemindersConfig.fragments.RemindersConfig}
-      ${this.DelegateUser}
-      ${MessageEmailSubjectFormControl.fragments.PetitionBase}
-    `;
-  },
+      organization {
+        id
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          id
+          limit
+          used
+        }
+      }
+      accesses {
+        ...AddPetitionAccessDialog_PetitionAccess
+      }
+      defaultOnBehalf {
+        ...AddPetitionAccessDialog_DelegateUser
+      }
+      ...MessageEmailSubjectFormControl_PetitionBase
+      ...RecipientSelectGroups_Petition
+    }
+
+    ${ConfirmPetitionSignersDialog.fragments.Petition}
+    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
+    ${PetitionRemindersConfig.fragments.RemindersConfig}
+    ${MessageEmailSubjectFormControl.fragments.PetitionBase}
+    ${RecipientSelectGroups.fragments.Petition}
+  `,
 };
+
+const _queries = [
+  gql`
+    query AddPetitionAccessDialog_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...AddPetitionAccessDialog_Petition
+      }
+    }
+    ${AddPetitionAccessDialog.fragments.Petition}
+  `,
+];
 
 AddPetitionAccessDialog.mutations = [
   gql`

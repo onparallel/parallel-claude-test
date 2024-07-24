@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { Box, Center, Flex, HStack, InputGroup, InputRightElement } from "@chakra-ui/react";
-import { EditIcon, SparklesIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
+import { EditIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
+import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { ProfileFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useMetadata } from "@parallel/utils/withMetadata";
@@ -74,46 +74,16 @@ export function ProfileFieldInputGroup({
         />
       ) : null}
       {showSuggestionsButton ? (
-        <SuggestionsButton
-          areSuggestionsVisible={areSuggestionsVisible}
-          onClick={onToggleSuggestions}
-        />
+        <Box paddingTop={1}>
+          <SuggestionsButton
+            areSuggestionsVisible={areSuggestionsVisible}
+            onClick={onToggleSuggestions}
+          />
+        </Box>
       ) : null}
     </HStack>
   );
 }
-
-interface SuggestionsButtonPros {
-  areSuggestionsVisible: boolean;
-  onClick: () => void;
-}
-
-export const SuggestionsButton = ({ areSuggestionsVisible, onClick }: SuggestionsButtonPros) => {
-  const intl = useIntl();
-  return (
-    <Box paddingTop={1}>
-      <IconButtonWithTooltip
-        color={areSuggestionsVisible ? "purple.600" : undefined}
-        icon={<SparklesIcon />}
-        label={
-          areSuggestionsVisible
-            ? intl.formatMessage({
-                id: "component.profile-field-input-group.hide-suggestions-button",
-                defaultMessage: "Hide suggestions",
-              })
-            : intl.formatMessage({
-                id: "component.profile-field-input-group.show-suggestions-button",
-                defaultMessage: "Show suggestions",
-              })
-        }
-        placement="left"
-        size="sm"
-        variant="ghost"
-        onClick={onClick}
-      />
-    </Box>
-  );
-};
 
 interface ProfileFieldExpiresAtIconProps {
   expiryDate: string;

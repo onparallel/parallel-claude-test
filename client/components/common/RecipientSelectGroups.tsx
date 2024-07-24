@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
@@ -19,12 +20,21 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { RecipientSelectGroups_PetitionFragment } from "@parallel/graphql/__types";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { useUpdateContact } from "@parallel/utils/mutations/useUpdateContact";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { useRef, useState } from "react";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniq, uniqBy, zip } from "remeda";
+import { differenceWith, isDefined, uniq, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import {
+  RecipientSuggestion,
+  RecipientSuggestionProps,
+} from "../petition-common/RecipientSuggestion";
 import { CloseableAlert } from "./CloseableAlert";
 import {
   ContactSelect,
@@ -34,15 +44,17 @@ import {
 } from "./ContactSelect";
 import { HelpPopover } from "./HelpPopover";
 import { Link } from "./Link";
+import { SuggestionsButton } from "./SuggestionsButton";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, isDialogError, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
+import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
+  petition: RecipientSelectGroups_PetitionFragment;
   recipientGroups: ContactSelectSelection[][];
   onChangeRecipientGroups: (groups: ContactSelectSelection[][]) => void;
-  onSearchContactsByEmail: (emails: string[]) => Promise<(ContactSelectSelection | null)[]>;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
   canAddRecipientGroups?: boolean;
@@ -50,17 +62,23 @@ interface RecipientSelectGroupsProps {
 }
 export function RecipientSelectGroups({
   showErrors,
+  petition,
   recipientGroups,
   canAddRecipientGroups,
   maxGroups,
   onChangeRecipientGroups,
   onSearchContacts,
-  onSearchContactsByEmail,
   onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
   const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance<true>>();
   const recipientGroupFormControlRef = useMultipleRefs<HTMLDivElement>();
+
+  const [showSuggestionGroup, setShowSuggestionGroup] = useState<boolean[]>(
+    recipientGroups.map((group) => group.length === 0),
+  );
+
+  const handleSearchContactsByEmail = useSearchContactsByEmail();
 
   function handleRecipientsChange(groupNumber: number) {
     return (recipients: ContactSelectSelection[]) => {
@@ -75,7 +93,7 @@ export function RecipientSelectGroups({
   const showMultipleEmailsDialog = useDialog(MultipleEmailsPastedDialog);
   async function handlePasteEmails(groupNumber: number, emails: string[][]) {
     const allEmails = emails.flat();
-    const contacts = await onSearchContactsByEmail(allEmails);
+    const contacts = await handleSearchContactsByEmail(allEmails);
 
     const unknownEmails = uniq(
       zip(contacts, allEmails)
@@ -173,10 +191,12 @@ export function RecipientSelectGroups({
   function addRecipientGroup() {
     onChangeRecipientGroups([...recipientGroups, []]);
     focusRecipientGroup(recipientGroups.length);
+    setShowSuggestionGroup([...showSuggestionGroup, true]);
   }
 
   function deleteRecipientGroup(index: number) {
     onChangeRecipientGroups(recipientGroups.filter((_, i) => i !== index));
+    setShowSuggestionGroup(showSuggestionGroup.filter((_, i) => i !== index));
   }
 
   function validRecipients(index: number) {
@@ -199,7 +219,10 @@ export function RecipientSelectGroups({
     });
   }
 
-  async function handleCreateContact(groupNumber: number, data: { defaultEmail?: string }) {
+  async function handleCreateContact(
+    groupNumber: number,
+    data: { email?: string; firstName?: string; lastName?: string },
+  ) {
     const contact = await onCreateContact(data);
     setTimeout(() => recipientGroupSelectRef[groupNumber].current?.focus());
     return contact;
@@ -209,112 +232,297 @@ export function RecipientSelectGroups({
     group.filter((contact) => contact.hasBouncedEmail),
   );
 
+  const toggleSuggestionGroup = (index: number, forceState?: boolean) => {
+    setShowSuggestionGroup((prev) => {
+      const newShowSuggestionGroup = [...prev];
+      newShowSuggestionGroup[index] = forceState ?? !prev[index];
+      return newShowSuggestionGroup;
+    });
+  };
+
+  const updateContact = useUpdateContact();
+
+  const handleSuggestionClick = async (
+    groupNumber: number,
+    suggestion: RecipientSuggestionProps,
+  ) => {
+    try {
+      const { email, firstName, lastName } = suggestion;
+      const [contact] = await handleSearchContactsByEmail([email]);
+      const addNewContact = handleRecipientsChange(groupNumber);
+
+      if (!contact) {
+        const newContact = await handleCreateContact(groupNumber, {
+          email,
+          firstName,
+          lastName,
+        });
+        if (isDefined(newContact)) {
+          addNewContact([...recipientGroups[groupNumber], newContact]);
+        }
+      } else {
+        const contactNeedsUpdate =
+          (isDefined(firstName) && firstName.length && contact.firstName !== firstName) ||
+          (isDefined(lastName) && lastName.length && contact.lastName !== lastName);
+
+        const updatedContact = contactNeedsUpdate
+          ? await updateContact({ id: contact.id, firstName, lastName })
+          : contact;
+
+        if (isDefined(updatedContact)) {
+          addNewContact([...recipientGroups[groupNumber], updatedContact]);
+        }
+      }
+      toggleSuggestionGroup(groupNumber, false);
+    } catch {}
+  };
+
+  const fieldLogic = useFieldLogic(petition);
+  const allFieldsWithIndices = useFieldsWithIndices(petition);
+  // filter visible fields
+  const fieldsWithIndices = zip(allFieldsWithIndices, fieldLogic)
+    .filter(([[field], { isVisible }]) => isVisible && isDefined(field))
+    .map(([[field, fieldIndex, childrenFieldIndices], { groupChildrenLogic }]) => {
+      return [
+        field.type === "FIELD_GROUP"
+          ? {
+              ...field,
+              replies: field.replies.map((r, groupIndex) => ({
+                ...r,
+                children: r.children?.filter(
+                  (_, childReplyIndex) =>
+                    groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible ?? false,
+                ),
+              })),
+            }
+          : field,
+        fieldIndex,
+        childrenFieldIndices,
+      ] as const;
+    });
+
+  const hasLinkedFieldGroupReplied = fieldsWithIndices.some(
+    ([f]) =>
+      f.type === "FIELD_GROUP" &&
+      f.isLinkedToProfileType &&
+      f.replies.some((r) => r.children?.some((c) => c.replies.some((cr) => isDefined(cr.content)))),
+  );
+
+  const fieldsWithIndicesRepliedWithEmail = useMemo(
+    () =>
+      fieldsWithIndices.filter(([field]) => {
+        if (field.type === "SHORT_TEXT") {
+          return (
+            (field.alias?.includes("email") || field.options.format === "EMAIL") &&
+            field.replies.some((r) => EMAIL_REGEX.test(r.content?.value ?? ""))
+          );
+        } else if (field.type === "FIELD_GROUP") {
+          return field.replies.some((r) =>
+            r.children?.some(
+              (c) =>
+                (c.field.alias?.toLowerCase().includes("email") ||
+                  (c.field.isLinkedToProfileTypeField &&
+                    c.field.profileTypeField?.alias?.toLowerCase().includes("email")) ||
+                  c.field.options.format === "EMAIL") &&
+                c.replies.some((cr) => isDefined(cr.content)),
+            ),
+          );
+        }
+        return false;
+      }),
+    [fieldsWithIndices],
+  );
+
+  const suggestions = useMemo(
+    () =>
+      fieldsWithIndicesRepliedWithEmail.flatMap(([field, index]) => {
+        if (field.type === "SHORT_TEXT") {
+          return field.replies
+            .map((r) => {
+              if (EMAIL_REGEX.test(r.content?.value ?? "")) {
+                return {
+                  email: r.content.value,
+                  petitionField: field,
+                  petitionFieldIndex: index,
+                };
+              }
+              return null;
+            })
+            .filter(isDefined);
+        } else if (field.type === "FIELD_GROUP") {
+          return field.replies
+            .map((r, i) => {
+              const suggestion = {
+                petitionField: field,
+                petitionFieldIndex: index,
+                groupName: field.options?.groupName
+                  ? `${field.options?.groupName} ${field.replies.length > 1 ? i + 1 : ""}`.trim()
+                  : undefined,
+              } as any;
+
+              r.children?.map(({ field, replies }) => {
+                const value = replies[0]?.content?.value;
+                const profileTypeFieldAlias = field.profileTypeField?.alias;
+
+                if (field.type === "SHORT_TEXT" && isDefined(value)) {
+                  if (
+                    field.options?.format === "EMAIL" ||
+                    field.alias?.toLowerCase().includes("email") ||
+                    profileTypeFieldAlias?.toLowerCase().includes("email")
+                  ) {
+                    suggestion.email = value;
+                  } else if (
+                    /^(?!.*last).*name/i.test(field.alias ?? profileTypeFieldAlias ?? "")
+                  ) {
+                    suggestion.firstName = value;
+                  } else if (/last[_\s-]*name/i.test(field.alias ?? profileTypeFieldAlias ?? "")) {
+                    suggestion.lastName = value;
+                  }
+                }
+              });
+
+              return suggestion;
+            })
+            .filter((s) => isDefined(s.email));
+        }
+      }),
+    [fieldsWithIndicesRepliedWithEmail],
+  );
+
   return (
     <Stack>
       <Stack margin={-1} padding={1} overflow="auto" maxHeight="240px">
-        {recipientGroups.map((recipients, index) => (
-          <FormControl
-            key={index}
-            id={`petition-recipients-${index}`}
-            ref={recipientGroupFormControlRef[index]}
-            isInvalid={
-              showErrors && (recipients.length === 0 || invalidRecipients(index).length > 0)
-            }
-          >
-            <FormLabel display="flex" alignItems="center" fontWeight="normal">
-              <FormattedMessage
-                id="component.recipient-select-groups.for-label"
-                defaultMessage="{total, plural, =1{For:} other{(Parallel {number}) For:}}"
-                values={{ total: recipientGroups.length, number: index + 1 }}
-              />
-              {canAddRecipientGroups && index === 0 ? (
-                <HelpPopover>
-                  <Stack>
-                    <Text fontSize="sm">
-                      <FormattedMessage
-                        id="component.recipient-select-groups.recipients-description"
-                        defaultMessage="The recipients of each parallel will answer the same form."
-                      />
-                    </Text>
-                    <Stack spacing={0.5}>
-                      <HStack>
-                        <Text>{untranslated("Parallel 1:")}</Text>
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/multiple-recipient-group.svg`}
+        {recipientGroups.map((recipients, index) => {
+          const filteredSuggestions = differenceWith(
+            suggestions,
+            recipients,
+            (s, r) => s.email === r.email,
+          );
+          return (
+            <FormControl
+              key={index}
+              id={`petition-recipients-${index}`}
+              ref={recipientGroupFormControlRef[index]}
+              isInvalid={
+                showErrors && (recipients.length === 0 || invalidRecipients(index).length > 0)
+              }
+            >
+              <FormLabel display="flex" alignItems="center" fontWeight="normal">
+                <FormattedMessage
+                  id="component.recipient-select-groups.for-label"
+                  defaultMessage="{total, plural, =1{For:} other{(Parallel {number}) For:}}"
+                  values={{ total: recipientGroups.length, number: index + 1 }}
+                />
+                {!hasLinkedFieldGroupReplied && canAddRecipientGroups && index === 0 ? (
+                  <HelpPopover>
+                    <Stack>
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.recipient-select-groups.recipients-description"
+                          defaultMessage="The recipients of each parallel will answer the same form."
                         />
-                      </HStack>
-                      <HStack>
-                        <Text>{untranslated("Parallel 2:")}</Text>
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/individual-recipient-group.svg`}
-                        />
-                      </HStack>
+                      </Text>
+                      <Stack spacing={0.5}>
+                        <HStack>
+                          <Text>{untranslated("Parallel 1:")}</Text>
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/multiple-recipient-group.svg`}
+                          />
+                        </HStack>
+                        <HStack>
+                          <Text>{untranslated("Parallel 2:")}</Text>
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/individual-recipient-group.svg`}
+                          />
+                        </HStack>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </HelpPopover>
-              ) : null}
-            </FormLabel>
-            <Flex>
-              <Box flex="1" minWidth={0} data-section="recipient-select">
-                <ContactSelect
-                  ref={recipientGroupSelectRef[index]}
-                  data-testid="petition-recipient-select"
-                  isMulti
-                  placeholder={intl.formatMessage({
-                    id: "component.recipient-select-groups.recipients-placeholder",
-                    defaultMessage: "Enter recipients...",
-                  })}
-                  isDisabled={maxGroups < 1}
-                  value={recipients}
-                  onChange={handleRecipientsChange(index)}
-                  onCreateContact={async (data: any) => await handleCreateContact(index, data)}
-                  onSearchContacts={onSearchContacts}
-                  onPasteEmails={
-                    canAddRecipientGroups
-                      ? (emails: string[][]) => handlePasteEmails(index, emails)
-                      : undefined
-                  }
-                />
-              </Box>
-              {index > 0 ? (
-                <IconButton
-                  marginStart={2}
-                  variant="ghost"
-                  aria-label={intl.formatMessage({
-                    id: "component.recipient-select-groups.delete-group-label",
-                    defaultMessage: "Delete recipient group",
-                  })}
-                  onClick={() => deleteRecipientGroup(index)}
-                  icon={<DeleteIcon />}
-                />
-              ) : null}
-            </Flex>
-            <FormErrorMessage>
-              {invalidRecipients(index).length === 0 ? (
-                index === 0 ? (
-                  <FormattedMessage
-                    id="component.recipient-select-groups.required-recipients-group-1-error"
-                    defaultMessage="Please specify at least one recipient"
+                  </HelpPopover>
+                ) : null}
+              </FormLabel>
+              <HStack>
+                <Box flex="1" minWidth={0} data-section="recipient-select">
+                  <ContactSelect
+                    ref={recipientGroupSelectRef[index]}
+                    data-testid="petition-recipient-select"
+                    isMulti
+                    placeholder={intl.formatMessage({
+                      id: "component.recipient-select-groups.recipients-placeholder",
+                      defaultMessage: "Enter recipients...",
+                    })}
+                    isDisabled={maxGroups < 1}
+                    value={recipients}
+                    onChange={handleRecipientsChange(index)}
+                    onCreateContact={async (data: any) => await handleCreateContact(index, data)}
+                    onSearchContacts={onSearchContacts}
+                    onPasteEmails={
+                      !hasLinkedFieldGroupReplied && canAddRecipientGroups
+                        ? (emails: string[][]) => handlePasteEmails(index, emails)
+                        : undefined
+                    }
                   />
+                </Box>
+                {index > 0 ? (
+                  <IconButton
+                    variant="ghost"
+                    aria-label={intl.formatMessage({
+                      id: "component.recipient-select-groups.delete-group-label",
+                      defaultMessage: "Delete recipient group",
+                    })}
+                    onClick={() => deleteRecipientGroup(index)}
+                    icon={<DeleteIcon />}
+                  />
+                ) : null}
+                {filteredSuggestions.length ? (
+                  <SuggestionsButton
+                    areSuggestionsVisible={showSuggestionGroup[index]}
+                    onClick={() => {
+                      toggleSuggestionGroup(index);
+                    }}
+                    size="md"
+                  />
+                ) : null}
+              </HStack>
+              <FormErrorMessage>
+                {invalidRecipients(index).length === 0 ? (
+                  index === 0 ? (
+                    <FormattedMessage
+                      id="component.recipient-select-groups.required-recipients-group-1-error"
+                      defaultMessage="Please specify at least one recipient"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.recipient-select-groups.required-recipients-group-n-error"
+                      defaultMessage="Please specify at least one recipient or delete the groups you don't need"
+                    />
+                  )
                 ) : (
                   <FormattedMessage
-                    id="component.recipient-select-groups.required-recipients-group-n-error"
-                    defaultMessage="Please specify at least one recipient or delete the groups you don't need"
+                    id="component.recipient-select-groups.unknown-recipients"
+                    defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+                    values={{
+                      count: invalidRecipients(index).length,
+                      email: invalidRecipients(index)[0].email,
+                    }}
                   />
-                )
-              ) : (
-                <FormattedMessage
-                  id="component.recipient-select-groups.unknown-recipients"
-                  defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
-                  values={{
-                    count: invalidRecipients(index).length,
-                    email: invalidRecipients(index)[0].email,
-                  }}
-                />
-              )}
-            </FormErrorMessage>
-          </FormControl>
-        ))}
+                )}
+              </FormErrorMessage>
+              {showSuggestionGroup[index] && filteredSuggestions.length ? (
+                <HStack wrap="wrap" paddingTop={1}>
+                  {filteredSuggestions.map((suggestion, i) => {
+                    return (
+                      <RecipientSuggestion
+                        key={i}
+                        {...suggestion}
+                        onClick={() => handleSuggestionClick(index, suggestion)}
+                      />
+                    );
+                  })}
+                </HStack>
+              ) : null}
+            </FormControl>
+          );
+        })}
       </Stack>
       {recipientGroups.length === 1 &&
       validRecipients(0).length >= 2 &&
@@ -329,7 +537,7 @@ export function RecipientSelectGroups({
           </Text>
         </CloseableAlert>
       ) : null}
-      {canAddRecipientGroups ? (
+      {!hasLinkedFieldGroupReplied && canAddRecipientGroups ? (
         <Flex justifyContent="flex-start" alignItems="center">
           <Button
             data-testid="petition-add-recipient-group-button"
@@ -445,3 +653,57 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
     />
   );
 }
+
+RecipientSelectGroups.fragments = {
+  PetitionField: gql`
+    fragment RecipientSelectGroups_PetitionField on PetitionField {
+      id
+      ...RecipientSuggestion_PetitionField
+    }
+    ${RecipientSuggestion.fragments.PetitionField}
+  `,
+  Petition: gql`
+    fragment RecipientSelectGroups_Petition on Petition {
+      id
+      fields {
+        ...RecipientSelectGroups_PetitionField
+        id
+        alias
+        options
+        isLinkedToProfileType
+        isLinkedToProfileType
+        isLinkedToProfileTypeField
+        profileTypeField {
+          id
+          alias
+        }
+        replies {
+          id
+          content
+          children {
+            field {
+              id
+              alias
+              type
+              title
+              options
+              isLinkedToProfileTypeField
+              profileTypeField {
+                id
+                alias
+              }
+            }
+            replies {
+              id
+              content
+            }
+          }
+        }
+      }
+      ...useFieldsWithIndices_PetitionBase
+      ...useFieldLogic_PetitionBase
+    }
+    ${useFieldsWithIndices.fragments.PetitionBase}
+    ${useFieldLogic.fragments.PetitionBase}
+  `,
+};

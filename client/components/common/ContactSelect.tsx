@@ -40,7 +40,11 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 
 export interface ContactSelectProps<IsMulti extends boolean = false>
   extends CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
-  onCreateContact: (data: { defaultEmail?: string }) => Promise<Maybe<ContactSelectSelection>>;
+  onCreateContact: (data: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+  }) => Promise<Maybe<ContactSelectSelection>>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[][]) => MaybePromise<void>;
   onFocus?: () => void;
@@ -111,7 +115,7 @@ export const ContactSelect = Object.assign(
       }
       setIsCreating(true);
       try {
-        const contact = await onCreateContact({ defaultEmail: email });
+        const contact = await onCreateContact({ email });
         if (!isDefined(contact)) {
           setIsCreating(false);
           return;

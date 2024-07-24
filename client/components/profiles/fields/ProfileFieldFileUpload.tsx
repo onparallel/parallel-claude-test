@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Center, Flex, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileIcon } from "@parallel/components/common/FileIcon";
@@ -16,7 +16,8 @@ import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isDefined, noop, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldExpiresAtIcon, SuggestionsButton } from "./ProfileFieldInputGroup";
+import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
+import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 
 interface ProfileFieldFileUploadProps extends ProfileFieldProps {
   showSuggestionsButton: boolean;
@@ -160,10 +161,12 @@ export function ProfileFieldFileUpload({
                 />
               ) : null}
               {showSuggestionsButton ? (
-                <SuggestionsButton
-                  areSuggestionsVisible={areSuggestionsVisible}
-                  onClick={onToggleSuggestions}
-                />
+                <Box paddingTop={1}>
+                  <SuggestionsButton
+                    areSuggestionsVisible={areSuggestionsVisible}
+                    onClick={onToggleSuggestions}
+                  />
+                </Box>
               ) : null}
             </HStack>
             <Dropzone

@@ -7900,6 +7900,11 @@
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
+    "term": "component.recipient-suggestion.unnamed",
+    "definition": "Unnamed",
+    "context": "Unnamed"
+  },
+  {
     "term": "component.recipient-view-comments.ask-here",
     "definition": "Ask here",
     "context": "Ask here"

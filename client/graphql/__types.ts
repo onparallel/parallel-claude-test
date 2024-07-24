@@ -7055,6 +7055,109 @@ export type PublicPetitionFieldCommentExcerpt_PetitionFieldCommentFragment = {
   excerptHtml?: string | null;
 };
 
+export type RecipientSelectGroups_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+};
+
+export type RecipientSelectGroups_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    alias?: string | null;
+    options: { [key: string]: any };
+    isLinkedToProfileType: boolean;
+    isLinkedToProfileTypeField: boolean;
+    type: PetitionFieldType;
+    title?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      alias?: string | null;
+    } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          alias?: string | null;
+          type: PetitionFieldType;
+          title?: string | null;
+          options: { [key: string]: any };
+          isLinkedToProfileTypeField: boolean;
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
 export type ShareButton_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   permissions: Array<
@@ -10271,6 +10374,14 @@ export type AddPetitionAccessDialog_SignatureConfigFragment = {
   } | null>;
 };
 
+export type AddPetitionAccessDialog_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  id: string;
+  status: PetitionAccessStatus;
+  isContactless: boolean;
+  recipientUrl?: string | null;
+};
+
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -10327,9 +10438,9 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
+    status: PetitionAccessStatus;
     isContactless: boolean;
     recipientUrl?: string | null;
-    status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -10347,15 +10458,21 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
+    alias?: string | null;
+    options: { [key: string]: any };
+    isLinkedToProfileType: boolean;
+    isLinkedToProfileTypeField: boolean;
     type: PetitionFieldType;
     title?: string | null;
-    options: { [key: string]: any };
-    alias?: string | null;
     isInternal: boolean;
     isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
-    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      alias?: string | null;
+    } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -10366,9 +10483,11 @@ export type AddPetitionAccessDialog_PetitionFragment = {
         field: {
           __typename?: "PetitionField";
           id: string;
-          type: PetitionFieldType;
           alias?: string | null;
+          type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
+          isLinkedToProfileTypeField: boolean;
           optional: boolean;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
@@ -10384,6 +10503,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -10443,6 +10563,205 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type AddPetitionAccessDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type AddPetitionAccessDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        emailSubject?: string | null;
+        emailBody?: any | null;
+        isInteractionWithRecipientsEnabled: boolean;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+        effectivePermissions: Array<{
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+          user: { __typename?: "User"; id: string };
+        }>;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          timezone: string;
+          review: boolean;
+          title?: string | null;
+          allowAdditionalSigners: boolean;
+          minSigners: number;
+          signingMode: SignatureConfigSigningMode;
+          instructions?: string | null;
+          integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            email: string;
+            fullName: string;
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+            isPreset: boolean;
+          } | null>;
+        } | null;
+        remindersConfig?: {
+          __typename?: "RemindersConfig";
+          offset: number;
+          limit: number;
+          time: string;
+          timezone: string;
+          weekdaysOnly: boolean;
+        } | null;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          petitionsPeriod?: {
+            __typename?: "OrganizationUsageLimit";
+            id: string;
+            limit: number;
+            used: number;
+          } | null;
+        };
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl?: string | null;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+          } | null;
+        }>;
+        defaultOnBehalf?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          alias?: string | null;
+          options: { [key: string]: any };
+          isLinkedToProfileType: boolean;
+          isLinkedToProfileTypeField: boolean;
+          type: PetitionFieldType;
+          title?: string | null;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                alias?: string | null;
+                type: PetitionFieldType;
+                title?: string | null;
+                options: { [key: string]: any };
+                isLinkedToProfileTypeField: boolean;
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+          }> | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+        }>;
+        signatureRequests: Array<{
+          __typename?: "PetitionSignatureRequest";
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              email: string;
+              firstName: string;
+              lastName?: string | null;
+              isPreset: boolean;
+            } | null>;
+          };
+        }>;
+        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
+      }
+    | { __typename?: "PetitionTemplate" }
+    | null;
 };
 
 export type AddPetitionAccessDialog_createContactlessPetitionAccessMutationVariables = Exact<{
@@ -10511,9 +10830,9 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
       accesses: Array<{
         __typename?: "PetitionAccess";
         id: string;
+        status: PetitionAccessStatus;
         isContactless: boolean;
         recipientUrl?: string | null;
-        status: PetitionAccessStatus;
         contact?: {
           __typename?: "Contact";
           id: string;
@@ -10531,17 +10850,20 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
       fields: Array<{
         __typename?: "PetitionField";
         id: string;
+        alias?: string | null;
+        options: { [key: string]: any };
+        isLinkedToProfileType: boolean;
+        isLinkedToProfileTypeField: boolean;
         type: PetitionFieldType;
         title?: string | null;
-        options: { [key: string]: any };
-        alias?: string | null;
         isInternal: boolean;
         isReadOnly: boolean;
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
-        profileType?: {
-          __typename?: "ProfileType";
-          profileNamePatternFields: Array<string>;
+        profileTypeField?: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          alias?: string | null;
         } | null;
         replies: Array<{
           __typename?: "PetitionFieldReply";
@@ -10553,9 +10875,11 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
             field: {
               __typename?: "PetitionField";
               id: string;
-              type: PetitionFieldType;
               alias?: string | null;
+              type: PetitionFieldType;
+              title?: string | null;
               options: { [key: string]: any };
+              isLinkedToProfileTypeField: boolean;
               optional: boolean;
               profileTypeField?: {
                 __typename?: "ProfileTypeField";
@@ -10571,6 +10895,10 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
             }>;
           }> | null;
         }>;
+        profileType?: {
+          __typename?: "ProfileType";
+          profileNamePatternFields: Array<string>;
+        } | null;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -11510,6 +11838,13 @@ export type MoreLiquidReferencesButton_PetitionFieldFragment = {
     alias?: string | null;
     options: { [key: string]: any };
   }> | null;
+};
+
+export type RecipientSuggestion_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
 };
 
 export type SelectedSignerRow_PetitionSignerFragment = {
@@ -13238,180 +13573,21 @@ export type useSendPetitionHandler_UserFragment = {
 export type useSendPetitionHandler_PetitionFragment = {
   __typename?: "Petition";
   id: string;
-  emailSubject?: string | null;
-  emailBody?: any | null;
-  isInteractionWithRecipientsEnabled: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
-    isContactless: boolean;
-    recipientUrl?: string | null;
     status: PetitionAccessStatus;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string } | null;
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    timezone: string;
-    review: boolean;
-    title?: string | null;
-    allowAdditionalSigners: boolean;
-    minSigners: number;
-    signingMode: SignatureConfigSigningMode;
-    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
       environment: SignatureOrgIntegrationEnvironment;
       name: string;
     } | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      email: string;
-      fullName: string;
-      contactId?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      isPreset: boolean;
-    } | null>;
   } | null;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
-  effectivePermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-  remindersConfig?: {
-    __typename?: "RemindersConfig";
-    offset: number;
-    limit: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  } | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    petitionsPeriod?: {
-      __typename?: "OrganizationUsageLimit";
-      id: string;
-      limit: number;
-      used: number;
-    } | null;
-  };
-  defaultOnBehalf?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    email: string;
-  } | null;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    options: { [key: string]: any };
-    alias?: string | null;
-    isInternal: boolean;
-    isReadOnly: boolean;
-    visibility?: { [key: string]: any } | null;
-    math?: Array<{ [key: string]: any }> | null;
-    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      isAnonymized: boolean;
-      children?: Array<{
-        __typename?: "PetitionFieldGroupChildReply";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          alias?: string | null;
-          options: { [key: string]: any };
-          optional: boolean;
-          profileTypeField?: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            alias?: string | null;
-          } | null;
-        };
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-        }>;
-      }> | null;
-    }>;
-    children?: Array<{
-      __typename?: "PetitionField";
-      id: string;
-      type: PetitionFieldType;
-      options: { [key: string]: any };
-      visibility?: { [key: string]: any } | null;
-      math?: Array<{ [key: string]: any }> | null;
-      parent?: { __typename?: "PetitionField"; id: string } | null;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-      }>;
-      previewReplies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-      }>;
-    }> | null;
-    previewReplies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      isAnonymized: boolean;
-      children?: Array<{
-        __typename?: "PetitionFieldGroupChildReply";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          optional: boolean;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        };
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-        }>;
-      }> | null;
-    }>;
-  }>;
-  signatureRequests: Array<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        contactId?: string | null;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      } | null>;
-    };
-  }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
-  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useSendPetitionHandler_sendPetitionMutationVariables = Exact<{
@@ -22996,10 +23172,10 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               __typename?: "PetitionFieldGroupChildReply";
               field: {
                 __typename?: "PetitionField";
+                id: string;
                 type: PetitionFieldType;
                 options: { [key: string]: any };
                 optional: boolean;
-                id: string;
                 parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
@@ -31029,13 +31205,13 @@ export type PetitionActivity_PetitionFragment = {
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
-    isContactless: boolean;
-    recipientUrl?: string | null;
     remindersOptOut: boolean;
     nextReminderAt?: string | null;
     remindersLeft: number;
     reminderCount: number;
     remindersActive: boolean;
+    isContactless: boolean;
+    recipientUrl?: string | null;
     createdAt: string;
     contact?: {
       __typename?: "Contact";
@@ -31057,12 +31233,14 @@ export type PetitionActivity_PetitionFragment = {
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
+    alias?: string | null;
+    options: { [key: string]: any };
+    isLinkedToProfileType: boolean;
+    isLinkedToProfileTypeField: boolean;
     type: PetitionFieldType;
     isInternal: boolean;
     isReadOnly: boolean;
     title?: string | null;
-    options: { [key: string]: any };
-    alias?: string | null;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     children?: Array<{
@@ -31087,7 +31265,11 @@ export type PetitionActivity_PetitionFragment = {
       }>;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
     }> | null;
-    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      alias?: string | null;
+    } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -31098,9 +31280,11 @@ export type PetitionActivity_PetitionFragment = {
         field: {
           __typename?: "PetitionField";
           id: string;
-          type: PetitionFieldType;
           alias?: string | null;
+          type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
+          isLinkedToProfileTypeField: boolean;
           optional: boolean;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
@@ -31116,6 +31300,7 @@ export type PetitionActivity_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -32070,13 +32255,13 @@ export type PetitionActivity_updatePetitionMutation = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
-          isContactless: boolean;
-          recipientUrl?: string | null;
           remindersOptOut: boolean;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
+          isContactless: boolean;
+          recipientUrl?: string | null;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -32098,12 +32283,14 @@ export type PetitionActivity_updatePetitionMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          alias?: string | null;
+          options: { [key: string]: any };
+          isLinkedToProfileType: boolean;
+          isLinkedToProfileTypeField: boolean;
           type: PetitionFieldType;
           isInternal: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          options: { [key: string]: any };
-          alias?: string | null;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           children?: Array<{
@@ -32128,9 +32315,10 @@ export type PetitionActivity_updatePetitionMutation = {
             }>;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            profileNamePatternFields: Array<string>;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
           } | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -32142,9 +32330,11 @@ export type PetitionActivity_updatePetitionMutation = {
               field: {
                 __typename?: "PetitionField";
                 id: string;
-                type: PetitionFieldType;
                 alias?: string | null;
+                type: PetitionFieldType;
+                title?: string | null;
                 options: { [key: string]: any };
+                isLinkedToProfileTypeField: boolean;
                 optional: boolean;
                 profileTypeField?: {
                   __typename?: "ProfileTypeField";
@@ -32160,6 +32350,10 @@ export type PetitionActivity_updatePetitionMutation = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -33359,13 +33553,13 @@ export type PetitionActivity_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
-          isContactless: boolean;
-          recipientUrl?: string | null;
           remindersOptOut: boolean;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
+          isContactless: boolean;
+          recipientUrl?: string | null;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -33387,12 +33581,14 @@ export type PetitionActivity_petitionQuery = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          alias?: string | null;
+          options: { [key: string]: any };
+          isLinkedToProfileType: boolean;
+          isLinkedToProfileTypeField: boolean;
           type: PetitionFieldType;
           isInternal: boolean;
           isReadOnly: boolean;
           title?: string | null;
-          options: { [key: string]: any };
-          alias?: string | null;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           children?: Array<{
@@ -33417,9 +33613,10 @@ export type PetitionActivity_petitionQuery = {
             }>;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            profileNamePatternFields: Array<string>;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
           } | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -33431,9 +33628,11 @@ export type PetitionActivity_petitionQuery = {
               field: {
                 __typename?: "PetitionField";
                 id: string;
-                type: PetitionFieldType;
                 alias?: string | null;
+                type: PetitionFieldType;
+                title?: string | null;
                 options: { [key: string]: any };
+                isLinkedToProfileTypeField: boolean;
                 optional: boolean;
                 profileTypeField?: {
                   __typename?: "ProfileTypeField";
@@ -33449,6 +33648,10 @@ export type PetitionActivity_petitionQuery = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -33674,8 +33877,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
   lastChangeAt: string;
-  emailSubject?: string | null;
-  emailBody?: any | null;
   path: string;
   closedAt?: string | null;
   anonymizeAfterMonths?: number | null;
@@ -33683,9 +33884,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
-    isContactless: boolean;
-    recipientUrl?: string | null;
     status: PetitionAccessStatus;
+    isContactless: boolean;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -33696,22 +33896,12 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    timezone: string;
-    review: boolean;
     title?: string | null;
+    review: boolean;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      email: string;
-      fullName: string;
-      contactId?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      isPreset: boolean;
-    } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -33719,18 +33909,20 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       isDefault: boolean;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      isPreset: boolean;
+    } | null>;
   } | null;
   organization: {
     __typename?: "Organization";
     id: string;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
-    petitionsPeriod?: {
-      __typename?: "OrganizationUsageLimit";
-      id: string;
-      limit: number;
-      used: number;
-    } | null;
   };
   fields: Array<{
     __typename?: "PetitionField";
@@ -33740,12 +33932,12 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     title?: string | null;
     isReadOnly: boolean;
     alias?: string | null;
-    isInternal: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
     isChild: boolean;
+    isInternal: boolean;
     isLinkedToProfileTypeField: boolean;
     optional: boolean;
     showInPdf: boolean;
@@ -34001,41 +34193,20 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     leftSidePetitionField: { __typename?: "PetitionField"; id: string };
     rightSidePetitionField: { __typename?: "PetitionField"; id: string };
   }>;
-  effectivePermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-  remindersConfig?: {
-    __typename?: "RemindersConfig";
-    offset: number;
-    limit: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  } | null;
-  defaultOnBehalf?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    email: string;
-  } | null;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+  profiles: Array<{ __typename?: "Profile"; id: string }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
         __typename?: "PetitionSigner";
-        contactId?: string | null;
-        email: string;
         firstName: string;
         lastName?: string | null;
-        isPreset: boolean;
+        email: string;
       } | null>;
     };
   }>;
-  profiles: Array<{ __typename?: "Profile"; id: string }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
@@ -34075,12 +34246,12 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title?: string | null;
     isReadOnly: boolean;
     alias?: string | null;
-    isInternal: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
     isChild: boolean;
+    isInternal: boolean;
     isLinkedToProfileTypeField: boolean;
     optional: boolean;
     showInPdf: boolean;
@@ -34687,9 +34858,9 @@ export type PetitionCompose_updatePetitionMutation = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
+          status: PetitionAccessStatus;
           isContactless: boolean;
           recipientUrl?: string | null;
-          status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -34708,17 +34879,20 @@ export type PetitionCompose_updatePetitionMutation = {
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
+          alias?: string | null;
+          options: { [key: string]: any };
+          isLinkedToProfileType: boolean;
+          isLinkedToProfileTypeField: boolean;
           type: PetitionFieldType;
           title?: string | null;
-          options: { [key: string]: any };
-          alias?: string | null;
           isInternal: boolean;
           isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            profileNamePatternFields: Array<string>;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
           } | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -34730,9 +34904,11 @@ export type PetitionCompose_updatePetitionMutation = {
               field: {
                 __typename?: "PetitionField";
                 id: string;
-                type: PetitionFieldType;
                 alias?: string | null;
+                type: PetitionFieldType;
+                title?: string | null;
                 options: { [key: string]: any };
+                isLinkedToProfileTypeField: boolean;
                 optional: boolean;
                 profileTypeField?: {
                   __typename?: "ProfileTypeField";
@@ -34748,6 +34924,10 @@ export type PetitionCompose_updatePetitionMutation = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -36698,8 +36878,6 @@ export type PetitionCompose_petitionQuery = {
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
         lastChangeAt: string;
-        emailSubject?: string | null;
-        emailBody?: any | null;
         path: string;
         closedAt?: string | null;
         anonymizeAfterMonths?: number | null;
@@ -36707,9 +36885,8 @@ export type PetitionCompose_petitionQuery = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
-          isContactless: boolean;
-          recipientUrl?: string | null;
           status: PetitionAccessStatus;
+          isContactless: boolean;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -36720,22 +36897,12 @@ export type PetitionCompose_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          timezone: string;
-          review: boolean;
           title?: string | null;
+          review: boolean;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            email: string;
-            fullName: string;
-            contactId?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            isPreset: boolean;
-          } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -36743,6 +36910,14 @@ export type PetitionCompose_petitionQuery = {
             isDefault: boolean;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+            isPreset: boolean;
+          } | null>;
         } | null;
         organization: {
           __typename?: "Organization";
@@ -36753,12 +36928,6 @@ export type PetitionCompose_petitionQuery = {
             name: FeatureFlag;
             value: boolean;
           }>;
-          petitionsPeriod?: {
-            __typename?: "OrganizationUsageLimit";
-            id: string;
-            limit: number;
-            used: number;
-          } | null;
         };
         fields: Array<{
           __typename?: "PetitionField";
@@ -36768,12 +36937,12 @@ export type PetitionCompose_petitionQuery = {
           title?: string | null;
           isReadOnly: boolean;
           alias?: string | null;
-          isInternal: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
           isChild: boolean;
+          isInternal: boolean;
           isLinkedToProfileTypeField: boolean;
           optional: boolean;
           showInPdf: boolean;
@@ -37044,41 +37213,20 @@ export type PetitionCompose_petitionQuery = {
           leftSidePetitionField: { __typename?: "PetitionField"; id: string };
           rightSidePetitionField: { __typename?: "PetitionField"; id: string };
         }>;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          limit: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        } | null;
-        defaultOnBehalf?: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
               __typename?: "PetitionSigner";
-              contactId?: string | null;
-              email: string;
               firstName: string;
               lastName?: string | null;
-              isPreset: boolean;
+              email: string;
             } | null>;
           };
         }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -37125,12 +37273,12 @@ export type PetitionCompose_petitionQuery = {
           title?: string | null;
           isReadOnly: boolean;
           alias?: string | null;
-          isInternal: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
           isChild: boolean;
+          isInternal: boolean;
           isLinkedToProfileTypeField: boolean;
           optional: boolean;
           showInPdf: boolean;
@@ -38189,8 +38337,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   isAnonymized: boolean;
   status: PetitionStatus;
   name?: string | null;
-  emailSubject?: string | null;
-  emailBody?: any | null;
   path: string;
   locale: PetitionLocale;
   deadline?: string | null;
@@ -38199,9 +38345,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
-    isContactless: boolean;
-    recipientUrl?: string | null;
     status: PetitionAccessStatus;
+    isContactless: boolean;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -38231,12 +38376,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     hasDowJones: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
-    petitionsPeriod?: {
-      __typename?: "OrganizationUsageLimit";
-      id: string;
-      limit: number;
-      used: number;
-    } | null;
   };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -38597,13 +38736,12 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    timezone: string;
     review: boolean;
-    title?: string | null;
-    allowAdditionalSigners: boolean;
-    minSigners: number;
+    timezone: string;
     signingMode: SignatureConfigSigningMode;
+    minSigners: number;
     instructions?: string | null;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -38612,9 +38750,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
-      email: string;
-      fullName: string;
       contactId?: string | null;
+      email: string;
       firstName: string;
       lastName?: string | null;
       isPreset: boolean;
@@ -38622,25 +38759,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
-  effectivePermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-  remindersConfig?: {
-    __typename?: "RemindersConfig";
-    offset: number;
-    limit: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  } | null;
-  defaultOnBehalf?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    email: string;
-  } | null;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
 };
@@ -39108,8 +39226,6 @@ export type PetitionPreview_updatePetitionMutation = {
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
-        emailSubject?: string | null;
-        emailBody?: any | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -39118,9 +39234,8 @@ export type PetitionPreview_updatePetitionMutation = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
-          isContactless: boolean;
-          recipientUrl?: string | null;
           status: PetitionAccessStatus;
+          isContactless: boolean;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -39154,12 +39269,6 @@ export type PetitionPreview_updatePetitionMutation = {
             name: FeatureFlag;
             value: boolean;
           }>;
-          petitionsPeriod?: {
-            __typename?: "OrganizationUsageLimit";
-            id: string;
-            limit: number;
-            used: number;
-          } | null;
         };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -39523,13 +39632,12 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          timezone: string;
           review: boolean;
-          title?: string | null;
-          allowAdditionalSigners: boolean;
-          minSigners: number;
+          timezone: string;
           signingMode: SignatureConfigSigningMode;
+          minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -39538,9 +39646,8 @@ export type PetitionPreview_updatePetitionMutation = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
-            email: string;
-            fullName: string;
             contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
             isPreset: boolean;
@@ -39552,25 +39659,6 @@ export type PetitionPreview_updatePetitionMutation = {
           name: string;
           values: Array<string>;
         }>;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          limit: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        } | null;
-        defaultOnBehalf?: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
@@ -39992,8 +40080,6 @@ export type PetitionPreview_completePetitionMutation = {
     isAnonymized: boolean;
     status: PetitionStatus;
     name?: string | null;
-    emailSubject?: string | null;
-    emailBody?: any | null;
     path: string;
     locale: PetitionLocale;
     deadline?: string | null;
@@ -40002,9 +40088,8 @@ export type PetitionPreview_completePetitionMutation = {
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
-      isContactless: boolean;
-      recipientUrl?: string | null;
       status: PetitionAccessStatus;
+      isContactless: boolean;
       contact?: {
         __typename?: "Contact";
         id: string;
@@ -40034,12 +40119,6 @@ export type PetitionPreview_completePetitionMutation = {
       hasDowJones: boolean;
       brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
       features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
-      petitionsPeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-        used: number;
-      } | null;
     };
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
@@ -40400,13 +40479,12 @@ export type PetitionPreview_completePetitionMutation = {
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
-      timezone: string;
       review: boolean;
-      title?: string | null;
-      allowAdditionalSigners: boolean;
-      minSigners: number;
+      timezone: string;
       signingMode: SignatureConfigSigningMode;
+      minSigners: number;
       instructions?: string | null;
+      allowAdditionalSigners: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -40415,9 +40493,8 @@ export type PetitionPreview_completePetitionMutation = {
       } | null;
       signers: Array<{
         __typename?: "PetitionSigner";
-        email: string;
-        fullName: string;
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
         isPreset: boolean;
@@ -40425,25 +40502,6 @@ export type PetitionPreview_completePetitionMutation = {
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
-    effectivePermissions: Array<{
-      __typename?: "EffectivePetitionUserPermission";
-      isSubscribed: boolean;
-      user: { __typename?: "User"; id: string };
-    }>;
-    remindersConfig?: {
-      __typename?: "RemindersConfig";
-      offset: number;
-      limit: number;
-      time: string;
-      timezone: string;
-      weekdaysOnly: boolean;
-    } | null;
-    defaultOnBehalf?: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
     tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
     profiles: Array<{ __typename?: "Profile"; id: string }>;
   };
@@ -40464,8 +40522,6 @@ export type PetitionPreview_petitionQuery = {
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
-        emailSubject?: string | null;
-        emailBody?: any | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -40474,9 +40530,8 @@ export type PetitionPreview_petitionQuery = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
-          isContactless: boolean;
-          recipientUrl?: string | null;
           status: PetitionAccessStatus;
+          isContactless: boolean;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -40510,12 +40565,6 @@ export type PetitionPreview_petitionQuery = {
             name: FeatureFlag;
             value: boolean;
           }>;
-          petitionsPeriod?: {
-            __typename?: "OrganizationUsageLimit";
-            id: string;
-            limit: number;
-            used: number;
-          } | null;
         };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -40879,13 +40928,12 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          timezone: string;
           review: boolean;
-          title?: string | null;
-          allowAdditionalSigners: boolean;
-          minSigners: number;
+          timezone: string;
           signingMode: SignatureConfigSigningMode;
+          minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -40894,9 +40942,8 @@ export type PetitionPreview_petitionQuery = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
-            email: string;
-            fullName: string;
             contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
             isPreset: boolean;
@@ -40908,25 +40955,6 @@ export type PetitionPreview_petitionQuery = {
           name: string;
           values: Array<string>;
         }>;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          limit: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        } | null;
-        defaultOnBehalf?: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
@@ -49484,6 +49512,23 @@ export type useUnarchiveProfileType_unarchiveProfileTypeMutation = {
   unarchiveProfileType: Array<{ __typename?: "ProfileType"; id: string }>;
 };
 
+export type useUpdateContact_updateContactMutationVariables = Exact<{
+  id: Scalars["GID"]["input"];
+  data: UpdateContactInput;
+}>;
+
+export type useUpdateContact_updateContactMutation = {
+  updateContact: {
+    __typename?: "Contact";
+    id: string;
+    email: string;
+    firstName: string;
+    lastName?: string | null;
+    fullName: string;
+    hasBouncedEmail: boolean;
+  };
+};
+
 export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
   id: string;
@@ -55128,6 +55173,14 @@ export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_SignatureConfigFragment, unknown>;
+export const AddPetitionAccessDialog_PetitionAccessFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_PetitionAccess on PetitionAccess {
+    id
+    status
+    isContactless
+    recipientUrl
+  }
+` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionAccessFragment, unknown>;
 export const AddPetitionAccessDialog_DelegateUserFragmentDoc = gql`
   fragment AddPetitionAccessDialog_DelegateUser on User {
     id
@@ -55142,6 +55195,65 @@ export const MessageEmailSubjectFormControl_PetitionBaseFragmentDoc = gql`
   }
   ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<MessageEmailSubjectFormControl_PetitionBaseFragment, unknown>;
+export const RecipientSuggestion_PetitionFieldFragmentDoc = gql`
+  fragment RecipientSuggestion_PetitionField on PetitionField {
+    id
+    title
+    type
+  }
+` as unknown as DocumentNode<RecipientSuggestion_PetitionFieldFragment, unknown>;
+export const RecipientSelectGroups_PetitionFieldFragmentDoc = gql`
+  fragment RecipientSelectGroups_PetitionField on PetitionField {
+    id
+    ...RecipientSuggestion_PetitionField
+  }
+  ${RecipientSuggestion_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<RecipientSelectGroups_PetitionFieldFragment, unknown>;
+export const RecipientSelectGroups_PetitionFragmentDoc = gql`
+  fragment RecipientSelectGroups_Petition on Petition {
+    id
+    fields {
+      ...RecipientSelectGroups_PetitionField
+      id
+      alias
+      options
+      isLinkedToProfileType
+      isLinkedToProfileType
+      isLinkedToProfileTypeField
+      profileTypeField {
+        id
+        alias
+      }
+      replies {
+        id
+        content
+        children {
+          field {
+            id
+            alias
+            type
+            title
+            options
+            isLinkedToProfileTypeField
+            profileTypeField {
+              id
+              alias
+            }
+          }
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+    ...useFieldsWithIndices_PetitionBase
+    ...useFieldLogic_PetitionBase
+  }
+  ${RecipientSelectGroups_PetitionFieldFragmentDoc}
+  ${useFieldsWithIndices_PetitionBaseFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<RecipientSelectGroups_PetitionFragment, unknown>;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   fragment AddPetitionAccessDialog_Petition on Petition {
     id
@@ -55174,27 +55286,29 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
     accesses {
-      id
-      isContactless
-      recipientUrl
+      ...AddPetitionAccessDialog_PetitionAccess
     }
     defaultOnBehalf {
       ...AddPetitionAccessDialog_DelegateUser
     }
     ...MessageEmailSubjectFormControl_PetitionBase
+    ...RecipientSelectGroups_Petition
   }
   ${ConfirmPetitionSignersDialog_PetitionFragmentDoc}
   ${AddPetitionAccessDialog_SignatureConfigFragmentDoc}
   ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
+  ${AddPetitionAccessDialog_PetitionAccessFragmentDoc}
   ${AddPetitionAccessDialog_DelegateUserFragmentDoc}
   ${MessageEmailSubjectFormControl_PetitionBaseFragmentDoc}
+  ${RecipientSelectGroups_PetitionFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
 export const useSendPetitionHandler_PetitionFragmentDoc = gql`
   fragment useSendPetitionHandler_Petition on Petition {
     id
     accesses {
       id
+      status
       contact {
         id
       }
@@ -55206,9 +55320,7 @@ export const useSendPetitionHandler_PetitionFragmentDoc = gql`
         name
       }
     }
-    ...AddPetitionAccessDialog_Petition
   }
-  ${AddPetitionAccessDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<useSendPetitionHandler_PetitionFragment, unknown>;
 export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
   fragment validatePetitionFields_PetitionField on PetitionField {
@@ -61082,6 +61194,17 @@ export const useProfileTypeFieldPermissionDialog_userGroupsDocument = gql`
   useProfileTypeFieldPermissionDialog_userGroupsQuery,
   useProfileTypeFieldPermissionDialog_userGroupsQueryVariables
 >;
+export const AddPetitionAccessDialog_petitionDocument = gql`
+  query AddPetitionAccessDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...AddPetitionAccessDialog_Petition
+    }
+  }
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  AddPetitionAccessDialog_petitionQuery,
+  AddPetitionAccessDialog_petitionQueryVariables
+>;
 export const AddPetitionAccessDialog_createContactlessPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createContactlessPetitionAccess(
     $petitionId: GID!
@@ -66468,6 +66591,21 @@ export const useUnarchiveProfileType_unarchiveProfileTypeDocument = gql`
 ` as unknown as DocumentNode<
   useUnarchiveProfileType_unarchiveProfileTypeMutation,
   useUnarchiveProfileType_unarchiveProfileTypeMutationVariables
+>;
+export const useUpdateContact_updateContactDocument = gql`
+  mutation useUpdateContact_updateContact($id: GID!, $data: UpdateContactInput!) {
+    updateContact(id: $id, data: $data) {
+      id
+      email
+      firstName
+      lastName
+      fullName
+      hasBouncedEmail
+    }
+  }
+` as unknown as DocumentNode<
+  useUpdateContact_updateContactMutation,
+  useUpdateContact_updateContactMutationVariables
 >;
 export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument = gql`
   mutation useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus(
