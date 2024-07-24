@@ -77,6 +77,7 @@ interface SignatureConfigFormData {
   minSigners: number;
   instructions: Maybe<string>;
   showInstructions: boolean;
+  useCustomDocument: boolean;
 }
 
 export const MAX_SIGNERS_ALLOWED = 40;
@@ -113,6 +114,7 @@ export function SignatureConfigDialog({
       minSigners: signatureConfig?.minSigners ?? 1,
       instructions: signatureConfig?.instructions ?? null,
       showInstructions: isDefined(signatureConfig?.instructions),
+      useCustomDocument: signatureConfig?.useCustomDocument ?? false,
     },
   });
 
@@ -160,7 +162,7 @@ export function SignatureConfigDialog({
         title: data.title || null,
         orgIntegrationId: data.integration.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        review: data.review,
+        review: data.useCustomDocument ? true : data.review,
         allowAdditionalSigners: data.allowAdditionalSigners,
         signingMode: data.signingMode,
         minSigners: data.minSigners,
@@ -169,6 +171,7 @@ export function SignatureConfigDialog({
           ? [...otherSigners, ...data.presetSigners.map((s) => ({ ...s, isPreset: true }))]
           : otherSigners
         ).map((s) => pick(s, ["firstName", "lastName", "email", "contactId", "isPreset"])),
+        useCustomDocument: data.useCustomDocument,
       });
     }
   }
@@ -249,7 +252,9 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
   ref,
 ) {
   const intl = useIntl();
-  const { register, control } = useFormContext<SignatureConfigFormData>();
+  const { register, control, watch } = useFormContext<SignatureConfigFormData>();
+
+  const useCustomDocument = watch("useCustomDocument");
 
   const signatureIntegrationReactProps = useReactSelectProps<
     SignatureConfigDialog_SignatureOrgIntegrationFragment,
@@ -289,7 +294,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
         <Text>
           <FormattedMessage
             id="component.signature-config-dialog.header-subtitle"
-            defaultMessage="Sign a PDF document with all the replies using one of our integrated eSignature providers."
+            defaultMessage="Sign a PDF document using one of our integrated eSignature providers."
           />
         </Text>
         <Flex>
@@ -332,6 +337,45 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
         />
       </FormControl>
       <FormControl>
+        <FormLabel>
+          <FormattedMessage
+            id="component.signature-config-dialog.document-to-sign-label"
+            defaultMessage="Which document do you want to sign?"
+          />
+        </FormLabel>
+        <Controller
+          name="useCustomDocument"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup
+              as={Stack}
+              spacing={2}
+              onChange={(value) => onChange(value === "CUSTOM")}
+              value={value ? "CUSTOM" : "REPLIES"}
+            >
+              <Radio backgroundColor="white" value="REPLIES">
+                <FormattedMessage
+                  id="component.signature-config-dialog.replies-document-label"
+                  defaultMessage="Document generated on the basis of the replies"
+                />
+              </Radio>
+              <Radio backgroundColor="white" value="CUSTOM">
+                <FormattedMessage
+                  id="component.signature-config-dialog.custom-document-label"
+                  defaultMessage="I will upload a document when launching the signature"
+                />
+                <HelpPopover>
+                  <FormattedMessage
+                    id="component.signature-config-dialog.custom-document-label-help"
+                    defaultMessage="The document will not be filled in automatically and cannot be edited. We will only add a signature page at the end of the document."
+                  />
+                </HelpPopover>
+              </Radio>
+            </RadioGroup>
+          )}
+        />
+      </FormControl>
+      <FormControl>
         <FormLabel display="flex" alignItems="center">
           <FormattedMessage
             id="component.signature-config-dialog.title-label"
@@ -356,6 +400,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
           })}
         />
       </FormControl>
+
       <FormControl isDisabled={petitionIsCompleted || !petition.isReviewFlowEnabled}>
         <FormLabel>
           <FormattedMessage
@@ -370,13 +415,15 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
             <>
               <Select
                 {...reactSelectProps}
-                value={reviewBeforeSendOptions[review ? 1 : 0]}
+                value={reviewBeforeSendOptions[review || useCustomDocument ? 1 : 0]}
                 options={reviewBeforeSendOptions}
                 onChange={(v: any) => onChange(v.value === "YES")}
-                isDisabled={petitionIsCompleted || !petition.isReviewFlowEnabled}
+                isDisabled={
+                  useCustomDocument || petitionIsCompleted || !petition.isReviewFlowEnabled
+                }
               />
               <Text marginTop={2} color="gray.500" fontSize="sm">
-                {review ? (
+                {review || useCustomDocument ? (
                   <FormattedMessage
                     id="component.signature-config-dialog.review-before-send-option-yes-explainer"
                     defaultMessage="After reviewing the information you will have to start the signature manually."
@@ -721,6 +768,7 @@ SignatureConfigDialog.fragments = {
         signingMode
         minSigners
         instructions
+        useCustomDocument
       }
       ${this.SignatureOrgIntegration}
     `;

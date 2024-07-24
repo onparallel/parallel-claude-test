@@ -31,6 +31,7 @@ import {
   replyBelongsToAccess,
   replyBelongsToExternalField,
 } from "../authorizers";
+import { toBytes } from "../../../util/fileSize";
 
 export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetitionFieldReplies", {
   description: "Creates replies on a petition field as recipient.",
@@ -252,7 +253,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   validateArgs: validateAnd(
-    validFileUploadInput((args) => args.data, { maxSizeBytes: 300 * 1024 * 1024 }, "data"),
+    validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(300, "MB") }, "data"),
     validateCreateFileReplyInput(
       (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
       "fieldId",

@@ -1,7 +1,7 @@
 import { core } from "nexus";
 import { unMaybeArray } from "../../../util/arrays";
 import { MaybeArray } from "../../../util/types";
-import { ArgValidationError, MaxFileSizeExceededError } from "../errors";
+import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validFileUploadInput<TypeName extends string, FieldName extends string>(
@@ -17,7 +17,7 @@ export function validFileUploadInput<TypeName extends string, FieldName extends 
     const files = unMaybeArray(prop(args));
     for (const file of files) {
       if (opts.maxSizeBytes && file.size > opts.maxSizeBytes) {
-        throw new MaxFileSizeExceededError(
+        throw new ArgValidationError(
           info,
           argName,
           `File size exceeds the max file size allowed of ${opts.maxSizeBytes} bytes`,

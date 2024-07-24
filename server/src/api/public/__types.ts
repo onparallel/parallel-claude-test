@@ -843,6 +843,7 @@ export type Mutation = {
   createContact: Contact;
   /** Creates a contactless petition access */
   createContactlessPetitionAccess: PetitionAccess;
+  createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /**
@@ -1400,6 +1401,11 @@ export type MutationcreateContactArgs = {
 export type MutationcreateContactlessPetitionAccessArgs = {
   petitionId: Scalars["GID"]["input"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
+};
+
+export type MutationcreateCustomSignatureDocumentUploadLinkArgs = {
+  file: FileUploadInput;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {
@@ -2181,6 +2187,7 @@ export type MutationstartAsyncFieldCompletionArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
+  customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
@@ -5396,6 +5403,7 @@ export type SignatureConfig = {
   timezone: Scalars["String"]["output"];
   /** Title of the signature document */
   title: Maybe<Scalars["String"]["output"]>;
+  useCustomDocument: Scalars["Boolean"]["output"];
 };
 
 /** The signature settings for the petition */
@@ -5416,6 +5424,8 @@ export type SignatureConfigInput = {
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
   title?: InputMaybe<Scalars["String"]["input"]>;
+  /** if true, use custom document for signature instead of petition binder */
+  useCustomDocument?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 /** The signer that need to sign the generated document. */
@@ -8486,9 +8496,19 @@ export type GetSignatures_petitionSignaturesQuery = {
     | null;
 };
 
+export type StartSignature_createCustomSignatureDocumentUploadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  file: FileUploadInput;
+}>;
+
+export type StartSignature_createCustomSignatureDocumentUploadLinkMutation = {
+  createCustomSignatureDocumentUploadLink: { [key: string]: any };
+};
+
 export type StartSignature_startSignatureRequestMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   message?: InputMaybe<Scalars["String"]["input"]>;
+  customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type StartSignature_startSignatureRequestMutation = {
@@ -11845,9 +11865,28 @@ export const GetSignatures_petitionSignaturesDocument = gql`
   GetSignatures_petitionSignaturesQuery,
   GetSignatures_petitionSignaturesQueryVariables
 >;
+export const StartSignature_createCustomSignatureDocumentUploadLinkDocument = gql`
+  mutation StartSignature_createCustomSignatureDocumentUploadLink(
+    $petitionId: GID!
+    $file: FileUploadInput!
+  ) {
+    createCustomSignatureDocumentUploadLink(petitionId: $petitionId, file: $file)
+  }
+` as unknown as DocumentNode<
+  StartSignature_createCustomSignatureDocumentUploadLinkMutation,
+  StartSignature_createCustomSignatureDocumentUploadLinkMutationVariables
+>;
 export const StartSignature_startSignatureRequestDocument = gql`
-  mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
-    startSignatureRequest(petitionId: $petitionId, message: $message) {
+  mutation StartSignature_startSignatureRequest(
+    $petitionId: GID!
+    $message: String
+    $customDocumentTemporaryFileId: GID
+  ) {
+    startSignatureRequest(
+      petitionId: $petitionId
+      message: $message
+      customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+    ) {
       ...PetitionSignatureRequest
     }
   }

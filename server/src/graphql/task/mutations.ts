@@ -41,6 +41,7 @@ import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
+import { toBytes } from "../../util/fileSize";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
@@ -316,7 +317,7 @@ export const uploadBulkPetitionSendTaskInputFile = mutationField(
     },
     validateArgs: validFileUploadInput(
       (args) => args.file,
-      { contentType: "text/csv", maxSizeBytes: 1024 * 1024 * 10 },
+      { contentType: "text/csv", maxSizeBytes: toBytes(10, "MB") },
       "file",
     ),
     resolve: async (_, args, ctx) => {

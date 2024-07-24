@@ -46,7 +46,14 @@ async function startSignatureProcess(
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
-  const { title, orgIntegrationId, signersInfo, message, signingMode } = signature.signature_config;
+  const {
+    title,
+    orgIntegrationId,
+    signersInfo,
+    message,
+    signingMode,
+    customDocumentTemporaryFileId,
+  } = signature.signature_config;
 
   let documentTmpPath: string | null = null;
   const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
@@ -67,6 +74,7 @@ async function startSignatureProcess(
       maxOutputSize: 10 * 1024 * 1024, // signaturit has a 15MB limit for emails
       outputFileName,
       includeAnnexedDocuments: true,
+      customDocumentTemporaryFileId,
     });
 
     const documentTmpFile = await storeTemporaryDocument(documentTmpPath, outputFileName, ctx);

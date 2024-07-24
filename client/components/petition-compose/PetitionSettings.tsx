@@ -835,7 +835,9 @@ function _PetitionSettings({
           {petition.signatureConfig || hasSignature ? (
             <SettingsRowButton
               data-section="esignature-settings"
-              isDisabled={!hasSignature || settingIsDisabled}
+              isDisabled={
+                !hasSignature || settingIsDisabled || ongoingSignatureRequest?.status === "ENQUEUED"
+              }
               icon={<SignatureIcon />}
               label={
                 <HStack>

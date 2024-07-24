@@ -2787,7 +2787,9 @@ describe("GraphQL/Petition Field Replies", () => {
           },
         },
       );
-      expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
+      });
       expect(data).toBeNull();
     });
 

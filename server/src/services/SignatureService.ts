@@ -1,6 +1,6 @@
 import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { countBy, omit } from "remeda";
+import { countBy, isDefined, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   PetitionAccess,
@@ -8,6 +8,7 @@ import {
   PetitionSignatureRequest,
   User,
 } from "../db/__types";
+import { FileRepository } from "../db/repositories/FileRepository";
 import {
   IntegrationProvider,
   IntegrationRepository,
@@ -18,12 +19,13 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
+import { ISignatureClient, SIGNATURE_CLIENT } from "../integrations/signature/SigantureClient";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
-import { ISignatureClient, SIGNATURE_CLIENT } from "../integrations/signature/SigantureClient";
+import { IStorageService, STORAGE_SERVICE } from "./StorageService";
 
 interface UpdateBrandingOpts {
   integrationId?: number;
@@ -75,6 +77,8 @@ export class SignatureService implements ISignatureService {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(Container) private container: Container,
+    @inject(FileRepository) private files: FileRepository,
+    @inject(STORAGE_SERVICE) private storage: IStorageService,
   ) {}
 
   public getClient<TClient extends ISignatureClient>(integration: {
@@ -98,7 +102,7 @@ export class SignatureService implements ISignatureService {
 
     const [updatedPetition] = await this.petitions.updatePetition(
       petitionId,
-      { signature_config: signatureConfig },
+      { signature_config: omit(signatureConfig, ["customDocumentTemporaryFileId"]) },
       updatedBy,
     );
 
@@ -275,22 +279,20 @@ export class SignatureService implements ISignatureService {
     signatureConfig: PetitionSignatureConfig,
   ) {
     if (signatureConfig.orgIntegrationId === undefined) {
-      throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
+      throw new Error(`undefined orgIntegrationId on signature_config`);
     }
     const petition = await this.petitions.loadPetition(petitionId);
     if (!petition) {
-      throw new Error(`Petition:${petitionId} not found`);
+      throw new Error(`Petition not found`);
     }
 
     const integration = await this.integrations.loadIntegration(signatureConfig.orgIntegrationId);
     if (!integration || integration.type !== "SIGNATURE") {
-      throw new Error(
-        `Couldn't find an enabled signature integration for OrgIntegration:${signatureConfig.orgIntegrationId}`,
-      );
+      throw new Error(`Couldn't find an enabled signature integration`);
     }
 
     if (petition.org_id !== integration.org_id) {
-      throw new Error(`Invalid OrgIntegration:${integration.id} on Petition:${petitionId}`);
+      throw new Error(`Invalid integration`);
     }
 
     const allSigners = [
@@ -314,6 +316,30 @@ export class SignatureService implements ISignatureService {
       ) {
         throw new Error(
           "DEVELOPMENT: Every recipient email must be whitelisted in .development.env",
+        );
+      }
+    }
+
+    if (
+      signatureConfig.useCustomDocument &&
+      !isDefined(signatureConfig.customDocumentTemporaryFileId)
+    ) {
+      throw new Error("Custom document for signature not provided");
+    }
+
+    if (isDefined(signatureConfig.customDocumentTemporaryFileId)) {
+      const file = await this.files.loadTemporaryFile(
+        signatureConfig.customDocumentTemporaryFileId,
+      );
+
+      if (!file) {
+        throw new Error("Temporary file not found for custom signature document");
+      }
+      try {
+        await this.storage.temporaryFiles.getFileMetadata(file.path);
+      } catch {
+        throw new Error(
+          "Some error happened when trying to fetch custom document metadata from S3",
         );
       }
     }

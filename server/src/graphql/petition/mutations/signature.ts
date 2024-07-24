@@ -1,29 +1,72 @@
 import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { authenticateAnd } from "../../helpers/authorize";
-import { ApolloError } from "../../helpers/errors";
-import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { isDefined } from "remeda";
+import { toGlobalId } from "../../../util/globalId";
+import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
+import { authenticateAnd } from "../../helpers/authorize";
+import { ApolloError, ForbiddenError } from "../../helpers/errors";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
+import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
+  petitionCanUploadCustomSignatureDocument,
   petitionIsNotAnonymized,
+  petitionsAreOfTypePetition,
   signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
 } from "../authorizers";
+import { toBytes } from "../../../util/fileSize";
 
 export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     message: nullable(stringArg()),
+    customDocumentTemporaryFileId: globalIdArg("FileUpload"),
   },
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
+    async (root, args, ctx) => {
+      const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+
+      if (!petition.signature_config) {
+        throw new ApolloError(
+          `Petition:${petition.id} was expected to have signature_config set`,
+          "MISSING_SIGNATURE_CONFIG_ERROR",
+        );
+      }
+
+      if (
+        petition.signature_config.useCustomDocument &&
+        !isDefined(args.customDocumentTemporaryFileId)
+      ) {
+        throw new ApolloError(
+          `Petition:${petition.id} requires a custom document to be uploaded`,
+          "MISSING_CUSTOM_SIGNATURE_DOCUMENT_ERROR",
+        );
+      }
+
+      if (isDefined(args.customDocumentTemporaryFileId)) {
+        try {
+          const tmpFile = await ctx.files.loadTemporaryFile(args.customDocumentTemporaryFileId);
+          if (!isDefined(tmpFile)) {
+            throw new Error();
+          }
+          await ctx.storage.temporaryFiles.getFileMetadata(tmpFile.path);
+        } catch {
+          throw new ForbiddenError("Temporary file not found");
+        }
+      }
+
+      return true;
+    },
   ),
-  resolve: async (_, { petitionId, message }, ctx) => {
+
+  resolve: async (_, { petitionId, message, customDocumentTemporaryFileId }, ctx) => {
     try {
       const petition = (await ctx.petitions.loadPetition(petitionId))!;
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
@@ -34,16 +77,13 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         `User:${ctx.user!.id}`,
       );
 
-      if (!petition.signature_config) {
-        throw new ApolloError(
-          `Petition:${petition.id} was expected to have signature_config set`,
-          "MISSING_SIGNATURE_CONFIG_ERROR",
-        );
-      }
-
       const { signatureRequest } = await ctx.signature.createSignatureRequest(
         petition.id,
-        { ...petition.signature_config, message: message ?? undefined },
+        {
+          ...petition.signature_config!,
+          message: message ?? undefined,
+          customDocumentTemporaryFileId: customDocumentTemporaryFileId ?? undefined,
+        },
         ctx.user!,
       );
 
@@ -82,6 +122,10 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
 
     if (!signature) {
       throw new Error(`Petition signature request with id ${petitionSignatureRequestId} not found`);
+    }
+
+    if (signature.status === "ENQUEUED") {
+      throw new Error("Can't cancel a signature request that is still enqueued");
     }
 
     // if, for any reason, signature was already cancelled or completed, just return it
@@ -221,3 +265,47 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
     return RESULT.SUCCESS;
   },
 });
+
+export const createCustomSignatureDocumentUploadLink = mutationField(
+  "createCustomSignatureDocumentUploadLink",
+  {
+    type: "JSONObject",
+    authorize: authenticateAnd(
+      userHasEnabledIntegration("SIGNATURE"),
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionCanUploadCustomSignatureDocument("petitionId"),
+      petitionsAreOfTypePetition("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      file: nonNull("FileUploadInput"),
+    },
+    validateArgs: validFileUploadInput(
+      (args) => args.file,
+      { contentType: "application/pdf", maxSizeBytes: toBytes(10, "MB") },
+      "file",
+    ),
+    resolve: async (_, args, ctx) => {
+      const { filename, size, contentType } = args.file;
+      const key = random(16);
+      const temporaryFile = await ctx.files.createTemporaryFile(
+        {
+          path: key,
+          filename,
+          size: size.toString(),
+          content_type: contentType,
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      const presignedPostData = await ctx.storage.temporaryFiles.getSignedUploadEndpoint(
+        key,
+        contentType,
+        size,
+      );
+
+      return { temporaryFileId: toGlobalId("FileUpload", temporaryFile.id), presignedPostData };
+    },
+  },
+);

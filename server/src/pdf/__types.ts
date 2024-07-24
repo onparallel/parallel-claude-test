@@ -843,6 +843,7 @@ export type Mutation = {
   createContact: Contact;
   /** Creates a contactless petition access */
   createContactlessPetitionAccess: PetitionAccess;
+  createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /**
@@ -1400,6 +1401,11 @@ export type MutationcreateContactArgs = {
 export type MutationcreateContactlessPetitionAccessArgs = {
   petitionId: Scalars["GID"]["input"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
+};
+
+export type MutationcreateCustomSignatureDocumentUploadLinkArgs = {
+  file: FileUploadInput;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {
@@ -2181,6 +2187,7 @@ export type MutationstartAsyncFieldCompletionArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
+  customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
@@ -5396,6 +5403,7 @@ export type SignatureConfig = {
   timezone: Scalars["String"]["output"];
   /** Title of the signature document */
   title: Maybe<Scalars["String"]["output"]>;
+  useCustomDocument: Scalars["Boolean"]["output"];
 };
 
 /** The signature settings for the petition */
@@ -5416,6 +5424,8 @@ export type SignatureConfigInput = {
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
   title?: InputMaybe<Scalars["String"]["input"]>;
+  /** if true, use custom document for signature instead of petition binder */
+  useCustomDocument?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 /** The signer that need to sign the generated document. */
@@ -6633,6 +6643,44 @@ export type PetitionExport_petitionQuery = {
     | null;
 };
 
+export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
+  __typename: "Petition";
+  fromTemplate: { id: string } | null;
+  signatureConfig: {
+    timezone: string;
+    signers: Array<{ fullName: string; email: string } | null>;
+  } | null;
+  selectedDocumentTheme: { data: { [key: string]: any } };
+};
+
+export type SignatureBoxesPage_PetitionBase_PetitionTemplate_Fragment = {
+  __typename: "PetitionTemplate";
+  selectedDocumentTheme: { data: { [key: string]: any } };
+};
+
+export type SignatureBoxesPage_PetitionBaseFragment =
+  | SignatureBoxesPage_PetitionBase_Petition_Fragment
+  | SignatureBoxesPage_PetitionBase_PetitionTemplate_Fragment;
+
+export type SignatureBoxesPage_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type SignatureBoxesPage_petitionQuery = {
+  petition:
+    | {
+        __typename: "Petition";
+        fromTemplate: { id: string } | null;
+        signatureConfig: {
+          timezone: string;
+          signers: Array<{ fullName: string; email: string } | null>;
+        } | null;
+        selectedDocumentTheme: { data: { [key: string]: any } };
+      }
+    | { __typename: "PetitionTemplate"; selectedDocumentTheme: { data: { [key: string]: any } } }
+    | null;
+};
+
 export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
   id: string;
   fields: Array<{
@@ -6881,6 +6929,23 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
   ${SignaturesBlock_SignatureConfigFragmentDoc}
   ${LiquidScopeProvider_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
+export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
+  fragment SignatureBoxesPage_PetitionBase on PetitionBase {
+    selectedDocumentTheme {
+      data
+    }
+    ... on Petition {
+      fromTemplate {
+        id
+      }
+      signatureConfig {
+        ...SignaturesBlock_SignatureConfig
+      }
+    }
+    __typename
+  }
+  ${SignaturesBlock_SignatureConfigFragmentDoc}
+` as unknown as DocumentNode<SignatureBoxesPage_PetitionBaseFragment, unknown>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {
     petition(id: $petitionId) {
@@ -6889,3 +6954,14 @@ export const PetitionExport_petitionDocument = gql`
   }
   ${PetitionExport_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_petitionQuery, PetitionExport_petitionQueryVariables>;
+export const SignatureBoxesPage_petitionDocument = gql`
+  query SignatureBoxesPage_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...SignatureBoxesPage_PetitionBase
+    }
+  }
+  ${SignatureBoxesPage_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  SignatureBoxesPage_petitionQuery,
+  SignatureBoxesPage_petitionQueryVariables
+>;

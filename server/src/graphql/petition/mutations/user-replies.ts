@@ -51,6 +51,7 @@ import {
   validateCreatePetitionFieldReplyInput,
   validateUpdatePetitionFieldReplyInput,
 } from "../validations";
+import { toBytes } from "../../../util/fileSize";
 
 export const FileUploadReplyResponse = objectType({
   name: "FileUploadReplyResponse",
@@ -80,7 +81,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateAnd(
-    validFileUploadInput((args) => args.file, { maxSizeBytes: 300 * 1024 * 1024 }, "file"),
+    validFileUploadInput((args) => args.file, { maxSizeBytes: toBytes(300, "MB") }, "file"),
     validateCreateFileReplyInput(
       (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
       "fieldId",
@@ -175,7 +176,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
   ),
   validateArgs: validFileUploadInput(
     (args) => args.file,
-    { maxSizeBytes: 300 * 1024 * 1024 },
+    { maxSizeBytes: toBytes(300, "MB") },
     "file",
   ),
   resolve: async (_, args, ctx) => {

@@ -314,7 +314,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           size="md"
           placement="bottom"
           label={intl.formatMessage({
-            id: "component.recipient-view-petition-field-reply.download-label",
+            id: "generic.download-file",
             defaultMessage: "Download file",
           })}
         />

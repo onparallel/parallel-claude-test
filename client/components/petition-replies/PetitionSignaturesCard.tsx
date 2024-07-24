@@ -243,6 +243,7 @@ export const PetitionSignaturesCard = Object.assign(
                   "timezone",
                   "instructions",
                   "title",
+                  "useCustomDocument",
                 ]),
               },
             },

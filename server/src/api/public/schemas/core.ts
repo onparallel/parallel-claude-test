@@ -1794,6 +1794,11 @@ export const SignatureRequestInput = schema({
       example: "Please, sign this petition",
       maxLength: 1000,
     },
+    file: {
+      description: "The file to be signed",
+      type: "object",
+      isFile: true,
+    },
   },
 });
 

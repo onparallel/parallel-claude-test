@@ -1,27 +1,34 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
   AlertIcon,
   Button,
+  Center,
   Checkbox,
   FormControl,
   HStack,
   ListItem,
   OrderedList,
+  Progress,
   Stack,
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { SignatureIcon } from "@parallel/chakra/icons";
+import { DeleteIcon, DownloadIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import {
   ContactSelect,
   ContactSelectInstance,
   ContactSelectSelection,
 } from "@parallel/components/common/ContactSelect";
+import { Dropzone } from "@parallel/components/common/Dropzone";
+import { FileIcon } from "@parallel/components/common/FileIcon";
+import { FileName } from "@parallel/components/common/FileName";
+import { FileSize } from "@parallel/components/common/FileSize";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -30,19 +37,25 @@ import {
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
   ConfirmPetitionSignersDialog_UserFragment,
+  ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
+import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRef, useState } from "react";
+import { FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { FORMATS } from "@parallel/utils/dates";
+import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
@@ -55,6 +68,7 @@ export interface ConfirmPetitionSignersDialogResult {
   signers: SignatureConfigInputSigner[];
   message: Maybe<string>;
   allowAdditionalSigners: boolean;
+  customDocumentTemporaryFileId: Maybe<string>;
 }
 
 export type SignerSelectSelection = Omit<
@@ -63,11 +77,12 @@ export type SignerSelectSelection = Omit<
 >;
 
 const MAX_SIGNERS_ALLOWED = 40;
+const MAX_FILESIZE = 1024 * 1024 * 10;
 
 export function ConfirmPetitionSignersDialog(
   props: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>,
 ) {
-  const { minSigners, instructions, signingMode } = props.signatureConfig;
+  const { minSigners, instructions, signingMode, useCustomDocument } = props.signatureConfig;
   const [presetSigners, otherSigners] = partition(
     props.signatureConfig.signers.filter(isDefined),
     (s) => s.isPreset,
@@ -80,12 +95,9 @@ export function ConfirmPetitionSignersDialog(
     handleSubmit,
     watch,
     register,
+    setValue,
     formState: { errors, isDirty },
-  } = useForm<{
-    signers: SignerSelectSelection[];
-    message: Maybe<string>;
-    allowAdditionalSigners: boolean;
-  }>({
+  } = useForm<ConfirmPetitionSignersDialogResult>({
     mode: "onSubmit",
     defaultValues: {
       signers: otherSigners,
@@ -93,6 +105,7 @@ export function ConfirmPetitionSignersDialog(
       allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
         ? props.signatureConfig.allowAdditionalSigners
         : false,
+      customDocumentTemporaryFileId: null,
     },
   });
 
@@ -145,6 +158,72 @@ export function ConfirmPetitionSignersDialog(
   const isMaxSignersReached = allSigners.length >= MAX_SIGNERS_ALLOWED;
   const showSignersAddedByRecipient = allowAdditionalSigners && (props.isUpdate ?? false);
   const ListElement = isSequential ? OrderedList : UnorderedList;
+
+  const [createCustomSignatureDocumentUploadLink] = useMutation(
+    ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument,
+  );
+
+  const [fileDropError, setFileDropError] = useState<string | null>(null);
+  const [customDocument, setCustomDocument] = useState<Maybe<File>>(null);
+  const [uploadTime, setUploadTime] = useState<Date | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+
+  const onDownloadCustomFile = () => {
+    if (customDocument) {
+      downloadLocalFile(customDocument);
+    }
+  };
+
+  const onRemoveCustomFile = () => {
+    setCustomDocument(null);
+    setFileDropError(null);
+    setValue("customDocumentTemporaryFileId", null);
+    setUploadTime(null);
+  };
+
+  async function handleFileDrop(files: File[], rejected: FileRejection[]) {
+    if (rejected.length > 0) {
+      setFileDropError(rejected[0].errors[0].code);
+    } else if (files.length === 1) {
+      const file = files[0];
+
+      if (isDefined(file)) {
+        setFileDropError(null);
+        setCustomDocument(file);
+        const { data } = await createCustomSignatureDocumentUploadLink({
+          variables: {
+            petitionId: props.petition.id,
+            file: {
+              contentType: file.type,
+              filename: file.name,
+              size: file.size,
+            },
+          },
+        });
+
+        try {
+          await uploadFile(file, data!.createCustomSignatureDocumentUploadLink.presignedPostData, {
+            onProgress: (progress) => setProgress(progress),
+          });
+          setUploadTime(new Date());
+          setValue(
+            "customDocumentTemporaryFileId",
+            data!.createCustomSignatureDocumentUploadLink.temporaryFileId,
+          );
+        } catch (e) {
+          if (e instanceof UploadFileError && e.message === "Aborted") {
+            // handled when aborted
+          } else {
+            setCustomDocument(null);
+            setValue("customDocumentTemporaryFileId", null);
+            setFileDropError("error-uploading-file");
+          }
+          return;
+        }
+      }
+    }
+  }
+
   return (
     <ConfirmDialog
       size="xl"
@@ -153,29 +232,41 @@ export function ConfirmPetitionSignersDialog(
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ signers, message, allowAdditionalSigners }) => {
-          props.onResolve({
-            message: showMessage ? message : null,
-            signers: [
-              ...signers.map((s) => ({
-                contactId: s.contactId,
-                email: s.email,
-                firstName: s.firstName,
-                lastName: s.lastName ?? "",
-              })),
-              ...presetSigners.map((s) => ({
-                contactId: s.contactId,
-                email: s.email,
-                firstName: s.firstName,
-                lastName: s.lastName ?? "",
-                isPreset: true,
-              })),
-            ],
-            allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
-              ? !isMaxSignersReached && allowAdditionalSigners
-              : false,
-          });
-        }),
+        onSubmit: handleSubmit(
+          ({ signers, message, allowAdditionalSigners, customDocumentTemporaryFileId }) => {
+            if (
+              !props.isUpdate &&
+              props.signatureConfig.useCustomDocument &&
+              !customDocumentTemporaryFileId
+            ) {
+              setFileDropError("document-not-selected");
+              return;
+            }
+
+            props.onResolve({
+              customDocumentTemporaryFileId,
+              message: showMessage ? message : null,
+              signers: [
+                ...signers.map((s) => ({
+                  contactId: s.contactId,
+                  email: s.email,
+                  firstName: s.firstName,
+                  lastName: s.lastName ?? "",
+                })),
+                ...presetSigners.map((s) => ({
+                  contactId: s.contactId,
+                  email: s.email,
+                  firstName: s.firstName,
+                  lastName: s.lastName ?? "",
+                  isPreset: true,
+                })),
+              ],
+              allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
+                ? !isMaxSignersReached && allowAdditionalSigners
+                : false,
+            });
+          },
+        ),
       }}
       header={
         <HStack>
@@ -195,49 +286,177 @@ export function ConfirmPetitionSignersDialog(
       }
       body={
         <Stack>
-          <Text>
-            {presetSigners.length > 0 ? (
-              isSequential ? (
+          {!props.isUpdate && useCustomDocument ? (
+            <>
+              <Text>{`1. ${intl.formatMessage({
+                id: "component.confirm-petition-signers-dialog.upload-document-sign",
+                defaultMessage: "Upload the document you want to sign",
+              })}:`}</Text>
+              {isDefined(customDocument) ? (
+                <HStack>
+                  <Center
+                    boxSize={10}
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    color="gray.600"
+                    boxShadow="sm"
+                  >
+                    <FileIcon
+                      boxSize={5}
+                      filename={customDocument.name}
+                      contentType={customDocument.type}
+                    />
+                  </Center>
+
+                  <Stack flex="1" minWidth={0} whiteSpace="nowrap" spacing={0.5}>
+                    <HStack>
+                      <FileName value={customDocument.name} />
+                      <Text as="span">-</Text>
+                      <Text as="span" fontSize="xs" color="gray.500">
+                        <FileSize value={customDocument.size} />
+                      </Text>
+                    </HStack>
+                    {isDefined(uploadTime) ? (
+                      <DateTime
+                        fontSize="xs"
+                        value={uploadTime}
+                        format={FORMATS.LLL}
+                        useRelativeTime
+                      />
+                    ) : (
+                      <Center height="18px">
+                        <Progress
+                          borderRadius="sm"
+                          width="100%"
+                          isIndeterminate={progress === 1}
+                          value={progress * 100}
+                          size="xs"
+                          colorScheme="green"
+                        />
+                      </Center>
+                    )}
+                  </Stack>
+                  <HStack>
+                    <IconButtonWithTooltip
+                      onClick={onDownloadCustomFile}
+                      variant="ghost"
+                      icon={<DownloadIcon />}
+                      size="md"
+                      placement="bottom"
+                      label={intl.formatMessage({
+                        id: "generic.download-file",
+                        defaultMessage: "Download file",
+                      })}
+                    />
+                    <IconButtonWithTooltip
+                      onClick={onRemoveCustomFile}
+                      variant="ghost"
+                      icon={<DeleteIcon />}
+                      size="md"
+                      placement="bottom"
+                      label={intl.formatMessage({
+                        id: "generic.remove",
+                        defaultMessage: "Remove",
+                      })}
+                    />
+                  </HStack>
+                </HStack>
+              ) : (
+                <Dropzone
+                  as={Center}
+                  accept={{ "application/pdf": [".pdf"] }}
+                  maxSize={MAX_FILESIZE}
+                  multiple={false}
+                  onDrop={handleFileDrop}
+                >
+                  <Text pointerEvents="none" fontSize="sm">
+                    <FormattedMessage
+                      id="generic.dropzone-single-default"
+                      defaultMessage="Drag the file here, or click to select it"
+                    />
+                  </Text>
+                </Dropzone>
+              )}
+
+              {fileDropError && (
+                <Text color="red.500" fontSize="sm">
+                  {fileDropError === "file-too-large" ? (
+                    <FormattedMessage
+                      id="generic.dropzone-error-file-too-large"
+                      defaultMessage="The file is too large. Maximum size allowed {size}"
+                      values={{ size: <FileSize value={MAX_FILESIZE} /> }}
+                    />
+                  ) : fileDropError === "file-invalid-type" ? (
+                    <FormattedMessage
+                      id="generic.dropzone-error-file-invalid-type"
+                      defaultMessage="File type not allowed. Please, attach an {extension} file"
+                      values={{ extension: ".pdf" }}
+                    />
+                  ) : fileDropError === "error-uploading-file" ? (
+                    <FormattedMessage
+                      id="component.confirm-petition-signers-dialog.error-uploading-file"
+                      defaultMessage="There was an error uploading the file. Please try again."
+                    />
+                  ) : fileDropError === "document-not-selected" ? (
+                    <FormattedMessage
+                      id="component.confirm-petition-signers-dialog.document-not-selected"
+                      defaultMessage="Please, select the document you want to sign."
+                    />
+                  ) : null}
+                </Text>
+              )}
+              <Text>{`2. ${intl.formatMessage({
+                id: "component.confirm-petition-signers-dialog.add-contacts-sign-document",
+                defaultMessage: "Add the contacts who need to sign the document",
+              })}:`}</Text>
+            </>
+          ) : (
+            <Text>
+              {presetSigners.length > 0 ? (
+                isSequential ? (
+                  <FormattedMessage
+                    id="component.confirm-petition-signers-dialog.preset-signers-sequential"
+                    defaultMessage="{names} will sign after the other signers."
+                    values={{
+                      names: intl.formatList(
+                        presetSigners.map((s, i) => (
+                          <b key={i}>{fullName(s.firstName, s.lastName)}</b>
+                        )),
+                      ),
+                      // eslint-disable-next-line formatjs/enforce-placeholders
+                      count: presetSigners.length,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.confirm-petition-signers-dialog.preset-signers"
+                    defaultMessage="{names} will sign together with the signers you add."
+                    values={{
+                      names: intl.formatList(
+                        presetSigners.map((s, i) => (
+                          <b key={i}>{fullName(s.firstName, s.lastName)}</b>
+                        )),
+                      ),
+                      // eslint-disable-next-line formatjs/enforce-placeholders
+                      count: presetSigners.length,
+                    }}
+                  />
+                )
+              ) : isSequential ? (
                 <FormattedMessage
-                  id="component.confirm-petition-signers-dialog.preset-signers-sequential"
-                  defaultMessage="{names} will sign after the other signers."
-                  values={{
-                    names: intl.formatList(
-                      presetSigners.map((s, i) => (
-                        <b key={i}>{fullName(s.firstName, s.lastName)}</b>
-                      )),
-                    ),
-                    // eslint-disable-next-line formatjs/enforce-placeholders
-                    count: presetSigners.length,
-                  }}
+                  id="component.confirm-petition-signers-dialog.no-signers-set-sequential"
+                  defaultMessage="We will send the document to sign to each contact after the one before has signed:"
                 />
               ) : (
                 <FormattedMessage
-                  id="component.confirm-petition-signers-dialog.preset-signers"
-                  defaultMessage="{names} will sign together with the signers you add."
-                  values={{
-                    names: intl.formatList(
-                      presetSigners.map((s, i) => (
-                        <b key={i}>{fullName(s.firstName, s.lastName)}</b>
-                      )),
-                    ),
-                    // eslint-disable-next-line formatjs/enforce-placeholders
-                    count: presetSigners.length,
-                  }}
+                  id="component.confirm-petition-signers-dialog.no-signers-set"
+                  defaultMessage="We will send the document to the following contacts:"
                 />
-              )
-            ) : isSequential ? (
-              <FormattedMessage
-                id="component.confirm-petition-signers-dialog.no-signers-set-sequential"
-                defaultMessage="We will send the document to sign to each contact after the one before has signed:"
-              />
-            ) : (
-              <FormattedMessage
-                id="component.confirm-petition-signers-dialog.no-signers-set"
-                defaultMessage="We will send the document to the following contacts:"
-              />
-            )}
-          </Text>
+              )}
+            </Text>
+          )}
+
           <FormControl id="signers" isInvalid={!!errors.signers}>
             <Controller
               name="signers"
@@ -434,6 +653,7 @@ ConfirmPetitionSignersDialog.fragments = {
       minSigners
       instructions
       allowAdditionalSigners
+      useCustomDocument
       signers {
         ...ConfirmPetitionSignersDialog_PetitionSigner
       }
@@ -493,6 +713,17 @@ ConfirmPetitionSignersDialog.fragments = {
     ${SuggestedSigners.fragments.PetitionBase}
   `,
 };
+
+const _mutations = [
+  gql`
+    mutation ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLink(
+      $petitionId: GID!
+      $file: FileUploadInput!
+    ) {
+      createCustomSignatureDocumentUploadLink(petitionId: $petitionId, file: $file)
+    }
+  `,
+];
 
 export function useConfirmPetitionSignersDialog() {
   return useDialog(ConfirmPetitionSignersDialog);

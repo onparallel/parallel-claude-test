@@ -4,6 +4,7 @@ import {
   ConfirmPetitionSignersDialog,
   useConfirmPetitionSignersDialog,
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   useStartSignatureRequest_PetitionFragment,
   useStartSignatureRequest_UserFragment,
@@ -11,7 +12,6 @@ import {
   useStartSignatureRequest_startSignatureRequestDocument,
   useStartSignatureRequest_updateSignatureConfigDocument,
 } from "@parallel/graphql/__types";
-
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -19,9 +19,9 @@ import { isApolloError } from "./apollo/isApolloError";
 import { useGoToPetitionSection } from "./goToPetition";
 import { withError } from "./promises/withError";
 import { Maybe, MaybePromise } from "./types";
+
 import { usePetitionCanFinalize } from "./usePetitionCanFinalize";
 import { usePetitionLimitReachedErrorDialog } from "./usePetitionLimitReachedErrorDialog";
-import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 
 interface UseStartSignatureRequestProps {
   user: useStartSignatureRequest_UserFragment;
@@ -59,7 +59,11 @@ export function useStartSignatureRequest({
   const showTestSignatureDialog = useHandledTestSignatureDialog();
 
   const handleStartSignatureProcess = useCallback(
-    async (message?: Maybe<string>, complete?: boolean) => {
+    async (
+      message: Maybe<string>,
+      complete: boolean,
+      customDocumentTemporaryFileId: Maybe<string>,
+    ) => {
       try {
         if (complete) {
           await completePetition({
@@ -70,13 +74,18 @@ export function useStartSignatureRequest({
           });
         } else {
           await startSignatureRequest({
-            variables: { petitionId: petition.id, message },
+            variables: {
+              petitionId: petition.id,
+              message,
+              customDocumentTemporaryFileId,
+            },
           });
         }
-      } catch (error: any) {
+      } catch (error) {
         if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
           await withError(showPetitionLimitReachedErrorDialog());
         }
+        throw error;
       }
     },
     [completePetition, startSignatureRequest, petition],
@@ -89,6 +98,7 @@ export function useStartSignatureRequest({
           signers: signersInfo,
           message,
           allowAdditionalSigners: allowMoreSigners,
+          customDocumentTemporaryFileId,
         } = await showConfirmPetitionSignersDialog({
           user,
           signatureConfig: petition.signatureConfig!,
@@ -117,7 +127,11 @@ export function useStartSignatureRequest({
             petition.signatureConfig?.integration?.name,
           );
 
-          await handleStartSignatureProcess(message, completePetition);
+          await handleStartSignatureProcess(
+            message,
+            completePetition,
+            customDocumentTemporaryFileId,
+          );
 
           toast({
             isClosable: true,
@@ -180,6 +194,7 @@ useStartSignatureRequest.fragments = {
         }
         ...ConfirmPetitionSignersDialog_SignatureConfig
         review
+        useCustomDocument
       }
       ...usePetitionCanFinalize_PetitionBase
     }
@@ -210,8 +225,16 @@ const _mutations = [
     ${useStartSignatureRequest.fragments.Petition}
   `,
   gql`
-    mutation useStartSignatureRequest_startSignatureRequest($petitionId: GID!, $message: String) {
-      startSignatureRequest(petitionId: $petitionId, message: $message) {
+    mutation useStartSignatureRequest_startSignatureRequest(
+      $petitionId: GID!
+      $message: String
+      $customDocumentTemporaryFileId: GID
+    ) {
+      startSignatureRequest(
+        petitionId: $petitionId
+        message: $message
+        customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+      ) {
         id
         status
       }

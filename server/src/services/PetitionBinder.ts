@@ -34,6 +34,7 @@ interface PetitionBinderOptions {
   showSignatureBoxes?: boolean;
   includeAnnexedDocuments?: boolean;
   includeNetDocumentsLinks?: boolean;
+  customDocumentTemporaryFileId?: number;
 }
 
 export interface IPetitionBinder {
@@ -75,6 +76,7 @@ export class PetitionBinder implements IPetitionBinder {
       outputFileName,
       includeAnnexedDocuments,
       includeNetDocumentsLinks,
+      customDocumentTemporaryFileId,
     }: PetitionBinderOptions,
   ) {
     try {
@@ -103,16 +105,39 @@ export class PetitionBinder implements IPetitionBinder {
         throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
       }
 
-      const mainDocPath = await this.writeTemporaryFile(
-        await this.printer.petitionExport(userId, {
-          petitionId,
-          documentTitle,
-          showSignatureBoxes,
-          includeNetDocumentsLinks,
-        }),
-        "pdf",
-      );
-      this.info(`Main document created at ${mainDocPath}`);
+      const mainDocPaths: string[] = [];
+
+      if (!isDefined(customDocumentTemporaryFileId)) {
+        mainDocPaths.push(
+          await this.writeTemporaryFile(
+            await this.printer.petitionExport(userId, {
+              petitionId,
+              documentTitle,
+              showSignatureBoxes,
+              includeNetDocumentsLinks,
+            }),
+            "pdf",
+          ),
+        );
+      } else {
+        const customFile = await this.files.loadTemporaryFile(customDocumentTemporaryFileId);
+        mainDocPaths.push(
+          await this.writeTemporaryFile(
+            await this.storage.temporaryFiles.downloadFile(customFile!.path),
+            "pdf",
+          ),
+        );
+        if (showSignatureBoxes) {
+          mainDocPaths.push(
+            await this.writeTemporaryFile(
+              await this.printer.signatureBoxesPage(userId, { petitionId }),
+              "pdf",
+            ),
+          );
+        }
+      }
+
+      this.info(`Main document created at ${mainDocPaths[0]}`);
 
       const annexedDocumentPaths = includeAnnexedDocuments
         ? await pFlatMap(
@@ -169,7 +194,7 @@ export class PetitionBinder implements IPetitionBinder {
       return await this.merge(
         [
           ...attachmentPaths.FRONT,
-          mainDocPath,
+          ...mainDocPaths,
           ...attachmentPaths.ANNEX,
           ...annexedDocumentPaths,
           ...attachmentPaths.BACK,

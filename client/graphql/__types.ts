@@ -903,6 +903,7 @@ export interface Mutation {
   createContact: Contact;
   /** Creates a contactless petition access */
   createContactlessPetitionAccess: PetitionAccess;
+  createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /**
@@ -1460,6 +1461,11 @@ export interface MutationcreateContactArgs {
 export interface MutationcreateContactlessPetitionAccessArgs {
   petitionId: Scalars["GID"]["input"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
+}
+
+export interface MutationcreateCustomSignatureDocumentUploadLinkArgs {
+  file: FileUploadInput;
+  petitionId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateDowJonesKycIntegrationArgs {
@@ -2241,6 +2247,7 @@ export interface MutationstartAsyncFieldCompletionArgs {
 }
 
 export interface MutationstartSignatureRequestArgs {
+  customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 }
@@ -5597,6 +5604,7 @@ export interface SignatureConfig {
   timezone: Scalars["String"]["output"];
   /** Title of the signature document */
   title?: Maybe<Scalars["String"]["output"]>;
+  useCustomDocument: Scalars["Boolean"]["output"];
 }
 
 /** The signature settings for the petition */
@@ -5617,6 +5625,8 @@ export interface SignatureConfigInput {
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
   title?: InputMaybe<Scalars["String"]["input"]>;
+  /** if true, use custom document for signature instead of petition binder */
+  useCustomDocument?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
 
 /** The signer that need to sign the generated document. */
@@ -10662,6 +10672,7 @@ export type AddPetitionAccessDialog_SignatureConfigFragment = {
   minSigners: number;
   signingMode: SignatureConfigSigningMode;
   instructions?: string | null;
+  useCustomDocument: boolean;
   integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
   signers: Array<{
     __typename?: "PetitionSigner";
@@ -10706,6 +10717,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     minSigners: number;
     signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
@@ -10895,6 +10907,7 @@ export type AddPetitionAccessDialog_petitionQuery = {
           minSigners: number;
           signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
@@ -11098,6 +11111,7 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
         minSigners: number;
         signingMode: SignatureConfigSigningMode;
         instructions?: string | null;
+        useCustomDocument: boolean;
         integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
@@ -12705,6 +12719,7 @@ export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
   minSigners: number;
   instructions?: string | null;
   allowAdditionalSigners: boolean;
+  useCustomDocument: boolean;
   signers: Array<{
     __typename?: "PetitionSigner";
     contactId?: string | null;
@@ -12857,6 +12872,16 @@ export type ConfirmPetitionSignersDialog_PetitionFragment = {
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    file: FileUploadInput;
+  }>;
+
+export type ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkMutation = {
+  createCustomSignatureDocumentUploadLink: { [key: string]: any };
 };
 
 export type CreateFolderDialog_PetitionBase_Petition_Fragment = {
@@ -13342,6 +13367,7 @@ export type SignatureConfigDialog_SignatureConfigFragment = {
   signingMode: SignatureConfigSigningMode;
   minSigners: number;
   instructions?: string | null;
+  useCustomDocument: boolean;
   integration?: {
     __typename?: "SignatureOrgIntegration";
     id: string;
@@ -13388,6 +13414,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -13413,6 +13440,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -13540,6 +13568,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -15792,6 +15821,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -15835,6 +15865,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -16004,6 +16035,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -18134,6 +18166,7 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     __typename?: "SignatureConfig";
     timezone: string;
     review: boolean;
+    useCustomDocument: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
@@ -20451,6 +20484,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
     __typename?: "SignatureConfig";
     timezone: string;
     review: boolean;
+    useCustomDocument: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
@@ -21372,6 +21406,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       allowAdditionalSigners: boolean;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -21424,6 +21459,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -21445,6 +21481,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     __typename?: "SignatureConfig";
     timezone: string;
     review: boolean;
+    useCustomDocument: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
@@ -21634,6 +21671,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             allowAdditionalSigners: boolean;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -21686,6 +21724,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             signingMode: SignatureConfigSigningMode;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -21707,6 +21746,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           __typename?: "SignatureConfig";
           timezone: string;
           review: boolean;
+          useCustomDocument: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
@@ -21939,6 +21979,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         allowAdditionalSigners: boolean;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -21991,6 +22032,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         signingMode: SignatureConfigSigningMode;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         integration?: {
           __typename?: "SignatureOrgIntegration";
           id: string;
@@ -22012,6 +22054,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       __typename?: "SignatureConfig";
       timezone: string;
       review: boolean;
+      useCustomDocument: boolean;
       title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
@@ -22201,6 +22244,7 @@ export type PetitionSignaturesCard_petitionQuery = {
             allowAdditionalSigners: boolean;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -22253,6 +22297,7 @@ export type PetitionSignaturesCard_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -22274,6 +22319,7 @@ export type PetitionSignaturesCard_petitionQuery = {
           __typename?: "SignatureConfig";
           timezone: string;
           review: boolean;
+          useCustomDocument: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
@@ -31862,6 +31908,7 @@ export type PetitionActivity_PetitionFragment = {
     minSigners: number;
     signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -33117,6 +33164,7 @@ export type PetitionActivity_updatePetitionMutation = {
           minSigners: number;
           signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -34457,6 +34505,7 @@ export type PetitionActivity_petitionQuery = {
           minSigners: number;
           signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -34641,6 +34690,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -34882,6 +34932,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -35248,6 +35299,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -35521,6 +35573,7 @@ export type PetitionCompose_updatePetitionMutation = {
             signingMode: SignatureConfigSigningMode;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -35554,6 +35607,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           timezone: string;
           review: boolean;
+          useCustomDocument: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
@@ -35791,6 +35845,7 @@ export type PetitionCompose_updatePetitionMutation = {
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -37642,6 +37697,7 @@ export type PetitionCompose_petitionQuery = {
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -37887,6 +37943,7 @@ export type PetitionCompose_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -38290,6 +38347,7 @@ export type PetitionCompose_petitionQuery = {
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -39476,6 +39534,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     timezone: string;
+    useCustomDocument: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
@@ -39880,6 +39939,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     minSigners: number;
     instructions?: string | null;
     allowAdditionalSigners: boolean;
+    useCustomDocument: boolean;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -40370,6 +40430,7 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
+          useCustomDocument: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
@@ -40781,6 +40842,7 @@ export type PetitionPreview_updatePetitionMutation = {
           minSigners: number;
           instructions?: string | null;
           allowAdditionalSigners: boolean;
+          useCustomDocument: boolean;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -41215,6 +41277,7 @@ export type PetitionPreview_completePetitionMutation = {
       __typename?: "SignatureConfig";
       review: boolean;
       timezone: string;
+      useCustomDocument: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
@@ -41663,6 +41726,7 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
+          useCustomDocument: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
@@ -42074,6 +42138,7 @@ export type PetitionPreview_petitionQuery = {
           minSigners: number;
           instructions?: string | null;
           allowAdditionalSigners: boolean;
+          useCustomDocument: boolean;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -42690,6 +42755,7 @@ export type PetitionReplies_PetitionFragment = {
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -42745,6 +42811,7 @@ export type PetitionReplies_PetitionFragment = {
       allowAdditionalSigners: boolean;
       minSigners: number;
       instructions?: string | null;
+      useCustomDocument: boolean;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -42777,6 +42844,7 @@ export type PetitionReplies_PetitionFragment = {
     __typename?: "SignatureConfig";
     timezone: string;
     review: boolean;
+    useCustomDocument: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
@@ -43612,6 +43680,7 @@ export type PetitionReplies_closePetitionMutation = {
         signingMode: SignatureConfigSigningMode;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         integration?: {
           __typename?: "SignatureOrgIntegration";
           id: string;
@@ -43667,6 +43736,7 @@ export type PetitionReplies_closePetitionMutation = {
         allowAdditionalSigners: boolean;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -43699,6 +43769,7 @@ export type PetitionReplies_closePetitionMutation = {
       __typename?: "SignatureConfig";
       timezone: string;
       review: boolean;
+      useCustomDocument: boolean;
       title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
@@ -44302,6 +44373,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         signingMode: SignatureConfigSigningMode;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         integration?: {
           __typename?: "SignatureOrgIntegration";
           id: string;
@@ -44357,6 +44429,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         allowAdditionalSigners: boolean;
         minSigners: number;
         instructions?: string | null;
+        useCustomDocument: boolean;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -44389,6 +44462,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       __typename?: "SignatureConfig";
       timezone: string;
       review: boolean;
+      useCustomDocument: boolean;
       title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
@@ -45151,6 +45225,7 @@ export type PetitionReplies_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -45206,6 +45281,7 @@ export type PetitionReplies_petitionQuery = {
             allowAdditionalSigners: boolean;
             minSigners: number;
             instructions?: string | null;
+            useCustomDocument: boolean;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -45238,6 +45314,7 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "SignatureConfig";
           timezone: string;
           review: boolean;
+          useCustomDocument: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
@@ -51838,6 +51915,7 @@ export type useStartSignatureRequest_PetitionFragment = {
     __typename?: "SignatureConfig";
     timezone: string;
     review: boolean;
+    useCustomDocument: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
@@ -52031,6 +52109,7 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           __typename?: "SignatureConfig";
           timezone: string;
           review: boolean;
+          useCustomDocument: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
@@ -52232,6 +52311,7 @@ export type useStartSignatureRequest_completePetitionMutation = {
       __typename?: "SignatureConfig";
       timezone: string;
       review: boolean;
+      useCustomDocument: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
@@ -52413,6 +52493,7 @@ export type useStartSignatureRequest_completePetitionMutation = {
 export type useStartSignatureRequest_startSignatureRequestMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   message?: InputMaybe<Scalars["String"]["input"]>;
+  customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type useStartSignatureRequest_startSignatureRequestMutation = {
@@ -55900,6 +55981,7 @@ export const ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc = gql`
     minSigners
     instructions
     allowAdditionalSigners
+    useCustomDocument
     signers {
       ...ConfirmPetitionSignersDialog_PetitionSigner
     }
@@ -57530,6 +57612,7 @@ export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
     signingMode
     minSigners
     instructions
+    useCustomDocument
   }
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_SignatureConfigFragment, unknown>;
@@ -58242,6 +58325,7 @@ export const useStartSignatureRequest_PetitionFragmentDoc = gql`
       }
       ...ConfirmPetitionSignersDialog_SignatureConfig
       review
+      useCustomDocument
     }
     ...usePetitionCanFinalize_PetitionBase
   }
@@ -61960,6 +62044,17 @@ export const TimelineMessageScheduledEvent_cancelScheduledMessageDocument = gql`
 ` as unknown as DocumentNode<
   TimelineMessageScheduledEvent_cancelScheduledMessageMutation,
   TimelineMessageScheduledEvent_cancelScheduledMessageMutationVariables
+>;
+export const ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument = gql`
+  mutation ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLink(
+    $petitionId: GID!
+    $file: FileUploadInput!
+  ) {
+    createCustomSignatureDocumentUploadLink(petitionId: $petitionId, file: $file)
+  }
+` as unknown as DocumentNode<
+  ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkMutation,
+  ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkMutationVariables
 >;
 export const CreateFolderDialog_petitionsDocument = gql`
   query CreateFolderDialog_petitions(
@@ -67902,8 +67997,16 @@ export const useStartSignatureRequest_completePetitionDocument = gql`
   useStartSignatureRequest_completePetitionMutationVariables
 >;
 export const useStartSignatureRequest_startSignatureRequestDocument = gql`
-  mutation useStartSignatureRequest_startSignatureRequest($petitionId: GID!, $message: String) {
-    startSignatureRequest(petitionId: $petitionId, message: $message) {
+  mutation useStartSignatureRequest_startSignatureRequest(
+    $petitionId: GID!
+    $message: String
+    $customDocumentTemporaryFileId: GID
+  ) {
+    startSignatureRequest(
+      petitionId: $petitionId
+      message: $message
+      customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+    ) {
       id
       status
     }

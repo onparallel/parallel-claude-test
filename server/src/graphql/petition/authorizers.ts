@@ -666,6 +666,32 @@ export const petitionIsNotAnonymized = createPetitionAuthorizer(
   (petition) => petition.anonymized_at === null,
 );
 
+export function petitionCanUploadCustomSignatureDocument<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+>(petitionIdArg: TPetitionIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args[petitionIdArg] as unknown as number);
+
+    if (!petition?.signature_config) {
+      throw new ApolloError(
+        "Petition was expected to have signature_config set",
+        "MISSING_SIGNATURE_CONFIG_ERROR",
+      );
+    }
+
+    if (petition.signature_config.useCustomDocument === false) {
+      throw new ApolloError(
+        "Petition does not allow custom signature documents",
+        "CUSTOM_SIGNATURE_DOCUMENT_NOT_ALLOWED_ERROR",
+      );
+    }
+
+    return true;
+  };
+}
+
 export function signatureRequestIsNotAnonymized<
   TypeName extends string,
   FieldName extends string,

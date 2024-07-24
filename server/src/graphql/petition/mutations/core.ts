@@ -647,6 +647,9 @@ export const SignatureConfigInput = inputObjectType({
     t.nonNull.field("signingMode", {
       type: "SignatureConfigSigningMode",
     });
+    t.nullable.boolean("useCustomDocument", {
+      description: "if true, use custom document for signature instead of petition binder",
+    });
   },
 });
 

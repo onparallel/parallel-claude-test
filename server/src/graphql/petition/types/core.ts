@@ -955,6 +955,9 @@ export const SignatureConfig = objectType({
       type: "SignatureConfigSigningMode",
     });
     t.nullable.string("message");
+    t.nonNull.boolean("useCustomDocument", {
+      resolve: (o) => o.useCustomDocument ?? false,
+    });
   },
   sourceType: /* ts */ `{
     orgIntegrationId: number;
@@ -972,6 +975,7 @@ export const SignatureConfig = objectType({
     instructions?: string | null;
     message?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL"
+    useCustomDocument?: boolean;
   }`,
 });
 

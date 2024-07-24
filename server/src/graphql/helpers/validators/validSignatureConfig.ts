@@ -14,7 +14,8 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { orgIntegrationId, signersInfo, timezone, instructions } = signatureConfig;
+      const { orgIntegrationId, signersInfo, timezone, instructions, review, useCustomDocument } =
+        signatureConfig;
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
@@ -42,6 +43,14 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           info,
           `${argName}.instructions`,
           `Instructions must be equal or less than 300 characters.`,
+        );
+      }
+
+      if (useCustomDocument && !review) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.review`,
+          `Review is required when using a custom document.`,
         );
       }
     }

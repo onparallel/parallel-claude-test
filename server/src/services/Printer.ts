@@ -1,19 +1,22 @@
 import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
+import { CONFIG, Config } from "../config";
 import { ContactLocale } from "../db/__types";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
+import BackgroundCheckProfile, {
+  BackgroundCheckProfileProps,
+} from "../pdf/documents/BackgroundCheckProfile";
 import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/recipient/AnnexCoverPage";
 import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdf";
 import PetitionExport, {
   PetitionExportInitialData,
 } from "../pdf/documents/recipient/PetitionExport";
+import SignatureBoxesPage, {
+  SignatureBoxesPageInitialData,
+} from "../pdf/documents/recipient/SignatureBoxesPage";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./AuthService";
-import BackgroundCheckProfile, {
-  BackgroundCheckProfileProps,
-} from "../pdf/documents/BackgroundCheckProfile";
-import { CONFIG, Config } from "../config";
 
 export interface IPrinter {
   petitionExport(
@@ -29,6 +32,10 @@ export interface IPrinter {
   backgroundCheckProfile(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
+  ): Promise<NodeJS.ReadableStream>;
+  signatureBoxesPage(
+    userId: number,
+    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
   ): Promise<NodeJS.ReadableStream>;
 }
 
@@ -91,6 +98,24 @@ export class Printer implements IPrinter {
         client,
         locale: "en",
       },
+    );
+  }
+
+  public async signatureBoxesPage(
+    userId: number,
+    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
+  ) {
+    const petition = await this.petitions.loadPetition(data.petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
+    if (!petition) {
+      throw new Error("Petition not available");
+    }
+    const client = await this.createClient(userId);
+    return await buildPdf(
+      SignatureBoxesPage,
+      {
+        petitionId: toGlobalId("Petition", data.petitionId),
+      },
+      { client, locale: petition.recipient_locale },
     );
   }
 }

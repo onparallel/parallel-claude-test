@@ -334,6 +334,7 @@ export interface NexusGenInputs {
     signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
     title?: string | null; // String
+    useCustomDocument?: boolean | null; // Boolean
   };
   SignatureConfigInputSigner: {
     // input type
@@ -1265,6 +1266,7 @@ export interface NexusGenObjects {
     instructions?: string | null;
     message?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL";
+    useCustomDocument?: boolean;
   };
   SignatureDeliveredEvent: petitionEvents.SignatureDeliveredEvent;
   SignatureOpenedEvent: petitionEvents.SignatureOpenedEvent;
@@ -1902,6 +1904,7 @@ export interface NexusGenFieldTypes {
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createCustomSignatureDocumentUploadLink: NexusGenScalars["JSONObject"]; // JSONObject!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
@@ -3535,6 +3538,7 @@ export interface NexusGenFieldTypes {
     signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
     title: string | null; // String
+    useCustomDocument: boolean; // Boolean!
   };
   SignatureDeliveredEvent: {
     // field return type
@@ -4450,6 +4454,7 @@ export interface NexusGenFieldTypeNames {
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
     createContactlessPetitionAccess: "PetitionAccess";
+    createCustomSignatureDocumentUploadLink: "JSONObject";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
@@ -6083,6 +6088,7 @@ export interface NexusGenFieldTypeNames {
     signingMode: "SignatureConfigSigningMode";
     timezone: "String";
     title: "String";
+    useCustomDocument: "Boolean";
   };
   SignatureDeliveredEvent: {
     // field return type name
@@ -6660,6 +6666,11 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
+    };
+    createCustomSignatureDocumentUploadLink: {
+      // args
+      file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     createDowJonesKycIntegration: {
       // args
@@ -7441,6 +7452,7 @@ export interface NexusGenArgTypes {
     };
     startSignatureRequest: {
       // args
+      customDocumentTemporaryFileId?: NexusGenScalars["GID"] | null; // GID
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };

@@ -230,6 +230,8 @@ export interface PetitionSignatureConfig {
   minSigners: number;
   instructions?: string | null;
   signingMode: "PARALLEL" | "SEQUENTIAL";
+  useCustomDocument?: boolean | null;
+  customDocumentTemporaryFileId?: number;
 }
 
 export interface PetitionSummaryConfig {

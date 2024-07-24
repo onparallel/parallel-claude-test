@@ -111,6 +111,7 @@ import {
   SharePetition_createAddPetitionPermissionTaskDocument,
   SharePetition_petitionDocument,
   SharePetition_usersByEmailDocument,
+  StartSignature_createCustomSignatureDocumentUploadLinkDocument,
   StartSignature_startSignatureRequestDocument,
   StopSharing_createRemovePetitionPermissionTaskDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
@@ -2967,7 +2968,11 @@ export function publicApi(container: Container) {
         If the parallel has an ongoing eSignature request, it will be cancelled and a new eSignature request will be started.
       `,
         tags: ["Signatures"],
-        body: JsonBody(SignatureRequestInput, { required: false }),
+        middleware: singleFileUploadMiddleware("file"),
+        body: Body(
+          [JsonBodyContent(SignatureRequestInput), FormDataBodyContent(SignatureRequestInput)],
+          { required: false },
+        ),
         responses: {
           201: SuccessResponse(SignatureRequest),
           403: ErrorResponse({
@@ -2979,9 +2984,23 @@ export function publicApi(container: Container) {
         },
       },
       async ({ client, params, body }) => {
-        const _mutation = gql`
-          mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
-            startSignatureRequest(petitionId: $petitionId, message: $message) {
+        const _mutations = gql`
+          mutation StartSignature_createCustomSignatureDocumentUploadLink(
+            $petitionId: GID!
+            $file: FileUploadInput!
+          ) {
+            createCustomSignatureDocumentUploadLink(petitionId: $petitionId, file: $file)
+          }
+          mutation StartSignature_startSignatureRequest(
+            $petitionId: GID!
+            $message: String
+            $customDocumentTemporaryFileId: GID
+          ) {
+            startSignatureRequest(
+              petitionId: $petitionId
+              message: $message
+              customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+            ) {
               ...PetitionSignatureRequest
             }
           }
@@ -2989,9 +3008,30 @@ export function publicApi(container: Container) {
         `;
 
         try {
+          let customDocumentTemporaryFileId: string | undefined;
+          if (isDefined(body.file)) {
+            const file = body.file as unknown as FormDataFile;
+            const uploadData = await client.request(
+              StartSignature_createCustomSignatureDocumentUploadLinkDocument,
+              {
+                petitionId: params.petitionId,
+                file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+              },
+            );
+
+            await uploadFile(
+              file,
+              uploadData.createCustomSignatureDocumentUploadLink.presignedPostData,
+            );
+
+            customDocumentTemporaryFileId = uploadData.createCustomSignatureDocumentUploadLink
+              .temporaryFileId as string;
+          }
+
           const response = await client.request(StartSignature_startSignatureRequestDocument, {
             petitionId: params.petitionId,
             message: body.message,
+            customDocumentTemporaryFileId,
           });
 
           assert("id" in response.startSignatureRequest);
@@ -3001,8 +3041,22 @@ export function publicApi(container: Container) {
             throw new ConflictError("The parallel does not have a signature configuration");
           } else if (containsGraphQLError(error, "REQUIRED_SIGNER_INFO_ERROR")) {
             throw new ConflictError("The parallel requires signer information");
+          } else if (containsGraphQLError(error, "CUSTOM_SIGNATURE_DOCUMENT_NOT_ALLOWED_ERROR")) {
+            throw new ConflictError("The parallel does not allow custom signature documents");
+          } else if (containsGraphQLError(error, "MISSING_CUSTOM_SIGNATURE_DOCUMENT_ERROR")) {
+            throw new ConflictError("Please, provide a document to be signed");
           } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to complete this parallel");
+          } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
+              error_code: string;
+            };
+            if (errorCode === "INVALID_CONTENT_TYPE_ERROR") {
+              throw new BadRequestError(`File must be a PDF document`);
+            }
+            if (errorCode === "FILE_SIZE_EXCEEDED_ERROR") {
+              throw new BadRequestError(`File size exceeded`);
+            }
           }
 
           throw error;

@@ -5,8 +5,10 @@ import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
+import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { discriminator } from "@parallel/utils/discriminator";
+import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -17,7 +19,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isDefined, noop, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
-import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 
 interface ProfileFieldFileUploadProps extends ProfileFieldProps {
   showSuggestionsButton: boolean;
@@ -53,17 +54,6 @@ export function ProfileFieldFileUpload({
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
     await downloadProfileFieldFile(profileId, field.id, profileFieldFileId, preview);
-  };
-
-  const downloadLocalFile = async (file: File) => {
-    const response = await fetch(URL.createObjectURL(file));
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = file.name;
-    link.click();
-    window.URL.revokeObjectURL(url);
   };
 
   const handleDownloadLocalFile = async (file: File, preview: boolean) => {
