@@ -136,7 +136,9 @@ function DowJonesFieldProfileDetails({
     row: DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment,
   ) {
     if (isDefined(row.sources[0])) {
-      openNewWindow(row.sources[0]);
+      try {
+        openNewWindow(row.sources[0]);
+      } catch {}
     }
   }, []);
 

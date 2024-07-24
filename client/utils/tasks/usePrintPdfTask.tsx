@@ -13,7 +13,7 @@ import {
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { openNewWindow } from "../openNewWindow";
+import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { waitFor } from "../promises/waitFor";
 import { withError } from "../promises/withError";
 import { BackgroundTaskOptions } from "./backgroundTaskOptions";
@@ -70,7 +70,7 @@ export function usePrintPdfTask() {
         }),
       );
 
-      if (error) {
+      if (error && !isWindowBlockedError(error)) {
         await withError(
           showError({
             message: intl.formatMessage({

@@ -110,9 +110,11 @@ export function PreviewPetitionFieldKyc({
   const handleStart = async () => {
     if (petition.organization.hasDowJones) {
       setState("FETCHING");
-      browserTabRef.current = await openNewWindow(
-        `/${intl.locale}/app/petitions/${petition.id}/preview/dowjones/${field.id}`,
-      );
+      try {
+        browserTabRef.current = await openNewWindow(
+          `/${intl.locale}/app/petitions/${petition.id}/preview/dowjones/${field.id}`,
+        );
+      } catch {}
       if (isCacheOnly) {
         setState("IDLE");
       }

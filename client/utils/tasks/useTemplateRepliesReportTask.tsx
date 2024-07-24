@@ -10,7 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { openNewWindow } from "../openNewWindow";
+import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { withError } from "../promises/withError";
 import { Maybe } from "../types";
 
@@ -71,7 +71,7 @@ export function useTemplateRepliesReportTask() {
         }),
       );
 
-      if (error) {
+      if (error && !isWindowBlockedError(error)) {
         await withError(
           showError({
             message: intl.formatMessage({

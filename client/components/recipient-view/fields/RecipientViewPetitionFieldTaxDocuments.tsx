@@ -3,7 +3,7 @@ import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
+import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isDefined } from "@udecode/plate-common";
@@ -162,11 +162,13 @@ export function RecipientViewPetitionFieldTaxDocuments({
         setState("IDLE");
       }
     } catch (e) {
-      onError(e);
-      if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
-        setState("FIELD_ALREADY_REPLIED_ERROR");
-      } else {
-        setState("ERROR");
+      if (!isWindowBlockedError(e)) {
+        onError(e);
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setState("FIELD_ALREADY_REPLIED_ERROR");
+        } else {
+          setState("ERROR");
+        }
       }
     }
   };

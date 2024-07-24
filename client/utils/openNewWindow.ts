@@ -29,8 +29,11 @@ export async function openNewWindow(
         }
       })
       .join(",");
-  const _window = window.open(undefined, "_blank", windowFeatures)!;
+  const _window = window.open(undefined, "_blank", windowFeatures);
   try {
+    if (!_window) {
+      throw new Error("WINDOW_BLOCKED");
+    }
     const url = typeof value === "function" ? await value() : await value;
     _window.location.href = url!;
     return _window;
@@ -38,6 +41,10 @@ export async function openNewWindow(
     _window?.close();
     throw e;
   }
+}
+
+export function isWindowBlockedError(e: unknown): boolean {
+  return e instanceof Error && e.message === "WINDOW_BLOCKED";
 }
 
 export function centeredPopup({

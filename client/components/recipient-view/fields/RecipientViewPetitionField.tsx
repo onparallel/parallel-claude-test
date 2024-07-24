@@ -15,7 +15,7 @@ import {
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -205,7 +205,9 @@ export function RecipientViewPetitionField({
           return url!;
         });
       } catch (e) {
-        props.onError(e);
+        if (!isWindowBlockedError(e)) {
+          props.onError(e);
+        }
       }
     },
     [downloadFileUploadReply],

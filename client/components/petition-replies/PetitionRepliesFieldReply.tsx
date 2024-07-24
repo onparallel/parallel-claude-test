@@ -146,7 +146,9 @@ export function PetitionRepliesFieldReply({
         ...(type ? { type } : {}),
         ...(isReadOnly ? { readonly: "true" } : {}),
       });
-      browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
+      try {
+        browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
+      } catch {}
     } else {
       onAction(action);
     }

@@ -47,18 +47,20 @@ export function useDocusignConsentPopup() {
       environment: "sandbox" | "production";
     }) => {
       setIsRunning(true);
-      windowRef.current = await openNewWindow(
-        () =>
-          `/api/oauth/docusign/authorize?${new URLSearchParams(
-            params
-              ? {
-                  ...params,
-                  isDefault: params.isDefault.toString(),
-                }
-              : {},
-          )}`,
-        centeredPopup({ width: 500, height: 600 }),
-      );
+      try {
+        windowRef.current = await openNewWindow(
+          () =>
+            `/api/oauth/docusign/authorize?${new URLSearchParams(
+              params
+                ? {
+                    ...params,
+                    isDefault: params.isDefault.toString(),
+                  }
+                : {},
+            )}`,
+          centeredPopup({ width: 500, height: 600 }),
+        );
+      } catch {}
       return new Promise<void>((...params) => {
         promiseArgsRef.current = params;
       });

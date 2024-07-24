@@ -200,7 +200,9 @@ export function PreviewPetitionFieldBackgroundCheck({
         url += `/results?${urlParams}`;
       }
 
-      browserTabRef.current = await openNewWindow(url);
+      try {
+        browserTabRef.current = await openNewWindow(url);
+      } catch {}
     },
     [intl.locale, isDisabled],
   );
@@ -271,7 +273,9 @@ export function PreviewPetitionFieldBackgroundCheck({
 
     url += `?${searchParams.toString()}`;
 
-    browserTabRef.current = await openNewWindow(url);
+    try {
+      browserTabRef.current = await openNewWindow(url);
+    } catch {}
 
     if (isCacheOnly) {
       setState("IDLE");

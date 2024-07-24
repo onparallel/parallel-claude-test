@@ -284,7 +284,9 @@ export function ProfileFieldBackgroundCheck({
 
     url += `?${searchParams.toString()}`;
 
-    browserTabRef.current = await openNewWindow(url);
+    try {
+      browserTabRef.current = await openNewWindow(url);
+    } catch {}
   };
 
   const handleCancelClick = () => {
