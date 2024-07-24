@@ -39,7 +39,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, partition, pick, uniqBy } from "remeda";
+import { isDefined, partition } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
@@ -102,38 +102,6 @@ export function ConfirmPetitionSignersDialog(
   const allowAdditionalSigners = watch("allowAdditionalSigners");
 
   const allSigners = [...presetSigners, ...signers];
-
-  const suggestions = uniqBy(
-    [
-      ...(props.petition.signatureRequests.flatMap((s) => s.signatureConfig.signers) ?? [])
-        .filter(isDefined)
-        .map((signer) => pick(signer, ["firstName", "lastName", "email"])),
-      {
-        email: props.user.email,
-        firstName: props.user.firstName ?? "",
-        lastName: props.user.lastName,
-      },
-      ...props.petition.accesses
-        .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
-        .map((a) => ({
-          contactId: a.contact!.id,
-          email: a.contact!.email,
-          firstName: a.contact!.firstName,
-          lastName: a.contact!.lastName ?? "",
-        })),
-    ]
-      // remove already added signers
-      .filter(
-        (suggestion) =>
-          !allSigners.some(
-            (s) =>
-              s.email === suggestion.email &&
-              s.firstName === suggestion.firstName &&
-              s.lastName === suggestion.lastName,
-          ),
-      ),
-    (s) => [s.email, s.firstName, s.lastName].join("|"),
-  );
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
@@ -303,6 +271,10 @@ export function ConfirmPetitionSignersDialog(
                         key={index}
                         isEditable
                         signer={signer}
+                        isMe={
+                          [signer.email, signer.firstName, signer.lastName].join("") ===
+                          [props.user.email, props.user.firstName, props.user.lastName].join("")
+                        }
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                       />
@@ -352,8 +324,10 @@ export function ConfirmPetitionSignersDialog(
                       </Alert>
                     ) : null}
                     <SuggestedSigners
+                      currentSigners={allSigners}
                       isDisabled={isMaxSignersReached}
-                      suggestions={suggestions}
+                      petition={props.petition}
+                      user={props.user}
                       onAddSigner={(s) => onChange([...signers, s])}
                     />
                   </Stack>
@@ -433,71 +407,91 @@ export function ConfirmPetitionSignersDialog(
 }
 
 ConfirmPetitionSignersDialog.fragments = {
-  get User() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_User on User {
+  User: gql`
+    fragment ConfirmPetitionSignersDialog_User on User {
+      id
+      email
+      firstName
+      lastName
+      ...SuggestedSigners_User
+    }
+    ${SuggestedSigners.fragments.User}
+  `,
+  PetitionSigner: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+      contactId
+      email
+      firstName
+      lastName
+      isPreset
+      ...SelectedSignerRow_PetitionSigner
+    }
+    ${SelectedSignerRow.fragments.PetitionSigner}
+  `,
+  SignatureConfig: gql`
+    fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+      signingMode
+      minSigners
+      instructions
+      allowAdditionalSigners
+      signers {
+        ...ConfirmPetitionSignersDialog_PetitionSigner
+      }
+    }
+  `,
+  PetitionField: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
+      id
+      type
+      title
+      options
+      alias
+      replies {
         id
-        email
-        firstName
-        lastName
-      }
-    `;
-  },
-  get PetitionSigner() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-        contactId
-        email
-        firstName
-        lastName
-        isPreset
-        ...SelectedSignerRow_PetitionSigner
-        ...SuggestedSigners_PetitionSigner
-      }
-      ${SelectedSignerRow.fragments.PetitionSigner}
-      ${SuggestedSigners.fragments.PetitionSigner}
-    `;
-  },
-  get SignatureConfig() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
-        signingMode
-        minSigners
-        instructions
-        allowAdditionalSigners
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
-      }
-      ${this.PetitionSigner}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_Petition on Petition {
-        id
-        isInteractionWithRecipientsEnabled
-        accesses {
-          id
-          status
-          contact {
+        content
+        children {
+          field {
             id
-            email
-            firstName
-            lastName
+            type
+            alias
+            options
           }
-        }
-        signatureRequests {
-          signatureConfig {
-            signers {
-              ...ConfirmPetitionSignersDialog_PetitionSigner
-            }
+          replies {
+            id
+            content
           }
         }
       }
-      ${this.PetitionSigner}
-    `;
-  },
+    }
+  `,
+  Petition: gql`
+    fragment ConfirmPetitionSignersDialog_Petition on Petition {
+      id
+      isInteractionWithRecipientsEnabled
+      fields {
+        ...ConfirmPetitionSignersDialog_PetitionField
+      }
+      accesses {
+        id
+        status
+        contact {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+      signatureRequests {
+        signatureConfig {
+          signers {
+            ...ConfirmPetitionSignersDialog_PetitionSigner
+          }
+        }
+      }
+      ...SuggestedSigners_PetitionBase
+    }
+    ${SuggestedSigners.fragments.PetitionBase}
+  `,
 };
 
 export function useConfirmPetitionSignersDialog() {

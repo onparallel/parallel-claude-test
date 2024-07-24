@@ -489,6 +489,51 @@ export const PublicPetitionField = objectType({
         return null;
       },
     });
+    t.nullable.field("profileType", {
+      type: "PublicProfileType",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.profile_type_id)) {
+          return await ctx.profiles.loadProfileType(o.profile_type_id);
+        }
+        return null;
+      },
+    });
+    t.nullable.field("profileTypeField", {
+      type: "PublicProfileTypeField",
+      description: "Linked profile type field.",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.profile_type_field_id)) {
+          return await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
+        }
+        return null;
+      },
+    });
+  },
+});
+
+export const PublicProfileType = objectType({
+  name: "PublicProfileType",
+  sourceType: "db.ProfileType",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "ProfileType" });
+    t.nonNull.list.nonNull.globalId("profileNamePatternFields", {
+      prefixName: "ProfileTypeField",
+      resolve: (o) => {
+        return (o.profile_name_pattern as (string | number)[]).filter(
+          (v) => typeof v === "number",
+        ) as number[];
+      },
+    });
+  },
+});
+
+export const PublicProfileTypeField = objectType({
+  name: "PublicProfileTypeField",
+  sourceType: "db.ProfileTypeField",
+  description: "A public view of a profile type field",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "ProfileTypeField" });
+    t.nullable.string("alias");
   },
 });
 

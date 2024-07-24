@@ -1204,6 +1204,8 @@ export interface NexusGenObjects {
   PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
   PublicPetitionSignatureRequest: db.PetitionSignatureRequest;
+  PublicProfileType: db.ProfileType;
+  PublicProfileTypeField: db.ProfileTypeField;
   PublicPublicPetitionLink: db.PublicPetitionLink;
   PublicRemindersOptOut: {
     // root type
@@ -3066,6 +3068,7 @@ export interface NexusGenFieldTypes {
     isStandard: boolean; // Boolean!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     profileNamePattern: string; // String!
+    profileNamePatternFields: NexusGenScalars["GID"][]; // [GID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   ProfileTypeField: {
@@ -3203,6 +3206,8 @@ export interface NexusGenFieldTypes {
     options: NexusGenScalars["JSONObject"]; // JSONObject!
     parent: NexusGenRootTypes["PublicPetitionField"] | null; // PublicPetitionField
     petition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+    profileType: NexusGenRootTypes["PublicProfileType"] | null; // PublicProfileType
+    profileTypeField: NexusGenRootTypes["PublicProfileTypeField"] | null; // PublicProfileTypeField
     replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
@@ -3269,6 +3274,16 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     signerStatus: NexusGenRootTypes["PetitionSignatureRequestSignerStatus"][]; // [PetitionSignatureRequestSignerStatus!]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
+  };
+  PublicProfileType: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    profileNamePatternFields: NexusGenScalars["GID"][]; // [GID!]!
+  };
+  PublicProfileTypeField: {
+    // field return type
+    alias: string | null; // String
+    id: NexusGenScalars["GID"]; // GID!
   };
   PublicPublicPetitionLink: {
     // field return type
@@ -5601,6 +5616,7 @@ export interface NexusGenFieldTypeNames {
     isStandard: "Boolean";
     name: "LocalizableUserText";
     profileNamePattern: "String";
+    profileNamePatternFields: "GID";
     updatedAt: "DateTime";
   };
   ProfileTypeField: {
@@ -5738,6 +5754,8 @@ export interface NexusGenFieldTypeNames {
     options: "JSONObject";
     parent: "PublicPetitionField";
     petition: "PublicPetition";
+    profileType: "PublicProfileType";
+    profileTypeField: "PublicProfileTypeField";
     replies: "PublicPetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
@@ -5804,6 +5822,16 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     signerStatus: "PetitionSignatureRequestSignerStatus";
     status: "PetitionSignatureRequestStatus";
+  };
+  PublicProfileType: {
+    // field return type name
+    id: "GID";
+    profileNamePatternFields: "GID";
+  };
+  PublicProfileTypeField: {
+    // field return type name
+    alias: "String";
+    id: "GID";
   };
   PublicPublicPetitionLink: {
     // field return type name

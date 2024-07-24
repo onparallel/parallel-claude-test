@@ -38,6 +38,14 @@ export const ProfileType = objectType({
           )
           .join(""),
     });
+    t.nonNull.list.nonNull.globalId("profileNamePatternFields", {
+      prefixName: "ProfileTypeField",
+      resolve: (o) => {
+        return (o.profile_name_pattern as (string | number)[]).filter(
+          (v) => typeof v === "number",
+        ) as number[];
+      },
+    });
     t.implements("Timestamps");
     t.nullable.datetime("archivedAt", {
       description: "Time when the response was created.",

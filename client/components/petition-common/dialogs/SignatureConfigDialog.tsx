@@ -55,7 +55,7 @@ import {
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isDefined, noop, omit, partition, pick, uniqBy } from "remeda";
+import { isDefined, noop, partition, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
@@ -582,45 +582,10 @@ function SignatureConfigDialogBodyStep3({
 
   const isPetition = petition.__typename === "Petition";
 
-  const previousSignatures = isPetition ? petition.signatureRequests : [];
-  const accesses = isPetition ? petition.accesses : [];
-
   const intl = useIntl();
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
   const showConfirmSignerInfo = useConfirmSignerInfoDialog();
-
-  const suggestions = uniqBy(
-    [
-      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? [])
-        .filter(isDefined)
-        .map((signer) => omit(signer, ["__typename"])),
-      {
-        email: user.email,
-        firstName: user.firstName ?? "",
-        lastName: user.lastName,
-      },
-      ...accesses
-        .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
-        .map((a) => ({
-          contactId: a.contact!.id,
-          email: a.contact!.email,
-          firstName: a.contact!.firstName,
-          lastName: a.contact!.lastName ?? "",
-        })),
-    ]
-      // remove already added signers
-      .filter(
-        (suggestion) =>
-          !presetSigners.some(
-            (s) =>
-              s.email === suggestion.email &&
-              s.firstName === suggestion.firstName &&
-              s.lastName === suggestion.lastName,
-          ),
-      ),
-    (s) => [s.email, s.firstName, s.lastName].join("|"),
-  );
 
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
 
@@ -721,7 +686,9 @@ function SignatureConfigDialogBodyStep3({
                 })}
               />
               <SuggestedSigners
-                suggestions={suggestions}
+                user={user}
+                petition={petition}
+                currentSigners={presetSigners}
                 onAddSigner={(s) => {
                   onChange([...signers, s]);
                 }}
@@ -742,7 +709,6 @@ SignatureConfigDialog.fragments = {
           ...SignatureConfigDialog_SignatureOrgIntegration
         }
         signers {
-          ...SuggestedSigners_PetitionSigner
           contactId
           firstName
           lastName
@@ -757,7 +723,6 @@ SignatureConfigDialog.fragments = {
         instructions
       }
       ${this.SignatureOrgIntegration}
-      ${SuggestedSigners.fragments.PetitionSigner}
     `;
   },
   get PetitionBase() {
@@ -786,17 +751,11 @@ SignatureConfigDialog.fragments = {
               ...SignatureConfigDialog_SignatureConfig
             }
           }
-          signatureRequests {
-            signatureConfig {
-              signers {
-                ...SuggestedSigners_PetitionSigner
-              }
-            }
-          }
         }
+        ...SuggestedSigners_PetitionBase
       }
       ${this.SignatureConfig}
-      ${SuggestedSigners.fragments.PetitionSigner}
+      ${SuggestedSigners.fragments.PetitionBase}
     `;
   },
   get SignatureOrgIntegration() {
@@ -815,7 +774,9 @@ SignatureConfigDialog.fragments = {
         firstName
         lastName
         email
+        ...SuggestedSigners_User
       }
+      ${SuggestedSigners.fragments.User}
     `;
   },
 };

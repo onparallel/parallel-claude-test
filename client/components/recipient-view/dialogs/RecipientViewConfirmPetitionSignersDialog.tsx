@@ -25,23 +25,20 @@ import { useConfirmSignerInfoDialog } from "@parallel/components/petition-common
 import {
   PublicPetitionSignerDataInput,
   Tone,
-  useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment,
-  useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment,
+  useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment,
 } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick, uniqBy } from "remeda";
+import { isDefined } from "remeda";
+import { assert } from "ts-essentials";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
 interface RecipientViewConfirmPetitionSignersDialogProps {
   keycode: string;
-  recipients: useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment[];
-  contact: useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment;
-  organization: string;
-  signatureConfig: useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment;
+  access: useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment;
   tone: Tone;
 }
 
@@ -54,10 +51,7 @@ const MAX_SIGNERS_ALLOWED = 40;
 
 function RecipientViewConfirmPetitionSignersDialog({
   keycode,
-  recipients,
-  contact,
-  organization,
-  signatureConfig,
+  access,
   tone,
   ...props
 }: DialogProps<
@@ -65,6 +59,17 @@ function RecipientViewConfirmPetitionSignersDialog({
   RecipientViewConfirmPetitionSignersDialogResult
 >) {
   const intl = useIntl();
+
+  const petition = access.petition;
+  const contact = access.contact;
+  const signatureConfig = petition.signatureConfig;
+
+  assert(
+    signatureConfig,
+    "petition.signatureConfig is required in RecipientViewConfirmPetitionSignersDialog",
+  );
+  assert(contact, "access.contact is required in RecipientViewConfirmPetitionSignersDialog");
+
   const {
     control,
     handleSubmit,
@@ -89,15 +94,6 @@ function RecipientViewConfirmPetitionSignersDialog({
   const additionalSigners = watch("additionalSigners");
 
   const allSigners = [...presetSigners, ...additionalSigners];
-
-  const suggestions = uniqBy(
-    recipients
-      .map((r) => pick(r, ["email", "firstName", "lastName"]))
-      .filter((suggestion) => !allSigners.some((s) => s.email === suggestion.email))
-      // first in the list is the contact
-      .sort((r) => (r.email === contact.email ? -1 : 0)),
-    (s) => [s.email, s.firstName, s.lastName].join("|"),
-  );
 
   const showConfirmSignerInfo = useConfirmSignerInfoDialog();
   const handleSelectedSignerRowOnEditClick =
@@ -236,6 +232,10 @@ function RecipientViewConfirmPetitionSignersDialog({
                           key={index}
                           isEditable
                           signer={signer}
+                          isMe={
+                            [signer.email, signer.firstName, signer.lastName].join("") ===
+                            [contact.email, contact.firstName, contact.lastName].join("")
+                          }
                           onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                           onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                         />
@@ -268,8 +268,11 @@ function RecipientViewConfirmPetitionSignersDialog({
                           ) : null}
                         </HStack>
                         <SuggestedSigners
-                          suggestions={suggestions}
+                          petition={petition}
+                          contact={contact}
+                          currentSigners={allSigners}
                           onAddSigner={(s) => onChange([...signers, s])}
+                          tone={tone}
                         />
                       </Stack>
                     ) : null}
@@ -371,17 +374,17 @@ useRecipientViewConfirmPetitionSignersDialog.fragments = {
       email
       isPreset
       ...SelectedSignerRow_PetitionSigner
-      ...SuggestedSigners_PetitionSigner
     }
     ${SelectedSignerRow.fragments.PetitionSigner}
-    ${SuggestedSigners.fragments.PetitionSigner}
   `,
   PublicContact: gql`
     fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
       firstName
       lastName
       email
+      ...SuggestedSigners_PublicContact
     }
+    ${SuggestedSigners.fragments.PublicContact}
   `,
   PublicSignatureConfig: gql`
     fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
@@ -391,6 +394,28 @@ useRecipientViewConfirmPetitionSignersDialog.fragments = {
       allowAdditionalSigners
       signers {
         ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
+      }
+    }
+  `,
+  PublicPetition: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetition on PublicPetition {
+      signatureConfig {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
+      }
+      recipients {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
+      }
+      ...SuggestedSigners_PublicPetition
+    }
+    ${SuggestedSigners.fragments.PublicPetition}
+  `,
+  PublicPetitionAccess: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess on PublicPetitionAccess {
+      petition {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicPetition
+      }
+      contact {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
       }
     }
   `,

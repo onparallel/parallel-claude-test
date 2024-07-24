@@ -97,7 +97,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
 
   const petition = access!.petition!;
   const granter = access!.granter;
-  const contact = access!.contact!;
   const message = access!.message;
 
   const pages = useGetPetitionPages(petition, { hideInternalFields: true });
@@ -167,11 +166,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             confirmSignerInfoData = await showConfirmPetitionSignersDialog({
-              recipients: petition.recipients,
-              signatureConfig: petition.signatureConfig,
               keycode,
-              organization: petition.organization.name,
-              contact,
+              access,
               tone,
             });
           }
@@ -449,9 +445,6 @@ const _fragments = {
         petition {
           ...RecipientView_PublicPetition
           isDelegateAccessEnabled
-          recipients {
-            ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-          }
           organization {
             id
             name
@@ -464,19 +457,17 @@ const _fragments = {
         granter {
           ...RecipientView_PublicUser
         }
-        contact {
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-        }
         message {
           ...RecipientView_PublicPetitionMessage
         }
         ...RecipientViewPetitionField_PublicPetitionAccess
         ...RecipientViewSidebar_PublicPetitionAccess
         ...RecipientViewHeader_PublicPetitionAccess
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess
       }
       ${this.PublicPetition}
       ${this.PublicUser}
-      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicContact}
+      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicPetitionAccess}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
       ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
@@ -507,15 +498,6 @@ const _fragments = {
         }
         signatureConfig {
           review
-          allowAdditionalSigners
-          signers {
-            fullName
-            ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-          }
-          additionalSigners {
-            ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-          }
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
         }
         recipients {
           ...RecipientViewHeader_PublicContact
@@ -533,8 +515,6 @@ const _fragments = {
         ...usePetitionCanFinalize_PublicPetition
       }
       ${focusPetitionField.fragments.PublicPetitionField}
-      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PetitionSigner}
-      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicSignatureConfig}
       ${RecipientViewContents.fragments.PublicPetition}
       ${RecipientViewProgressBar.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}

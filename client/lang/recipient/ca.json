@@ -845,9 +845,19 @@
     "context": "Signature started"
   },
   {
-    "term": "component.suggested-signers.header",
-    "definition": "Suggerit:",
-    "context": "Suggested:"
+    "term": "component.suggested-signers.others",
+    "definition": "Altres",
+    "context": "Others"
+  },
+  {
+    "term": "component.suggested-signers.potential-signers",
+    "definition": "Possibles signants",
+    "context": "Potential signers"
+  },
+  {
+    "term": "component.suggested-signers.unnamed-group",
+    "definition": "Grup sense nom",
+    "context": "Unnamed group"
   },
   {
     "term": "component.task-progress-dialog.unknown-task.confirm",

@@ -5625,6 +5625,7 @@ type ProfileType implements Timestamps {
   isStandard: Boolean!
   name: LocalizableUserText!
   profileNamePattern: String!
+  profileNamePatternFields: [GID!]!
 
   """
   Time when the resource was last updated.
@@ -5988,6 +5989,12 @@ type PublicPetitionField {
   options: JSONObject!
   parent: PublicPetitionField
   petition: PublicPetition!
+  profileType: PublicProfileType
+
+  """
+  Linked profile type field.
+  """
+  profileTypeField: PublicProfileTypeField
 
   """
   The replies to the petition field
@@ -6164,6 +6171,19 @@ input PublicPetitionSignerDataInput {
   email: String!
   firstName: String!
   lastName: String!
+}
+
+type PublicProfileType {
+  id: GID!
+  profileNamePatternFields: [GID!]!
+}
+
+"""
+A public view of a profile type field
+"""
+type PublicProfileTypeField {
+  alias: String
+  id: GID!
 }
 
 type PublicPublicPetitionLink {

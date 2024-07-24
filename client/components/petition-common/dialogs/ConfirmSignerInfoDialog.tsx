@@ -77,7 +77,7 @@ function ConfirmSignerInfoDialog({
             </Text>
           ) : null}
           <FormControl id="email" isInvalid={!!errors.email}>
-            <FormLabel fontWeight="bold">
+            <FormLabel fontWeight={400}>
               <FormattedMessage id="generic.email" defaultMessage="Email" />
             </FormLabel>
             <Input
@@ -98,32 +98,31 @@ function ConfirmSignerInfoDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <Stack direction={{ base: "column", sm: "row" }}>
-            <FormControl isInvalid={!!errors.firstName}>
-              <FormLabel fontWeight="bold">
-                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
-              </FormLabel>
-              <Input {...firstNameProps} />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.invalid-first-name-error"
-                  defaultMessage="Please, enter the first name"
-                />
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.lastName}>
-              <FormLabel fontWeight="bold">
-                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
-              </FormLabel>
-              <Input {...register("lastName", { required: true })} />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-last-name-error"
-                  defaultMessage="Please, enter the last name"
-                />
-              </FormErrorMessage>
-            </FormControl>
-          </Stack>
+
+          <FormControl isInvalid={!!errors.firstName}>
+            <FormLabel fontWeight={400}>
+              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+            </FormLabel>
+            <Input {...firstNameProps} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.invalid-first-name-error"
+                defaultMessage="Please, enter the first name"
+              />
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!errors.lastName}>
+            <FormLabel fontWeight={400}>
+              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+            </FormLabel>
+            <Input {...register("lastName", { required: true })} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-last-name-error"
+                defaultMessage="Please, enter the last name"
+              />
+            </FormErrorMessage>
+          </FormControl>
         </Stack>
       }
       confirm={

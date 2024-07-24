@@ -4568,6 +4568,7 @@ export interface ProfileType extends Timestamps {
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
+  profileNamePatternFields: Array<Scalars["GID"]["output"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 }
@@ -4797,6 +4798,9 @@ export interface PublicPetitionField {
   options: Scalars["JSONObject"]["output"];
   parent?: Maybe<PublicPetitionField>;
   petition: PublicPetition;
+  profileType?: Maybe<PublicProfileType>;
+  /** Linked profile type field. */
+  profileTypeField?: Maybe<PublicProfileTypeField>;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
   /** The title of the petition field. */
@@ -4904,6 +4908,19 @@ export interface PublicPetitionSignerDataInput {
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
   lastName: Scalars["String"]["input"];
+}
+
+export interface PublicProfileType {
+  __typename?: "PublicProfileType";
+  id: Scalars["GID"]["output"];
+  profileNamePatternFields: Array<Scalars["GID"]["output"]>;
+}
+
+/** A public view of a profile type field */
+export interface PublicProfileTypeField {
+  __typename?: "PublicProfileTypeField";
+  alias?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["GID"]["output"];
 }
 
 export interface PublicPublicPetitionLink {
@@ -10327,6 +10344,89 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     fullName?: string | null;
     email: string;
   } | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    isInternal: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
@@ -10341,16 +10441,8 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       } | null>;
     };
   }>;
-  fields: Array<{
-    __typename?: "PetitionField";
-    type: PetitionFieldType;
-    isInternal: boolean;
-    isReadOnly: boolean;
-    id: string;
-    title?: string | null;
-    alias?: string | null;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type AddPetitionAccessDialog_createContactlessPetitionAccessMutationVariables = Exact<{
@@ -10436,6 +10528,92 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
         fullName?: string | null;
         email: string;
       } | null;
+      fields: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        title?: string | null;
+        options: { [key: string]: any };
+        alias?: string | null;
+        isInternal: boolean;
+        isReadOnly: boolean;
+        visibility?: { [key: string]: any } | null;
+        math?: Array<{ [key: string]: any }> | null;
+        profileType?: {
+          __typename?: "ProfileType";
+          profileNamePatternFields: Array<string>;
+        } | null;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: {
+              __typename?: "PetitionField";
+              id: string;
+              type: PetitionFieldType;
+              alias?: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              profileTypeField?: {
+                __typename?: "ProfileTypeField";
+                id: string;
+                alias?: string | null;
+              } | null;
+            };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+        }>;
+        children?: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+          }>;
+        }> | null;
+        previewReplies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: {
+              __typename?: "PetitionField";
+              id: string;
+              type: PetitionFieldType;
+              options: { [key: string]: any };
+              optional: boolean;
+              parent?: { __typename?: "PetitionField"; id: string } | null;
+            };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+        }>;
+      }>;
       signatureRequests: Array<{
         __typename?: "PetitionSignatureRequest";
         signatureConfig: {
@@ -10450,15 +10628,11 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
           } | null>;
         };
       }>;
-      fields: Array<{
-        __typename?: "PetitionField";
-        type: PetitionFieldType;
-        isInternal: boolean;
-        isReadOnly: boolean;
-        id: string;
-        title?: string | null;
-        alias?: string | null;
-        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      customLists: Array<{
+        __typename?: "PetitionCustomList";
+        name: string;
+        values: Array<string>;
       }>;
     } | null;
   };
@@ -11352,6 +11526,305 @@ export type SuggestedSigners_PetitionSignerFragment = {
   email: string;
 };
 
+export type SuggestedSigners_PublicContactFragment = {
+  __typename?: "PublicContact";
+  firstName: string;
+  lastName?: string | null;
+  email: string;
+  isMe: boolean;
+};
+
+export type SuggestedSigners_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  id: string;
+  signatureConfig?: {
+    __typename?: "PublicSignatureConfig";
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+    }>;
+  } | null;
+  recipients: Array<{
+    __typename?: "PublicContact";
+    firstName: string;
+    lastName?: string | null;
+    email: string;
+    isMe: boolean;
+  }>;
+  fields: Array<{
+    __typename?: "PublicPetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: {
+      __typename?: "PublicProfileType";
+      profileNamePatternFields: Array<string>;
+    } | null;
+    replies: Array<{
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PublicPetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PublicPetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "PublicProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PublicPetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PublicPetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type SuggestedSigners_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
+export type SuggestedSigners_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
+  }>;
+  signatureRequests: Array<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+      } | null>;
+    };
+  }>;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type SuggestedSigners_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type SuggestedSigners_PetitionBaseFragment =
+  | SuggestedSigners_PetitionBase_Petition_Fragment
+  | SuggestedSigners_PetitionBase_PetitionTemplate_Fragment;
+
 export type TestModeSignatureBadge_UserFragment = {
   __typename?: "User";
   hasPetitionSignature: boolean;
@@ -11411,10 +11884,120 @@ export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
   } | null>;
 };
 
+export type ConfirmPetitionSignersDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  options: { [key: string]: any };
+  alias?: string | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: {
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        alias?: string | null;
+        options: { [key: string]: any };
+      };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+  }>;
+};
+
 export type ConfirmPetitionSignersDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isInteractionWithRecipientsEnabled: boolean;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -11441,6 +12024,8 @@ export type ConfirmPetitionSignersDialog_PetitionFragment = {
       } | null>;
     };
   }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type CreateFolderDialog_PetitionBase_Petition_Fragment = {
@@ -11947,6 +12532,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   name?: string | null;
   isReviewFlowEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  id: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -11954,9 +12540,9 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     contact?: {
       __typename?: "Contact";
       id: string;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
     } | null;
   }>;
   currentSignatureRequest?: {
@@ -11986,6 +12572,30 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       } | null>;
     };
   } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    title?: string | null;
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      name: string;
+      isDefault: boolean;
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      isPreset: boolean;
+    } | null>;
+  } | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
@@ -11998,30 +12608,89 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       } | null>;
     };
   }>;
-  signatureConfig?: {
-    __typename?: "SignatureConfig";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
     title?: string | null;
-    review: boolean;
-    allowAdditionalSigners: boolean;
-    signingMode: SignatureConfigSigningMode;
-    minSigners: number;
-    instructions?: string | null;
-    integration?: {
-      __typename?: "SignatureOrgIntegration";
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
       id: string;
-      name: string;
-      isDefault: boolean;
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      email: string;
-      isPreset: boolean;
-    } | null>;
-  } | null;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
@@ -12029,6 +12698,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
   name?: string | null;
   isReviewFlowEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  id: string;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -12053,6 +12723,89 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
       isPreset: boolean;
     } | null>;
   } | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type SignatureConfigDialog_PetitionBaseFragment =
@@ -12072,6 +12825,7 @@ export type SignatureConfigDialog_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
+  id: string;
 };
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
@@ -12559,6 +13313,89 @@ export type useSendPetitionHandler_PetitionFragment = {
     fullName?: string | null;
     email: string;
   } | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    isInternal: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
@@ -12573,16 +13410,8 @@ export type useSendPetitionHandler_PetitionFragment = {
       } | null>;
     };
   }>;
-  fields: Array<{
-    __typename?: "PetitionField";
-    type: PetitionFieldType;
-    isInternal: boolean;
-    isReadOnly: boolean;
-    id: string;
-    title?: string | null;
-    alias?: string | null;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useSendPetitionHandler_sendPetitionMutationVariables = Exact<{
@@ -14319,22 +15148,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     contact?: {
       __typename?: "Contact";
       id: string;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
     } | null;
-  }>;
-  signatureRequests: Array<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        firstName: string;
-        lastName?: string | null;
-        email: string;
-      } | null>;
-    };
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -14360,6 +15177,101 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
       isPreset: boolean;
     } | null>;
   } | null;
+  signatureRequests: Array<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+      } | null>;
+    };
+  }>;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
@@ -14434,6 +15346,89 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
       isPreset: boolean;
     } | null>;
   } | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -16484,32 +17479,6 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
       isPreset: boolean;
     } | null>;
   } | null;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-    } | null;
-  }>;
-  signatureRequests: Array<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        contactId?: string | null;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      } | null>;
-    };
-  }>;
   fields: Array<{
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -16518,6 +17487,8 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     isReadOnly: boolean;
     isInternal: boolean;
     id: string;
+    title?: string | null;
+    alias?: string | null;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
@@ -16534,9 +17505,15 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -16586,6 +17563,7 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -16595,10 +17573,10 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -16628,6 +17606,32 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
         content: { [key: string]: any };
       }>;
     }> | null;
+  }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
+  }>;
+  signatureRequests: Array<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+        isPreset: boolean;
+      } | null>;
+    };
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -16696,9 +17700,9 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -16760,10 +17764,10 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -16828,9 +17832,9 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -16892,10 +17896,10 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -17839,9 +18843,9 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -17903,10 +18907,10 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -17971,9 +18975,9 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -18035,10 +19039,10 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -18593,10 +19597,10 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment =
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -18677,10 +19681,10 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_PetitionTemplate_Fr
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -18793,32 +19797,6 @@ export type NewSignatureRequestRow_PetitionFragment = {
       name: string;
     } | null;
   } | null;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-    } | null;
-  }>;
-  signatureRequests: Array<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        contactId?: string | null;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      } | null>;
-    };
-  }>;
   fields: Array<{
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -18827,6 +19805,8 @@ export type NewSignatureRequestRow_PetitionFragment = {
     isReadOnly: boolean;
     isInternal: boolean;
     id: string;
+    title?: string | null;
+    alias?: string | null;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
@@ -18843,9 +19823,15 @@ export type NewSignatureRequestRow_PetitionFragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -18895,6 +19881,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -18904,10 +19891,10 @@ export type NewSignatureRequestRow_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -18937,6 +19924,32 @@ export type NewSignatureRequestRow_PetitionFragment = {
         content: { [key: string]: any };
       }>;
     }> | null;
+  }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
+  }>;
+  signatureRequests: Array<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+        isPreset: boolean;
+      } | null>;
+    };
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -19692,9 +20705,9 @@ export type PetitionSignaturesCard_PetitionFragment = {
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         isPreset: boolean;
       } | null>;
       integration?: {
@@ -19724,9 +20737,9 @@ export type PetitionSignaturesCard_PetitionFragment = {
     contact?: {
       __typename?: "Contact";
       id: string;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
     } | null;
   }>;
   currentSignatureRequest?: {
@@ -19792,6 +20805,8 @@ export type PetitionSignaturesCard_PetitionFragment = {
     isReadOnly: boolean;
     isInternal: boolean;
     id: string;
+    title?: string | null;
+    alias?: string | null;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
@@ -19808,9 +20823,15 @@ export type PetitionSignaturesCard_PetitionFragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -19860,6 +20881,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -19869,10 +20891,10 @@ export type PetitionSignaturesCard_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -19945,9 +20967,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
             integration?: {
@@ -19977,9 +20999,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           contact?: {
             __typename?: "Contact";
             id: string;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
           } | null;
         }>;
         currentSignatureRequest?: {
@@ -20045,6 +21067,8 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           isReadOnly: boolean;
           isInternal: boolean;
           id: string;
+          title?: string | null;
+          alias?: string | null;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           replies: Array<{
@@ -20061,9 +21085,15 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
                 optional: boolean;
                 isInternal: boolean;
                 isReadOnly: boolean;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -20113,6 +21143,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -20122,10 +21156,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
               __typename?: "PetitionFieldGroupChildReply";
               field: {
                 __typename?: "PetitionField";
+                id: string;
                 type: PetitionFieldType;
                 options: { [key: string]: any };
                 optional: boolean;
-                id: string;
                 parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
@@ -20238,9 +21272,9 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
+          email: string;
           firstName: string;
           lastName?: string | null;
-          email: string;
           isPreset: boolean;
         } | null>;
         integration?: {
@@ -20270,9 +21304,9 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       contact?: {
         __typename?: "Contact";
         id: string;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
       } | null;
     }>;
     currentSignatureRequest?: {
@@ -20338,6 +21372,8 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       isReadOnly: boolean;
       isInternal: boolean;
       id: string;
+      title?: string | null;
+      alias?: string | null;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       replies: Array<{
@@ -20354,9 +21390,15 @@ export type PetitionSignaturesCard_completePetitionMutation = {
             optional: boolean;
             isInternal: boolean;
             isReadOnly: boolean;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             id: string;
+            type: PetitionFieldType;
+            alias?: string | null;
+            options: { [key: string]: any };
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+            } | null;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
               content: { [key: string]: any };
@@ -20406,6 +21448,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
           }>;
         }> | null;
       }>;
+      profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -20415,10 +21458,10 @@ export type PetitionSignaturesCard_completePetitionMutation = {
           __typename?: "PetitionFieldGroupChildReply";
           field: {
             __typename?: "PetitionField";
+            id: string;
             type: PetitionFieldType;
             options: { [key: string]: any };
             optional: boolean;
-            id: string;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           };
           replies: Array<{
@@ -20491,9 +21534,9 @@ export type PetitionSignaturesCard_petitionQuery = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
             integration?: {
@@ -20523,9 +21566,9 @@ export type PetitionSignaturesCard_petitionQuery = {
           contact?: {
             __typename?: "Contact";
             id: string;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
           } | null;
         }>;
         currentSignatureRequest?: {
@@ -20591,6 +21634,8 @@ export type PetitionSignaturesCard_petitionQuery = {
           isReadOnly: boolean;
           isInternal: boolean;
           id: string;
+          title?: string | null;
+          alias?: string | null;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           replies: Array<{
@@ -20607,9 +21652,15 @@ export type PetitionSignaturesCard_petitionQuery = {
                 optional: boolean;
                 isInternal: boolean;
                 isReadOnly: boolean;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -20659,6 +21710,10 @@ export type PetitionSignaturesCard_petitionQuery = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -20668,10 +21723,10 @@ export type PetitionSignaturesCard_petitionQuery = {
               __typename?: "PetitionFieldGroupChildReply";
               field: {
                 __typename?: "PetitionField";
+                id: string;
                 type: PetitionFieldType;
                 options: { [key: string]: any };
                 optional: boolean;
-                id: string;
                 parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
@@ -21648,10 +22703,10 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -24244,10 +25299,10 @@ export type RecipientViewContents_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -24332,10 +25387,10 @@ export type RecipientViewContents_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -24574,9 +25629,9 @@ export type RecipientViewProgressBar_PetitionFragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -24652,10 +25707,10 @@ export type RecipientViewProgressBar_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -24692,9 +25747,9 @@ export type RecipientViewProgressBar_PetitionFieldFragment = {
         optional: boolean;
         isInternal: boolean;
         isReadOnly: boolean;
+        id: string;
         type: PetitionFieldType;
         options: { [key: string]: any };
-        id: string;
         previewReplies: Array<{
           __typename?: "PetitionFieldReply";
           content: { [key: string]: any };
@@ -25023,6 +26078,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment =
   firstName: string;
   lastName?: string | null;
   email: string;
+  isMe: boolean;
 };
 
 export type useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment = {
@@ -25039,6 +26095,186 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFr
     email: string;
     isPreset: boolean;
   }>;
+};
+
+export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  id: string;
+  signatureConfig?: {
+    __typename?: "PublicSignatureConfig";
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      fullName: string;
+      isPreset: boolean;
+    }>;
+  } | null;
+  recipients: Array<{
+    __typename?: "PublicContact";
+    firstName: string;
+    lastName?: string | null;
+    email: string;
+    isMe: boolean;
+  }>;
+  fields: Array<{
+    __typename?: "PublicPetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    profileType?: {
+      __typename?: "PublicProfileType";
+      profileNamePatternFields: Array<string>;
+    } | null;
+    replies: Array<{
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PublicPetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PublicPetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "PublicProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PublicPetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    children?: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PublicPetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+  }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+};
+
+export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+  petition: {
+    __typename?: "PublicPetition";
+    id: string;
+    signatureConfig?: {
+      __typename?: "PublicSignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      allowAdditionalSigners: boolean;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        fullName: string;
+        isPreset: boolean;
+      }>;
+    } | null;
+    recipients: Array<{
+      __typename?: "PublicContact";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      isMe: boolean;
+    }>;
+    fields: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      alias?: string | null;
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      profileType?: {
+        __typename?: "PublicProfileType";
+        profileNamePatternFields: Array<string>;
+      } | null;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        children?: Array<{
+          __typename?: "PublicPetitionFieldGroupChildReply";
+          field: {
+            __typename?: "PublicPetitionField";
+            id: string;
+            type: PetitionFieldType;
+            alias?: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            profileTypeField?: {
+              __typename?: "PublicProfileTypeField";
+              id: string;
+              alias?: string | null;
+            } | null;
+          };
+          replies: Array<{
+            __typename?: "PublicPetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+          }>;
+        }> | null;
+      }>;
+      children?: Array<{
+        __typename?: "PublicPetitionField";
+        id: string;
+        type: PetitionFieldType;
+        options: { [key: string]: any };
+        visibility?: { [key: string]: any } | null;
+        math?: Array<{ [key: string]: any }> | null;
+        parent?: { __typename?: "PublicPetitionField"; id: string } | null;
+        replies: Array<{
+          __typename?: "PublicPetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+        }>;
+      }> | null;
+    }>;
+    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+  };
+  contact?: {
+    __typename?: "PublicContact";
+    firstName: string;
+    lastName?: string | null;
+    email: string;
+    isMe: boolean;
+  } | null;
 };
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
@@ -29827,6 +31063,8 @@ export type PetitionActivity_PetitionFragment = {
     title?: string | null;
     options: { [key: string]: any };
     alias?: string | null;
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -29834,9 +31072,73 @@ export type PetitionActivity_PetitionFragment = {
       type: PetitionFieldType;
       isReadOnly: boolean;
       options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
     }> | null;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
   }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -29947,13 +31249,15 @@ export type PetitionActivity_PetitionFragment = {
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         isPreset: boolean;
       } | null>;
     };
   }>;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment = {
@@ -30800,6 +32104,8 @@ export type PetitionActivity_updatePetitionMutation = {
           title?: string | null;
           options: { [key: string]: any };
           alias?: string | null;
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30807,9 +32113,76 @@ export type PetitionActivity_updatePetitionMutation = {
             type: PetitionFieldType;
             isReadOnly: boolean;
             options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
         }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -30929,12 +32302,18 @@ export type PetitionActivity_updatePetitionMutation = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
+        }>;
+        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
         }>;
       }
     | { __typename?: "PetitionTemplate" };
@@ -32014,6 +33393,8 @@ export type PetitionActivity_petitionQuery = {
           title?: string | null;
           options: { [key: string]: any };
           alias?: string | null;
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -32021,9 +33402,76 @@ export type PetitionActivity_petitionQuery = {
             type: PetitionFieldType;
             isReadOnly: boolean;
             options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
         }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -32143,12 +33591,18 @@ export type PetitionActivity_petitionQuery = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
+        }>;
+        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
         }>;
       }
     | { __typename?: "PetitionTemplate" }
@@ -32285,13 +33739,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     options: { [key: string]: any };
     title?: string | null;
     isReadOnly: boolean;
+    alias?: string | null;
     isInternal: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
     isChild: boolean;
-    alias?: string | null;
     isLinkedToProfileTypeField: boolean;
     optional: boolean;
     showInPdf: boolean;
@@ -32322,8 +33776,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       hasCommentsEnabled: boolean;
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
-      description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
+      description?: string | null;
       parent?: {
         __typename?: "PetitionField";
         id: string;
@@ -32336,7 +33790,16 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
           type: PetitionFieldType;
         }> | null;
       } | null;
-      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
       profileType?: {
         __typename?: "ProfileType";
         id: string;
@@ -32381,6 +33844,47 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         };
       }>;
     }> | null;
+    profileType?: {
+      __typename?: "ProfileType";
+      profileNamePatternFields: Array<string>;
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        __typename?: "ProfileTypeField";
+        id: string;
+        alias?: string | null;
+        name: { [locale in UserLocale]?: string };
+        type: ProfileTypeFieldType;
+      }>;
+    } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -32393,19 +33897,29 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         type: PetitionFieldType;
       }> | null;
     } | null;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-    profileType?: {
-      __typename?: "ProfileType";
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
       id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        __typename?: "ProfileTypeField";
-        id: string;
-        alias?: string | null;
-        name: { [locale in UserLocale]?: string };
-        type: ProfileTypeFieldType;
-      }>;
-    } | null;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
     profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -32514,9 +34028,9 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         isPreset: boolean;
       } | null>;
     };
@@ -32560,13 +34074,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     options: { [key: string]: any };
     title?: string | null;
     isReadOnly: boolean;
+    alias?: string | null;
+    isInternal: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
     isChild: boolean;
-    isInternal: boolean;
-    alias?: string | null;
     isLinkedToProfileTypeField: boolean;
     optional: boolean;
     showInPdf: boolean;
@@ -32597,8 +34111,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       hasCommentsEnabled: boolean;
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
-      description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
+      description?: string | null;
       parent?: {
         __typename?: "PetitionField";
         id: string;
@@ -32611,7 +34125,16 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           type: PetitionFieldType;
         }> | null;
       } | null;
-      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
       profileType?: {
         __typename?: "ProfileType";
         id: string;
@@ -32656,6 +34179,47 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         };
       }>;
     }> | null;
+    profileType?: {
+      __typename?: "ProfileType";
+      profileNamePatternFields: Array<string>;
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      fields: Array<{
+        __typename?: "ProfileTypeField";
+        id: string;
+        alias?: string | null;
+        name: { [locale in UserLocale]?: string };
+        type: ProfileTypeFieldType;
+      }>;
+    } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -32668,18 +34232,29 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         type: PetitionFieldType;
       }> | null;
     } | null;
-    profileType?: {
-      __typename?: "ProfileType";
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
       id: string;
-      name: { [locale in UserLocale]?: string };
-      fields: Array<{
-        __typename?: "ProfileTypeField";
-        id: string;
-        alias?: string | null;
-        name: { [locale in UserLocale]?: string };
-        type: ProfileTypeFieldType;
-      }>;
-    } | null;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
     profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -33130,6 +34705,92 @@ export type PetitionCompose_updatePetitionMutation = {
           email: string;
         } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+          options: { [key: string]: any };
+          alias?: string | null;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+          }> | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+        }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           signatureConfig: {
@@ -33137,23 +34798,19 @@ export type PetitionCompose_updatePetitionMutation = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
         }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
-        fields: Array<{
-          __typename?: "PetitionField";
-          type: PetitionFieldType;
-          isInternal: boolean;
-          isReadOnly: boolean;
-          id: string;
-          title?: string | null;
-          alias?: string | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
         }>;
       }
     | {
@@ -33231,6 +34888,96 @@ export type PetitionCompose_updatePetitionMutation = {
             isPreset: boolean;
           } | null>;
         } | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+          options: { [key: string]: any };
+          alias?: string | null;
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+          }> | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+        }>;
+        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
       };
 };
 
@@ -35020,13 +36767,13 @@ export type PetitionCompose_petitionQuery = {
           options: { [key: string]: any };
           title?: string | null;
           isReadOnly: boolean;
+          alias?: string | null;
           isInternal: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
           isChild: boolean;
-          alias?: string | null;
           isLinkedToProfileTypeField: boolean;
           optional: boolean;
           showInPdf: boolean;
@@ -35057,8 +36804,8 @@ export type PetitionCompose_petitionQuery = {
             hasCommentsEnabled: boolean;
             requireApproval: boolean;
             isLinkedToProfileType: boolean;
-            description?: string | null;
             math?: Array<{ [key: string]: any }> | null;
+            description?: string | null;
             parent?: {
               __typename?: "PetitionField";
               id: string;
@@ -35071,7 +36818,16 @@ export type PetitionCompose_petitionQuery = {
                 type: PetitionFieldType;
               }> | null;
             } | null;
-            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
             profileType?: {
               __typename?: "ProfileType";
               id: string;
@@ -35116,6 +36872,47 @@ export type PetitionCompose_petitionQuery = {
               };
             }>;
           }> | null;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+            id: string;
+            name: { [locale in UserLocale]?: string };
+            fields: Array<{
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+              name: { [locale in UserLocale]?: string };
+              type: ProfileTypeFieldType;
+            }>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
           parent?: {
             __typename?: "PetitionField";
             id: string;
@@ -35128,19 +36925,29 @@ export type PetitionCompose_petitionQuery = {
               type: PetitionFieldType;
             }> | null;
           } | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-          profileType?: {
-            __typename?: "ProfileType";
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
             id: string;
-            name: { [locale in UserLocale]?: string };
-            fields: Array<{
-              __typename?: "ProfileTypeField";
-              id: string;
-              alias?: string | null;
-              name: { [locale in UserLocale]?: string };
-              type: ProfileTypeFieldType;
-            }>;
-          } | null;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
           profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -35264,9 +37071,9 @@ export type PetitionCompose_petitionQuery = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
@@ -35317,13 +37124,13 @@ export type PetitionCompose_petitionQuery = {
           options: { [key: string]: any };
           title?: string | null;
           isReadOnly: boolean;
+          alias?: string | null;
+          isInternal: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
           isChild: boolean;
-          isInternal: boolean;
-          alias?: string | null;
           isLinkedToProfileTypeField: boolean;
           optional: boolean;
           showInPdf: boolean;
@@ -35354,8 +37161,8 @@ export type PetitionCompose_petitionQuery = {
             hasCommentsEnabled: boolean;
             requireApproval: boolean;
             isLinkedToProfileType: boolean;
-            description?: string | null;
             math?: Array<{ [key: string]: any }> | null;
+            description?: string | null;
             parent?: {
               __typename?: "PetitionField";
               id: string;
@@ -35368,7 +37175,16 @@ export type PetitionCompose_petitionQuery = {
                 type: PetitionFieldType;
               }> | null;
             } | null;
-            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+            }>;
             profileType?: {
               __typename?: "ProfileType";
               id: string;
@@ -35413,6 +37229,47 @@ export type PetitionCompose_petitionQuery = {
               };
             }>;
           }> | null;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+            id: string;
+            name: { [locale in UserLocale]?: string };
+            fields: Array<{
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+              name: { [locale in UserLocale]?: string };
+              type: ProfileTypeFieldType;
+            }>;
+          } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                optional: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
           parent?: {
             __typename?: "PetitionField";
             id: string;
@@ -35425,18 +37282,29 @@ export type PetitionCompose_petitionQuery = {
               type: PetitionFieldType;
             }> | null;
           } | null;
-          profileType?: {
-            __typename?: "ProfileType";
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
             id: string;
-            name: { [locale in UserLocale]?: string };
-            fields: Array<{
-              __typename?: "ProfileTypeField";
-              id: string;
-              alias?: string | null;
-              name: { [locale in UserLocale]?: string };
-              type: ProfileTypeFieldType;
-            }>;
-          } | null;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
           profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -36350,9 +38218,9 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         isPreset: boolean;
       } | null>;
     };
@@ -36388,8 +38256,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     isReadOnly: boolean;
     title?: string | null;
     hasCommentsEnabled: boolean;
-    multiple: boolean;
     alias?: string | null;
+    multiple: boolean;
     commentCount: number;
     isChild: boolean;
     description?: string | null;
@@ -36487,16 +38355,21 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
           isInternal: boolean;
           optional: boolean;
           isReadOnly: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           id: string;
-          multiple: boolean;
+          type: PetitionFieldType;
           alias?: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
           title?: string | null;
           description?: string | null;
           commentCount: number;
           unreadCommentCount: number;
           hasCommentsEnabled: boolean;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -36657,6 +38530,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
     lastComment?: {
       __typename?: "PetitionFieldComment";
@@ -36803,15 +38677,15 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     unreadCommentCount: number;
     position: number;
     type: PetitionFieldType;
+    multiple: boolean;
+    alias?: string | null;
+    isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     isInternal: boolean;
     optional: boolean;
-    isReadOnly: boolean;
     title?: string | null;
     hasCommentsEnabled: boolean;
-    multiple: boolean;
-    alias?: string | null;
     commentCount: number;
     isChild: boolean;
     description?: string | null;
@@ -37263,9 +39137,9 @@ export type PetitionPreview_updatePetitionMutation = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
@@ -37305,8 +39179,8 @@ export type PetitionPreview_updatePetitionMutation = {
           isReadOnly: boolean;
           title?: string | null;
           hasCommentsEnabled: boolean;
-          multiple: boolean;
           alias?: string | null;
+          multiple: boolean;
           commentCount: number;
           isChild: boolean;
           description?: string | null;
@@ -37404,16 +39278,21 @@ export type PetitionPreview_updatePetitionMutation = {
                 isInternal: boolean;
                 optional: boolean;
                 isReadOnly: boolean;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 id: string;
-                multiple: boolean;
+                type: PetitionFieldType;
                 alias?: string | null;
+                options: { [key: string]: any };
+                multiple: boolean;
                 title?: string | null;
                 description?: string | null;
                 commentCount: number;
                 unreadCommentCount: number;
                 hasCommentsEnabled: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -37574,6 +39453,10 @@ export type PetitionPreview_updatePetitionMutation = {
             }> | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
           lastComment?: {
             __typename?: "PetitionFieldComment";
@@ -37727,15 +39610,15 @@ export type PetitionPreview_updatePetitionMutation = {
           unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
+          multiple: boolean;
+          alias?: string | null;
+          isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           options: { [key: string]: any };
           isInternal: boolean;
           optional: boolean;
-          isReadOnly: boolean;
           title?: string | null;
           hasCommentsEnabled: boolean;
-          multiple: boolean;
-          alias?: string | null;
           commentCount: number;
           isChild: boolean;
           description?: string | null;
@@ -38138,9 +40021,9 @@ export type PetitionPreview_completePetitionMutation = {
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
+          email: string;
           firstName: string;
           lastName?: string | null;
-          email: string;
           isPreset: boolean;
         } | null>;
       };
@@ -38176,8 +40059,8 @@ export type PetitionPreview_completePetitionMutation = {
       isReadOnly: boolean;
       title?: string | null;
       hasCommentsEnabled: boolean;
-      multiple: boolean;
       alias?: string | null;
+      multiple: boolean;
       commentCount: number;
       isChild: boolean;
       description?: string | null;
@@ -38275,16 +40158,21 @@ export type PetitionPreview_completePetitionMutation = {
             isInternal: boolean;
             optional: boolean;
             isReadOnly: boolean;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             id: string;
-            multiple: boolean;
+            type: PetitionFieldType;
             alias?: string | null;
+            options: { [key: string]: any };
+            multiple: boolean;
             title?: string | null;
             description?: string | null;
             commentCount: number;
             unreadCommentCount: number;
             hasCommentsEnabled: boolean;
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+            } | null;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
               content: { [key: string]: any };
@@ -38445,6 +40333,7 @@ export type PetitionPreview_completePetitionMutation = {
         }> | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
+      profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
       lastComment?: {
         __typename?: "PetitionFieldComment";
@@ -38604,9 +40493,9 @@ export type PetitionPreview_petitionQuery = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
           };
@@ -38646,8 +40535,8 @@ export type PetitionPreview_petitionQuery = {
           isReadOnly: boolean;
           title?: string | null;
           hasCommentsEnabled: boolean;
-          multiple: boolean;
           alias?: string | null;
+          multiple: boolean;
           commentCount: number;
           isChild: boolean;
           description?: string | null;
@@ -38745,16 +40634,21 @@ export type PetitionPreview_petitionQuery = {
                 isInternal: boolean;
                 optional: boolean;
                 isReadOnly: boolean;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 id: string;
-                multiple: boolean;
+                type: PetitionFieldType;
                 alias?: string | null;
+                options: { [key: string]: any };
+                multiple: boolean;
                 title?: string | null;
                 description?: string | null;
                 commentCount: number;
                 unreadCommentCount: number;
                 hasCommentsEnabled: boolean;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -38915,6 +40809,10 @@ export type PetitionPreview_petitionQuery = {
             }> | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
           lastComment?: {
             __typename?: "PetitionFieldComment";
@@ -39068,15 +40966,15 @@ export type PetitionPreview_petitionQuery = {
           unreadCommentCount: number;
           position: number;
           type: PetitionFieldType;
+          multiple: boolean;
+          alias?: string | null;
+          isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           options: { [key: string]: any };
           isInternal: boolean;
           optional: boolean;
-          isReadOnly: boolean;
           title?: string | null;
           hasCommentsEnabled: boolean;
-          multiple: boolean;
-          alias?: string | null;
           commentCount: number;
           isChild: boolean;
           description?: string | null;
@@ -39516,9 +41414,9 @@ export type PetitionReplies_PetitionFragment = {
     contact?: {
       __typename?: "Contact";
       id: string;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
     } | null;
   }>;
   fields: Array<{
@@ -39533,9 +41431,9 @@ export type PetitionReplies_PetitionFragment = {
     type: PetitionFieldType;
     isInternal: boolean;
     alias?: string | null;
+    title?: string | null;
     options: { [key: string]: any };
     optional: boolean;
-    title?: string | null;
     multiple: boolean;
     description?: string | null;
     hasCommentsEnabled: boolean;
@@ -39701,9 +41599,9 @@ export type PetitionReplies_PetitionFragment = {
     replies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       status: PetitionFieldReplyStatus;
       isAnonymized: boolean;
       metadata: { [key: string]: any };
@@ -39713,18 +41611,29 @@ export type PetitionReplies_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           title?: string | null;
           description?: string | null;
           commentCount: number;
           unreadCommentCount: number;
           multiple: boolean;
-          alias?: string | null;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+            name: { [locale in UserLocale]?: string };
+            isExpirable: boolean;
+            expiryAlertAheadTime?: Duration | null;
+            options: { [key: string]: any };
+            isUsedInProfileName: boolean;
+            myPermission: ProfileTypeFieldPermissionType;
+          } | null;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -39736,16 +41645,6 @@ export type PetitionReplies_PetitionFragment = {
               isComplete: boolean;
             };
           }>;
-          profileTypeField?: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            isExpirable: boolean;
-            expiryAlertAheadTime?: Duration | null;
-            options: { [key: string]: any };
-            isUsedInProfileName: boolean;
-            myPermission: ProfileTypeFieldPermissionType;
-          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -39795,10 +41694,10 @@ export type PetitionReplies_PetitionFragment = {
         replies: Array<{
           __typename?: "PetitionFieldReply";
           content: { [key: string]: any };
+          id: string;
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
           status: PetitionFieldReplyStatus;
           metadata: { [key: string]: any };
           repliedAt?: string | null;
@@ -39942,6 +41841,12 @@ export type PetitionReplies_PetitionFragment = {
         };
       } | null;
     }>;
+    profileType?: {
+      __typename?: "ProfileType";
+      profileNamePatternFields: Array<string>;
+      id: string;
+      profileNamePattern: string;
+    } | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -40005,7 +41910,6 @@ export type PetitionReplies_PetitionFragment = {
           }
       >;
     } | null;
-    profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
@@ -40085,9 +41989,9 @@ export type PetitionReplies_PetitionFragment = {
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         isPreset: boolean;
       } | null>;
       integration?: {
@@ -40336,10 +42240,10 @@ export type PetitionReplies_PetitionFieldFragment = {
       __typename?: "PetitionFieldGroupChildReply";
       field: {
         __typename?: "PetitionField";
+        id: string;
         type: PetitionFieldType;
         options: { [key: string]: any };
         optional: boolean;
-        id: string;
         parent?: { __typename?: "PetitionField"; id: string } | null;
       };
       replies: Array<{
@@ -40427,9 +42331,9 @@ export type PetitionReplies_closePetitionMutation = {
       contact?: {
         __typename?: "Contact";
         id: string;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
       } | null;
     }>;
     fields: Array<{
@@ -40444,9 +42348,9 @@ export type PetitionReplies_closePetitionMutation = {
       type: PetitionFieldType;
       isInternal: boolean;
       alias?: string | null;
+      title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
-      title?: string | null;
       multiple: boolean;
       description?: string | null;
       hasCommentsEnabled: boolean;
@@ -40612,9 +42516,9 @@ export type PetitionReplies_closePetitionMutation = {
       replies: Array<{
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
+        id: string;
         createdAt: string;
         updatedAt: string;
-        id: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
         metadata: { [key: string]: any };
@@ -40624,18 +42528,29 @@ export type PetitionReplies_closePetitionMutation = {
           __typename?: "PetitionFieldGroupChildReply";
           field: {
             __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            alias?: string | null;
+            options: { [key: string]: any };
             optional: boolean;
             isInternal: boolean;
             isReadOnly: boolean;
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             title?: string | null;
             description?: string | null;
             commentCount: number;
             unreadCommentCount: number;
             multiple: boolean;
-            alias?: string | null;
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+              name: { [locale in UserLocale]?: string };
+              isExpirable: boolean;
+              expiryAlertAheadTime?: Duration | null;
+              options: { [key: string]: any };
+              isUsedInProfileName: boolean;
+              myPermission: ProfileTypeFieldPermissionType;
+            } | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
               id: string;
@@ -40647,16 +42562,6 @@ export type PetitionReplies_closePetitionMutation = {
                 isComplete: boolean;
               };
             }>;
-            profileTypeField?: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              isExpirable: boolean;
-              expiryAlertAheadTime?: Duration | null;
-              options: { [key: string]: any };
-              isUsedInProfileName: boolean;
-              myPermission: ProfileTypeFieldPermissionType;
-            } | null;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
               content: { [key: string]: any };
@@ -40706,10 +42611,10 @@ export type PetitionReplies_closePetitionMutation = {
           replies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            id: string;
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt?: string | null;
@@ -40853,6 +42758,12 @@ export type PetitionReplies_closePetitionMutation = {
           };
         } | null;
       }>;
+      profileType?: {
+        __typename?: "ProfileType";
+        profileNamePatternFields: Array<string>;
+        id: string;
+        profileNamePattern: string;
+      } | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
         id: string;
@@ -40916,7 +42827,6 @@ export type PetitionReplies_closePetitionMutation = {
             }
         >;
       } | null;
-      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
       profileTypeField?: {
         __typename?: "ProfileTypeField";
         id: string;
@@ -40996,9 +42906,9 @@ export type PetitionReplies_closePetitionMutation = {
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
+          email: string;
           firstName: string;
           lastName?: string | null;
-          email: string;
           isPreset: boolean;
         } | null>;
         integration?: {
@@ -41106,9 +43016,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       contact?: {
         __typename?: "Contact";
         id: string;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
       } | null;
     }>;
     fields: Array<{
@@ -41123,9 +43033,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       type: PetitionFieldType;
       isInternal: boolean;
       alias?: string | null;
+      title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
-      title?: string | null;
       multiple: boolean;
       description?: string | null;
       hasCommentsEnabled: boolean;
@@ -41291,9 +43201,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       replies: Array<{
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
+        id: string;
         createdAt: string;
         updatedAt: string;
-        id: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
         metadata: { [key: string]: any };
@@ -41303,18 +43213,29 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           __typename?: "PetitionFieldGroupChildReply";
           field: {
             __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            alias?: string | null;
+            options: { [key: string]: any };
             optional: boolean;
             isInternal: boolean;
             isReadOnly: boolean;
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             title?: string | null;
             description?: string | null;
             commentCount: number;
             unreadCommentCount: number;
             multiple: boolean;
-            alias?: string | null;
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+              name: { [locale in UserLocale]?: string };
+              isExpirable: boolean;
+              expiryAlertAheadTime?: Duration | null;
+              options: { [key: string]: any };
+              isUsedInProfileName: boolean;
+              myPermission: ProfileTypeFieldPermissionType;
+            } | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
               id: string;
@@ -41326,16 +43247,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                 isComplete: boolean;
               };
             }>;
-            profileTypeField?: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              isExpirable: boolean;
-              expiryAlertAheadTime?: Duration | null;
-              options: { [key: string]: any };
-              isUsedInProfileName: boolean;
-              myPermission: ProfileTypeFieldPermissionType;
-            } | null;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
               content: { [key: string]: any };
@@ -41385,10 +43296,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           replies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            id: string;
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt?: string | null;
@@ -41532,6 +43443,12 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           };
         } | null;
       }>;
+      profileType?: {
+        __typename?: "ProfileType";
+        profileNamePatternFields: Array<string>;
+        id: string;
+        profileNamePattern: string;
+      } | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
         id: string;
@@ -41595,7 +43512,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             }
         >;
       } | null;
-      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
       profileTypeField?: {
         __typename?: "ProfileTypeField";
         id: string;
@@ -41675,9 +43591,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
+          email: string;
           firstName: string;
           lastName?: string | null;
-          email: string;
           isPreset: boolean;
         } | null>;
         integration?: {
@@ -41940,9 +43856,9 @@ export type PetitionReplies_petitionQuery = {
           contact?: {
             __typename?: "Contact";
             id: string;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
           } | null;
         }>;
         fields: Array<{
@@ -41957,9 +43873,9 @@ export type PetitionReplies_petitionQuery = {
           type: PetitionFieldType;
           isInternal: boolean;
           alias?: string | null;
+          title?: string | null;
           options: { [key: string]: any };
           optional: boolean;
-          title?: string | null;
           multiple: boolean;
           description?: string | null;
           hasCommentsEnabled: boolean;
@@ -42129,9 +44045,9 @@ export type PetitionReplies_petitionQuery = {
           replies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            id: string;
             createdAt: string;
             updatedAt: string;
-            id: string;
             status: PetitionFieldReplyStatus;
             isAnonymized: boolean;
             metadata: { [key: string]: any };
@@ -42141,18 +44057,29 @@ export type PetitionReplies_petitionQuery = {
               __typename?: "PetitionFieldGroupChildReply";
               field: {
                 __typename?: "PetitionField";
+                id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
                 optional: boolean;
                 isInternal: boolean;
                 isReadOnly: boolean;
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 title?: string | null;
                 description?: string | null;
                 commentCount: number;
                 unreadCommentCount: number;
                 multiple: boolean;
-                alias?: string | null;
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                  name: { [locale in UserLocale]?: string };
+                  isExpirable: boolean;
+                  expiryAlertAheadTime?: Duration | null;
+                  options: { [key: string]: any };
+                  isUsedInProfileName: boolean;
+                  myPermission: ProfileTypeFieldPermissionType;
+                } | null;
                 attachments: Array<{
                   __typename?: "PetitionFieldAttachment";
                   id: string;
@@ -42164,16 +44091,6 @@ export type PetitionReplies_petitionQuery = {
                     isComplete: boolean;
                   };
                 }>;
-                profileTypeField?: {
-                  __typename?: "ProfileTypeField";
-                  id: string;
-                  name: { [locale in UserLocale]?: string };
-                  isExpirable: boolean;
-                  expiryAlertAheadTime?: Duration | null;
-                  options: { [key: string]: any };
-                  isUsedInProfileName: boolean;
-                  myPermission: ProfileTypeFieldPermissionType;
-                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -42223,10 +44140,10 @@ export type PetitionReplies_petitionQuery = {
               replies: Array<{
                 __typename?: "PetitionFieldReply";
                 content: { [key: string]: any };
+                id: string;
                 isAnonymized: boolean;
                 createdAt: string;
                 updatedAt: string;
-                id: string;
                 status: PetitionFieldReplyStatus;
                 metadata: { [key: string]: any };
                 repliedAt?: string | null;
@@ -42370,6 +44287,12 @@ export type PetitionReplies_petitionQuery = {
               };
             } | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+            id: string;
+            profileNamePattern: string;
+          } | null;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -42432,11 +44355,6 @@ export type PetitionReplies_petitionQuery = {
                   } | null;
                 }
             >;
-          } | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            profileNamePattern: string;
           } | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
@@ -42517,9 +44435,9 @@ export type PetitionReplies_petitionQuery = {
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
+              email: string;
               firstName: string;
               lastName?: string | null;
-              email: string;
               isPreset: boolean;
             } | null>;
             integration?: {
@@ -44939,15 +46857,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
-    recipients: Array<{
-      __typename?: "PublicContact";
-      id: string;
-      firstName: string;
-      lastName?: string | null;
-      email: string;
-      fullName: string;
-      initials?: string | null;
-    }>;
     organization: {
       __typename?: "PublicOrganization";
       id: string;
@@ -44973,8 +46882,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
       isReadOnly: boolean;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
-      multiple: boolean;
       alias?: string | null;
+      multiple: boolean;
       description?: string | null;
       commentCount: number;
       math?: Array<{ [key: string]: any }> | null;
@@ -44994,16 +46903,21 @@ export type RecipientView_PublicPetitionAccessFragment = {
             isInternal: boolean;
             optional: boolean;
             isReadOnly: boolean;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             id: string;
-            multiple: boolean;
+            type: PetitionFieldType;
             alias?: string | null;
+            options: { [key: string]: any };
+            multiple: boolean;
             title?: string | null;
             description?: string | null;
             commentCount: number;
             unreadCommentCount: number;
             hasCommentsEnabled: boolean;
+            profileTypeField?: {
+              __typename?: "PublicProfileTypeField";
+              id: string;
+              alias?: string | null;
+            } | null;
             replies: Array<{
               __typename?: "PublicPetitionFieldReply";
               id: string;
@@ -45052,6 +46966,10 @@ export type RecipientView_PublicPetitionAccessFragment = {
           }>;
         }> | null;
       }>;
+      profileType?: {
+        __typename?: "PublicProfileType";
+        profileNamePatternFields: Array<string>;
+      } | null;
       children?: Array<{
         __typename?: "PublicPetitionField";
         id: string;
@@ -45078,29 +46996,32 @@ export type RecipientView_PublicPetitionAccessFragment = {
         };
       }>;
     }>;
+    recipients: Array<{
+      __typename?: "PublicContact";
+      id: string;
+      fullName: string;
+      firstName: string;
+      email: string;
+      initials?: string | null;
+      lastName?: string | null;
+      isMe: boolean;
+    }>;
     signatureConfig?: {
       __typename?: "PublicSignatureConfig";
       review: boolean;
-      allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      allowAdditionalSigners: boolean;
       signers: Array<{
         __typename?: "PetitionSigner";
-        fullName: string;
-        email: string;
         firstName: string;
         lastName?: string | null;
-        isPreset: boolean;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
         email: string;
-        firstName: string;
-        lastName?: string | null;
+        fullName: string;
         isPreset: boolean;
       }>;
+      additionalSigners: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
     } | null;
     latestSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
@@ -45122,16 +47043,17 @@ export type RecipientView_PublicPetitionAccessFragment = {
     email: string;
     organization: { __typename?: "PublicOrganization"; name: string };
   } | null;
+  message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
   contact?: {
     __typename?: "PublicContact";
     id: string;
-    firstName: string;
-    lastName?: string | null;
-    email: string;
     fullName: string;
+    firstName: string;
+    email: string;
     initials?: string | null;
+    lastName?: string | null;
+    isMe: boolean;
   } | null;
-  message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
 };
 
 export type RecipientView_PublicPetitionMessageFragment = {
@@ -45153,13 +47075,13 @@ export type RecipientView_PublicPetitionFragment = {
   fields: Array<{
     __typename?: "PublicPetitionField";
     id: string;
-    unreadCommentCount: number;
     type: PetitionFieldType;
     title?: string | null;
     options: { [key: string]: any };
     optional: boolean;
     isInternal: boolean;
     isReadOnly: boolean;
+    unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
     multiple: boolean;
@@ -45270,26 +47192,9 @@ export type RecipientView_PublicPetitionFragment = {
   signatureConfig?: {
     __typename?: "PublicSignatureConfig";
     review: boolean;
-    allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
-    minSigners: number;
-    instructions?: string | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      fullName: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-      isPreset: boolean;
-    }>;
-    additionalSigners: Array<{
-      __typename?: "PetitionSigner";
-      fullName: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-      isPreset: boolean;
-    }>;
+    signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+    additionalSigners: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
   } | null;
   recipients: Array<{
     __typename?: "PublicContact";
@@ -45354,13 +47259,13 @@ export type RecipientView_publicCompletePetitionMutation = {
     fields: Array<{
       __typename?: "PublicPetitionField";
       id: string;
-      unreadCommentCount: number;
       type: PetitionFieldType;
       title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
       isInternal: boolean;
       isReadOnly: boolean;
+      unreadCommentCount: number;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
       multiple: boolean;
@@ -45471,26 +47376,9 @@ export type RecipientView_publicCompletePetitionMutation = {
     signatureConfig?: {
       __typename?: "PublicSignatureConfig";
       review: boolean;
-      allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
-      minSigners: number;
-      instructions?: string | null;
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      }>;
+      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+      additionalSigners: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
     } | null;
     recipients: Array<{
       __typename?: "PublicContact";
@@ -45541,15 +47429,6 @@ export type RecipientView_accessQuery = {
       isCompletingMessageEnabled: boolean;
       completingMessageBody?: string | null;
       completingMessageSubject?: string | null;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        firstName: string;
-        lastName?: string | null;
-        email: string;
-        fullName: string;
-        initials?: string | null;
-      }>;
       organization: {
         __typename?: "PublicOrganization";
         id: string;
@@ -45575,8 +47454,8 @@ export type RecipientView_accessQuery = {
         isReadOnly: boolean;
         hasCommentsEnabled: boolean;
         visibility?: { [key: string]: any } | null;
-        multiple: boolean;
         alias?: string | null;
+        multiple: boolean;
         description?: string | null;
         commentCount: number;
         math?: Array<{ [key: string]: any }> | null;
@@ -45596,16 +47475,21 @@ export type RecipientView_accessQuery = {
               isInternal: boolean;
               optional: boolean;
               isReadOnly: boolean;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
               id: string;
-              multiple: boolean;
+              type: PetitionFieldType;
               alias?: string | null;
+              options: { [key: string]: any };
+              multiple: boolean;
               title?: string | null;
               description?: string | null;
               commentCount: number;
               unreadCommentCount: number;
               hasCommentsEnabled: boolean;
+              profileTypeField?: {
+                __typename?: "PublicProfileTypeField";
+                id: string;
+                alias?: string | null;
+              } | null;
               replies: Array<{
                 __typename?: "PublicPetitionFieldReply";
                 id: string;
@@ -45654,6 +47538,10 @@ export type RecipientView_accessQuery = {
             }>;
           }> | null;
         }>;
+        profileType?: {
+          __typename?: "PublicProfileType";
+          profileNamePatternFields: Array<string>;
+        } | null;
         children?: Array<{
           __typename?: "PublicPetitionField";
           id: string;
@@ -45680,28 +47568,35 @@ export type RecipientView_accessQuery = {
           };
         }>;
       }>;
+      recipients: Array<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName: string;
+        firstName: string;
+        email: string;
+        initials?: string | null;
+        lastName?: string | null;
+        isMe: boolean;
+      }>;
       signatureConfig?: {
         __typename?: "PublicSignatureConfig";
         review: boolean;
-        allowAdditionalSigners: boolean;
         signingMode: SignatureConfigSigningMode;
         minSigners: number;
         instructions?: string | null;
+        allowAdditionalSigners: boolean;
         signers: Array<{
           __typename?: "PetitionSigner";
-          fullName: string;
-          email: string;
           firstName: string;
           lastName?: string | null;
+          email: string;
+          fullName: string;
           isPreset: boolean;
         }>;
         additionalSigners: Array<{
           __typename?: "PetitionSigner";
           fullName: string;
           email: string;
-          firstName: string;
-          lastName?: string | null;
-          isPreset: boolean;
         }>;
       } | null;
       latestSignatureRequest?: {
@@ -45728,16 +47623,17 @@ export type RecipientView_accessQuery = {
       email: string;
       organization: { __typename?: "PublicOrganization"; name: string };
     } | null;
+    message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
     contact?: {
       __typename?: "PublicContact";
       id: string;
-      firstName: string;
-      lastName?: string | null;
-      email: string;
       fullName: string;
+      firstName: string;
+      email: string;
       initials?: string | null;
+      lastName?: string | null;
+      isMe: boolean;
     } | null;
-    message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
   };
   metadata: {
     __typename?: "ConnectionMetadata";
@@ -46670,10 +48566,10 @@ export type useFieldLogic_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -46748,10 +48644,10 @@ export type useFieldLogic_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -46826,10 +48722,10 @@ export type useFieldLogic_PetitionFieldFragment = {
       __typename?: "PetitionFieldGroupChildReply";
       field: {
         __typename?: "PetitionField";
+        id: string;
         type: PetitionFieldType;
         options: { [key: string]: any };
         optional: boolean;
-        id: string;
         parent?: { __typename?: "PetitionField"; id: string } | null;
       };
       replies: Array<{
@@ -48363,10 +50259,10 @@ export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -48443,10 +50339,10 @@ export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -48517,9 +50413,9 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -48578,10 +50474,10 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -48642,9 +50538,9 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          id: string;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -48703,10 +50599,10 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -49166,32 +51062,6 @@ export type useStartSignatureRequest_PetitionFragment = {
       isPreset: boolean;
     } | null>;
   } | null;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      email: string;
-      firstName: string;
-      lastName?: string | null;
-    } | null;
-  }>;
-  signatureRequests: Array<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        contactId?: string | null;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-        isPreset: boolean;
-      } | null>;
-    };
-  }>;
   fields: Array<{
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -49200,6 +51070,8 @@ export type useStartSignatureRequest_PetitionFragment = {
     isReadOnly: boolean;
     isInternal: boolean;
     id: string;
+    title?: string | null;
+    alias?: string | null;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
@@ -49216,9 +51088,15 @@ export type useStartSignatureRequest_PetitionFragment = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           id: string;
+          type: PetitionFieldType;
+          alias?: string | null;
+          options: { [key: string]: any };
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            alias?: string | null;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -49268,6 +51146,7 @@ export type useStartSignatureRequest_PetitionFragment = {
         }>;
       }> | null;
     }>;
+    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -49277,10 +51156,10 @@ export type useStartSignatureRequest_PetitionFragment = {
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           optional: boolean;
-          id: string;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
@@ -49310,6 +51189,32 @@ export type useStartSignatureRequest_PetitionFragment = {
         content: { [key: string]: any };
       }>;
     }> | null;
+  }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
+  }>;
+  signatureRequests: Array<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+        isPreset: boolean;
+      } | null>;
+    };
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -49350,32 +51255,6 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
             isPreset: boolean;
           } | null>;
         } | null;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            email: string;
-            firstName: string;
-            lastName?: string | null;
-          } | null;
-        }>;
-        signatureRequests: Array<{
-          __typename?: "PetitionSignatureRequest";
-          signatureConfig: {
-            __typename?: "SignatureConfig";
-            signers: Array<{
-              __typename?: "PetitionSigner";
-              contactId?: string | null;
-              email: string;
-              firstName: string;
-              lastName?: string | null;
-              isPreset: boolean;
-            } | null>;
-          };
-        }>;
         fields: Array<{
           __typename?: "PetitionField";
           type: PetitionFieldType;
@@ -49384,6 +51263,8 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           isReadOnly: boolean;
           isInternal: boolean;
           id: string;
+          title?: string | null;
+          alias?: string | null;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           replies: Array<{
@@ -49400,9 +51281,15 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
                 optional: boolean;
                 isInternal: boolean;
                 isReadOnly: boolean;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
                 id: string;
+                type: PetitionFieldType;
+                alias?: string | null;
+                options: { [key: string]: any };
+                profileTypeField?: {
+                  __typename?: "ProfileTypeField";
+                  id: string;
+                  alias?: string | null;
+                } | null;
                 previewReplies: Array<{
                   __typename?: "PetitionFieldReply";
                   content: { [key: string]: any };
@@ -49452,6 +51339,10 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
               }>;
             }> | null;
           }>;
+          profileType?: {
+            __typename?: "ProfileType";
+            profileNamePatternFields: Array<string>;
+          } | null;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -49461,10 +51352,10 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
               __typename?: "PetitionFieldGroupChildReply";
               field: {
                 __typename?: "PetitionField";
+                id: string;
                 type: PetitionFieldType;
                 options: { [key: string]: any };
                 optional: boolean;
-                id: string;
                 parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
@@ -49494,6 +51385,32 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
               content: { [key: string]: any };
             }>;
           }> | null;
+        }>;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+          } | null;
+        }>;
+        signatureRequests: Array<{
+          __typename?: "PetitionSignatureRequest";
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              email: string;
+              firstName: string;
+              lastName?: string | null;
+              isPreset: boolean;
+            } | null>;
+          };
         }>;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
@@ -49539,32 +51456,6 @@ export type useStartSignatureRequest_completePetitionMutation = {
         isPreset: boolean;
       } | null>;
     } | null;
-    accesses: Array<{
-      __typename?: "PetitionAccess";
-      id: string;
-      status: PetitionAccessStatus;
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        email: string;
-        firstName: string;
-        lastName?: string | null;
-      } | null;
-    }>;
-    signatureRequests: Array<{
-      __typename?: "PetitionSignatureRequest";
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        signers: Array<{
-          __typename?: "PetitionSigner";
-          contactId?: string | null;
-          email: string;
-          firstName: string;
-          lastName?: string | null;
-          isPreset: boolean;
-        } | null>;
-      };
-    }>;
     fields: Array<{
       __typename?: "PetitionField";
       type: PetitionFieldType;
@@ -49573,6 +51464,8 @@ export type useStartSignatureRequest_completePetitionMutation = {
       isReadOnly: boolean;
       isInternal: boolean;
       id: string;
+      title?: string | null;
+      alias?: string | null;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       replies: Array<{
@@ -49589,9 +51482,15 @@ export type useStartSignatureRequest_completePetitionMutation = {
             optional: boolean;
             isInternal: boolean;
             isReadOnly: boolean;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
             id: string;
+            type: PetitionFieldType;
+            alias?: string | null;
+            options: { [key: string]: any };
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              alias?: string | null;
+            } | null;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
               content: { [key: string]: any };
@@ -49641,6 +51540,7 @@ export type useStartSignatureRequest_completePetitionMutation = {
           }>;
         }> | null;
       }>;
+      profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -49650,10 +51550,10 @@ export type useStartSignatureRequest_completePetitionMutation = {
           __typename?: "PetitionFieldGroupChildReply";
           field: {
             __typename?: "PetitionField";
+            id: string;
             type: PetitionFieldType;
             options: { [key: string]: any };
             optional: boolean;
-            id: string;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           };
           replies: Array<{
@@ -49683,6 +51583,32 @@ export type useStartSignatureRequest_completePetitionMutation = {
           content: { [key: string]: any };
         }>;
       }> | null;
+    }>;
+    accesses: Array<{
+      __typename?: "PetitionAccess";
+      id: string;
+      status: PetitionAccessStatus;
+      contact?: {
+        __typename?: "Contact";
+        id: string;
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+      } | null;
+    }>;
+    signatureRequests: Array<{
+      __typename?: "PetitionSignatureRequest";
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null;
+          email: string;
+          firstName: string;
+          lastName?: string | null;
+          isPreset: boolean;
+        } | null>;
+      };
     }>;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -51285,13 +53211,23 @@ export const TestModeSignatureBadge_UserFragmentDoc = gql`
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
   }
 ` as unknown as DocumentNode<TestModeSignatureBadge_UserFragment, unknown>;
+export const SuggestedSigners_UserFragmentDoc = gql`
+  fragment SuggestedSigners_User on User {
+    id
+    email
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<SuggestedSigners_UserFragment, unknown>;
 export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
   fragment ConfirmPetitionSignersDialog_User on User {
     id
     email
     firstName
     lastName
+    ...SuggestedSigners_User
   }
+  ${SuggestedSigners_UserFragmentDoc}
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
 export const useStartSignatureRequest_UserFragmentDoc = gql`
   fragment useStartSignatureRequest_User on User {
@@ -51311,7 +53247,9 @@ export const SignatureConfigDialog_UserFragmentDoc = gql`
     firstName
     lastName
     email
+    ...SuggestedSigners_User
   }
+  ${SuggestedSigners_UserFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_UserFragment, unknown>;
 export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
   fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
@@ -52902,6 +54840,31 @@ export const ShareButton_PetitionBaseFragmentDoc = gql`
   ${UserReference_UserFragmentDoc}
   ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<ShareButton_PetitionBaseFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionFieldFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
+    id
+    type
+    title
+    options
+    alias
+    replies {
+      id
+      content
+      children {
+        field {
+          id
+          type
+          alias
+          options
+        }
+        replies {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionFieldFragment, unknown>;
 export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
   fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
     firstName
@@ -52909,13 +54872,6 @@ export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<SelectedSignerRow_PetitionSignerFragment, unknown>;
-export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
-  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
 export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
   fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
     contactId
@@ -52924,15 +54880,195 @@ export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
     lastName
     isPreset
     ...SelectedSignerRow_PetitionSigner
-    ...SuggestedSigners_PetitionSigner
   }
   ${SelectedSignerRow_PetitionSignerFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
+export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
+  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
+export const useFieldLogic_PetitionFieldInnerFragmentDoc = gql`
+  fragment useFieldLogic_PetitionFieldInner on PetitionField {
+    id
+    type
+    options
+    visibility
+    math
+  }
+` as unknown as DocumentNode<useFieldLogic_PetitionFieldInnerFragment, unknown>;
+export const completedFieldReplies_PetitionFieldReplyFragmentDoc = gql`
+  fragment completedFieldReplies_PetitionFieldReply on PetitionFieldReply {
+    content
+    isAnonymized
+  }
+` as unknown as DocumentNode<completedFieldReplies_PetitionFieldReplyFragment, unknown>;
+export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
+  fragment completedFieldReplies_PetitionField on PetitionField {
+    type
+    options
+    previewReplies @client {
+      ...completedFieldReplies_PetitionFieldReply
+      children {
+        field {
+          type
+          options
+          optional
+        }
+        replies {
+          ...completedFieldReplies_PetitionFieldReply
+        }
+      }
+    }
+    replies {
+      ...completedFieldReplies_PetitionFieldReply
+      children {
+        field {
+          type
+          options
+          optional
+        }
+        replies {
+          ...completedFieldReplies_PetitionFieldReply
+        }
+      }
+    }
+  }
+  ${completedFieldReplies_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<completedFieldReplies_PetitionFieldFragment, unknown>;
+export const useFieldLogic_PetitionFieldFragmentDoc = gql`
+  fragment useFieldLogic_PetitionField on PetitionField {
+    ...useFieldLogic_PetitionFieldInner
+    children {
+      ...useFieldLogic_PetitionFieldInner
+      parent {
+        id
+      }
+      replies {
+        id
+        content
+      }
+      previewReplies @client {
+        id
+        content
+      }
+    }
+    replies {
+      id
+      content
+      children {
+        field {
+          id
+        }
+        replies {
+          id
+          content
+        }
+      }
+    }
+    previewReplies @client {
+      id
+      content
+      children {
+        field {
+          id
+          parent {
+            id
+          }
+        }
+        replies {
+          id
+          content
+        }
+      }
+    }
+    ...completedFieldReplies_PetitionField
+  }
+  ${useFieldLogic_PetitionFieldInnerFragmentDoc}
+  ${completedFieldReplies_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<useFieldLogic_PetitionFieldFragment, unknown>;
+export const useFieldLogic_PetitionBaseFragmentDoc = gql`
+  fragment useFieldLogic_PetitionBase on PetitionBase {
+    variables {
+      name
+      defaultValue
+    }
+    customLists {
+      name
+      values
+    }
+    fields {
+      ...useFieldLogic_PetitionField
+    }
+  }
+  ${useFieldLogic_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<useFieldLogic_PetitionBaseFragment, unknown>;
+export const SuggestedSigners_PetitionBaseFragmentDoc = gql`
+  fragment SuggestedSigners_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      type
+      title
+      options
+      alias
+      profileType {
+        profileNamePatternFields
+      }
+      replies {
+        id
+        content
+        children {
+          field {
+            id
+            type
+            alias
+            options
+            profileTypeField {
+              id
+              alias
+            }
+          }
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+    ... on Petition {
+      accesses {
+        id
+        status
+        contact {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+      signatureRequests {
+        signatureConfig {
+          signers {
+            ...SuggestedSigners_PetitionSigner
+          }
+        }
+      }
+    }
+    ...useFieldLogic_PetitionBase
+  }
+  ${SuggestedSigners_PetitionSignerFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<SuggestedSigners_PetitionBaseFragment, unknown>;
 export const ConfirmPetitionSignersDialog_PetitionFragmentDoc = gql`
   fragment ConfirmPetitionSignersDialog_Petition on Petition {
     id
     isInteractionWithRecipientsEnabled
+    fields {
+      ...ConfirmPetitionSignersDialog_PetitionField
+    }
     accesses {
       id
       status
@@ -52950,8 +55086,11 @@ export const ConfirmPetitionSignersDialog_PetitionFragmentDoc = gql`
         }
       }
     }
+    ...SuggestedSigners_PetitionBase
   }
+  ${ConfirmPetitionSignersDialog_PetitionFieldFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${SuggestedSigners_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionFragment, unknown>;
 export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
   fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
@@ -54516,7 +56655,6 @@ export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
       ...SignatureConfigDialog_SignatureOrgIntegration
     }
     signers {
-      ...SuggestedSigners_PetitionSigner
       contactId
       firstName
       lastName
@@ -54531,7 +56669,6 @@ export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
     instructions
   }
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_SignatureConfigFragment, unknown>;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
   fragment SignatureConfigDialog_PetitionBase on PetitionBase {
@@ -54558,17 +56695,11 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
           ...SignatureConfigDialog_SignatureConfig
         }
       }
-      signatureRequests {
-        signatureConfig {
-          signers {
-            ...SuggestedSigners_PetitionSigner
-          }
-        }
-      }
     }
+    ...SuggestedSigners_PetitionBase
   }
   ${SignatureConfigDialog_SignatureConfigFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
+  ${SuggestedSigners_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_PetitionBaseFragment, unknown>;
 export const CompliancePeriodDialog_PetitionBaseFragmentDoc = gql`
   fragment CompliancePeriodDialog_PetitionBase on PetitionBase {
@@ -55201,121 +57332,6 @@ export const DowJonesFieldSearchResults_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<DowJonesFieldSearchResults_PetitionFieldFragment, unknown>;
-export const completedFieldReplies_PetitionFieldReplyFragmentDoc = gql`
-  fragment completedFieldReplies_PetitionFieldReply on PetitionFieldReply {
-    content
-    isAnonymized
-  }
-` as unknown as DocumentNode<completedFieldReplies_PetitionFieldReplyFragment, unknown>;
-export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
-  fragment completedFieldReplies_PetitionField on PetitionField {
-    type
-    options
-    previewReplies @client {
-      ...completedFieldReplies_PetitionFieldReply
-      children {
-        field {
-          type
-          options
-          optional
-        }
-        replies {
-          ...completedFieldReplies_PetitionFieldReply
-        }
-      }
-    }
-    replies {
-      ...completedFieldReplies_PetitionFieldReply
-      children {
-        field {
-          type
-          options
-          optional
-        }
-        replies {
-          ...completedFieldReplies_PetitionFieldReply
-        }
-      }
-    }
-  }
-  ${completedFieldReplies_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<completedFieldReplies_PetitionFieldFragment, unknown>;
-export const useFieldLogic_PetitionFieldInnerFragmentDoc = gql`
-  fragment useFieldLogic_PetitionFieldInner on PetitionField {
-    id
-    type
-    options
-    visibility
-    math
-  }
-` as unknown as DocumentNode<useFieldLogic_PetitionFieldInnerFragment, unknown>;
-export const useFieldLogic_PetitionFieldFragmentDoc = gql`
-  fragment useFieldLogic_PetitionField on PetitionField {
-    ...useFieldLogic_PetitionFieldInner
-    children {
-      ...useFieldLogic_PetitionFieldInner
-      parent {
-        id
-      }
-      replies {
-        id
-        content
-      }
-      previewReplies @client {
-        id
-        content
-      }
-    }
-    replies {
-      id
-      content
-      children {
-        field {
-          id
-        }
-        replies {
-          id
-          content
-        }
-      }
-    }
-    previewReplies @client {
-      id
-      content
-      children {
-        field {
-          id
-          parent {
-            id
-          }
-        }
-        replies {
-          id
-          content
-        }
-      }
-    }
-    ...completedFieldReplies_PetitionField
-  }
-  ${useFieldLogic_PetitionFieldInnerFragmentDoc}
-  ${completedFieldReplies_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<useFieldLogic_PetitionFieldFragment, unknown>;
-export const useFieldLogic_PetitionBaseFragmentDoc = gql`
-  fragment useFieldLogic_PetitionBase on PetitionBase {
-    variables {
-      name
-      defaultValue
-    }
-    customLists {
-      name
-      values
-    }
-    fields {
-      ...useFieldLogic_PetitionField
-    }
-  }
-  ${useFieldLogic_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<useFieldLogic_PetitionBaseFragment, unknown>;
 export const usePetitionCanFinalize_PetitionBaseFragmentDoc = gql`
   fragment usePetitionCanFinalize_PetitionBase on PetitionBase {
     fields {
@@ -57492,37 +59508,6 @@ export const focusPetitionField_PublicPetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<focusPetitionField_PublicPetitionFieldFragment, unknown>;
-export const useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
-  fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    fullName
-    email
-    isPreset
-    ...SelectedSignerRow_PetitionSigner
-    ...SuggestedSigners_PetitionSigner
-  }
-  ${SelectedSignerRow_PetitionSignerFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<
-  useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment,
-  unknown
->;
-export const useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc = gql`
-  fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
-    signingMode
-    minSigners
-    instructions
-    allowAdditionalSigners
-    signers {
-      ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-    }
-  }
-  ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<
-  useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment,
-  unknown
->;
 export const RecipientViewMenuButton_PublicContactFragmentDoc = gql`
   fragment RecipientViewMenuButton_PublicContact on PublicContact {
     id
@@ -57832,15 +59817,6 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     }
     signatureConfig {
       review
-      allowAdditionalSigners
-      signers {
-        fullName
-        ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-      }
-      additionalSigners {
-        ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-      }
-      ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
     }
     recipients {
       ...RecipientViewHeader_PublicContact
@@ -57860,8 +59836,6 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
   ${completedFieldReplies_PublicPetitionFieldFragmentDoc}
   ${focusPetitionField_PublicPetitionFieldFragmentDoc}
-  ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
-  ${useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientViewContents_PublicPetitionFragmentDoc}
   ${RecipientViewProgressBar_PublicPetitionFragmentDoc}
@@ -57873,16 +59847,6 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewSignatureSentAlert_PublicPetitionFragmentDoc}
   ${usePetitionCanFinalize_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
-export const useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc = gql`
-  fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<
-  useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment,
-  unknown
->;
 export const RecipientViewContents_PublicUserFragmentDoc = gql`
   fragment RecipientViewContents_PublicUser on PublicUser {
     firstName
@@ -58030,14 +59994,139 @@ export const RecipientViewHeader_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientViewHeader_PublicPetitionFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewHeader_PublicPetitionAccessFragment, unknown>;
+export const useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    fullName
+    email
+    isPreset
+    ...SelectedSignerRow_PetitionSigner
+  }
+  ${SelectedSignerRow_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment,
+  unknown
+>;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
+    signingMode
+    minSigners
+    instructions
+    allowAdditionalSigners
+    signers {
+      ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
+    }
+  }
+  ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment,
+  unknown
+>;
+export const SuggestedSigners_PublicContactFragmentDoc = gql`
+  fragment SuggestedSigners_PublicContact on PublicContact {
+    firstName
+    lastName
+    email
+    isMe
+  }
+` as unknown as DocumentNode<SuggestedSigners_PublicContactFragment, unknown>;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
+    firstName
+    lastName
+    email
+    ...SuggestedSigners_PublicContact
+  }
+  ${SuggestedSigners_PublicContactFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment,
+  unknown
+>;
+export const SuggestedSigners_PublicPetitionFragmentDoc = gql`
+  fragment SuggestedSigners_PublicPetition on PublicPetition {
+    id
+    signatureConfig {
+      signers {
+        ...SuggestedSigners_PetitionSigner
+      }
+    }
+    recipients {
+      ...SuggestedSigners_PublicContact
+    }
+    fields {
+      id
+      type
+      title
+      options
+      alias
+      profileType {
+        profileNamePatternFields
+      }
+      replies {
+        id
+        content
+        children {
+          field {
+            id
+            type
+            alias
+            options
+            profileTypeField {
+              id
+              alias
+            }
+          }
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+    ...useFieldLogic_PublicPetition
+  }
+  ${SuggestedSigners_PetitionSignerFragmentDoc}
+  ${SuggestedSigners_PublicContactFragmentDoc}
+  ${useFieldLogic_PublicPetitionFragmentDoc}
+` as unknown as DocumentNode<SuggestedSigners_PublicPetitionFragment, unknown>;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetition on PublicPetition {
+    signatureConfig {
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
+    }
+    recipients {
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
+    }
+    ...SuggestedSigners_PublicPetition
+  }
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
+  ${SuggestedSigners_PublicPetitionFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment,
+  unknown
+>;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess on PublicPetitionAccess {
+    petition {
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicPetition
+    }
+    contact {
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
+    }
+  }
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment,
+  unknown
+>;
 export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
       ...RecipientView_PublicPetition
       isDelegateAccessEnabled
-      recipients {
-        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-      }
       organization {
         id
         name
@@ -58050,24 +60139,22 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     granter {
       ...RecipientView_PublicUser
     }
-    contact {
-      ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-    }
     message {
       ...RecipientView_PublicPetitionMessage
     }
     ...RecipientViewPetitionField_PublicPetitionAccess
     ...RecipientViewSidebar_PublicPetitionAccess
     ...RecipientViewHeader_PublicPetitionAccess
+    ...useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
-  ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
   ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
   ${RecipientViewSidebar_PublicPetitionAccessFragmentDoc}
   ${RecipientViewHeader_PublicPetitionAccessFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionAccessFragment, unknown>;
 export const RecipientView_ConnectionMetadataFragmentDoc = gql`
   fragment RecipientView_ConnectionMetadata on ConnectionMetadata {

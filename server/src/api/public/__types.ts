@@ -4410,6 +4410,7 @@ export type ProfileType = Timestamps & {
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
+  profileNamePatternFields: Array<Scalars["GID"]["output"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 };
@@ -4626,6 +4627,9 @@ export type PublicPetitionField = {
   options: Scalars["JSONObject"]["output"];
   parent: Maybe<PublicPetitionField>;
   petition: PublicPetition;
+  profileType: Maybe<PublicProfileType>;
+  /** Linked profile type field. */
+  profileTypeField: Maybe<PublicProfileTypeField>;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
   /** The title of the petition field. */
@@ -4726,6 +4730,17 @@ export type PublicPetitionSignerDataInput = {
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
   lastName: Scalars["String"]["input"];
+};
+
+export type PublicProfileType = {
+  id: Scalars["GID"]["output"];
+  profileNamePatternFields: Array<Scalars["GID"]["output"]>;
+};
+
+/** A public view of a profile type field */
+export type PublicProfileTypeField = {
+  alias: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["GID"]["output"];
 };
 
 export type PublicPublicPetitionLink = {

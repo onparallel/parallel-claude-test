@@ -9455,9 +9455,19 @@
     "context": "Subscribed to notifications"
   },
   {
-    "term": "component.suggested-signers.header",
-    "definition": "Suggested:",
-    "context": "Suggested:"
+    "term": "component.suggested-signers.others",
+    "definition": "Others",
+    "context": "Others"
+  },
+  {
+    "term": "component.suggested-signers.potential-signers",
+    "definition": "Potential signers",
+    "context": "Potential signers"
+  },
+  {
+    "term": "component.suggested-signers.unnamed-group",
+    "definition": "Unnamed group",
+    "context": "Unnamed group"
   },
   {
     "term": "component.table-page.n-selected",
