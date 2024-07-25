@@ -220,6 +220,11 @@ export function SuggestedSigners({
     );
   }
 
+  suggestions = suggestions.filter((s) => {
+    const contactKey = [s.email, s.firstName, s.lastName].join("|");
+    return !seenContacts.has(contactKey);
+  });
+
   return [
     ...groupContactSuggestions,
     {
@@ -282,7 +287,11 @@ function SuggestedSignersRow({
     }
   };
 
-  return suggestions.length > 0 ? (
+  if (suggestions.length === 0) {
+    return null;
+  }
+
+  return (
     <>
       <Text
         textStyle={title ? undefined : "hint"}
@@ -310,7 +319,7 @@ function SuggestedSignersRow({
         ))}
       </Stack>
     </>
-  ) : null;
+  );
 }
 
 SuggestedSigners.fragments = {

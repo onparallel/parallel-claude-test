@@ -35,7 +35,6 @@ import {
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
 import {
   AddPetitionAccessDialog_DelegateUserFragment,
-  AddPetitionAccessDialog_PetitionAccessFragment,
   AddPetitionAccessDialog_PetitionFragment,
   AddPetitionAccessDialog_SignatureConfigFragment,
   AddPetitionAccessDialog_UserFragment,
@@ -54,7 +53,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { BaseSyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BaseSyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isDefined, noop, omit } from "remeda";
@@ -102,7 +101,7 @@ export function AddPetitionAccessDialog({
 
   const petition = data?.petition as Maybe<AddPetitionAccessDialog_PetitionFragment> | undefined;
 
-  const [accesses, setAccesses] = useState<AddPetitionAccessDialog_PetitionAccessFragment[]>([]);
+  const accesses = petition?.accesses ?? [];
 
   const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
 
@@ -126,13 +125,6 @@ export function AddPetitionAccessDialog({
     },
   });
 
-  //set the accesses when the petition is loaded
-  useEffect(() => {
-    if (!loading && isDefined(petition)) {
-      setAccesses(petition.accesses);
-    }
-  }, [petition, loading]);
-
   //reset the form when the petition is loaded
   useEffect(() => {
     if (!loading && isDefined(petition)) {
@@ -155,7 +147,7 @@ export function AddPetitionAccessDialog({
         subscribeSender: false,
       });
     }
-  }, [petition, loading]);
+  }, [loading]);
 
   const recipientGroups = watch("recipientGroups");
   const signatureConfig = watch("signatureConfig");
@@ -291,7 +283,6 @@ export function AddPetitionAccessDialog({
 
         if (isDefined(newAccess.data)) {
           link = newAccess.data.createContactlessPetitionAccess.recipientUrl!;
-          setAccesses(newAccess.data.createContactlessPetitionAccess.petition!.accesses);
         }
       }
 

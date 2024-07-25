@@ -910,7 +910,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             petition.isAnonymized || isClosed || myEffectivePermission === "READ"
                           }
                         >
-                          {petition.signatureConfig ? (
+                          {petition.signatureConfig?.review === false ? (
                             <FormattedMessage
                               id="generic.finalize-and-sign-button"
                               defaultMessage="Finalize and sign"

@@ -131,7 +131,7 @@ export const ContactSelect = Object.assign(
         if (isMulti) {
           onChange(
             [
-              ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
+              ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.email !== email),
               option,
             ] as any,
             { action: "select-option", option },
