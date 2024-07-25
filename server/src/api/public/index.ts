@@ -768,7 +768,7 @@ export function publicApi(container: Container) {
       {
         operationId: "CreatePetition",
         summary: "Create parallel",
-        description: outdent`Create a new parallel based on a template.`,
+        description: "Create a new parallel based on a template.",
         body: JsonBody(CreatePetition),
         query: {
           ...petitionIncludeParam(),
@@ -3696,7 +3696,7 @@ export function publicApi(container: Container) {
       {
         operationId: "CreateSubscription",
         summary: "Create subscription",
-        description: outdent`Creates a new event subscription on any of your parallels of profiles.`,
+        description: "Creates a new event subscription on any of your parallels of profiles.",
         body: JsonBody(CreateEventSubscription),
         responses: {
           201: SuccessResponse(EventSubscription),
