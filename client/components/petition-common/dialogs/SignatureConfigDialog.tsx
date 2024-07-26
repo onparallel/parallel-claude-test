@@ -449,6 +449,7 @@ function SignatureConfigDialogBodyStep2({
   const intl = useIntl();
   const { register, watch, control } = useFormContext<SignatureConfigFormData>();
   const review = watch("review");
+  const useCustomDocument = watch("useCustomDocument");
   const showInstructions = watch("showInstructions");
 
   const petitionIsCompleted =
@@ -541,7 +542,10 @@ function SignatureConfigDialogBodyStep2({
           )}
         />
       </FormControl>
-      {!review && !petitionIsCompleted && petition.isInteractionWithRecipientsEnabled ? (
+      {!review &&
+      !useCustomDocument &&
+      !petitionIsCompleted &&
+      petition.isInteractionWithRecipientsEnabled ? (
         <FormControl id="allowAdditionalSigners">
           <FormLabel margin={0}>
             <Checkbox {...register("allowAdditionalSigners")}>
