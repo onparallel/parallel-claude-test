@@ -23,7 +23,7 @@ export const RecipientViewFooter = Object.assign(
         {...props}
       >
         {props.petition.organization.hasRemoveParallelBranding ? null : (
-          <Flex fontSize="sm" alignItems="center">
+          <Flex fontSize="sm" alignItems="center" position="relative">
             <FormattedMessage
               id="generic.created-with-parallel"
               defaultMessage="Created with {parallel}"
