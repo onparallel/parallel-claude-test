@@ -141,6 +141,7 @@ export function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
       return [
         "list of",
         "countries",
+        "country",
         "EU",
         "non-EU",
         "currencies",
@@ -257,6 +258,7 @@ export function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
         "sanctions",
         "PEPs",
         "background",
+        "screening",
         "check",
         "research",
         "sanciones",
