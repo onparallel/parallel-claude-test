@@ -72,12 +72,20 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
       resolve: async (o, _, ctx) =>
         (await ctx.petitions.loadPetitionFieldComment(o.data.petition_field_comment_id))!,
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.data.petition_field_id))!,
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.data.petition_field_id)) {
+          return await ctx.petitions.loadField(o.data.petition_field_id);
+        }
+        return null;
+      },
     });
     t.boolean("isMention", {
       resolve: (o) => o.data.is_mentioned ?? false,
+    });
+    t.boolean("isGeneral", {
+      resolve: (o) => !isDefined(o.data.petition_field_id),
     });
   },
 );

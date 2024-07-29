@@ -12,11 +12,136 @@
         "userName": "Santi",
         "petitionName": "Declaración de la renta",
         "petitionId": "1234567890",
-        "fields": [
+        "fieldsWithComments": [
           {
-            "id": 1,
-            "title": "Nominas",
-            "position": 2,
+            "comments": [
+              {
+                "id": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya sale en el borrador"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek Lou"
+                }
+              },
+              {
+                "id": 4,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Cualquier cosa me avisas"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek Lou"
+                }
+              },
+              {
+                "id": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ostia que chulo este sistema de comentarios 😎"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
+                "author": {
+                  "id": "User:3",
+                  "name": "Angela Velasco"
+                }
+              },
+              {
+                "id": 6,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Que bueno"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:2",
+                        "children": [
+                          {
+                            "text": "Angela Velasco"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:3",
+                        "children": [
+                          {
+                            "text": "Derek Lou"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "!"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [
+                  { "id": "User:2", "highlight": false },
+                  { "id": "User:3", "highlight": false }
+                ],
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              },
+              {
+                "id": 7,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya está todo"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "UserGroup:1",
+                        "children": [
+                          {
+                            "text": "Devs"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [{ "id": "UserGroup:1", "highlight": true }],
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              }
+            ]
+          },
+          {
+            "field": { "id": 1, "title": "Nominas", "position": 2 },
             "comments": [
               {
                 "id": 1,
@@ -77,9 +202,7 @@
             ]
           },
           {
-            "id": 2,
-            "title": "Dividendos",
-            "position": 4,
+            "field": { "id": 2, "title": "Dividendos", "position": 4 },
             "comments": [
               {
                 "id": 3,
@@ -221,7 +344,7 @@
         "userName": { "control": { "type": "text" }, "type": { "required": false } },
         "petitionName": { "control": { "type": "text" }, "type": { "required": false } },
         "petitionId": { "control": { "type": "text" } },
-        "fields": { "control": { "type": "object" } },
+        "fieldsWithComments": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },

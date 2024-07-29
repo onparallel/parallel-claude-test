@@ -562,19 +562,19 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("notification should be deleted if the user comments a field and then deletes the comment", async () => {
     const { errors } = await testClient.mutate({
       mutation: gql`
-        mutation ($petitionFieldCommentId: GID!, $petitionFieldId: GID!, $petitionId: GID!) {
-          deletePetitionFieldComment(
+        mutation ($petitionFieldCommentId: GID!, $petitionId: GID!) {
+          deletePetitionComment(
             petitionFieldCommentId: $petitionFieldCommentId
-            petitionFieldId: $petitionFieldId
             petitionId: $petitionId
           ) {
-            id
+            ... on PetitionField {
+              id
+            }
           }
         }
       `,
       variables: {
         petitionId: toGlobalId("Petition", petition.id),
-        petitionFieldId: toGlobalId("PetitionField", petitionField.id),
         petitionFieldCommentId: toGlobalId("PetitionFieldComment", petitionFieldComment.id),
       },
     });

@@ -299,6 +299,36 @@ export const PublicPetition = objectType({
       description: "Indicates whether delegate access is enabled for the recipient",
       resolve: (o) => o.enable_delegate_access,
     });
+    t.list.nonNull.field("generalComments", {
+      type: "PublicPetitionFieldComment",
+      description: "The general comments for this petition",
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadGeneralPetitionCommentsForPetition({
+          petitionId: root.id,
+        }),
+    });
+    t.nonNull.int("generalCommentCount", {
+      resolve: async (root, _, ctx) =>
+        (
+          await ctx.petitions.loadGeneralPetitionCommentsForPetition({
+            petitionId: root.id,
+          })
+        ).length,
+    });
+    t.nonNull.int("unreadGeneralCommentCount", {
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadPetitionUnreadGeneralCommentCountForPetitionAndAccess({
+          accessId: ctx.access!.id,
+          petitionId: root.id,
+        }),
+    });
+    t.nullable.field("lastGeneralComment", {
+      type: "PublicPetitionFieldComment",
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadLastGeneralPetitionCommentForPetition({
+          petitionId: root.id,
+        }),
+    });
   },
 });
 
@@ -852,9 +882,20 @@ export const PublicPetitionFieldComment = objectType({
         });
       },
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PublicPetitionField",
-      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.petition_field_id)) {
+          return await ctx.petitions.loadField(o.petition_field_id);
+        }
+        return null;
+      },
+    });
+    t.field("petition", {
+      type: "PublicPetition",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadPetition(root.petition_id))!;
+      },
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
@@ -906,4 +947,21 @@ export const PublicLicenseCode = objectType({
     t.nonNull.string("source");
     t.nonNull.jsonObject("details", { resolve: (o) => o.details });
   },
+});
+
+export const PublicPetitionFieldOrPublicPetition = unionType({
+  name: "PublicPetitionFieldOrPublicPetition",
+  definition(t) {
+    t.members("PublicPetitionField", "PublicPetition");
+  },
+  resolveType: (o) => {
+    if (["PublicPetitionField", "PublicPetition"].includes(o.__type)) {
+      return o.__type;
+    }
+    throw new Error("Missing __type on PublicPetitionFieldOrPublicPetition");
+  },
+  sourceType: /* ts */ `
+    | ({__type: "PublicPetitionField"} & NexusGenRootTypes["PublicPetitionField"])
+    | ({__type: "PublicPetition"} & NexusGenRootTypes["PublicPetition"])
+  `,
 });

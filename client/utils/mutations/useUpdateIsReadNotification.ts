@@ -106,6 +106,12 @@ useUpdateIsReadNotification.mutations = [
               unreadCommentCount
             }
           }
+          petition {
+            id
+            ... on Petition {
+              unreadGeneralCommentCount
+            }
+          }
         }
       }
     }

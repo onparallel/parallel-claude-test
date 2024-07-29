@@ -1,8 +1,8 @@
 import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
 interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
@@ -33,14 +33,13 @@ export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         {intl.formatNumber(commentCount)}
       </Button>
     ) : (
-      <ResponsiveButtonIcon
+      <IconButtonWithTooltip
         icon={<CommentIcon fontSize="16px" />}
         ref={ref}
-        breakpoint="sm"
-        hideIconOnDesktop={true}
+        placement="bottom"
         label={intl.formatMessage({
-          id: "recipient-view.doubts-button",
-          defaultMessage: "Questions?",
+          id: "generic.add-comment",
+          defaultMessage: "Add comment",
         })}
         {...common}
       />

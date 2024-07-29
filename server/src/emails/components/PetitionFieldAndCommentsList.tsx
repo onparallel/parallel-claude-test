@@ -3,6 +3,7 @@ import { FormattedMessage } from "react-intl";
 import { SlateNode, renderSlateToHtml, renderSlateToReactNodes } from "../../util/slate/render";
 import { Maybe } from "../../util/types";
 import { UserMessageBox } from "./UserMessageBox";
+import { isDefined } from "remeda";
 
 interface FieldComment {
   id: number;
@@ -15,17 +16,19 @@ interface FieldComment {
 }
 
 export interface PetitionFieldAndComments {
-  id: number;
-  title: Maybe<string>;
-  position: number;
+  field: Maybe<{
+    id: number;
+    title: Maybe<string>;
+    position: number;
+  }>;
   comments: FieldComment[];
 }
 
 export interface PetitionFieldAndCommentsProps {
-  fields: PetitionFieldAndComments[];
+  fieldsWithComments: PetitionFieldAndComments[];
 }
 
-export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsProps) {
+export function PetitionFieldAndComments({ fieldsWithComments }: PetitionFieldAndCommentsProps) {
   /** group together consecutive comments of the same author */
   function groupCommentsByAuthor(comments: FieldComment[]) {
     const groups: FieldComment[][] = [];
@@ -48,67 +51,80 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
 
   return (
     <>
-      {fields.map(({ position, id, title, comments }) => (
-        <MjmlWrapper key={id} padding="0">
-          <MjmlSection padding="8px 0 0">
-            <MjmlColumn>
-              <MjmlText padding="0 20px 0 50px" lineHeight="24px">
-                <ul style={{ margin: 0, padding: 0 }}>
-                  <li value={position + 1} style={{ margin: 0, padding: 0 }}>
-                    {title ? (
-                      <span>{title}</span>
-                    ) : (
-                      <span style={{ fontStyle: "italic" }}>
-                        <FormattedMessage
-                          id="generic.untitled-field"
-                          defaultMessage="Untitled field"
-                        />
-                      </span>
-                    )}
-                  </li>
-                </ul>
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
-          {groupCommentsByAuthor(comments).map((commentGroup, i) => (
-            <MjmlSection key={i} padding="8px 50px">
+      {fieldsWithComments.map(({ field, comments }) => {
+        const { position = -1, id = 0, title } = field ?? {};
+
+        return (
+          <MjmlWrapper key={id} padding="0">
+            <MjmlSection padding="8px 0 0">
               <MjmlColumn>
-                {commentGroup.map(({ id, content, mentions, author }, commentNumber) => (
-                  <MjmlSection key={id} padding="1px 0">
-                    <MjmlColumn backgroundColor="#F4F7F9" borderRadius="4px" padding="8px 16px">
-                      {commentNumber === 0 && (
-                        <MjmlText fontSize="12px" padding="0">
-                          <b>{author.name}</b>
-                        </MjmlText>
+                <MjmlText padding="0 20px 0 50px" lineHeight="24px">
+                  <ul style={{ margin: 0, padding: 0 }}>
+                    <li value={position + 1} style={{ margin: 0, padding: 0 }}>
+                      {isDefined(field) ? (
+                        title ? (
+                          <span>{title}</span>
+                        ) : (
+                          <span style={{ fontStyle: "italic" }}>
+                            <FormattedMessage
+                              id="generic.untitled-field"
+                              defaultMessage="Untitled field"
+                            />
+                          </span>
+                        )
+                      ) : (
+                        <span>
+                          <FormattedMessage
+                            id="generic.general-comments-label"
+                            defaultMessage="General"
+                          />
+                        </span>
                       )}
-                      <MjmlText padding="0" lineHeight="24px">
-                        <UserMessageBox
-                          dangerouslySetInnerHTML={renderSlateToHtml(content, {
-                            override: {
-                              mention: (node) => {
-                                if (node && node.type === "mention") {
-                                  const mention = mentions.find((m) => m.id === node.mention!);
-                                  if (mention) {
-                                    return (
-                                      <Mention mention={mention}>
-                                        {renderSlateToReactNodes(node.children!)}
-                                      </Mention>
-                                    );
-                                  }
-                                }
-                              },
-                            },
-                          })}
-                        />
-                      </MjmlText>
-                    </MjmlColumn>
-                  </MjmlSection>
-                ))}
+                    </li>
+                  </ul>
+                </MjmlText>
               </MjmlColumn>
             </MjmlSection>
-          ))}
-        </MjmlWrapper>
-      ))}
+            {groupCommentsByAuthor(comments).map((commentGroup, i) => (
+              <MjmlSection key={i} padding="8px 50px">
+                <MjmlColumn>
+                  {commentGroup.map(({ id, content, mentions, author }, commentNumber) => (
+                    <MjmlSection key={id} padding="1px 0">
+                      <MjmlColumn backgroundColor="#F4F7F9" borderRadius="4px" padding="8px 16px">
+                        {commentNumber === 0 && (
+                          <MjmlText fontSize="12px" padding="0">
+                            <b>{author.name}</b>
+                          </MjmlText>
+                        )}
+                        <MjmlText padding="0" lineHeight="24px">
+                          <UserMessageBox
+                            dangerouslySetInnerHTML={renderSlateToHtml(content, {
+                              override: {
+                                mention: (node) => {
+                                  if (node && node.type === "mention") {
+                                    const mention = mentions.find((m) => m.id === node.mention!);
+                                    if (mention) {
+                                      return (
+                                        <Mention mention={mention}>
+                                          {renderSlateToReactNodes(node.children!)}
+                                        </Mention>
+                                      );
+                                    }
+                                  }
+                                },
+                              },
+                            })}
+                          />
+                        </MjmlText>
+                      </MjmlColumn>
+                    </MjmlSection>
+                  ))}
+                </MjmlColumn>
+              </MjmlSection>
+            ))}
+          </MjmlWrapper>
+        );
+      })}
     </>
   );
 }

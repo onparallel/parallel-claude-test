@@ -493,7 +493,9 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   },
 });
 
+/** @deprecated use publicCreatePetitionComment */
 export const publicCreatePetitionFieldComment = mutationField("publicCreatePetitionFieldComment", {
+  deprecation: "Use publicCreatePetitionComment instead",
   description: "Create a petition field comment.",
   type: "PublicPetitionFieldComment",
   authorize: chain(
@@ -501,7 +503,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
     and(
       fieldBelongsToAccess("petitionFieldId"),
       fieldsHaveCommentsEnabled("petitionFieldId"),
-      validPetitionFieldCommentContent("content", "petitionFieldId"),
+      validPetitionFieldCommentContent("content"),
       not(fieldHasParent("petitionFieldId")),
     ),
   ),
@@ -527,7 +529,9 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   },
 });
 
+/** @deprecated use publicDeletePetitionComment */
 export const publicDeletePetitionFieldComment = mutationField("publicDeletePetitionFieldComment", {
+  deprecation: "Use publicDeletePetitionComment instead",
   description: "Delete a petition field comment.",
   type: "PublicPetitionField",
   authorize: chain(
@@ -542,7 +546,6 @@ export const publicDeletePetitionFieldComment = mutationField("publicDeletePetit
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionFieldCommentFromAccess(
       ctx.access!.petition_id,
-      args.petitionFieldId,
       args.petitionFieldCommentId,
       ctx.access!,
     );
@@ -554,17 +557,111 @@ export const publicDeletePetitionFieldComment = mutationField("publicDeletePetit
   },
 });
 
+/** @deprecated use publicUpdatePetitionComment */
 export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetitionFieldComment", {
+  deprecation: "Use publicUpdatePetitionComment instead",
   description: "Update a petition field comment.",
   type: "PublicPetitionFieldComment",
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId"),
+    validPetitionFieldCommentContent("content"),
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+    content: nonNull(jsonArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldCommentFromContact(
+      args.petitionFieldCommentId,
+      {
+        contentJson: args.content,
+      },
+      ctx.contact!,
+    );
+  },
+});
+
+export const publicCreatePetitionComment = mutationField("publicCreatePetitionComment", {
+  description: "Create a petition comment.",
+  type: "PublicPetitionFieldComment",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      validPetitionFieldCommentContent("content"),
+      ifArgDefined(
+        "petitionFieldId",
+        and(
+          fieldBelongsToAccess("petitionFieldId" as never),
+          fieldsHaveCommentsEnabled("petitionFieldId" as never),
+          not(fieldHasParent("petitionFieldId" as never)),
+        ),
+      ),
+    ),
+  ),
+  args: {
+    keycode: nonNull(idArg()),
+    petitionFieldId: nullable(globalIdArg("PetitionField")),
+    content: nonNull(jsonArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldCommentFromAccess(
+      {
+        petitionId: ctx.access!.petition_id,
+        petitionFieldId: args.petitionFieldId ?? null,
+        contentJson: args.content,
+      },
+      ctx.access!,
+    );
+  },
+});
+
+export const publicDeletePetitionComment = mutationField("publicDeletePetitionComment", {
+  description: "Delete a petition comment.",
+  type: "PublicPetitionFieldOrPublicPetition",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    commentsBelongsToAccess("petitionFieldCommentId"),
+  ),
+  args: {
+    keycode: nonNull(idArg()),
+    petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+  },
+  resolve: async (_, args, ctx) => {
+    const comment = await ctx.petitions.deletePetitionFieldCommentFromAccess(
+      ctx.access!.petition_id,
+      args.petitionFieldCommentId,
+      ctx.access!,
+    );
+
+    if (isDefined(comment?.petition_field_id)) {
+      const publicPetitionField = await ctx.petitions.loadField(comment.petition_field_id);
+      if (!publicPetitionField) {
+        throw new ApolloError("PublicPetitionField not found", "PUBLIC_PETITION_FIELD_NOT_FOUND");
+      }
+      return { __type: "PublicPetitionField", ...publicPetitionField };
+    } else {
+      const publicPetition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
+      if (!publicPetition) {
+        throw new ApolloError("PublicPetition not found", "PUBLIC_PETITION_NOT_FOUND");
+      }
+      return { __type: "PublicPetition", ...publicPetition };
+    }
+  },
+});
+
+export const publicUpdatePetitionComment = mutationField("publicUpdatePetitionComment", {
+  description: "Update a petition comment.",
+  type: "PublicPetitionFieldComment",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    commentsBelongsToAccess("petitionFieldCommentId"),
+    validPetitionFieldCommentContent("content"),
+  ),
+  args: {
+    keycode: nonNull(idArg()),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
     content: nonNull(jsonArg()),
   },

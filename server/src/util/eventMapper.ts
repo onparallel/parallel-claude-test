@@ -38,7 +38,9 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id,
         ),
-        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldId: isDefined(event.data.petition_field_id)
+          ? toGlobalId("PetitionField", event.data.petition_field_id)
+          : null,
         userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
       };
     }
@@ -48,7 +50,9 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id,
         ),
-        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldId: isDefined(event.data.petition_field_id)
+          ? toGlobalId("PetitionField", event.data.petition_field_id)
+          : null,
       };
     }
     case "MESSAGE_CANCELLED": {

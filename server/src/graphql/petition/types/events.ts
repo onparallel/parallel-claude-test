@@ -318,7 +318,10 @@ export const CommentPublishedEvent = createPetitionEvent("CommentPublishedEvent"
   t.nullable.field("field", {
     type: "PetitionField",
     resolve: async (root, _, ctx) => {
-      return await ctx.petitions.loadField(root.data.petition_field_id);
+      if (isDefined(root.data.petition_field_id)) {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      }
+      return null;
     },
   });
   t.nullable.field("comment", {
@@ -330,13 +333,19 @@ export const CommentPublishedEvent = createPetitionEvent("CommentPublishedEvent"
   t.boolean("isInternal", {
     resolve: (root) => root.data.is_internal ?? false,
   });
+  t.boolean("isGeneral", {
+    resolve: (root) => !isDefined(root.data.petition_field_id),
+  });
 });
 
 export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t) => {
   t.nullable.field("field", {
     type: "PetitionField",
     resolve: async (root, _, ctx) => {
-      return await ctx.petitions.loadField(root.data.petition_field_id);
+      if (isDefined(root.data.petition_field_id)) {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      }
+      return null;
     },
   });
   t.nullable.field("deletedBy", {
@@ -345,6 +354,9 @@ export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t
   });
   t.boolean("isInternal", {
     resolve: (root) => root.data.is_internal ?? false,
+  });
+  t.boolean("isGeneral", {
+    resolve: (root) => !isDefined(root.data.petition_field_id),
   });
 });
 

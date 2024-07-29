@@ -49,12 +49,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_field_reply_id: number;
   };
   COMMENT_PUBLISHED: {
-    petition_field_id: number;
+    petition_field_id: number | null;
     petition_field_comment_id: number;
     is_internal?: boolean;
   };
   COMMENT_DELETED: {
-    petition_field_id: number;
+    petition_field_id: number | null;
     user_id?: number;
     petition_access_id?: number;
     petition_field_comment_id: number;

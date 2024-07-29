@@ -170,6 +170,11 @@
     "context": "Deleted user"
   },
   {
+    "term": "generic.general-comments-label",
+    "definition": "Generale",
+    "context": "General"
+  },
+  {
     "term": "generic.submit-text.with-deadline",
     "definition": "Queste informazioni sono state richieste prima del {deadline}.",
     "context": "This information has been requested to be submitted before {deadline}."

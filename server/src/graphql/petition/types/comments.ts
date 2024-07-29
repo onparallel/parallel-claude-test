@@ -22,6 +22,23 @@ export const UserOrPetitionAccess = unionType({
   `,
 });
 
+export const PetitionFieldOrPetition = unionType({
+  name: "PetitionFieldOrPetition",
+  definition(t) {
+    t.members("PetitionField", "Petition");
+  },
+  resolveType: (o) => {
+    if (["PetitionField", "Petition"].includes(o.__type)) {
+      return o.__type;
+    }
+    throw new Error("Missing __type on PetitionFieldOrPetition");
+  },
+  sourceType: /* ts */ `
+    | ({__type: "PetitionField"} & NexusGenRootTypes["PetitionField"])
+    | ({__type: "Petition"} & NexusGenRootTypes["Petition"])
+  `,
+});
+
 export const PetitionFieldCommentMention = unionType({
   name: "PetitionFieldCommentMention",
   definition(t) {
@@ -163,9 +180,20 @@ export const PetitionFieldComment = objectType({
         "Whether the comment is internal (only visible to org users) or public (visible for users and accesses)",
       resolve: (root) => root.is_internal,
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.petition_field_id)) {
+          return await ctx.petitions.loadField(o.petition_field_id);
+        }
+        return null;
+      },
+    });
+    t.field("petition", {
+      type: "PetitionBase",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadPetition(o.petition_id))!;
+      },
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },

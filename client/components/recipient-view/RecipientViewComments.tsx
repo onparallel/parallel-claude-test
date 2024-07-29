@@ -14,15 +14,17 @@ import {
   Text,
   usePrevious,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon, CommentIcon } from "@parallel/chakra/icons";
+import { ChevronLeftIcon, CommentIcon, EditIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewComments_PublicPetitionAccessFragment,
+  RecipientViewComments_PublicPetitionFieldFragment,
   RecipientViewComments_accessDocument,
-  RecipientViewComments_createPetitionFieldCommentDocument,
-  RecipientViewComments_deletePetitionFieldCommentDocument,
   RecipientViewComments_markPetitionFieldCommentsAsReadDocument,
+  RecipientViewComments_publicCreatePetitionCommentDocument,
+  RecipientViewComments_publicDeletePetitionCommentDocument,
   RecipientViewComments_publicPetitionFieldDocument,
-  RecipientViewComments_updatePetitionFieldCommentDocument,
+  RecipientViewComments_publicUpdatePetitionCommentDocument,
+  Tone,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
@@ -66,10 +68,12 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const closeRef = useRef<HTMLButtonElement>(null);
   const [fieldId, setFieldId] = useFieldCommentsQueryState();
 
+  const showGeneralComments = fieldId === "general";
+
   const { data, loading: isLoadingField } = useQuery(
     RecipientViewComments_publicPetitionFieldDocument,
     {
-      skip: !isDefined(fieldId),
+      skip: !isDefined(fieldId) || showGeneralComments,
       variables: { keycode, petitionFieldId: fieldId! },
       fetchPolicy: "cache-and-network",
     },
@@ -77,38 +81,63 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const { data: dataAccess, loading: isLoadingAccess } = useQuery(
     RecipientViewComments_accessDocument,
     {
-      skip: isDefined(fieldId),
+      skip: isDefined(fieldId) && !showGeneralComments,
       variables: { keycode },
       fetchPolicy: "cache-and-network",
     },
   );
 
   useEffect(() => {
-    if (isDefined(fieldId)) {
+    if (isDefined(fieldId) && !showGeneralComments) {
       const element = document.getElementById(`field-${fieldId}`);
       if (element) {
         smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
       }
     }
-  }, [fieldId]);
+  }, [fieldId, showGeneralComments]);
 
-  const field = fieldId ? data?.publicPetitionField : null;
-
-  const comments = data?.publicPetitionField.comments ?? [];
+  const field = fieldId && !showGeneralComments ? data?.publicPetitionField : null;
 
   const petition = dataAccess?.access.petition;
 
-  const fieldsWithComments =
+  const comments = showGeneralComments
+    ? petition?.generalComments ?? []
+    : data?.publicPetitionField.comments ?? [];
+
+  const unsortedFieldsWithComments =
     petition?.fields
       .filter((f) => isDefined(f.lastComment) && f.hasCommentsEnabled)
-      .sort((a, b) => {
-        const lastCommentA = a.lastComment!.createdAt;
-        const lastCommentB = b.lastComment!.createdAt;
-        return new Date(lastCommentB).getTime() - new Date(lastCommentA).getTime();
+      .map((f) => {
+        return {
+          id: f.id,
+          title: f.title,
+          lastComment: f.lastComment,
+          unreadCommentCount: f.unreadCommentCount,
+          type: f.type,
+        };
       }) ?? [];
 
-  const [createPetitionFieldComment] = useMutation(
-    RecipientViewComments_createPetitionFieldCommentDocument,
+  if (isDefined(petition?.lastGeneralComment)) {
+    unsortedFieldsWithComments.push({
+      id: "general",
+      title: intl.formatMessage({
+        id: "generic.general-comments-label",
+        defaultMessage: "General",
+      }),
+      lastComment: petition!.lastGeneralComment,
+      unreadCommentCount: petition!.unreadGeneralCommentCount,
+      type: "TEXT",
+    });
+  }
+
+  const fieldsWithComments = unsortedFieldsWithComments.sort((a, b) => {
+    const lastCommentA = a.lastComment!.createdAt;
+    const lastCommentB = b.lastComment!.createdAt;
+    return new Date(lastCommentB).getTime() - new Date(lastCommentA).getTime();
+  });
+
+  const [publicCreatePetitionComment] = useMutation(
+    RecipientViewComments_publicCreatePetitionCommentDocument,
   );
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (isMetaReturn(event)) {
@@ -118,12 +147,12 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   }
 
   async function handleSubmitClick() {
-    if (!isEmptyCommentEditorValue(draft) && isDefined(fieldId)) {
+    if (!isEmptyCommentEditorValue(draft)) {
       try {
-        await createPetitionFieldComment({
+        await publicCreatePetitionComment({
           variables: {
             keycode,
-            petitionFieldId: fieldId,
+            petitionFieldId: fieldId === "general" ? null : fieldId,
             content: draft,
           },
         });
@@ -153,39 +182,33 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
     [fieldId, comments.map((c) => c.id).join(",")],
   );
 
-  const [updatePetitionFieldComment] = useMutation(
-    RecipientViewComments_updatePetitionFieldCommentDocument,
+  const [publicUpdatePetitionComment] = useMutation(
+    RecipientViewComments_publicUpdatePetitionCommentDocument,
   );
 
   async function handleEditCommentContent(commentId: string, content: any) {
     try {
-      if (isDefined(fieldId)) {
-        await updatePetitionFieldComment({
-          variables: {
-            keycode,
-            petitionFieldId: fieldId,
-            petitionFieldCommentId: commentId,
-            content,
-          },
-        });
-      }
+      await publicUpdatePetitionComment({
+        variables: {
+          keycode,
+          petitionFieldCommentId: commentId,
+          content,
+        },
+      });
     } catch {}
   }
 
-  const [deletePetitionFieldComment] = useMutation(
-    RecipientViewComments_deletePetitionFieldCommentDocument,
+  const [publicDeletePetitionComment] = useMutation(
+    RecipientViewComments_publicDeletePetitionCommentDocument,
   );
   async function handleDeleteClick(commentId: string) {
     try {
-      if (isDefined(fieldId)) {
-        await deletePetitionFieldComment({
-          variables: {
-            keycode,
-            petitionFieldId: fieldId,
-            petitionFieldCommentId: commentId,
-          },
-        });
-      }
+      await publicDeletePetitionComment({
+        variables: {
+          keycode,
+          petitionFieldCommentId: commentId,
+        },
+      });
     } catch {}
   }
 
@@ -207,6 +230,12 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
   const { deviceType } = useMetadata();
 
+  const hasGeneralComments = isDefined(petition?.lastGeneralComment);
+
+  const handleStartGeneralComment = () => {
+    setFieldId("general");
+  };
+
   return (
     <Flex flexDirection="column" minWidth={0} height="100%" width="100%">
       <HStack
@@ -217,7 +246,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
         justify="space-between"
         height="56px"
       >
-        {isDefined(field) ? (
+        {isDefined(field) || showGeneralComments ? (
           <HStack>
             <IconButtonWithTooltip
               variant="ghost"
@@ -226,24 +255,33 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               label={intl.formatMessage({ id: "generic.go-back", defaultMessage: "Go back" })}
               onClick={() => setFieldId(null)}
             />
-            {field.title ? (
-              <Heading as="h3" size="sm" fontWeight={500} noOfLines={2}>
-                {field.title}
-              </Heading>
+            {isDefined(field) ? (
+              field.title ? (
+                <Heading as="h3" size="sm" fontWeight={500} noOfLines={2}>
+                  {field.title}
+                </Heading>
+              ) : (
+                <Heading
+                  as="h3"
+                  size="sm"
+                  fontWeight={500}
+                  noOfLines={2}
+                  sx={{ color: "gray.500", fontWeight: "normal", fontStyle: "italic" }}
+                  paddingEnd={2}
+                >
+                  {field.type === "HEADING" ? (
+                    <FormattedMessage
+                      id="generic.empty-heading"
+                      defaultMessage="Untitled heading"
+                    />
+                  ) : (
+                    <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+                  )}
+                </Heading>
+              )
             ) : (
-              <Heading
-                as="h3"
-                size="sm"
-                fontWeight={500}
-                noOfLines={2}
-                sx={{ color: "gray.500", fontWeight: "normal", fontStyle: "italic" }}
-                paddingEnd={2}
-              >
-                {field.type === "HEADING" ? (
-                  <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
-                ) : (
-                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-                )}
+              <Heading as="h3" size="sm" fontWeight={500} noOfLines={2}>
+                <FormattedMessage id="generic.general-comments-label" defaultMessage="General" />
               </Heading>
             )}
           </HStack>
@@ -263,201 +301,30 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
       <Stack padding={0} overflow="auto" height="100%" spacing={0}>
         {!isDefined(fieldId) ? (
           fieldsWithComments.length === 0 && isLoadingAccess ? (
-            <Center overflow="auto" width="100%" flex="1">
-              <Spinner
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="primary.500"
-                size="xl"
-              />
-            </Center>
+            <LoadingSpinner />
           ) : fieldsWithComments.length === 0 ? (
-            <Center
-              textAlign="center"
-              display="flex"
-              flexDirection="column"
-              gap={2}
-              padding={4}
-              height="100%"
-              width="100%"
-            >
-              <Text as="h3" fontWeight="bold">
-                <FormattedMessage
-                  id="component.recipient-view-comments.no-comments-title"
-                  defaultMessage="There are no comments yet."
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="component.recipient-view-comments.no-comments-body"
-                  defaultMessage="Select the {commentsButtonLabel} buttons to add a comment in a field."
-                  values={{
-                    commentsButtonLabel: (
-                      <b>
-                        {intl.formatMessage({
-                          id: "recipient-view.doubts-button",
-                          defaultMessage: "Questions?",
-                        })}
-                      </b>
-                    ),
-                  }}
-                />
-              </Text>
-            </Center>
+            <CommentsEmptyState onStartGeneralComment={handleStartGeneralComment} />
           ) : (
             fieldsWithComments.map((field) => {
-              const comment = field.lastComment!;
-
-              const unreadCount = field.unreadCommentCount;
-              const isAuthor =
-                comment.author?.__typename === "PublicContact" && comment.author.isMe;
               return (
-                <LinkBox
-                  as={Stack}
+                <LastFieldComment
                   key={field.id}
-                  spacing={1}
-                  paddingX={4}
-                  paddingY={2}
-                  backgroundColor={unreadCount > 0 ? "primary.50" : "white"}
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  tabIndex={0}
-                  _focus={{
-                    outline: "none",
-                    boxShadow: "inline",
-                  }}
-                  _hover={{
-                    background: "gray.75",
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.code === "Space" || e.code === "Enter") {
-                      setFieldId(field.id);
-                    }
-                  }}
-                >
-                  <HStack justify="space-between" align="baseline">
-                    <LinkOverlay
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFieldId(field.id);
-                      }}
-                      href="#"
-                      tabIndex={-1}
-                    >
-                      {field.title ? (
-                        <Text noOfLines={2} fontWeight={600}>
-                          {field.title}
-                        </Text>
-                      ) : (
-                        <Text as="span" textStyle="hint" fontWeight={600}>
-                          {field.type === "HEADING" ? (
-                            <FormattedMessage
-                              id="generic.empty-heading"
-                              defaultMessage="Untitled heading"
-                            />
-                          ) : (
-                            <FormattedMessage
-                              id="generic.untitled-field"
-                              defaultMessage="Untitled field"
-                            />
-                          )}
-                        </Text>
-                      )}
-                    </LinkOverlay>
-
-                    <DateTime
-                      fontSize="sm"
-                      whiteSpace="nowrap"
-                      color={unreadCount > 0 ? "primary.500" : "gray.600"}
-                      value={comment.createdAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime
-                    />
-                  </HStack>
-                  <HStack color="gray.600" justify="space-between">
-                    <Box flex="1">
-                      <Text noOfLines={2} fontSize="sm" as="span" wordBreak="break-all">
-                        {`${
-                          isAuthor
-                            ? intl.formatMessage({ id: "generic.you", defaultMessage: "You" })
-                            : isDefined(comment.author)
-                              ? comment.author.fullName
-                              : intl.formatMessage({
-                                  id: "generic.unknown",
-                                  defaultMessage: "Unknown",
-                                })
-                        }: `}
-                        <PublicPetitionFieldCommentExcerpt as="span" comment={comment} />
-                      </Text>
-                    </Box>
-                    {unreadCount ? (
-                      <Badge
-                        background="primary.500"
-                        color="white"
-                        fontSize="xs"
-                        borderRadius="full"
-                        minW="18px"
-                        minH="18px"
-                        lineHeight="18px"
-                        pointerEvents="none"
-                        textAlign="center"
-                      >
-                        {unreadCount < 100 ? unreadCount : "99+"}
-                      </Badge>
-                    ) : null}
-                  </HStack>
-                </LinkBox>
+                  field={field}
+                  onClick={() => setFieldId(field.id)}
+                />
               );
             })
           )
         ) : (
           <>
             {isLoadingField ? (
-              <Center overflow="auto" width="100%" flex="1">
-                <Spinner
-                  thickness="4px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color="primary.500"
-                  size="xl"
-                />
-              </Center>
+              <LoadingSpinner />
             ) : comments.length === 0 ? (
-              <Center
-                overflow="auto"
-                width="100%"
-                flex="1"
-                flexDirection="column"
-                paddingX={4}
-                paddingY={8}
-                gap={2}
-                textAlign="center"
-              >
-                <CommentIcon color="gray.300" boxSize="64px" />
-                <Text as="h3" fontWeight="bold">
-                  <FormattedMessage
-                    id="component.recipient-view-comments.no-comments-field-title"
-                    defaultMessage="Do you have questions about this field?"
-                    values={{ tone }}
-                  />
-                </Text>
-                <Text color="gray.500">
-                  {access.granter!.fullName ? (
-                    <FormattedMessage
-                      id="component.recipient-view-comments.ask-with-name"
-                      defaultMessage="Ask {name} here"
-                      values={{ name: access.granter!.fullName, tone }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.recipient-view-comments.ask-here"
-                      defaultMessage="Ask here"
-                      values={{ tone }}
-                    />
-                  )}
-                </Text>
-              </Center>
+              <FieldCommentsEmptyState
+                tone={tone}
+                fullName={access.granter!.fullName}
+                isGeneral={showGeneralComments}
+              />
             ) : (
               <>
                 <Stack
@@ -520,6 +387,13 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
           </>
         )}
       </Stack>
+      {!isDefined(fieldId) && !hasGeneralComments && fieldsWithComments.length > 0 ? (
+        <Flex padding={2} borderTop="1px solid" borderColor="gray.200" justify="end">
+          <Button leftIcon={<EditIcon />} onClick={handleStartGeneralComment}>
+            <FormattedMessage id="generic.add-comment" defaultMessage="Add comment" />
+          </Button>
+        </Flex>
+      ) : null}
     </Flex>
   );
 }
@@ -543,6 +417,32 @@ RecipientViewComments.fragments = {
       }
     }
   `,
+  PublicPetitionField: gql`
+    fragment RecipientViewComments_PublicPetitionField on PublicPetitionField {
+      id
+      type
+      title
+      unreadCommentCount
+      hasCommentsEnabled
+      lastComment {
+        ...RecipientViewComments_PublicPetitionFieldComment
+        ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
+        createdAt
+        author {
+          ... on PublicUser {
+            id
+            fullName
+          }
+          ... on PublicContact {
+            id
+            fullName
+            isMe
+          }
+        }
+      }
+    }
+    ${PublicPetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
+  `,
 };
 
 const _queries = [
@@ -552,49 +452,33 @@ const _queries = [
         petition {
           id
           fields {
-            id
-            type
-            title
-            unreadCommentCount
-            hasCommentsEnabled
-            lastComment {
-              ...RecipientViewComments_PublicPetitionFieldComment
-              ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
-              createdAt
-              author {
-                ... on PublicUser {
-                  id
-                  fullName
-                }
-                ... on PublicContact {
-                  id
-                  fullName
-                  isMe
-                }
-              }
-            }
+            ...RecipientViewComments_PublicPetitionField
+          }
+          generalComments {
+            ...RecipientViewComments_PublicPetitionFieldComment
+          }
+          generalCommentCount
+          unreadGeneralCommentCount
+          lastGeneralComment {
+            ...RecipientViewComments_PublicPetitionFieldComment
           }
         }
       }
     }
-    ${PublicPetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
+    ${RecipientViewComments.fragments.PublicPetitionField}
     ${RecipientViewComments.fragments.PublicPetitionFieldComment}
   `,
   gql`
     query RecipientViewComments_publicPetitionField($keycode: ID!, $petitionFieldId: GID!) {
       publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-        id
-        title
-        type
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
+        ...RecipientViewComments_PublicPetitionField
         comments {
           id
           ...RecipientViewComments_PublicPetitionFieldComment
         }
       }
     }
+    ${RecipientViewComments.fragments.PublicPetitionField}
     ${RecipientViewComments.fragments.PublicPetitionFieldComment}
   `,
 ];
@@ -615,16 +499,20 @@ const _mutations = [
           id
           unreadCommentCount
         }
+        petition {
+          id
+          unreadGeneralCommentCount
+        }
       }
     }
   `,
   gql`
-    mutation RecipientViewComments_createPetitionFieldComment(
+    mutation RecipientViewComments_publicCreatePetitionComment(
       $keycode: ID!
-      $petitionFieldId: GID!
+      $petitionFieldId: GID
       $content: JSON!
     ) {
-      publicCreatePetitionFieldComment(
+      publicCreatePetitionComment(
         keycode: $keycode
         petitionFieldId: $petitionFieldId
         content: $content
@@ -638,20 +526,25 @@ const _mutations = [
             id
           }
         }
+        petition {
+          id
+          unreadGeneralCommentCount
+          generalComments {
+            id
+          }
+        }
       }
     }
     ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
-    mutation RecipientViewComments_updatePetitionFieldComment(
+    mutation RecipientViewComments_publicUpdatePetitionComment(
       $keycode: ID!
-      $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: JSON!
     ) {
-      publicUpdatePetitionFieldComment(
+      publicUpdatePetitionComment(
         keycode: $keycode
-        petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
       ) {
@@ -661,23 +554,242 @@ const _mutations = [
     ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
-    mutation RecipientViewComments_deletePetitionFieldComment(
+    mutation RecipientViewComments_publicDeletePetitionComment(
       $keycode: ID!
-      $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
     ) {
-      publicDeletePetitionFieldComment(
+      publicDeletePetitionComment(
         keycode: $keycode
-        petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
       ) {
-        id
-        commentCount
-        unreadCommentCount
-        comments {
+        ... on PublicPetitionField {
           id
+          commentCount
+          comments {
+            id
+          }
+          lastComment {
+            id
+          }
+        }
+        ... on PublicPetition {
+          id
+          generalCommentCount
+          lastGeneralComment {
+            id
+          }
+          generalComments {
+            id
+          }
         }
       }
     }
   `,
 ];
+
+function CommentsEmptyState({ onStartGeneralComment }: { onStartGeneralComment: () => void }) {
+  return (
+    <Center
+      textAlign="center"
+      display="flex"
+      flexDirection="column"
+      gap={2}
+      padding={4}
+      height="100%"
+      width="100%"
+    >
+      <Text as="h3" fontWeight="bold">
+        <FormattedMessage
+          id="component.recipient-view-comments.no-comments-title"
+          defaultMessage="There are no comments yet."
+        />
+      </Text>
+      <Text>
+        <FormattedMessage
+          id="component.recipient-view-comments.no-comments-body"
+          defaultMessage="Select the {commentsIcon} buttons to add a comment in a field or add a general comment here."
+          values={{
+            commentsIcon: (
+              <Text as="span" paddingX={0.5}>
+                <CommentIcon marginBottom={1} />
+              </Text>
+            ),
+          }}
+        />
+      </Text>
+      <Button leftIcon={<EditIcon />} onClick={onStartGeneralComment}>
+        <FormattedMessage id="generic.add-comment" defaultMessage="Add comment" />
+      </Button>
+    </Center>
+  );
+}
+
+function FieldCommentsEmptyState({
+  isGeneral,
+  fullName,
+  tone,
+}: {
+  isGeneral?: boolean;
+  fullName?: string;
+  tone: Tone;
+}) {
+  return (
+    <Center
+      overflow="auto"
+      width="100%"
+      flex="1"
+      flexDirection="column"
+      paddingX={4}
+      paddingY={8}
+      gap={2}
+      textAlign="center"
+    >
+      <CommentIcon color="gray.300" boxSize="64px" />
+      <Text as="h3" fontWeight="bold">
+        {isGeneral ? (
+          <FormattedMessage
+            id="component.recipient-view-comments.no-general-comments-title"
+            defaultMessage="Do you have questions not related to any field?"
+            values={{ tone }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.recipient-view-comments.no-comments-field-title"
+            defaultMessage="Do you have questions about this field?"
+            values={{ tone }}
+          />
+        )}
+      </Text>
+      <Text color="gray.500">
+        {fullName ? (
+          <FormattedMessage
+            id="component.recipient-view-comments.ask-with-name"
+            defaultMessage="Ask {name} here"
+            values={{ name: fullName, tone }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.recipient-view-comments.ask-here"
+            defaultMessage="Ask here"
+            values={{ tone }}
+          />
+        )}
+      </Text>
+    </Center>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <Center overflow="auto" width="100%" flex="1">
+      <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="primary.500" size="xl" />
+    </Center>
+  );
+}
+
+function LastFieldComment({
+  field,
+  onClick,
+}: {
+  field: Pick<
+    RecipientViewComments_PublicPetitionFieldFragment,
+    "id" | "lastComment" | "title" | "unreadCommentCount" | "type"
+  >;
+  onClick: () => void;
+}) {
+  const intl = useIntl();
+  const comment = field.lastComment!;
+  const unreadCount = field.unreadCommentCount;
+  const isAuthor = comment.author?.__typename === "PublicContact" && comment.author.isMe;
+  return (
+    <LinkBox
+      as={Stack}
+      key={field.id}
+      spacing={1}
+      paddingX={4}
+      paddingY={2}
+      backgroundColor={unreadCount > 0 ? "primary.50" : "white"}
+      borderBottom="1px solid"
+      borderColor="gray.200"
+      tabIndex={0}
+      _focus={{
+        outline: "none",
+        boxShadow: "inline",
+      }}
+      _hover={{
+        background: "gray.75",
+      }}
+      onKeyDown={(e) => {
+        if (e.code === "Space" || e.code === "Enter") {
+          onClick();
+        }
+      }}
+    >
+      <HStack justify="space-between" align="baseline">
+        <LinkOverlay
+          onClick={(e) => {
+            e.preventDefault();
+            onClick();
+          }}
+          href="#"
+          tabIndex={-1}
+        >
+          {field.title ? (
+            <Text noOfLines={2} fontWeight={600}>
+              {field.title}
+            </Text>
+          ) : (
+            <Text as="span" textStyle="hint" fontWeight={600}>
+              {field.type === "HEADING" ? (
+                <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
+              ) : (
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              )}
+            </Text>
+          )}
+        </LinkOverlay>
+
+        <DateTime
+          fontSize="sm"
+          whiteSpace="nowrap"
+          color={unreadCount > 0 ? "primary.500" : "gray.600"}
+          value={comment.createdAt}
+          format={FORMATS.LLL}
+          useRelativeTime
+        />
+      </HStack>
+      <HStack color="gray.600" justify="space-between">
+        <Box flex="1">
+          <Text noOfLines={2} fontSize="sm" as="span" wordBreak="break-all">
+            {`${
+              isAuthor
+                ? intl.formatMessage({ id: "generic.you", defaultMessage: "You" })
+                : isDefined(comment.author)
+                  ? comment.author.fullName
+                  : intl.formatMessage({
+                      id: "generic.unknown",
+                      defaultMessage: "Unknown",
+                    })
+            }: `}
+            <PublicPetitionFieldCommentExcerpt as="span" comment={comment} />
+          </Text>
+        </Box>
+        {unreadCount ? (
+          <Badge
+            background="primary.500"
+            color="white"
+            fontSize="xs"
+            borderRadius="full"
+            minW="18px"
+            minH="18px"
+            lineHeight="18px"
+            pointerEvents="none"
+            textAlign="center"
+          >
+            {unreadCount < 100 ? unreadCount : "99+"}
+          </Badge>
+        ) : null}
+      </HStack>
+    </LinkBox>
+  );
+}

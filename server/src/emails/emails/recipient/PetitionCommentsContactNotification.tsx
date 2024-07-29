@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { toGlobalId } from "../../../util/globalId";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
 import { GreetingContact } from "../../components/Greeting";
@@ -10,17 +11,17 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../../components/PetitionFieldAndCommentsList";
 import { closing, greetingContact } from "../../components/texts";
-import { toGlobalId } from "../../../util/globalId";
+import { isDefined } from "remeda";
 
-export type PetitionCommentsContactNotificationProps = {
+type CommentsContactNotificationProps = {
   contactFullName: string;
   contactName: string;
   keycode: string;
   emailSubject: string | null;
-  fields: PetitionFieldAndCommentsProps["fields"];
+  fieldsWithComments: PetitionFieldAndCommentsProps["fieldsWithComments"];
 } & LayoutProps;
 
-const email: Email<PetitionCommentsContactNotificationProps> = {
+const email: Email<CommentsContactNotificationProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
@@ -38,18 +39,22 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
   },
   text(
     {
-      fields,
+      fieldsWithComments,
       contactName: name,
       contactFullName: fullName,
       keycode,
       parallelUrl,
       emailSubject,
       theme,
-    }: PetitionCommentsContactNotificationProps,
+    }: CommentsContactNotificationProps,
     intl: IntlShape,
   ) {
-    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
-    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
+    const commentCount = fieldsWithComments.reduce((acc, { comments }) => acc + comments.length, 0);
+
+    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+      ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
+      : "general";
+
     return outdent`
       ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
 
@@ -75,7 +80,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     contactName: name,
     contactFullName: fullName,
     keycode,
-    fields,
+    fieldsWithComments,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -83,10 +88,12 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     emailSubject,
     removeParallelBranding,
     theme,
-  }: PetitionCommentsContactNotificationProps) {
+  }: CommentsContactNotificationProps) {
     const { locale } = useIntl();
-    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
-    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
+    const commentCount = fieldsWithComments.reduce((acc, { comments }) => acc + comments.length, 0);
+    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+      ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
+      : "general";
 
     return (
       <Layout
@@ -117,7 +124,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
           </MjmlColumn>
         </MjmlSection>
 
-        <PetitionFieldAndComments fields={fields} />
+        <PetitionFieldAndComments fieldsWithComments={fieldsWithComments} />
 
         <MjmlSection>
           <MjmlColumn>

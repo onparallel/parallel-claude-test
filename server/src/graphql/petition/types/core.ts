@@ -545,6 +545,40 @@ export const Petition = objectType({
         return await ctx.petitions.loadPetitionSummaryRequest(root.summary_ai_completion_log_id);
       },
     });
+    t.list.nonNull.field("generalComments", {
+      type: "PetitionFieldComment",
+      description: "The general comments for this petition",
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadGeneralPetitionCommentsForPetition({
+          loadInternalComments: true,
+          petitionId: root.id,
+        }),
+    });
+    t.nonNull.int("generalCommentCount", {
+      resolve: async (root, _, ctx) => {
+        return (
+          await ctx.petitions.loadGeneralPetitionCommentsForPetition({
+            loadInternalComments: true,
+            petitionId: root.id,
+          })
+        ).length;
+      },
+    });
+    t.nonNull.int("unreadGeneralCommentCount", {
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadPetitionUnreadGeneralCommentCountForPetitionAndUser({
+          userId: ctx.user!.id,
+          petitionId: root.id,
+        }),
+    });
+    t.nullable.field("lastGeneralComment", {
+      type: "PetitionFieldComment",
+      resolve: async (root, _, ctx) =>
+        await ctx.petitions.loadLastGeneralPetitionCommentForPetition({
+          loadInternalComments: true,
+          petitionId: root.id,
+        }),
+    });
   },
 });
 

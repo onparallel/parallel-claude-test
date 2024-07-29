@@ -35,13 +35,15 @@ export async function commentsContactNotification(
     throw new Error(`Access not found for petition_access_id ${payload.petition_access_id}`);
   }
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
+
   const comments = _comments.filter(isDefined);
-  const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
+
+  const fieldIds = uniq(comments.map((c) => c!.petition_field_id)).filter(isDefined);
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
-  const commentsByField = groupBy(comments, (c) => c.petition_field_id);
-  const fields = await pMap(
-    sortBy(_fields, (f) => f.position),
-    (f) => buildFieldWithComments(f, commentsByField, context),
+  const commentsByField = groupBy(comments, (c) => c.petition_field_id ?? "null");
+
+  const fieldsWithComments = await pMap([null, ...sortBy(_fields, (f) => f.position)], (f) =>
+    buildFieldWithComments(f, commentsByField, context),
   );
 
   const { html, text, subject, from } = await buildEmail(
@@ -51,7 +53,7 @@ export async function commentsContactNotification(
       contactName: contact.first_name,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
-      fields,
+      fieldsWithComments,
       ...layoutProps,
     },
     { locale: petition.recipient_locale },

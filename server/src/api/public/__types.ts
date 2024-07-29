@@ -277,8 +277,9 @@ export type ChangePasswordResult =
 export type CommentCreatedUserNotification = PetitionUserNotification & {
   comment: PetitionFieldComment;
   createdAt: Scalars["DateTime"]["output"];
-  field: PetitionField;
+  field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
+  isGeneral: Scalars["Boolean"]["output"];
   isMention: Scalars["Boolean"]["output"];
   isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
@@ -290,6 +291,7 @@ export type CommentDeletedEvent = PetitionEvent & {
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
+  isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -301,6 +303,7 @@ export type CommentPublishedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
+  isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -883,13 +886,18 @@ export type Mutation = {
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
+  /** Create a petition comment. */
+  createPetitionComment: PetitionFieldComment;
   /** Creates an event subscription for the user's petitions */
   createPetitionEventSubscription: PetitionEventSubscription;
   /** Creates a petition field */
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
-  /** Create a petition field comment. */
+  /**
+   * Create a petition field comment.
+   * @deprecated use createPetitionComment
+   */
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates multiple replies for a petition at once */
   createPetitionFieldReplies: Array<PetitionFieldReply>;
@@ -955,11 +963,16 @@ export type Mutation = {
   deleteOrganizationPdfDocumentTheme: Organization;
   /** Remove a petition attachment */
   deletePetitionAttachment: PetitionBase;
+  /** Delete a petition comment. */
+  deletePetitionComment: PetitionFieldOrPetition;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
   deletePetitionFieldAttachment: PetitionField;
-  /** Delete a petition field comment. */
+  /**
+   * Delete a petition field comment.
+   * @deprecated use deletePetitionComment
+   */
   deletePetitionFieldComment: PetitionField;
   /** Deletes a petition list view of the user */
   deletePetitionListView: User;
@@ -1033,7 +1046,12 @@ export type Mutation = {
   publicCreateAndSendPetitionFromPublicLink: Result;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
-  /** Create a petition field comment. */
+  /** Create a petition comment. */
+  publicCreatePetitionComment: PublicPetitionFieldComment;
+  /**
+   * Create a petition field comment.
+   * @deprecated Use publicCreatePetitionComment instead
+   */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates replies on a petition field as recipient. */
   publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
@@ -1041,7 +1059,12 @@ export type Mutation = {
   publicCreatePrintPdfTask: Task;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
-  /** Delete a petition field comment. */
+  /** Delete a petition comment. */
+  publicDeletePetitionComment: PublicPetitionFieldOrPublicPetition;
+  /**
+   * Delete a petition field comment.
+   * @deprecated Use publicDeletePetitionComment instead
+   */
   publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
   publicDeletePetitionFieldReply: PublicPetitionField;
@@ -1066,7 +1089,12 @@ export type Mutation = {
   publicSendVerificationCode: VerificationCodeRequest;
   /** Starts the completion of an async field */
   publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
-  /** Update a petition field comment. */
+  /** Update a petition comment. */
+  publicUpdatePetitionComment: PublicPetitionFieldComment;
+  /**
+   * Update a petition field comment.
+   * @deprecated Use publicUpdatePetitionComment instead
+   */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates replies on a petition field as recipient. */
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
@@ -1175,13 +1203,18 @@ export type Mutation = {
   updatePetition: PetitionBase;
   /** Updates the type of a petition attachment and sets it in the final position */
   updatePetitionAttachmentType: PetitionAttachment;
+  /** Update a petition comment. */
+  updatePetitionComment: PetitionFieldComment;
   /** Updates an existing event subscription for the user's petitions */
   updatePetitionEventSubscription: PetitionEventSubscription;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
   updatePetitionFieldAutoSearchConfig: PetitionField;
-  /** Update a petition field comment. */
+  /**
+   * Update a petition field comment.
+   * @deprecated use updatePetitionComment
+   */
   updatePetitionFieldComment: PetitionFieldComment;
   updatePetitionFieldGroupRelationships: PetitionBase;
   /** Updates multiple replies for a petition at once */
@@ -1489,6 +1522,17 @@ export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   type: PetitionAttachmentType;
 };
 
+export type MutationcreatePetitionCommentArgs = {
+  content: Scalars["JSON"]["input"];
+  isInternal: Scalars["Boolean"]["input"];
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
 export type MutationcreatePetitionEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["input"];
@@ -1692,6 +1736,11 @@ export type MutationdeleteOrganizationPdfDocumentThemeArgs = {
 
 export type MutationdeletePetitionAttachmentArgs = {
   attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationdeletePetitionCommentArgs = {
+  petitionFieldCommentId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -1927,6 +1976,12 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
+export type MutationpublicCreatePetitionCommentArgs = {
+  content: Scalars["JSON"]["input"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
 export type MutationpublicCreatePetitionFieldCommentArgs = {
   content: Scalars["JSON"]["input"];
   keycode: Scalars["ID"]["input"];
@@ -1948,6 +2003,11 @@ export type MutationpublicDelegateAccessToContactArgs = {
   keycode: Scalars["ID"]["input"];
   lastName: Scalars["String"]["input"];
   messageBody: Scalars["JSON"]["input"];
+};
+
+export type MutationpublicDeletePetitionCommentArgs = {
+  keycode: Scalars["ID"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicDeletePetitionFieldCommentArgs = {
@@ -2024,6 +2084,12 @@ export type MutationpublicStartAsyncFieldCompletionArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
+export type MutationpublicUpdatePetitionCommentArgs = {
+  content: Scalars["JSON"]["input"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -2344,6 +2410,16 @@ export type MutationupdatePetitionAttachmentTypeArgs = {
   attachmentId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
   type: PetitionAttachmentType;
+};
+
+export type MutationupdatePetitionCommentArgs = {
+  content: Scalars["JSON"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationupdatePetitionEventSubscriptionArgs = {
@@ -2845,6 +2921,9 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate: Maybe<PetitionBaseMini>;
+  generalCommentCount: Scalars["Int"]["output"];
+  /** The general comments for this petition */
+  generalComments: Array<PetitionFieldComment>;
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
@@ -2865,6 +2944,7 @@ export type Petition = PetitionBase & {
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the petition or any of its relations were last updated. */
   lastChangeAt: Scalars["DateTime"]["output"];
+  lastGeneralComment: Maybe<PetitionFieldComment>;
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The latest summary request for this petition */
   latestSummaryRequest: Maybe<AiCompletionLog>;
@@ -2903,6 +2983,7 @@ export type Petition = PetitionBase & {
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
+  unreadGeneralCommentCount: Scalars["Int"]["output"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
   variables: Array<PetitionVariable>;
@@ -3348,7 +3429,7 @@ export type PetitionFieldComment = {
   createdAt: Scalars["DateTime"]["output"];
   /** The HTML content of the comment. */
   excerptHtml: Maybe<Scalars["String"]["output"]>;
-  field: PetitionField;
+  field: Maybe<PetitionField>;
   /** The ID of the petition field comment. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
@@ -3360,6 +3441,7 @@ export type PetitionFieldComment = {
   isUnread: Scalars["Boolean"]["output"];
   /** The mentions of the comments. */
   mentions: Array<PetitionFieldCommentMention>;
+  petition: PetitionBase;
 };
 
 export type PetitionFieldCommentMention =
@@ -3401,6 +3483,8 @@ export type PetitionFieldMini = {
   /** The type of the petition field. */
   type: PetitionFieldType;
 };
+
+export type PetitionFieldOrPetition = Petition | PetitionField;
 
 /** The progress of the petition */
 export type PetitionFieldProgress = {
@@ -4549,6 +4633,9 @@ export type PublicPetition = Timestamps & {
   deadline: Maybe<Scalars["DateTime"]["output"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
+  generalCommentCount: Scalars["Int"]["output"];
+  /** The general comments for this petition */
+  generalComments: Array<PublicPetitionFieldComment>;
   /** Shows if the petition has unread comments */
   hasUnreadComments: Scalars["Boolean"]["output"];
   /** The ID of the petition. */
@@ -4562,6 +4649,7 @@ export type PublicPetition = Timestamps & {
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
+  lastGeneralComment: Maybe<PublicPetitionFieldComment>;
   /** The latest signature request of the petition. */
   latestSignatureRequest: Maybe<PublicPetitionSignatureRequest>;
   /** The locale of the parallel. */
@@ -4579,6 +4667,7 @@ export type PublicPetition = Timestamps & {
   status: PetitionStatus;
   /** The preferred tone of organization. */
   tone: Tone;
+  unreadGeneralCommentCount: Scalars["Int"]["output"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
   variables: Array<PetitionVariable>;
@@ -4660,12 +4749,13 @@ export type PublicPetitionFieldComment = {
   createdAt: Scalars["DateTime"]["output"];
   /** The HTML content of the comment. */
   excerptHtml: Maybe<Scalars["String"]["output"]>;
-  field: PublicPetitionField;
+  field: Maybe<PublicPetitionField>;
   /** The ID of the petition field comment. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"]["output"];
+  petition: PublicPetition;
 };
 
 /** References the replies of a FIELD_GROUP field on a specific field and group */
@@ -4673,6 +4763,8 @@ export type PublicPetitionFieldGroupChildReply = {
   field: PublicPetitionField;
   replies: Array<PublicPetitionFieldReply>;
 };
+
+export type PublicPetitionFieldOrPublicPetition = PublicPetition | PublicPetitionField;
 
 /** The progress of a petition. */
 export type PublicPetitionFieldProgress = {
@@ -8170,9 +8262,9 @@ export type SendPetitionFieldComment_getUsersOrGroupsQuery = {
   >;
 };
 
-export type SendPetitionFieldComment_createPetitionFieldCommentMutationVariables = Exact<{
+export type SendPetitionFieldComment_createPetitionCommentMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   content: Scalars["JSON"]["input"];
   isInternal: Scalars["Boolean"]["input"];
   sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -8180,8 +8272,8 @@ export type SendPetitionFieldComment_createPetitionFieldCommentMutationVariables
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
-export type SendPetitionFieldComment_createPetitionFieldCommentMutation = {
-  createPetitionFieldComment: {
+export type SendPetitionFieldComment_createPetitionCommentMutation = {
+  createPetitionComment: {
     id: string;
     content: any | null;
     isInternal: boolean;
@@ -11650,17 +11742,17 @@ export const SendPetitionFieldComment_getUsersOrGroupsDocument = gql`
   SendPetitionFieldComment_getUsersOrGroupsQuery,
   SendPetitionFieldComment_getUsersOrGroupsQueryVariables
 >;
-export const SendPetitionFieldComment_createPetitionFieldCommentDocument = gql`
-  mutation SendPetitionFieldComment_createPetitionFieldComment(
+export const SendPetitionFieldComment_createPetitionCommentDocument = gql`
+  mutation SendPetitionFieldComment_createPetitionComment(
     $petitionId: GID!
-    $petitionFieldId: GID!
+    $petitionFieldId: GID
     $content: JSON!
     $isInternal: Boolean!
     $sharePetition: Boolean
     $sharePetitionPermission: PetitionPermissionTypeRW
     $sharePetitionSubscribed: Boolean
   ) {
-    createPetitionFieldComment(
+    createPetitionComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
       content: $content
@@ -11675,8 +11767,8 @@ export const SendPetitionFieldComment_createPetitionFieldCommentDocument = gql`
   }
   ${PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
-  SendPetitionFieldComment_createPetitionFieldCommentMutation,
-  SendPetitionFieldComment_createPetitionFieldCommentMutationVariables
+  SendPetitionFieldComment_createPetitionCommentMutation,
+  SendPetitionFieldComment_createPetitionCommentMutationVariables
 >;
 export const DeleteReply_deletePetitionReplyDocument = gql`
   mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {

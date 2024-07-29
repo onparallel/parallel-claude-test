@@ -83,6 +83,7 @@ const result: PossibleTypesResultData = {
       "PetitionFieldCommentUserGroupMention",
       "PetitionFieldCommentUserMention",
     ],
+    PetitionFieldOrPetition: ["Petition", "PetitionField"],
     PetitionPermission: ["PetitionUserGroupPermission", "PetitionUserPermission"],
     PetitionUserNotification: [
       "AccessActivatedFromPublicPetitionLinkUserNotification",
@@ -112,6 +113,7 @@ const result: PossibleTypesResultData = {
       "ProfileUpdatedEvent",
     ],
     ProfileFieldResponse: ["ProfileFieldFile", "ProfileFieldValue"],
+    PublicPetitionFieldOrPublicPetition: ["PublicPetition", "PublicPetitionField"],
     PublicUserOrContact: ["PublicContact", "PublicUser"],
     TemplateDefaultPermission: [
       "TemplateDefaultUserGroupPermission",

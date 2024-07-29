@@ -455,6 +455,11 @@
     "context": "Deleted user"
   },
   {
+    "term": "generic.general-comments-label",
+    "definition": "General",
+    "context": "General"
+  },
+  {
     "term": "generic.no",
     "definition": "No",
     "context": "No"

@@ -6,18 +6,18 @@ import { removeMentionInputElements } from "@parallel/components/common/slate/Co
 import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import {
-  usePetitionCommentsMutations_createPetitionFieldCommentDocument,
-  usePetitionCommentsMutations_deletePetitionFieldCommentDocument,
+  usePetitionCommentsMutations_createPetitionCommentDocument,
+  usePetitionCommentsMutations_deletePetitionCommentDocument,
   usePetitionCommentsMutations_getUsersOrGroupsDocument,
-  usePetitionCommentsMutations_updatePetitionFieldCommentDocument,
+  usePetitionCommentsMutations_updatePetitionCommentDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { isApolloError } from "../apollo/isApolloError";
 import { Maybe } from "../types";
 
-export function useCreatePetitionFieldComment() {
-  const [createPetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_createPetitionFieldCommentDocument,
+export function useCreatePetitionComment() {
+  const [createPetitionComment] = useMutation(
+    usePetitionCommentsMutations_createPetitionCommentDocument,
   );
 
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
@@ -31,11 +31,11 @@ export function useCreatePetitionFieldComment() {
       content,
       ...variables
     }: Pick<
-      VariablesOf<typeof usePetitionCommentsMutations_createPetitionFieldCommentDocument>,
+      VariablesOf<typeof usePetitionCommentsMutations_createPetitionCommentDocument>,
       "petitionId" | "petitionFieldId" | "isInternal" | "content"
     >) => {
       try {
-        await createPetitionFieldComment({
+        await createPetitionComment({
           variables: { content: removeMentionInputElements(content), ...variables },
         });
       } catch (e) {
@@ -48,7 +48,7 @@ export function useCreatePetitionFieldComment() {
               usersAndGroups: data.getUsersOrGroups,
               isInternal: variables.isInternal,
             });
-            await createPetitionFieldComment({
+            await createPetitionComment({
               variables: {
                 ...variables,
                 content: removeMentionInputElements(content),
@@ -60,13 +60,13 @@ export function useCreatePetitionFieldComment() {
         }
       }
     },
-    [createPetitionFieldComment],
+    [createPetitionComment],
   );
 }
 
-export function useUpdatePetitionFieldComment() {
-  const [updatePetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_updatePetitionFieldCommentDocument,
+export function useUpdatePetitionComment() {
+  const [updatePetitionComment] = useMutation(
+    usePetitionCommentsMutations_updatePetitionCommentDocument,
   );
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
   const { refetch: fetchUsersOrGroups } = useQuery(
@@ -79,11 +79,11 @@ export function useUpdatePetitionFieldComment() {
       content,
       ...variables
     }: Pick<
-      VariablesOf<typeof usePetitionCommentsMutations_updatePetitionFieldCommentDocument>,
-      "petitionId" | "petitionFieldId" | "petitionFieldCommentId" | "content"
+      VariablesOf<typeof usePetitionCommentsMutations_updatePetitionCommentDocument>,
+      "petitionId" | "petitionFieldCommentId" | "content"
     > & { isInternal?: Maybe<boolean> }) => {
       try {
-        await updatePetitionFieldComment({
+        await updatePetitionComment({
           variables: { content: removeMentionInputElements(content), ...variables },
         });
       } catch (e) {
@@ -96,7 +96,7 @@ export function useUpdatePetitionFieldComment() {
               usersAndGroups: data.getUsersOrGroups,
               isInternal: variables.isInternal,
             });
-            await updatePetitionFieldComment({
+            await updatePetitionComment({
               variables: {
                 ...variables,
                 content: removeMentionInputElements(content),
@@ -108,23 +108,21 @@ export function useUpdatePetitionFieldComment() {
         }
       }
     },
-    [updatePetitionFieldComment],
+    [updatePetitionComment],
   );
 }
 
-export function useDeletePetitionFieldComment() {
-  const [deletePetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_deletePetitionFieldCommentDocument,
+export function useDeletePetitionComment() {
+  const [deletePetitionComment] = useMutation(
+    usePetitionCommentsMutations_deletePetitionCommentDocument,
   );
   return useCallback(
     async (
-      variables: VariablesOf<
-        typeof usePetitionCommentsMutations_deletePetitionFieldCommentDocument
-      >,
+      variables: VariablesOf<typeof usePetitionCommentsMutations_deletePetitionCommentDocument>,
     ) => {
-      await deletePetitionFieldComment({ variables });
+      await deletePetitionComment({ variables });
     },
-    [deletePetitionFieldComment],
+    [deletePetitionComment],
   );
 }
 
@@ -171,9 +169,9 @@ const _fragments = {
 
 const _mutations = [
   gql`
-    mutation usePetitionCommentsMutations_createPetitionFieldComment(
+    mutation usePetitionCommentsMutations_createPetitionComment(
       $petitionId: GID!
-      $petitionFieldId: GID!
+      $petitionFieldId: GID
       $content: JSON!
       $isInternal: Boolean!
       $sharePetition: Boolean
@@ -181,7 +179,7 @@ const _mutations = [
       $sharePetitionSubscribed: Boolean
       $throwOnNoPermission: Boolean
     ) {
-      createPetitionFieldComment(
+      createPetitionComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
         content: $content
@@ -195,15 +193,26 @@ const _mutations = [
         field {
           ...usePetitionCommentsMutations_PetitionField
         }
+        petition {
+          id
+          ... on Petition {
+            generalCommentCount
+            generalComments {
+              id
+            }
+            lastGeneralComment {
+              id
+            }
+          }
+        }
       }
     }
     ${_fragments.PetitionFieldComment}
     ${_fragments.PetitionField}
   `,
   gql`
-    mutation usePetitionCommentsMutations_updatePetitionFieldComment(
+    mutation usePetitionCommentsMutations_updatePetitionComment(
       $petitionId: GID!
-      $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: JSON!
       $sharePetition: Boolean
@@ -211,9 +220,8 @@ const _mutations = [
       $sharePetitionSubscribed: Boolean
       $throwOnNoPermission: Boolean
     ) {
-      updatePetitionFieldComment(
+      updatePetitionComment(
         petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
         sharePetition: $sharePetition
@@ -225,23 +233,41 @@ const _mutations = [
         field {
           ...usePetitionCommentsMutations_PetitionField
         }
+        petition {
+          id
+          ... on Petition {
+            generalComments {
+              id
+            }
+          }
+        }
       }
     }
     ${_fragments.PetitionFieldComment}
     ${_fragments.PetitionField}
   `,
   gql`
-    mutation usePetitionCommentsMutations_deletePetitionFieldComment(
+    mutation usePetitionCommentsMutations_deletePetitionComment(
       $petitionId: GID!
-      $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
     ) {
-      deletePetitionFieldComment(
+      deletePetitionComment(
         petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
       ) {
-        ...usePetitionCommentsMutations_PetitionField
+        ... on PetitionField {
+          ...usePetitionCommentsMutations_PetitionField
+        }
+        ... on Petition {
+          id
+          generalCommentCount
+          lastGeneralComment {
+            id
+          }
+          generalComments {
+            id
+          }
+        }
       }
     }
     ${_fragments.PetitionField}

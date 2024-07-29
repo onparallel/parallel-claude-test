@@ -318,15 +318,9 @@ export function validPetitionFieldCommentContent<
   TypeName extends string,
   FieldName extends string,
   TArgContent extends Arg<TypeName, FieldName, any>,
-  TArgFieldId extends Arg<TypeName, FieldName, number>,
->(
-  argContent: TArgContent,
-  argFieldId: TArgFieldId,
-  allowMentions?: boolean,
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argContent: TArgContent, allowMentions?: boolean): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx, info) => {
     const content = args[argContent] as any;
-    const fieldId = args[argFieldId] as unknown as number;
     const ajv = new Ajv();
     if (!content) {
       throw new ForbiddenError("comment content is not defined");
@@ -393,12 +387,10 @@ export function validPetitionFieldCommentContent<
       throw new ArgValidationError(info, argContent, ajv.errorsText());
     }
     if (allowMentions) {
-      const field = (await ctx.petitions.loadField(fieldId))!;
-      const petition = (await ctx.petitions.loadPetition(field.petition_id))!;
       const mentions = collectMentionsFromSlate(content);
       const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
       const passes = await ctx.petitions.canBeMentionedInPetitionFieldComment(
-        petition.org_id,
+        ctx.user!.org_id,
         userMentions.map((m) => m.id),
         userGroupMentions.map((m) => m.id),
       );

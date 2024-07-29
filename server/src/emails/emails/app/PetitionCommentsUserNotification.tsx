@@ -1,7 +1,8 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { sumBy, uniqBy } from "remeda";
+import { isDefined, sumBy, uniqBy } from "remeda";
+import { toGlobalId } from "../../../util/globalId";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
 import { GreetingUser } from "../../components/Greeting";
@@ -11,13 +12,12 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../../components/PetitionFieldAndCommentsList";
 import { closing, greetingUser } from "../../components/texts";
-import { toGlobalId } from "../../../util/globalId";
 
-export type PetitionCommentsUserNotificationProps = {
+type PetitionCommentsUserNotificationProps = {
   userName: string | null;
   petitionName: string | null;
   petitionId: string;
-  fields: PetitionFieldAndCommentsProps["fields"];
+  fieldsWithComments: PetitionFieldAndCommentsProps["fieldsWithComments"];
 } & LayoutProps;
 
 const email: Email<PetitionCommentsUserNotificationProps> = {
@@ -27,9 +27,9 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       defaultMessage: "Parallel",
     });
   },
-  subject({ petitionName, fields }, intl: IntlShape) {
-    const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.filter((m) => m.highlight).length > 0),
+  subject({ petitionName, fieldsWithComments }, intl: IntlShape) {
+    const commentsWithMentions = fieldsWithComments.flatMap(({ comments }) =>
+      comments.filter((c) => c.mentions.filter((m) => m.highlight).length > 0),
     );
 
     return commentsWithMentions.length === 0
@@ -57,24 +57,27 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
   text(
     {
       userName,
-      fields,
+      fieldsWithComments,
       petitionName,
       petitionId,
       parallelUrl,
     }: PetitionCommentsUserNotificationProps,
     intl: IntlShape,
   ) {
-    const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.length > 0),
+    const commentsWithMentions = fieldsWithComments.flatMap(({ comments }) =>
+      comments.filter((c) => c.mentions.length > 0),
     );
     const mentionCount = commentsWithMentions.flatMap((c) =>
       c.mentions.filter((m) => m.highlight),
     ).length;
 
-    const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
+    const commentCount =
+      sumBy(fieldsWithComments, ({ comments }) => comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
-    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
+    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+      ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
+      : "general";
 
     return outdent`
       ${greetingUser({ name: userName }, intl)}
@@ -120,7 +123,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     userName,
     petitionName,
     petitionId,
-    fields,
+    fieldsWithComments,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -129,18 +132,21 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
   }: PetitionCommentsUserNotificationProps) {
     const { locale } = useIntl();
 
-    const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.length > 0),
+    const commentsWithMentions = fieldsWithComments.flatMap(({ comments }) =>
+      comments.filter((c) => c.mentions.length > 0),
     );
     const mentionCount = commentsWithMentions.flatMap((c) =>
       c.mentions.filter((m) => m.highlight),
     ).length;
 
-    const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
+    const commentCount =
+      sumBy(fieldsWithComments, ({ comments }) => comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
 
-    const firstFieldWithCommentsId = toGlobalId("PetitionField", fields[0].id);
+    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+      ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
+      : "general";
 
     return (
       <Layout
@@ -177,7 +183,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
           </MjmlColumn>
         </MjmlSection>
 
-        <PetitionFieldAndComments fields={fields} />
+        <PetitionFieldAndComments fieldsWithComments={fieldsWithComments} />
 
         <MjmlSection>
           <MjmlColumn>

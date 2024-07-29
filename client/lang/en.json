@@ -4335,6 +4335,11 @@
     "context": "{name} has written a comment in the field {field}."
   },
   {
+    "term": "component.notification-comment.body-general-chat",
+    "definition": "{name} has written a comment in {general}.",
+    "context": "{name} has written a comment in {general}."
+  },
+  {
     "term": "component.notification-email-bounced.body",
     "definition": "Error sending the parallel to recipient {name}.",
     "context": "Error sending the parallel to recipient {name}."
@@ -4345,9 +4350,19 @@
     "context": "{name} has added a note in the field {field}."
   },
   {
+    "term": "component.notification-internal-comment.body-general-chat",
+    "definition": "{name} has added a note in {general}.",
+    "context": "{name} has added a note in {general}."
+  },
+  {
     "term": "component.notification-mention-comment.body",
     "definition": "{name} has mentioned you in the field {field}.",
     "context": "{name} has mentioned you in the field {field}."
+  },
+  {
+    "term": "component.notification-mention.body-general-chat",
+    "definition": "{name} has mentioned you in {general}.",
+    "context": "{name} has mentioned you in {general}."
   },
   {
     "term": "component.notification-petition-completed.body",
@@ -6103,6 +6118,11 @@
     "term": "component.petition-replies-field-comments.enable-comments-settings",
     "definition": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab.",
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+  },
+  {
+    "term": "component.petition-replies-field-comments.general-comments-title",
+    "definition": "General",
+    "context": "General"
   },
   {
     "term": "component.petition-replies-field-comments.only-notes",
@@ -7941,8 +7961,8 @@
   },
   {
     "term": "component.recipient-view-comments.no-comments-body",
-    "definition": "Select the {commentsButtonLabel} buttons to add a comment in a field.",
-    "context": "Select the {commentsButtonLabel} buttons to add a comment in a field."
+    "definition": "Select the {commentsIcon} buttons to add a comment in a field or add a general comment here.",
+    "context": "Select the {commentsIcon} buttons to add a comment in a field or add a general comment here."
   },
   {
     "term": "component.recipient-view-comments.no-comments-field-title",
@@ -7953,6 +7973,11 @@
     "term": "component.recipient-view-comments.no-comments-title",
     "definition": "There are no comments yet.",
     "context": "There are no comments yet."
+  },
+  {
+    "term": "component.recipient-view-comments.no-general-comments-title",
+    "definition": "Do you have questions not related to any field?",
+    "context": "Do you have questions not related to any field?"
   },
   {
     "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
@@ -9770,6 +9795,76 @@
     "context": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
   },
   {
+    "term": "component.timeline-comment-deleted-event.comment-deleted",
+    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-deleted-event.general-comment-deleted",
+    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment in {general} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-deleted-event.general-note-deleted",
+    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a note in {general} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-deleted-event.note-deleted",
+    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.comment",
+    "definition": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.comment-published-deleted",
+    "definition": "Someone wrote a (now deleted) comment on field {field} {timeAgo}",
+    "context": "Someone wrote a (now deleted) comment on field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.general-comment",
+    "definition": "{userIsYou, select, true {You} other {{author}}} commented in {general} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{author}}} commented in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.general-comment-published-deleted",
+    "definition": "Someone wrote a (now deleted) comment in {general} {timeAgo}",
+    "context": "Someone wrote a (now deleted) comment in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.general-note",
+    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in {general} {timeAgo}",
+    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.general-note-published-deleted",
+    "definition": "Someone wrote a (now deleted) note in {general} {timeAgo}",
+    "context": "Someone wrote a (now deleted) note in {general} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.message-not-available",
+    "definition": "Message not available",
+    "context": "Message not available"
+  },
+  {
+    "term": "component.timeline-comment-published-event.note",
+    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.note-published-deleted",
+    "definition": "Someone wrote a (now deleted) note on field {field} {timeAgo}",
+    "context": "Someone wrote a (now deleted) note on field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-comment-published-event.reply-comment",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
     "term": "component.timeline-contactless-access-used-event.contactless-access-used",
     "definition": "{contact} accessed the link {timeAgo}",
     "context": "{contact} accessed the link {timeAgo}"
@@ -10665,6 +10760,11 @@
     "context": "Add"
   },
   {
+    "term": "generic.add-comment",
+    "definition": "Add comment",
+    "context": "Add comment"
+  },
+  {
     "term": "generic.added-at",
     "definition": "Added at",
     "context": "Added at"
@@ -11273,6 +11373,11 @@
     "term": "generic.forms.valid-password-error",
     "definition": "Please, enter a valid password",
     "context": "Please, enter a valid password"
+  },
+  {
+    "term": "generic.general-comments-label",
+    "definition": "General",
+    "context": "General"
   },
   {
     "term": "generic.go-back",
@@ -15540,11 +15645,6 @@
     "context": "Contents"
   },
   {
-    "term": "recipient-view.doubts-button",
-    "definition": "Questions?",
-    "context": "Questions?"
-  },
-  {
     "term": "recipient-view.expired-code-description",
     "definition": "The code has expired. Please try again.",
     "context": "The code has expired. Please try again."
@@ -15715,31 +15815,6 @@
     "context": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}"
   },
   {
-    "term": "timeline.comment-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.comment-published-deleted",
-    "definition": "Someone wrote a (now deleted) comment on field {field} {timeAgo}",
-    "context": "Someone wrote a (now deleted) comment on field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.comment-published-description",
-    "definition": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.comment-published.message-not-available",
-    "definition": "Message not available",
-    "context": "Message not available"
-  },
-  {
-    "term": "timeline.comment-published.reply",
-    "definition": "Reply",
-    "context": "Reply"
-  },
-  {
     "term": "timeline.contactless-access-deactivated-manual-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
@@ -15808,21 +15883,6 @@
     "term": "timeline.message-sent-see-message",
     "definition": "See message",
     "context": "See message"
-  },
-  {
-    "term": "timeline.note-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.note-published-deleted",
-    "definition": "Someone wrote a (now deleted) note on field {field} {timeAgo}",
-    "context": "Someone wrote a (now deleted) note on field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.note-published-description",
-    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
   },
   {
     "term": "timeline.ownership-transferred-description",

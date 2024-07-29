@@ -16,6 +16,7 @@ import {
   PetitionRepliesFieldComments_PetitionBaseFragment,
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionRepliesFieldComments_petitionFieldQueryDocument,
+  PetitionRepliesFieldComments_petitionQueryDocument,
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -36,10 +37,11 @@ import {
   PetitionCommentsAndNotesEditor,
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
-  field: PetitionRepliesFieldComments_PetitionFieldFragment;
+  field?: PetitionRepliesFieldComments_PetitionFieldFragment | null;
   onAddComment: (content: any, isNote: boolean) => Promise<void>;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: any, isNote: boolean) => void;
@@ -62,24 +64,48 @@ export function PetitionRepliesFieldComments({
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
 
-  const hasCommentsEnabled = field.isInternal
-    ? false
-    : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled;
+  const hasCommentsEnabled = isDefined(field)
+    ? field.isInternal
+      ? false
+      : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled
+    : true;
 
   const petitionId = petition.id;
   const isTemplate = petition.__typename === "PetitionTemplate";
   const commentsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
   const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
+  const [fieldId] = useFieldCommentsQueryState();
 
-  const { data, loading } = useQuery(PetitionRepliesFieldComments_petitionFieldQueryDocument, {
-    variables: { petitionId, petitionFieldId: field.id },
-    pollInterval: 10_000,
-    fetchPolicy: "cache-and-network",
-  });
+  const showGeneralComments = !isDefined(field) && fieldId === "general";
+
+  const { data, loading: loadingField } = useQuery(
+    PetitionRepliesFieldComments_petitionFieldQueryDocument,
+    {
+      skip: showGeneralComments,
+      variables: { petitionId, petitionFieldId: field?.id ?? "" },
+      pollInterval: 10_000,
+      fetchPolicy: "cache-and-network",
+    },
+  );
+
+  const { data: petitionData, loading: loadingPetition } = useQuery(
+    PetitionRepliesFieldComments_petitionQueryDocument,
+    {
+      skip: !showGeneralComments,
+      variables: { petitionId },
+      pollInterval: 10_000,
+      fetchPolicy: "cache-and-network",
+    },
+  );
+
+  const loading = showGeneralComments ? loadingPetition : loadingField;
 
   const defaultMentionables = useGetDefaultMentionables(petitionId);
-  const comments = data?.petitionField.comments ?? [];
+  const comments =
+    showGeneralComments && petitionData?.petition?.__typename === "Petition"
+      ? petitionData.petition.generalComments
+      : data?.petitionField.comments ?? [];
 
   const markedAsUnreadIdsRef = useRef<string[]>([]);
 
@@ -107,7 +133,7 @@ export function PetitionRepliesFieldComments({
       }
       setTimeout(() => editorRef.current?.focus());
     }
-  }, [field.id, loading]);
+  }, [field?.id, loading]);
 
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePrevious(comments.length);
@@ -155,23 +181,33 @@ export function PetitionRepliesFieldComments({
           onClick={() => onClose()}
           display={{ base: "none", lg: "flex" }}
         />
-        <Heading
-          as="h3"
-          size="sm"
-          fontWeight={500}
-          noOfLines={2}
-          sx={
-            isDefined(field.title)
-              ? {}
-              : { color: "gray.500", fontWeight: "normal", fontStyle: "italic" }
-          }
-        >
-          {field.title ??
-            intl.formatMessage({
-              id: "generic.untitled-field",
-              defaultMessage: "Untitled field",
-            })}
-        </Heading>
+        {showGeneralComments ? (
+          <Heading as="h3" size="sm" fontWeight={500}>
+            <FormattedMessage
+              id="component.petition-replies-field-comments.general-comments-title"
+              defaultMessage="General"
+            />
+          </Heading>
+        ) : (
+          <Heading
+            as="h3"
+            size="sm"
+            fontWeight={500}
+            noOfLines={2}
+            sx={
+              !isDefined(field?.title)
+                ? { color: "gray.500", fontWeight: "normal", fontStyle: "italic" }
+                : {}
+            }
+          >
+            {field?.title ??
+              intl.formatMessage({
+                id: "generic.untitled-field",
+                defaultMessage: "Untitled field",
+              })}
+          </Heading>
+        )}
+
         <CloseButton
           onClick={onClose}
           display={{ base: "flex", lg: "none" }}
@@ -236,7 +272,7 @@ export function PetitionRepliesFieldComments({
                             }),
                             a: (chunks: any) => (
                               <Link
-                                href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                href={`/app/petitions/${petitionId}/compose#field-settings-${field?.id}`}
                               >
                                 {chunks}
                               </Link>
@@ -273,7 +309,7 @@ export function PetitionRepliesFieldComments({
       <Box paddingTop={2}>
         <PetitionCommentsAndNotesEditor
           ref={editorRef}
-          id={field.id}
+          id={field?.id ?? "general"}
           isDisabled={isDisabled}
           isTemplate={false}
           defaultMentionables={defaultMentionables}
@@ -317,6 +353,19 @@ const _queries = [
         id
         comments {
           ...PetitionFieldComment_PetitionFieldComment
+        }
+      }
+    }
+    ${PetitionFieldComment.fragments.PetitionFieldComment}
+  `,
+  gql`
+    query PetitionRepliesFieldComments_petitionQuery($petitionId: GID!) {
+      petition(id: $petitionId) {
+        id
+        ... on Petition {
+          generalComments {
+            ...PetitionFieldComment_PetitionFieldComment
+          }
         }
       }
     }

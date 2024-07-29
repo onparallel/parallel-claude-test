@@ -83,8 +83,9 @@ const PetitionEventSchemas = {
         example: toGlobalId("PetitionFieldComment", 10),
       },
       petitionFieldId: {
-        description: "The ID of the field where the comment belongs",
-        type: "string",
+        description:
+          "The ID of the field where the comment belongs to. If null, this is a general comment on the parallel.",
+        type: ["string", "null"],
         example: toGlobalId("PetitionField", 10),
       },
       petitionAccessId: {
@@ -109,8 +110,9 @@ const PetitionEventSchemas = {
         example: toGlobalId("PetitionFieldComment", 10),
       },
       petitionFieldId: {
-        description: "The ID of the field where the comment belongs",
-        type: "string",
+        description:
+          "The ID of the field where the comment belongs to. If null, this is a general comment on the parallel.",
+        type: ["string", "null"],
         example: toGlobalId("PetitionField", 10),
       },
     },

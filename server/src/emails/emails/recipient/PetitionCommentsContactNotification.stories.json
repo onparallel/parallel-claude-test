@@ -13,11 +13,70 @@
         "contactFullName": "Santi Albo",
         "contactName": "Santi",
         "keycode": "1234567890",
-        "fields": [
+        "fieldsWithComments": [
           {
-            "id": 1,
-            "title": "Nominas",
-            "position": 2,
+            "comments": [
+              {
+                "id": 1,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya sale en el borrador"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:1",
+                        "children": [{ "text": "Mariano Rodriguez" }]
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [{ "id": "User:1", "highlight": false }],
+                "author": {
+                  "id": "User:1",
+                  "name": "Derek Lou"
+                }
+              },
+              {
+                "id": 2,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "De dónde saco esto tio?\n No lo encuentro por ningun lado"
+                      }
+                    ]
+                  }
+                ],
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              },
+              {
+                "id": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ni caso, ya lo encontré"
+                      }
+                    ]
+                  }
+                ],
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              }
+            ]
+          },
+          {
+            "field": { "id": 1, "title": "Nominas", "position": 2 },
             "comments": [
               {
                 "id": 1,
@@ -56,9 +115,7 @@
             ]
           },
           {
-            "id": 2,
-            "title": "Dividendos",
-            "position": 4,
+            "field": { "id": 2, "title": "Dividendos", "position": 4 },
             "comments": [
               {
                 "id": 3,
@@ -102,7 +159,7 @@
         "contactFullName": { "control": { "type": "text" } },
         "contactName": { "control": { "type": "text" } },
         "keycode": { "control": { "type": "text" } },
-        "fields": { "control": { "type": "object" } },
+        "fieldsWithComments": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },

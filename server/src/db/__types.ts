@@ -1461,7 +1461,7 @@ export type CreatePetitionFieldAttachment = PartialProps<
 export interface PetitionFieldComment {
   id: number; // int4
   petition_id: number; // int4
-  petition_field_id: number; // int4
+  petition_field_id: Maybe<number>; // int4
   user_id: Maybe<number>; // int4
   petition_access_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
@@ -1477,6 +1477,7 @@ export interface PetitionFieldComment {
 
 export type CreatePetitionFieldComment = PartialProps<
   Omit<PetitionFieldComment, "id">,
+  | "petition_field_id"
   | "user_id"
   | "petition_access_id"
   | "created_at"

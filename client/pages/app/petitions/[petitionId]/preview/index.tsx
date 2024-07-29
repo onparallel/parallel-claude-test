@@ -93,9 +93,9 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import {
-  useCreatePetitionFieldComment,
-  useDeletePetitionFieldComment,
-  useUpdatePetitionFieldComment,
+  useCreatePetitionComment,
+  useDeletePetitionComment,
+  useUpdatePetitionComment,
 } from "@parallel/utils/mutations/comments";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
@@ -155,7 +155,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   }, []);
 
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
-  const allFieldsUnreadCommentCount = sumBy(petition.fields, (f) => f.unreadCommentCount);
+  const allFieldsUnreadCommentCount =
+    sumBy(petition.fields, (f) => f.unreadCommentCount) +
+    (petition.__typename === "Petition" ? petition.unreadGeneralCommentCount : 0);
 
   const [activeFieldId, setActiveFieldId] = useFieldCommentsQueryState();
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
@@ -525,36 +527,34 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     minHeight: 0,
   } as const;
 
-  const createPetitionFieldComment = useCreatePetitionFieldComment();
+  const createPetitionComment = useCreatePetitionComment();
   async function handleAddComment(content: any, isNote: boolean) {
-    await createPetitionFieldComment({
+    await createPetitionComment({
       petitionId,
-      petitionFieldId: activeFieldId!,
+      petitionFieldId: activeFieldId === "general" ? null : activeFieldId,
       content,
       isInternal: isNote,
     });
   }
 
-  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
+  const updatePetitionComment = useUpdatePetitionComment();
   async function handleUpdateComment(
     petitionFieldCommentId: string,
     content: string,
     isNote: boolean,
   ) {
-    await updatePetitionFieldComment({
+    await updatePetitionComment({
       petitionId,
-      petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
       content,
       isInternal: isNote,
     });
   }
 
-  const deletePetitionFieldComment = useDeletePetitionFieldComment();
+  const deletePetitionComment = useDeletePetitionComment();
   async function handleDeleteComment(petitionFieldCommentId: string) {
-    await deletePetitionFieldComment({
+    await deletePetitionComment({
       petitionId,
-      petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
     });
   }
@@ -682,7 +682,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     />
                   </TabPanel>
                   <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
-                    {activeFieldId && !!activeField ? (
+                    {activeFieldId ? (
                       <PetitionRepliesFieldComments
                         key={activeFieldId}
                         petition={petition}
@@ -959,6 +959,7 @@ const _fragments = {
       ... on Petition {
         ...PetitionPreviewStartSignatureButton_Petition
         ...ConfirmPetitionSignersDialog_Petition
+        unreadGeneralCommentCount
         accesses {
           id
           status

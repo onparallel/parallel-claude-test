@@ -28,13 +28,15 @@ export async function commentsUserNotification(
   }
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
+
   const comments = _comments.filter(isDefined);
-  const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
+
+  const fieldIds = uniq(comments.map((c) => c!.petition_field_id)).filter(isDefined);
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
-  const commentsByField = groupBy(comments, (c) => c.petition_field_id);
-  const fields = await pMap(
-    sortBy(_fields, (f) => f.position),
-    (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id),
+  const commentsByField = groupBy(comments, (c) => c.petition_field_id ?? "null");
+
+  const fieldsWithComments = await pMap([null, ...sortBy(_fields, (f) => f.position)], (f) =>
+    buildFieldWithComments(f, commentsByField, context, payload.user_id),
   );
 
   const { html, text, subject, from } = await buildEmail(
@@ -43,7 +45,7 @@ export async function commentsUserNotification(
       userName: userData.first_name,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
-      fields,
+      fieldsWithComments,
       ...layoutProps,
     },
     { locale: userData.preferred_locale },

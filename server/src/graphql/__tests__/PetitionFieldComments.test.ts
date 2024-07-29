@@ -77,17 +77,17 @@ describe("GraphQL/Petition Fields Comments", () => {
     await testClient.stop();
   });
 
-  describe("createPetitionFieldComment", () => {
+  describe("createPetitionComment", () => {
     it("should send error when trying to create an external comment with READ access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $isInternal: Boolean!
             $content: JSON!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               isInternal: $isInternal
@@ -113,11 +113,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $isInternal: Boolean!
             $content: JSON!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               isInternal: $isInternal
@@ -136,7 +136,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetitionFieldComment).toBeDefined();
+      expect(data!.createPetitionComment).toBeDefined();
     });
 
     it("creates a comment on a petition field", async () => {
@@ -145,11 +145,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -176,13 +176,13 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetitionFieldComment).toEqual({
-        id: data!.createPetitionFieldComment.id,
+      expect(data?.createPetitionComment).toEqual({
+        id: data!.createPetitionComment.id,
         contentHtml: renderSlateWithMentionsToHtml(content),
         isInternal: false,
         field: {
           id: toGlobalId("PetitionField", headingField.id),
-          comments: [{ id: data!.createPetitionFieldComment.id }],
+          comments: [{ id: data!.createPetitionComment.id }],
         },
       });
     });
@@ -193,11 +193,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -224,13 +224,13 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetitionFieldComment).toEqual({
-        id: data!.createPetitionFieldComment.id,
+      expect(data?.createPetitionComment).toEqual({
+        id: data!.createPetitionComment.id,
         contentHtml: renderSlateWithMentionsToHtml(content),
         isInternal: true,
         field: {
           id: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
-          comments: [{ id: data!.createPetitionFieldComment.id }],
+          comments: [{ id: data!.createPetitionComment.id }],
         },
       });
     });
@@ -240,11 +240,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -271,11 +271,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -308,11 +308,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -350,7 +350,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetitionFieldComment).toEqual({
+      expect(data!.createPetitionComment).toEqual({
         mentions: [{ user: { id: toGlobalId("User", mentioned.id) } }],
       });
     });
@@ -366,11 +366,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -415,11 +415,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -470,13 +470,13 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
             $throwOnNoPermission: Boolean
             $sharePetition: Boolean
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -518,7 +518,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetitionFieldComment).toEqual({
+      expect(data!.createPetitionComment).toEqual({
         mentions: [{ user: { id: toGlobalId("User", joey.id) } }],
       });
 
@@ -547,11 +547,11 @@ describe("GraphQL/Petition Fields Comments", () => {
         gql`
           mutation (
             $petitionId: GID!
-            $petitionFieldId: GID!
+            $petitionFieldId: GID
             $content: JSON!
             $isInternal: Boolean!
           ) {
-            createPetitionFieldComment(
+            createPetitionComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
@@ -574,7 +574,7 @@ describe("GraphQL/Petition Fields Comments", () => {
     });
   });
 
-  describe("updatePetitionFieldComment", () => {
+  describe("updatePetitionComment", () => {
     let comment: PetitionFieldComment;
     let internalComment: PetitionFieldComment;
     let otherUserComment: PetitionFieldComment;
@@ -599,15 +599,9 @@ describe("GraphQL/Petition Fields Comments", () => {
     it("should send error when trying to update others user comment", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $petitionFieldCommentId: GID!
-            $content: JSON!
-          ) {
-            updatePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!, $content: JSON!) {
+            updatePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
               content: $content
             ) {
@@ -628,15 +622,9 @@ describe("GraphQL/Petition Fields Comments", () => {
 
       const dataInternal = await testClient.execute(
         gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $petitionFieldCommentId: GID!
-            $content: JSON!
-          ) {
-            updatePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!, $content: JSON!) {
+            updatePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
               content: $content
             ) {
@@ -646,7 +634,6 @@ describe("GraphQL/Petition Fields Comments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
           content: mocks.createRandomCommentContent(),
         },
@@ -659,15 +646,9 @@ describe("GraphQL/Petition Fields Comments", () => {
     it("should allow to update an internal comment with READ access and owner of that comment", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $petitionFieldCommentId: GID!
-            $content: JSON!
-          ) {
-            updatePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!, $content: JSON!) {
+            updatePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
               content: $content
             ) {
@@ -677,29 +658,22 @@ describe("GraphQL/Petition Fields Comments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
           content: mocks.createRandomCommentContent(),
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.updatePetitionFieldComment).toBeDefined();
+      expect(data?.updatePetitionComment).toBeDefined();
     });
 
     it("should allow to update an external comment with READ access and owner of that comment", async () => {
       const content = mocks.createRandomCommentContent();
       const { errors, data } = await testClient.execute(
         gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $petitionFieldCommentId: GID!
-            $content: JSON!
-          ) {
-            updatePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!, $content: JSON!) {
+            updatePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
               content: $content
             ) {
@@ -710,21 +684,20 @@ describe("GraphQL/Petition Fields Comments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
           content,
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.updatePetitionFieldComment).toEqual({
+      expect(data!.updatePetitionComment).toEqual({
         id: toGlobalId("PetitionFieldComment", comment.id),
         content,
       });
     });
   });
 
-  describe("deletePetitionFieldComment", () => {
+  describe("deletePetitionComment", () => {
     let comment: PetitionFieldComment;
     let internalComment: PetitionFieldComment;
     let otherUserComment: PetitionFieldComment;
@@ -750,19 +723,19 @@ describe("GraphQL/Petition Fields Comments", () => {
     it("should send error when trying to delete others user comment", async () => {
       const dataExternal = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
-            deletePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
             ) {
-              id
+              ... on PetitionField {
+                id
+              }
             }
           }
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserComment.id),
         },
       );
@@ -771,19 +744,19 @@ describe("GraphQL/Petition Fields Comments", () => {
 
       const dataInternal = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
-            deletePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
             ) {
-              id
+              ... on PetitionField {
+                id
+              }
             }
           }
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
         },
       );
@@ -794,48 +767,50 @@ describe("GraphQL/Petition Fields Comments", () => {
     it("should allow to delete an internal comment with READ access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
-            deletePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
             ) {
-              id
+              ... on PetitionField {
+                id
+              }
             }
           }
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
         },
       );
       expect(errors).toBeUndefined();
-      expect(data?.deletePetitionFieldComment).toBeDefined();
+      expect(data?.deletePetitionComment).toEqual({
+        id: toGlobalId("PetitionField", comment.petition_field_id!),
+      });
     });
 
     it("should allow to delete an external comment with READ access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
-            deletePetitionFieldComment(
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionComment(
               petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
               petitionFieldCommentId: $petitionFieldCommentId
             ) {
-              id
+              ... on PetitionField {
+                id
+              }
             }
           }
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
         },
       );
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitionFieldComment).toEqual({
-        id: toGlobalId("PetitionField", readField.id),
+      expect(data?.deletePetitionComment).toEqual({
+        id: toGlobalId("PetitionField", comment.petition_field_id!),
       });
     });
   });

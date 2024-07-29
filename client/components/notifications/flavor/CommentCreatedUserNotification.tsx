@@ -20,6 +20,7 @@ export const CommentCreatedUserNotification = Object.assign(
       const {
         comment: { author, isInternal: isNote },
         isMention,
+        isGeneral,
         field,
       } = notification;
 
@@ -39,9 +40,59 @@ export const CommentCreatedUserNotification = Object.assign(
               )}
             </Circle>
           }
-          path={`/replies?comments=${notification.field?.id ?? ""}`}
+          path={`/replies?comments=${isGeneral ? "general" : notification.field?.id ?? ""}`}
         >
-          {isMention ? (
+          {isGeneral ? (
+            isMention ? (
+              <FormattedMessage
+                id="component.notification-mention.body-general-chat"
+                defaultMessage="{name} has mentioned you in {general}."
+                values={{
+                  name: <UserOrContactReference userOrAccess={author} />,
+                  general: (
+                    <b>
+                      <FormattedMessage
+                        id="generic.general-comments-label"
+                        defaultMessage="General"
+                      />
+                    </b>
+                  ),
+                }}
+              />
+            ) : isNote ? (
+              <FormattedMessage
+                id="component.notification-internal-comment.body-general-chat"
+                defaultMessage="{name} has added a note in {general}."
+                values={{
+                  name: <UserOrContactReference userOrAccess={author} />,
+                  general: (
+                    <b>
+                      <FormattedMessage
+                        id="generic.general-comments-label"
+                        defaultMessage="General"
+                      />
+                    </b>
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="component.notification-comment.body-general-chat"
+                defaultMessage="{name} has written a comment in {general}."
+                values={{
+                  name: <UserOrContactReference userOrAccess={author} />,
+                  general: (
+                    <b>
+                      <FormattedMessage
+                        id="generic.general-comments-label"
+                        defaultMessage="General"
+                      />
+                    </b>
+                  ),
+                }}
+              />
+            )
+          ) : isMention ? (
             <FormattedMessage
               id="component.notification-mention-comment.body"
               defaultMessage="{name} has mentioned you in the field {field}."
@@ -89,6 +140,7 @@ export const CommentCreatedUserNotification = Object.assign(
             }
           }
           isMention
+          isGeneral
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
         ${PetitionFieldReference.fragments.PetitionField}

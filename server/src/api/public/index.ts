@@ -104,7 +104,7 @@ import {
   RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
   RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
   ReopenPetition_reopenPetitionDocument,
-  SendPetitionFieldComment_createPetitionFieldCommentDocument,
+  SendPetitionFieldComment_createPetitionCommentDocument,
   SendPetitionFieldComment_getUsersOrGroupsDocument,
   SendPetitionFieldComment_userGroupsDocument,
   SendPetitionFieldComment_usersByEmailDocument,
@@ -203,7 +203,7 @@ import {
   CreateEventSubscription,
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
-  CreatePetitionFieldComment,
+  CreatePetitionComment,
   CreateProfile,
   CreateProfileRelationship,
   EventSubscription,
@@ -1880,7 +1880,7 @@ export function publicApi(container: Container) {
           operationId: `SendPetitionField${titleize(type)}`,
           summary: `Send a ${type} to a petition field`,
           description: `Send a ${type} to the specified petition field`,
-          body: JsonBody(CreatePetitionFieldComment),
+          body: JsonBody(CreatePetitionComment),
 
           responses: {
             200: SuccessResponse(PetitionFieldComment),
@@ -1925,16 +1925,16 @@ export function publicApi(container: Container) {
                 }
               }
             }
-            mutation SendPetitionFieldComment_createPetitionFieldComment(
+            mutation SendPetitionFieldComment_createPetitionComment(
               $petitionId: GID!
-              $petitionFieldId: GID!
+              $petitionFieldId: GID
               $content: JSON!
               $isInternal: Boolean!
               $sharePetition: Boolean
               $sharePetitionPermission: PetitionPermissionTypeRW
               $sharePetitionSubscribed: Boolean
             ) {
-              createPetitionFieldComment(
+              createPetitionComment(
                 petitionId: $petitionId
                 petitionFieldId: $petitionFieldId
                 content: $content
@@ -2026,8 +2026,8 @@ export function publicApi(container: Container) {
             }
           });
 
-          const { createPetitionFieldComment } = await client.request(
-            SendPetitionFieldComment_createPetitionFieldCommentDocument,
+          const { createPetitionComment } = await client.request(
+            SendPetitionFieldComment_createPetitionCommentDocument,
             {
               petitionId: params.petitionId,
               petitionFieldId: params.fieldId,
@@ -2039,7 +2039,7 @@ export function publicApi(container: Container) {
             },
           );
 
-          return Ok(mapPetitionFieldComment(createPetitionFieldComment));
+          return Ok(mapPetitionFieldComment(createPetitionComment));
         },
       );
   }

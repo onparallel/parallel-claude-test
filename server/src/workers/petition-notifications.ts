@@ -1,10 +1,10 @@
 import { differenceInMinutes } from "date-fns";
 import { difference, groupBy, maxBy } from "remeda";
-import { WorkerContext } from "../context";
-import { SignatureCancelledUserNotification } from "../db/notifications";
-import { PetitionContactNotification, PetitionUserNotification } from "../db/__types";
-import { createCronWorker } from "./helpers/createCronWorker";
 import { Config } from "../config";
+import { WorkerContext } from "../context";
+import { PetitionContactNotification, PetitionUserNotification } from "../db/__types";
+import { SignatureCancelledUserNotification } from "../db/notifications";
+import { createCronWorker } from "./helpers/createCronWorker";
 
 function shouldBeProcessed(
   notifications: (PetitionUserNotification | PetitionContactNotification)[],
@@ -24,7 +24,7 @@ async function processCommentCreatedUserNotifications(
   config: Config["cronWorkers"]["petition-notifications"],
 ) {
   const notifications =
-    await context.petitions.loadUnprocessedUserNotificationsOfType("COMMENT_CREATED");
+    await context.petitions.getUnprocessedUserNotificationsOfType("COMMENT_CREATED");
 
   if (notifications.length > 0) {
     const groupedUserNotifications = groupBy(notifications, (n) => `${n.petition_id},${n.user_id}`);
@@ -57,7 +57,7 @@ async function processCommentCreatedContactNotifications(
   config: Config["cronWorkers"]["petition-notifications"],
 ) {
   const notifications =
-    await context.petitions.loadUnprocessedContactNotificationsOfType("COMMENT_CREATED");
+    await context.petitions.getUnprocessedContactNotificationsOfType("COMMENT_CREATED");
 
   if (notifications.length > 0) {
     const groupedContactNotifications = groupBy(
@@ -90,7 +90,7 @@ async function processCommentCreatedContactNotifications(
  */
 async function processSignatureCancelledUserNotifications(context: WorkerContext) {
   const notifications =
-    await context.petitions.loadUnprocessedUserNotificationsOfType("SIGNATURE_CANCELLED");
+    await context.petitions.getUnprocessedUserNotificationsOfType("SIGNATURE_CANCELLED");
 
   const emailBouncedNotificationIds = await processSignatureCancelledEmailBouncedUserNotifications(
     notifications,

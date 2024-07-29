@@ -122,6 +122,7 @@ import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
+  GenericPetitionContactNotification,
   GenericPetitionUserNotification,
   PetitionUserNotification,
 } from "../notifications";
@@ -3980,16 +3981,48 @@ export class PetitionRepository extends BaseRepository {
         })
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereNotNull("petition_field_id")
         .whereNull("deleted_at")
         .select<PetitionFieldComment[]>("*");
 
-      const byId = groupBy(rows, (r) => r.petition_field_id);
+      const byId = groupBy(rows, (r) => r.petition_field_id!);
       return keys.map((id) => {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
         return id.loadInternalComments ? comments : comments.filter((c) => c.is_internal === false);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
+  );
+
+  readonly loadGeneralPetitionCommentsForPetition = this.buildLoader<
+    {
+      loadInternalComments?: boolean;
+      petitionId: number;
+    },
+    PetitionFieldComment[],
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_field_comment", t)
+        .modify((q) => {
+          if (!keys.some((k) => k.loadInternalComments)) {
+            q.where("is_internal", false);
+          }
+        })
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereNull("petition_field_id")
+        .whereNull("deleted_at")
+        .select<PetitionFieldComment[]>("*");
+
+      const byId = groupBy(rows, (r) => r.petition_id);
+      return keys.map((key) => {
+        const comments = this.sortComments(byId[key.petitionId] ?? []);
+        return key.loadInternalComments
+          ? comments
+          : comments.filter((c) => c.is_internal === false);
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "loadInternalComments"]) },
   );
 
   readonly loadLastPetitionFieldCommentsForField = this.buildLoader<
@@ -4019,12 +4052,13 @@ export class PetitionRepository extends BaseRepository {
         })
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereNotNull("petition_field_id")
         .whereNull("deleted_at")
         .orderBy("petition_field_id", "desc")
         .orderBy("created_at", "desc")
         .select<PetitionFieldComment[]>("*");
 
-      const byId = groupBy(rows, (r) => r.petition_field_id);
+      const byId = groupBy(rows, (r) => r.petition_field_id!);
       return keys.map((id) => {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
         return id.loadInternalComments
@@ -4033,6 +4067,46 @@ export class PetitionRepository extends BaseRepository {
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
+  );
+
+  readonly loadLastGeneralPetitionCommentForPetition = this.buildLoader<
+    {
+      loadInternalComments?: boolean;
+      petitionId: number;
+    },
+    PetitionFieldComment | null,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_field_comment", t)
+        .modify((q) => {
+          if (keys.every((k) => k.loadInternalComments)) {
+            q.distinctOn("petition_id").orderBy("petition_id");
+          } else if (keys.every((k) => !k.loadInternalComments)) {
+            q.where("is_internal", false).distinctOn("petition_id").orderBy("petition_id");
+          } else {
+            // on mixed keys we need to obtain both
+            q.distinctOn("petition_id", "is_internal")
+              .orderBy("petition_id")
+              .orderBy("is_internal");
+          }
+        })
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereNull("petition_field_id")
+        .whereNull("deleted_at")
+        .orderBy("petition_id", "desc")
+        .orderBy("created_at", "desc")
+        .select<PetitionFieldComment[]>("*");
+
+      const byId = groupBy(rows, (r) => r.petition_id);
+      return keys.map((key) => {
+        const comments = this.sortComments(byId[key.petitionId] ?? []);
+        return key.loadInternalComments
+          ? comments[0] ?? null
+          : comments.filter((c) => c.is_internal === false)[0] ?? null;
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "loadInternalComments"]) },
   );
 
   readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = this.buildLoader<
@@ -4044,6 +4118,7 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.from("petition_contact_notification", t)
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
+        .whereNotNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
           uniq(keys.map((x) => x.petitionFieldId)),
@@ -4077,6 +4152,34 @@ export class PetitionRepository extends BaseRepository {
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) },
+  );
+
+  readonly loadPetitionUnreadGeneralCommentCountForPetitionAndAccess = this.buildLoader<
+    { accessId: number; petitionId: number },
+    number,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_contact_notification", t)
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
+        .whereNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
+        .where("type", "COMMENT_CREATED")
+        .whereNull("read_at")
+        .groupBy("petition_id", "petition_access_id")
+        .select<
+          (Pick<PetitionContactNotification, "petition_id" | "petition_access_id"> & {
+            unread_count: number;
+          })[]
+        >("petition_id", "petition_access_id", this.count("unread_count"));
+
+      const rowsById = indexBy(rows, keyBuilder(["petition_id", "petition_access_id"]));
+
+      return keys.map(keyBuilder(["petitionId", "accessId"])).map((key) => {
+        return rowsById[key]?.unread_count ?? 0;
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "accessId"]) },
   );
 
   readonly loadContactHasUnreadCommentsInPetition = this.buildLoader<
@@ -4118,6 +4221,7 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.from("petition_user_notification", t)
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereNotNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
           uniq(keys.map((x) => x.petitionFieldId)),
@@ -4144,6 +4248,34 @@ export class PetitionRepository extends BaseRepository {
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]) },
+  );
+
+  readonly loadPetitionUnreadGeneralCommentCountForPetitionAndUser = this.buildLoader<
+    { userId: number; petitionId: number },
+    number,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_user_notification", t)
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
+        .where("type", "COMMENT_CREATED")
+        .whereNull("read_at")
+        .groupBy("petition_id", "user_id")
+        .select<
+          (Pick<PetitionUserNotification, "petition_id" | "user_id"> & {
+            unread_count: number;
+          })[]
+        >("petition_id", "user_id", this.count("unread_count"));
+
+      const rowsById = indexBy(rows, keyBuilder(["petition_id", "user_id"]));
+
+      return keys.map(keyBuilder(["petitionId", "userId"])).map((key) => {
+        return rowsById[key]?.unread_count ?? 0;
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "userId"]) },
   );
 
   async canBeMentionedInPetitionFieldComment(
@@ -4174,7 +4306,7 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at"),
   );
 
-  async loadUnprocessedUserNotificationsOfType<Type extends PetitionUserNotificationType>(
+  async getUnprocessedUserNotificationsOfType<Type extends PetitionUserNotificationType>(
     type: Type,
   ) {
     return await this.knex<GenericPetitionUserNotification<Type>>("petition_user_notification")
@@ -4187,8 +4319,12 @@ export class PetitionRepository extends BaseRepository {
       .select("*");
   }
 
-  async loadUnprocessedContactNotificationsOfType(type: PetitionContactNotificationType) {
-    return await this.from("petition_contact_notification")
+  async getUnprocessedContactNotificationsOfType<Type extends PetitionContactNotificationType>(
+    type: Type,
+  ) {
+    return await this.knex<GenericPetitionContactNotification<Type>>(
+      "petition_contact_notification",
+    )
       .where({
         processed_at: null,
         read_at: null,
@@ -4489,7 +4625,7 @@ export class PetitionRepository extends BaseRepository {
     {
       userId: number;
       petitionId: number;
-      petitionFieldId: number;
+      petitionFieldId: number | null;
       petitionFieldCommentId: number;
     },
     boolean,
@@ -4535,7 +4671,7 @@ export class PetitionRepository extends BaseRepository {
     {
       petitionAccessId: number;
       petitionId: number;
-      petitionFieldId: number;
+      petitionFieldId: number | null;
       petitionFieldCommentId: number;
     },
     boolean,
@@ -4589,7 +4725,7 @@ export class PetitionRepository extends BaseRepository {
   async createPetitionFieldCommentFromUser(
     data: {
       petitionId: number;
-      petitionFieldId: number;
+      petitionFieldId: number | null;
       contentJson: any;
       isInternal: boolean;
     },
@@ -4629,7 +4765,7 @@ export class PetitionRepository extends BaseRepository {
   async createPetitionFieldCommentFromAccess(
     data: {
       petitionId: number;
-      petitionFieldId: number;
+      petitionFieldId: number | null;
       contentJson: string;
     },
     access: PetitionAccess,
@@ -4665,7 +4801,6 @@ export class PetitionRepository extends BaseRepository {
 
   async deletePetitionFieldCommentFromUser(
     petitionId: number,
-    petitionFieldId: number,
     petitionFieldCommentId: number,
     user: User,
   ) {
@@ -4679,18 +4814,18 @@ export class PetitionRepository extends BaseRepository {
         type: "COMMENT_DELETED",
         petition_id: petitionId,
         data: {
-          petition_field_id: petitionFieldId,
-          petition_field_comment_id: petitionFieldCommentId,
+          petition_field_id: comment.petition_field_id,
+          petition_field_comment_id: comment.id,
           user_id: user.id,
           is_internal: comment.is_internal,
         },
       });
     }
+    return comment;
   }
 
   async deletePetitionFieldCommentFromAccess(
     petitionId: number,
-    petitionFieldId: number,
     petitionFieldCommentId: number,
     access: PetitionAccess,
   ) {
@@ -4704,12 +4839,14 @@ export class PetitionRepository extends BaseRepository {
         type: "COMMENT_DELETED",
         petition_id: petitionId,
         data: {
-          petition_field_id: petitionFieldId,
-          petition_field_comment_id: petitionFieldCommentId,
+          petition_field_id: comment.petition_field_id,
+          petition_field_comment_id: comment.id,
           petition_access_id: access.id,
         },
       });
     }
+
+    return comment;
   }
 
   private async deletePetitionFieldComment(

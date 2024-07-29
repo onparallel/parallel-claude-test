@@ -1218,8 +1218,8 @@ export const Contact = schema(_Contact);
 export const User = schema(_User);
 export const UserWithOrg = schema(_UserWithOrg);
 
-export const CreatePetitionFieldComment = schema({
-  title: "CreatePetitionFieldComment",
+export const CreatePetitionComment = schema({
+  title: "CreatePetitionComment",
   type: "object",
   additionalProperties: false,
   required: ["content"],

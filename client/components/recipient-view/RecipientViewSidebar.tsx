@@ -8,7 +8,6 @@ import {
   FlexProps,
   HStack,
   Icon,
-  IconButton,
   IconProps,
   Stack,
 } from "@chakra-ui/react";
@@ -18,12 +17,14 @@ import { RecipientViewSidebar_PublicPetitionAccessFragment } from "@parallel/gra
 import { AnimatePresence, motion } from "framer-motion";
 import { useIntl } from "react-intl";
 import { sumBy } from "remeda";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewComments } from "./RecipientViewComments";
 import { RecipientViewContents } from "./RecipientViewContents";
 import { RecipientViewInformation } from "./RecipientViewInformation";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
 import { useRecipientViewSidebarContext } from "./RecipientViewSidebarContextProvider";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
+
 const MotionFlex = motion<FlexProps>(Flex);
 const breakpoint = "md";
 
@@ -40,7 +41,9 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
   const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
   const isOpen = sidebarState !== "CLOSED";
 
-  const unreadedComments = sumBy(petition.fields, (field) => field.unreadCommentCount);
+  const unreadedComments =
+    sumBy(petition.fields, (field) => field.unreadCommentCount) +
+    petition.unreadGeneralCommentCount;
 
   return (
     <HStack
@@ -92,6 +95,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
           icon={ListIcon}
           onClick={() => setSidebarState("CONTENTS")}
           hasBorder
+          placement="left"
         />
         <SidebarIconButton
           isActive={isOpen && sidebarState === "COMMENTS"}
@@ -103,6 +107,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
           onClick={() => setSidebarState("COMMENTS")}
           hasBorder
           unreadCount={unreadedComments}
+          placement="left"
         />
         <SidebarIconButton
           isActive={isOpen && sidebarState === "INFORMATION"}
@@ -113,6 +118,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
           icon={InfoCircleIcon}
           onClick={() => setSidebarState("INFORMATION")}
           hasBorder
+          placement="left"
         />
       </Stack>
     </HStack>
@@ -182,6 +188,7 @@ export function RecipientViewMobileNavigation({
           })}
           icon={ListIcon}
           onClick={() => setSidebarState("CONTENTS")}
+          placement="top"
         />
         <SidebarIconButton
           isActive={isOpen && sidebarState === "COMMENTS"}
@@ -192,6 +199,7 @@ export function RecipientViewMobileNavigation({
           icon={CommentIcon}
           onClick={() => setSidebarState("COMMENTS")}
           unreadCount={unreadedComments}
+          placement="top"
         />
         <SidebarIconButton
           isActive={isOpen && sidebarState === "INFORMATION"}
@@ -201,15 +209,17 @@ export function RecipientViewMobileNavigation({
           })}
           icon={InfoCircleIcon}
           onClick={() => setSidebarState("INFORMATION")}
+          placement="top"
         />
-        <IconButton
+        <IconButtonWithTooltip
           variant="ghost"
           boxSize={14}
           borderRadius="0"
-          aria-label={intl.formatMessage({ id: "generic.share", defaultMessage: "Share" })}
+          label={intl.formatMessage({ id: "generic.share", defaultMessage: "Share" })}
           color="primary.500"
           icon={<UserArrowIcon boxSize={6} />}
           onClick={handleDelegateAccess}
+          placement="top"
         />
         <Center boxSize={14}>
           <RecipientViewMenuButton
@@ -230,6 +240,7 @@ function SidebarIconButton({
   icon,
   hasBorder,
   unreadCount,
+  placement,
   onClick,
 }: {
   isActive: boolean;
@@ -237,16 +248,18 @@ function SidebarIconButton({
   icon: ComponentWithAs<"svg", IconProps>;
   hasBorder?: boolean;
   unreadCount?: number;
+  placement?: "left" | "top";
   onClick: () => void;
 }) {
   return (
     <Box position="relative">
-      <IconButton
+      <IconButtonWithTooltip
         variant="ghost"
         boxSize={14}
         borderRadius="0"
-        aria-label={label}
+        label={label}
         icon={<Icon as={icon} boxSize={6} />}
+        placement={placement}
         onClick={onClick}
         backgroundColor={isActive ? "gray.100" : "inherit"}
         _hover={{
@@ -325,6 +338,7 @@ RecipientViewSidebar.fragments = {
       petition {
         id
         isRecipientViewContentsHidden
+        unreadGeneralCommentCount
         ...RecipientViewContents_PublicPetition
         fields {
           id

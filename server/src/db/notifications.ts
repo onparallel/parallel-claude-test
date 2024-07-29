@@ -2,12 +2,14 @@ import { If } from "../util/types";
 import {
   PetitionSignatureCancelReason,
   PetitionUserNotification as DbPetitionUserNotification,
+  PetitionContactNotification as DbPetitionContactNotification,
   PetitionUserNotificationType,
+  PetitionContactNotificationType,
 } from "./__types";
 
 export type PetitionUserNotificationPayload<TType extends PetitionUserNotificationType> = {
   COMMENT_CREATED: {
-    petition_field_id: number;
+    petition_field_id: number | null;
     petition_field_comment_id: number;
     /** if true, notified user is mentioned on the comment */
     is_mentioned?: boolean;
@@ -90,3 +92,21 @@ export type PetitionUserNotification<IsCreate extends boolean = false> =
   | AccessActivatedFromPublicPetitionLinkUserNotification<IsCreate>;
 
 export type CreatePetitionUserNotification = PetitionUserNotification<true>;
+
+type PetitionContactNotificationPayload<TType extends PetitionContactNotificationType> = {
+  COMMENT_CREATED: {
+    petition_field_id: number | null;
+    petition_field_comment_id: number;
+  };
+}[TType];
+
+export type GenericPetitionContactNotification<
+  TType extends PetitionContactNotificationType,
+  IsCreate extends boolean = false,
+> = Omit<
+  DbPetitionContactNotification,
+  "type" | "data" | If<IsCreate, "id" | "created_at" | "read_at" | "processed_at">
+> & {
+  type: TType;
+  data: PetitionContactNotificationPayload<TType>;
+};

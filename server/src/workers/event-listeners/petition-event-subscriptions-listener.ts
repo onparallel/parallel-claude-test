@@ -51,6 +51,11 @@ export const petitionEventSubscriptionsListener = listener(
           return false;
         }
         if (isDefined(s.from_template_field_ids) && "petition_field_id" in event.data) {
+          if (event.data.petition_field_id === null) {
+            // subscription is for a field event, but this event is not a field event
+            // (general comments on petition)
+            return false;
+          }
           const field = await ctx.petitions.loadField(event.data.petition_field_id);
           if (!isDefined(field?.from_petition_field_id)) {
             // field does not come from a template

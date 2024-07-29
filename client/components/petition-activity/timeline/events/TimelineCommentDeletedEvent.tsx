@@ -17,16 +17,48 @@ export interface TimelineCommentDeletedEventProps {
 
 export function TimelineCommentDeletedEvent({
   userId,
-  event: { deletedBy, field, createdAt, isInternal },
+  event: { deletedBy, field, createdAt, isInternal, isGeneral },
 }: TimelineCommentDeletedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={CommentXIcon} color="gray.700" backgroundColor="gray.200" />}
       paddingY={2}
     >
-      {isInternal ? (
+      {isGeneral ? (
+        isInternal ? (
+          <FormattedMessage
+            id="component.timeline-comment-deleted-event.general-note-deleted"
+            defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a note in {general} {timeAgo}"
+            values={{
+              userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
+              someone: <UserOrContactReference userOrAccess={deletedBy} />,
+              general: (
+                <b>
+                  <FormattedMessage id="generic.general-comments-label" defaultMessage="General" />
+                </b>
+              ),
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.timeline-comment-deleted-event.general-comment-deleted"
+            defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a comment in {general} {timeAgo}"
+            values={{
+              userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
+              someone: <UserOrContactReference userOrAccess={deletedBy} />,
+              general: (
+                <b>
+                  <FormattedMessage id="generic.general-comments-label" defaultMessage="General" />
+                </b>
+              ),
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+            }}
+          />
+        )
+      ) : isInternal ? (
         <FormattedMessage
-          id="timeline.note-deleted"
+          id="component.timeline-comment-deleted-event.note-deleted"
           defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
           values={{
             userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
@@ -37,7 +69,7 @@ export function TimelineCommentDeletedEvent({
         />
       ) : (
         <FormattedMessage
-          id="timeline.comment-deleted"
+          id="component.timeline-comment-deleted-event.comment-deleted"
           defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
           values={{
             userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
@@ -61,6 +93,7 @@ TimelineCommentDeletedEvent.fragments = {
         ...UserOrContactReference_UserOrPetitionAccess
       }
       isInternal
+      isGeneral
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}

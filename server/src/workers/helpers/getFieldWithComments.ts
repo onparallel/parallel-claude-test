@@ -5,6 +5,7 @@ import { PetitionField, PetitionFieldComment } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
+import { Maybe } from "../../util/types";
 
 async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContext) {
   if (c.user_id) {
@@ -29,16 +30,17 @@ async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContex
     throw new Error(`Expected user_id or petition_access_id on comment with id ${c.id}`);
   }
 }
+
 export async function buildFieldWithComments(
-  field: PetitionField,
+  field: Maybe<PetitionField>,
   commentsByField: Record<string, PetitionFieldComment[]>,
   context: WorkerContext,
   userId?: number,
 ) {
   return {
-    ...pick(field, ["id", "title", "position"]),
+    field: field ? { ...pick(field, ["id", "title", "position"]) } : null,
     comments: await pMap(
-      sortBy(commentsByField[field.id], (c) => c.created_at),
+      sortBy(commentsByField[field?.id ?? "null"], (c) => c.created_at),
       async (c) => {
         return {
           id: c.id,
