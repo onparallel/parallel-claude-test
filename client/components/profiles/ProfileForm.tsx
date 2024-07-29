@@ -427,7 +427,7 @@ export const ProfileForm = Object.assign(
             color="gray.600"
             lineHeight="18px"
           >
-            <Box>
+            <OverflownText>
               <LocalizableUserTextRender
                 value={profile.profileType.name}
                 default={intl.formatMessage({
@@ -435,15 +435,16 @@ export const ProfileForm = Object.assign(
                   defaultMessage: "Unnamed profile type",
                 })}
               />
-            </Box>
-            <Box>
+            </OverflownText>
+
+            <Box whiteSpace="nowrap">
               <FormattedMessage
                 id="component.profile-form.associated-profiles-count"
                 defaultMessage="{count, plural, =1 {# association} other {# associations}}"
                 values={{ count: profile.relationships.length }}
               />
             </Box>
-            <Box>
+            <Box whiteSpace="nowrap">
               <FormattedMessage
                 id="generic.petition-count"
                 defaultMessage="{count, plural, =1 {# parallel} other {# parallels}}"
