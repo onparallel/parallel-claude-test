@@ -2037,13 +2037,13 @@ export interface MutationpublicCreateFileUploadReplyArgs {
 }
 
 export interface MutationpublicCreatePetitionCommentArgs {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
 }
 
 export interface MutationpublicCreatePetitionFieldCommentArgs {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
 }
@@ -2147,13 +2147,13 @@ export interface MutationpublicStartAsyncFieldCompletionArgs {
 }
 
 export interface MutationpublicUpdatePetitionCommentArgs {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
 }
 
 export interface MutationpublicUpdatePetitionFieldCommentArgs {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
@@ -4917,6 +4917,8 @@ export interface PublicPetitionFieldComment {
   content?: Maybe<Scalars["JSON"]["output"]>;
   /** The HTML content of the comment. */
   contentHtml?: Maybe<Scalars["String"]["output"]>;
+  /** The text content of the comment. */
+  contentPlainText?: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"]["output"];
   /** The HTML content of the comment. */
@@ -7133,7 +7135,7 @@ export type ProfileTypeSelect_profileTypeQuery = {
 export type PublicPetitionFieldComment_PublicPetitionFieldCommentFragment = {
   __typename?: "PublicPetitionFieldComment";
   id: string;
-  content?: any | null;
+  contentPlainText?: string | null;
   createdAt: string;
   isUnread: boolean;
   isAnonymized: boolean;
@@ -25972,7 +25974,7 @@ export type RecipientPortalHeader_PublicOrganizationFragment = {
 export type RecipientViewComments_PublicPetitionFieldCommentFragment = {
   __typename?: "PublicPetitionFieldComment";
   id: string;
-  content?: any | null;
+  contentPlainText?: string | null;
   createdAt: string;
   isUnread: boolean;
   isAnonymized: boolean;
@@ -26002,7 +26004,7 @@ export type RecipientViewComments_PublicPetitionFieldFragment = {
     createdAt: string;
     id: string;
     excerptHtml?: string | null;
-    content?: any | null;
+    contentPlainText?: string | null;
     isUnread: boolean;
     isAnonymized: boolean;
     contentHtml?: string | null;
@@ -26037,7 +26039,7 @@ export type RecipientViewComments_accessQuery = {
           createdAt: string;
           id: string;
           excerptHtml?: string | null;
-          content?: any | null;
+          contentPlainText?: string | null;
           isUnread: boolean;
           isAnonymized: boolean;
           contentHtml?: string | null;
@@ -26050,7 +26052,7 @@ export type RecipientViewComments_accessQuery = {
       generalComments: Array<{
         __typename?: "PublicPetitionFieldComment";
         id: string;
-        content?: any | null;
+        contentPlainText?: string | null;
         createdAt: string;
         isUnread: boolean;
         isAnonymized: boolean;
@@ -26064,7 +26066,7 @@ export type RecipientViewComments_accessQuery = {
       lastGeneralComment?: {
         __typename?: "PublicPetitionFieldComment";
         id: string;
-        content?: any | null;
+        contentPlainText?: string | null;
         createdAt: string;
         isUnread: boolean;
         isAnonymized: boolean;
@@ -26095,7 +26097,7 @@ export type RecipientViewComments_publicPetitionFieldQuery = {
     comments: Array<{
       __typename?: "PublicPetitionFieldComment";
       id: string;
-      content?: any | null;
+      contentPlainText?: string | null;
       createdAt: string;
       isUnread: boolean;
       isAnonymized: boolean;
@@ -26111,7 +26113,7 @@ export type RecipientViewComments_publicPetitionFieldQuery = {
       createdAt: string;
       id: string;
       excerptHtml?: string | null;
-      content?: any | null;
+      contentPlainText?: string | null;
       isUnread: boolean;
       isAnonymized: boolean;
       contentHtml?: string | null;
@@ -26141,14 +26143,14 @@ export type RecipientViewComments_markPetitionFieldCommentsAsReadMutation = {
 export type RecipientViewComments_publicCreatePetitionCommentMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
 }>;
 
 export type RecipientViewComments_publicCreatePetitionCommentMutation = {
   publicCreatePetitionComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content?: any | null;
+    contentPlainText?: string | null;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
@@ -26177,14 +26179,14 @@ export type RecipientViewComments_publicCreatePetitionCommentMutation = {
 export type RecipientViewComments_publicUpdatePetitionCommentMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
 }>;
 
 export type RecipientViewComments_publicUpdatePetitionCommentMutation = {
   publicUpdatePetitionComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content?: any | null;
+    contentPlainText?: string | null;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
@@ -55409,7 +55411,7 @@ export const PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc =
 export const PublicPetitionFieldComment_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment PublicPetitionFieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
     id
-    content
+    contentPlainText
     ...PublicPetitionFieldCommentContent_PetitionFieldComment
     createdAt
     isUnread
@@ -64684,7 +64686,7 @@ export const RecipientViewComments_publicCreatePetitionCommentDocument = gql`
   mutation RecipientViewComments_publicCreatePetitionComment(
     $keycode: ID!
     $petitionFieldId: GID
-    $content: JSON!
+    $content: String!
   ) {
     publicCreatePetitionComment(
       keycode: $keycode
@@ -64718,7 +64720,7 @@ export const RecipientViewComments_publicUpdatePetitionCommentDocument = gql`
   mutation RecipientViewComments_publicUpdatePetitionComment(
     $keycode: ID!
     $petitionFieldCommentId: GID!
-    $content: JSON!
+    $content: String!
   ) {
     publicUpdatePetitionComment(
       keycode: $keycode

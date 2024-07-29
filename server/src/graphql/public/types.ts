@@ -15,6 +15,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
 import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
+import { renderSlateToText } from "../../util/slate/render";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -850,6 +851,12 @@ export const PublicPetitionFieldComment = objectType({
       description: "The JSON content of the comment.",
       resolve: async (root) => {
         return root.content_json;
+      },
+    });
+    t.nullable.string("contentPlainText", {
+      description: "The text content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return isDefined(root.content_json) ? renderSlateToText(root.content_json) : null;
       },
     });
     t.nullable.string("contentHtml", {

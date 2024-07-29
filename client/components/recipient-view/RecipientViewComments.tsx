@@ -33,13 +33,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { CloseButton } from "../common/CloseButton";
 import { PublicPetitionFieldComment } from "../common/PublicPetitionFieldComment";
 import { useTone } from "../common/ToneProvider";
-import {
-  CommentEditor,
-  CommentEditorInstance,
-  emptyCommentEditorValue,
-  isEmptyCommentEditorValue,
-} from "../common/slate/CommentEditor";
-
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useMetadata } from "@parallel/utils/withMetadata";
@@ -47,6 +40,7 @@ import { isDefined } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
+import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PublicPetitionFieldCommentExcerpt } from "../common/PublicPetitionFieldCommentExcerpt";
 import { Spacer } from "../common/Spacer";
@@ -60,11 +54,10 @@ interface RecipientViewCommentsProps {
 export function RecipientViewComments({ keycode, access, onClose }: RecipientViewCommentsProps) {
   const intl = useIntl();
   const tone = useTone();
-  const [draft, setDraft] = useState(emptyCommentEditorValue());
-  const isDraftEmpty = isEmptyCommentEditorValue(draft);
+  const [draft, setDraft] = useState("");
 
   const commentsRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<CommentEditorInstance>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const [fieldId, setFieldId] = useFieldCommentsQueryState();
 
@@ -139,7 +132,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const [publicCreatePetitionComment] = useMutation(
     RecipientViewComments_publicCreatePetitionCommentDocument,
   );
-  async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (isMetaReturn(event)) {
       event.preventDefault();
       await handleSubmitClick();
@@ -147,7 +140,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   }
 
   async function handleSubmitClick() {
-    if (!isEmptyCommentEditorValue(draft)) {
+    if (draft.length > 0 && isDefined(fieldId)) {
       try {
         await publicCreatePetitionComment({
           variables: {
@@ -156,7 +149,8 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
             content: draft,
           },
         });
-        editorRef.current?.clear();
+        setDraft("");
+        //editorRef.current?.clear();
       } catch {}
     }
     closeRef.current?.focus();
@@ -186,7 +180,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
     RecipientViewComments_publicUpdatePetitionCommentDocument,
   );
 
-  async function handleEditCommentContent(commentId: string, content: any) {
+  async function handleEditCommentContent(commentId: string, content: string) {
     try {
       await publicUpdatePetitionComment({
         variables: {
@@ -352,7 +346,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
             <Divider />
             <HStack padding={2} alignItems="flex-start">
               <Stack flex={1} spacing={1} minWidth={0}>
-                <CommentEditor
+                <GrowingTextarea
                   id={`comment-editor-${fieldId}`}
                   ref={editorRef}
                   placeholder={intl.formatMessage({
@@ -362,7 +356,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                   value={draft}
                   isDisabled={!isDefined(fieldId) || field?.hasCommentsEnabled === false}
                   onKeyDown={handleKeyDown}
-                  onChange={setDraft}
+                  onChange={(e) => setDraft(e.target.value)}
                 />
                 {deviceType === null ? (
                   // show only on desktop
@@ -377,7 +371,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               <Box>
                 <Button
                   colorScheme="primary"
-                  isDisabled={isDraftEmpty || !isDefined(fieldId)}
+                  isDisabled={draft.length === 0 || !isDefined(fieldId)}
                   onClick={handleSubmitClick}
                 >
                   <FormattedMessage id="generic.submit" defaultMessage="Submit" />
@@ -510,7 +504,7 @@ const _mutations = [
     mutation RecipientViewComments_publicCreatePetitionComment(
       $keycode: ID!
       $petitionFieldId: GID
-      $content: JSON!
+      $content: String!
     ) {
       publicCreatePetitionComment(
         keycode: $keycode
@@ -541,7 +535,7 @@ const _mutations = [
     mutation RecipientViewComments_publicUpdatePetitionComment(
       $keycode: ID!
       $petitionFieldCommentId: GID!
-      $content: JSON!
+      $content: String!
     ) {
       publicUpdatePetitionComment(
         keycode: $keycode

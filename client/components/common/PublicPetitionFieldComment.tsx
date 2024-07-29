@@ -7,9 +7,9 @@ import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 import { DateTime } from "./DateTime";
+import { GrowingTextarea } from "./GrowingTextarea";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 import { PublicPetitionFieldCommentContent } from "./PublicPetitionFieldCommentContent";
-import { CommentEditor, CommentEditorInstance, CommentEditorValue } from "./slate/CommentEditor";
 
 export function PublicPetitionFieldComment({
   comment,
@@ -19,17 +19,17 @@ export function PublicPetitionFieldComment({
 }: {
   comment: PublicPetitionFieldComment_PublicPetitionFieldCommentFragment;
   onDelete: () => void;
-  onEdit: (content: CommentEditorValue) => void;
+  onEdit: (content: string) => void;
   isDisabled?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [content, setContent] = useState<CommentEditorValue>(comment.content);
-  const editorRef = useRef<CommentEditorInstance>(null);
+  const [content, setContent] = useState<string>(comment.contentPlainText ?? "");
+  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const isAuthor = comment.author?.__typename === "PublicContact" && comment.author.isMe;
 
   function handleEditClick() {
-    setContent(comment.content);
+    setContent(comment.contentPlainText ?? "");
     setIsEditing(true);
     setTimeout(() => {
       editorRef.current?.focus();
@@ -110,12 +110,12 @@ export function PublicPetitionFieldComment({
         </Box>
       ) : isEditing ? (
         <Box marginTop={1} marginX={-2}>
-          <CommentEditor
+          <GrowingTextarea
             id={`comment-editor-${comment.id}`}
             ref={editorRef}
             value={content}
             onKeyDown={handleKeyDown as any}
-            onChange={setContent}
+            onChange={(e) => setContent(e.target.value)}
           />
           <Stack direction="row" justifyContent="flex-end" marginTop={2}>
             <Button size="sm" onClick={handleCancelClick}>
@@ -137,7 +137,7 @@ PublicPetitionFieldComment.fragments = {
   PublicPetitionFieldComment: gql`
     fragment PublicPetitionFieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
       id
-      content
+      contentPlainText
       ...PublicPetitionFieldCommentContent_PetitionFieldComment
       createdAt
       isUnread

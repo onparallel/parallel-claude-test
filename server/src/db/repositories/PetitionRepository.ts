@@ -4766,7 +4766,7 @@ export class PetitionRepository extends BaseRepository {
     data: {
       petitionId: number;
       petitionFieldId: number | null;
-      contentJson: string;
+      contentJson: any;
     },
     access: PetitionAccess,
   ) {

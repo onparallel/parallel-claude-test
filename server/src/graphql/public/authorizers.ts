@@ -1,6 +1,7 @@
 import Ajv from "ajv";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
+import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, partition, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
@@ -10,7 +11,6 @@ import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
-import { core } from "nexus";
 
 export function authenticatePublicAccess<
   TypeName extends string,

@@ -1898,7 +1898,7 @@ type Mutation {
   Create a petition comment.
   """
   publicCreatePetitionComment(
-    content: JSON!
+    content: String!
     keycode: ID!
     petitionFieldId: GID
   ): PublicPetitionFieldComment!
@@ -1907,7 +1907,7 @@ type Mutation {
   Create a petition field comment.
   """
   publicCreatePetitionFieldComment(
-    content: JSON!
+    content: String!
     keycode: ID!
     petitionFieldId: GID!
   ): PublicPetitionFieldComment! @deprecated(reason: "Use publicCreatePetitionComment instead")
@@ -2054,7 +2054,7 @@ type Mutation {
   Update a petition comment.
   """
   publicUpdatePetitionComment(
-    content: JSON!
+    content: String!
     keycode: ID!
     petitionFieldCommentId: GID!
   ): PublicPetitionFieldComment!
@@ -2063,7 +2063,7 @@ type Mutation {
   Update a petition field comment.
   """
   publicUpdatePetitionFieldComment(
-    content: JSON!
+    content: String!
     keycode: ID!
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
@@ -6153,6 +6153,11 @@ type PublicPetitionFieldComment {
   The HTML content of the comment.
   """
   contentHtml: String
+
+  """
+  The text content of the comment.
+  """
+  contentPlainText: String
 
   """
   Time when the comment was created.

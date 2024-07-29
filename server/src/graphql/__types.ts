@@ -3246,6 +3246,7 @@ export interface NexusGenFieldTypes {
     author: NexusGenRootTypes["PublicUserOrContact"] | null; // PublicUserOrContact
     content: NexusGenScalars["JSON"] | null; // JSON
     contentHtml: string | null; // String
+    contentPlainText: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     excerptHtml: string | null; // String
     field: NexusGenRootTypes["PublicPetitionField"] | null; // PublicPetitionField
@@ -5815,6 +5816,7 @@ export interface NexusGenFieldTypeNames {
     author: "PublicUserOrContact";
     content: "JSON";
     contentHtml: "String";
+    contentPlainText: "String";
     createdAt: "DateTime";
     excerptHtml: "String";
     field: "PublicPetitionField";
@@ -7253,13 +7255,13 @@ export interface NexusGenArgTypes {
     };
     publicCreatePetitionComment: {
       // args
-      content: NexusGenScalars["JSON"]; // JSON!
+      content: string; // String!
       keycode: string; // ID!
       petitionFieldId?: NexusGenScalars["GID"] | null; // GID
     };
     publicCreatePetitionFieldComment: {
       // args
-      content: NexusGenScalars["JSON"]; // JSON!
+      content: string; // String!
       keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
@@ -7363,13 +7365,13 @@ export interface NexusGenArgTypes {
     };
     publicUpdatePetitionComment: {
       // args
-      content: NexusGenScalars["JSON"]; // JSON!
+      content: string; // String!
       keycode: string; // ID!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
     };
     publicUpdatePetitionFieldComment: {
       // args
-      content: NexusGenScalars["JSON"]; // JSON!
+      content: string; // String!
       keycode: string; // ID!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!

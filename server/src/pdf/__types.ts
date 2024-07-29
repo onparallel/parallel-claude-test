@@ -1977,13 +1977,13 @@ export type MutationpublicCreateFileUploadReplyArgs = {
 };
 
 export type MutationpublicCreatePetitionCommentArgs = {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
 };
@@ -2087,13 +2087,13 @@ export type MutationpublicStartAsyncFieldCompletionArgs = {
 };
 
 export type MutationpublicUpdatePetitionCommentArgs = {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"]["input"];
+  content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
@@ -4745,6 +4745,8 @@ export type PublicPetitionFieldComment = {
   content: Maybe<Scalars["JSON"]["output"]>;
   /** The HTML content of the comment. */
   contentHtml: Maybe<Scalars["String"]["output"]>;
+  /** The text content of the comment. */
+  contentPlainText: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"]["output"];
   /** The HTML content of the comment. */

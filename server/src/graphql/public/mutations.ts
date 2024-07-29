@@ -47,11 +47,11 @@ import {
   fieldBelongsToAccess,
   getContactAuthCookieValue,
   taskBelongsToAccess,
-  validPetitionFieldCommentContent,
   validPublicPetitionLinkPrefill,
   validPublicPetitionLinkPrefillDataKeycode,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
+import { fromPlainText } from "../../util/slate/utils";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -503,14 +503,13 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
     and(
       fieldBelongsToAccess("petitionFieldId"),
       fieldsHaveCommentsEnabled("petitionFieldId"),
-      validPetitionFieldCommentContent("content"),
       not(fieldHasParent("petitionFieldId")),
     ),
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
-    content: nonNull(jsonArg()),
+    content: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
@@ -522,7 +521,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
       {
         petitionId: petitionId,
         petitionFieldId: args.petitionFieldId,
-        contentJson: args.content,
+        contentJson: fromPlainText(args.content),
       },
       ctx.access!,
     );
@@ -565,19 +564,18 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
-    validPetitionFieldCommentContent("content"),
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-    content: nonNull(jsonArg()),
+    content: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldCommentFromContact(
       args.petitionFieldCommentId,
       {
-        contentJson: args.content,
+        contentJson: fromPlainText(args.content),
       },
       ctx.contact!,
     );
@@ -590,7 +588,6 @@ export const publicCreatePetitionComment = mutationField("publicCreatePetitionCo
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(
-      validPetitionFieldCommentContent("content"),
       ifArgDefined(
         "petitionFieldId",
         and(
@@ -604,14 +601,14 @@ export const publicCreatePetitionComment = mutationField("publicCreatePetitionCo
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nullable(globalIdArg("PetitionField")),
-    content: nonNull(jsonArg()),
+    content: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createPetitionFieldCommentFromAccess(
       {
         petitionId: ctx.access!.petition_id,
         petitionFieldId: args.petitionFieldId ?? null,
-        contentJson: args.content,
+        contentJson: fromPlainText(args.content),
       },
       ctx.access!,
     );
@@ -658,18 +655,17 @@ export const publicUpdatePetitionComment = mutationField("publicUpdatePetitionCo
   authorize: chain(
     authenticatePublicAccess("keycode"),
     commentsBelongsToAccess("petitionFieldCommentId"),
-    validPetitionFieldCommentContent("content"),
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-    content: nonNull(jsonArg()),
+    content: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldCommentFromContact(
       args.petitionFieldCommentId,
       {
-        contentJson: args.content,
+        contentJson: fromPlainText(args.content),
       },
       ctx.contact!,
     );
