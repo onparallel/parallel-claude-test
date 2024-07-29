@@ -5,6 +5,7 @@ import { times, zip } from "remeda";
 import { BreakLines } from "./BreakLines";
 import { Divider } from "./Divider";
 import { NormalLink } from "./Link";
+import { ScrollShadows } from "./ScrollShadows";
 
 interface MarkdownRender {
   markdown: string;
@@ -85,28 +86,30 @@ type InlineToken =
 
 function MdTable({ token }: { token: Tokens.Table }) {
   return (
-    <Table size="sm">
-      <Thead>
-        <Tr>
-          {zip(token.header, token.align).map(([header, align], i) => (
-            <Th key={i} width="1%" textAlign={align ?? undefined}>
-              <MdInlineContent tokens={header.tokens as any} />
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {token.rows.map((row, i) => (
-          <Tr key={i}>
-            {zip(row, token.align).map(([cell, align], i) => (
-              <Td key={i} textAlign={align ?? undefined}>
-                <MdInlineContent tokens={cell.tokens as any} />
-              </Td>
+    <ScrollShadows overflowX="auto" direction="horizontal">
+      <Table size="sm">
+        <Thead>
+          <Tr>
+            {zip(token.header, token.align).map(([header, align], i) => (
+              <Th key={i} width="1%" textAlign={align ?? undefined}>
+                <MdInlineContent tokens={header.tokens as any} />
+              </Th>
             ))}
           </Tr>
-        ))}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+          {token.rows.map((row, i) => (
+            <Tr key={i}>
+              {zip(row, token.align).map(([cell, align], i) => (
+                <Td key={i} textAlign={align ?? undefined}>
+                  <MdInlineContent tokens={cell.tokens as any} />
+                </Td>
+              ))}
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </ScrollShadows>
   );
 }
 
