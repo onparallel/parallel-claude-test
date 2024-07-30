@@ -26022,6 +26022,7 @@ export type RecipientViewComments_accessQueryVariables = Exact<{
 export type RecipientViewComments_accessQuery = {
   access: {
     __typename?: "PublicPetitionAccess";
+    keycode: string;
     petition: {
       __typename?: "PublicPetition";
       id: string;
@@ -49022,6 +49023,7 @@ export type RecipientView_accessQueryVariables = Exact<{
 export type RecipientView_accessQuery = {
   access: {
     __typename?: "PublicPetitionAccess";
+    keycode: string;
     hasClientPortalAccess: boolean;
     petition: {
       __typename?: "PublicPetition";
@@ -49350,8 +49352,8 @@ export type RecipientPortal_accessQueryVariables = Exact<{
 export type RecipientPortal_accessQuery = {
   access: {
     __typename?: "PublicPetitionAccess";
-    hasClientPortalAccess: boolean;
     keycode: string;
+    hasClientPortalAccess: boolean;
     createdAt: string;
     petition: {
       __typename?: "PublicPetition";
@@ -64619,6 +64621,7 @@ export const PublicSignupForm_emailIsAvailableDocument = gql`
 export const RecipientViewComments_accessDocument = gql`
   query RecipientViewComments_access($keycode: ID!) {
     access(keycode: $keycode) {
+      keycode
       petition {
         id
         fields {
@@ -67686,6 +67689,7 @@ export const RecipientView_publicCompletePetitionDocument = gql`
 export const RecipientView_accessDocument = gql`
   query RecipientView_access($keycode: ID!) {
     access(keycode: $keycode) {
+      keycode
       hasClientPortalAccess
       ...RecipientView_PublicPetitionAccess
     }
@@ -67706,6 +67710,7 @@ export const RecipientView_accessesDocument = gql`
 export const RecipientPortal_accessDocument = gql`
   query RecipientPortal_access($keycode: ID!) {
     access(keycode: $keycode) {
+      keycode
       hasClientPortalAccess
       ...RecipientPortal_PublicPetitionAccess
     }

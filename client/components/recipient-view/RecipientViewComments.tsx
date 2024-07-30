@@ -443,6 +443,7 @@ const _queries = [
   gql`
     query RecipientViewComments_access($keycode: ID!) {
       access(keycode: $keycode) {
+        keycode
         petition {
           id
           fields {

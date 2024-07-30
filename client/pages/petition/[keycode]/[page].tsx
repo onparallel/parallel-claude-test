@@ -572,6 +572,7 @@ const _queries = [
   gql`
     query RecipientView_access($keycode: ID!) {
       access(keycode: $keycode) {
+        keycode
         hasClientPortalAccess
         ...RecipientView_PublicPetitionAccess
       }

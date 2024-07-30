@@ -606,6 +606,7 @@ const _queries = [
   gql`
     query RecipientPortal_access($keycode: ID!) {
       access(keycode: $keycode) {
+        keycode
         hasClientPortalAccess
         ...RecipientPortal_PublicPetitionAccess
       }

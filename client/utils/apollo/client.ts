@@ -122,8 +122,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         // we don't want PetitionBaseMini to clash with Petition and PetitionTemplate objects in the Apollo cache
         if (o.__typename === "PetitionBaseMini") {
           return `_${o.id}`;
+        } else if (o.__typename === "PublicPetitionAccess") {
+          return o.keycode as string;
+        } else {
+          return o.id as string;
         }
-        return o.id as string;
       },
       possibleTypes: fragmentMatcher.possibleTypes,
       typePolicies: {
