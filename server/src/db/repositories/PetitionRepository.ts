@@ -4512,7 +4512,9 @@ export class PetitionRepository extends BaseRepository {
     return await pMapChunk(
       petitionFieldCommentIds,
       async (idsChunk) => {
-        const comments = (await this.loadPetitionFieldComment(idsChunk)) as PetitionFieldComment[];
+        const comments = (await this.loadPetitionFieldComment.raw(
+          idsChunk,
+        )) as PetitionFieldComment[];
         return await this.from("petition_user_notification")
           .where({
             user_id: userId,
@@ -4527,10 +4529,15 @@ export class PetitionRepository extends BaseRepository {
             }
           })
           .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
-          .whereIn(
-            this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(comments.map((c) => c.petition_field_id)),
-          )
+          .where((q) => {
+            q.whereIn(
+              this.knex.raw("data ->> 'petition_field_id'") as any,
+              uniq(comments.map((c) => c.petition_field_id).filter(isDefined)),
+            );
+            if (comments.some((c) => c.petition_field_id === null)) {
+              q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
+            }
+          })
           .whereIn(
             this.knex.raw("data ->> 'petition_field_comment_id'") as any,
             uniq(comments.map((c) => c.id)),
@@ -4992,17 +4999,22 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentIds: number[],
     accessId: number,
   ) {
-    const comments = (await this.loadPetitionFieldComment(
+    const comments = (await this.loadPetitionFieldComment.raw(
       petitionFieldCommentIds,
     )) as PetitionFieldComment[];
     await this.from("petition_contact_notification")
       .where("petition_access_id", accessId)
       .where("type", "COMMENT_CREATED")
       .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
-      .whereIn(
-        this.knex.raw("data ->> 'petition_field_id'") as any,
-        uniq(comments.map((c) => c.petition_field_id)),
-      )
+      .where((q) => {
+        q.whereIn(
+          this.knex.raw("data ->> 'petition_field_id'") as any,
+          uniq(comments.map((c) => c.petition_field_id)).filter(isDefined),
+        );
+        if (comments.some((c) => c.petition_field_id === null)) {
+          q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
+        }
+      })
       .whereIn(
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
         uniq(comments.map((c) => c.id)),
