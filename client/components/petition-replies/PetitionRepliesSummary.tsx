@@ -27,6 +27,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MarkdownRender } from "../common/MarkdownRender";
 import { SupportButton } from "../common/SupportButton";
 import { SupportLink } from "../common/SupportLink";
+import { ScrollShadows } from "../common/ScrollShadows";
 
 interface PetitionRepliesSummaryProps {
   petition: PetitionRepliesSummary_PetitionFragment;
@@ -135,12 +136,10 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
         </Center>
       ) : summary ? (
         <>
-          <Box flex="1" minHeight={0} overflow="auto">
-            <Box padding={4}>
-              {hasError ? <ErrorAlert /> : null}
-              <MarkdownRender markdown={summary} />
-            </Box>
-          </Box>
+          <ScrollShadows flex="1" minHeight={0} overflow="auto" padding={4}>
+            {hasError ? <ErrorAlert /> : null}
+            <MarkdownRender markdown={summary} />
+          </ScrollShadows>
           <HStack height="68px" padding={4}>
             <CopyToClipboardButton
               size="sm"
