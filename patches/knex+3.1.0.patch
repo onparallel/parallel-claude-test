@@ -1,0 +1,16 @@
+diff --git a/node_modules/knex/lib/query/querybuilder.js b/node_modules/knex/lib/query/querybuilder.js
+index 0d3cff5..82cba0e 100644
+--- a/node_modules/knex/lib/query/querybuilder.js
++++ b/node_modules/knex/lib/query/querybuilder.js
+@@ -602,6 +602,11 @@ class Builder extends EventEmitter {
+   whereIn(column, values) {
+     if (Array.isArray(values) && isEmpty(values))
+       return this.where(this._not());
++    if (process.env.NODE_ENV !== "production") {
++      if (Array.isArray(values) && values.some((value) => value === null)) {
++        throw new Error("Be careful with null values in whereIn");
++      }
++    }
+     this._statements.push({
+       grouping: 'where',
+       type: 'whereIn',
