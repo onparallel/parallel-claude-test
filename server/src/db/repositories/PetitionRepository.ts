@@ -4639,10 +4639,15 @@ export class PetitionRepository extends BaseRepository {
         .where("type", "COMMENT_CREATED")
         .whereIn("user_id", uniq(keys.map((x) => x.userId)))
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn(
-          this.knex.raw("data ->> 'petition_field_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldId)),
-        )
+        .where((q) => {
+          q.whereIn(
+            this.knex.raw("data ->> 'petition_field_id'") as any,
+            uniq(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+          );
+          if (keys.some((x) => x.petitionFieldId === null)) {
+            q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
+          }
+        })
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
           uniq(keys.map((x) => x.petitionFieldCommentId)),
@@ -4682,10 +4687,15 @@ export class PetitionRepository extends BaseRepository {
         .where("type", "COMMENT_CREATED")
         .whereIn("petition_access_id", uniq(keys.map((x) => x.petitionAccessId)))
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn(
-          this.knex.raw("data ->> 'petition_field_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldId)),
-        )
+        .where((q) => {
+          q.whereIn(
+            this.knex.raw("data ->> 'petition_field_id'") as any,
+            uniq(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+          );
+          if (keys.some((x) => x.petitionFieldId === null)) {
+            q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
+          }
+        })
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
           uniq(keys.map((x) => x.petitionFieldCommentId)),
