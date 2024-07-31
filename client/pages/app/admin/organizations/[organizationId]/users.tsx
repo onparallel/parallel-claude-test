@@ -1,13 +1,17 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
-import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
+import { Badge, Flex, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { ForbiddenIcon, KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { useInviteUserDialog } from "@parallel/components/admin-organizations/dialogs/InviteUserDialog";
+import { useUpdateOrganizationUsageDetailsDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationUsageDetailsDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { UserReference } from "@parallel/components/common/UserReference";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import {
@@ -15,6 +19,7 @@ import {
   AdminOrganizationsMembers_organizationDocument,
   AdminOrganizationsMembers_OrganizationUserFragment,
   AdminOrganizationsMembers_queryDocument,
+  AdminOrganizationsMembers_updateOrganizationUserLimitDocument,
   OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -22,6 +27,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -30,6 +36,7 @@ import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { sort } from "remeda";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -181,6 +188,27 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
     await loginAs(selectedRows[0].id);
   };
 
+  const showUpdateOrganizationUsageDetailsDialog = useUpdateOrganizationUsageDetailsDialog();
+
+  const [updateOrganizationUserLimit] = useMutation(
+    AdminOrganizationsMembers_updateOrganizationUserLimitDocument,
+  );
+  async function handleChangeUserLimit() {
+    try {
+      const { limit } = await showUpdateOrganizationUsageDetailsDialog({
+        hidePeriodSection: true,
+        header: intl.formatMessage({
+          id: "page.admin-users.user-limit",
+          defaultMessage: "User limit",
+        }),
+        usageDetails: { limit: organization.usageDetails.USER_LIMIT },
+      });
+      await updateOrganizationUserLimit({
+        variables: { orgId: organizationId, limit },
+      });
+    } catch {}
+  }
+
   return (
     <AdminOrganizationsLayout
       currentTabKey="users"
@@ -226,6 +254,9 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
               onSearchChange={handleSearchChange}
               onInviteClick={handleInviteUser}
               hasSsoProvider={organization.hasSsoProvider}
+              onChangeLimit={handleChangeUserLimit}
+              usersCount={organization.activeUserCount}
+              usersLimit={organization.usageDetails?.USER_LIMIT ?? 0}
             />
           }
           body={
@@ -263,10 +294,7 @@ function useOrganizationMembersTableColumns() {
     () => [
       {
         key: "id",
-        label: intl.formatMessage({
-          id: "organization-users.header.id",
-          defaultMessage: "ID",
-        }),
+        label: intl.formatMessage({ id: "generic.id", defaultMessage: "ID" }),
         cellProps: {
           width: "1px",
         },
@@ -284,26 +312,7 @@ function useOrganizationMembersTableColumns() {
         CellContent: ({ row }) => {
           return (
             <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
-              <Text as="span" textDecoration={row.status === "INACTIVE" ? "line-through" : "none"}>
-                {row.fullName}
-              </Text>
-              {row.status === "INACTIVE" ? (
-                <Tooltip
-                  label={intl.formatMessage({
-                    id: "page.users.inactive-user",
-                    defaultMessage: "Inactive user",
-                  })}
-                >
-                  <ForbiddenIcon
-                    marginStart={2}
-                    color="red.300"
-                    aria-label={intl.formatMessage({
-                      id: "page.users.inactive-user",
-                      defaultMessage: "Inactive user",
-                    })}
-                  />
-                </Tooltip>
-              ) : null}
+              <UserReference as="span" user={row} />
               {row.isOrgOwner ? (
                 <Badge marginStart={2} colorScheme="primary" position="relative" top="1.5px">
                   <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
@@ -321,6 +330,91 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "Email",
         }),
         CellContent: ({ row }) => <>{row.email}</>,
+      },
+      {
+        key: "teams",
+        label: intl.formatMessage({
+          id: "page.users.table-teams-label",
+          defaultMessage: "Teams",
+        }),
+        cellProps: {
+          minWidth: "220px",
+        },
+        CellContent: ({ row }) => {
+          const groups = sort(row.userGroups, (a, b) => {
+            // type === ALL_USER always goes last
+            if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
+              return 1;
+            }
+            if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
+              return -1;
+            }
+
+            // groups with permissions show first
+            if (a.hasPermissions && !b.hasPermissions) {
+              return -1;
+            }
+            if (!a.hasPermissions && b.hasPermissions) {
+              return 1;
+            }
+
+            // then sort by name
+            if (a.name && b.name) {
+              return a.name.localeCompare(b.name);
+            }
+
+            // if all is the same it doesn't matter the order
+            return 0;
+          });
+          return (
+            <EnumerateList
+              values={groups}
+              maxItems={2}
+              renderItem={({ value }, index) => {
+                return (
+                  <Text key={index} as="span" whiteSpace="nowrap">
+                    {value.hasPermissions ? <KeyIcon marginEnd={1} marginBottom={0.5} /> : null}
+                    <LocalizableUserTextRender value={value.localizableName} default={value.name} />
+                  </Text>
+                );
+              }}
+              renderOther={({ children, remaining }) => {
+                return (
+                  <SmallPopover
+                    id="other-groups"
+                    width="auto"
+                    content={
+                      <Stack width="auto" spacing={1}>
+                        {remaining
+                          .sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : 1))
+                          .map((userGroup, index) => {
+                            return (
+                              <Text key={index} as="span" whiteSpace="nowrap">
+                                {userGroup.hasPermissions ? (
+                                  <KeyIcon marginEnd={1} marginBottom={0.5} />
+                                ) : (
+                                  <UsersIcon marginEnd={1} marginBottom={0.5} />
+                                )}
+                                <LocalizableUserTextRender
+                                  value={userGroup.localizableName}
+                                  default={userGroup.name}
+                                />
+                              </Text>
+                            );
+                          })}
+                      </Stack>
+                    }
+                    placement="bottom"
+                  >
+                    <Text as="span" whiteSpace="nowrap">
+                      {children}
+                    </Text>
+                  </SmallPopover>
+                );
+              }}
+            />
+          );
+        },
       },
       {
         key: "lastActiveAt",
@@ -374,19 +468,29 @@ AdminOrganizationsMembers.fragments = {
   OrganizationUser: gql`
     fragment AdminOrganizationsMembers_OrganizationUser on User {
       id
-      fullName
+      ...UserReference_User
       email
       createdAt
       lastActiveAt
       status
       isOrgOwner
+      userGroups {
+        id
+        hasPermissions
+        name
+        localizableName
+        type
+      }
     }
+    ${UserReference.fragments.User}
   `,
   Organization: gql`
     fragment AdminOrganizationsMembers_Organization on Organization {
       id
       name
       hasSsoProvider
+      usageDetails
+      activeUserCount
       ...AdminOrganizationsLayout_Organization
     }
     ${AdminOrganizationsLayout.fragments.Organization}
@@ -446,6 +550,14 @@ const _mutations = [
       }
     }
     ${AdminOrganizationsMembers.fragments.OrganizationUser}
+  `,
+  gql`
+    mutation AdminOrganizationsMembers_updateOrganizationUserLimit($orgId: GID!, $limit: Int!) {
+      updateOrganizationUserLimit(orgId: $orgId, limit: $limit) {
+        ...AdminOrganizationsMembers_Organization
+      }
+    }
+    ${AdminOrganizationsMembers.fragments.Organization}
   `,
 ];
 

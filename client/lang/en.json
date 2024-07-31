@@ -4470,9 +4470,19 @@
     "context": "Unread"
   },
   {
-    "term": "component.organization-memebers-list-table-headr.sso-provider",
+    "term": "component.organization-memebers-list-table-header.change-limit",
+    "definition": "Change limit",
+    "context": "Change limit"
+  },
+  {
+    "term": "component.organization-memebers-list-table-header.sso-provider",
     "definition": "SSO provider",
     "context": "SSO provider"
+  },
+  {
+    "term": "component.organization-memebers-list-table-header.users-usage",
+    "definition": "<b>Usage:</b> {usersCount}/{usersLimit} users",
+    "context": "<b>Usage:</b> {usersCount}/{usersLimit} users"
   },
   {
     "term": "component.organization-status-dialog.organization-status",
@@ -12485,7 +12495,7 @@
     "context": "out of"
   },
   {
-    "term": "organization-users.header.id",
+    "term": "generic.id",
     "definition": "ID",
     "context": "ID"
   },
@@ -12783,6 +12793,11 @@
     "term": "page.admin-support-methods.title",
     "definition": "Support methods",
     "context": "Support methods"
+  },
+  {
+    "term": "page.admin-users.user-limit",
+    "definition": "User limit",
+    "context": "User limit"
   },
   {
     "term": "page.alerts.no-alerts",

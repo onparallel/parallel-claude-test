@@ -3,7 +3,6 @@ import { Badge, Flex, Heading, Stack, Text, Tooltip, useToast } from "@chakra-ui
 import {
   AlertCircleFilledIcon,
   ArrowUpRightIcon,
-  ForbiddenIcon,
   KeyIcon,
   LogInIcon,
   UserCheckIcon,
@@ -18,6 +17,7 @@ import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { UserReference } from "@parallel/components/common/UserReference";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
@@ -707,32 +707,9 @@ function useOrganizationUsersTableColumns() {
         }),
         CellContent: ({ row }) => {
           return (
-            <Text
-              as="span"
-              display="inline-flex"
-              whiteSpace="nowrap"
-              alignItems="center"
-              opacity={row.status === "INACTIVE" ? 0.5 : 1}
-            >
-              <Text as="span" textDecoration={row.status === "INACTIVE" ? "line-through" : "none"}>
-                {row.fullName}
-              </Text>
-              {row.status === "INACTIVE" ? (
-                <Tooltip
-                  label={intl.formatMessage({
-                    id: "page.users.inactive-user",
-                    defaultMessage: "Inactive user",
-                  })}
-                >
-                  <ForbiddenIcon
-                    marginStart={2}
-                    aria-label={intl.formatMessage({
-                      id: "page.users.inactive-user",
-                      defaultMessage: "Inactive user",
-                    })}
-                  />
-                </Tooltip>
-              ) : row.status === "ON_HOLD" ? (
+            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+              <UserReference as="span" user={row} />
+              {row.status === "ON_HOLD" ? (
                 <Tooltip
                   label={intl.formatMessage({
                     id: "page.users.untransferred-parallels",
@@ -765,9 +742,7 @@ function useOrganizationUsersTableColumns() {
           id: "page.users.table-user-email-label",
           defaultMessage: "Email",
         }),
-        CellContent: ({ row }) => (
-          <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
-        ),
+        CellContent: ({ row }) => <>{row.email}</>,
       },
       {
         key: "teams",
@@ -872,7 +847,6 @@ function useOrganizationUsersTableColumns() {
               format={FORMATS.LLL}
               useRelativeTime
               whiteSpace="nowrap"
-              opacity={row.status === "INACTIVE" ? 0.5 : 1}
             />
           ) : (
             <Text textStyle="hint">
@@ -896,7 +870,6 @@ function useOrganizationUsersTableColumns() {
             format={FORMATS.LLL}
             useRelativeTime
             whiteSpace="nowrap"
-            opacity={row.status === "INACTIVE" ? 0.5 : 1}
           />
         ),
       },
@@ -910,9 +883,7 @@ OrganizationUsers.fragments = {
     return gql`
       fragment OrganizationUsers_User on User {
         id
-        fullName
-        firstName
-        lastName
+        ...UserReference_User
         email
         isOrgOwner
         createdAt
@@ -928,6 +899,7 @@ OrganizationUsers.fragments = {
         ...useCreateOrUpdateUserDialog_User
         ...useConfirmDeactivateUserDialog_User
       }
+      ${UserReference.fragments.User}
       ${useCreateOrUpdateUserDialog.fragments.User}
       ${useConfirmDeactivateUserDialog.fragments.User}
     `;

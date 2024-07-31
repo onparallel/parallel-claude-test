@@ -6742,6 +6742,12 @@ export type PetitionFieldCommentExcerpt_PetitionFieldCommentFragment = {
   >;
 };
 
+export type PetitionFieldReference_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+};
+
 export type PetitionFieldSelect_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   fields: Array<{
@@ -7329,6 +7335,8 @@ export type SignerReference_PetitionSignerFragment = {
 
 export type Tag_TagFragment = { __typename?: "Tag"; name: string; color: string };
 
+export type TagReference_TagFragment = { __typename?: "Tag"; name: string; color: string };
+
 export type TagSelect_TagFragment = { __typename?: "Tag"; id: string; name: string; color: string };
 
 export type TagSelect_tagsQueryVariables = Exact<{
@@ -7430,6 +7438,13 @@ export type UserGroupMembersPopover_getMembersQuery = {
   >;
 };
 
+export type UserGroupReference_UserGroupFragment = {
+  __typename?: "UserGroup";
+  name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
+};
+
 export type UserListPopover_UserFragment = {
   __typename?: "User";
   id: string;
@@ -7445,6 +7460,31 @@ export type UserListPopover_UserGroupFragment = {
   name: string;
   localizableName: { [locale in UserLocale]?: string };
   type: UserGroupType;
+};
+
+export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
+  __typename?: "PetitionAccess";
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+};
+
+export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  status: UserStatus;
+  isMe: boolean;
+};
+
+export type UserOrContactReference_UserOrPetitionAccessFragment =
+  | UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment
+  | UserOrContactReference_UserOrPetitionAccess_User_Fragment;
+
+export type UserReference_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  status: UserStatus;
+  isMe: boolean;
 };
 
 export type UserSelect_UserFragment = {
@@ -10648,12 +10688,6 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment;
 
-export type PetitionFieldReference_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  title?: string | null;
-};
-
 export type PetitionProfilesTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
@@ -10709,40 +10743,6 @@ export type PetitionProfilesTable_PetitionFragment = {
       };
     }>;
   }>;
-};
-
-export type TagReference_TagFragment = { __typename?: "Tag"; name: string; color: string };
-
-export type UserGroupReference_UserGroupFragment = {
-  __typename?: "UserGroup";
-  name: string;
-  localizableName: { [locale in UserLocale]?: string };
-  type: UserGroupType;
-};
-
-export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
-  __typename?: "PetitionAccess";
-  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-};
-
-export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  status: UserStatus;
-  isMe: boolean;
-};
-
-export type UserOrContactReference_UserOrPetitionAccessFragment =
-  | UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment
-  | UserOrContactReference_UserOrPetitionAccess_User_Fragment;
-
-export type UserReference_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  status: UserStatus;
-  isMe: boolean;
 };
 
 export type AddPetitionAccessDialog_DelegateUserFragment = {
@@ -28941,12 +28941,21 @@ export type AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodMutation = {
 export type AdminOrganizationsMembers_OrganizationUserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: string | null;
   email: string;
   createdAt: string;
   lastActiveAt?: string | null;
   status: UserStatus;
   isOrgOwner: boolean;
+  fullName?: string | null;
+  isMe: boolean;
+  userGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    hasPermissions: boolean;
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  }>;
 };
 
 export type AdminOrganizationsMembers_OrganizationFragment = {
@@ -28954,6 +28963,8 @@ export type AdminOrganizationsMembers_OrganizationFragment = {
   id: string;
   name: string;
   hasSsoProvider: boolean;
+  usageDetails: { [key: string]: any };
+  activeUserCount: number;
   status: OrganizationStatus;
 };
 
@@ -28967,6 +28978,8 @@ export type AdminOrganizationsMembers_queryQuery = {
     id: string;
     name: string;
     hasSsoProvider: boolean;
+    usageDetails: { [key: string]: any };
+    activeUserCount: number;
     status: OrganizationStatus;
   } | null;
   me: {
@@ -29028,12 +29041,21 @@ export type AdminOrganizationsMembers_organizationQuery = {
       items: Array<{
         __typename?: "User";
         id: string;
-        fullName?: string | null;
         email: string;
         createdAt: string;
         lastActiveAt?: string | null;
         status: UserStatus;
         isOrgOwner: boolean;
+        fullName?: string | null;
+        isMe: boolean;
+        userGroups: Array<{
+          __typename?: "UserGroup";
+          id: string;
+          hasPermissions: boolean;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        }>;
       }>;
     };
   } | null;
@@ -29051,12 +29073,38 @@ export type AdminOrganizationsMembers_inviteUserToOrganizationMutation = {
   inviteUserToOrganization: {
     __typename?: "User";
     id: string;
-    fullName?: string | null;
     email: string;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
     isOrgOwner: boolean;
+    fullName?: string | null;
+    isMe: boolean;
+    userGroups: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      hasPermissions: boolean;
+      name: string;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    }>;
+  };
+};
+
+export type AdminOrganizationsMembers_updateOrganizationUserLimitMutationVariables = Exact<{
+  orgId: Scalars["GID"]["input"];
+  limit: Scalars["Int"]["input"];
+}>;
+
+export type AdminOrganizationsMembers_updateOrganizationUserLimitMutation = {
+  updateOrganizationUserLimit: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    hasSsoProvider: boolean;
+    usageDetails: { [key: string]: any };
+    activeUserCount: number;
+    status: OrganizationStatus;
   };
 };
 
@@ -31864,16 +31912,16 @@ export type OrganizationUsage_userQuery = {
 export type OrganizationUsers_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
   email: string;
   isOrgOwner: boolean;
   createdAt: string;
   lastActiveAt?: string | null;
   status: UserStatus;
   isSsoUser: boolean;
+  fullName?: string | null;
   isMe: boolean;
+  firstName?: string | null;
+  lastName?: string | null;
   userGroups: Array<{
     __typename?: "UserGroup";
     id: string;
@@ -31897,16 +31945,16 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
   inviteUserToOrganization: {
     __typename?: "User";
     id: string;
-    fullName?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
     email: string;
     isOrgOwner: boolean;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    fullName?: string | null;
     isMe: boolean;
+    firstName?: string | null;
+    lastName?: string | null;
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
@@ -31928,16 +31976,16 @@ export type OrganizationUsers_updateUserGroupMembershipMutation = {
   updateUserGroupMembership: {
     __typename?: "User";
     id: string;
-    fullName?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
     email: string;
     isOrgOwner: boolean;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    fullName?: string | null;
     isMe: boolean;
+    firstName?: string | null;
+    lastName?: string | null;
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
@@ -32045,16 +32093,16 @@ export type OrganizationUsers_orgUsersQuery = {
         items: Array<{
           __typename?: "User";
           id: string;
-          fullName?: string | null;
-          firstName?: string | null;
-          lastName?: string | null;
           email: string;
           isOrgOwner: boolean;
           createdAt: string;
           lastActiveAt?: string | null;
           status: UserStatus;
           isSsoUser: boolean;
+          fullName?: string | null;
           isMe: boolean;
+          firstName?: string | null;
+          lastName?: string | null;
           userGroups: Array<{
             __typename?: "UserGroup";
             id: string;
@@ -55653,19 +55701,29 @@ export const AdminOrganizationsSubscriptions_OrganizationFragmentDoc = gql`
 export const AdminOrganizationsMembers_OrganizationUserFragmentDoc = gql`
   fragment AdminOrganizationsMembers_OrganizationUser on User {
     id
-    fullName
+    ...UserReference_User
     email
     createdAt
     lastActiveAt
     status
     isOrgOwner
+    userGroups {
+      id
+      hasPermissions
+      name
+      localizableName
+      type
+    }
   }
+  ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsMembers_OrganizationUserFragment, unknown>;
 export const AdminOrganizationsMembers_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsMembers_Organization on Organization {
     id
     name
     hasSsoProvider
+    usageDetails
+    activeUserCount
     ...AdminOrganizationsLayout_Organization
   }
   ${AdminOrganizationsLayout_OrganizationFragmentDoc}
@@ -56308,9 +56366,7 @@ export const useConfirmDeactivateUserDialog_UserFragmentDoc = gql`
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
-    fullName
-    firstName
-    lastName
+    ...UserReference_User
     email
     isOrgOwner
     createdAt
@@ -56326,6 +56382,7 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     ...useCreateOrUpdateUserDialog_User
     ...useConfirmDeactivateUserDialog_User
   }
+  ${UserReference_UserFragmentDoc}
   ${useCreateOrUpdateUserDialog_UserFragmentDoc}
   ${useConfirmDeactivateUserDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_UserFragment, unknown>;
@@ -65424,6 +65481,17 @@ export const AdminOrganizationsMembers_inviteUserToOrganizationDocument = gql`
 ` as unknown as DocumentNode<
   AdminOrganizationsMembers_inviteUserToOrganizationMutation,
   AdminOrganizationsMembers_inviteUserToOrganizationMutationVariables
+>;
+export const AdminOrganizationsMembers_updateOrganizationUserLimitDocument = gql`
+  mutation AdminOrganizationsMembers_updateOrganizationUserLimit($orgId: GID!, $limit: Int!) {
+    updateOrganizationUserLimit(orgId: $orgId, limit: $limit) {
+      ...AdminOrganizationsMembers_Organization
+    }
+  }
+  ${AdminOrganizationsMembers_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsMembers_updateOrganizationUserLimitMutation,
+  AdminOrganizationsMembers_updateOrganizationUserLimitMutationVariables
 >;
 export const AdminOrganizations_organizationsDocument = gql`
   query AdminOrganizations_organizations(

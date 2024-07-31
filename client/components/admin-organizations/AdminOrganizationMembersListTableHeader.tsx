@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Stack } from "@chakra-ui/react";
+import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -10,6 +10,9 @@ export interface AdminOrganizationMembersListTableHeaderProps {
   onSearchChange(value: string | null): void;
   onReload(): void;
   onInviteClick(): void;
+  onChangeLimit(): void;
+  usersCount: number;
+  usersLimit: number;
   hasSsoProvider: boolean;
 }
 
@@ -18,6 +21,9 @@ export function AdminOrganizationMembersListTableHeader({
   onSearchChange,
   onReload,
   onInviteClick,
+  onChangeLimit,
+  usersCount,
+  usersLimit,
   hasSsoProvider,
 }: AdminOrganizationMembersListTableHeaderProps) {
   const intl = useIntl();
@@ -40,17 +46,30 @@ export function AdminOrganizationMembersListTableHeader({
       {hasSsoProvider ? (
         <Badge colorScheme="primary">
           <FormattedMessage
-            id="component.organization-memebers-list-table-headr.sso-provider"
+            id="component.organization-memebers-list-table-header.sso-provider"
             defaultMessage="SSO provider"
           />
         </Badge>
       ) : null}
+      <Text>
+        <FormattedMessage
+          id="component.organization-memebers-list-table-header.users-usage"
+          defaultMessage="<b>Usage:</b> {usersCount}/{usersLimit} users"
+          values={{ usersCount, usersLimit }}
+        />
+      </Text>
       <Spacer />
-      <Box>
+      <HStack>
+        <Button onClick={onChangeLimit}>
+          <FormattedMessage
+            id="component.organization-memebers-list-table-header.change-limit"
+            defaultMessage="Change limit"
+          />
+        </Button>
         <Button colorScheme="primary" onClick={onInviteClick}>
           <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
         </Button>
-      </Box>
+      </HStack>
     </Stack>
   );
 }
