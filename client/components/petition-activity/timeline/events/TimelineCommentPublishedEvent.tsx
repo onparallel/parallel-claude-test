@@ -11,9 +11,9 @@ import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@pa
 import { FORMATS } from "@parallel/utils/dates";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { FormattedMessage } from "react-intl";
-import { PetitionFieldReference } from "../../PetitionFieldReference";
-import { UserOrContactReference } from "../../UserOrContactReference";
-import { UserReference } from "../../UserReference";
+import { PetitionFieldReference } from "../../../common/PetitionFieldReference";
+import { UserOrContactReference } from "../../../common/UserOrContactReference";
+import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

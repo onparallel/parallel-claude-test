@@ -10,8 +10,8 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
-import { UserReference } from "@parallel/components/petition-activity/UserReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
+import { UserReference } from "@parallel/components/common/UserReference";
 import { PetitionPermissionTypeSelect } from "@parallel/components/petition-common/PetitionPermissionTypeSelect";
 import {
   ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,

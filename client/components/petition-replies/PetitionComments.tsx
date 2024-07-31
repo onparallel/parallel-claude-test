@@ -18,7 +18,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { DateTime } from "../common/DateTime";
 import { PetitionFieldCommentExcerpt } from "../common/PetitionFieldCommentExcerpt";
-import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
+import { UserOrContactReference } from "../common/UserOrContactReference";
 
 export interface PetitionCommentsProps {
   petition: PetitionComments_PetitionBaseFragment;

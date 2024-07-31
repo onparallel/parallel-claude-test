@@ -10,7 +10,7 @@ import {
   SentReminderMessageDialog,
   useSentReminderMessageDialog,
 } from "../../dialogs/SentReminderMessageDialog";
-import { UserReference } from "../../UserReference";
+import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

@@ -10450,6 +10450,11 @@
     "context": "This team has no members yet"
   },
   {
+    "term": "component.user-group-reference.all-users-description",
+    "definition": "Este equipo contiene a todos los usuarios de la organización.",
+    "context": "This team contains all users from the organization."
+  },
+  {
     "term": "component.user-group-select.no-options",
     "definition": "No se han encontrado equipos",
     "context": "No teams have been found"
@@ -16028,11 +16033,6 @@
     "term": "timeline.signature-restarted.description",
     "definition": "El proceso de firma ha sido reiniciado {timeAgo}",
     "context": "The eSignature process has been restarted {timeAgo}"
-  },
-  {
-    "term": "user-group.all-members.description",
-    "definition": "Este equipo contiene a todos los usuarios de la organización.",
-    "context": "This team contains all users from the organization."
   },
   {
     "term": "util.generate-value-label-excel.header-label-english",

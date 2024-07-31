@@ -6,7 +6,7 @@ import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 import { SubscribedNotificationsIcon } from "../common/SubscribedNotificationsIcon";
 import { UserAvatar } from "../common/UserAvatar";
-import { UserGroupReference } from "../petition-activity/UserGroupReference";
+import { UserGroupReference } from "../common/UserGroupReference";
 
 export interface TemplateIconDefaultPermissionsProps extends PopoverProps {
   template: TemplateIconDefaultPermissions_PetitionTemplateFragment;

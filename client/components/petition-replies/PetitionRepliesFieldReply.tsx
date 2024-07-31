@@ -30,7 +30,7 @@ import { FileSize } from "../common/FileSize";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
-import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
+import { UserOrContactReference } from "../common/UserOrContactReference";
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";

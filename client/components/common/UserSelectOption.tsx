@@ -7,10 +7,7 @@ import {
   UserSelectOption_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
-  UserGroupReference,
-  userGroupReferenceText,
-} from "../petition-activity/UserGroupReference";
+import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
 import { HighlightText } from "./HighlightText";
 
 interface UserSelectOptionProps {

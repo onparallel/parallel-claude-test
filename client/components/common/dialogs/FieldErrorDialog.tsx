@@ -6,7 +6,7 @@ import {
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
+import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { FieldErrorDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";

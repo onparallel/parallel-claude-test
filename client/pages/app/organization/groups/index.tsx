@@ -18,7 +18,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import {
   OrganizationGroups_UserGroupFragment,
   OrganizationGroups_cloneUserGroupsDocument,

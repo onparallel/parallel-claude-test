@@ -26,7 +26,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
+import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   CreatePetitionFromProfilePrefillInput,

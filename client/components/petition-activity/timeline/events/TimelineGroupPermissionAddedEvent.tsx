@@ -5,8 +5,8 @@ import { PetitionPermissionTypeText } from "@parallel/components/petition-common
 import { TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { UserGroupReference } from "../../UserGroupReference";
-import { UserReference } from "../../UserReference";
+import { UserGroupReference } from "../../../common/UserGroupReference";
+import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

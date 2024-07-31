@@ -17,7 +17,7 @@ import {
 
 import { getOperationName } from "@apollo/client/utilities";
 import { useCallback } from "react";
-import { UserReference } from "../../UserReference";
+import { UserReference } from "../../../common/UserReference";
 import { useConfirmCancelScheduledMessageDialog } from "../../dialogs/ConfirmCancelScheduledMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";

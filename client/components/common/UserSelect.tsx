@@ -27,10 +27,7 @@ import Select, {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
-import {
-  UserGroupReference,
-  userGroupReferenceText,
-} from "../petition-activity/UserGroupReference";
+import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";

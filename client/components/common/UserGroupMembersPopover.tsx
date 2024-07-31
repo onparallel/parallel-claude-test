@@ -22,7 +22,7 @@ import {
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
-import { UserGroupReference } from "../petition-activity/UserGroupReference";
+import { UserGroupReference } from "./UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
 
 export interface UserGroupMembersPopoverProps {

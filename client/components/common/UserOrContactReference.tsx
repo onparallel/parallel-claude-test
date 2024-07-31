@@ -3,7 +3,7 @@ import { SystemStyleObject } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserOrContactReference_UserOrPetitionAccessFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
-import { ContactReference } from "../common/ContactReference";
+import { ContactReference } from "./ContactReference";
 import { UserReference } from "./UserReference";
 
 interface UserOrContactReferenceProps {

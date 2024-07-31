@@ -3,8 +3,8 @@ import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { UserGroupReference } from "../petition-activity/UserGroupReference";
-import { UserReference } from "../petition-activity/UserReference";
+import { UserGroupReference } from "./UserGroupReference";
+import { UserReference } from "./UserReference";
 import { SmallPopover } from "./SmallPopover";
 
 export function ShareButton({

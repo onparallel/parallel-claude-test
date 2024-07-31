@@ -4,8 +4,8 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { UserGroupReference } from "../../UserGroupReference";
-import { UserReference } from "../../UserReference";
+import { UserGroupReference } from "../../../common/UserGroupReference";
+import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

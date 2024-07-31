@@ -19,7 +19,7 @@ import {
   UserListPopover_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
-import { UserGroupReference } from "../petition-activity/UserGroupReference";
+import { UserGroupReference } from "./UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
 
 export function UserListPopover({

@@ -30,7 +30,7 @@ import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMe
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import {
   ProfileTypeFieldPermissionType,
   UpdateProfileTypeFieldPermissionInput,

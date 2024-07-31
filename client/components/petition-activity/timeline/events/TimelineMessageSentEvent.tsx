@@ -11,7 +11,7 @@ import {
   SentPetitionMessageDialog,
   useSentPetitionMessageDialog,
 } from "../../dialogs/SentPetitionMessageDialog";
-import { UserReference } from "../../UserReference";
+import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

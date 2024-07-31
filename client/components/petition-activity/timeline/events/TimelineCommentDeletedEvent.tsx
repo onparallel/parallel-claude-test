@@ -5,8 +5,8 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineCommentDeletedEvent_CommentDeletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { PetitionFieldReference } from "../../PetitionFieldReference";
-import { UserOrContactReference } from "../../UserOrContactReference";
+import { PetitionFieldReference } from "../../../common/PetitionFieldReference";
+import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

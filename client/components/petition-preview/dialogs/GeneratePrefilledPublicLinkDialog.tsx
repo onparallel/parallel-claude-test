@@ -18,7 +18,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PathName } from "@parallel/components/common/PathName";
-import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
+import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { useSelectFolderDialog } from "@parallel/components/petition-common/dialogs/SelectFolderDialog";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {

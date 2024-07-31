@@ -3,8 +3,8 @@ import { VariablesOf } from "@graphql-typed-document-node/core";
 import { useConfirmCommentMentionAndShareDialog } from "@parallel/components/common/dialogs/ConfirmCommentMentionAndShareDialog";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { removeMentionInputElements } from "@parallel/components/common/slate/CommentEditor";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
-import { UserReference } from "@parallel/components/petition-activity/UserReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
+import { UserReference } from "@parallel/components/common/UserReference";
 import {
   usePetitionCommentsMutations_createPetitionCommentDocument,
   usePetitionCommentsMutations_deletePetitionCommentDocument,

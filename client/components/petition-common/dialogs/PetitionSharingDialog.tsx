@@ -30,8 +30,8 @@ import { SubscribedNotificationsIcon } from "@parallel/components/common/Subscri
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
-import { UserReference } from "@parallel/components/petition-activity/UserReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
+import { UserReference } from "@parallel/components/common/UserReference";
 import {
   PetitionActivity_petitionDocument,
   PetitionBaseType,

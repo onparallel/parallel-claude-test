@@ -8,7 +8,7 @@ import {
 import {
   UserGroupReference,
   userGroupReferenceText,
-} from "@parallel/components/petition-activity/UserGroupReference";
+} from "@parallel/components/common/UserGroupReference";
 import {
   UserGroupLayout_QueryFragment,
   UserGroupLayout_UserGroupFragment,

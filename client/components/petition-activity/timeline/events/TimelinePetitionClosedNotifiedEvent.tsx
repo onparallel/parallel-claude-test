@@ -6,7 +6,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { UserReference } from "../../UserReference";
+import { UserReference } from "../../../common/UserReference";
 import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";

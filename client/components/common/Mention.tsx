@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { UserGroupReference } from "../petition-activity/UserGroupReference";
+import { UserGroupReference } from "./UserGroupReference";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 
 export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMentionFragment }) {

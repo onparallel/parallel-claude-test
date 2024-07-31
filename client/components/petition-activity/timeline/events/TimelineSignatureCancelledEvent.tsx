@@ -9,7 +9,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
-import { UserOrContactReference } from "../../UserOrContactReference";
+import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { useDeclinedSignatureReasonDialog } from "../../dialogs/DeclinedSignatureReasonDialog";
 import { useSignatureCancelledRequestErrorDialog } from "../../dialogs/SignatureCancelledRequestErrorDialog";
 import { TimelineIcon } from "../common/TimelineIcon";

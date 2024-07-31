@@ -11,7 +11,7 @@ import {
 import {
   UserGroupReference,
   userGroupReferenceText,
-} from "@parallel/components/petition-activity/UserGroupReference";
+} from "@parallel/components/common/UserGroupReference";
 import { UserLocale, createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
   PlateEditor,

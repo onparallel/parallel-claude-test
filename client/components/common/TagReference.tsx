@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import { TagReference_TagFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
-import { Tag } from "../common/Tag";
+import { Tag } from "./Tag";
 
 export function TagReference({ tag }: { tag?: Maybe<TagReference_TagFragment> }) {
   return tag ? (

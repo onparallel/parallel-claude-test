@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { UserOrContactReference } from "@parallel/components/petition-activity/UserOrContactReference";
+import { UserOrContactReference } from "@parallel/components/common/UserOrContactReference";
 import { PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";

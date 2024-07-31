@@ -15,7 +15,7 @@ import {
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,

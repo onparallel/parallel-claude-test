@@ -5,11 +5,8 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserGroupReference_UserGroupFragment, UserLocale } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
-import {
-  LocalizableUserTextRender,
-  localizableUserTextRender,
-} from "../common/LocalizableUserTextRender";
-import { SmallPopover } from "../common/SmallPopover";
+import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
+import { SmallPopover } from "./SmallPopover";
 
 interface UserGroupReferenceProps {
   userGroup?: Maybe<UserGroupReference_UserGroupFragment>;
@@ -33,7 +30,7 @@ export const UserGroupReference = Object.assign(
                 content={
                   <Text fontSize="sm">
                     <FormattedMessage
-                      id="user-group.all-members.description"
+                      id="component.user-group-reference.all-users-description"
                       defaultMessage="This team contains all users from the organization."
                     />
                   </Text>
