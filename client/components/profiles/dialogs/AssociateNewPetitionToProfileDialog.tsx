@@ -392,7 +392,6 @@ const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetit
               ref={ref}
               defaultOptions
               type="TEMPLATE"
-              permissionTypes={["OWNER", "WRITE"]}
               value={value}
               onChange={(v) => {
                 onChange(v?.id ?? null);
