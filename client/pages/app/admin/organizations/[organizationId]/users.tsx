@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
-import { ForbiddenIcon, KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
+import { Badge, Flex, Stack, Text, useToast } from "@chakra-ui/react";
+import { KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { useInviteUserDialog } from "@parallel/components/admin-organizations/dialogs/InviteUserDialog";
