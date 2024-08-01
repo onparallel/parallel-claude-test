@@ -26169,6 +26169,7 @@ export type RecipientViewComments_publicCreatePetitionCommentMutation = {
       id: string;
       unreadGeneralCommentCount: number;
       generalComments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
+      lastGeneralComment?: { __typename?: "PublicPetitionFieldComment"; id: string } | null;
     };
     author?:
       | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
@@ -64766,6 +64767,9 @@ export const RecipientViewComments_publicCreatePetitionCommentDocument = gql`
         id
         unreadGeneralCommentCount
         generalComments {
+          id
+        }
+        lastGeneralComment {
           id
         }
       }

@@ -159,6 +159,7 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                         userOrAccess={comment.author}
                         userUseYou
                         _activeContact={{ fontWeight: "bold" }}
+                        contactAsLink={false}
                       />
                       {`: `}
                       {comment.isInternal ? (

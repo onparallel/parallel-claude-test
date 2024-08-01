@@ -41,8 +41,8 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
   const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
   const isOpen = sidebarState !== "CLOSED";
 
-  const unreadedComments =
-    sumBy(petition.fields, (field) => field.unreadCommentCount) +
+  const unreadCount =
+    sumBy(petition.fields, (field) => (field.hasCommentsEnabled ? field.unreadCommentCount : 0)) +
     petition.unreadGeneralCommentCount;
 
   return (
@@ -106,7 +106,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
           icon={CommentIcon}
           onClick={() => setSidebarState("COMMENTS")}
           hasBorder
-          unreadCount={unreadedComments}
+          unreadCount={unreadCount}
           placement="left"
         />
         <SidebarIconButton
@@ -139,9 +139,10 @@ export function RecipientViewMobileNavigation({
   const granter = access!.granter;
   const contact = access!.contact!;
 
-  const unreadedComments = sumBy(petition.fields, (field) =>
-    field.hasCommentsEnabled ? field.unreadCommentCount : 0,
-  );
+  const unreadCount =
+    sumBy(petition.fields, (field) => (field.hasCommentsEnabled ? field.unreadCommentCount : 0)) +
+    petition.unreadGeneralCommentCount;
+
   const delegateAccess = useDelegateAccess();
 
   const handleDelegateAccess = () => {
@@ -198,7 +199,7 @@ export function RecipientViewMobileNavigation({
           })}
           icon={CommentIcon}
           onClick={() => setSidebarState("COMMENTS")}
-          unreadCount={unreadedComments}
+          unreadCount={unreadCount}
           placement="top"
         />
         <SidebarIconButton

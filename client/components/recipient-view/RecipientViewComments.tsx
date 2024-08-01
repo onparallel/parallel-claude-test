@@ -150,7 +150,6 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
           },
         });
         setDraft("");
-        //editorRef.current?.clear();
       } catch {}
     }
     closeRef.current?.focus();
@@ -525,6 +524,9 @@ const _mutations = [
           id
           unreadGeneralCommentCount
           generalComments {
+            id
+          }
+          lastGeneralComment {
             id
           }
         }
