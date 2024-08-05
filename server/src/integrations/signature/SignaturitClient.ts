@@ -183,7 +183,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
                   },
                 ],
               })),
-              expire_time: 0, // disable signaturit automatic reminder emails
+              expire_time: 365,
               reminders: 0,
             });
           },
