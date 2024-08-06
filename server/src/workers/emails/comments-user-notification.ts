@@ -35,8 +35,9 @@ export async function commentsUserNotification(
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id ?? "null");
 
-  const fieldsWithComments = await pMap([null, ...sortBy(_fields, (f) => f.position)], (f) =>
-    buildFieldWithComments(f, commentsByField, context, payload.user_id),
+  const fieldsWithComments = await pMap(
+    [...(isDefined(commentsByField["null"]) ? [null] : []), ...sortBy(_fields, (f) => f.position)],
+    (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id),
   );
 
   const { html, text, subject, from } = await buildEmail(

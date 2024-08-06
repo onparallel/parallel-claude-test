@@ -40,7 +40,7 @@ export async function buildFieldWithComments(
   return {
     field: field ? { ...pick(field, ["id", "title", "position"]) } : null,
     comments: await pMap(
-      sortBy(commentsByField[field?.id ?? "null"], (c) => c.created_at),
+      sortBy(commentsByField[field?.id ?? "null"] ?? [], (c) => c.created_at),
       async (c) => {
         return {
           id: c.id,
