@@ -70,7 +70,8 @@ export function requiresRefresh(currentDate: Date) {
       const selectValueId = monitoring.searchFrequency.profileTypeFieldId;
       const selectPfv = selectValues.find((sv) => sv.profile_type_field_id === selectValueId);
       if (!selectPfv) {
-        throw new Error(`ProfileFieldValue with profile_type_field_id ${selectValueId} not found`);
+        // the SELECT property referenced in monitoring is not found (not replied, deleted, etc)
+        return false;
       }
       const frequency = monitoring.searchFrequency.options.find(
         (option) => option.value === selectPfv.content.value,

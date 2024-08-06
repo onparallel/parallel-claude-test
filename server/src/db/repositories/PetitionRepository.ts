@@ -2605,13 +2605,14 @@ export class PetitionRepository extends BaseRepository {
 
     const fileUploadIds = deletedReplies
       .filter((r) => isFileTypeField(r.type))
-      .map((r) => r.content["file_upload_id"] as number);
+      .map((r) => r.content["file_upload_id"] as number)
+      .filter(isDefined);
 
     if (fileUploadIds.length > 0) {
       await this.files.deleteFileUpload(fileUploadIds, deletedBy);
     }
 
-    return { field, reply: deletedReplies.find((r) => r.id === replyId)! };
+    return { field, reply };
   }
 
   /**

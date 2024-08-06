@@ -384,6 +384,26 @@ describe("monitoringUtils", () => {
       ).toEqual(false);
     });
 
+    test("variable frequency - no selectValues", () => {
+      expect(
+        requiresRefresh(new Date("2024-03-01"))(
+          { created_at: new Date("2024-01-01") },
+          {
+            searchFrequency: {
+              type: "VARIABLE",
+              profileTypeFieldId: 1,
+              options: [
+                { value: "high", frequency: "1_MONTHS" },
+                { value: "medium", frequency: "6_MONTHS" },
+                { value: "low", frequency: "1_YEARS" },
+              ],
+            },
+          },
+          [],
+        ),
+      ).toEqual(false);
+    });
+
     test("with passing activation condition and fixed frequency - expired", () => {
       expect(
         requiresRefresh(new Date("2024-02-01"))(
