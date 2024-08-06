@@ -301,6 +301,7 @@ function DynamicSelectOptionsDropzone({
         maxSize={MAX_FILESIZE}
         multiple={false}
         onDrop={handleFileDrop}
+        textAlign="center"
       >
         <Text pointerEvents="none" fontSize="sm">
           <FormattedMessage

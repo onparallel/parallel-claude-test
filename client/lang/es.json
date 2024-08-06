@@ -4841,7 +4841,7 @@
   },
   {
     "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model",
-    "definition": "Descargar modelo de importación de opciones",
+    "definition": "Descargar modelo de importación",
     "context": "Download option loading model"
   },
   {

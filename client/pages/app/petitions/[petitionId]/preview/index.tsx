@@ -214,13 +214,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const highlight = useHighlightElement();
   useEffect(() => {
     if (isDefined(router.query.field)) {
-      const { field: fieldId, parentReply: parentReplyId } = router.query;
+      const { field: fieldId, parentReply: parentReplyId, sufix } = router.query;
 
       const field = allFields.find((f) => f.id === fieldId);
       if (field) {
         focusPetitionField({
           field,
           parentReplyId: parentReplyId as string | undefined,
+          sufix: sufix as string | undefined,
         });
         const element = document.getElementById(`field-${field.id}`);
         highlight(element, true);

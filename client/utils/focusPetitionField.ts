@@ -13,10 +13,12 @@ export function focusPetitionField({
   field,
   parentReplyId,
   usePreviewReplies,
+  sufix,
 }: {
   field: PetitionFieldSelection;
   parentReplyId?: string;
   usePreviewReplies?: boolean;
+  sufix?: string;
 }) {
   const replies =
     usePreviewReplies && field.__typename === "PetitionField"
@@ -34,7 +36,7 @@ export function focusPetitionField({
   }
 
   if (field.type === "DYNAMIC_SELECT" && replies.length) {
-    id += "-0";
+    id += sufix ?? "-0";
   }
 
   const element =

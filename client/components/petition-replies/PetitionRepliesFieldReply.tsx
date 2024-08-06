@@ -78,9 +78,8 @@ export function PetitionRepliesFieldReply({
       <NakedLink
         href={buildUrlToSection("preview", {
           field: reply.field!.id,
-          reply: `${reply.field!.id}${reply.parent ? `-${reply.parent.id}` : ""}-${
-            reply.id
-          }${idSuffix}`,
+          ...(reply.parent ? { parentReply: reply.parent.id } : {}),
+          ...(idSuffix ? { sufix: idSuffix } : {}),
         })}
       >
         <IconButtonWithTooltip
