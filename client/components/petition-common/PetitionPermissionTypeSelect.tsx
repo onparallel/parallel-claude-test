@@ -25,7 +25,7 @@ export const PetitionPermissionTypeSelect = forwardRef<
         : [
             {
               label: intl.formatMessage({
-                id: "petition-permission-type.owner",
+                id: "generic.petition-permission-type-owner",
                 defaultMessage: "Owner",
               }),
               value: "OWNER",
@@ -34,14 +34,14 @@ export const PetitionPermissionTypeSelect = forwardRef<
           ]),
       {
         label: intl.formatMessage({
-          id: "petition-permission-type.write",
+          id: "generic.petition-permission-type-write",
           defaultMessage: "Editor",
         }),
         value: "WRITE",
       },
       {
         label: intl.formatMessage({
-          id: "petition-permission-type.reader",
+          id: "generic.petition-permission-type-reader",
           defaultMessage: "Reader",
         }),
         value: "READ",

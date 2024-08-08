@@ -10,11 +10,11 @@ export const PetitionPermissionTypeText = chakraForwardRef<
   return (
     <Text ref={ref as any} as="span" {...props}>
       {type === "OWNER" ? (
-        <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
+        <FormattedMessage id="generic.petition-permission-type-owner" defaultMessage="Owner" />
       ) : type === "WRITE" ? (
-        <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
+        <FormattedMessage id="generic.petition-permission-type-write" defaultMessage="Editor" />
       ) : (
-        <FormattedMessage id="petition-permission-type.read" defaultMessage="Reader" />
+        <FormattedMessage id="generic.petition-permission-type-read" defaultMessage="Reader" />
       )}
     </Text>
   );

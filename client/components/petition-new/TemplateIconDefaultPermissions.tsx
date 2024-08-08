@@ -35,12 +35,18 @@ export function TemplateIconDefaultPermissions({
 
                 const permissionType =
                   effectiveDefaultPermissions?.permissionType === "OWNER" ? (
-                    <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
+                    <FormattedMessage
+                      id="generic.petition-permission-type-owner"
+                      defaultMessage="Owner"
+                    />
                   ) : effectiveDefaultPermissions?.permissionType === "WRITE" ? (
-                    <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
+                    <FormattedMessage
+                      id="generic.petition-permission-type-write"
+                      defaultMessage="Editor"
+                    />
                   ) : effectiveDefaultPermissions?.permissionType === "READ" ? (
                     <FormattedMessage
-                      id="petition-permission-type.reader"
+                      id="generic.petition-permission-type-reader"
                       defaultMessage="Reader"
                     />
                   ) : null;
@@ -66,10 +72,13 @@ export function TemplateIconDefaultPermissions({
               if (p.__typename === "TemplateDefaultUserGroupPermission") {
                 const permissionType =
                   p.permissionType === "WRITE" ? (
-                    <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
+                    <FormattedMessage
+                      id="generic.petition-permission-type-write"
+                      defaultMessage="Editor"
+                    />
                   ) : p.permissionType === "READ" ? (
                     <FormattedMessage
-                      id="petition-permission-type.reader"
+                      id="generic.petition-permission-type-reader"
                       defaultMessage="Reader"
                     />
                   ) : null;

@@ -11440,6 +11440,11 @@
     "context": "I understand"
   },
   {
+    "term": "generic.id",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
     "term": "generic.import",
     "definition": "Importar",
     "context": "Import"
@@ -11863,6 +11868,26 @@
     "term": "generic.petition-field-type-text",
     "definition": "Respuestas largas",
     "context": "Long replies"
+  },
+  {
+    "term": "generic.petition-permission-type-owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
+    "term": "generic.petition-permission-type-read",
+    "definition": "Lector",
+    "context": "Reader"
+  },
+  {
+    "term": "generic.petition-permission-type-reader",
+    "definition": "Lector",
+    "context": "Reader"
+  },
+  {
+    "term": "generic.petition-permission-type-write",
+    "definition": "Editor",
+    "context": "Editor"
   },
   {
     "term": "generic.plans.enterprise",
@@ -12493,11 +12518,6 @@
     "term": "organization-usage.visually-hidden.out-of",
     "definition": "de",
     "context": "out of"
-  },
-  {
-    "term": "generic.id",
-    "definition": "ID",
-    "context": "ID"
   },
   {
     "term": "organization-users.invite-user.add-in",
@@ -14715,11 +14735,6 @@
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
   },
   {
-    "term": "page.users.inactive-user",
-    "definition": "Usuario inactivo",
-    "context": "Inactive user"
-  },
-  {
     "term": "page.users.login-as",
     "definition": "Acceder como...",
     "context": "Login as..."
@@ -14858,26 +14873,6 @@
     "term": "petition-access.status-pending",
     "definition": "Pendiente",
     "context": "Pending"
-  },
-  {
-    "term": "petition-permission-type.owner",
-    "definition": "Propietario",
-    "context": "Owner"
-  },
-  {
-    "term": "petition-permission-type.read",
-    "definition": "Lector",
-    "context": "Reader"
-  },
-  {
-    "term": "petition-permission-type.reader",
-    "definition": "Lector",
-    "context": "Reader"
-  },
-  {
-    "term": "petition-permission-type.write",
-    "definition": "Editor",
-    "context": "Editor"
   },
   {
     "term": "petition-replies.note-popover",
