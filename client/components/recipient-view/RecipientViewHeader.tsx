@@ -18,15 +18,16 @@ import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
+import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
 import { useLastSaved } from "./LastSavedProvider";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
+import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
-import { useHelpModal } from "./hooks/useHelpModal";
-import { useEffect, useState } from "react";
 
 interface RecipientViewHeaderProps {
   access: RecipientViewHeader_PublicPetitionAccessFragment;
@@ -59,12 +60,24 @@ export const RecipientViewHeader = Object.assign(
     const hasClientPortalAccess = access.hasClientPortalAccess;
     const organization = access.petition.organization;
     const [poppoverClosed, setPoppoverClosed] = useState(true);
+    const [isFirstTime, setIsFirstTime] = useUserPreference("recipient-first-time-check", "");
+    const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
 
     useEffect(() => {
       setPoppoverClosed(false);
     }, []);
 
-    const handleHelpClick = useHelpModal({ tone });
+    function showHelpModal() {
+      showRecipientViewHelpDialog.ignoringDialogErrors({ tone }).then();
+    }
+
+    useEffect(() => {
+      if (isFirstTime !== "check") {
+        setIsFirstTime("check");
+        showHelpModal();
+      }
+    }, []);
+
     const { lastSaved } = useLastSaved();
 
     const delegateAccess = useDelegateAccess();
@@ -210,7 +223,7 @@ export const RecipientViewHeader = Object.assign(
             />
             {hasClientPortalAccess ? null : (
               <IconButtonWithTooltip
-                onClick={handleHelpClick}
+                onClick={showHelpModal}
                 icon={<HelpOutlineIcon boxSize={6} />}
                 label={intl.formatMessage({
                   id: "generic.recipient-view-guide-me",

@@ -28,8 +28,7 @@ import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTa
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { useTone } from "../common/ToneProvider";
-import { useHelpModal } from "./hooks/useHelpModal";
-
+import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 export function RecipientViewMenuButton({
   keycode,
   hasClientPortalAccess,
@@ -45,7 +44,12 @@ export function RecipientViewMenuButton({
 }) {
   const intl = useIntl();
   const tone = useTone();
-  const handleHelpClick = useHelpModal({ tone });
+  const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
+
+  function showHelpModal() {
+    showRecipientViewHelpDialog.ignoringDialogErrors({ tone }).then();
+  }
+
   const showExportPdfInMenu = useBreakpointValue({
     base: true,
     md: false,
@@ -158,7 +162,7 @@ export function RecipientViewMenuButton({
             )}
 
             <MenuItem
-              onClick={handleHelpClick}
+              onClick={showHelpModal}
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
             >
               <FormattedMessage id="generic.recipient-view-guide-me" defaultMessage="Guide me" />
@@ -201,7 +205,7 @@ export function RecipientViewMenuButton({
               defaultMessage="Export to PDF"
             />
           </MenuItem>
-          <MenuItem onClick={handleHelpClick} icon={<HelpOutlineIcon fontSize="md" />}>
+          <MenuItem onClick={showHelpModal} icon={<HelpOutlineIcon fontSize="md" />}>
             <FormattedMessage id="generic.recipient-view-guide-me" defaultMessage="Guide me" />
           </MenuItem>
         </MenuList>
