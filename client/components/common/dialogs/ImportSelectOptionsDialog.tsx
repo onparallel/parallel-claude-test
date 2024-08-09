@@ -110,16 +110,12 @@ function ImportSelectOptionsDialog({
             multiple={false}
             onDrop={handleFileDrop}
           >
-            {false ? (
-              <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="primary.500" />
-            ) : (
-              <Text pointerEvents="none" fontSize="sm">
-                <FormattedMessage
-                  id="generic.dropzone-single-default"
-                  defaultMessage="Drag the file here, or click to select it"
-                />
-              </Text>
-            )}
+            <Text pointerEvents="none" fontSize="sm">
+              <FormattedMessage
+                id="generic.dropzone-single-default"
+                defaultMessage="Drag the file here, or click to select it"
+              />
+            </Text>
           </Dropzone>
           {fileDropError && (
             <Text color="red.500" fontSize="sm">
