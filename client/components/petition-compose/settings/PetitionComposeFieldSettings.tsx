@@ -34,6 +34,7 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
+import { PetitionComposeIdVerificationSettings } from "./fields/PetitionComposeIdVerificationSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petition: PetitionComposeFieldSettings_PetitionBaseFragment;
@@ -63,6 +64,7 @@ const COMPONENTS: Partial<
   NUMBER: PetitionComposeNumberSettings,
   SHORT_TEXT: PetitionComposeShortTextSettings,
   BACKGROUND_CHECK: PetitionComposeBackgroundCheckSettings,
+  ID_VERIFICATION: PetitionComposeIdVerificationSettings,
 };
 
 export const PetitionComposeFieldSettings = Object.assign(
@@ -106,6 +108,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         "ES_TAX_DOCUMENTS",
         "DOW_JONES_KYC",
         "BACKGROUND_CHECK",
+        "ID_VERIFICATION",
       ].includes(field.type);
 
       const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);

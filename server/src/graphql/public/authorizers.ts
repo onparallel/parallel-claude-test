@@ -4,6 +4,7 @@ import { IncomingMessage } from "http";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, partition, uniq } from "remeda";
+import { FeatureFlagName } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
@@ -398,6 +399,20 @@ export function validPetitionFieldCommentContent<
         throw new ForbiddenError("Mention not allowed");
       }
     }
+    return true;
+  };
+}
+
+export function organizationHasFeatureFlag<TypeName extends string, FieldName extends string>(
+  name: FeatureFlagName,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
+    const hasFF = await ctx.featureFlags.orgHasFeatureFlag(petition.org_id, name);
+    if (!hasFF) {
+      throw new ForbiddenError("Feature flag not found");
+    }
+
     return true;
   };
 }

@@ -21,6 +21,7 @@ import { TaskRepository } from "./db/repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
+import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { AI_COMPLETION_SERVICE, AiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
@@ -30,11 +31,15 @@ import {
   BackgroundCheckService,
 } from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
-import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService } from "./services/EncryptionService";
+import {
+  EVENT_SUBSCRIPTION_SERVICE,
+  EventSubscriptionService,
+} from "./services/EventSubscriptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
 import { I18N_SERVICE, II18nService } from "./services/I18nService";
+import { ID_VERIFICATION_SERVICE, IdVerificationService } from "./services/IdVerificationService";
 import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
 import {
   IIntegrationsSetupService,
@@ -66,10 +71,6 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
-import {
-  EVENT_SUBSCRIPTION_SERVICE,
-  EventSubscriptionService,
-} from "./services/EventSubscriptionService";
 
 @injectable()
 export class ApiContext {
@@ -115,6 +116,7 @@ export class ApiContext {
     public readonly integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE)
     public readonly profilesSetup: IProfilesSetupService,
+    @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -167,6 +169,7 @@ export class WorkerContext {
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
     @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
     @inject(REDIS) public readonly redis: IRedis,
+    @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
 
     // Repositories
     public readonly contacts: ContactRepository,

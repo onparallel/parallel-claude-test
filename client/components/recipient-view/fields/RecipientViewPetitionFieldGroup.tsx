@@ -41,6 +41,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
+import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -258,6 +259,14 @@ function RecipientViewPetitionFieldGroupField(props: {
           }
           onRefreshField={onRefreshField}
           hideDeleteReplyButton
+        />
+      ) : field.type === "ID_VERIFICATION" ? (
+        <RecipientViewPetitionFieldIdVerification
+          {...commonProps}
+          onStartAsyncFieldCompletion={async () => {
+            return await onStartAsyncFieldCompletion(field.id, parentReplyId);
+          }}
+          onRefreshField={onRefreshField}
         />
       ) : null}
     </Box>

@@ -104,7 +104,9 @@ export function validateCreatePetitionFieldReplyInput<
         const isValid =
           isDefined(petitionFieldReply) &&
           ((field.type === "FILE_UPLOAD" &&
-            ["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(petitionFieldReply.type)) ||
+            ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(
+              petitionFieldReply.type,
+            )) ||
             field.type === petitionFieldReply.type);
 
         const hasAccess =

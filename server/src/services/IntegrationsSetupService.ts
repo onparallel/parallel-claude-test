@@ -9,6 +9,10 @@ import {
 import { AzureOpenAiIntegration } from "../integrations/ai-completion/AzureOpenAiIntegration";
 import { DowJonesIntegration } from "../integrations/dow-jones/DowJonesIntegration";
 import {
+  BANKFLIP_ID_VERIFICATION_INTEGRATION,
+  BankflipIdVerificationIntegration,
+} from "../integrations/id-verification/bankflip/BankflipIdVerificationIntegration";
+import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/signature/SignaturitIntegration";
@@ -40,6 +44,13 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">>;
+  createBankflipIdVerificationIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"ID_VERIFICATION", "BANKFLIP">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"ID_VERIFICATION", "BANKFLIP">>;
 }
 
 @injectable()
@@ -49,6 +60,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
     @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
+    @inject(BANKFLIP_ID_VERIFICATION_INTEGRATION)
+    private bankflipIdVerificationIntegration: BankflipIdVerificationIntegration,
   ) {}
 
   private async authenticateSignaturitApiKey(apiKey: string) {
@@ -99,7 +112,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     );
   }
 
-  public async createDowJonesIntegration(
+  async createDowJonesIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     credentials: Pick<
       IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">,
@@ -124,5 +137,15 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     t?: Knex.Transaction<any, any[]> | undefined,
   ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">> {
     return await this.azureOpenAiIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async createBankflipIdVerificationIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: { CREDENTIALS: { API_KEY: string; HOST: string; WEBHOOK_SECRET: string } };
+    },
+    createdBy: string,
+    t?: Knex.Transaction<any, any[]> | undefined,
+  ): Promise<EnhancedOrgIntegration<"ID_VERIFICATION", "BANKFLIP">> {
+    return await this.bankflipIdVerificationIntegration.createOrgIntegration(data, createdBy, t);
   }
 }

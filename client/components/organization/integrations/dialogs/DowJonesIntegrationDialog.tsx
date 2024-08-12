@@ -149,7 +149,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
           {isInvalid ? (
             <Text color="red.500">
               <FormattedMessage
-                id="omponent.dow-jones-integration-dialog.invalid-credentials-message"
+                id="generic.integration-invalid-credentials-message"
                 defaultMessage="The credentials validation has failed, please check that everything is correct."
               />
             </Text>
@@ -158,10 +158,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
       }
       confirm={
         <Button type="submit" colorScheme="primary" variant="solid" isLoading={isSubmitting}>
-          <FormattedMessage
-            id="component.dow-jones-integration-dialog.connect"
-            defaultMessage="Connect"
-          />
+          <FormattedMessage id="generic.connect" defaultMessage="Connect" />
         </Button>
       }
       {...props}

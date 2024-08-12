@@ -76,6 +76,7 @@ function _completedFieldReplies(
       });
     case "FILE_UPLOAD":
     case "ES_TAX_DOCUMENTS":
+    case "ID_VERIFICATION":
     case "DOW_JONES_KYC":
       return replies.filter((reply) => reply.content.uploadComplete);
     default:

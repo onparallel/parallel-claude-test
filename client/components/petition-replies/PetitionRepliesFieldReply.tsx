@@ -35,6 +35,7 @@ import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRisk
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
@@ -196,33 +197,48 @@ export function PetitionRepliesFieldReply({
                         .join("_")
                     )}
                   </Text>
-                ) : isFileTypeField(type) && type !== "DOW_JONES_KYC" ? (
-                  <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                    <VisuallyHidden>
-                      {intl.formatMessage({
-                        id: "generic.file-name",
-                        defaultMessage: "File name",
-                      })}
-                    </VisuallyHidden>
-                    <Text as="span" wordBreak="break-all">
-                      {content.filename}
-                      {" - "}
-                      <Text
-                        as="span"
-                        aria-label={intl.formatMessage({
-                          id: "generic.file-size",
-                          defaultMessage: "File size",
+                ) : type === "ID_VERIFICATION" ? (
+                  <PetitionRepliesFieldIdVerificationReply
+                    reply={reply}
+                    editReplyIconButton={editReplyIconButton()}
+                  />
+                ) : type === "DOW_JONES_KYC" ? (
+                  <Stack spacing={1}>
+                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                      <VisuallyHidden>
+                        {intl.formatMessage({
+                          id: "generic.name",
+                          defaultMessage: "Name",
                         })}
-                        fontSize="sm"
-                        color="gray.500"
-                      >
-                        <FileSize value={content.size} />
+                      </VisuallyHidden>
+                      <Text as="span">
+                        <Text as="span" display="inline-block" marginEnd={2}>
+                          {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+                        </Text>
+                        {content.entity.name}
+                        {" - "}
+                        <Text
+                          as="span"
+                          aria-label={intl.formatMessage({
+                            id: "generic.file-size",
+                            defaultMessage: "File size",
+                          })}
+                          fontSize="sm"
+                          color="gray.500"
+                        >
+                          <FileSize value={content.size} />
+                        </Text>
+                        <Box display="inline-block" marginStart={2}>
+                          {editReplyIconButton()}
+                        </Box>
                       </Text>
-                      <Box display="inline-block" marginStart={2}>
-                        {editReplyIconButton()}
-                      </Box>
-                    </Text>
-                  </Flex>
+                    </Flex>
+                    <Flex flexWrap="wrap" gap={2} alignItems="center">
+                      {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
+                        <DowJonesRiskLabel key={i} risk={hint} />
+                      ))}
+                    </Flex>
+                  </Stack>
                 ) : type === "BACKGROUND_CHECK" ? (
                   <Stack spacing={1}>
                     <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
@@ -274,43 +290,33 @@ export function PetitionRepliesFieldReply({
                       </Box>
                     </Flex>
                   </Stack>
-                ) : type === "DOW_JONES_KYC" ? (
-                  <Stack spacing={1}>
-                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                      <VisuallyHidden>
-                        {intl.formatMessage({
-                          id: "generic.name",
-                          defaultMessage: "Name",
+                ) : isFileTypeField(type) ? (
+                  <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                    <VisuallyHidden>
+                      {intl.formatMessage({
+                        id: "generic.file-name",
+                        defaultMessage: "File name",
+                      })}
+                    </VisuallyHidden>
+                    <Text as="span" wordBreak="break-all">
+                      {content.filename}
+                      {" - "}
+                      <Text
+                        as="span"
+                        aria-label={intl.formatMessage({
+                          id: "generic.file-size",
+                          defaultMessage: "File size",
                         })}
-                      </VisuallyHidden>
-                      <Text as="span">
-                        <Text as="span" display="inline-block" marginEnd={2}>
-                          {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
-                        </Text>
-                        {content.entity.name}
-                        {" - "}
-                        <Text
-                          as="span"
-                          aria-label={intl.formatMessage({
-                            id: "generic.file-size",
-                            defaultMessage: "File size",
-                          })}
-                          fontSize="sm"
-                          color="gray.500"
-                        >
-                          <FileSize value={content.size} />
-                        </Text>
-                        <Box display="inline-block" marginStart={2}>
-                          {editReplyIconButton()}
-                        </Box>
+                        fontSize="sm"
+                        color="gray.500"
+                      >
+                        <FileSize value={content.size} />
                       </Text>
-                    </Flex>
-                    <Flex flexWrap="wrap" gap={2} alignItems="center">
-                      {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
-                        <DowJonesRiskLabel key={i} risk={hint} />
-                      ))}
-                    </Flex>
-                  </Stack>
+                      <Box display="inline-block" marginStart={2}>
+                        {editReplyIconButton()}
+                      </Box>
+                    </Text>
+                  </Flex>
                 ) : (
                   <HStack>
                     {["SELECT", "CHECKBOX"].includes(type) &&
@@ -370,13 +376,13 @@ export function PetitionRepliesFieldReply({
                   defaultMessage="There was an error uploading the file. Please request a new upload."
                 />
               </Text>
-            ) : type === "ES_TAX_DOCUMENTS" && reply.content.error ? (
+            ) : ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(type) && reply.content.error ? (
               <EsTaxDocumentsContentErrorMessage
                 type={reply.content.type}
                 error={reply.content.error}
               />
             ) : null
-          ) : type === "ES_TAX_DOCUMENTS" &&
+          ) : ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(type) &&
             reply.content.warning === "manual_review_required" &&
             reply.status === "PENDING" ? (
             <Text fontSize="xs" color="yellow.500">
@@ -482,7 +488,6 @@ PetitionRepliesFieldReply.fragments = {
       id
       content
       status
-      metadata
       field {
         id
         type

@@ -2380,11 +2380,6 @@
     "context": "a moment ago"
   },
   {
-    "term": "component.deactivate-dow-jones-integration-dialog.deactivate",
-    "definition": "Desactivar",
-    "context": "Deactivate"
-  },
-  {
     "term": "component.deactivate-dow-jones-integration-dialog.description-1",
     "definition": "Si continúas, se desactivará la integración con Dow Jones y Parallel no podrá acceder a tu cuenta de Dow Jones para realizar búsquedas.",
     "context": "If you continue, the integration with Dow Jones will be disabled and Parallel will not be able to access your Dow Jones account to perform searches."
@@ -2583,11 +2578,6 @@
     "term": "component.dow-jones-integration-dialog.client-id",
     "definition": "ID del cliente",
     "context": "Client ID"
-  },
-  {
-    "term": "component.dow-jones-integration-dialog.connect",
-    "definition": "Conectar",
-    "context": "Connect"
   },
   {
     "term": "component.dow-jones-integration-dialog.description",
@@ -3193,6 +3183,16 @@
     "term": "component.feature-flag-descriptions.hide-recipient-view-contents-name",
     "definition": "Ocultar Contenidos en destinatario",
     "context": "Hide recipient view contents"
+  },
+  {
+    "term": "component.feature-flag-descriptions.id-verification-description",
+    "definition": "Activa el campo de verificación de identidad en la organización.",
+    "context": "Enables the ID Verification petition field on the organization."
+  },
+  {
+    "term": "component.feature-flag-descriptions.id-verification-name",
+    "definition": "Verificación de identidad",
+    "context": "ID Verification"
   },
   {
     "term": "component.feature-flag-descriptions.integrations",
@@ -5225,6 +5225,26 @@
     "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
+    "term": "component.petition-compose-id-verification-settings.all",
+    "definition": "Todos",
+    "context": "All"
+  },
+  {
+    "term": "component.petition-compose-id-verification-settings.allowed-documents",
+    "definition": "Documentos permitidos",
+    "context": "Allowed documents"
+  },
+  {
+    "term": "component.petition-compose-id-verification-settings.type-of-verification",
+    "definition": "Tipo de verificación",
+    "context": "Type of verification"
+  },
+  {
+    "term": "component.petition-compose-id-verification-settings.x-documents-selected",
+    "definition": "{count, plural, =1 {1 seleccionado} other {# seleccionados}}",
+    "context": "{count} selected"
+  },
+  {
     "term": "component.petition-compose-new-field-drawer.category-files",
     "definition": "Archivos y fuentes externas",
     "context": "Files and external sources"
@@ -6143,6 +6163,111 @@
     "term": "component.petition-replies-field-comments.template-read-only-alert",
     "definition": "<b>Solo previsualización</b> - Los comentarios están desactivados.",
     "context": "<b>Preview only</b> - Comments are disabled."
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.birth-place",
+    "definition": "Lugar de nacimiento",
+    "context": "Birth place"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.checked-mrz",
+    "definition": "Verificación de MRZ",
+    "context": "Checked MRZ"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.coherent-dates",
+    "definition": "Fechas coherentes",
+    "context": "Coherent dates"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.date-of-issue",
+    "definition": "Fecha de emisión",
+    "context": "Date of issue"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.driver-license-number",
+    "definition": "Permiso de conducir",
+    "context": "Driver license"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.expired-document-poppover",
+    "definition": "Este documento ha caducado. Puedes rechazar la respuesta y solicitarlo de nuevo.",
+    "context": "This document has expired. You can reject the reply and request it again."
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.expiry-date",
+    "definition": "Fecha de caducidad",
+    "context": "Expiry date"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.face-front-side",
+    "definition": "Cara frontal",
+    "context": "Face front side"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.id-number",
+    "definition": "DNI",
+    "context": "ID"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.issuing-country",
+    "definition": "País emisor",
+    "context": "Issuing country"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.liveness",
+    "definition": "Prueba de vida",
+    "context": "Liveness"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.matched-expected-document",
+    "definition": "Documento coincidente esperado",
+    "context": "Matched expected document"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.nationality",
+    "definition": "Nacionalidad",
+    "context": "Nationality"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.not-shown-screen",
+    "definition": "No mostrado en pantalla",
+    "context": "Not shown screen"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.only-one-face",
+    "definition": "Solo una cara",
+    "context": "Only one face"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.passport-number",
+    "definition": "Pasaporte",
+    "context": "Passport"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.residence-permit-number",
+    "definition": "Permiso de residencia",
+    "context": "Residence permit"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.selfie-completed",
+    "definition": "Vídeo/Selfi completado",
+    "context": "Video/Selfie completed"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.uncompromised-document",
+    "definition": "Documento no comprometido",
+    "context": "Uncompromised document"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.unexpired-document-poppover",
+    "definition": "Este documento está en vigor",
+    "context": "This document is valid"
   },
   {
     "term": "component.petition-replies-field-reply.approve",
@@ -8145,6 +8270,21 @@
     "context": "Your answers are automatically saved."
   },
   {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-1",
+    "definition": "Si {tone, select, INFORMAL {continúas, comenzarás} other {continúa, comenzará}} de nuevo el proceso de verificación.",
+    "context": "If you continue, you will start the verification process again."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-2",
+    "definition": "Una vez finalizado, el documento actual se sobreescribirá con el nuevo.",
+    "context": "Once completed, the current document will be overwritten with the new one."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.header",
+    "definition": "Comenzar de nuevo",
+    "context": "Start over"
+  },
+  {
     "term": "component.recipient-view-information.heading",
     "definition": "Información",
     "context": "Information"
@@ -8233,6 +8373,41 @@
     "term": "component.recipient-view-petition-field-group.remove-reply-button",
     "definition": "Borrar {groupName}",
     "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.error",
+    "definition": "No hemos podido verificar {tone, select, INFORMAL {tus} other {sus}} documentos. Por favor, {tone, select, INFORMAL {inténtalo} other {inténtelo}} de nuevo.",
+    "context": "We were unable to verify your documents. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.id-document-successfully-completed",
+    "definition": "Verificación de documento de identidad realizada con éxito",
+    "context": "Identity document verification completed successfully"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.start-again",
+    "definition": "Comenzar de nuevo",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-canceled",
+    "definition": "La verificación se canceló antes de completarse. Por favor, {tone, select, INFORMAL {inténtalo} other {inténtelo}} de nuevo.",
+    "context": "The verification was cancelled before completion. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-not-completed",
+    "definition": "La verificación de identidad no se completó",
+    "context": "Identity verification not completed"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verifying-documentation",
+    "definition": "Verificando {tone, select, INFORMAL {tus} other {sus}} documentos...",
+    "context": "Verifying your documents..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.video-successfully-completed",
+    "definition": "Video-identificación realizado con éxito",
+    "context": "Video identification completed successfully"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -8988,6 +9163,61 @@
     "term": "component.select-folder-dialog.header",
     "definition": "Seleccione carpeta",
     "context": "Select folder"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.description",
+    "definition": "Selecciona los documentos que quieres permitir en la validación.",
+    "context": "Select the documents you want to allow in the validation."
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.driver-license",
+    "definition": "Carnet de conducir",
+    "context": "Driver's license"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.error-message",
+    "definition": "Por favor, selecciona al menos un tipo de documento.",
+    "context": "Please, select at least one document type."
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.extended",
+    "definition": "Extendida",
+    "context": "Extended"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.extended-description",
+    "definition": "Documento de identidad + Selfi",
+    "context": "Identity card + Selfie"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.id-card",
+    "definition": "Documento nacional de identidad",
+    "context": "National identity card"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.passport",
+    "definition": "Pasaporte",
+    "context": "Passport"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.residence-permit",
+    "definition": "Permiso de residencia",
+    "context": "Residence permit"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.simple",
+    "definition": "Simple",
+    "context": "Simple"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.simple-description",
+    "definition": "Solo documento de identidad",
+    "context": "Identity document only"
+  },
+  {
+    "term": "component.select-type-of-documents-dialog.title",
+    "definition": "Tipos de documentos",
+    "context": "Types of documents"
   },
   {
     "term": "component.send-button.schedule",
@@ -10235,11 +10465,6 @@
     "context": "confirm"
   },
   {
-    "term": "component.use-confirm-disable-monitoring-dialog.deactivate",
-    "definition": "Desactivar",
-    "context": "Deactivate"
-  },
-  {
     "term": "component.use-confirm-disable-monitoring-dialog.description",
     "definition": "Hay <b>{profileCount, plural, =1 {1 perfil} other {# perfiles}}</b> con monitoreo activo. Si continúas, se desactivará y no te avisaremos si se produce algún cambio en tus búsquedas. ¿Estás seguro de que quieres continuar?",
     "context": "There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?"
@@ -10960,6 +11185,11 @@
     "context": "Yes, send"
   },
   {
+    "term": "generic.connect",
+    "definition": "Conectar",
+    "context": "Connect"
+  },
+  {
     "term": "generic.contact",
     "definition": "Contactar",
     "context": "Contact"
@@ -11018,6 +11248,11 @@
     "term": "generic.current-year",
     "definition": "Año en curso",
     "context": "Current year"
+  },
+  {
+    "term": "generic.deactivate",
+    "definition": "Desactivar",
+    "context": "Deactivate"
   },
   {
     "term": "generic.default",
@@ -11465,6 +11700,11 @@
     "context": "The password is incorrect"
   },
   {
+    "term": "generic.integration-invalid-credentials-message",
+    "definition": "La validación de las credenciales ha fallado, por favor compruebe que todo esté correcto.",
+    "context": "The credentials validation has failed, please check that everything is correct."
+  },
+  {
     "term": "generic.integration-name",
     "definition": "Nombre",
     "context": "Name"
@@ -11840,6 +12080,11 @@
     "context": "Text block"
   },
   {
+    "term": "generic.petition-field-type-id-verification",
+    "definition": "Verificación de identidad",
+    "context": "ID Verification"
+  },
+  {
     "term": "generic.petition-field-type-number",
     "definition": "Números",
     "context": "Numbers"
@@ -12093,6 +12338,11 @@
     "term": "generic.something-went-wrong",
     "definition": "Algo ha fallado",
     "context": "Something went wrong"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Empezar",
+    "context": "Start"
   },
   {
     "term": "generic.submit",
@@ -12483,11 +12733,6 @@
     "term": "new-petition.search-placeholder",
     "definition": "¿Qué estás buscando?",
     "context": "What are you looking for?"
-  },
-  {
-    "term": "omponent.dow-jones-integration-dialog.invalid-credentials-message",
-    "definition": "La validación de las credenciales ha fallado, por favor compruebe que todo esté correcto.",
-    "context": "The credentials validation has failed, please check that everything is correct."
   },
   {
     "term": "organization-groups.add-user",
@@ -13278,6 +13523,16 @@
     "term": "page.organization-integrations.dow-jones-title",
     "definition": "Dow Jones RiskCenter",
     "context": "Dow Jones RiskCenter"
+  },
+  {
+    "term": "page.organization-integrations.id-verification-contact-message",
+    "definition": "Hola, me gustaría recibir más información sobre la integración de Verificación de identidad.",
+    "context": "Hi, I would like more information about ID Verification integration."
+  },
+  {
+    "term": "page.organization-integrations.id-verification-description",
+    "definition": "Permite verificar la identidad de personas físicas a través de su documento de identidad.",
+    "context": "Allows verification of the identity of individuals through their identity documents."
   },
   {
     "term": "page.organization-integrations.open-sanctions-contact-message",
@@ -16293,6 +16548,11 @@
     "term": "util.get-petition-field-type-description.heading-description",
     "definition": "Añade títulos, textos y saltos de página.",
     "context": "Insert headings, paragraphs and page breaks."
+  },
+  {
+    "term": "util.get-petition-field-type-description.id-verification-description",
+    "definition": "Permite tomar una foto de un ID y un selfi para verificar la identidad.",
+    "context": "Take an ID photo and a selfie for identity verification."
   },
   {
     "term": "util.get-petition-field-type-description.number",

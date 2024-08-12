@@ -6,7 +6,7 @@ import { ContactLocale, OrgIntegration } from "../db/__types";
 import { IntegrationProvider, IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { InvalidCredentialsError } from "../integrations/helpers/GenericIntegration";
-import { CancelAbortedError, SignatureResponse } from "../integrations/signature/SigantureClient";
+import { CancelAbortedError, SignatureResponse } from "../integrations/signature/SignatureClient";
 import { SignaturitRequestError } from "../integrations/signature/SignaturitClient";
 import { fullName } from "../util/fullName";
 import { removeKeys } from "../util/remedaExtensions";

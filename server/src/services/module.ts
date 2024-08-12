@@ -26,6 +26,11 @@ import {
 } from "./EventSubscriptionService";
 import { FETCH_SERVICE, FetchService, IFetchService } from "./FetchService";
 import { I18N_SERVICE, I18nService, II18nService } from "./I18nService";
+import {
+  ID_VERIFICATION_SERVICE,
+  IIdVerificationService,
+  IdVerificationService,
+} from "./IdVerificationService";
 import { IImageService, IMAGE_SERVICE, ImageService } from "./ImageService";
 import {
   IIntegrationsSetupService,
@@ -99,4 +104,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
   bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
   bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
+  bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
 });

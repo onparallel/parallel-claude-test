@@ -258,8 +258,13 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       setShowRefreshRepliesAlert(true);
     } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
       await refetchAccess();
-    } else if (isApolloError(error, "INVALID_REPLY_ERROR")) {
+    } else if (
+      isApolloError(error, "INVALID_REPLY_ERROR") ||
+      isApolloError(error, "ID_VERIFICATION_FAILED")
+    ) {
       // handled in field component
+    } else if (isApolloError(error, "FORBIDDEN")) {
+      showErrorToast(error);
     } else if (
       isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE") ||
       isApolloError(error, "CONTACT_NOT_FOUND") ||

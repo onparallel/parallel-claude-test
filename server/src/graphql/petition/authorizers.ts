@@ -212,12 +212,15 @@ export function fieldCanBeReplied<
   fieldsArg: (
     args: core.ArgsValue<TypeName, FieldName>,
   ) => MaybeArray<{ id: number; parentReplyId?: number | null }>,
-  overWriteArg?: TOverwrite,
+  overWriteArg?: TOverwrite | boolean,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const _fields = unMaybeArray(fieldsArg(args));
+
     const overwriteExisting = isDefined(overWriteArg)
-      ? (args[overWriteArg] as boolean | null | undefined) ?? false
+      ? ((typeof overWriteArg === "boolean"
+          ? overWriteArg
+          : (args as any)[overWriteArg]) as boolean)
       : false;
 
     if (!(await ctx.petitions.fieldsCanBeReplied(_fields, overwriteExisting))) {
@@ -257,6 +260,26 @@ export function fieldHasType<
     }
 
     return true;
+  };
+}
+
+export function fieldTypeSwitch<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(
+  argFieldId: TArg,
+  map: Partial<Record<PetitionFieldType, FieldAuthorizeResolver<TypeName, FieldName>>>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    const fieldId = args[argFieldId] as number;
+    const field = (await ctx.petitions.loadField(fieldId))!;
+    const resolver = map[field.type];
+    if (!resolver) {
+      return true;
+    }
+
+    return await resolver(root, args, ctx, info);
   };
 }
 
@@ -521,7 +544,7 @@ export function userHasFeatureFlag<TypeName extends string, FieldName extends st
     try {
       const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, feature);
       if (!hasFeatureFlag) {
-        throw new ForbiddenError(`User does not have the FeatureFlag ${feature}`);
+        throw new ForbiddenError(`missing required feature flags`);
       }
       return true;
     } catch (error) {

@@ -87,6 +87,13 @@ export interface FieldOptions {
   ES_TAX_DOCUMENTS: {
     attachToPdf: boolean;
   };
+  ID_VERIFICATION: {
+    attachToPdf: boolean;
+    identityVerification: {
+      type: "SIMPLE" | "EXTENDED";
+      allowedDocuments: ("ID_CARD" | "PASSPORT" | "RESIDENCE_PERMIT" | "DRIVER_LICENSE")[];
+    };
+  };
 }
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
@@ -173,6 +180,11 @@ export function getPetitionFieldTypeLabel(intl: IntlShape, type: PetitionFieldTy
         id: "generic.petition-field-type-field-group",
         defaultMessage: "Group of fields",
       });
+    case "ID_VERIFICATION":
+      return intl.formatMessage({
+        id: "generic.petition-field-type-id-verification",
+        defaultMessage: "ID Verification",
+      });
     default:
       throw new Error(`Missing PetitionFieldType "${type}"`);
   }
@@ -197,6 +209,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       DOW_JONES_KYC: "#48A3D3",
       BACKGROUND_CHECK: theme.colors.green[700],
       FIELD_GROUP: theme.colors.blue[600],
+      ID_VERIFICATION: theme.colors.green[500],
     } as Record<PetitionFieldType, string>
   )[type];
 }

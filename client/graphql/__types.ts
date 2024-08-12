@@ -742,6 +742,7 @@ export interface InputFeatureFlagNameValue {
 export type IntegrationType =
   | "AI_COMPLETION"
   | "DOW_JONES_KYC"
+  | "ID_VERIFICATION"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -900,6 +901,8 @@ export interface Mutation {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  /** Creates a new Bankflip ID Verification integration on the provided organization */
+  createBankflipIdVerificationIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
@@ -1479,6 +1482,13 @@ export interface MutationcreateAzureOpenAiIntegrationArgs {
 export interface MutationcreateBackgroundCheckProfilePdfTaskArgs {
   entityId: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
+}
+
+export interface MutationcreateBankflipIdVerificationIntegrationArgs {
+  apiKey: Scalars["String"]["input"];
+  host: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+  webhookSecret: Scalars["String"]["input"];
 }
 
 export interface MutationcreateBulkPetitionSendTaskArgs {
@@ -3665,6 +3675,8 @@ export type PetitionFieldType =
   | "FILE_UPLOAD"
   /** A heading field. */
   | "HEADING"
+  /** A field for verification of identity documents */
+  | "ID_VERIFICATION"
   /** A only numbers field. */
   | "NUMBER"
   /** A phone formatted field. */
@@ -5843,6 +5855,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "ID_VERIFICATION_SESSION_COMPLETED"
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
@@ -6269,6 +6282,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       name: string;
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -7638,6 +7652,7 @@ export type AdminSettingsLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -7679,6 +7694,7 @@ export type AppLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -7753,6 +7769,7 @@ export type DevelopersLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -7823,6 +7840,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -8044,6 +8062,7 @@ export type PetitionLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -8085,6 +8104,7 @@ export type ReportsSidebarLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -8126,6 +8146,7 @@ export type SidebarLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -8168,6 +8189,7 @@ export type UserGroupLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -8272,6 +8294,7 @@ export type UserSettingsLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -9436,6 +9459,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21111,10 +21135,10 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
-    metadata: { [key: string]: any };
     repliedAt?: string | null;
     lastReviewedAt?: string | null;
     isAnonymized: boolean;
+    metadata: { [key: string]: any };
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
       field: {
@@ -21151,10 +21175,10 @@ export type PetitionRepliesField_PetitionFieldFragment = {
         id: string;
         content: { [key: string]: any };
         status: PetitionFieldReplyStatus;
-        metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
         isAnonymized: boolean;
+        metadata: { [key: string]: any };
         field?: {
           __typename?: "PetitionField";
           id: string;
@@ -21237,10 +21261,10 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  metadata: { [key: string]: any };
   repliedAt?: string | null;
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
+  metadata: { [key: string]: any };
   children?: Array<{
     __typename?: "PetitionFieldGroupChildReply";
     field: {
@@ -21277,10 +21301,10 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
-      metadata: { [key: string]: any };
       repliedAt?: string | null;
       lastReviewedAt?: string | null;
       isAnonymized: boolean;
+      metadata: { [key: string]: any };
       field?: {
         __typename?: "PetitionField";
         id: string;
@@ -21529,10 +21553,10 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  metadata: { [key: string]: any };
   repliedAt?: string | null;
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
+  metadata: { [key: string]: any };
   field?: {
     __typename?: "PetitionField";
     id: string;
@@ -24413,6 +24437,14 @@ export type useResolveProfilePropertiesConflictsDialog_profileQuery = {
       } | null;
     }>;
   };
+};
+
+export type PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
+  metadata: { [key: string]: any };
 };
 
 export type ProfileFieldSuggestion_PetitionFieldFragment = {
@@ -28549,6 +28581,7 @@ export type Admin_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -28610,6 +28643,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       name: string;
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -28744,6 +28778,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       name: string;
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -29005,6 +29040,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       name: string;
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -29179,6 +29215,7 @@ export type AdminOrganizations_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -29249,6 +29286,7 @@ export type AdminSupportMethods_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -29337,6 +29375,7 @@ export type Alerts_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30130,6 +30169,7 @@ export type Contact_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30297,6 +30337,7 @@ export type Contacts_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30380,6 +30421,7 @@ export type OrganizationBranding_userQuery = {
       name: string;
       logoUrl?: string | null;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30456,6 +30498,7 @@ export type OrganizationCompliance_userQuery = {
       name: string;
       anonymizePetitionsAfterMonths?: number | null;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30516,6 +30559,7 @@ export type OrganizationGeneral_userQuery = {
       customHost?: string | null;
       iconUrl240?: string | null;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30682,6 +30726,7 @@ export type OrganizationGroup_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30763,6 +30808,7 @@ export type PermissionsGroup_userQuery = {
       name: string;
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -30965,6 +31011,7 @@ export type OrganizationGroups_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -31008,6 +31055,7 @@ export type OrganizationSettings_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -31052,6 +31100,7 @@ export type OrganizationIntegrations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      hasIdVerification: boolean;
       hasDowJones: boolean;
       hasDocuSign: boolean;
       petitionsSubscriptionEndDate?: string | null;
@@ -31167,6 +31216,7 @@ export type IntegrationsSignature_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       signatureIntegrations: {
@@ -31364,6 +31414,7 @@ export type OrganizationProfileType_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -31759,6 +31810,7 @@ export type OrganizationProfileTypes_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -31873,6 +31925,7 @@ export type OrganizationUsage_userQuery = {
       usageDetails: { [key: string]: any };
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       license?: {
@@ -32054,6 +32107,7 @@ export type OrganizationUsers_userQuery = {
       name: string;
       hasUserProvisioning: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -33347,6 +33401,7 @@ export type PetitionActivity_QueryFragment = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -35025,6 +35080,7 @@ export type PetitionActivity_userQuery = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -35880,6 +35936,7 @@ export type PetitionCompose_QueryFragment = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -38012,6 +38069,7 @@ export type PetitionCompose_userQuery = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -38871,6 +38929,7 @@ export type PetitionMessages_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -38915,6 +38974,7 @@ export type PetitionMessages_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -40426,6 +40486,7 @@ export type PetitionPreview_QueryFragment = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
@@ -42786,6 +42847,7 @@ export type PetitionPreview_userQuery = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
@@ -43031,9 +43093,9 @@ export type PetitionReplies_PetitionFragment = {
       updatedAt: string;
       status: PetitionFieldReplyStatus;
       isAnonymized: boolean;
-      metadata: { [key: string]: any };
       repliedAt?: string | null;
       lastReviewedAt?: string | null;
+      metadata: { [key: string]: any };
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
@@ -43126,9 +43188,9 @@ export type PetitionReplies_PetitionFragment = {
           createdAt: string;
           updatedAt: string;
           status: PetitionFieldReplyStatus;
-          metadata: { [key: string]: any };
           repliedAt?: string | null;
           lastReviewedAt?: string | null;
+          metadata: { [key: string]: any };
           field?: {
             __typename?: "PetitionField";
             id: string;
@@ -43573,9 +43635,9 @@ export type PetitionReplies_PetitionFieldFragment = {
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
     isAnonymized: boolean;
-    metadata: { [key: string]: any };
     repliedAt?: string | null;
     lastReviewedAt?: string | null;
+    metadata: { [key: string]: any };
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
       field: {
@@ -43613,9 +43675,9 @@ export type PetitionReplies_PetitionFieldFragment = {
         content: { [key: string]: any };
         isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
-        metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
+        metadata: { [key: string]: any };
         field?: {
           __typename?: "PetitionField";
           id: string;
@@ -44003,9 +44065,9 @@ export type PetitionReplies_closePetitionMutation = {
         updatedAt: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
-        metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
+        metadata: { [key: string]: any };
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
           field: {
@@ -44098,9 +44160,9 @@ export type PetitionReplies_closePetitionMutation = {
             createdAt: string;
             updatedAt: string;
             status: PetitionFieldReplyStatus;
-            metadata: { [key: string]: any };
             repliedAt?: string | null;
             lastReviewedAt?: string | null;
+            metadata: { [key: string]: any };
             field?: {
               __typename?: "PetitionField";
               id: string;
@@ -44748,9 +44810,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         updatedAt: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
-        metadata: { [key: string]: any };
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
+        metadata: { [key: string]: any };
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
           field: {
@@ -44843,9 +44905,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             createdAt: string;
             updatedAt: string;
             status: PetitionFieldReplyStatus;
-            metadata: { [key: string]: any };
             repliedAt?: string | null;
             lastReviewedAt?: string | null;
+            metadata: { [key: string]: any };
             field?: {
               __typename?: "PetitionField";
               id: string;
@@ -45291,10 +45353,10 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
       id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
-      metadata: { [key: string]: any };
       repliedAt?: string | null;
       lastReviewedAt?: string | null;
       isAnonymized: boolean;
+      metadata: { [key: string]: any };
       field?: {
         __typename?: "PetitionField";
         id: string;
@@ -45390,6 +45452,7 @@ export type PetitionReplies_userQuery = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -45652,9 +45715,9 @@ export type PetitionReplies_petitionQuery = {
             updatedAt: string;
             status: PetitionFieldReplyStatus;
             isAnonymized: boolean;
-            metadata: { [key: string]: any };
             repliedAt?: string | null;
             lastReviewedAt?: string | null;
+            metadata: { [key: string]: any };
             children?: Array<{
               __typename?: "PetitionFieldGroupChildReply";
               field: {
@@ -45747,9 +45810,9 @@ export type PetitionReplies_petitionQuery = {
                 createdAt: string;
                 updatedAt: string;
                 status: PetitionFieldReplyStatus;
-                metadata: { [key: string]: any };
                 repliedAt?: string | null;
                 lastReviewedAt?: string | null;
+                metadata: { [key: string]: any };
                 field?: {
                   __typename?: "PetitionField";
                   id: string;
@@ -46451,6 +46514,7 @@ export type Petitions_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47013,6 +47077,7 @@ export type NewPetition_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47257,6 +47322,7 @@ export type ProfileDetail_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47571,6 +47637,7 @@ export type Profiles_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47683,6 +47750,7 @@ export type Reports_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47732,6 +47800,7 @@ export type Overview_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47781,6 +47850,7 @@ export type ReportsReplies_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47830,6 +47900,7 @@ export type ReportsTemplates_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47874,6 +47945,7 @@ export type Account_QueryFragment = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -47958,6 +48030,7 @@ export type Account_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -48274,6 +48347,7 @@ export type Subscriptions_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -48349,6 +48423,7 @@ export type Tokens_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -48392,6 +48467,7 @@ export type Settings_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -48443,6 +48519,7 @@ export type Security_userQuery = {
       id: string;
       name: string;
       petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -52071,6 +52148,16 @@ export type useHasBackgroundCheck_MeQuery = {
   me: { __typename?: "User"; hasBackgroundCheck: boolean };
 };
 
+export type useHasIdVerification_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useHasIdVerification_MeQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    organization: { __typename?: "Organization"; id: string; hasIdVerification: boolean };
+  };
+};
+
 export type useHasPermission_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useHasPermission_MeQuery = { me: { __typename?: "User"; permissions: Array<string> } };
@@ -53431,6 +53518,7 @@ export const AppLayout_QueryFragmentDoc = gql`
         id
         name
         petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+        hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
       }
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     }
@@ -55106,6 +55194,17 @@ export const useResolveProfilePropertiesConflictsDialog_ProfileFragmentDoc = gql
   }
   ${useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<useResolveProfilePropertiesConflictsDialog_ProfileFragment, unknown>;
+export const PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesFieldIdVerificationReply_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    status
+    metadata
+  }
+` as unknown as DocumentNode<
+  PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment,
+  unknown
+>;
 export const ProfileReference_ProfileFragmentDoc = gql`
   fragment ProfileReference_Profile on Profile {
     id
@@ -59821,7 +59920,6 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     id
     content
     status
-    metadata
     field {
       id
       type
@@ -65998,6 +66096,7 @@ export const OrganizationIntegrations_userDocument = gql`
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
       organization {
         id
+        hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
         hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
         integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
@@ -68835,6 +68934,17 @@ export const useHasBackgroundCheck_MeDocument = gql`
     }
   }
 ` as unknown as DocumentNode<useHasBackgroundCheck_MeQuery, useHasBackgroundCheck_MeQueryVariables>;
+export const useHasIdVerification_MeDocument = gql`
+  query useHasIdVerification_Me {
+    me {
+      id
+      organization {
+        id
+        hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
+      }
+    }
+  }
+` as unknown as DocumentNode<useHasIdVerification_MeQuery, useHasIdVerification_MeQueryVariables>;
 export const useHasPermission_MeDocument = gql`
   query useHasPermission_Me {
     me {

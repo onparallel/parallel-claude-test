@@ -51,6 +51,7 @@ export interface MapFieldsTableProps {
 export const excludedFieldsTarget = [
   "HEADING",
   "ES_TAX_DOCUMENTS",
+  "ID_VERIFICATION",
   "DYNAMIC_SELECT",
   "DOW_JONES_KYC",
   "BACKGROUND_CHECK",
@@ -75,10 +76,9 @@ export const MapFieldsTable = Object.assign(
     const fields = petition.fields;
     const sourcePetitionFields = sourcePetition.fields.map((f) => ({
       ...f,
-      replies:
-        f.type === "ES_TAX_DOCUMENTS"
-          ? f.replies.filter((r) => !isDefined(r.content.error))
-          : f.replies,
+      replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
+        ? f.replies.filter((r) => !isDefined(r.content.error))
+        : f.replies,
     }));
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -608,7 +608,8 @@ function FieldReplies({
         return (
           <Fragment key={i}>
             {sourceReply.isAnonymized ||
-            (sourceReply.field!.type === "ES_TAX_DOCUMENTS" && content.error) ? (
+            (["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(sourceReply.field!.type) &&
+              content.error) ? (
               <ReplyNotAvailable type={sourceReply.field!.type} />
             ) : isFileTypeField(targetField.type) ? (
               <Flex gap={2} alignItems="center" minHeight={6}>

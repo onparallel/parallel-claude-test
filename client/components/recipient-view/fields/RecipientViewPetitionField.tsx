@@ -41,6 +41,7 @@ import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFiel
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
+import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -319,6 +320,13 @@ export function RecipientViewPetitionField({
           onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
           onRefreshField={handleRefreshAsyncField}
           hideDeleteReplyButton
+        />
+      ) : props.field.type === "ID_VERIFICATION" ? (
+        <RecipientViewPetitionFieldIdVerification
+          {...rest}
+          {...commonProps}
+          onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRefreshField={handleRefreshAsyncField}
         />
       ) : null}
     </RecipientViewPetitionFieldCard>

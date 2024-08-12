@@ -815,10 +815,7 @@ function useConfirmDisableMonitoringDialog() {
       }),
       confirm: (
         <Button colorScheme="red" type="submit">
-          <FormattedMessage
-            id="component.use-confirm-disable-monitoring-dialog.deactivate"
-            defaultMessage="Deactivate"
-          />
+          <FormattedMessage id="generic.deactivate" defaultMessage="Deactivate" />
         </Button>
       ),
     });

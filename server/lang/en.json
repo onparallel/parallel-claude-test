@@ -215,6 +215,11 @@
     "context": "Identity Verification"
   },
   {
+    "term": "document.petition-export.identity-verification-selfie-header",
+    "definition": "Identity Verification (Proof of life)",
+    "context": "Identity Verification (Proof of life)"
+  },
+  {
     "term": "document.petition-export.no-files",
     "definition": "No files have been submitted.",
     "context": "No files have been submitted."

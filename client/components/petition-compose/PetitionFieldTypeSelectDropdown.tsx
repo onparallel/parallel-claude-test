@@ -104,6 +104,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
               "DYNAMIC_SELECT",
               ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
               ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
+              "ID_VERIFICATION",
             ],
           },
         ] as { category: string; fields: PetitionFieldType[] }[];

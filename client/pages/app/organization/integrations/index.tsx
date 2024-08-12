@@ -36,12 +36,12 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, noop } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
-import { untranslated } from "@parallel/utils/untranslated";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -54,6 +54,8 @@ function OrganizationIntegrations() {
   const userHasApiAccess = useHasPermission("INTEGRATIONS:CRUD_API");
 
   const hasDownJones = me.organization.hasDowJones;
+  const hasIdVerification = me.organization.hasIdVerification;
+
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
   const [deleteDowJonesKycIntegration] = useMutation(
@@ -258,6 +260,50 @@ function OrganizationIntegrations() {
       isChecked: hasDownJones,
     },
     {
+      isDisabled: true,
+      disabledMessage: (
+        <Text>
+          <FormattedMessage
+            id="page.organization-integrations.dow-jones-disabled-message"
+            defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
+            values={{
+              a: (chunks: any) => (
+                <SupportButton
+                  variant="link"
+                  fontSize="sm"
+                  message={intl.formatMessage({
+                    id: "page.organization-integrations.id-verification-contact-message",
+                    defaultMessage:
+                      "Hi, I would like more information about ID Verification integration.",
+                  })}
+                >
+                  {chunks}
+                </SupportButton>
+              ),
+            }}
+          />
+        </Text>
+      ),
+      logo: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/bankflip.png`}
+          alt={untranslated("ID Verification")}
+          maxWidth="124px"
+        />
+      ),
+      title: intl.formatMessage({
+        id: "generic.petition-field-type-id-verification",
+        defaultMessage: "ID Verification",
+      }),
+      body: intl.formatMessage({
+        id: "page.organization-integrations.id-verification-description",
+        defaultMessage:
+          "Allows verification of the identity of individuals through their identity documents.",
+      }),
+      onChange: noop,
+      isChecked: hasIdVerification,
+    },
+    {
       isDisabled: (!userCanEditIntegrations && !userHasApiAccess) || !userHasApiAccess,
       logo: (
         <Image
@@ -376,6 +422,7 @@ OrganizationIntegrations.queries = [
         hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
         organization {
           id
+          hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
           hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
           integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {

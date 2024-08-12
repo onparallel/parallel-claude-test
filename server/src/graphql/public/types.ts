@@ -693,12 +693,14 @@ export const PublicPetitionFieldReply = objectType({
                 contentType: file.content_type,
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
-                ...(root.type === "ES_TAX_DOCUMENTS" ? { warning: root.content.warning } : {}),
+                ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
+                  ? { warning: root.content.warning }
+                  : {}),
               }
             : root.anonymized_at
               ? {}
               : {
-                  ...(root.type === "ES_TAX_DOCUMENTS"
+                  ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
                     ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
                       pick(root.content, ["type", "request", "error"])
                     : {}),

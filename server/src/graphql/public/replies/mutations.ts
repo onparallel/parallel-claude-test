@@ -2,11 +2,13 @@ import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nex
 import { isDefined, uniq } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
+import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
 import { and, chain } from "../../helpers/authorize";
+import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
@@ -14,6 +16,7 @@ import { validFileUploadInput } from "../../helpers/validators/validFileUploadIn
 import {
   fieldCanBeReplied,
   fieldHasType,
+  fieldTypeSwitch,
   replyCanBeDeleted,
   replyCanBeUpdated,
   replyIsForFieldOfType,
@@ -27,6 +30,7 @@ import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
   fieldIsExternal,
+  organizationHasFeatureFlag,
   publicPetitionIsNotClosed,
   replyBelongsToAccess,
   replyBelongsToExternalField,
@@ -297,7 +301,12 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     authorize: chain(
       authenticatePublicAccess("keycode"),
       replyBelongsToExternalField("replyId"),
-      replyIsForFieldOfType("replyId", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
+      replyIsForFieldOfType("replyId", [
+        "FILE_UPLOAD",
+        "ES_TAX_DOCUMENTS",
+        "DOW_JONES_KYC",
+        "ID_VERIFICATION",
+      ]),
       replyBelongsToAccess("replyId"),
     ),
     args: {
@@ -355,26 +364,85 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
   authorize: chain(
     authenticatePublicAccess("keycode"),
     fieldIsExternal("fieldId"),
-    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"]),
+    fieldTypeSwitch("fieldId", {
+      ES_TAX_DOCUMENTS: and(
+        organizationHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),
+        fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+      ),
+      ID_VERIFICATION: fieldCanBeReplied(
+        (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
+        true,
+      ),
+    }),
     and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   resolve: async (_, { fieldId, parentReplyId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
-    const session = await ctx.bankflip.createSession({
-      petitionId: toGlobalId("Petition", petition!.id),
-      orgId: toGlobalId("Organization", petition!.org_id),
-      fieldId: toGlobalId("PetitionField", fieldId),
-      accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-      parentReplyId: isDefined(parentReplyId)
-        ? toGlobalId("PetitionFieldReply", parentReplyId)
-        : null,
-    });
+    const field = await ctx.petitions.loadField(fieldId);
 
-    return {
-      type: "WINDOW",
-      url: session.widgetLink,
-    };
+    assert(petition, "Petition not found");
+    assert(field, "Field not found");
+
+    if (field.type === "ES_TAX_DOCUMENTS") {
+      const session = await ctx.bankflip.createSession({
+        petitionId: toGlobalId("Petition", petition!.id),
+        orgId: toGlobalId("Organization", petition!.org_id),
+        fieldId: toGlobalId("PetitionField", fieldId),
+        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+        parentReplyId: isDefined(parentReplyId)
+          ? toGlobalId("PetitionFieldReply", parentReplyId)
+          : null,
+      });
+
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    } else if (field.type === "ID_VERIFICATION") {
+      const options = field.options as PetitionFieldOptions["ID_VERIFICATION"];
+      let integrationId = options.integrationId;
+
+      if (!isDefined(integrationId)) {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          petition.org_id,
+          "ID_VERIFICATION",
+        );
+
+        integrationId = integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+
+        if (!isDefined(integrationId)) {
+          throw new ApolloError(
+            "An enabled integration is required for ID_VERIFICATION field",
+            "MISSING_ID_VERIFICATION_INTEGRATION",
+          );
+        }
+      }
+
+      try {
+        const session = await ctx.idVerification.createSession(options.config, {
+          integrationId: toGlobalId("OrgIntegration", integrationId),
+          petitionId: toGlobalId("Petition", petition.id),
+          orgId: toGlobalId("Organization", petition.org_id),
+          fieldId: toGlobalId("PetitionField", fieldId),
+          accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+          parentReplyId: parentReplyId ? toGlobalId("PetitionFieldReply", parentReplyId) : null,
+        });
+
+        return {
+          type: "WINDOW",
+          url: session.url,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown";
+        throw new ApolloError(
+          `Failed to create ID verification session: ${message}`,
+          "ID_VERIFICATION_FAILED",
+        );
+      }
+    }
+
+    return null as never;
   },
 });
 
@@ -390,6 +458,7 @@ export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFi
     authenticatePublicAccess("keycode"),
     fieldIsExternal("fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    organizationHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),
     and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   resolve: async (_, { fieldId, parentReplyId }, ctx) => {

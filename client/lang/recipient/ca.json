@@ -435,6 +435,21 @@
     "context": "Your answers are automatically saved."
   },
   {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-1",
+    "definition": "Si {tone, select, INFORMAL {continues} other {continua}}, començaràs de nou el procés de verificació.",
+    "context": "If you continue, you will start the verification process again."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-2",
+    "definition": "Una vegada finalitzat, el document actual se sobreescriurà amb el nou.",
+    "context": "Once completed, the current document will be overwritten with the new one."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.header",
+    "definition": "Començar de nou",
+    "context": "Start over"
+  },
+  {
     "term": "component.recipient-view-information.heading",
     "definition": "Informació",
     "context": "Information"
@@ -518,6 +533,41 @@
     "term": "component.recipient-view-petition-field-group.remove-reply-button",
     "definition": "Esborrar {groupName}",
     "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.error",
+    "definition": "No hem pogut verificar {tone, select, INFORMAL {els teus} other {els seus}} documents. Si us plau, {tone, select, INFORMAL {intenta-ho} other {intenti-ho}} de nou.",
+    "context": "We were unable to verify your documents. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.id-document-successfully-completed",
+    "definition": "Verificació del document d'identitat realitzada amb èxit",
+    "context": "Identity document verification completed successfully"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.start-again",
+    "definition": "Començar de nou",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-canceled",
+    "definition": "La verificació es va cancel·lar abans de completar-se. Si us plau, {tone, select, INFORMAL {intenta-ho} other {intenti-ho}} de nou",
+    "context": "The verification was cancelled before completion. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-not-completed",
+    "definition": "La verificació d'identitat no s'ha completat",
+    "context": "Identity verification not completed"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verifying-documentation",
+    "definition": "Verificant {tone, select, INFORMAL {els teus} other {els seus}} documents...",
+    "context": "Verifying your documents..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.video-successfully-completed",
+    "definition": "Vídeo-identificació realitzada amb èxit",
+    "context": "Video identification completed successfully"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -1170,6 +1220,11 @@
     "context": "Text block"
   },
   {
+    "term": "generic.petition-field-type-id-verification",
+    "definition": "Verificació d'identitat",
+    "context": "ID Verification"
+  },
+  {
     "term": "generic.petition-field-type-number",
     "definition": "Números",
     "context": "Numbers"
@@ -1278,6 +1333,11 @@
     "term": "generic.something-went-wrong",
     "definition": "Alguna cosa ha fallat",
     "context": "Something went wrong"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Començar",
+    "context": "Start"
   },
   {
     "term": "generic.submit",

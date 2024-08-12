@@ -2192,7 +2192,7 @@ export class PetitionRepository extends BaseRepository {
    */
   async deletePetitionFieldReplies(
     fields: { id: number; parentReplyId?: number | null }[],
-    user: User,
+    deletedBy: string,
     t?: Knex.Transaction,
   ) {
     await this.raw(
@@ -2217,7 +2217,7 @@ export class PetitionRepository extends BaseRepository {
           fields.map((f) => [f.id, f.parentReplyId ?? null]),
           ["int", "int"],
         ),
-        `User:${user.id}`,
+        deletedBy,
       ],
       t,
     );
@@ -2774,7 +2774,13 @@ export class PetitionRepository extends BaseRepository {
               ) filter (
                 -- when file field types, filter replies with upload_complete
                 where
-                case when pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC') then fu.id is not null and fu.upload_complete
+                case when pfr.type in (
+                  'FILE_UPLOAD',
+                  'ES_TAX_DOCUMENTS',
+                  'ID_VERIFICATION',
+                  'DOW_JONES_KYC'
+                )
+                then fu.id is not null and fu.upload_complete
                 else true
                 end
               )
@@ -2784,7 +2790,12 @@ export class PetitionRepository extends BaseRepository {
         from petition_field pf
         left join petition_field_reply as pfr on pfr.petition_field_id = pf.id and pfr.deleted_at is null
         left join file_upload fu
-          on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC') and (pfr.content->>'file_upload_id')::int = fu.id
+          on pfr.type in (
+            'FILE_UPLOAD',
+            'ES_TAX_DOCUMENTS',
+            'ID_VERIFICATION',
+            'DOW_JONES_KYC'
+          ) and (pfr.content->>'file_upload_id')::int = fu.id
         where
           pf.petition_id in ?
           and pf.deleted_at is null
@@ -5088,12 +5099,26 @@ export class PetitionRepository extends BaseRepository {
         this.loadFieldsForPetition.dataloader.clear(petitionId);
       }
 
+      const props = defaultFieldProperties(type, field);
+      if (type === "ID_VERIFICATION") {
+        const integrations = await this.from("org_integration", t)
+          .where("org_id", user.org_id)
+          .where("type", "ID_VERIFICATION")
+          .whereNull("deleted_at")
+          .where("is_enabled", true)
+          .orderBy("created_at", "desc")
+          .select("*");
+
+        props.options.integrationId =
+          integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+      }
+
       const [updated] = await this.updatePetitionField(
         petitionId,
         fieldId,
         {
           type,
-          ...defaultFieldProperties(type, field),
+          ...props,
         },
         `User:${user.id}`,
         t,
@@ -7074,6 +7099,8 @@ export class PetitionRepository extends BaseRepository {
               content || jsonb_build_object('file_upload_id', null, 'entity', null)
             when 'ES_TAX_DOCUMENTS' then
               content || jsonb_build_object('file_upload_id', null, 'json_contents', null)
+            when 'ID_VERIFICATION' then
+              content || jsonb_build_object('file_upload_id', null)
             when 'FIELD_GROUP' then 
               '{}'::jsonb
             when 'BACKGROUND_CHECK' then 

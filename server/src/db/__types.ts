@@ -99,7 +99,8 @@ export type IntegrationType =
   | "SSO"
   | "USER_PROVISIONING"
   | "DOW_JONES_KYC"
-  | "AI_COMPLETION";
+  | "AI_COMPLETION"
+  | "ID_VERIFICATION";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
@@ -107,6 +108,7 @@ export const IntegrationTypeValues = [
   "USER_PROVISIONING",
   "DOW_JONES_KYC",
   "AI_COMPLETION",
+  "ID_VERIFICATION",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -268,7 +270,8 @@ export type PetitionFieldType =
   | "DOW_JONES_KYC"
   | "DATE_TIME"
   | "FIELD_GROUP"
-  | "BACKGROUND_CHECK";
+  | "BACKGROUND_CHECK"
+  | "ID_VERIFICATION";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -286,6 +289,7 @@ export const PetitionFieldTypeValues = [
   "DATE_TIME",
   "FIELD_GROUP",
   "BACKGROUND_CHECK",
+  "ID_VERIFICATION",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
@@ -482,7 +486,8 @@ export type TaskName =
   | "PETITION_SUMMARY"
   | "BACKGROUND_CHECK_PROFILE_PDF"
   | "PETITION_SHARING"
-  | "PROFILE_NAME_PATTERN_UPDATED";
+  | "PROFILE_NAME_PATTERN_UPDATED"
+  | "ID_VERIFICATION_SESSION_COMPLETED";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -499,6 +504,7 @@ export const TaskNameValues = [
   "BACKGROUND_CHECK_PROFILE_PDF",
   "PETITION_SHARING",
   "PROFILE_NAME_PATTERN_UPDATED",
+  "ID_VERIFICATION_SESSION_COMPLETED",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

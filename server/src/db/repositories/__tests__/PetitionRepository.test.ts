@@ -1534,7 +1534,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates single replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(15);
+      expect(PetitionFieldTypeValues).toHaveLength(16);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1551,6 +1551,7 @@ describe("repositories/PetitionRepository", () => {
           DATE: ["2024-05-21"],
           ES_TAX_DOCUMENTS: "this should be ignored",
           DOW_JONES_KYC: "this should be ignored",
+          ID_VERIFICATION: "this should be ignored",
           DATE_TIME: {
             datetime: "2023-03-03T03:00",
             timezone: "Europe/Madrid",
@@ -1615,7 +1616,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates multiple replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(15);
+      expect(PetitionFieldTypeValues).toHaveLength(16);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1635,6 +1636,7 @@ describe("repositories/PetitionRepository", () => {
           DATE: ["2024-05-21", "2011-08-29"],
           ES_TAX_DOCUMENTS: "this should be ignored",
           DOW_JONES_KYC: "this should be ignored",
+          ID_VERIFICATION: "this should be ignored",
           DATE_TIME: [
             {
               datetime: "2023-03-03T03:00",
@@ -1751,7 +1753,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("ignores a reply if it does not match with field options", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(15);
+      expect(PetitionFieldTypeValues).toHaveLength(16);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1767,6 +1769,7 @@ describe("repositories/PetitionRepository", () => {
             timezone: "Europe/Madrid",
           },
           BACKGROUND_CHECK: "this should be ignored",
+          ID_VERIFICATION: "this should be ignored",
         },
         user,
       );

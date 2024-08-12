@@ -435,6 +435,21 @@
     "context": "Your answers are automatically saved."
   },
   {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-1",
+    "definition": "If you continue, you will start the verification process again.",
+    "context": "If you continue, you will start the verification process again."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-2",
+    "definition": "Once completed, the current document will be overwritten with the new one.",
+    "context": "Once completed, the current document will be overwritten with the new one."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.header",
+    "definition": "Start over",
+    "context": "Start over"
+  },
+  {
     "term": "component.recipient-view-information.heading",
     "definition": "Information",
     "context": "Information"
@@ -518,6 +533,41 @@
     "term": "component.recipient-view-petition-field-group.remove-reply-button",
     "definition": "Remove {groupName}",
     "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.error",
+    "definition": "We were unable to verify your documents. Please try again.",
+    "context": "We were unable to verify your documents. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.id-document-successfully-completed",
+    "definition": "Identity document verification completed successfully",
+    "context": "Identity document verification completed successfully"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.start-again",
+    "definition": "Start again",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-canceled",
+    "definition": "The verification was cancelled before completion. Please try again.",
+    "context": "The verification was cancelled before completion. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-not-completed",
+    "definition": "Identity verification not completed",
+    "context": "Identity verification not completed"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verifying-documentation",
+    "definition": "Verifying your documents...",
+    "context": "Verifying your documents..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.video-successfully-completed",
+    "definition": "Video identification completed successfully",
+    "context": "Video identification completed successfully"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -1170,6 +1220,11 @@
     "context": "Text block"
   },
   {
+    "term": "generic.petition-field-type-id-verification",
+    "definition": "ID Verification",
+    "context": "ID Verification"
+  },
+  {
     "term": "generic.petition-field-type-number",
     "definition": "Numbers",
     "context": "Numbers"
@@ -1278,6 +1333,11 @@
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Start",
+    "context": "Start"
   },
   {
     "term": "generic.submit",

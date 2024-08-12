@@ -12,6 +12,7 @@ interface IntegrationProviders {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
   DOW_JONES_KYC: "DOW_JONES_KYC";
   AI_COMPLETION: "AZURE_OPEN_AI";
+  ID_VERIFICATION: "BANKFLIP";
 }
 
 export type IntegrationProvider<TType extends IntegrationType> =
@@ -60,7 +61,11 @@ export type IntegrationSettings<
                 ENDPOINT: string;
               }
             : never
-          : never;
+          : TType extends "ID_VERIFICATION"
+            ? TProvider extends "BANKFLIP"
+              ? { CREDENTIALS: { API_KEY: string; HOST: string; WEBHOOK_SECRET: string } }
+              : never
+            : never;
 
 export type IntegrationCredentials<
   TType extends IntegrationType,

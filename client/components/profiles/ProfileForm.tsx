@@ -85,7 +85,7 @@ function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragm
 
 const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]> = {
   DATE: ["DATE"],
-  FILE: ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"],
+  FILE: ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC", "ID_VERIFICATION"],
   NUMBER: ["NUMBER"],
   PHONE: ["PHONE"],
   SHORT_TEXT: ["SHORT_TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],

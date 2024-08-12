@@ -327,6 +327,7 @@ export const AppLayout = Object.assign(
               id
               name
               petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+              hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
             }
             hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
           }

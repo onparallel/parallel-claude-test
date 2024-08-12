@@ -4,20 +4,20 @@ import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
 import { CONFIG, Config } from "../../config";
-import { DocusignIntegration, DocusignIntegrationContext } from "./DocusignIntegration";
-import { ExpiredCredentialsError } from "../helpers/ExpirableCredentialsIntegration";
-import { InvalidCredentialsError } from "../helpers/GenericIntegration";
+import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { I18N_SERVICE, II18nService } from "../../services/I18nService";
+import { BaseClient } from "../helpers/BaseClient";
+import { ExpiredCredentialsError } from "../helpers/ExpirableCredentialsIntegration";
+import { InvalidCredentialsError } from "../helpers/GenericIntegration";
+import { DocusignIntegration, DocusignIntegrationContext } from "./DocusignIntegration";
 import {
   ISignatureClient,
   Recipient,
   SignatureOptions,
   SignatureResponse,
-} from "./SigantureClient";
-import { BaseClient } from "../helpers/BaseClient";
+} from "./SignatureClient";
 
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];

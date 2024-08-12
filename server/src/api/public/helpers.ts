@@ -128,6 +128,7 @@ export function containsGraphQLError(error: unknown, errorCode: string): error i
 function mapFieldReplyContent(fieldType: PetitionFieldType, content: any): any {
   switch (fieldType) {
     case "ES_TAX_DOCUMENTS":
+    case "ID_VERIFICATION":
     case "FILE_UPLOAD":
     case "DOW_JONES_KYC":
       return pick(content, ["filename", "contentType", "size"]) as {
@@ -258,6 +259,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
         return replies[0]?.content ?? null; // BACKGROUND_CHECK is always single-reply
       case "FILE_UPLOAD":
       case "ES_TAX_DOCUMENTS":
+      case "ID_VERIFICATION":
       case "DOW_JONES_KYC":
         if (replies.length > 1) {
           return replies.map((r) => ({

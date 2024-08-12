@@ -41,7 +41,7 @@ import {
   Recipient,
   SignatureOptions,
   SignatureResponse,
-} from "./SigantureClient";
+} from "./SignatureClient";
 import {
   SignaturitBrandingIdKey,
   SignaturitIntegration,

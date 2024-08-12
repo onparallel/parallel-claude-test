@@ -435,6 +435,21 @@
     "context": "Your answers are automatically saved."
   },
   {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-1",
+    "definition": "Se {tone, select, INFORMAL {continuares} other {continuar}}, recomeçarás o processo de verificação.",
+    "context": "If you continue, you will start the verification process again."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.body-2",
+    "definition": "Uma vez finalizado, o documento atual será sobrescrito com o novo.",
+    "context": "Once completed, the current document will be overwritten with the new one."
+  },
+  {
+    "term": "component.recipient-view-id-verification-start-again-dialog.header",
+    "definition": "Recomeçar",
+    "context": "Start over"
+  },
+  {
     "term": "component.recipient-view-information.heading",
     "definition": "Informação",
     "context": "Information"
@@ -518,6 +533,41 @@
     "term": "component.recipient-view-petition-field-group.remove-reply-button",
     "definition": "Eliminar {groupName}",
     "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.error",
+    "definition": "Não conseguimos verificar {tone, select, INFORMAL {os teus} other {os seus}} documentos. Por favor, {tone, select, INFORMAL {tenta} other {tente}} novamente.",
+    "context": "We were unable to verify your documents. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.id-document-successfully-completed",
+    "definition": "Verificação do documento de identidade realizada com sucesso",
+    "context": "Identity document verification completed successfully"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.start-again",
+    "definition": "Começar de novo",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-canceled",
+    "definition": "A verificação foi cancelada antes de ser concluída. Por favor, {tone, select, INFORMAL {tenta} other {tente}} novamente.",
+    "context": "The verification was cancelled before completion. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verification-not-completed",
+    "definition": "A verificação de identidade não foi concluída",
+    "context": "Identity verification not completed"
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.verifying-documentation",
+    "definition": "Verificando {tone, select, INFORMAL {os teus} other {os seus}} documentos...",
+    "context": "Verifying your documents..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-id-verification.video-successfully-completed",
+    "definition": "Video-identificação realizada com sucesso",
+    "context": "Video identification completed successfully"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -1170,6 +1220,11 @@
     "context": "Text block"
   },
   {
+    "term": "generic.petition-field-type-id-verification",
+    "definition": "Verificação de identidade",
+    "context": "ID Verification"
+  },
+  {
     "term": "generic.petition-field-type-number",
     "definition": "Números",
     "context": "Numbers"
@@ -1278,6 +1333,11 @@
     "term": "generic.something-went-wrong",
     "definition": "Algo falhou",
     "context": "Something went wrong"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Iniciar",
+    "context": "Start"
   },
   {
     "term": "generic.submit",

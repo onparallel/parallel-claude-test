@@ -37,6 +37,8 @@ import { useIntl } from "react-intl";
 import { zip } from "remeda";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
+import { RecipientViewPetitionFieldIdVerification } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldIdVerification";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
@@ -241,6 +243,8 @@ function PreviewPetitionFieldGroupField(props: {
   onRefreshField: () => void;
   onError: (error: any) => void;
 }) {
+  const hasIdVerificationFeature = useHasIdVerification();
+
   const {
     parentReplyId,
     field,
@@ -330,6 +334,16 @@ function PreviewPetitionFieldGroupField(props: {
           petition={petition}
           onRefreshField={onRefreshField}
           isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "ID_VERIFICATION" ? (
+        <RecipientViewPetitionFieldIdVerification
+          {...commonProps}
+          onStartAsyncFieldCompletion={async () => {
+            return await onStartAsyncFieldCompletion(field.id, parentReplyId);
+          }}
+          onRefreshField={onRefreshField}
+          isCacheOnly={isCacheOnly}
+          hasIdVerificationFeature={hasIdVerificationFeature}
         />
       ) : null}
     </Box>

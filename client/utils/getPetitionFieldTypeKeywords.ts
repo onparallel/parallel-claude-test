@@ -291,6 +291,8 @@ export function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
         "campos",
         "grupo",
       ];
+    case "ID_VERIFICATION":
+      return ["id", "dni"];
     default:
       throw new Error(`Missing keywords PetitionFieldType  "${type}"`);
   }

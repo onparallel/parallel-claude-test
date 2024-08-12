@@ -1910,6 +1910,7 @@ export interface NexusGenFieldTypes {
     createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
+    createBankflipIdVerificationIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
@@ -4480,6 +4481,7 @@ export interface NexusGenFieldTypeNames {
     createAddPetitionPermissionTask: "Task";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
+    createBankflipIdVerificationIntegration: "SupportMethodResponse";
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
     createContactlessPetitionAccess: "PetitionAccess";
@@ -6697,6 +6699,13 @@ export interface NexusGenArgTypes {
       // args
       entityId: string; // String!
       token: string; // String!
+    };
+    createBankflipIdVerificationIntegration: {
+      // args
+      apiKey: string; // String!
+      host: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
+      webhookSecret: string; // String!
     };
     createBulkPetitionSendTask: {
       // args

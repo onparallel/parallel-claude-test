@@ -1,3 +1,4 @@
+/** no-recipient */
 import { Alert, AlertIcon, AlertProps, Box, HStack } from "@chakra-ui/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "../common/SupportButton";

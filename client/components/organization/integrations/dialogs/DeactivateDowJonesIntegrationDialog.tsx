@@ -33,10 +33,7 @@ export function DeactivateDowJonesIntegrationDialog({ ...props }: DialogProps<{}
       }
       confirm={
         <Button onClick={() => props.onResolve()} colorScheme="red" variant="solid">
-          <FormattedMessage
-            id="component.deactivate-dow-jones-integration-dialog.deactivate"
-            defaultMessage="Deactivate"
-          />
+          <FormattedMessage id="generic.deactivate" defaultMessage="Deactivate" />
         </Button>
       }
       {...props}

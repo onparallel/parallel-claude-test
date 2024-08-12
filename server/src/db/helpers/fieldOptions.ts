@@ -312,6 +312,38 @@ const SCHEMAS = {
       },
     },
   },
+  ID_VERIFICATION: {
+    type: "object",
+    required: ["attachToPdf", "integrationId", "config"],
+    additionalProperties: false,
+    properties: {
+      attachToPdf: {
+        type: "boolean",
+      },
+      integrationId: {
+        type: ["number", "null"],
+      },
+      config: {
+        type: "object",
+        required: ["type", "allowedDocuments"],
+        additionalProperties: false,
+        properties: {
+          type: {
+            type: "string",
+            enum: ["SIMPLE", "EXTENDED"],
+          },
+          allowedDocuments: {
+            type: "array",
+            minItems: 1,
+            items: {
+              type: "string",
+              enum: ["ID_CARD", "PASSPORT", "RESIDENCE_PERMIT", "DRIVER_LICENSE"],
+            },
+          },
+        },
+      },
+    },
+  },
 } as const;
 
 export type PetitionFieldOptions = {
@@ -483,6 +515,16 @@ export function defaultFieldProperties(
           groupName: null,
         };
       }
+      case "ID_VERIFICATION": {
+        return {
+          attachToPdf: false,
+          integrationId: null,
+          config: {
+            type: "SIMPLE",
+            allowedDocuments: ["ID_CARD", "PASSPORT", "RESIDENCE_PERMIT", "DRIVER_LICENSE"],
+          },
+        };
+      }
       default:
         throw new Error();
     }
@@ -589,6 +631,9 @@ export async function mapFieldOptions(
       ...options,
       ...(await selectOptionsValuesAndLabels(options, locale)),
     };
+  } else if (type === "ID_VERIFICATION") {
+    // don't expose integrationId until we allow to configure it on frontend
+    return pick(options, ["config", "attachToPdf"]);
   }
 
   return options;

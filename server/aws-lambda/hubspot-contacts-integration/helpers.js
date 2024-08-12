@@ -214,7 +214,13 @@ async function buildHubspotProperties(petitionId, email, fields, replies) {
         // if passing a datetime field to a DATE hs property, remove the "hours" part
         values.push(hsProp.type === "date" ? value.value.split("T")[0] : value.value);
       } else if (
-        ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(fieldType)
+        [
+          "FILE_UPLOAD",
+          "ES_TAX_DOCUMENTS",
+          "DOW_JONES_KYC",
+          "BACKGROUND_CHECK",
+          "ID_VERIFICATION",
+        ].includes(fieldType)
       ) {
         values.push(
           `${

@@ -86,6 +86,71 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createBankflipIdVerificationIntegration",
+      description:
+        "Creates a new Bankflip ID Verification integration on the provided organization",
+      args: [
+        {
+          name: "apiKey",
+          description: "Bankflip Account API KEY",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "host",
+          description: "e.g. https://core.bankflip.io",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "e.g. yw7RQt2cQ4XDHdrbtL3",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "webhookSecret",
+          description: "Secret for webhook verification",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "deleteAzureOpenAiIntegration",
       description: "Removes the Azure OpenAI integration of the user's organization",
       args: [

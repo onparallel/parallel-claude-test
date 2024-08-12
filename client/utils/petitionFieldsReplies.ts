@@ -338,6 +338,7 @@ export const isReplyContentCompatible = (
         "FILE_UPLOAD",
         "ES_TAX_DOCUMENTS",
         "DOW_JONES_KYC",
+        "ID_VERIFICATION",
       ] as PetitionFieldType[];
       if (compatibleFields.includes(origin.type)) {
         isCompatible = true;
@@ -347,6 +348,7 @@ export const isReplyContentCompatible = (
     case "DOW_JONES_KYC":
     case "ES_TAX_DOCUMENTS":
     case "DYNAMIC_SELECT":
+    case "ID_VERIFICATION":
       break;
     default:
       break;

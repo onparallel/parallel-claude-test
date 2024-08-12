@@ -45,6 +45,8 @@ import {
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
+import { RecipientViewPetitionFieldIdVerification } from "../recipient-view/fields/RecipientViewPetitionFieldIdVerification";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -77,6 +79,8 @@ export function PreviewPetitionField({
   const petitionId = petition.id;
   const uploads = useRef<Record<string, AbortController>>({});
   const fieldId = field.id;
+
+  const hasIdVerificationFeature = useHasIdVerification();
 
   useEffect(() => {
     if (
@@ -336,6 +340,16 @@ export function PreviewPetitionField({
           petition={petition}
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "ID_VERIFICATION" ? (
+        <RecipientViewPetitionFieldIdVerification
+          {...props}
+          {...commonProps}
+          isDisabled={fieldIsDisabled}
+          onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+          hasIdVerificationFeature={hasIdVerificationFeature}
         />
       ) : null}
     </RecipientViewPetitionFieldCard>

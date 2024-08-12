@@ -244,7 +244,8 @@ export async function validateReplyContent(
     }
     case "FILE_UPLOAD":
     case "DOW_JONES_KYC":
-    case "ES_TAX_DOCUMENTS": {
+    case "ES_TAX_DOCUMENTS":
+    case "ID_VERIFICATION": {
       if (typeof content !== "object") {
         throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type object.");
       }

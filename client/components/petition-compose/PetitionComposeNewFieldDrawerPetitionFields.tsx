@@ -22,6 +22,8 @@ import { SearchInput } from "../common/SearchInput";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 
@@ -75,6 +77,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
           "FILE_UPLOAD",
           "BACKGROUND_CHECK",
           ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
+          "ID_VERIFICATION",
         ],
       },
       {
@@ -122,6 +125,9 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
     minHeight: 0,
   } as const;
 
+  const hasBackgroundCheck = useHasBackgroundCheck();
+  const hasIdVerification = useHasIdVerification();
+
   return (
     <Box {...extendFlexColumn}>
       <Box padding={4}>
@@ -162,7 +168,10 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
                           type={type}
                           label={label}
                           description={description}
-                          showPaidBadge={type === "BACKGROUND_CHECK" && !user.hasBackgroundCheck}
+                          showPaidBadge={
+                            (type === "BACKGROUND_CHECK" && !hasBackgroundCheck) ||
+                            (type === "ID_VERIFICATION" && !hasIdVerification)
+                          }
                           onAddField={onAddField}
                         />
                       </Box>

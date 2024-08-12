@@ -10,6 +10,7 @@ import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
+import { IdVerificationSessionCompletedRunner } from "./tasks/IdVerificationSessionCompletedRunner";
 import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
@@ -34,6 +35,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   BACKGROUND_CHECK_PROFILE_PDF: BackgroundCheckProfilePdfRunner,
   PETITION_SHARING: PetitionSharingRunner,
   PROFILE_NAME_PATTERN_UPDATED: ProfileNamePatternUpdatedRunner,
+  ID_VERIFICATION_SESSION_COMPLETED: IdVerificationSessionCompletedRunner,
 };
 
 export interface TaskWorkerPayload {

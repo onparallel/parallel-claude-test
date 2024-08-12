@@ -1415,10 +1415,16 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
     profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
     userHasAccessToPetitions("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     repliesBelongsToPetition("petitionId", "fileReplyIds"),
-    replyIsForFieldOfType("fileReplyIds", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
+    replyIsForFieldOfType("fileReplyIds", [
+      "FILE_UPLOAD",
+      "ES_TAX_DOCUMENTS",
+      "DOW_JONES_KYC",
+      "ID_VERIFICATION",
+    ]),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),

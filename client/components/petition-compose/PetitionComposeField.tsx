@@ -94,6 +94,7 @@ import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -759,7 +760,10 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   const letter = letters();
   const previousVisibility = usePrevious(field.visibility);
   const hasBackgroundCheck = useHasBackgroundCheck();
-  const showRestrictedPetitionFieldAlert = field.type === "BACKGROUND_CHECK" && !hasBackgroundCheck;
+  const hasIdVerification = useHasIdVerification();
+  const showRestrictedPetitionFieldAlert =
+    (field.type === "BACKGROUND_CHECK" && !hasBackgroundCheck) ||
+    (field.type === "ID_VERIFICATION" && !hasIdVerification);
 
   return (
     <Stack spacing={1} ref={elementRef} {...props}>

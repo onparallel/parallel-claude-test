@@ -11,14 +11,16 @@ import {
 import pMap from "p-map";
 import { isDefined, uniq } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
+import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { never } from "../../../util/never";
 import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { random } from "../../../util/token";
 import { SUCCESS } from "../../helpers/Success";
-import { authenticateAnd, chain, not } from "../../helpers/authorize";
+import { and, authenticateAnd, chain, not } from "../../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
@@ -35,6 +37,7 @@ import {
 import {
   fieldCanBeReplied,
   fieldHasType,
+  fieldTypeSwitch,
   fieldsBelongsToPetition,
   petitionHasStatus,
   petitionIsNotAnonymized,
@@ -323,8 +326,17 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"]),
+    fieldTypeSwitch("fieldId", {
+      ES_TAX_DOCUMENTS: and(
+        userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),
+        fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+      ),
+      ID_VERIFICATION: fieldCanBeReplied(
+        (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
+        true,
+      ),
+    }),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
@@ -333,20 +345,67 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     "fieldId",
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
-    const session = await ctx.bankflip.createSession({
-      petitionId: toGlobalId("Petition", petitionId),
-      orgId: toGlobalId("Organization", ctx.user!.org_id),
-      fieldId: toGlobalId("PetitionField", fieldId),
-      userId: toGlobalId("User", ctx.user!.id),
-      parentReplyId: isDefined(parentReplyId)
-        ? toGlobalId("PetitionFieldReply", parentReplyId)
-        : null,
-    });
+    const field = (await ctx.petitions.loadField(fieldId))!;
 
-    return {
-      type: "WINDOW",
-      url: session.widgetLink,
-    };
+    if (field.type === "ES_TAX_DOCUMENTS") {
+      const session = await ctx.bankflip.createSession({
+        petitionId: toGlobalId("Petition", petitionId),
+        orgId: toGlobalId("Organization", ctx.user!.org_id),
+        fieldId: toGlobalId("PetitionField", fieldId),
+        userId: toGlobalId("User", ctx.user!.id),
+        parentReplyId: isDefined(parentReplyId)
+          ? toGlobalId("PetitionFieldReply", parentReplyId)
+          : null,
+      });
+
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    } else if (field.type === "ID_VERIFICATION") {
+      const options = field.options as PetitionFieldOptions["ID_VERIFICATION"];
+      let integrationId = options.integrationId;
+
+      if (!isDefined(integrationId)) {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          ctx.user!.org_id,
+          "ID_VERIFICATION",
+        );
+
+        integrationId = integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+
+        if (!isDefined(integrationId)) {
+          throw new ApolloError(
+            "An enabled integration is required for ID_VERIFICATION field",
+            "MISSING_ID_VERIFICATION_INTEGRATION",
+          );
+        }
+      }
+
+      try {
+        const session = await ctx.idVerification.createSession(options.config, {
+          integrationId: toGlobalId("OrgIntegration", integrationId),
+          petitionId: toGlobalId("Petition", petitionId),
+          orgId: toGlobalId("Organization", ctx.user!.org_id),
+          fieldId: toGlobalId("PetitionField", fieldId),
+          userId: toGlobalId("User", ctx.user!.id),
+          parentReplyId: parentReplyId ? toGlobalId("PetitionFieldReply", parentReplyId) : null,
+        });
+
+        return {
+          type: "WINDOW",
+          url: session.url,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown";
+        throw new ApolloError(
+          `Failed to create ID verification session: ${message}`,
+          "ID_VERIFICATION_FAILED",
+        );
+      }
+    } else {
+      never();
+    }
   },
 });
 
@@ -362,6 +421,7 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
@@ -565,7 +625,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
           : [];
 
       if (args.overwriteExisting) {
-        await ctx.petitions.deletePetitionFieldReplies(args.fields, ctx.user!);
+        await ctx.petitions.deletePetitionFieldReplies(args.fields, `User:${ctx.user!.id}`);
       }
 
       const data: CreatePetitionFieldReply[] = await pMap(

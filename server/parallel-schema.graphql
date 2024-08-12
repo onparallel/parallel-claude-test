@@ -788,6 +788,7 @@ The types of integrations available.
 enum IntegrationType {
   AI_COMPLETION
   DOW_JONES_KYC
+  ID_VERIFICATION
   SIGNATURE
   SSO
   USER_PROVISIONING
@@ -1080,6 +1081,31 @@ type Mutation {
     orgId: GID!
   ): SupportMethodResponse!
   createBackgroundCheckProfilePdfTask(entityId: String!, token: String!): Task!
+
+  """
+  Creates a new Bankflip ID Verification integration on the provided organization
+  """
+  createBankflipIdVerificationIntegration(
+    """
+    Bankflip Account API KEY
+    """
+    apiKey: String!
+
+    """
+    e.g. https://core.bankflip.io
+    """
+    host: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+
+    """
+    Secret for webhook verification
+    """
+    webhookSecret: String!
+  ): SupportMethodResponse!
 
   """
   Creates a Task for creating, prefilling and sending petitions from a templateId
@@ -4366,6 +4392,11 @@ enum PetitionFieldType {
   HEADING
 
   """
+  A field for verification of identity documents
+  """
+  ID_VERIFICATION
+
+  """
   A only numbers field.
   """
   NUMBER
@@ -7382,6 +7413,7 @@ enum TaskName {
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
+  ID_VERIFICATION_SESSION_COMPLETED
   PETITION_SHARING
   PETITION_SUMMARY
   PRINT_PDF

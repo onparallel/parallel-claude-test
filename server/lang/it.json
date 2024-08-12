@@ -95,6 +95,11 @@
     "context": "Identity Verification"
   },
   {
+    "term": "document.petition-export.identity-verification-selfie-header",
+    "definition": "Verifica dell'identità (Prova di vita)",
+    "context": "Identity Verification (Proof of life)"
+  },
+  {
     "term": "document.petition-export.no-files",
     "definition": "Nessun file è stato caricato.",
     "context": "No files have been submitted."

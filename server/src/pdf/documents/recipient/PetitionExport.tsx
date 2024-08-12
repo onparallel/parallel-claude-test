@@ -379,13 +379,18 @@ function PetitionExportField({
                         />
                       ) : null}
                     </View>
-                  ) : field.type === "ES_TAX_DOCUMENTS" ? (
+                  ) : field.type === "ES_TAX_DOCUMENTS" || field.type === "ID_VERIFICATION" ? (
                     <View>
                       <Text style={[styles.text]}>
                         {reply.content.type === "identity-verification" ? (
                           <FormattedMessage
                             id="document.petition-export.identity-verification-header"
                             defaultMessage="Identity Verification"
+                          />
+                        ) : reply.content.type === "identity-verification-selfie" ? (
+                          <FormattedMessage
+                            id="document.petition-export.identity-verification-selfie-header"
+                            defaultMessage="Identity Verification (Proof of life)"
                           />
                         ) : (
                           [reply.content.request.model.type, reply.content.request.model.year]

@@ -35,6 +35,7 @@ import {
   CreatePetitionFieldReply,
   CreatePublicPetitionLink,
   Petition,
+  PetitionFieldType,
   PetitionPermission,
   ProfileTypeFieldType,
 } from "../../../db/__types";
@@ -1043,11 +1044,27 @@ export const createPetitionField = mutationField("createPetitionField", {
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
     ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
+
+    async function defaultProperties(type: PetitionFieldType) {
+      const props = defaultFieldProperties(type);
+      if (type === "ID_VERIFICATION") {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          ctx.user!.org_id,
+          "ID_VERIFICATION",
+        );
+
+        props.options.integrationId =
+          integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+      }
+
+      return props;
+    }
+
     const [field] = await ctx.petitions.createPetitionFieldsAtPosition(
       args.petitionId,
       {
         type: args.type,
-        ...defaultFieldProperties(args.type),
+        ...(await defaultProperties(args.type)),
       },
       args.parentFieldId ?? null,
       args.position ?? -1,
@@ -1197,6 +1214,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         args.data.options?.format,
       not(fieldIsLinkedToProfileTypeField("fieldId")),
     ),
+    ifArgDefined(
+      (args) => args.data.multiple,
+      not(fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"])),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1337,7 +1358,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
 
           if (replies.length > 0) {
-            await ctx.petitions.deletePetitionFieldReplies([{ id: args.fieldId }], ctx.user!);
+            await ctx.petitions.deletePetitionFieldReplies(
+              [{ id: args.fieldId }],
+              `User:${ctx.user!.id}`,
+            );
           }
         }
       } catch (e: any) {

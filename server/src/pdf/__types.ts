@@ -691,6 +691,7 @@ export type InputFeatureFlagNameValue = {
 export type IntegrationType =
   | "AI_COMPLETION"
   | "DOW_JONES_KYC"
+  | "ID_VERIFICATION"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -840,6 +841,8 @@ export type Mutation = {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  /** Creates a new Bankflip ID Verification integration on the provided organization */
+  createBankflipIdVerificationIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
@@ -1419,6 +1422,13 @@ export type MutationcreateAzureOpenAiIntegrationArgs = {
 export type MutationcreateBackgroundCheckProfilePdfTaskArgs = {
   entityId: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
+};
+
+export type MutationcreateBankflipIdVerificationIntegrationArgs = {
+  apiKey: Scalars["String"]["input"];
+  host: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+  webhookSecret: Scalars["String"]["input"];
 };
 
 export type MutationcreateBulkPetitionSendTaskArgs = {
@@ -3561,6 +3571,8 @@ export type PetitionFieldType =
   | "FILE_UPLOAD"
   /** A heading field. */
   | "HEADING"
+  /** A field for verification of identity documents */
+  | "ID_VERIFICATION"
   /** A only numbers field. */
   | "NUMBER"
   /** A phone formatted field. */
@@ -5633,6 +5645,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "ID_VERIFICATION_SESSION_COMPLETED"
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"

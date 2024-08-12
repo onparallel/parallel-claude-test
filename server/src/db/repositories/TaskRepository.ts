@@ -82,6 +82,10 @@ export type TaskInput<TName extends TaskName> = {
   PROFILE_NAME_PATTERN_UPDATED: {
     profile_type_id: number;
   };
+  ID_VERIFICATION_SESSION_COMPLETED: {
+    integration_id: number;
+    external_id: string;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -212,6 +216,10 @@ export type TaskOutput<TName extends TaskName> = {
     error?: any;
   };
   PROFILE_NAME_PATTERN_UPDATED: {
+    success: boolean;
+    error?: any;
+  };
+  ID_VERIFICATION_SESSION_COMPLETED: {
     success: boolean;
     error?: any;
   };

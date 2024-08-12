@@ -2782,3 +2782,50 @@ export const InfoCircleIcon = createIcon({
     </g>
   ),
 });
+
+export const IdVerificationIcon = createIcon({
+  displayName: "IdVerificationIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m9.00008 16.6h-7.00002v-12.99999h20.00004v7.19999" />
+      <path
+        d="m11 14v-1c0-.5304-.1686-1.0391-.4686-1.4142-.3001-.3751-.70705-.5858-1.1314-.5858h-2.8c-.42435 0-.83131.2107-1.13137.5858s-.46863.8838-.46863 1.4142v1"
+        fill="currentColor"
+      />
+      <path
+        d="m8.1 10.2c1.1598 0 2.1-.9402 2.1-2.1s-.9402-2.1-2.1-2.1-2.1.9402-2.1 2.1.9402 2.1 2.1 2.1z"
+        fill="currentColor"
+      />
+      <g stroke="currentColor">
+        <path d="m13.2 7.20001h6" />
+        <path d="m13.2 9.95999h6" />
+        <path d="m16.98 22.08c3.1481 0 5.7-2.552 5.7-5.7s-2.5519-5.7-5.7-5.7c-3.148 0-5.7 2.552-5.7 5.7s2.552 5.7 5.7 5.7z" />
+        <path d="m14.28 16.6709 1.8092 1.8091 3.8924-3.6" />
+      </g>
+    </g>
+  ),
+});
+
+export const CameraIcon = createIcon({
+  displayName: "CameraIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="1.33"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m22 7.45459-6.3636 4.54541 6.3636 4.5455z" />
+      <path d="m13.8182 5.63623h-10.00002c-1.00415 0-1.81818.81403-1.81818 1.81818v9.09089c0 1.0042.81403 1.8182 1.81818 1.8182h10.00002c1.0041 0 1.8182-.814 1.8182-1.8182v-9.09089c0-1.00415-.8141-1.81818-1.8182-1.81818z" />
+    </g>
+  ),
+});

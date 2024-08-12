@@ -92,10 +92,9 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         .flatMap((f) => [f, ...(f.children ?? [])])
         .map((f) => ({
           ...f,
-          replies:
-            f.type === "ES_TAX_DOCUMENTS"
-              ? f.replies.filter((r) => !isDefined(r.content.error))
-              : f.replies,
+          replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
+            ? f.replies.filter((r) => !isDefined(r.content.error))
+            : f.replies,
         })),
     [selectedPetitionData?.petition?.fields],
   );
@@ -109,10 +108,9 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       .flatMap((f) => [f, ...(f.children ?? [])])
       .map((f) => ({
         ...f,
-        replies:
-          f.type === "ES_TAX_DOCUMENTS"
-            ? f.replies.filter((r) => !isDefined(r.content.error))
-            : f.replies,
+        replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
+          ? f.replies.filter((r) => !isDefined(r.content.error))
+          : f.replies,
       }));
 
     const filteredFields = allFields.filter(

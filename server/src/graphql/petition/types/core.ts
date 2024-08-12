@@ -671,6 +671,7 @@ export const PetitionFieldType = enumType({
     { name: "DOW_JONES_KYC", description: "A saerch in Dow Jones field." },
     { name: "FIELD_GROUP", description: "A group of fields" },
     { name: "BACKGROUND_CHECK", description: "Run a background check of entities" },
+    { name: "ID_VERIFICATION", description: "A field for verification of identity documents" },
   ],
 });
 
@@ -1178,12 +1179,14 @@ export const PetitionFieldReply = objectType({
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
-                ...(root.type === "ES_TAX_DOCUMENTS" ? { warning: root.content.warning } : {}),
+                ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
+                  ? { warning: root.content.warning }
+                  : {}),
               }
             : root.anonymized_at
               ? {}
               : {
-                  ...(root.type === "ES_TAX_DOCUMENTS"
+                  ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
                     ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
                       pick(root.content, ["type", "request", "error"])
                     : {}),

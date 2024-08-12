@@ -101,6 +101,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
@@ -477,13 +478,20 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     } catch {}
   }
 
+  const showErrorToast = useGenericErrorToast();
+
   const handleErrorFromFields = useCallback(async (error: any) => {
     if (isApolloError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
       setShowRefreshRepliesAlert(true);
     } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
       await refetch();
-    } else if (isApolloError(error, "INVALID_REPLY_ERROR")) {
+    } else if (
+      isApolloError(error, "INVALID_REPLY_ERROR") ||
+      isApolloError(error, "ID_VERIFICATION_FAILED")
+    ) {
       // handled in field component
+    } else if (isApolloError(error, "FORBIDDEN")) {
+      showErrorToast(error);
     } else {
       throw error;
     }

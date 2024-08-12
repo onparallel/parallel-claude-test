@@ -84,6 +84,11 @@ export function getPetitionFieldTypeDescription(intl: IntlShape, type: PetitionF
         defaultMessage:
           "Group fields to gather information from the same profile, or multiple profiles.",
       });
+    case "ID_VERIFICATION":
+      return intl.formatMessage({
+        id: "util.get-petition-field-type-description.id-verification-description",
+        defaultMessage: "Take an ID photo and a selfie for identity verification.",
+      });
     default:
       throw new Error(`Missing description PetitionFieldType  "${type}"`);
   }
