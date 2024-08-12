@@ -35,6 +35,7 @@ import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
 import { PetitionComposeIdVerificationSettings } from "./fields/PetitionComposeIdVerificationSettings";
+import { PetitionComposeFileUploadSettings } from "./fields/PetitionComposeFileUploadSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petition: PetitionComposeFieldSettings_PetitionBaseFragment;
@@ -63,6 +64,7 @@ const COMPONENTS: Partial<
   FIELD_GROUP: PetitionComposeFieldGroupSettings,
   NUMBER: PetitionComposeNumberSettings,
   SHORT_TEXT: PetitionComposeShortTextSettings,
+  FILE_UPLOAD: PetitionComposeFileUploadSettings,
   BACKGROUND_CHECK: PetitionComposeBackgroundCheckSettings,
   ID_VERIFICATION: PetitionComposeIdVerificationSettings,
 };

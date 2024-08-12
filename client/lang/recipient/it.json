@@ -1025,6 +1025,11 @@
     "context": "Download file"
   },
   {
+    "term": "generic.dropzone-allowed-types",
+    "definition": "Sono consentiti solo i seguenti tipi di file:",
+    "context": "Only the following file types are allowed:"
+  },
+  {
     "term": "generic.dropzone-error-file-too-large",
     "definition": "Il file è troppo grande. Dimensione massima consentita {size}",
     "context": "The file is too large. Maximum size allowed {size}"
@@ -1053,6 +1058,21 @@
     "term": "generic.empty-heading",
     "definition": "Intestazione vuota",
     "context": "Untitled heading"
+  },
+  {
+    "term": "generic.file-upload-format-any",
+    "definition": "Qualsiasi formato",
+    "context": "Any format"
+  },
+  {
+    "term": "generic.file-upload-format-image",
+    "definition": "Immagini",
+    "context": "Images"
+  },
+  {
+    "term": "generic.file-upload-format-pdf",
+    "definition": "PDF",
+    "context": "PDF"
   },
   {
     "term": "generic.finalize-and-sign-button",

@@ -12,7 +12,6 @@ import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -35,7 +34,6 @@ import {
   replyBelongsToAccess,
   replyBelongsToExternalField,
 } from "../authorizers";
-import { toBytes } from "../../../util/fileSize";
 
 export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetitionFieldReplies", {
   description: "Creates replies on a petition field as recipient.",
@@ -256,12 +254,9 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
-  validateArgs: validateAnd(
-    validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(300, "MB") }, "data"),
-    validateCreateFileReplyInput(
-      (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
-      "fieldId",
-    ),
+  validateArgs: validateCreateFileReplyInput(
+    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId, file: args.data }),
+    "fieldId",
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);

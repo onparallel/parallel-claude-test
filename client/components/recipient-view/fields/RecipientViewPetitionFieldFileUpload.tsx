@@ -5,6 +5,7 @@ import {
   Center,
   Flex,
   List,
+  ListItem,
   Progress,
   Stack,
   Text,
@@ -35,6 +36,8 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
+import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
+import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -356,10 +359,26 @@ function PetitionFieldFileUploadDropzone({
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
   const tone = useTone();
+  const intl = useIntl();
+
+  const { accepts, maxFileSize }: FieldOptions["FILE_UPLOAD"] = field.options as any;
 
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
 
-  const MAX_FILE_SIZE = 300 * 1024 * 1024;
+  const fileUploadFormats = useFileUploadFormats();
+
+  function getAcceptFormats(acceptTypes: FileUploadAccepts[]): Record<string, string[]> {
+    const formats: Record<FileUploadAccepts, Record<string, string[]>> = {
+      PDF: { "application/pdf": [".pdf"] },
+      IMAGE: {
+        "image/png": [".png"],
+        "image/jpeg": [".jpeg", ".jpg"],
+      },
+    };
+    return Object.assign({}, ...acceptTypes.map((type) => formats[type]));
+  }
+
+  const MAX_FILE_SIZE = maxFileSize ?? 300 * 1024 * 1024;
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
   async function handleFileDrop(files: File[], rejected: FileRejection[]) {
@@ -384,6 +403,7 @@ function PetitionFieldFileUploadDropzone({
         textAlign="center"
         onDrop={handleFileDrop}
         multiple={field.multiple}
+        accept={accepts ? getAcceptFormats(accepts) : undefined}
         disabled={_isDisabled}
         maxSize={MAX_FILE_SIZE}
         isInvalid={isInvalid}
@@ -391,11 +411,39 @@ function PetitionFieldFileUploadDropzone({
       >
         {({ isDragActive, isDragReject }) => (
           <Box pointerEvents="none">
-            <FormattedMessage
-              id="component.recipient-view-petition-field-file-upload.dropzone-placeholder"
-              defaultMessage="Drag files here, or click to select them"
-              values={{ tone }}
-            />
+            {isDragActive && isDragReject ? (
+              <>
+                <FormattedMessage
+                  id="generic.dropzone-allowed-types"
+                  defaultMessage="Only the following file types are allowed:"
+                />
+                <List paddingStart={4} textAlign="start">
+                  {accepts?.map((type) => {
+                    const option = fileUploadFormats.find((f) => f.value === type);
+
+                    if (!option || option.extensions === undefined) {
+                      return null;
+                    }
+
+                    const text = `${option.label} (${intl.formatList(option.extensions, {
+                      type: "conjunction",
+                    })})`;
+
+                    return (
+                      <ListItem listStyleType="disc" key={type}>
+                        {text}
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </>
+            ) : (
+              <FormattedMessage
+                id="component.recipient-view-petition-field-file-upload.dropzone-placeholder"
+                defaultMessage="Drag files here, or click to select them"
+                values={{ tone }}
+              />
+            )}
           </Box>
         )}
       </Dropzone>

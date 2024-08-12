@@ -99,11 +99,14 @@ const SCHEMAS = {
     required: ["accepts", "attachToPdf"],
     additionalProperties: false,
     properties: {
+      maxFileSize: {
+        type: ["number", "null"],
+      },
       accepts: {
         type: ["array", "null"],
         items: {
           type: "string",
-          enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"],
+          enum: ["PDF", "IMAGE"],
         },
       },
       attachToPdf: {

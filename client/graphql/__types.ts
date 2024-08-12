@@ -35968,6 +35968,132 @@ export type PetitionCompose_PetitionFieldFragment = {
   }>;
 };
 
+export type PetitionCompose_updatePetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  visibility?: { [key: string]: any } | null;
+  math?: Array<{ [key: string]: any }> | null;
+  isReadOnly: boolean;
+  isFixed: boolean;
+  title?: string | null;
+  isInternal: boolean;
+  alias?: string | null;
+  isChild: boolean;
+  isLinkedToProfileTypeField: boolean;
+  optional: boolean;
+  multiple: boolean;
+  showInPdf: boolean;
+  showActivityInPdf: boolean;
+  position: number;
+  hasCommentsEnabled: boolean;
+  requireApproval: boolean;
+  isLinkedToProfileType: boolean;
+  description?: string | null;
+  petition:
+    | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
+    | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
+  parent?: {
+    __typename?: "PetitionField";
+    id: string;
+    position: number;
+    showInPdf: boolean;
+    isInternal: boolean;
+    children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
+  } | null;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    multiple: boolean;
+    alias?: string | null;
+    options: { [key: string]: any };
+    isInternal: boolean;
+    isChild: boolean;
+    isLinkedToProfileTypeField: boolean;
+    optional: boolean;
+    isReadOnly: boolean;
+    showInPdf: boolean;
+    showActivityInPdf: boolean;
+    isFixed: boolean;
+    position: number;
+    visibility?: { [key: string]: any } | null;
+    hasCommentsEnabled: boolean;
+    requireApproval: boolean;
+    isLinkedToProfileType: boolean;
+    description?: string | null;
+    math?: Array<{ [key: string]: any }> | null;
+    parent?: {
+      __typename?: "PetitionField";
+      id: string;
+      position: number;
+      showInPdf: boolean;
+      isInternal: boolean;
+      children?: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+      }> | null;
+    } | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    profileType?: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    } | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      multiple: boolean;
+      alias?: string | null;
+      options: { [key: string]: any };
+    }> | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      profileType: {
+        __typename?: "ProfileType";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+      };
+    } | null;
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      isUploading: boolean;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+  }> | null;
+  profileType?: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  } | null;
+  attachments: Array<{
+    __typename?: "PetitionFieldAttachment";
+    id: string;
+    isUploading: boolean;
+    file: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+      isComplete: boolean;
+    };
+  }>;
+};
+
 export type PetitionCompose_QueryFragment = {
   me: {
     __typename?: "User";
@@ -59034,6 +59160,20 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   ${useFieldsWithIndices_PetitionBaseFragmentDoc}
   ${PetitionComposeNewFieldDrawer_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionBaseFragment, unknown>;
+export const PetitionCompose_updatePetitionFieldFragmentDoc = gql`
+  fragment PetitionCompose_updatePetitionField on PetitionField {
+    id
+    ...PetitionCompose_PetitionField
+    petition {
+      id
+      lastChangeAt
+      ... on Petition {
+        status
+      }
+    }
+  }
+  ${PetitionCompose_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<PetitionCompose_updatePetitionFieldFragment, unknown>;
 export const PublicLinkSettingsDialog_UserFragmentDoc = gql`
   fragment PublicLinkSettingsDialog_User on User {
     hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)
@@ -66951,18 +67091,10 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     $force: Boolean
   ) {
     updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
-      id
-      ...PetitionCompose_PetitionField
-      petition {
-        id
-        lastChangeAt
-        ... on Petition {
-          status
-        }
-      }
+      ...PetitionCompose_updatePetitionField
     }
   }
-  ${PetitionCompose_PetitionFieldFragmentDoc}
+  ${PetitionCompose_updatePetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables

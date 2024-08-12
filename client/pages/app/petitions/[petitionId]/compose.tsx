@@ -61,6 +61,7 @@ import {
   PetitionCompose_updatePetitionDocument,
   PetitionCompose_updatePetitionFieldAutoSearchConfigDocument,
   PetitionCompose_updatePetitionFieldDocument,
+  PetitionCompose_updatePetitionFieldFragmentDoc,
   PetitionCompose_userDocument,
   PetitionFieldType,
   UpdatePetitionFieldInput,
@@ -618,6 +619,43 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await updatePetitionField({
           variables: { petitionId, fieldId, data },
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          optimisticResponse: (_, { IGNORE }) => {
+            // make field settings more responsive by enabling optimistic responses
+            const keys = Object.keys(data);
+            if (
+              keys.length === 1 &&
+              [
+                "options",
+                "optional",
+                "multiple",
+                "isInternal",
+                "showInPdf",
+                "showActivityInPdf",
+                "hasCommentsEnabled",
+                "requireApproval",
+              ].includes(keys[0])
+            ) {
+              const cached = apollo.readFragment({
+                fragment: PetitionCompose_updatePetitionFieldFragmentDoc,
+                fragmentName: "PetitionCompose_updatePetitionField",
+                id: fieldId,
+              });
+              if (isDefined(cached)) {
+                return {
+                  updatePetitionField: {
+                    ...cached,
+                    ...data,
+                    options: {
+                      ...cached.options,
+                      ...data?.options,
+                    },
+                  },
+                };
+              }
+            }
+            return IGNORE as any;
+          },
         });
       } catch (e) {
         if (isApolloError(e, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
@@ -1467,6 +1505,22 @@ const _fragments = {
       ${ReferencedFieldDialog.fragments.PetitionField}
     `;
   },
+  get updatePetitionField() {
+    return gql`
+      fragment PetitionCompose_updatePetitionField on PetitionField {
+        id
+        ...PetitionCompose_PetitionField
+        petition {
+          id
+          lastChangeAt
+          ... on Petition {
+            status
+          }
+        }
+      }
+      ${this.PetitionField}
+    `;
+  },
   get Query() {
     return gql`
       fragment PetitionCompose_Query on Query {
@@ -1637,18 +1691,10 @@ const _mutations = [
       $force: Boolean
     ) {
       updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
-        id
-        ...PetitionCompose_PetitionField
-        petition {
-          id
-          lastChangeAt
-          ... on Petition {
-            status
-          }
-        }
+        ...PetitionCompose_updatePetitionField
       }
     }
-    ${_fragments.PetitionField}
+    ${_fragments.updatePetitionField}
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(

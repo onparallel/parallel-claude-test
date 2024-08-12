@@ -14,6 +14,7 @@ import {
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -3116,6 +3117,138 @@ describe("GraphQL/Petition Field Replies", () => {
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if field does not accept file content type set in field", async () => {
+      const [pdfUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+        optional: true,
+        options: { accepts: ["PDF"] },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $file: FileUploadInput!
+            $parentReplyId: GID
+          ) {
+            createFileUploadReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              file: $file
+              parentReplyId: $parentReplyId
+            ) {
+              reply {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", pdfUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { error_code: "FILE_FORMAT_NOT_ACCEPTED_ERROR" },
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if file exceeds maxFileSize set in field", async () => {
+      const [maxSizeUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+        optional: true,
+        options: { accepts: null, maxFileSize: 10 * 1024 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $file: FileUploadInput!
+            $parentReplyId: GID
+          ) {
+            createFileUploadReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              file: $file
+              parentReplyId: $parentReplyId
+            ) {
+              reply {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", maxSizeUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 10 * 1024 + 1,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
+      });
+      expect(data).toBeNull();
+    });
+
+    it("has a hard limit of 300MB no matter what is set in field options", async () => {
+      const [maxSizeUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+        optional: true,
+        options: { accepts: null, maxFileSize: toBytes(300, "MB") + 1 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $file: FileUploadInput!
+            $parentReplyId: GID
+          ) {
+            createFileUploadReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              file: $file
+              parentReplyId: $parentReplyId
+            ) {
+              reply {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", maxSizeUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: toBytes(300, "MB") + 1,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
+      });
       expect(data).toBeNull();
     });
   });

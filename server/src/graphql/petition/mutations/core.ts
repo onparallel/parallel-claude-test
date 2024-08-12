@@ -1324,7 +1324,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         const field = await ctx.petitions.validateFieldData(args.fieldId, {
           options,
         });
-        data.options = { ...field.options, ...options };
+        data.options = {
+          ...field.options,
+          ...(field.type === "FILE_UPLOAD"
+            ? omit(options, ["maxFileSize"]) // ignore maxFileSize so user can't change it
+            : options),
+        };
 
         if (["SELECT", "CHECKBOX"].includes(field.type)) {
           const { values, labels } = data.options as {

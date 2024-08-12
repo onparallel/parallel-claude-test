@@ -1025,6 +1025,11 @@
     "context": "Download file"
   },
   {
+    "term": "generic.dropzone-allowed-types",
+    "definition": "Només es permeten els següents tipus de fitxers:",
+    "context": "Only the following file types are allowed:"
+  },
+  {
     "term": "generic.dropzone-error-file-too-large",
     "definition": "L'arxiu és massa gran. Mida màxima permesa {size}",
     "context": "The file is too large. Maximum size allowed {size}"
@@ -1053,6 +1058,21 @@
     "term": "generic.empty-heading",
     "definition": "Encapçalament buit",
     "context": "Untitled heading"
+  },
+  {
+    "term": "generic.file-upload-format-any",
+    "definition": "Qualsevol format",
+    "context": "Any format"
+  },
+  {
+    "term": "generic.file-upload-format-image",
+    "definition": "Imatges",
+    "context": "Images"
+  },
+  {
+    "term": "generic.file-upload-format-pdf",
+    "definition": "PDF",
+    "context": "PDF"
   },
   {
     "term": "generic.finalize-and-sign-button",

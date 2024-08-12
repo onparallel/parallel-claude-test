@@ -13,6 +13,7 @@ import {
 } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import Select, {
+  ActionMeta,
   components,
   OptionProps,
   SelectInstance,
@@ -39,7 +40,7 @@ export interface SimpleSelectProps<
     Omit<SelectProps<OptionType, IsMulti>, "value" | "onChange"> {
   as?: Component;
   value: If<IsMulti, T[], T | null>;
-  onChange: (value: If<IsMulti, T[], T | null>) => void;
+  onChange: (value: If<IsMulti, T[], T | null>, actionMeta: ActionMeta<OptionType>) => void;
 }
 export function toSimpleSelectOption<T extends string = string>(
   value: T | null,
@@ -53,7 +54,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
   { as, value, onChange, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
-  ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>,
+  ref: ForwardedRef<SimpleSelectInstance<T, IsMulti, OptionType>>,
 ) {
   const rsProps = useReactSelectProps({
     ...props,
@@ -83,9 +84,10 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
       {...props}
       {...rsProps}
       value={_value}
-      onChange={(option) => {
+      onChange={(option, actionMeta) => {
         onChange(
           Array.isArray(option) ? option.map((o) => o.value) : (option as any)?.value ?? null,
+          actionMeta,
         );
       }}
     />

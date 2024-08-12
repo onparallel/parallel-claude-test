@@ -1417,7 +1417,7 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
   switch (type) {
     case "FILE_UPLOAD": {
       return {
-        accepts: [faker.helpers.arrayElement(["PDF", "IMAGE", "VIDEO"])],
+        accepts: null,
         multiple: faker.datatype.boolean(),
       };
     }

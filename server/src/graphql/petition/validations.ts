@@ -2,15 +2,18 @@ import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
 import { groupBy, indexBy, isDefined, mapValues, pipe, uniq } from "remeda";
+import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
 import { PetitionField } from "../../db/__types";
+import { PetitionFieldOptions } from "../../db/helpers/fieldOptions";
+import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { keyBuilder } from "../../util/keyBuilder";
 import { ValidateReplyContentError, validateReplyContent } from "../../util/validateReplyContent";
 import { NexusGenInputs } from "../__types";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { keyBuilder } from "../../util/keyBuilder";
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
   slugArg: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
@@ -169,13 +172,93 @@ export function validateUpdatePetitionFieldReplyInput<
 }
 
 export function validateCreateFileReplyInput<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => Omit<NexusGenInputs["CreatePetitionFieldReplyInput"], "content">[],
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => Omit<
+    NexusGenInputs["CreatePetitionFieldReplyInput"],
+    "content"
+  > & {
+    file?: NexusGenInputs["FileUploadInput"];
+  },
   argName: string,
 ) {
   return (async (_, args, ctx, info) => {
-    await validateCreateReplyInput(prop(args), argName, ctx, info);
+    const formats: Record<string, string[]> = {
+      PDF: ["application/pdf"],
+      IMAGE: ["image/png", "image/jpeg"],
+    };
+    const input = prop(args);
+
+    if (isDefined(input.file)) {
+      const field = await ctx.petitions.loadField(input.id);
+      assert(isDefined(field), `Field ${input.id} not found`);
+      assert(field.type === "FILE_UPLOAD", `Field ${input.id} is not a FILE_UPLOAD field`);
+      const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
+
+      const maxFileSize = Math.min(options.maxFileSize ?? Infinity, toBytes(300, "MB"));
+      if (input.file.size > maxFileSize) {
+        throw new ArgValidationError(
+          info,
+          argName + ".file.size",
+          `File size exceeds the maximum allowed size of ${options.maxFileSize} bytes`,
+          { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
+        );
+      }
+
+      if (isDefined(options.accepts)) {
+        const acceptedFormats = options.accepts.flatMap((format) => formats[format]);
+        if (!acceptedFormats.includes(input.file.contentType)) {
+          throw new ArgValidationError(
+            info,
+            argName + ".file.contentType",
+            `File format is not accepted.`,
+            { error_code: "FILE_FORMAT_NOT_ACCEPTED_ERROR" },
+          );
+        }
+      }
+    }
+
+    await validateCreateReplyInput([input], argName, ctx, info);
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateUpdateFileReplyInput<TypeName extends string, FieldName extends string>(
+  replyIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
+  fileProp: (args: core.ArgsValue<TypeName, FieldName>) => NexusGenInputs["FileUploadInput"],
+  argName: string,
+) {
+  return (async (_, args, ctx, info) => {
+    const formats: Record<string, string[]> = {
+      PDF: ["application/pdf"],
+      IMAGE: ["image/png", "image/jpeg"],
+    };
+    const replyId = replyIdProp(args);
+    const file = fileProp(args);
+
+    const field = await ctx.petitions.loadFieldForReply(replyId);
+    assert(isDefined(field), `Field for reply ${replyId} not found`);
+    assert(field.type === "FILE_UPLOAD", `Field for reply ${replyId} is not a FILE_UPLOAD field`);
+    const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
+
+    const maxFileSize = Math.min(options.maxFileSize ?? Infinity, toBytes(300, "MB"));
+    if (file.size > maxFileSize) {
+      throw new ArgValidationError(
+        info,
+        argName + ".size",
+        `File size exceeds the maximum allowed size of ${options.maxFileSize} bytes`,
+        { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
+      );
+    }
+
+    if (isDefined(options.accepts)) {
+      const acceptedFormats = options.accepts.flatMap((format) => formats[format]);
+      if (!acceptedFormats.includes(file.contentType)) {
+        throw new ArgValidationError(
+          info,
+          argName + ".file.contentType",
+          `File format is not accepted.`,
+          { error_code: "FILE_FORMAT_NOT_ACCEPTED_ERROR" },
+        );
+      }
+    }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 

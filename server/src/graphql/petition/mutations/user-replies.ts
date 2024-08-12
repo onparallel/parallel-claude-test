@@ -26,7 +26,6 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import { authenticateBackgroundCheckToken } from "../../integrations/authorizers";
 import {
   BackgroundCheckPetitionParams,
@@ -52,9 +51,9 @@ import {
 import {
   validateCreateFileReplyInput,
   validateCreatePetitionFieldReplyInput,
+  validateUpdateFileReplyInput,
   validateUpdatePetitionFieldReplyInput,
 } from "../validations";
-import { toBytes } from "../../../util/fileSize";
 
 export const FileUploadReplyResponse = objectType({
   name: "FileUploadReplyResponse",
@@ -83,13 +82,11 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validateAnd(
-    validFileUploadInput((args) => args.file, { maxSizeBytes: toBytes(300, "MB") }, "file"),
-    validateCreateFileReplyInput(
-      (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
-      "fieldId",
-    ),
+  validateArgs: validateCreateFileReplyInput(
+    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId, file: args.file }),
+    "fieldId",
   ),
+
   resolve: async (_, args, ctx) => {
     const key = random(16);
     try {
@@ -177,9 +174,9 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validFileUploadInput(
+  validateArgs: validateUpdateFileReplyInput(
+    (args) => args.replyId,
     (args) => args.file,
-    { maxSizeBytes: toBytes(300, "MB") },
     "file",
   ),
   resolve: async (_, args, ctx) => {
@@ -341,7 +338,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateCreateFileReplyInput(
-    (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
     "fieldId",
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
@@ -493,7 +490,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateCreateFileReplyInput(
-    (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
     "fieldId",
   ),
   resolve: async (_, args, ctx) => {

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { Maybe } from "./types";
 
-export type FileUploadAccepts = "PDF" | "IMAGE" | "VIDEO" | "DOCUMENT";
+export type FileUploadAccepts = "PDF" | "IMAGE";
 
 export type DynamicSelectOption = [string, string[] | DynamicSelectOption[]];
 
@@ -22,6 +22,7 @@ export interface FieldOptions {
   FILE_UPLOAD: {
     accepts: Maybe<FileUploadAccepts[]>;
     attachToPdf: boolean;
+    maxFileSize?: Maybe<number>;
   };
   SHORT_TEXT: {
     placeholder?: Maybe<string>;

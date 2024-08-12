@@ -5205,6 +5205,11 @@
     "context": "Visibility conditions"
   },
   {
+    "term": "component.petition-compose-file-upload-settings.allowed-formats",
+    "definition": "Formatos permitidos",
+    "context": "Allowed formats"
+  },
+  {
     "term": "component.petition-compose-group-children.add-field",
     "definition": "Añadir...",
     "context": "Add..."
@@ -11645,6 +11650,11 @@
     "context": "Drag to sort"
   },
   {
+    "term": "generic.dropzone-allowed-types",
+    "definition": "Solo se permiten los siguientes tipos de archivos:",
+    "context": "Only the following file types are allowed:"
+  },
+  {
     "term": "generic.dropzone-error-file-invalid-type",
     "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo {extension}",
     "context": "File type not allowed. Please, attach an {extension} file"
@@ -11758,6 +11768,21 @@
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size"
+  },
+  {
+    "term": "generic.file-upload-format-any",
+    "definition": "Cualquier formato",
+    "context": "Any format"
+  },
+  {
+    "term": "generic.file-upload-format-image",
+    "definition": "Imágenes",
+    "context": "Images"
+  },
+  {
+    "term": "generic.file-upload-format-pdf",
+    "definition": "PDF",
+    "context": "PDF"
   },
   {
     "term": "generic.finalize-and-sign-button",
