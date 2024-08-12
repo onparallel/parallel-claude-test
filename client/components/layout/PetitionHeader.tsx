@@ -349,7 +349,7 @@ export const PetitionHeader = Object.assign(
         toast({
           title: intl.formatMessage({
             id: "component.petition-header.import-replies-success-title",
-            defaultMessage: "Replies succesfully imported",
+            defaultMessage: "Replies successfully imported",
           }),
           status: "success",
           isClosable: true,

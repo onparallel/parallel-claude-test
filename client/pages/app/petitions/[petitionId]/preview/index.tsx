@@ -821,6 +821,23 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                       {fieldsWithLogic.map(({ field, logic }) => {
                         const fieldHasReplies = field.replies.length !== 0;
 
+                        const iconButtonReviewReply = (
+                          <IconButtonWithTooltip
+                            as="a"
+                            icon={<ChevronRightIcon boxSize={5} />}
+                            size="sm"
+                            variant="outline"
+                            backgroundColor="white"
+                            placement="bottom"
+                            color="gray.600"
+                            isDisabled={!fieldHasReplies}
+                            label={intl.formatMessage({
+                              id: "page.preview.review-reply",
+                              defaultMessage: "Review reply",
+                            })}
+                          />
+                        );
+
                         return (
                           <LiquidPetitionVariableProvider key={field.id} logic={logic}>
                             <Box
@@ -882,25 +899,15 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                         })}
                                       />
                                     </NakedLink>
-                                    {field.type === "HEADING" || !isPetition ? null : (
+                                    {field.type === "HEADING" ||
+                                    !isPetition ? null : fieldHasReplies ? (
                                       <NakedLink
                                         href={buildUrlToSection("replies", { field: field.id })}
                                       >
-                                        <IconButtonWithTooltip
-                                          as="a"
-                                          icon={<ChevronRightIcon boxSize={5} />}
-                                          size="sm"
-                                          variant="outline"
-                                          backgroundColor="white"
-                                          placement="bottom"
-                                          color="gray.600"
-                                          isDisabled={!fieldHasReplies}
-                                          label={intl.formatMessage({
-                                            id: "page.preview.review-reply",
-                                            defaultMessage: "Review reply",
-                                          })}
-                                        />
+                                        {iconButtonReviewReply}
                                       </NakedLink>
+                                    ) : (
+                                      iconButtonReviewReply
                                     )}
                                   </Stack>
                                 </Center>

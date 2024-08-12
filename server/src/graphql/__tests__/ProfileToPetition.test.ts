@@ -5,18 +5,20 @@ import {
   Organization,
   Petition,
   PetitionField,
+  PetitionFieldType,
   Profile,
   ProfileRelationshipType,
   ProfileType,
   ProfileTypeField,
+  ProfileTypeFieldTypeValues,
   User,
 } from "../../db/__types";
 import { mapProfileTypeFieldToPetitionField } from "../../db/helpers/petitionProfileMapper";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
-import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
 
 describe("GraphQL/Profiles to Petitions", () => {
   let testClient: TestClient;
@@ -30,6 +32,9 @@ describe("GraphQL/Profiles to Petitions", () => {
     mocks = new Mocks(knex);
 
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
+
+    await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
+    await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
   });
 
   afterAll(async () => {
@@ -67,8 +72,6 @@ describe("GraphQL/Profiles to Petitions", () => {
     let yourContractsChildren: PetitionField[];
 
     beforeAll(async () => {
-      await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
-      await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
       const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
       await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
       await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
@@ -5636,6 +5639,1054 @@ describe("GraphQL/Profiles to Petitions", () => {
           updatedFields.map((f) => f.id),
         )
         .update({ permission: "WRITE" });
+    });
+  });
+
+  describe("createFieldGroupReplyFromProfile", () => {
+    let petition: Petition;
+    let fieldGroup: PetitionField;
+    let groupChildren: PetitionField[];
+
+    let profile: Profile;
+    let profileType: ProfileType;
+    let propertiesIdx: Record<string, ProfileTypeField>;
+
+    beforeAll(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      const properties = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        ProfileTypeFieldTypeValues.length,
+        (i) => {
+          const type = ProfileTypeFieldTypeValues[i];
+          return {
+            type,
+            position: i,
+            alias: type.toLowerCase(),
+            options:
+              type === "DATE"
+                ? { useReplyAsExpiryDate: false }
+                : type === "SELECT"
+                  ? {
+                      values: [
+                        { label: { en: "High", es: "Alto" }, value: "HIGH" },
+                        { label: { en: "Medium", es: "Medio" }, value: "MEDIUM" },
+                        { label: { en: "Low", es: "Bajo" }, value: "LOW" },
+                      ],
+                    }
+                  : {},
+          };
+        },
+      );
+
+      propertiesIdx = indexBy(properties, (p) => p.type);
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          type: "TEXT",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["TEXT"].id,
+          content: { value: "Mike" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "SHORT_TEXT",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
+          content: { value: "Ross" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "DATE",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["DATE"].id,
+          content: { value: "2020-10-09" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "PHONE",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["PHONE"].id,
+          content: { value: "+34611676433" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "NUMBER",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["NUMBER"].id,
+          content: { value: 1234 },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "SELECT",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["SELECT"].id,
+          content: { value: "LOW" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "BACKGROUND_CHECK",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
+          content: {
+            query: {
+              name: "Mike Ross",
+              date: "2020-10-09",
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Mike ROSS",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: {
+              id: "Q7747",
+              type: "Person",
+              name: "Mike ROSS",
+              properties: {},
+            },
+          },
+        },
+      ]);
+
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        filename: "id_document__mike_ross",
+        size: "1024",
+        content_type: "application/pdf",
+      }));
+
+      await mocks.knex.from("profile_field_file").insert({
+        profile_id: profile.id,
+        profile_type_field_id: propertiesIdx["FILE"].id,
+        type: "FILE",
+        file_upload_id: file.id,
+        created_by_user_id: user.id,
+      });
+
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      groupChildren = await mocks.createRandomPetitionFields(
+        petition.id,
+        ProfileTypeFieldTypeValues.length + 1,
+        (i) =>
+          [
+            {
+              type: "TEXT" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["TEXT"].id,
+            },
+            {
+              type: "SHORT_TEXT" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
+            },
+            {
+              type: "FILE_UPLOAD" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["FILE"].id,
+            },
+            {
+              type: "DATE" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["DATE"].id,
+            },
+            {
+              type: "PHONE" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["PHONE"].id,
+            },
+            {
+              type: "NUMBER" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["NUMBER"].id,
+            },
+            {
+              type: "SELECT" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["SELECT"].id,
+            },
+            {
+              type: "BACKGROUND_CHECK" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
+            },
+            {
+              type: "SHORT_TEXT" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: null,
+            },
+          ][i],
+      );
+    });
+
+    beforeEach(async () => {
+      await mocks.knex.from("petition_field_reply").delete();
+      await mocks.knex.from("petition_profile").delete();
+      await mocks.knex.from("petition_event").delete();
+    });
+
+    it("creates a new field group reply with the contents of the profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const [unlinkedReply] = await mocks.createRandomTextReply(
+        groupChildren.at(-1)!.id,
+        undefined,
+        1,
+        () => ({
+          parent_petition_field_reply_id: groupReply.id,
+          user_id: user.id,
+          type: "SHORT_TEXT",
+          content: { value: "This reply is not linked to a profile field" },
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                  }
+                }
+              }
+              children {
+                field {
+                  id
+                  type
+                  profileTypeField {
+                    id
+                  }
+                }
+                replies {
+                  id
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+        },
+        field: {
+          petition: {
+            profiles: [{ id: toGlobalId("Profile", profile.id) }],
+          },
+        },
+        children: [
+          {
+            field: {
+              id: expect.any(String),
+              type: "TEXT",
+              profileTypeField: { id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id) },
+            },
+            replies: [{ id: expect.any(String), content: { value: "Mike" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SHORT_TEXT",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+              },
+            },
+            replies: [{ id: expect.any(String), content: { value: "Ross" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "FILE_UPLOAD",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+              },
+            },
+            replies: [
+              {
+                id: expect.any(String),
+                content: {
+                  id: expect.any(String),
+                  filename: "id_document__mike_ross",
+                  size: "1024",
+                  contentType: "application/pdf",
+                  extension: "pdf",
+                  uploadComplete: true,
+                },
+              },
+            ],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "DATE",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+              },
+            },
+            replies: [{ id: expect.any(String), content: { value: "2020-10-09" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "PHONE",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+              },
+            },
+            replies: [{ id: expect.any(String), content: { value: "+34611676433" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "NUMBER",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+              },
+            },
+            replies: [{ id: expect.any(String), content: { value: 1234 } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SELECT",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+              },
+            },
+            replies: [{ id: expect.any(String), content: { value: "LOW" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "BACKGROUND_CHECK",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+              },
+            },
+            replies: [
+              {
+                id: expect.any(String),
+                content: {
+                  query: {
+                    name: "Mike Ross",
+                    date: "2020-10-09",
+                    type: "PERSON",
+                  },
+                  search: {
+                    totalCount: 1,
+                  },
+                  entity: {
+                    id: "Q7747",
+                    type: "Person",
+                    name: "Mike ROSS",
+                    properties: {},
+                  },
+                },
+              },
+            ],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SHORT_TEXT",
+              profileTypeField: null,
+            },
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", unlinkedReply.id),
+                content: { value: "This reply is not linked to a profile field" },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("updates field group reply if it already exists and replaces associated_profile_id, disassociating old profile from petition", async () => {
+      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex.from("profile_field_value").insert({
+        type: "TEXT",
+        profile_id: newProfile.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+        content: { value: "Harvey" },
+        created_by_user_id: user.id,
+      });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+        associated_profile_id: profile.id,
+      }));
+
+      const [unlinkedReply] = await mocks.createRandomTextReply(
+        groupChildren.at(-1)!.id,
+        undefined,
+        1,
+        () => ({
+          parent_petition_field_reply_id: groupReply.id,
+          user_id: user.id,
+          type: "SHORT_TEXT",
+          content: { value: "This reply is not linked to a profile field" },
+        }),
+      );
+
+      await mocks.knex.from("petition_field_reply").insert([
+        {
+          content: { value: "Mike" },
+          parent_petition_field_reply_id: groupReply.id,
+          petition_field_id: groupChildren.find(
+            (f) => f.profile_type_field_id === propertiesIdx["TEXT"].id,
+          )!.id,
+          type: "TEXT",
+          status: "APPROVED", // doesn't matter, it will be replaced
+          user_id: user.id,
+        },
+        {
+          content: { value: "Ross" },
+          parent_petition_field_reply_id: groupReply.id,
+          petition_field_id: groupChildren.find(
+            (f) => f.profile_type_field_id === propertiesIdx["SHORT_TEXT"].id,
+          )!.id,
+          type: "SHORT_TEXT",
+          status: "APPROVED", // doesn't matter, it will be replaced
+          user_id: user.id,
+        },
+      ]);
+
+      await mocks.knex.from("petition_profile").insert({
+        petition_id: petition.id,
+        profile_id: profile.id,
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                    events(limit: 100, offset: 0) {
+                      totalCount
+                      items {
+                        type
+                        data
+                      }
+                    }
+                  }
+                }
+              }
+              children {
+                field {
+                  id
+                  type
+                  profileTypeField {
+                    id
+                  }
+                }
+                replies {
+                  id
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", newProfile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", newProfile.id),
+        },
+        field: {
+          petition: {
+            profiles: [{ id: toGlobalId("Profile", newProfile.id) }],
+            events: {
+              totalCount: 3,
+              items: [
+                {
+                  type: "REPLY_CREATED",
+                  data: {
+                    petitionAccessId: null,
+                    userId: toGlobalId("User", user.id),
+                    petitionFieldId: toGlobalId(
+                      "PetitionField",
+                      groupChildren.find(
+                        (f) => f.profile_type_field_id === propertiesIdx["TEXT"].id,
+                      )!.id,
+                    ),
+                    petitionFieldReplyId: expect.any(String),
+                  },
+                },
+                {
+                  type: "PROFILE_ASSOCIATED",
+                  data: {
+                    profileId: toGlobalId("Profile", newProfile.id),
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+                {
+                  type: "PROFILE_DISASSOCIATED",
+                  data: {
+                    profileId: toGlobalId("Profile", profile.id),
+                    userId: toGlobalId("User", user.id),
+                    petitionAccessId: null,
+                  },
+                },
+              ],
+            },
+          },
+        },
+        children: [
+          {
+            field: {
+              id: expect.any(String),
+              type: "TEXT",
+              profileTypeField: { id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id) },
+            },
+            replies: [{ id: expect.any(String), content: { value: "Harvey" } }],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SHORT_TEXT",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "FILE_UPLOAD",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "DATE",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "PHONE",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "NUMBER",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SELECT",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "BACKGROUND_CHECK",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "SHORT_TEXT",
+              profileTypeField: null,
+            },
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", unlinkedReply.id),
+                content: { value: "This reply is not linked to a profile field" },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("does not disassociate old profile if it is still being referenced on another reply", async () => {
+      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex.from("profile_field_value").insert({
+        type: "TEXT",
+        profile_id: newProfile.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+        content: { value: "Harvey" },
+        created_by_user_id: user.id,
+      });
+
+      const [, groupReply2] = await mocks.createFieldGroupReply(
+        fieldGroup.id,
+        undefined,
+        2,
+        () => ({
+          user_id: user.id,
+          associated_profile_id: profile.id,
+        }),
+      );
+
+      await mocks.knex.from("petition_profile").insert({
+        petition_id: petition.id,
+        profile_id: profile.id,
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                    events(limit: 100, offset: 0) {
+                      totalCount
+                      items {
+                        type
+                        data
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply2.id),
+          profileId: toGlobalId("Profile", newProfile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply2.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", newProfile.id),
+        },
+        field: {
+          petition: {
+            profiles: [
+              { id: toGlobalId("Profile", profile.id) },
+              { id: toGlobalId("Profile", newProfile.id) },
+            ],
+            events: {
+              totalCount: 2,
+              items: [
+                {
+                  type: "REPLY_CREATED",
+                  data: {
+                    petitionAccessId: null,
+                    userId: toGlobalId("User", user.id),
+                    petitionFieldId: expect.any(String),
+                    petitionFieldReplyId: expect.any(String),
+                  },
+                },
+                {
+                  type: "PROFILE_ASSOCIATED",
+                  data: {
+                    profileId: toGlobalId("Profile", newProfile.id),
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+    });
+
+    it("sends error if there are no visible completed properties for the user and force=false", async () => {
+      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", propertiesIdx["TEXT"].id)
+        .update("permission", "HIDDEN");
+
+      // only replied value is HIDDEN
+      await mocks.knex.from("profile_field_value").insert({
+        type: "TEXT",
+        profile_id: newProfile.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+        content: { value: "Harvey" },
+        created_by_user_id: user.id,
+      });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                    events(limit: 100, offset: 0) {
+                      totalCount
+                      items {
+                        type
+                        data
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", newProfile.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("NOTHING_TO_IMPORT_ERROR");
+      expect(data).toBeNull();
+
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", propertiesIdx["TEXT"].id)
+        .update("permission", "READ");
+    });
+
+    it("only associates the empty reply to the profile if there are no visible completed properties for the user and force=true", async () => {
+      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", propertiesIdx["TEXT"].id)
+        .update("permission", "HIDDEN");
+
+      // only replied value is HIDDEN
+      await mocks.knex.from("profile_field_value").insert({
+        type: "TEXT",
+        profile_id: newProfile.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+        content: { value: "Harvey" },
+        created_by_user_id: user.id,
+      });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              force: true
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                    events(limit: 100, offset: 0) {
+                      totalCount
+                      items {
+                        type
+                        data
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", newProfile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", newProfile.id),
+        },
+        field: {
+          petition: {
+            profiles: [{ id: toGlobalId("Profile", newProfile.id) }],
+            events: {
+              totalCount: 1,
+              items: [
+                {
+                  type: "PROFILE_ASSOCIATED",
+                  data: {
+                    profileId: toGlobalId("Profile", newProfile.id),
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", propertiesIdx["TEXT"].id)
+        .update("permission", "READ");
+    });
+
+    it("associates profile to petition only once", async () => {
+      const [groupReply1, groupReply2] = await mocks.createFieldGroupReply(
+        fieldGroup.id,
+        undefined,
+        2,
+        () => ({ user_id: user.id }),
+      );
+
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply1.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply1.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+        },
+        field: {
+          petition: {
+            profiles: [{ id: toGlobalId("Profile", profile.id) }],
+          },
+        },
+      });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            createFieldGroupReplyFromProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+            ) {
+              id
+              associatedProfile {
+                id
+              }
+              field {
+                petition {
+                  ... on Petition {
+                    profiles {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply2.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.createFieldGroupReplyFromProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply2.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+        },
+        field: {
+          petition: {
+            profiles: [{ id: toGlobalId("Profile", profile.id) }],
+          },
+        },
+      });
     });
   });
 });

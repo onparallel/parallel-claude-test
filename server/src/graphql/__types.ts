@@ -1922,6 +1922,7 @@ export interface NexusGenFieldTypes {
     createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
+    createFieldGroupReplyFromProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["Organization"]; // Organization!
@@ -4493,6 +4494,7 @@ export interface NexusGenFieldTypeNames {
     createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
+    createFieldGroupReplyFromProfile: "PetitionFieldReply";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
     createOrganization: "Organization";
@@ -6763,6 +6765,14 @@ export interface NexusGenArgTypes {
       // args
       pattern?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    createFieldGroupReplyFromProfile: {
+      // args
+      force?: boolean | null; // Boolean
+      parentReplyId: NexusGenScalars["GID"]; // GID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
     };
     createFileUploadReply: {
       // args

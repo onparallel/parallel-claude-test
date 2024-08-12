@@ -1,9 +1,11 @@
-import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
+import { DataProxy, gql, useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
 import {
+  PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
   PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
+  PreviewPetitionFieldMutations_profileDocument,
   PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument,
   PreviewPetitionFieldMutations_updatePetitionFieldRepliesDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
@@ -11,13 +13,17 @@ import {
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
+  useCreateFieldGroupReplyFromProfile_PetitionFieldFragment,
+  useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc,
   useCreatePetitionFieldReply_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
+import { isDefined } from "remeda";
 import { RecipientViewPetitionFieldLayout } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 function getRandomId() {
@@ -767,6 +773,152 @@ updateReplyContent.fragments = {
   PetitionFieldReply: gql`
     fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
       content
+    }
+  `,
+};
+
+const _createFieldGroupReplyFromProfile = gql`
+  mutation PreviewPetitionFieldMutations_createFieldGroupReplyFromProfile(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $parentReplyId: GID!
+    $profileId: GID!
+    $force: Boolean
+  ) {
+    createFieldGroupReplyFromProfile(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      parentReplyId: $parentReplyId
+      profileId: $profileId
+      force: $force
+    ) {
+      id
+    }
+  }
+`;
+
+const _getProfile = gql`
+  query PreviewPetitionFieldMutations_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      id
+      properties {
+        field {
+          id
+        }
+        files {
+          id
+          file {
+            size
+            isComplete
+            filename
+            contentType
+          }
+        }
+        value {
+          id
+          content
+        }
+      }
+    }
+  }
+`;
+
+export function useCreateFieldGroupReplyFromProfile() {
+  const client = useApolloClient();
+
+  const [createFieldGroupReplyFromProfile] = useMutation(
+    PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileDocument,
+  );
+
+  const [getProfile] = useLazyQuery(PreviewPetitionFieldMutations_profileDocument, {
+    fetchPolicy: "cache-and-network",
+  });
+
+  const createFieldReply = useCreatePetitionFieldReply();
+  const createFileUploadReply = useCreateFileUploadReply();
+
+  return useCallback(
+    async function _createFieldGroupReplyFromProfile({
+      petitionId,
+      petitionFieldId,
+      parentReplyId,
+      profileId,
+      force,
+      isCacheOnly,
+    }: {
+      petitionId: string;
+      petitionFieldId: string;
+      parentReplyId: string;
+      profileId: string;
+      force?: boolean;
+      isCacheOnly?: boolean;
+    }) {
+      if (isCacheOnly) {
+        const field =
+          client.readFragment<useCreateFieldGroupReplyFromProfile_PetitionFieldFragment>({
+            fragment: useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc,
+            id: petitionFieldId,
+          });
+        const { data } = await getProfile({ variables: { profileId } });
+
+        const linkedFields =
+          field?.children?.filter((field) => isDefined(field.profileTypeField)) ?? [];
+
+        for (const linkedField of linkedFields) {
+          const property = data?.profile?.properties.find((property) => {
+            return property.field.id === linkedField.profileTypeField!.id;
+          });
+          if (!property) continue;
+
+          if (isFileTypeField(linkedField.type) && property.files) {
+            await createFileUploadReply({
+              petitionId,
+              fieldId: linkedField.id,
+              content: (property!.files?.map((f) => {
+                const { filename, size, contentType } = f.file ?? {};
+                return { name: filename, size, type: contentType };
+              }) ?? []) as File[],
+              uploads: { current: {} },
+              parentReplyId,
+              isCacheOnly,
+            });
+          } else if (property.value) {
+            await createFieldReply({
+              petitionId,
+              fieldId: linkedField.id,
+              content: property!.value?.content,
+              parentReplyId,
+              isCacheOnly,
+            });
+          }
+        }
+      } else {
+        await createFieldGroupReplyFromProfile({
+          variables: {
+            petitionId,
+            petitionFieldId,
+            parentReplyId,
+            profileId,
+            force,
+          },
+        });
+      }
+    },
+    [createFieldGroupReplyFromProfile],
+  );
+}
+
+useCreateFieldGroupReplyFromProfile.fragments = {
+  PetitionField: gql`
+    fragment useCreateFieldGroupReplyFromProfile_PetitionField on PetitionField {
+      id
+      children {
+        id
+        type
+        profileTypeField {
+          id
+        }
+      }
     }
   `,
 };

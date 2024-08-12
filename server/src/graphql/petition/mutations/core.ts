@@ -4055,3 +4055,180 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     return petition;
   },
 });
+
+export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupReplyFromProfile", {
+  type: "PetitionFieldReply",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    petitionIsNotAnonymized("petitionId"),
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
+    repliesBelongsToField("petitionFieldId", "parentReplyId"),
+    userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
+    profileIsNotAnonymized("profileId"),
+    profileHasSameProfileTypeAsField("profileId", "petitionFieldId"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    parentReplyId: nonNull(globalIdArg("PetitionFieldReply")),
+    profileId: nonNull(globalIdArg("Profile")),
+    force: booleanArg({
+      description:
+        "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
+    }),
+  },
+  resolve: async (_, args, ctx) => {
+    const profileLinkedChildren = (
+      await ctx.petitions.loadPetitionFieldChildren(args.petitionFieldId)
+    ).filter((f) => isDefined(f.profile_type_field_id));
+
+    const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+      profileLinkedChildren.map((child) => ({
+        profileTypeFieldId: child.profile_type_field_id!,
+        userId: ctx.user!.id,
+      })),
+    );
+
+    const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(args.profileId);
+    const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId);
+
+    const replies: CreatePetitionFieldReply[] = [];
+
+    for (const [child] of zip(profileLinkedChildren, userPermissions).filter(([, permission]) =>
+      // do not prefill petition fields if the user does not have at least READ permission on the profile property
+      isAtLeast(permission, "READ"),
+    )) {
+      const profileValue = profileFieldValues.find(
+        (v) => v.profile_type_field_id === child.profile_type_field_id,
+      );
+      const profileFiles = profileFieldFiles.filter(
+        (f) => f.profile_type_field_id === child.profile_type_field_id,
+      );
+
+      const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isDefined);
+      const clonedFileUploads =
+        fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
+
+      if (isDefined(profileValue)) {
+        replies.push({
+          petition_field_id: child.id,
+          parent_petition_field_reply_id: args.parentReplyId,
+          content: profileValue.content,
+          type: child.type,
+          user_id: ctx.user!.id,
+        });
+      } else if (clonedFileUploads.length > 0) {
+        replies.push(
+          ...clonedFileUploads.map((file) => ({
+            petition_field_id: child.id,
+            parent_petition_field_reply_id: args.parentReplyId,
+            content: { file_upload_id: file.id },
+            type: child.type,
+            user_id: ctx.user!.id,
+          })),
+        );
+      }
+    }
+
+    if (replies.length === 0 && !args.force) {
+      throw new ApolloError(
+        "Nothing to import from the profile. Pass force=true to associate the profile to the empty reply",
+        "NOTHING_TO_IMPORT_ERROR",
+      );
+    }
+
+    const parentReply = await ctx.petitions.loadFieldReply(args.parentReplyId);
+    const updatedReply = await ctx.petitions.updatePetitionFieldReply(
+      args.parentReplyId,
+      { associated_profile_id: args.profileId },
+      `User:${ctx.user!.id}`,
+    );
+
+    if (isDefined(parentReply?.associated_profile_id)) {
+      // call safeRemove AFTER updating associated_profile_id on reply, so old profile_id can be safe removed
+      // (calling this function before updating will result in no disassociation as there is still a reference to the profile on the parentReply)
+      const disassociated = await ctx.petitions.safeRemovePetitionProfileAssociation(
+        args.petitionId,
+        parentReply.associated_profile_id,
+      );
+      if (disassociated) {
+        await ctx.petitions.createEvent({
+          type: "PROFILE_DISASSOCIATED",
+          petition_id: disassociated.petition_id,
+          data: {
+            user_id: ctx.user!.id,
+            profile_id: disassociated.profile_id,
+          },
+        });
+
+        await ctx.profiles.createEvent({
+          type: "PETITION_DISASSOCIATED",
+          org_id: ctx.user!.org_id,
+          profile_id: disassociated.profile_id,
+          data: {
+            user_id: ctx.user!.id,
+            petition_id: disassociated.petition_id,
+          },
+        });
+      }
+    }
+
+    try {
+      await ctx.profiles.associateProfilesToPetition(
+        args.profileId,
+        args.petitionId,
+        `User:${ctx.user!.id}`,
+      );
+
+      await ctx.petitions.createEvent({
+        type: "PROFILE_ASSOCIATED",
+        petition_id: args.petitionId,
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: args.profileId,
+        },
+      });
+
+      await ctx.profiles.createEvent({
+        type: "PETITION_ASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: args.profileId,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: args.petitionId,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "petition_profile__petition_id__profile_id"
+      ) {
+        // profile is already associated to petition, safe to ignore error
+      } else {
+        throw error;
+      }
+    }
+
+    if (profileLinkedChildren.length > 0) {
+      await ctx.petitions.deletePetitionFieldReplies(
+        profileLinkedChildren.map((c) => ({ id: c.id, parentReplyId: args.parentReplyId })),
+        `User:${ctx.user!.id}`,
+      );
+    }
+
+    if (replies.length > 0) {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+      await ctx.petitions.createPetitionFieldReply(
+        args.petitionId,
+        replies,
+        `User:${ctx.user!.id}`,
+        false,
+      );
+    }
+
+    return updatedReply;
+  },
+});

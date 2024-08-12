@@ -5827,7 +5827,7 @@
   {
     "term": "component.petition-header.import-replies-success-title",
     "definition": "Respuestas importadas con éxito",
-    "context": "Replies succesfully imported"
+    "context": "Replies successfully imported"
   },
   {
     "term": "component.petition-header.input-tab",
@@ -6980,6 +6980,21 @@
     "context": "No activity yet"
   },
   {
+    "term": "component.preview-confirm-import-from-profile-dialog.body",
+    "definition": "El perfil seleccionado no tiene información disponible para importar al grupo.",
+    "context": "The selected profile has no information available to import into the group."
+  },
+  {
+    "term": "component.preview-confirm-import-from-profile-dialog.body-2",
+    "definition": "Si continúas, la información actual en los campos correspondientes al tipo de perfil será sobrescrita y se perderá la información existente.",
+    "context": "If you continue, the current information in the fields related to this profile type will be overwritten and any existing data will be lost."
+  },
+  {
+    "term": "component.preview-confirm-import-from-profile-dialog.header",
+    "definition": "No hemos encontrado información",
+    "context": "No information found"
+  },
+  {
     "term": "component.preview-dow-jones-permission-denied-dialog.description-1",
     "definition": "Se requiere autorización para realizar la búsqueda con Dow Jones. Por favor, conecta una cuenta para poder utilizar este campo desde {integrations}.",
     "context": "Authorization is required to search in Dow Jones. Please connect an account to be able to use this field from {integrations}."
@@ -6988,6 +7003,26 @@
     "term": "component.preview-dow-jones-permission-denied-dialog.title",
     "definition": "Permisos para realizar esta acción",
     "context": "Permissions needed"
+  },
+  {
+    "term": "component.preview-import-from-profile-dialog.body",
+    "definition": "Se sobreescribirán todas las respuestas a campos vinculados.",
+    "context": "All replies to linked fields will be overwritten."
+  },
+  {
+    "term": "component.preview-import-from-profile-dialog.header",
+    "definition": "Importar desde perfil",
+    "context": "Import from profile"
+  },
+  {
+    "term": "component.preview-import-from-profile-dialog.profile-error",
+    "definition": "Por favor, selecciona un perfil",
+    "context": "Please, select a profile"
+  },
+  {
+    "term": "component.preview-import-from-profile-dialog.select-profile-label",
+    "definition": "Selecciona un perfil del que importar sus respuestas",
+    "context": "Select a profile to import the information from"
   },
   {
     "term": "component.preview-petition-background-check.check-lists",
@@ -7058,6 +7093,16 @@
     "term": "component.preview-petition-field-background-check.view-results",
     "definition": "Ver resultados",
     "context": "View results"
+  },
+  {
+    "term": "component.preview-petition-field-group.import-from-profile",
+    "definition": "Importar desde perfil",
+    "context": "Import from profile"
+  },
+  {
+    "term": "component.preview-petition-field-group.profile-successfully-imported",
+    "definition": "Perfil importado con éxito",
+    "context": "Profile successfully imported"
   },
   {
     "term": "component.preview-petition-field-group.review-reply",
@@ -8353,6 +8398,11 @@
     "term": "component.recipient-view-petition-field-group.add-button",
     "definition": "Añadir {groupName}",
     "context": "Add {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.add-from-profile-button",
+    "definition": "Añadir desde perfil",
+    "context": "Add from profile"
   },
   {
     "term": "component.recipient-view-petition-field-group.confirm-delete-group",

@@ -1179,6 +1179,16 @@ type Mutation {
   Creates a task for exporting a ZIP file with petition replies and sends it to the queue
   """
   createExportRepliesTask(pattern: String, petitionId: GID!): Task!
+  createFieldGroupReplyFromProfile(
+    """
+    Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile
+    """
+    force: Boolean
+    parentReplyId: GID!
+    petitionFieldId: GID!
+    petitionId: GID!
+    profileId: GID!
+  ): PetitionFieldReply!
 
   """
   Creates a reply to a file upload field.

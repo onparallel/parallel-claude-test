@@ -32,16 +32,16 @@ import {
 } from "@parallel/graphql/__types";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
+import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
-import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -282,6 +282,7 @@ interface RecipientViewPetitionFieldGroupLayoutProps {
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick?: () => void;
   onAddNewGroup?: () => void;
+  addNewGroupAndFillWithProfileButton?: ReactNode;
   composeUrl?: string;
   children: ReactNode;
 }
@@ -291,6 +292,7 @@ export function RecipientViewPetitionFieldGroupLayout({
   onDownloadAttachment,
   onCommentsButtonClick,
   onAddNewGroup,
+  addNewGroupAndFillWithProfileButton,
   composeUrl,
   children,
 }: RecipientViewPetitionFieldGroupLayoutProps) {
@@ -388,7 +390,7 @@ export function RecipientViewPetitionFieldGroupLayout({
       </Stack>
       {children}
       {(field.replies.length > 0 && !field.multiple) || !isDefined(onAddNewGroup) ? null : (
-        <Box paddingX={4}>
+        <HStack paddingX={4} spacing={4}>
           <Button onClick={onAddNewGroup} leftIcon={<AddIcon />}>
             <Text>
               {intl.formatMessage(
@@ -408,7 +410,10 @@ export function RecipientViewPetitionFieldGroupLayout({
               )}
             </Text>
           </Button>
-        </Box>
+          {isDefined(addNewGroupAndFillWithProfileButton)
+            ? addNewGroupAndFillWithProfileButton
+            : null}
+        </HStack>
       )}
     </Stack>
   );

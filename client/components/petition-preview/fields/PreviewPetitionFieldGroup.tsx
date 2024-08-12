@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Center } from "@chakra-ui/react";
-import { ChevronRightIcon } from "@parallel/chakra/icons";
+import { Box, Button, Center, Stack, Text, useToast } from "@chakra-ui/react";
+import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { RecipientViewPetitionFieldCard } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDate";
@@ -13,6 +14,7 @@ import {
   RecipientViewPetitionFieldGroupCard,
   RecipientViewPetitionFieldGroupLayout,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldGroup";
+import { RecipientViewPetitionFieldIdVerification } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldIdVerification";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -29,16 +31,19 @@ import {
   PreviewPetitionFieldGroup_PetitionFieldFragment,
   PreviewPetitionFieldGroup_UserFragment,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
+import { usePreviewConfirmImportFromProfileDialog } from "../dialogs/PreviewConfirmImportFromProfileDialog";
+import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromProfileDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
-import { RecipientViewPetitionFieldIdVerification } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldIdVerification";
-import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
@@ -78,6 +83,19 @@ export interface PreviewPetitionFieldGroupProps
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
   onDownloadAttachment: (fieldId: string) => (attachmentId: string) => Promise<void>;
+  onCreateFieldGroupReplyFromProfile: ({
+    petitionId,
+    petitionFieldId,
+    parentReplyId,
+    profileId,
+    force,
+  }: {
+    petitionId: string;
+    petitionFieldId: string;
+    parentReplyId: string;
+    profileId: string;
+    force?: boolean;
+  }) => Promise<void>;
 }
 
 export function PreviewPetitionFieldGroup({
@@ -95,6 +113,7 @@ export function PreviewPetitionFieldGroup({
   onCreateFileReply,
   onStartAsyncFieldCompletion,
   onRetryAsyncFieldCompletion,
+  onCreateFieldGroupReplyFromProfile,
   onRefreshField,
   onError,
   fieldLogic,
@@ -103,10 +122,70 @@ export function PreviewPetitionFieldGroup({
   const handleAddReply = async () => {
     await onCreateReply({});
   };
+
   const buildUrlToSection = useBuildUrlToPetitionSection();
+
+  const showErrorToast = useGenericErrorToast();
+  const showToast = useToast();
 
   const replies =
     isCacheOnly && field.__typename === "PetitionField" ? field.previewReplies : field.replies;
+
+  const isLinkedToProfileType = isDefined(field.profileType);
+
+  const showPreviewImportFromProfileDialog = usePreviewImportFromProfileDialog();
+  const showConfirmImportFromProfileDialog = usePreviewConfirmImportFromProfileDialog();
+  const handleImportFromProfile = async (parentReplyId: string) => {
+    if (!isDefined(field.profileType)) {
+      return;
+    }
+    let profileId = "";
+    try {
+      profileId = await showPreviewImportFromProfileDialog({ profileTypeId: field.profileType.id });
+      await onCreateFieldGroupReplyFromProfile({
+        petitionId: petition.id,
+        petitionFieldId: field.id,
+        parentReplyId,
+        profileId,
+      });
+    } catch (e) {
+      if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
+        try {
+          await showConfirmImportFromProfileDialog();
+          await onCreateFieldGroupReplyFromProfile({
+            petitionId: petition.id,
+            petitionFieldId: field.id,
+            parentReplyId,
+            profileId,
+            force: true,
+          });
+        } catch (e) {
+          if (!isDialogError(e)) {
+            showErrorToast();
+          }
+          return;
+        }
+      } else if (!isDialogError(e)) {
+        showErrorToast();
+      }
+      return;
+    }
+    onRefreshField();
+    showToast({
+      title: intl.formatMessage({
+        id: "component.preview-petition-field-group.profile-successfully-imported",
+        defaultMessage: "Profile successfully imported",
+      }),
+      status: "success",
+    });
+  };
+
+  const handleAddReplyAndFillWithProfile = async () => {
+    const parentReplyId = await onCreateReply({});
+    if (parentReplyId) {
+      await handleImportFromProfile(parentReplyId);
+    }
+  };
 
   return (
     <>
@@ -119,12 +198,45 @@ export function PreviewPetitionFieldGroup({
             ? undefined
             : handleAddReply
         }
+        addNewGroupAndFillWithProfileButton={
+          isDisabled ||
+          !isLinkedToProfileType ||
+          (petition.__typename === "Petition"
+            ? petition.status === "CLOSED"
+            : false) ? undefined : (
+            <Button onClick={handleAddReplyAndFillWithProfile} leftIcon={<ImportIcon />}>
+              <Text>
+                {intl.formatMessage({
+                  id: "component.recipient-view-petition-field-group.add-from-profile-button",
+                  defaultMessage: "Add from profile",
+                })}
+              </Text>
+            </Button>
+          )
+        }
         composeUrl={buildUrlToSection("compose", { field: field.id })}
       >
         {zip(replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
           const groupHasSomeReply = group.children!.some((c) => c.replies.length > 0);
           const groupHasSomeApprovedReply = group.children!.some((c) =>
             c.replies.some((r) => r.status === "APPROVED"),
+          );
+
+          const iconButtonReviewReply = (
+            <IconButtonWithTooltip
+              as="a"
+              icon={<ChevronRightIcon boxSize={5} />}
+              size="sm"
+              variant="outline"
+              backgroundColor="white"
+              placement="bottom"
+              color="gray.600"
+              isDisabled={!groupHasSomeReply}
+              label={intl.formatMessage({
+                id: "component.preview-petition-field-group.review-reply",
+                defaultMessage: "Review reply",
+              })}
+            />
           );
 
           return (
@@ -170,7 +282,8 @@ export function PreviewPetitionFieldGroup({
                   </LiquidPetitionVariableProvider>
                 );
               })}
-              {petition.__typename === "PetitionTemplate" ? null : (
+
+              {petition.__typename === "PetitionTemplate" && !isLinkedToProfileType ? null : (
                 <Center
                   display={{ base: "none", xl: "flex" }}
                   position="absolute"
@@ -181,24 +294,31 @@ export function PreviewPetitionFieldGroup({
                   minWidth="48px"
                   padding={2}
                 >
-                  <Box className={"edit-preview-field-buttons"} display="none">
-                    <NakedLink href={buildUrlToSection("replies", { parentReply: group.id })}>
+                  <Stack className={"edit-preview-field-buttons"} display="none">
+                    {isLinkedToProfileType ? (
                       <IconButtonWithTooltip
-                        as="a"
-                        icon={<ChevronRightIcon boxSize={5} />}
+                        icon={<ImportIcon boxSize={4} />}
                         size="sm"
                         variant="outline"
                         backgroundColor="white"
                         placement="bottom"
                         color="gray.600"
-                        isDisabled={!groupHasSomeReply}
+                        onClick={() => handleImportFromProfile(group.id)}
                         label={intl.formatMessage({
-                          id: "component.preview-petition-field-group.review-reply",
-                          defaultMessage: "Review reply",
+                          id: "component.preview-petition-field-group.import-from-profile",
+                          defaultMessage: "Import from profile",
                         })}
                       />
-                    </NakedLink>
-                  </Box>
+                    ) : null}
+
+                    {petition.__typename === "PetitionTemplate" ? null : groupHasSomeReply ? (
+                      <NakedLink href={buildUrlToSection("replies", { parentReply: group.id })}>
+                        {iconButtonReviewReply}
+                      </NakedLink>
+                    ) : (
+                      iconButtonReviewReply
+                    )}
+                  </Stack>
                 </Center>
               )}
             </RecipientViewPetitionFieldGroupCard>
@@ -374,6 +494,9 @@ PreviewPetitionFieldGroup.fragments = {
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldGroup_PetitionFieldData
+      profileType {
+        id
+      }
       children {
         ...RecipientViewPetitionFieldLayout_PetitionField
       }

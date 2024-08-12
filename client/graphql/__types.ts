@@ -932,6 +932,7 @@ export interface Mutation {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -1546,6 +1547,14 @@ export interface MutationcreateExportExcelTaskArgs {
 export interface MutationcreateExportRepliesTaskArgs {
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateFieldGroupReplyFromProfileArgs {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateFileUploadReplyArgs {
@@ -18960,6 +18969,7 @@ export type PreviewPetitionField_PetitionFieldFragment = {
       isComplete: boolean;
     };
   }>;
+  profileType?: { __typename?: "ProfileType"; id: string } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -18973,6 +18983,7 @@ export type PreviewPetitionField_PetitionFieldFragment = {
     commentCount: number;
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -19248,6 +19259,7 @@ export type PreviewPetitionField_queryQuery = {
         isComplete: boolean;
       };
     }>;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -19261,6 +19273,7 @@ export type PreviewPetitionField_queryQuery = {
       commentCount: number;
       unreadCommentCount: number;
       hasCommentsEnabled: boolean;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -19592,6 +19605,61 @@ export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyF
   content: { [key: string]: any };
 };
 
+export type PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    petitionFieldId: Scalars["GID"]["input"];
+    parentReplyId: Scalars["GID"]["input"];
+    profileId: Scalars["GID"]["input"];
+    force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  }>;
+
+export type PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutation = {
+  createFieldGroupReplyFromProfile: { __typename?: "PetitionFieldReply"; id: string };
+};
+
+export type PreviewPetitionFieldMutations_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type PreviewPetitionFieldMutations_profileQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: { __typename?: "ProfileTypeField"; id: string };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        file?: {
+          __typename?: "FileUpload";
+          size: number;
+          isComplete: boolean;
+          filename: string;
+          contentType: string;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+      } | null;
+    }>;
+  };
+};
+
+export type useCreateFieldGroupReplyFromProfile_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+  }> | null;
+};
+
 export type GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables =
   Exact<{
     data: Scalars["JSONObject"]["input"];
@@ -19909,6 +19977,7 @@ export type PreviewPetitionFieldGroup_PetitionFieldFragment = {
   commentCount: number;
   unreadCommentCount: number;
   hasCommentsEnabled: boolean;
+  profileType?: { __typename?: "ProfileType"; id: string } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -39661,8 +39730,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       __typename?: "PetitionField";
       id: string;
       alias?: string | null;
-      title?: string | null;
       type: PetitionFieldType;
+      title?: string | null;
       isReadOnly: boolean;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
@@ -39721,6 +39790,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
           }>;
         }> | null;
       }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -39925,7 +39995,11 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
-    profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+    profileType?: {
+      __typename?: "ProfileType";
+      profileNamePatternFields: Array<string>;
+      id: string;
+    } | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
     lastComment?: {
       __typename?: "PetitionFieldComment";
@@ -40113,8 +40187,8 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       __typename?: "PetitionField";
       id: string;
       alias?: string | null;
-      title?: string | null;
       type: PetitionFieldType;
+      title?: string | null;
       isReadOnly: boolean;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
@@ -40173,6 +40247,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
           }>;
         }> | null;
       }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -40434,6 +40509,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
         isComplete: boolean;
       };
     }>;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -40602,8 +40678,8 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionField";
             id: string;
             alias?: string | null;
-            title?: string | null;
             type: PetitionFieldType;
+            title?: string | null;
             isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
@@ -40662,6 +40738,7 @@ export type PetitionPreview_updatePetitionMutation = {
                 }>;
               }> | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -40869,6 +40946,7 @@ export type PetitionPreview_updatePetitionMutation = {
           profileType?: {
             __typename?: "ProfileType";
             profileNamePatternFields: Array<string>;
+            id: string;
           } | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
           lastComment?: {
@@ -41069,8 +41147,8 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionField";
             id: string;
             alias?: string | null;
-            title?: string | null;
             type: PetitionFieldType;
+            title?: string | null;
             isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
@@ -41129,6 +41207,7 @@ export type PetitionPreview_updatePetitionMutation = {
                 }>;
               }> | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -41390,6 +41469,7 @@ export type PetitionPreview_updatePetitionMutation = {
               isComplete: boolean;
             };
           }>;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -41504,8 +41584,8 @@ export type PetitionPreview_completePetitionMutation = {
         __typename?: "PetitionField";
         id: string;
         alias?: string | null;
-        title?: string | null;
         type: PetitionFieldType;
+        title?: string | null;
         isReadOnly: boolean;
         options: { [key: string]: any };
         visibility?: { [key: string]: any } | null;
@@ -41564,6 +41644,7 @@ export type PetitionPreview_completePetitionMutation = {
             }>;
           }> | null;
         }>;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
         children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         attachments: Array<{
           __typename?: "PetitionFieldAttachment";
@@ -41768,7 +41849,11 @@ export type PetitionPreview_completePetitionMutation = {
         }> | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
-      profileType?: { __typename?: "ProfileType"; profileNamePatternFields: Array<string> } | null;
+      profileType?: {
+        __typename?: "ProfileType";
+        profileNamePatternFields: Array<string>;
+        id: string;
+      } | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
       lastComment?: {
         __typename?: "PetitionFieldComment";
@@ -42002,8 +42087,8 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionField";
             id: string;
             alias?: string | null;
-            title?: string | null;
             type: PetitionFieldType;
+            title?: string | null;
             isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
@@ -42062,6 +42147,7 @@ export type PetitionPreview_petitionQuery = {
                 }>;
               }> | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -42269,6 +42355,7 @@ export type PetitionPreview_petitionQuery = {
           profileType?: {
             __typename?: "ProfileType";
             profileNamePatternFields: Array<string>;
+            id: string;
           } | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
           lastComment?: {
@@ -42469,8 +42556,8 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionField";
             id: string;
             alias?: string | null;
-            title?: string | null;
             type: PetitionFieldType;
+            title?: string | null;
             isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
@@ -42529,6 +42616,7 @@ export type PetitionPreview_petitionQuery = {
                 }>;
               }> | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -42790,6 +42878,7 @@ export type PetitionPreview_petitionQuery = {
               isComplete: boolean;
             };
           }>;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -59432,6 +59521,9 @@ export const PreviewPetitionFieldGroup_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldCard_PetitionField
     ...PreviewPetitionFieldGroup_PetitionFieldData
+    profileType {
+      id
+    }
     children {
       ...RecipientViewPetitionFieldLayout_PetitionField
     }
@@ -59467,6 +59559,18 @@ export const PreviewPetitionFieldGroup_PetitionFieldFragmentDoc = gql`
   ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldGroup_PetitionFieldFragment, unknown>;
+export const useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc = gql`
+  fragment useCreateFieldGroupReplyFromProfile_PetitionField on PetitionField {
+    id
+    children {
+      id
+      type
+      profileTypeField {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<useCreateFieldGroupReplyFromProfile_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldLayout_PetitionField
@@ -59482,12 +59586,14 @@ export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
       id
     }
     ...completedFieldReplies_PetitionField
+    ...useCreateFieldGroupReplyFromProfile_PetitionField
   }
   ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldGroup_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
+  ${useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const HiddenFieldDialog_PetitionFieldFragmentDoc = gql`
   fragment HiddenFieldDialog_PetitionField on PetitionField {
@@ -64207,6 +64313,56 @@ export const PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument = g
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutation,
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileDocument = gql`
+  mutation PreviewPetitionFieldMutations_createFieldGroupReplyFromProfile(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $parentReplyId: GID!
+    $profileId: GID!
+    $force: Boolean
+  ) {
+    createFieldGroupReplyFromProfile(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      parentReplyId: $parentReplyId
+      profileId: $profileId
+      force: $force
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutation,
+  PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutationVariables
+>;
+export const PreviewPetitionFieldMutations_profileDocument = gql`
+  query PreviewPetitionFieldMutations_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      id
+      properties {
+        field {
+          id
+        }
+        files {
+          id
+          file {
+            size
+            isComplete
+            filename
+            contentType
+          }
+        }
+        value {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_profileQuery,
+  PreviewPetitionFieldMutations_profileQueryVariables
 >;
 export const GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument = gql`
   mutation GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillData(
