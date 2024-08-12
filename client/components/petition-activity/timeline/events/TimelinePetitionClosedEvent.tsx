@@ -9,20 +9,18 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionClosedEventProps {
-  userId: string;
   event: TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 }
 
-export function TimelinePetitionClosedEvent({ event, userId }: TimelinePetitionClosedEventProps) {
+export function TimelinePetitionClosedEvent({ event }: TimelinePetitionClosedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={DoubleCheckIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
-        id="timeline.petition-closed-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} closed the parallel {timeAgo}"
+        id="component.timeline-petition-closed-event.description"
+        defaultMessage="{user} closed the parallel {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

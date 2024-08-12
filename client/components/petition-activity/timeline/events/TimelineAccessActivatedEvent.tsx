@@ -10,11 +10,10 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 interface TimelineAccessActivatedEventProps {
-  userId: string;
   event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 }
 
-export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessActivatedEventProps) {
+export function TimelineAccessActivatedEvent({ event }: TimelineAccessActivatedEventProps) {
   return (
     <TimelineItem
       icon={
@@ -29,11 +28,9 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         event.access.delegateGranter ? (
           <FormattedMessage
             id="component.timeline-access-activated-event.contactless-access-delegated"
-            defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+            defaultMessage="{delegate} created a link access as {user} {timeAgo}"
             values={{
-              delegateIsYou: userId === event.access.delegateGranter.id,
               delegate: <UserReference user={event.access.delegateGranter} />,
-              userIsYou: userId === event.user?.id,
               user: <UserReference user={event.user} />,
               timeAgo: (
                 <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -43,9 +40,8 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         ) : (
           <FormattedMessage
             id="component.timeline-access-activated-event.contactless-access-activated"
-            defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+            defaultMessage="{user} created a link access {timeAgo}"
             values={{
-              userIsYou: userId === event.user?.id,
               user: <UserReference user={event.user} />,
               timeAgo: (
                 <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -56,11 +52,9 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
       ) : event.access.delegateGranter ? (
         <FormattedMessage
           id="component.timeline-access-activated-event.access-delegated"
-          defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} sent an access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+          defaultMessage="{delegate} sent an access to {contact} as {user} {timeAgo}"
           values={{
-            delegateIsYou: userId === event.access.delegateGranter.id,
             delegate: <UserReference user={event.access.delegateGranter} />,
-            userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
             contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (
@@ -71,9 +65,8 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
       ) : (
         <FormattedMessage
           id="component.timeline-access-activated-event.access-activated"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} sent an access to {contact} {timeAgo}"
+          defaultMessage="{user} sent an access to {contact} {timeAgo}"
           values={{
-            userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
             contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (

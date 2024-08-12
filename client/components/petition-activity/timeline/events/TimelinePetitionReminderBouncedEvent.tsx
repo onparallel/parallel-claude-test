@@ -18,10 +18,10 @@ export function TimelinePetitionReminderBouncedEvent({
   return (
     <TimelineItem icon={<TimelineIcon icon={EmailXIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
-        id="timeline.petition-reminder-bounced-description"
-        defaultMessage="We could not send a reminder to contact {contactName} {timeAgo}"
+        id="component.timeline-petition-reminder-bounced-event.description"
+        defaultMessage="We could not send a reminder to {contact} {timeAgo}"
         values={{
-          contactName: <ContactReference contact={event.reminder.access.contact} />,
+          contact: <ContactReference contact={event.reminder.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),

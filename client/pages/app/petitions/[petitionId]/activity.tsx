@@ -496,11 +496,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             }
             scrollableTarget="petition-layout-body"
           >
-            <PetitionActivityTimeline
-              id="petition-activity-timeline"
-              userId={me.id}
-              events={events.items}
-            />
+            <PetitionActivityTimeline events={events.items} />
           </InfiniteScroll>
         </Box>
       </Stack>

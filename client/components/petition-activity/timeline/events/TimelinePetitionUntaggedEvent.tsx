@@ -10,22 +10,17 @@ import { TagIcon } from "@parallel/chakra/icons";
 import { TimelineIcon } from "../common/TimelineIcon";
 
 export interface TimelinePetitionUntaggedEventProps {
-  userId: string;
   event: TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment;
 }
 
-export function TimelinePetitionUntaggedEvent({
-  event,
-  userId,
-}: TimelinePetitionUntaggedEventProps) {
+export function TimelinePetitionUntaggedEvent({ event }: TimelinePetitionUntaggedEventProps) {
   const intl = useIntl();
   return (
     <TimelineItem icon={<TimelineIcon icon={TagIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
         id="component.timeline-petition-untagged-event.description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
+        defaultMessage="{user} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           tagList: intl.formatList(event.tags.map((tag, i) => <TagReference key={i} tag={tag} />)),
           tagCount: event.tags.length,

@@ -4336,8 +4336,8 @@
   },
   {
     "term": "component.notification-comment.body-general-chat",
-    "definition": "{name} has written a comment in {general}.",
-    "context": "{name} has written a comment in {general}."
+    "definition": "{name} has written a comment in <b>General</b>.",
+    "context": "{name} has written a comment in <b>General</b>."
   },
   {
     "term": "component.notification-email-bounced.body",
@@ -4351,8 +4351,8 @@
   },
   {
     "term": "component.notification-internal-comment.body-general-chat",
-    "definition": "{name} has added a note in {general}.",
-    "context": "{name} has added a note in {general}."
+    "definition": "{name} has added a note in <b>General</b>.",
+    "context": "{name} has added a note in <b>General</b>."
   },
   {
     "term": "component.notification-mention-comment.body",
@@ -4361,8 +4361,8 @@
   },
   {
     "term": "component.notification-mention.body-general-chat",
-    "definition": "{name} has mentioned you in {general}.",
-    "context": "{name} has mentioned you in {general}."
+    "definition": "{name} has mentioned you in <b>General</b>.",
+    "context": "{name} has mentioned you in <b>General</b>."
   },
   {
     "term": "component.notification-petition-completed.body",
@@ -10016,48 +10016,83 @@
   },
   {
     "term": "component.timeline-access-activated-event.access-activated",
-    "definition": "{userIsYou, select, true {You} other {{user}}} sent an access to {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} sent an access to {contact} {timeAgo}"
+    "definition": "{user} sent an access to {contact} {timeAgo}",
+    "context": "{user} sent an access to {contact} {timeAgo}"
   },
   {
     "term": "component.timeline-access-activated-event.access-delegated",
-    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} sent an access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} sent an access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+    "definition": "{delegate} sent an access to {contact} as {user} {timeAgo}",
+    "context": "{delegate} sent an access to {contact} as {user} {timeAgo}"
   },
   {
     "term": "component.timeline-access-activated-event.contactless-access-activated",
-    "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+    "definition": "{user} created a link access {timeAgo}",
+    "context": "{user} created a link access {timeAgo}"
   },
   {
     "term": "component.timeline-access-activated-event.contactless-access-delegated",
-    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+    "definition": "{delegate} created a link access as {user} {timeAgo}",
+    "context": "{delegate} created a link access as {user} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-activated-from-link-event.description",
+    "definition": "{contact} created the parallel from a public link {timeAgo}",
+    "context": "{contact} created the parallel from a public link {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-deactivated-event.description",
+    "definition": "{user} removed access to {contact} {timeAgo}",
+    "context": "{user} removed access to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-deactivated-event.description-bounce",
+    "definition": "The access for {contact} was removed because the email bounced {timeAgo}",
+    "context": "The access for {contact} was removed because the email bounced {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-deactivated-event.description-contactless",
+    "definition": "{user} deactivated a link access {timeAgo}",
+    "context": "{user} deactivated a link access {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-deactivated-event.description-generic",
+    "definition": "The access for {contact} was removed {timeAgo}",
+    "context": "The access for {contact} was removed {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-delegated-event.description",
+    "definition": "{contact} has delegated the parallel to {newContact} {timeAgo}",
+    "context": "{contact} has delegated the parallel to {newContact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-access-opened-event.description",
+    "definition": "{contact} opened the parallel {timeAgo}",
+    "context": "{contact} opened the parallel {timeAgo}"
   },
   {
     "term": "component.timeline-comment-deleted-event.comment-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
+    "definition": "{someone} deleted a comment on field {field} {timeAgo}",
+    "context": "{someone} deleted a comment on field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-comment-deleted-event.general-comment-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment in {general} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment in {general} {timeAgo}"
+    "definition": "{someone} deleted a comment in <b>General</b> {timeAgo}",
+    "context": "{someone} deleted a comment in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-deleted-event.general-note-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a note in {general} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note in {general} {timeAgo}"
+    "definition": "{someone} deleted a note in <b>General</b> {timeAgo}",
+    "context": "{someone} deleted a note in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-deleted-event.note-deleted",
-    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
+    "definition": "{someone} deleted a note on field {field} {timeAgo}",
+    "context": "{someone} deleted a note on field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.comment",
-    "definition": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+    "definition": "{author} commented on field {field} {timeAgo}",
+    "context": "{author} commented on field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.comment-published-deleted",
@@ -10066,23 +10101,23 @@
   },
   {
     "term": "component.timeline-comment-published-event.general-comment",
-    "definition": "{userIsYou, select, true {You} other {{author}}} commented in {general} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{author}}} commented in {general} {timeAgo}"
+    "definition": "{author} commented in <b>General</b> {timeAgo}",
+    "context": "{author} commented in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.general-comment-published-deleted",
-    "definition": "Someone wrote a (now deleted) comment in {general} {timeAgo}",
-    "context": "Someone wrote a (now deleted) comment in {general} {timeAgo}"
+    "definition": "Someone wrote a (now deleted) comment in <b>General</b> {timeAgo}",
+    "context": "Someone wrote a (now deleted) comment in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.general-note",
-    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in {general} {timeAgo}",
-    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in {general} {timeAgo}"
+    "definition": "{author} added a note in <b>General</b> {timeAgo}",
+    "context": "{author} added a note in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.general-note-published-deleted",
-    "definition": "Someone wrote a (now deleted) note in {general} {timeAgo}",
-    "context": "Someone wrote a (now deleted) note in {general} {timeAgo}"
+    "definition": "Someone wrote a (now deleted) note in <b>General</b> {timeAgo}",
+    "context": "Someone wrote a (now deleted) note in <b>General</b> {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.message-not-available",
@@ -10091,8 +10126,8 @@
   },
   {
     "term": "component.timeline-comment-published-event.note",
-    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
+    "definition": "{author} added a note in the field {field} {timeAgo}",
+    "context": "{author} added a note in the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-comment-published-event.note-published-deleted",
@@ -10110,44 +10145,184 @@
     "context": "{contact} accessed the link {timeAgo}"
   },
   {
+    "term": "component.timeline-group-permission-added-event.description",
+    "definition": "{user} shared this parallel with {groupName} as {permissionType} {timeAgo}",
+    "context": "{user} shared this parallel with {groupName} as {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-group-permission-edited-event.description",
+    "definition": "{user} updated {groupName}'s permission to {permissionType} {timeAgo}",
+    "context": "{user} updated {groupName}'s permission to {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-group-permission-removed-event.description",
+    "definition": "{user} stopped sharing this parallel with {groupName} {timeAgo}",
+    "context": "{user} stopped sharing this parallel with {groupName} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-cancelled-event.description-bounced",
+    "definition": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}",
+    "context": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-cancelled-event.description-manual",
+    "definition": "{user} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{user} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-scheduled-event.description",
+    "definition": "{sender} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{sender} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-scheduled-event.description-delegated",
+    "definition": "{delegate} scheduled a message as {sender} for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{delegate} scheduled a message as {sender} for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-sent-event.description-manual",
+    "definition": "{sender} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{sender} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-sent-event.description-manual-delegated",
+    "definition": "{delegate} sent a message as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{delegate} sent a message as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-sent-event.description-scheduled",
+    "definition": "A message scheduled by {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
+    "context": "A message scheduled by {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-sent-event.description-scheduled-delegated",
+    "definition": "A message scheduled by {delegate} as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
+    "context": "A message scheduled by {delegate} as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-message-sent-event.subject-unavailable",
+    "definition": "Subject unavailable",
+    "context": "Subject unavailable"
+  },
+  {
+    "term": "component.timeline-ownership-transferred-event.description",
+    "definition": "{user} transferred the ownership of this parallel from {previousOwner} to {owner} {timeAgo}",
+    "context": "{user} transferred the ownership of this parallel from {previousOwner} to {owner} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-anonymized.description",
+    "definition": "The parallel has been anonymized {timeAgo}",
+    "context": "The parallel has been anonymized {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-cloned-event.description",
+    "definition": "{user} cloned this parallel {timeAgo}",
+    "context": "{user} cloned this parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-closed-event.description",
+    "definition": "{user} closed the parallel {timeAgo}",
+    "context": "{user} closed the parallel {timeAgo}"
+  },
+  {
     "term": "component.timeline-petition-closed-notified-delegated.description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
+    "definition": "{user} as {sender} notified {contact} that the parallel is correct {timeAgo}",
+    "context": "{user} as {sender} notified {contact} that the parallel is correct {timeAgo}"
   },
   {
     "term": "component.timeline-petition-closed-notified.description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
+    "definition": "{user} notified {contact} that the parallel is correct {timeAgo}",
+    "context": "{user} notified {contact} that the parallel is correct {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-completed-event.description",
+    "definition": "{someone} completed the parallel {timeAgo}",
+    "context": "{someone} completed the parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-created-event.description",
+    "definition": "{user} created this parallel {timeAgo}",
+    "context": "{user} created this parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-message-bounced.description",
+    "definition": "We could not deliver the parallel to {contact} {timeAgo}",
+    "context": "We could not deliver the parallel to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-reminder-bounced-event.description",
+    "definition": "We could not send a reminder to {contact} {timeAgo}",
+    "context": "We could not send a reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-reopened-event.description",
+    "definition": "{user} reopened the parallel {timeAgo}",
+    "context": "{user} reopened the parallel {timeAgo}"
   },
   {
     "term": "component.timeline-petition-tagged-event.description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} tagged this parallel with {tagList} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} tagged this parallel with {tagList} {timeAgo}"
+    "definition": "{user} tagged this parallel with {tagList} {timeAgo}",
+    "context": "{user} tagged this parallel with {tagList} {timeAgo}"
   },
   {
     "term": "component.timeline-petition-untagged-event.description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
+    "definition": "{user} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}",
+    "context": "{user} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-profile-associated.description",
+    "definition": "{user} associated the parallel with {profileName} {timeAgo}",
+    "context": "{user} associated the parallel with {profileName} {timeAgo}"
   },
   {
     "term": "component.timeline-profile-disassociated-event.description",
-    "definition": "{authorIsYou, select, true {You} other {{author}}} removed the association with {profileName} {timeAgo}",
-    "context": "{authorIsYou, select, true {You} other {{author}}} removed the association with {profileName} {timeAgo}"
+    "definition": "{author} removed the association with {profileName} {timeAgo}",
+    "context": "{author} removed the association with {profileName} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-recipiend-signed.description",
+    "definition": "{signer} signed the document {timeAgo}",
+    "context": "{signer} signed the document {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reminder-sent-event.description-automatic",
+    "definition": "An automatic reminder was sent to {contact} {timeAgo}",
+    "context": "An automatic reminder was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reminder-sent-event.description-automatic-delegated",
+    "definition": "An automatic reminder as {sender} was sent to {contact} {timeAgo}",
+    "context": "An automatic reminder as {sender} was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reminder-sent-event.description-manual",
+    "definition": "{user} sent a manual reminder to {contact} {timeAgo}",
+    "context": "{user} sent a manual reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reminder-sent-event.description-manual-delegated",
+    "definition": "{user} sent a manual reminder as {sender} to {contact} {timeAgo}",
+    "context": "{user} sent a manual reminder as {sender} to {contact} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reminders-opt-out-event.description",
+    "definition": "{contact} has opted out from receiving reminders for this parallel {timeAgo}",
+    "context": "{contact} has opted out from receiving reminders for this parallel {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+    "definition": "{someone} replied to the field {field} {timeAgo}",
+    "context": "{someone} replied to the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description-background-check-entity",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} {timeAgo}"
+    "definition": "{someone} saved an entity in the field {field} {timeAgo}",
+    "context": "{someone} saved an entity in the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description-background-check-entity-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} saved an entity in the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description-background-check-search",
@@ -10161,68 +10336,73 @@
   },
   {
     "term": "component.timeline-reply-created-event.description-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} replied to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} replied to the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-created-event.description-field-group",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}"
+    "definition": "{someone} added a group to the field {field} {timeAgo}",
+    "context": "{someone} added a group to the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-deleted-event.description",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+    "definition": "{someone} deleted a reply to the field {field} {timeAgo}",
+    "context": "{someone} deleted a reply to the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-deleted-event.description--field-group",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
+    "definition": "{someone} deleted a group {field} and all its replies {timeAgo}",
+    "context": "{someone} deleted a group {field} and all its replies {timeAgo}"
   },
   {
     "term": "component.timeline-reply-deleted-event.description-background-check",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} {timeAgo}"
+    "definition": "{someone} removed the search criteria/entity saved in the field {field} {timeAgo}",
+    "context": "{someone} removed the search criteria/entity saved in the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-deleted-event.description-background-check-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-deleted-event.description-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} deleted a reply to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-status-changed-event.description",
+    "definition": "{someone} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}",
+    "context": "{someone} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+    "definition": "{someone} updated a reply to the field {field} {timeAgo}",
+    "context": "{someone} updated a reply to the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-background-check-entity",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} {timeAgo}"
+    "definition": "{someone} updated an entity in the field {field} {timeAgo}",
+    "context": "{someone} updated an entity in the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-background-check-entity-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} updated an entity in the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-background-check-search",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} {timeAgo}"
+    "definition": "{someone} updated the search criteria in the field {field} {timeAgo}",
+    "context": "{someone} updated the search criteria in the field {field} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-background-check-search-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-children-of-group",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+    "definition": "{someone} updated a reply to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{someone} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-see-reply-button.reply-deleted",
@@ -10235,9 +10415,69 @@
     "context": "See"
   },
   {
+    "term": "component.timeline-signature-cancelled-event.description-by-signer",
+    "definition": "{signer} has declined the eSignature process {timeAgo}",
+    "context": "{signer} has declined the eSignature process {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-cancelled-event.description-by-user",
+    "definition": "{someone} cancelled the eSignature process {timeAgo}",
+    "context": "{someone} cancelled the eSignature process {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-cancelled-event.description-restarted",
+    "definition": "The eSignature process has been restarted {timeAgo}",
+    "context": "The eSignature process has been restarted {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-cancelled-event.review",
+    "definition": "Review",
+    "context": "Review"
+  },
+  {
+    "term": "component.timeline-signature-cancelled-event.see-reason",
+    "definition": "See reason",
+    "context": "See reason"
+  },
+  {
+    "term": "component.timeline-signature-completed-event.description",
+    "definition": "The eSignature process on the parallel has been completed {timeAgo}",
+    "context": "The eSignature process on the parallel has been completed {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-delivered-event.description",
+    "definition": "We sent the signature email to {signer} {timeAgo}",
+    "context": "We sent the signature email to {signer} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-opened-event.description",
+    "definition": "{signer} opened the signing document {timeAgo}",
+    "context": "{signer} opened the signing document {timeAgo}"
+  },
+  {
+    "term": "component.timeline-signature-reminder-event.description",
+    "definition": "{user} sent a reminder to the pending signers {timeAgo}",
+    "context": "{user} sent a reminder to the pending signers {timeAgo}"
+  },
+  {
     "term": "component.timeline-signature-started-event.signature-started-description",
     "definition": "We started a {signingMode, select, SEQUENTIAL{sequential} other{}} signature process on the parallel {timeAgo}",
     "context": "We started a {signingMode, select, SEQUENTIAL{sequential} other{}} signature process on the parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-user-permission-added-event.description",
+    "definition": "{user} shared this parallel with {other} as {permissionType} {timeAgo}",
+    "context": "{user} shared this parallel with {other} as {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-user-permission-edited-event.description",
+    "definition": "{user} updated {other}'s permission to {permissionType} {timeAgo}",
+    "context": "{user} updated {other}'s permission to {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-user-permission-removed-event.description",
+    "definition": "{user} stopped sharing this parallel with {other} {timeAgo}",
+    "context": "{user} stopped sharing this parallel with {other} {timeAgo}"
   },
   {
     "term": "component.timespan.days-part",
@@ -12268,6 +12508,11 @@
     "term": "generic.search",
     "definition": "Search",
     "context": "Search"
+  },
+  {
+    "term": "generic.see-message",
+    "definition": "See message",
+    "context": "See message"
   },
   {
     "term": "generic.select",
@@ -16048,256 +16293,6 @@
     "term": "template.description-edit.placeholder",
     "definition": "Write a short description of this template.",
     "context": "Write a short description of this template."
-  },
-  {
-    "term": "timeline.access-deactivated-auto-description",
-    "definition": "The access for {contact} was removed because the email bounced {timeAgo}",
-    "context": "The access for {contact} was removed because the email bounced {timeAgo}"
-  },
-  {
-    "term": "timeline.access-deactivated-generic-description",
-    "definition": "The access for {contact} was removed {timeAgo}",
-    "context": "The access for {contact} was removed {timeAgo}"
-  },
-  {
-    "term": "timeline.access-deactivated-manual-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.access-delegated-description",
-    "definition": "{contact} has delegated the parallel to {newContact} {timeAgo}",
-    "context": "{contact} has delegated the parallel to {newContact} {timeAgo}"
-  },
-  {
-    "term": "timeline.access-opened-description",
-    "definition": "{contact} opened the parallel {timeAgo}",
-    "context": "{contact} opened the parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.add-group-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {groupName} as {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {groupName} as {permissionType} {timeAgo}"
-  },
-  {
-    "term": "timeline.add-user-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}"
-  },
-  {
-    "term": "timeline.contactless-access-deactivated-manual-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
-  },
-  {
-    "term": "timeline.edit-group-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
-  },
-  {
-    "term": "timeline.edit-user-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-cancelled-auto-description",
-    "definition": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}",
-    "context": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
-  },
-  {
-    "term": "timeline.message-cancelled-manual-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-scheduled-cancel",
-    "definition": "Cancel",
-    "context": "Cancel"
-  },
-  {
-    "term": "timeline.message-scheduled-description",
-    "definition": "{senderIsYou, select, true {You} other {{sender}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{senderIsYou, select, true {You} other {{sender}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-scheduled-description-delegated",
-    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} scheduled a message as {senderIsYou, select, true {you} other {{sender}}} for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} scheduled a message as {senderIsYou, select, true {you} other {{sender}}} for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-sent-description-manual",
-    "definition": "{senderIsYou, select, true {You} other {{sender}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{senderIsYou, select, true {You} other {{sender}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-sent-description-manual-delegated",
-    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{delegateIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-sent-description-scheduled",
-    "definition": "A message scheduled by {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
-    "context": "A message scheduled by {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-sent-description-scheduled-delegated",
-    "definition": "A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
-    "context": "A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.message-sent-description.subject-unavailable",
-    "definition": "Subject unavailable",
-    "context": "Subject unavailable"
-  },
-  {
-    "term": "timeline.message-sent-see-message",
-    "definition": "See message",
-    "context": "See message"
-  },
-  {
-    "term": "timeline.ownership-transferred-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this parallel {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this parallel {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-anonymized-description",
-    "definition": "The parallel has been anonymized {timeAgo}",
-    "context": "The parallel has been anonymized {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-cloned-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} cloned this parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} cloned this parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-closed-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} closed the parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} closed the parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-completed-description",
-    "definition": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-created-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} created this parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} created this parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-message-bounced-description",
-    "definition": "We could not deliver the parallel to contact {contactName} {timeAgo}",
-    "context": "We could not deliver the parallel to contact {contactName} {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-reminder-bounced-description",
-    "definition": "We could not send a reminder to contact {contactName} {timeAgo}",
-    "context": "We could not send a reminder to contact {contactName} {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-reopened-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.profile-associated-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}"
-  },
-  {
-    "term": "timeline.public-petition-link-created-description",
-    "definition": "{contact} created the parallel from a public link {timeAgo}",
-    "context": "{contact} created the parallel from a public link {timeAgo}"
-  },
-  {
-    "term": "timeline.recipient-signed-description",
-    "definition": "{signer} signed the document {timeAgo}",
-    "context": "{signer} signed the document {timeAgo}"
-  },
-  {
-    "term": "timeline.reminder-sent-description-automatic",
-    "definition": "An automatic reminder was sent to {contact} {timeAgo}",
-    "context": "An automatic reminder was sent to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.reminder-sent-description-automatic-delegated",
-    "definition": "An automatic reminder as {senderIsYou, select, true {you} other {{sender}}} was sent to {contact} {timeAgo}",
-    "context": "An automatic reminder as {senderIsYou, select, true {you} other {{sender}}} was sent to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.reminder-sent-description-manual",
-    "definition": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.reminder-sent-description-manual-delegated",
-    "definition": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder as {senderIsYou, select, true {you} other {{sender}}} to {contact} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder as {senderIsYou, select, true {you} other {{sender}}} to {contact} {timeAgo}"
-  },
-  {
-    "term": "timeline.reminders-opt-out-description",
-    "definition": "{contact} has opted out from receiving reminders for this parallel {timeAgo}",
-    "context": "{contact} has opted out from receiving reminders for this parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.remove-group-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {groupName} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {groupName} {timeAgo}"
-  },
-  {
-    "term": "timeline.remove-user-permission-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-status-changed-description",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-cancelled-by-user.description",
-    "definition": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-completed-description",
-    "definition": "The eSignature process on the parallel has been completed {timeAgo}",
-    "context": "The eSignature process on the parallel has been completed {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-declined-by-signer.description",
-    "definition": "{signer} has declined the eSignature process {timeAgo}",
-    "context": "{signer} has declined the eSignature process {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-declined.review",
-    "definition": "Review",
-    "context": "Review"
-  },
-  {
-    "term": "timeline.signature-declined.see-reason",
-    "definition": "See reason",
-    "context": "See reason"
-  },
-  {
-    "term": "timeline.signature-delivered.description",
-    "definition": "We sent the signature email to {signer} {timeAgo}",
-    "context": "We sent the signature email to {signer} {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-opened-description",
-    "definition": "{signer} opened the signing document {timeAgo}",
-    "context": "{signer} opened the signing document {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-reminder.description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-restarted.description",
-    "definition": "The eSignature process has been restarted {timeAgo}",
-    "context": "The eSignature process has been restarted {timeAgo}"
   },
   {
     "term": "util.generate-value-label-excel.header-label-english",

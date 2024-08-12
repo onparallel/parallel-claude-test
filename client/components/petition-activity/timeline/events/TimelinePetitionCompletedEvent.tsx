@@ -10,23 +10,18 @@ import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionCompletedEventProps {
   event: TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
-  userId: string;
 }
 
-export function TimelinePetitionCompletedEvent({
-  event,
-  userId,
-}: TimelinePetitionCompletedEventProps) {
+export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionCompletedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={CheckIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
-        id="timeline.petition-completed-description"
-        defaultMessage="{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
+        id="component.timeline-petition-completed-event.description"
+        defaultMessage="{someone} completed the parallel {timeAgo}"
         values={{
-          userIsYou: event.completedBy?.__typename === "User" && event.completedBy.id === userId,
-          name: <UserOrContactReference userOrAccess={event.completedBy} />,
+          someone: <UserOrContactReference userOrAccess={event.completedBy} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),

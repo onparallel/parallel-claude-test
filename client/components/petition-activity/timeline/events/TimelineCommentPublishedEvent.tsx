@@ -18,27 +18,13 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineCommentPublishedEventProps {
-  userId: string;
   event: TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 }
 
 export function TimelineCommentPublishedEvent({
-  userId,
   event: { comment, field, createdAt, isInternal, isGeneral },
 }: TimelineCommentPublishedEventProps) {
   const { colors } = useTheme();
-  const values = {
-    field: <PetitionFieldReference field={field} />,
-    timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-  };
-  const generalValues = {
-    general: (
-      <b>
-        <FormattedMessage id="generic.general-comments-label" defaultMessage="General" />
-      </b>
-    ),
-    timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-  };
   if (comment) {
     const { author, isEdited } = comment;
 
@@ -65,41 +51,47 @@ export function TimelineCommentPublishedEvent({
                 isInternal ? (
                   <FormattedMessage
                     id="component.timeline-comment-published-event.general-note"
-                    defaultMessage="{userIsYou, select, true {You have} other {{author} has}} added a note in {general} {timeAgo}"
+                    defaultMessage="{author} added a note in <b>General</b> {timeAgo}"
                     values={{
-                      ...generalValues,
-                      userIsYou: author?.__typename === "User" && author?.id === userId,
                       author: <UserOrContactReference userOrAccess={author} />,
+                      timeAgo: (
+                        <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                      ),
                     }}
                   />
                 ) : (
                   <FormattedMessage
                     id="component.timeline-comment-published-event.general-comment"
-                    defaultMessage="{userIsYou, select, true {You} other {{author}}} commented in {general} {timeAgo}"
+                    defaultMessage="{author} commented in <b>General</b> {timeAgo}"
                     values={{
-                      ...generalValues,
-                      userIsYou: author?.__typename === "User" && author?.id === userId,
                       author: <UserOrContactReference userOrAccess={author} />,
+                      timeAgo: (
+                        <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                      ),
                     }}
                   />
                 )
               ) : isInternal ? (
                 <FormattedMessage
                   id="component.timeline-comment-published-event.note"
-                  defaultMessage="{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
+                  defaultMessage="{author} added a note in the field {field} {timeAgo}"
                   values={{
-                    ...values,
-                    userIsYou: author?.__typename === "User" && author?.id === userId,
+                    field: <PetitionFieldReference field={field} />,
+                    timeAgo: (
+                      <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                    ),
                     author: <UserOrContactReference userOrAccess={author} />,
                   }}
                 />
               ) : (
                 <FormattedMessage
                   id="component.timeline-comment-published-event.comment"
-                  defaultMessage="{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+                  defaultMessage="{author} commented on field {field} {timeAgo}"
                   values={{
-                    ...values,
-                    userIsYou: author?.__typename === "User" && author?.id === userId,
+                    field: <PetitionFieldReference field={field} />,
+                    timeAgo: (
+                      <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                    ),
                     author: <UserOrContactReference userOrAccess={author} />,
                   }}
                 />
@@ -160,17 +152,21 @@ export function TimelineCommentPublishedEvent({
           isInternal ? (
             <FormattedMessage
               id="component.timeline-comment-published-event.general-note-published-deleted"
-              defaultMessage="Someone wrote a (now deleted) note in {general} {timeAgo}"
+              defaultMessage="Someone wrote a (now deleted) note in <b>General</b> {timeAgo}"
               values={{
-                ...generalValues,
+                timeAgo: (
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
               }}
             />
           ) : (
             <FormattedMessage
               id="component.timeline-comment-published-event.general-comment-published-deleted"
-              defaultMessage="Someone wrote a (now deleted) comment in {general} {timeAgo}"
+              defaultMessage="Someone wrote a (now deleted) comment in <b>General</b> {timeAgo}"
               values={{
-                ...generalValues,
+                timeAgo: (
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
               }}
             />
           )
@@ -179,7 +175,8 @@ export function TimelineCommentPublishedEvent({
             id="component.timeline-comment-published-event.note-published-deleted"
             defaultMessage="Someone wrote a (now deleted) note on field {field} {timeAgo}"
             values={{
-              ...values,
+              field: <PetitionFieldReference field={field} />,
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
             }}
           />
         ) : (
@@ -187,7 +184,8 @@ export function TimelineCommentPublishedEvent({
             id="component.timeline-comment-published-event.comment-published-deleted"
             defaultMessage="Someone wrote a (now deleted) comment on field {field} {timeAgo}"
             values={{
-              ...values,
+              field: <PetitionFieldReference field={field} />,
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
             }}
           />
         )}

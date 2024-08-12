@@ -14,22 +14,19 @@ import { isDefined } from "remeda";
 
 export interface TimelineReplyCreatedEventProps {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
-  userId: string;
 }
 
 export function TimelineReplyCreatedEvent({
   event: { createdBy, field, reply, createdAt },
-  userId,
 }: TimelineReplyCreatedEventProps) {
   const isChildren = field?.parent?.id !== undefined;
 
   let message = isChildren ? (
     <FormattedMessage
       id="component.timeline-reply-created-event.description-children-of-group"
-      defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
+      defaultMessage="{someone} replied to the field {field} from a group of {parentField} {timeAgo}"
       values={{
-        userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-        createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+        someone: <UserOrContactReference userOrAccess={createdBy} />,
         field: <PetitionFieldReference field={field} />,
         parentField: <PetitionFieldReference field={field.parent!} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -38,10 +35,9 @@ export function TimelineReplyCreatedEvent({
   ) : (
     <FormattedMessage
       id="component.timeline-reply-created-event.description"
-      defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+      defaultMessage="{someone} replied to the field {field} {timeAgo}"
       values={{
-        userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-        createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+        someone: <UserOrContactReference userOrAccess={createdBy} />,
         field: <PetitionFieldReference field={field} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
       }}
@@ -53,10 +49,9 @@ export function TimelineReplyCreatedEvent({
       isDefined(reply?.content?.entity) ? (
         <FormattedMessage
           id="component.timeline-reply-created-event.description-background-check-entity-children-of-group"
-          defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
+          defaultMessage="{someone} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
           values={{
-            userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-            createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+            someone: <UserOrContactReference userOrAccess={createdBy} />,
             field: <PetitionFieldReference field={field} />,
             parentField: <PetitionFieldReference field={field.parent!} />,
             timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -76,10 +71,9 @@ export function TimelineReplyCreatedEvent({
     ) : isDefined(reply?.content?.entity) ? (
       <FormattedMessage
         id="component.timeline-reply-created-event.description-background-check-entity"
-        defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} {timeAgo}"
+        defaultMessage="{someone} saved an entity in the field {field} {timeAgo}"
         values={{
-          userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-          createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+          someone: <UserOrContactReference userOrAccess={createdBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
@@ -100,10 +94,9 @@ export function TimelineReplyCreatedEvent({
     message = (
       <FormattedMessage
         id="component.timeline-reply-created-event.description-field-group"
-        defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}"
+        defaultMessage="{someone} added a group to the field {field} {timeAgo}"
         values={{
-          userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-          createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+          someone: <UserOrContactReference userOrAccess={createdBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}

@@ -10,14 +10,10 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineSignatureReminderEventProps {
-  userId: string;
   event: TimelineSignatureReminderEvent_SignatureReminderEventFragment;
 }
 
-export function TimelineSignatureReminderEvent({
-  event,
-  userId,
-}: TimelineSignatureReminderEventProps) {
+export function TimelineSignatureReminderEvent({ event }: TimelineSignatureReminderEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={SignatureIcon} color="black" backgroundColor="gray.200" />}
@@ -25,10 +21,9 @@ export function TimelineSignatureReminderEvent({
       <Flex alignItems="center">
         <Box>
           <FormattedMessage
-            id="timeline.signature-reminder.description"
-            defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"
+            id="component.timeline-signature-reminder-event.description"
+            defaultMessage="{user} sent a reminder to the pending signers {timeAgo}"
             values={{
-              userIsYou: userId === event.user?.id,
               user: <UserReference user={event.user} />,
               timeAgo: (
                 <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

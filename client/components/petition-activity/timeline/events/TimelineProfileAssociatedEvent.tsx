@@ -19,10 +19,9 @@ export function TimelineProfileAssociatedEvent({ event }: TimelineProfileAssocia
       icon={<TimelineIcon icon={ArrowDiagonalRightIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
-        id="timeline.profile-associated-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}"
+        id="component.timeline-profile-associated.description"
+        defaultMessage="{user} associated the parallel with {profileName} {timeAgo}"
         values={{
-          userIsYou: false,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

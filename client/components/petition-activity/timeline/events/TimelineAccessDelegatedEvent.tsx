@@ -18,7 +18,7 @@ export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedE
       icon={<TimelineIcon icon={UserPlusIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
-        id="timeline.access-delegated-description"
+        id="component.timeline-access-delegated-event.description"
         defaultMessage="{contact} has delegated the parallel to {newContact} {timeAgo}"
         values={{
           contact: <ContactReference contact={event.originalAccess.contact} />,

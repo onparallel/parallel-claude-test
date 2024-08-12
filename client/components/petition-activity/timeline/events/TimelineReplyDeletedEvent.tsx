@@ -11,22 +11,19 @@ import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineReplyDeletedEventProps {
   event: TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
-  userId: string;
 }
 
 export function TimelineReplyDeletedEvent({
   event: { deletedBy, field, createdAt },
-  userId,
 }: TimelineReplyDeletedEventProps) {
   const isChildren = field?.parent?.id !== undefined;
 
   let message = isChildren ? (
     <FormattedMessage
       id="component.timeline-reply-deleted-event.description-children-of-group"
-      defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+      defaultMessage="{someone} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
       values={{
-        userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
-        deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+        someone: <UserOrContactReference userOrAccess={deletedBy} />,
         field: <PetitionFieldReference field={field} />,
         parentField: <PetitionFieldReference field={field.parent!} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -35,10 +32,9 @@ export function TimelineReplyDeletedEvent({
   ) : (
     <FormattedMessage
       id="component.timeline-reply-deleted-event.description"
-      defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+      defaultMessage="{someone} deleted a reply to the field {field} {timeAgo}"
       values={{
-        userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
-        deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+        someone: <UserOrContactReference userOrAccess={deletedBy} />,
         field: <PetitionFieldReference field={field} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
       }}
@@ -49,10 +45,9 @@ export function TimelineReplyDeletedEvent({
     message = isChildren ? (
       <FormattedMessage
         id="component.timeline-reply-deleted-event.description-background-check-children-of-group"
-        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}"
+        defaultMessage="{someone} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}"
         values={{
-          userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
-          deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+          someone: <UserOrContactReference userOrAccess={deletedBy} />,
           field: <PetitionFieldReference field={field} />,
           parentField: <PetitionFieldReference field={field.parent!} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -61,10 +56,9 @@ export function TimelineReplyDeletedEvent({
     ) : (
       <FormattedMessage
         id="component.timeline-reply-deleted-event.description-background-check"
-        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} {timeAgo}"
+        defaultMessage="{someone} removed the search criteria/entity saved in the field {field} {timeAgo}"
         values={{
-          userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
-          deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+          someone: <UserOrContactReference userOrAccess={deletedBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
@@ -76,10 +70,9 @@ export function TimelineReplyDeletedEvent({
     message = (
       <FormattedMessage
         id="component.timeline-reply-deleted-event.description--field-group"
-        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
+        defaultMessage="{someone} deleted a group {field} and all its replies {timeAgo}"
         values={{
-          userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
-          deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+          someone: <UserOrContactReference userOrAccess={deletedBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}

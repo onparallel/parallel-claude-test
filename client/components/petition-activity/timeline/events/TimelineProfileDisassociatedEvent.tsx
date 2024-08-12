@@ -11,13 +11,11 @@ import { TimelineItem } from "../common/TimelineItem";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
 
 export interface TimelineProfileDisassociatedEventProps {
-  userId: string;
   event: TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment;
 }
 
 export function TimelineProfileDisassociatedEvent({
   event,
-  userId,
 }: TimelineProfileDisassociatedEventProps) {
   return (
     <TimelineItem
@@ -25,10 +23,8 @@ export function TimelineProfileDisassociatedEvent({
     >
       <FormattedMessage
         id="component.timeline-profile-disassociated-event.description"
-        defaultMessage="{authorIsYou, select, true {You} other {{author}}} removed the association with {profileName} {timeAgo}"
+        defaultMessage="{author} removed the association with {profileName} {timeAgo}"
         values={{
-          authorIsYou:
-            event.disassociatedBy?.__typename === "User" && event.disassociatedBy.id === userId,
           author: <UserOrContactReference userOrAccess={event.disassociatedBy} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

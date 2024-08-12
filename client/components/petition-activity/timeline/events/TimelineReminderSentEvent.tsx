@@ -15,13 +15,11 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineReminderSentEventProps {
-  userId: string;
   event: TimelineReminderSentEvent_ReminderSentEventFragment;
 }
 
 export function TimelineReminderSentEvent({
   event: { reminder, createdAt },
-  userId,
 }: TimelineReminderSentEventProps) {
   const showSentReminderMessage = useSentReminderMessageDialog();
   async function handleSeeMessageClick() {
@@ -37,12 +35,10 @@ export function TimelineReminderSentEvent({
           {reminder.type === "MANUAL" ? (
             reminder.access.delegateGranter ? (
               <FormattedMessage
-                id="timeline.reminder-sent-description-manual-delegated"
-                defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder as {senderIsYou, select, true {you} other {{sender}}} to {contact} {timeAgo}"
+                id="component.timeline-reminder-sent-event.description-manual-delegated"
+                defaultMessage="{user} sent a manual reminder as {sender} to {contact} {timeAgo}"
                 values={{
-                  userIsYou: userId === reminder.sender?.id,
                   user: <UserReference user={reminder.sender} />,
-                  senderIsYou: userId === reminder.access.granter?.id,
                   sender: <UserReference user={reminder.access.granter} />,
                   contact: <ContactReference contact={reminder.access.contact} />,
                   timeAgo: (
@@ -52,10 +48,9 @@ export function TimelineReminderSentEvent({
               />
             ) : (
               <FormattedMessage
-                id="timeline.reminder-sent-description-manual"
-                defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+                id="component.timeline-reminder-sent-event.description-manual"
+                defaultMessage="{user} sent a manual reminder to {contact} {timeAgo}"
                 values={{
-                  userIsYou: userId === reminder.sender?.id,
                   user: <UserReference user={reminder.sender} />,
                   contact: <ContactReference contact={reminder.access.contact} />,
                   timeAgo: (
@@ -66,10 +61,9 @@ export function TimelineReminderSentEvent({
             )
           ) : reminder.access.delegateGranter ? (
             <FormattedMessage
-              id="timeline.reminder-sent-description-automatic-delegated"
-              defaultMessage="An automatic reminder as {senderIsYou, select, true {you} other {{sender}}} was sent to {contact} {timeAgo}"
+              id="component.timeline-reminder-sent-event.description-automatic-delegated"
+              defaultMessage="An automatic reminder as {sender} was sent to {contact} {timeAgo}"
               values={{
-                senderIsYou: userId === reminder.access.granter?.id,
                 sender: <UserReference user={reminder.access.granter} />,
                 contact: <ContactReference contact={reminder.access.contact} />,
                 timeAgo: (
@@ -79,7 +73,7 @@ export function TimelineReminderSentEvent({
             />
           ) : (
             <FormattedMessage
-              id="timeline.reminder-sent-description-automatic"
+              id="component.timeline-reminder-sent-event.description-automatic"
               defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
               values={{
                 contact: <ContactReference contact={reminder.access.contact} />,
@@ -98,7 +92,7 @@ export function TimelineReminderSentEvent({
             marginStart={4}
             background="white"
           >
-            <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
+            <FormattedMessage id="generic.see-message" defaultMessage="See message" />
           </Button>
         ) : null}
       </Flex>

@@ -16,14 +16,10 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineSignatureCancelledEventProps {
-  userId: string;
   event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
 }
 
-export function TimelineSignatureCancelledEvent({
-  event,
-  userId,
-}: TimelineSignatureCancelledEventProps) {
+export function TimelineSignatureCancelledEvent({ event }: TimelineSignatureCancelledEventProps) {
   const showDeclinedSignatureReason = useDeclinedSignatureReasonDialog();
   async function handleSeeMessageClick() {
     try {
@@ -55,12 +51,10 @@ export function TimelineSignatureCancelledEvent({
         <Box>
           {event.cancelType === "CANCELLED_BY_USER" && (
             <FormattedMessage
-              id="timeline.signature-cancelled-by-user.description"
-              defaultMessage="{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
+              id="component.timeline-signature-cancelled-event.description-by-user"
+              defaultMessage="{someone} cancelled the eSignature process {timeAgo}"
               values={{
-                userIsYou:
-                  event.cancelledBy?.__typename === "User" && userId === event.cancelledBy.id,
-                name: <UserOrContactReference userOrAccess={event.cancelledBy} />,
+                someone: <UserOrContactReference userOrAccess={event.cancelledBy} />,
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -69,7 +63,7 @@ export function TimelineSignatureCancelledEvent({
           )}
           {event.cancelType === "DECLINED_BY_SIGNER" && (
             <FormattedMessage
-              id="timeline.signature-declined-by-signer.description"
+              id="component.timeline-signature-cancelled-event.description-by-signer"
               defaultMessage="{signer} has declined the eSignature process {timeAgo}"
               values={{
                 signer: <SignerReference signer={event.canceller} />,
@@ -81,7 +75,7 @@ export function TimelineSignatureCancelledEvent({
           )}
           {event.cancelType === "REQUEST_RESTARTED" && (
             <FormattedMessage
-              id="timeline.signature-restarted.description"
+              id="component.timeline-signature-cancelled-event.description-restarted"
               defaultMessage="The eSignature process has been restarted {timeAgo}"
               values={{
                 timeAgo: (
@@ -101,7 +95,7 @@ export function TimelineSignatureCancelledEvent({
             background="white"
           >
             <FormattedMessage
-              id="timeline.signature-declined.see-reason"
+              id="component.timeline-signature-cancelled-event.see-reason"
               defaultMessage="See reason"
             />
           </Button>
@@ -115,7 +109,7 @@ export function TimelineSignatureCancelledEvent({
             background="white"
           >
             <FormattedMessage
-              id="timeline.signature-declined.see-reason"
+              id="component.timeline-signature-cancelled-event.see-reason"
               defaultMessage="See reason"
             />
           </Button>
@@ -127,7 +121,10 @@ export function TimelineSignatureCancelledEvent({
           ) && (
             <NakedLink href="/app/organization/integrations/signature">
               <Button as="a" variant="outline" size="sm" marginStart={4}>
-                <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
+                <FormattedMessage
+                  id="component.timeline-signature-cancelled-event.review"
+                  defaultMessage="Review"
+                />
               </Button>
             </NakedLink>
           )}

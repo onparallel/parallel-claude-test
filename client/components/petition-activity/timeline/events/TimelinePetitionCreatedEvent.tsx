@@ -9,13 +9,11 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionCreatedEventProps {
-  userId: string;
   event: TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 }
 
 export function TimelinePetitionCreatedEvent({
   event: { user, createdAt },
-  userId,
 }: TimelinePetitionCreatedEventProps) {
   return (
     <TimelineItem
@@ -23,10 +21,9 @@ export function TimelinePetitionCreatedEvent({
       paddingBottom={0}
     >
       <FormattedMessage
-        id="timeline.petition-created-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} created this parallel {timeAgo}"
+        id="component.timeline-petition-created-event.description"
+        defaultMessage="{user} created this parallel {timeAgo}"
         values={{
-          userIsYou: userId === user?.id,
           user: <UserReference user={user} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}

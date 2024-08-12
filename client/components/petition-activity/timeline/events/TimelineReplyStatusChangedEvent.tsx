@@ -13,12 +13,10 @@ import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
 
 export interface TimelineReplyStatusChangedEventProps {
   event: TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment;
-  userId: string;
 }
 
 export function TimelineReplyStatusChangedEvent({
   event: { updatedBy, field, reply, status, createdAt },
-  userId,
 }: TimelineReplyStatusChangedEventProps) {
   const timeLineIcon =
     status === "APPROVED" ? (
@@ -34,11 +32,10 @@ export function TimelineReplyStatusChangedEvent({
       <HStack spacing={2}>
         <Text>
           <FormattedMessage
-            id="timeline.reply-status-changed-description"
-            defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
+            id="component.timeline-reply-status-changed-event.description"
+            defaultMessage="{someone} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
             values={{
-              userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-              updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+              someone: <UserOrContactReference userOrAccess={updatedBy} />,
               status,
               multiple: field?.multiple ?? false,
               field: <PetitionFieldReference field={field} />,

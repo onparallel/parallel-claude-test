@@ -18,10 +18,10 @@ export function TimelinePetitionMessageBouncedEvent({
   return (
     <TimelineItem icon={<TimelineIcon icon={EmailXIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
-        id="timeline.petition-message-bounced-description"
-        defaultMessage="We could not deliver the parallel to contact {contactName} {timeAgo}"
+        id="component.timeline-petition-message-bounced.description"
+        defaultMessage="We could not deliver the parallel to {contact} {timeAgo}"
         values={{
-          contactName: <ContactReference contact={event.message.access.contact} />,
+          contact: <ContactReference contact={event.message.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),

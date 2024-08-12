@@ -12,13 +12,11 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionClosedNotifiedEventProps {
-  userId: string;
   event: TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
 }
 
 export function TimelinePetitionClosedNotifiedEvent({
   event,
-  userId,
 }: TimelinePetitionClosedNotifiedEventProps) {
   const showSendPetitionMessage = useSentPetitionMessageDialog();
   async function handleSeeMessageClick() {
@@ -42,11 +40,9 @@ export function TimelinePetitionClosedNotifiedEvent({
           {event.access.delegateGranter ? (
             <FormattedMessage
               id="component.timeline-petition-closed-notified-delegated.description"
-              defaultMessage="{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
+              defaultMessage="{user} as {sender} notified {contact} that the parallel is correct {timeAgo}"
               values={{
-                userIsYou: userId === event.user?.id,
                 user: <UserReference user={event.user} />,
-                senderIsYou: userId === event.access.granter?.id,
                 sender: <UserReference user={event.access.granter} />,
                 contact: <ContactReference contact={event.access.contact} />,
                 timeAgo: (
@@ -57,9 +53,8 @@ export function TimelinePetitionClosedNotifiedEvent({
           ) : (
             <FormattedMessage
               id="component.timeline-petition-closed-notified.description"
-              defaultMessage="{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
+              defaultMessage="{user} notified {contact} that the parallel is correct {timeAgo}"
               values={{
-                userIsYou: userId === event.user?.id,
                 user: <UserReference user={event.user} />,
                 contact: <ContactReference contact={event.access.contact} />,
                 timeAgo: (

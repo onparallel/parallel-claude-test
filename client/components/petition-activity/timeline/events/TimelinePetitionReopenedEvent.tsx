@@ -9,21 +9,16 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionReopenedEventProps {
-  userId: string;
   event: TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
 }
 
-export function TimelinePetitionReopenedEvent({
-  event,
-  userId,
-}: TimelinePetitionReopenedEventProps) {
+export function TimelinePetitionReopenedEvent({ event }: TimelinePetitionReopenedEventProps) {
   return (
     <TimelineItem icon={<TimelineIcon icon={EditIcon} color="black" backgroundColor="gray.200" />}>
       <FormattedMessage
-        id="timeline.petition-reopened-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"
+        id="component.timeline-petition-reopened-event.description"
+        defaultMessage="{user} reopened the parallel {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

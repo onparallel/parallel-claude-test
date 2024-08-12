@@ -14,22 +14,19 @@ import { isDefined } from "remeda";
 
 export interface TimelineReplyUpdatedEventProps {
   event: TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
-  userId: string;
 }
 
 export function TimelineReplyUpdatedEvent({
   event: { updatedBy, field, reply, createdAt },
-  userId,
 }: TimelineReplyUpdatedEventProps) {
   const isChildren = field?.parent?.id !== undefined;
 
   let message = isChildren ? (
     <FormattedMessage
       id="component.timeline-reply-updated-event.description-children-of-group"
-      defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+      defaultMessage="{someone} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
       values={{
-        userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-        updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+        someone: <UserOrContactReference userOrAccess={updatedBy} />,
         field: <PetitionFieldReference field={field} />,
         parentField: <PetitionFieldReference field={field.parent!} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -38,10 +35,9 @@ export function TimelineReplyUpdatedEvent({
   ) : (
     <FormattedMessage
       id="component.timeline-reply-updated-event.description"
-      defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+      defaultMessage="{someone} updated a reply to the field {field} {timeAgo}"
       values={{
-        userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-        updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+        someone: <UserOrContactReference userOrAccess={updatedBy} />,
         field: <PetitionFieldReference field={field} />,
         timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
       }}
@@ -53,10 +49,9 @@ export function TimelineReplyUpdatedEvent({
       isDefined(reply?.content?.entity) ? (
         <FormattedMessage
           id="component.timeline-reply-updated-event.description-background-check-entity-children-of-group"
-          defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
+          defaultMessage="{someone} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
           values={{
-            userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-            updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+            someone: <UserOrContactReference userOrAccess={updatedBy} />,
             field: <PetitionFieldReference field={field} />,
             parentField: <PetitionFieldReference field={field.parent!} />,
             timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -65,10 +60,9 @@ export function TimelineReplyUpdatedEvent({
       ) : (
         <FormattedMessage
           id="component.timeline-reply-updated-event.description-background-check-search-children-of-group"
-          defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
+          defaultMessage="{someone} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
           values={{
-            userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-            updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+            someone: <UserOrContactReference userOrAccess={updatedBy} />,
             field: <PetitionFieldReference field={field} />,
             parentField: <PetitionFieldReference field={field.parent!} />,
             timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
@@ -78,10 +72,9 @@ export function TimelineReplyUpdatedEvent({
     ) : isDefined(reply?.content?.entity) ? (
       <FormattedMessage
         id="component.timeline-reply-updated-event.description-background-check-entity"
-        defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} {timeAgo}"
+        defaultMessage="{someone} updated an entity in the field {field} {timeAgo}"
         values={{
-          userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-          updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+          someone: <UserOrContactReference userOrAccess={updatedBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
@@ -89,10 +82,9 @@ export function TimelineReplyUpdatedEvent({
     ) : (
       <FormattedMessage
         id="component.timeline-reply-updated-event.description-background-check-search"
-        defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} {timeAgo}"
+        defaultMessage="{someone} updated the search criteria in the field {field} {timeAgo}"
         values={{
-          userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-          updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+          someone: <UserOrContactReference userOrAccess={updatedBy} />,
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}

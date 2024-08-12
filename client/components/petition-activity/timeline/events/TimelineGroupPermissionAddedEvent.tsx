@@ -11,23 +11,20 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineGroupPermissionAddedEventProps {
-  userId: string;
   event: TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
 }
 
 export function TimelineGroupPermissionAddedEvent({
   event,
-  userId,
 }: TimelineGroupPermissionAddedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={UserGroupArrowIcon} color="white" backgroundColor="primary.500" />}
     >
       <FormattedMessage
-        id="timeline.add-group-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this parallel with {groupName} as {permissionType} {timeAgo}"
+        id="component.timeline-group-permission-added-event.description"
+        defaultMessage="{user} shared this parallel with {groupName} as {permissionType} {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           groupName: <UserGroupReference userGroup={event.permissionGroup} as="strong" />,
           permissionType: (

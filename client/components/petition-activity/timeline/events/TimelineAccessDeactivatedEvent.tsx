@@ -10,23 +10,18 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineAccessDeactivatedEventProps {
-  userId: string;
   event: TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 }
 
-export function TimelineAccessDeactivatedEvent({
-  event,
-  userId,
-}: TimelineAccessDeactivatedEventProps) {
+export function TimelineAccessDeactivatedEvent({ event }: TimelineAccessDeactivatedEventProps) {
   return (
     <TimelineItem icon={<TimelineIcon icon={UserXIcon} color="white" backgroundColor="red.500" />}>
       {event.reason === "DEACTIVATED_BY_USER" ? (
         event.access.isContactless ? (
           <FormattedMessage
-            id="timeline.contactless-access-deactivated-manual-description"
-            defaultMessage="{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
+            id="component.timeline-access-deactivated-event.description-contactless"
+            defaultMessage="{user} deactivated a link access {timeAgo}"
             values={{
-              userIsYou: userId === event.user?.id,
               user: <UserReference user={event.user} />,
               timeAgo: (
                 <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -35,10 +30,9 @@ export function TimelineAccessDeactivatedEvent({
           />
         ) : (
           <FormattedMessage
-            id="timeline.access-deactivated-manual-description"
-            defaultMessage="{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
+            id="component.timeline-access-deactivated-event.description"
+            defaultMessage="{user} removed access to {contact} {timeAgo}"
             values={{
-              userIsYou: userId === event.user?.id,
               user: <UserReference user={event.user} />,
               contact: <ContactReference contact={event.access.contact} />,
               timeAgo: (
@@ -49,7 +43,7 @@ export function TimelineAccessDeactivatedEvent({
         )
       ) : event.reason === "EMAIL_BOUNCED" ? (
         <FormattedMessage
-          id="timeline.access-deactivated-auto-description"
+          id="component.timeline-access-deactivated-event.description-bounce"
           defaultMessage="The access for {contact} was removed because the email bounced {timeAgo}"
           values={{
             contact: <ContactReference contact={event.access.contact} />,
@@ -60,7 +54,7 @@ export function TimelineAccessDeactivatedEvent({
         />
       ) : (
         <FormattedMessage
-          id="timeline.access-deactivated-generic-description"
+          id="component.timeline-access-deactivated-event.description-generic"
           defaultMessage="The access for {contact} was removed {timeAgo}"
           values={{
             contact: <ContactReference contact={event.access.contact} />,

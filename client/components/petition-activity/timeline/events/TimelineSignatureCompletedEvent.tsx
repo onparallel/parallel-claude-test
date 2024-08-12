@@ -18,7 +18,7 @@ export function TimelineSignatureCompletedEvent({ event }: TimelineSignatureComp
       icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
-        id="timeline.signature-completed-description"
+        id="component.timeline-signature-completed-event.description"
         defaultMessage="The eSignature process on the parallel has been completed {timeAgo}"
         values={{
           timeAgo: (

@@ -22,7 +22,7 @@ export function TimelineSignatureDeliveredEvent({ event }: TimelineSignatureDeli
       <Flex alignItems="center">
         <Box>
           <FormattedMessage
-            id="timeline.signature-delivered.description"
+            id="component.timeline-signature-delivered-event.description"
             defaultMessage="We sent the signature email to {signer} {timeAgo}"
             values={{
               signer: <SignerReference signer={event.signer} />,

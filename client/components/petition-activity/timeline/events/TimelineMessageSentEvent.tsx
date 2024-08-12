@@ -16,13 +16,11 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineMessageSentEventProps {
-  userId: string;
   event: TimelineMessageSentEvent_MessageSentEventFragment;
 }
 
 export function TimelineMessageSentEvent({
   event: { message, createdAt },
-  userId,
 }: TimelineMessageSentEventProps) {
   const showSentPetitionMessage = useSentPetitionMessageDialog();
   async function handleSeeMessageClick() {
@@ -39,12 +37,10 @@ export function TimelineMessageSentEvent({
           {message.scheduledAt ? (
             message.access.delegateGranter ? (
               <FormattedMessage
-                id="timeline.message-sent-description-scheduled-delegated"
-                defaultMessage="A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+                id="component.timeline-message-sent-event.description-scheduled-delegated"
+                defaultMessage="A message scheduled by {delegate} as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
                 values={{
-                  delegateIsYou: userId === message.access.delegateGranter?.id,
                   delegate: <UserReference user={message.access.delegateGranter} />,
-                  senderIsYou: userId === message.sender?.id,
                   sender: <UserReference user={message.sender} />,
                   subject: message.emailSubject,
                   contact: <ContactReference contact={message.access.contact} />,
@@ -55,10 +51,9 @@ export function TimelineMessageSentEvent({
               />
             ) : (
               <FormattedMessage
-                id="timeline.message-sent-description-scheduled"
-                defaultMessage="A message scheduled by {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+                id="component.timeline-message-sent-event.description-scheduled"
+                defaultMessage="A message scheduled by {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
                 values={{
-                  senderIsYou: userId === message.sender?.id,
                   sender: <UserReference user={message.sender} />,
                   subject: message.emailSubject,
                   contact: <ContactReference contact={message.access.contact} />,
@@ -70,17 +65,15 @@ export function TimelineMessageSentEvent({
             )
           ) : message.access.delegateGranter ? (
             <FormattedMessage
-              id="timeline.message-sent-description-manual-delegated"
-              defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              id="component.timeline-message-sent-event.description-manual-delegated"
+              defaultMessage="{delegate} sent a message as {sender} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
-                delegateIsYou: userId === message.access.delegateGranter?.id,
                 delegate: <UserReference user={message.access.delegateGranter} />,
-                senderIsYou: userId === message.sender?.id,
                 sender: <UserReference user={message.sender} />,
                 subject: message.isAnonymized ? (
                   <Text as="span" textStyle="hint" fontWeight="normal">
                     <FormattedMessage
-                      id="timeline.message-sent-description.subject-unavailable"
+                      id="component.timeline-message-sent-event.subject-unavailable"
                       defaultMessage="Subject unavailable"
                     />
                   </Text>
@@ -95,15 +88,14 @@ export function TimelineMessageSentEvent({
             />
           ) : (
             <FormattedMessage
-              id="timeline.message-sent-description-manual"
-              defaultMessage="{senderIsYou, select, true {You} other {{sender}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              id="component.timeline-message-sent-event.description-manual"
+              defaultMessage="{sender} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
-                senderIsYou: userId === message.sender!.id,
                 sender: <UserReference user={message.sender} />,
                 subject: message.isAnonymized ? (
                   <Text as="span" textStyle="hint" fontWeight="normal">
                     <FormattedMessage
-                      id="timeline.message-sent-description.subject-unavailable"
+                      id="component.timeline-message-sent-event.subject-unavailable"
                       defaultMessage="Subject unavailable"
                     />
                   </Text>
@@ -132,7 +124,7 @@ export function TimelineMessageSentEvent({
             marginStart={4}
             background="white"
           >
-            <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
+            <FormattedMessage id="generic.see-message" defaultMessage="See message" />
           </Button>
         ) : null}
       </Flex>

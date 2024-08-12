@@ -46,49 +46,25 @@ export const CommentCreatedUserNotification = Object.assign(
             isMention ? (
               <FormattedMessage
                 id="component.notification-mention.body-general-chat"
-                defaultMessage="{name} has mentioned you in {general}."
+                defaultMessage="{name} has mentioned you in <b>General</b>."
                 values={{
                   name: <UserOrContactReference userOrAccess={author} />,
-                  general: (
-                    <b>
-                      <FormattedMessage
-                        id="generic.general-comments-label"
-                        defaultMessage="General"
-                      />
-                    </b>
-                  ),
                 }}
               />
             ) : isNote ? (
               <FormattedMessage
                 id="component.notification-internal-comment.body-general-chat"
-                defaultMessage="{name} has added a note in {general}."
+                defaultMessage="{name} has added a note in <b>General</b>."
                 values={{
                   name: <UserOrContactReference userOrAccess={author} />,
-                  general: (
-                    <b>
-                      <FormattedMessage
-                        id="generic.general-comments-label"
-                        defaultMessage="General"
-                      />
-                    </b>
-                  ),
                 }}
               />
             ) : (
               <FormattedMessage
                 id="component.notification-comment.body-general-chat"
-                defaultMessage="{name} has written a comment in {general}."
+                defaultMessage="{name} has written a comment in <b>General</b>."
                 values={{
                   name: <UserOrContactReference userOrAccess={author} />,
-                  general: (
-                    <b>
-                      <FormattedMessage
-                        id="generic.general-comments-label"
-                        defaultMessage="General"
-                      />
-                    </b>
-                  ),
                 }}
               />
             )

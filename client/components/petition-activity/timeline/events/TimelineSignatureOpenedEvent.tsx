@@ -20,7 +20,7 @@ export function TimelineSignatureOpenedEvent({
       icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
-        id="timeline.signature-opened-description"
+        id="component.timeline-signature-opened-event.description"
         defaultMessage="{signer} opened the signing document {timeAgo}"
         values={{
           signer: <SignerReference signer={signer} />,

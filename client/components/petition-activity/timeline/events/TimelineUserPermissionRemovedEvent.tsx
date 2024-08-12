@@ -9,21 +9,18 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineUserPermissionRemovedEventProps {
-  userId: string;
   event: TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 }
 
 export function TimelineUserPermissionRemovedEvent({
   event,
-  userId,
 }: TimelineUserPermissionRemovedEventProps) {
   return (
     <TimelineItem icon={<TimelineIcon icon={UserXIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
-        id="timeline.remove-user-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"
+        id="component.timeline-user-permission-removed-event.description"
+        defaultMessage="{user} stopped sharing this parallel with {other} {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           timeAgo: (

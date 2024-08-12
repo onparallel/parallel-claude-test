@@ -9,20 +9,18 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionClonedEventProps {
-  userId: string;
   event: TimelinePetitionClonedEvent_PetitionClonedEventFragment;
 }
 
-export function TimelinePetitionClonedEvent({ event, userId }: TimelinePetitionClonedEventProps) {
+export function TimelinePetitionClonedEvent({ event }: TimelinePetitionClonedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={PlusCircleIcon} color="white" backgroundColor="primary.500" />}
     >
       <FormattedMessage
-        id="timeline.petition-cloned-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} cloned this parallel {timeAgo}"
+        id="component.timeline-petition-cloned-event.description"
+        defaultMessage="{user} cloned this parallel {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

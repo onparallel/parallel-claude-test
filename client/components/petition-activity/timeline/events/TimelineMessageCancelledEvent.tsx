@@ -10,13 +10,11 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineMessageCancelledEventProps {
-  userId: string;
   event: TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 }
 
 export function TimelineMessageCancelledEvent({
   event: { message, user, createdAt, reason },
-  userId,
 }: TimelineMessageCancelledEventProps) {
   return (
     <TimelineItem
@@ -24,10 +22,9 @@ export function TimelineMessageCancelledEvent({
     >
       {reason === "CANCELLED_BY_USER" ? (
         <FormattedMessage
-          id="timeline.message-cancelled-manual-description"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+          id="component.timeline-message-cancelled-event.description-manual"
+          defaultMessage="{user} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
           values={{
-            userIsYou: userId === user?.id,
             user: <UserReference user={user} />,
             subject: message.emailSubject,
             contact: <ContactReference contact={message.access.contact} />,
@@ -36,7 +33,7 @@ export function TimelineMessageCancelledEvent({
         />
       ) : (
         <FormattedMessage
-          id="timeline.message-cancelled-auto-description"
+          id="component.timeline-message-cancelled-event.description-bounced"
           defaultMessage="We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
           values={{
             subject: message.emailSubject,

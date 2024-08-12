@@ -16,7 +16,7 @@ export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventPr
   return (
     <TimelineItem icon={<TimelineIcon icon={EyeIcon} color="white" backgroundColor="blue.500" />}>
       <FormattedMessage
-        id="timeline.access-opened-description"
+        id="component.timeline-access-opened-event.description"
         defaultMessage="{contact} opened the parallel {timeAgo}"
         values={{
           contact: <ContactReference contact={event.access.contact} />,

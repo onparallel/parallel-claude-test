@@ -11,23 +11,20 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineGroupPermissionEditedEventProps {
-  userId: string;
   event: TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
 }
 
 export function TimelineGroupPermissionEditedEvent({
   event,
-  userId,
 }: TimelineGroupPermissionEditedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={UserGroupArrowIcon} color="white" backgroundColor="yellow.500" />}
     >
       <FormattedMessage
-        id="timeline.edit-group-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
+        id="component.timeline-group-permission-edited-event.description"
+        defaultMessage="{user} updated {groupName}'s permission to {permissionType} {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           groupName: <UserGroupReference userGroup={event.permissionGroup} as="strong" />,
           permissionType: (

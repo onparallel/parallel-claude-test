@@ -17,7 +17,7 @@ export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnony
       icon={<TimelineIcon icon={CircleCrossFilledIcon} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
-        id="timeline.petition-anonymized-description"
+        id="component.timeline-petition-anonymized.description"
         defaultMessage="The parallel has been anonymized {timeAgo}"
         values={{
           timeAgo: (

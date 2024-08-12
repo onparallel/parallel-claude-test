@@ -9,27 +9,21 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineOwnershipTransferredEventProps {
-  userId: string;
   event: TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 }
 
 export function TimelineOwnershipTransferredEvent({
   event,
-  userId,
 }: TimelineOwnershipTransferredEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={UserArrowIcon} color="white" backgroundColor="primary.500" />}
     >
       <FormattedMessage
-        id="timeline.ownership-transferred-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} transferred the ownership of this parallel {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
+        id="component.timeline-ownership-transferred-event.description"
+        defaultMessage="{user} transferred the ownership of this parallel from {previousOwner} to {owner} {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
-          previousOwner:
-            event.previousOwner && userId !== event.previousOwner.id ? (
-              <UserReference user={event.previousOwner} />
-            ) : null,
+          previousOwner: <UserReference user={event.previousOwner} />,
           user: <UserReference user={event.user} />,
           owner: <UserReference user={event.owner} />,
           timeAgo: (

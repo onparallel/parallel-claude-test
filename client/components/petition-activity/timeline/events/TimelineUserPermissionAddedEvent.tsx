@@ -10,23 +10,18 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineUserPermissionAddedEventProps {
-  userId: string;
   event: TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
 }
 
-export function TimelineUserPermissionAddedEvent({
-  event,
-  userId,
-}: TimelineUserPermissionAddedEventProps) {
+export function TimelineUserPermissionAddedEvent({ event }: TimelineUserPermissionAddedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={UserArrowIcon} color="white" backgroundColor="primary.500" />}
     >
       <FormattedMessage
-        id="timeline.add-user-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}"
+        id="component.timeline-user-permission-added-event.description"
+        defaultMessage="{user} shared this parallel with {other} as {permissionType} {timeAgo}"
         values={{
-          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           permissionType: (
