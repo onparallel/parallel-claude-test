@@ -626,92 +626,105 @@ export function ConfirmPetitionSignersDialog(
 }
 
 ConfirmPetitionSignersDialog.fragments = {
-  User: gql`
-    fragment ConfirmPetitionSignersDialog_User on User {
-      id
-      email
-      firstName
-      lastName
-      ...SuggestedSigners_User
-    }
-    ${SuggestedSigners.fragments.User}
-  `,
-  PetitionSigner: gql`
-    fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-      contactId
-      email
-      firstName
-      lastName
-      isPreset
-      ...SelectedSignerRow_PetitionSigner
-    }
-    ${SelectedSignerRow.fragments.PetitionSigner}
-  `,
-  SignatureConfig: gql`
-    fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
-      signingMode
-      minSigners
-      instructions
-      allowAdditionalSigners
-      useCustomDocument
-      signers {
-        ...ConfirmPetitionSignersDialog_PetitionSigner
-      }
-    }
-  `,
-  PetitionField: gql`
-    fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
-      id
-      type
-      title
-      options
-      alias
-      replies {
+  get User() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_User on User {
         id
-        content
-        children {
-          field {
-            id
-            type
-            alias
-            options
-          }
-          replies {
-            id
-            content
-          }
+        email
+        firstName
+        lastName
+        ...SuggestedSigners_User
+      }
+      ${SuggestedSigners.fragments.User}
+    `;
+  },
+  get PetitionSigner() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+        contactId
+        email
+        firstName
+        lastName
+        isPreset
+        ...SelectedSignerRow_PetitionSigner
+      }
+      ${SelectedSignerRow.fragments.PetitionSigner}
+    `;
+  },
+  get SignatureConfig() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+        signingMode
+        minSigners
+        instructions
+        allowAdditionalSigners
+        useCustomDocument
+        signers {
+          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
       }
-    }
-  `,
-  Petition: gql`
-    fragment ConfirmPetitionSignersDialog_Petition on Petition {
-      id
-      isInteractionWithRecipientsEnabled
-      fields {
-        ...ConfirmPetitionSignersDialog_PetitionField
-      }
-      accesses {
+      ${this.PetitionSigner}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
         id
-        status
-        contact {
+        type
+        title
+        options
+        alias
+        replies {
           id
-          email
-          firstName
-          lastName
-        }
-      }
-      signatureRequests {
-        signatureConfig {
-          signers {
-            ...ConfirmPetitionSignersDialog_PetitionSigner
+          content
+          children {
+            field {
+              id
+              type
+              alias
+              options
+            }
+            replies {
+              id
+              content
+            }
           }
         }
       }
-      ...SuggestedSigners_PetitionBase
-    }
-    ${SuggestedSigners.fragments.PetitionBase}
-  `,
+    `;
+  },
+  get Petition() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_Petition on Petition {
+        id
+        isInteractionWithRecipientsEnabled
+        fields {
+          ...ConfirmPetitionSignersDialog_PetitionField
+        }
+        accesses {
+          id
+          status
+          contact {
+            id
+            email
+            firstName
+            lastName
+          }
+        }
+        signatureRequests {
+          signatureConfig {
+            signers {
+              ...ConfirmPetitionSignersDialog_PetitionSigner
+            }
+          }
+        }
+        ...SuggestedSigners_PetitionBase
+      }
+      ${SuggestedSigners.fragments.PetitionBase}
+      ${this.PetitionField}
+      ${this.PetitionSigner}
+    `;
+  },
 };
 
 const _mutations = [

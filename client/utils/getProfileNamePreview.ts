@@ -52,29 +52,36 @@ export function getProfileNamePreview({
 }
 
 getProfileNamePreview.fragments = {
-  ProfileType: gql`
-    fragment getProfileNamePreview_ProfileType on ProfileType {
-      id
-      profileNamePattern
-    }
-  `,
-  PetitionField: gql`
-    fragment getProfileNamePreview_PetitionField on PetitionField {
-      id
-      type
-      options
-      profileType {
-        ...getProfileNamePreview_ProfileType
-      }
-      profileTypeField {
+  get ProfileType() {
+    return gql`
+      fragment getProfileNamePreview_ProfileType on ProfileType {
         id
+        profileNamePattern
       }
-    }
-  `,
-  PetitionFieldReply: gql`
-    fragment getProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-    }
-  `,
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment getProfileNamePreview_PetitionField on PetitionField {
+        id
+        type
+        options
+        profileType {
+          ...getProfileNamePreview_ProfileType
+        }
+        profileTypeField {
+          id
+        }
+      }
+      ${this.ProfileType}
+    `;
+  },
+  get PetitionFieldReply() {
+    return gql`
+      fragment getProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
+        id
+        content
+      }
+    `;
+  },
 };

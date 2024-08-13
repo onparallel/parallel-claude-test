@@ -211,44 +211,53 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
 }
 
 PetitionComments.fragments = {
-  PetitionFieldComment: gql`
-    fragment PetitionComments_PetitionFieldComment on PetitionFieldComment {
-      id
-      createdAt
-      isInternal
-      author {
-        ...UserOrContactReference_UserOrPetitionAccess
+  get PetitionFieldComment() {
+    return gql`
+      fragment PetitionComments_PetitionFieldComment on PetitionFieldComment {
+        id
+        createdAt
+        isInternal
+        author {
+          ...UserOrContactReference_UserOrPetitionAccess
+        }
+        ...PetitionFieldCommentExcerpt_PetitionFieldComment
       }
-      ...PetitionFieldCommentExcerpt_PetitionFieldComment
-    }
-    ${PetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-  `,
-  PetitionField: gql`
-    fragment PetitionComments_PetitionField on PetitionField {
-      id
-      title
-      commentCount
-      unreadCommentCount
-      hasCommentsEnabled
-      lastComment {
-        ...PetitionComments_PetitionFieldComment
-      }
-    }
-  `,
-  PetitionBase: gql`
-    fragment PetitionComments_PetitionBase on PetitionBase {
-      id
-      fields {
-        ...PetitionComments_PetitionField
-      }
-      ... on Petition {
-        generalCommentCount
-        unreadGeneralCommentCount
-        lastGeneralComment {
+      ${PetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
+      ${UserOrContactReference.fragments.UserOrPetitionAccess}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PetitionComments_PetitionField on PetitionField {
+        id
+        title
+        commentCount
+        unreadCommentCount
+        hasCommentsEnabled
+        lastComment {
           ...PetitionComments_PetitionFieldComment
         }
       }
-    }
-  `,
+      ${this.PetitionFieldComment}
+    `;
+  },
+  get PetitionBase() {
+    return gql`
+      fragment PetitionComments_PetitionBase on PetitionBase {
+        id
+        fields {
+          ...PetitionComments_PetitionField
+        }
+        ... on Petition {
+          generalCommentCount
+          unreadGeneralCommentCount
+          lastGeneralComment {
+            ...PetitionComments_PetitionFieldComment
+          }
+        }
+      }
+      ${this.PetitionField}
+      ${this.PetitionFieldComment}
+    `;
+  },
 };

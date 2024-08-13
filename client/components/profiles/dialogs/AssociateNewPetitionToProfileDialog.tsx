@@ -701,88 +701,99 @@ function AssociateNewPetitionToProfileStep3({
 }
 
 useAssociateNewPetitionToProfileDialog.fragments = {
-  PetitionBase: gql`
-    fragment useAssociateNewPetitionToProfileDialog_PetitionBase on PetitionBase {
-      id
-      name
-      fields {
+  get PetitionBase() {
+    return gql`
+      fragment useAssociateNewPetitionToProfileDialog_PetitionBase on PetitionBase {
         id
-        type
-        title
-        alias
-        isLinkedToProfileType
-        options
-        multiple
+        name
+        fields {
+          id
+          type
+          title
+          alias
+          isLinkedToProfileType
+          options
+          multiple
+          profileType {
+            id
+            name
+            isStandard
+          }
+          ...PetitionFieldReference_PetitionField
+        }
+        fieldRelationships {
+          id
+          leftSidePetitionField {
+            id
+            profileType {
+              id
+            }
+          }
+          rightSidePetitionField {
+            id
+            profileType {
+              id
+            }
+          }
+          relationshipTypeWithDirection {
+            direction
+            profileRelationshipType {
+              id
+              isReciprocal
+            }
+          }
+        }
+        ...useFieldsWithIndices_PetitionBase
+      }
+      ${PetitionFieldReference.fragments.PetitionField}
+      ${useFieldsWithIndices.fragments.PetitionBase}
+    `;
+  },
+  get ProfileInner() {
+    return gql`
+      fragment useAssociateNewPetitionToProfileDialog_ProfileInner on Profile {
+        id
+        localizableName
+        profileType {
+          id
+        }
+      }
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
+        ...useAssociateNewPetitionToProfileDialog_ProfileInner
         profileType {
           id
           name
-          isStandard
         }
-        ...PetitionFieldReference_PetitionField
+        relationships {
+          ...useAssociateNewPetitionToProfileDialog_ProfileRelationship
+        }
       }
-      fieldRelationships {
+      ${this.ProfileInner}
+      ${this.ProfileRelationship}
+    `;
+  },
+  get ProfileRelationship() {
+    return gql`
+      fragment useAssociateNewPetitionToProfileDialog_ProfileRelationship on ProfileRelationship {
         id
-        leftSidePetitionField {
+        leftSideProfile {
+          ...useAssociateNewPetitionToProfileDialog_ProfileInner
+        }
+        rightSideProfile {
+          ...useAssociateNewPetitionToProfileDialog_ProfileInner
+        }
+        relationshipType {
           id
-          profileType {
-            id
-          }
-        }
-        rightSidePetitionField {
-          id
-          profileType {
-            id
-          }
-        }
-        relationshipTypeWithDirection {
-          direction
-          profileRelationshipType {
-            id
-            isReciprocal
-          }
+          isReciprocal
         }
       }
-      ...useFieldsWithIndices_PetitionBase
-    }
-    ${PetitionFieldReference.fragments.PetitionField}
-    ${useFieldsWithIndices.fragments.PetitionBase}
-  `,
-  ProfileInner: gql`
-    fragment useAssociateNewPetitionToProfileDialog_ProfileInner on Profile {
-      id
-      localizableName
-      profileType {
-        id
-      }
-    }
-  `,
-  Profile: gql`
-    fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
-      ...useAssociateNewPetitionToProfileDialog_ProfileInner
-      profileType {
-        id
-        name
-      }
-      relationships {
-        ...useAssociateNewPetitionToProfileDialog_ProfileRelationship
-      }
-    }
-  `,
-  ProfileRelationship: gql`
-    fragment useAssociateNewPetitionToProfileDialog_ProfileRelationship on ProfileRelationship {
-      id
-      leftSideProfile {
-        ...useAssociateNewPetitionToProfileDialog_ProfileInner
-      }
-      rightSideProfile {
-        ...useAssociateNewPetitionToProfileDialog_ProfileInner
-      }
-      relationshipType {
-        id
-        isReciprocal
-      }
-    }
-  `,
+      ${this.ProfileInner}
+    `;
+  },
 };
 
 const _queries = [

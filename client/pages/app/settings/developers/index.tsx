@@ -938,50 +938,57 @@ function useConfirmDeleteSubscriptionDialog() {
 }
 
 const _fragments = {
-  PetitionEventSubscription: gql`
-    fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
-      id
-      isEnabled
-      eventTypes
-      fromTemplate {
+  get PetitionEventSubscription() {
+    return gql`
+      fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
         id
+        isEnabled
+        eventTypes
+        fromTemplate {
+          id
+          name
+        }
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
+      }
+      ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
+    `;
+  },
+  get ProfileEventSubscription() {
+    return gql`
+      fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
+        id
+        isEnabled
+        profileEventTypes: eventTypes
+        fromProfileType {
+          id
+          name
+        }
+        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+      }
+      ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
+    `;
+  },
+  get EventSubscription() {
+    return gql`
+      fragment Subscriptions_EventSubscription on EventSubscription {
+        id
+        eventsUrl
+        isEnabled
+        isFailing
         name
+        signatureKeys {
+          id
+        }
+        ... on PetitionEventSubscription {
+          ...Subscriptions_PetitionEventSubscription
+        }
+        ... on ProfileEventSubscription {
+          ...Subscriptions_ProfileEventSubscription
+        }
       }
-      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
-    }
-    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
-  `,
-  ProfileEventSubscription: gql`
-    fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
-      id
-      isEnabled
-      profileEventTypes: eventTypes
-      fromProfileType {
-        id
-        name
-      }
-      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
-    }
-    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
-  `,
-  EventSubscription: gql`
-    fragment Subscriptions_EventSubscription on EventSubscription {
-      id
-      eventsUrl
-      isEnabled
-      isFailing
-      name
-      signatureKeys {
-        id
-      }
-      ... on PetitionEventSubscription {
-        ...Subscriptions_PetitionEventSubscription
-      }
-      ... on ProfileEventSubscription {
-        ...Subscriptions_ProfileEventSubscription
-      }
-    }
-  `,
+      ${this.ProfileEventSubscription}
+    `;
+  },
 };
 
 const _mutations = [

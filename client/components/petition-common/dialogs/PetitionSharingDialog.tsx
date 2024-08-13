@@ -781,7 +781,6 @@ const _queries = [
               ...PetitionSharingModal_UserGroup
             }
             permissionType
-            
           }
         }
         firstPetitionEffectivePermissions {
@@ -791,10 +790,10 @@ const _queries = [
           isSubscribed
         }
       }
-      ${PetitionNameWithPath.fragments.PetitionBase}
-      ${_fragments.User}
-      ${_fragments.UserGroup}
     }
+    ${PetitionNameWithPath.fragments.PetitionBase}
+    ${_fragments.User}
+    ${_fragments.UserGroup}
   `,
 ];
 

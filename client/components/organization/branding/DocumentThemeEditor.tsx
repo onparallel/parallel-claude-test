@@ -335,5 +335,6 @@ DocumentThemeEditor.fragments = {
     fragment DocumentThemeEditor_User on User {
       ...useAvailablePetitionLocales_User
     }
+    ${useAvailablePetitionLocales.fragments.User}
   `,
 };

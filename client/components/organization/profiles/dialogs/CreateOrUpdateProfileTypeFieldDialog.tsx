@@ -700,31 +700,36 @@ export function useCreateOrUpdateProfileTypeFieldDialog() {
 }
 
 useCreateOrUpdateProfileTypeFieldDialog.fragments = {
-  ProfileTypeField: gql`
-    fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
-      id
-      name
-      type
-      alias
-      options
-      isExpirable
-      expiryAlertAheadTime
-      options
-      isStandard
-      ...getReferencedInBackgroundCheck_ProfileTypeField
-    }
-    ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
-  `,
-  ProfileType: gql`
-    fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
-      id
-      fields {
-        ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
+  get ProfileTypeField() {
+    return gql`
+      fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+        id
+        name
+        type
+        alias
+        options
+        isExpirable
+        expiryAlertAheadTime
+        options
+        isStandard
+        ...getReferencedInBackgroundCheck_ProfileTypeField
       }
-      ...ProfileFieldBackgroundCheckSettings_ProfileType
-    }
-    ${ProfileFieldBackgroundCheckSettings.fragments.ProfileType}
-  `,
+      ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
+    `;
+  },
+  get ProfileType() {
+    return gql`
+      fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
+        id
+        fields {
+          ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
+        }
+        ...ProfileFieldBackgroundCheckSettings_ProfileType
+      }
+      ${ProfileFieldBackgroundCheckSettings.fragments.ProfileType}
+      ${this.ProfileTypeField}
+    `;
+  },
 };
 
 const _mutations = [

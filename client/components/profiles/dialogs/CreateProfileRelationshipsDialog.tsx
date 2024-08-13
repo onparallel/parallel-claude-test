@@ -493,6 +493,7 @@ useCreateProfileRelationshipsDialog.fragments = {
     fragment useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
       ...ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection
     }
+    ${ProfileRelationshipTypeWithDirectionSelect.fragments.ProfileRelationshipTypeWithDirection}
   `,
 };
 

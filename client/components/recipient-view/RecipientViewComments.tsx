@@ -392,50 +392,57 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 }
 
 RecipientViewComments.fragments = {
-  PublicPetitionFieldComment: gql`
-    fragment RecipientViewComments_PublicPetitionFieldComment on PublicPetitionFieldComment {
-      id
-      ...PublicPetitionFieldComment_PublicPetitionFieldComment
-    }
-    ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
-  `,
-  PublicPetitionAccess: gql`
-    fragment RecipientViewComments_PublicPetitionAccess on PublicPetitionAccess {
-      granter {
+  get PublicPetitionFieldComment() {
+    return gql`
+      fragment RecipientViewComments_PublicPetitionFieldComment on PublicPetitionFieldComment {
         id
-        fullName
+        ...PublicPetitionFieldComment_PublicPetitionFieldComment
       }
-      contact {
+      ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
+    `;
+  },
+  get PublicPetitionAccess() {
+    return gql`
+      fragment RecipientViewComments_PublicPetitionAccess on PublicPetitionAccess {
+        granter {
+          id
+          fullName
+        }
+        contact {
+          id
+        }
+      }
+    `;
+  },
+  get PublicPetitionField() {
+    return gql`
+      fragment RecipientViewComments_PublicPetitionField on PublicPetitionField {
         id
-      }
-    }
-  `,
-  PublicPetitionField: gql`
-    fragment RecipientViewComments_PublicPetitionField on PublicPetitionField {
-      id
-      type
-      title
-      unreadCommentCount
-      hasCommentsEnabled
-      lastComment {
-        ...RecipientViewComments_PublicPetitionFieldComment
-        ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
-        createdAt
-        author {
-          ... on PublicUser {
-            id
-            fullName
-          }
-          ... on PublicContact {
-            id
-            fullName
-            isMe
+        type
+        title
+        unreadCommentCount
+        hasCommentsEnabled
+        lastComment {
+          ...RecipientViewComments_PublicPetitionFieldComment
+          ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
+          createdAt
+          author {
+            ... on PublicUser {
+              id
+              fullName
+            }
+            ... on PublicContact {
+              id
+              fullName
+              isMe
+            }
           }
         }
       }
-    }
-    ${PublicPetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
-  `,
+      ${PublicPetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
+      ${this.PublicPetitionFieldComment}
+    `;
+  },
 };
 
 const _queries = [

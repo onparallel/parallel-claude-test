@@ -544,22 +544,27 @@ CreateOrUpdateProfileEventSubscriptionDialog.fragments = {
       }
     `;
   },
-  ProfileTypeField: gql`
-    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
-      id
-      ...ProfileTypeFieldSelect_ProfileTypeField
-    }
-    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-  `,
-  ProfileType: gql`
-    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
-      id
-      name
-      fields {
-        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
+  get ProfileTypeField() {
+    return gql`
+      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
+        id
+        ...ProfileTypeFieldSelect_ProfileTypeField
       }
-    }
-  `,
+      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
+    `;
+  },
+  get ProfileType() {
+    return gql`
+      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
+        id
+        name
+        fields {
+          ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
+        }
+      }
+      ${this.ProfileTypeField}
+    `;
+  },
 };
 
 const _queries = [

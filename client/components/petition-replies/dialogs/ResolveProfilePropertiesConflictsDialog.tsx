@@ -519,51 +519,60 @@ export function useResolveProfilePropertiesConflictsDialog() {
 }
 
 useResolveProfilePropertiesConflictsDialog.fragments = {
-  ProfileFieldProperty: gql`
-    fragment useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty on ProfileFieldProperty {
-      field {
-        id
-        type
-        name
-        options
-      }
-      files {
-        id
-        file {
-          size
-          isComplete
-          filename
-          contentType
+  get ProfileFieldProperty() {
+    return gql`
+      fragment useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty on ProfileFieldProperty {
+        field {
+          id
+          type
+          name
+          options
+        }
+        files {
+          id
+          file {
+            size
+            isComplete
+            filename
+            contentType
+          }
+        }
+        value {
+          id
+          content
         }
       }
-      value {
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment useResolveProfilePropertiesConflictsDialog_Profile on Profile {
+        id
+        properties {
+          ...useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty
+        }
+      }
+      ${this.ProfileFieldProperty}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
+        id
+        profileTypeField {
+          id
+        }
+      }
+    `;
+  },
+  get PetitionFieldReply() {
+    return gql`
+      fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
         id
         content
       }
-    }
-  `,
-  Profile: gql`
-    fragment useResolveProfilePropertiesConflictsDialog_Profile on Profile {
-      id
-      properties {
-        ...useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty
-      }
-    }
-  `,
-  PetitionField: gql`
-    fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
-      id
-      profileTypeField {
-        id
-      }
-    }
-  `,
-  PetitionFieldReply: gql`
-    fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-    }
-  `,
+    `;
+  },
 };
 
 const _queries = {

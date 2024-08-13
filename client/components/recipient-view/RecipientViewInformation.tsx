@@ -102,54 +102,65 @@ export function RecipientViewInformation({
 }
 
 RecipientViewInformation.fragments = {
-  PublicPetitionMessage: gql`
-    fragment RecipientViewInformation_PublicPetitionMessage on PublicPetitionMessage {
-      id
-      subject
-    }
-  `,
-  PublicContact: gql`
-    fragment RecipientViewInformation_PublicContact on PublicContact {
-      id
-      fullName
-      firstName
-      email
-    }
-  `,
-  PublicUser: gql`
-    fragment RecipientViewInformation_PublicUser on PublicUser {
-      id
-      firstName
-      fullName
-      email
-      organization {
-        name
-      }
-    }
-  `,
-  PublicPetitionAccess: gql`
-    fragment RecipientViewInformation_PublicPetitionAccess on PublicPetitionAccess {
-      petition {
+  get PublicPetitionMessage() {
+    return gql`
+      fragment RecipientViewInformation_PublicPetitionMessage on PublicPetitionMessage {
         id
-        isDelegateAccessEnabled
-        recipients {
+        subject
+      }
+    `;
+  },
+  get PublicContact() {
+    return gql`
+      fragment RecipientViewInformation_PublicContact on PublicContact {
+        id
+        fullName
+        firstName
+        email
+      }
+    `;
+  },
+  get PublicUser() {
+    return gql`
+      fragment RecipientViewInformation_PublicUser on PublicUser {
+        id
+        firstName
+        fullName
+        email
+        organization {
+          name
+        }
+      }
+    `;
+  },
+  get PublicPetitionAccess() {
+    return gql`
+      fragment RecipientViewInformation_PublicPetitionAccess on PublicPetitionAccess {
+        petition {
+          id
+          isDelegateAccessEnabled
+          recipients {
+            id
+            ...RecipientViewInformation_PublicContact
+          }
+        }
+        granter {
+          id
+          ...RecipientViewInformation_PublicUser
+        }
+        contact {
           id
           ...RecipientViewInformation_PublicContact
         }
+        message {
+          ...RecipientViewInformation_PublicPetitionMessage
+        }
       }
-      granter {
-        id
-        ...RecipientViewInformation_PublicUser
-      }
-      contact {
-        id
-        ...RecipientViewInformation_PublicContact
-      }
-      message {
-        ...RecipientViewInformation_PublicPetitionMessage
-      }
-    }
-  `,
+      ${this.PublicPetitionMessage}
+      ${this.PublicContact}
+      ${this.PublicUser}
+    `;
+  },
 };
 
 function Contact({

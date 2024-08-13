@@ -266,49 +266,56 @@ function useProfileRelationshipsTableColumns({
 }
 
 ProfileRelationshipsTable.fragments = {
-  RelatedProfile: gql`
-    fragment ProfileRelationshipsTable_RelatedProfile on Profile {
-      id
-      ...ProfileReference_Profile
-      profileType {
+  get RelatedProfile() {
+    return gql`
+      fragment ProfileRelationshipsTable_RelatedProfile on Profile {
         id
-        name
+        ...ProfileReference_Profile
+        profileType {
+          id
+          name
+        }
+        ...useCreateProfileRelationshipsDialog_Profile
       }
-      ...useCreateProfileRelationshipsDialog_Profile
-    }
-    ${ProfileReference.fragments.Profile}
-    ${useCreateProfileRelationshipsDialog.fragments.Profile}
-  `,
-  ProfileRelationship: gql`
-    fragment ProfileRelationshipsTable_ProfileRelationship on ProfileRelationship {
-      id
-      leftSideProfile {
-        ...ProfileRelationshipsTable_RelatedProfile
-      }
-      rightSideProfile {
-        ...ProfileRelationshipsTable_RelatedProfile
-      }
-      relationshipType {
-        alias
+      ${ProfileReference.fragments.Profile}
+      ${useCreateProfileRelationshipsDialog.fragments.Profile}
+    `;
+  },
+  get ProfileRelationship() {
+    return gql`
+      fragment ProfileRelationshipsTable_ProfileRelationship on ProfileRelationship {
         id
-        leftRightName
-        rightLeftName
+        leftSideProfile {
+          ...ProfileRelationshipsTable_RelatedProfile
+        }
+        rightSideProfile {
+          ...ProfileRelationshipsTable_RelatedProfile
+        }
+        relationshipType {
+          alias
+          id
+          leftRightName
+          rightLeftName
+        }
       }
-    }
-  `,
-  Profile: gql`
-    fragment ProfileRelationshipsTable_Profile on Profile {
-      id
-      ...ProfileReference_Profile
-      status
-      relationships {
-        ...ProfileRelationshipsTable_ProfileRelationship
+      ${this.RelatedProfile}
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment ProfileRelationshipsTable_Profile on Profile {
+        id
+        ...ProfileReference_Profile
+        status
+        relationships {
+          ...ProfileRelationshipsTable_ProfileRelationship
+        }
+        ...useCreateProfileRelationshipsDialog_Profile
       }
-      ...useCreateProfileRelationshipsDialog_Profile
-    }
-    ${ProfileReference.fragments.Profile}
-    ${useCreateProfileRelationshipsDialog.fragments.Profile}
-  `,
+      ${ProfileReference.fragments.Profile}
+      ${useCreateProfileRelationshipsDialog.fragments.Profile}
+    `;
+  },
 };
 
 const _mutations = [

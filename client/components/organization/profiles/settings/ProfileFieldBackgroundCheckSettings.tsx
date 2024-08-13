@@ -620,23 +620,28 @@ function SearchFrequencyOptions({
 }
 
 ProfileFieldBackgroundCheckSettings.fragments = {
-  ProfileTypeField: gql`
-    fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
-      id
-      name
-      type
-      options
-      alias
-      ...ProfileTypeFieldSelect_ProfileTypeField
-    }
-    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-  `,
-  ProfileType: gql`
-    fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
-      id
-      fields {
-        ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+  get ProfileTypeField() {
+    return gql`
+      fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
+        id
+        name
+        type
+        options
+        alias
+        ...ProfileTypeFieldSelect_ProfileTypeField
       }
-    }
-  `,
+      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
+    `;
+  },
+  get ProfileType() {
+    return gql`
+      fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
+        id
+        fields {
+          ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+        }
+      }
+      ${this.ProfileTypeField}
+    `;
+  },
 };

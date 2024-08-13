@@ -323,128 +323,140 @@ function SuggestedSignersRow({
 }
 
 SuggestedSigners.fragments = {
-  PetitionSigner: gql`
-    fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-      firstName
-      lastName
-      email
-    }
-  `,
-  PublicContact: gql`
-    fragment SuggestedSigners_PublicContact on PublicContact {
-      firstName
-      lastName
-      email
-      isMe
-    }
-  `,
-  PublicPetition: gql`
-    fragment SuggestedSigners_PublicPetition on PublicPetition {
-      id
-      signatureConfig {
-        signers {
-          ...SuggestedSigners_PetitionSigner
-        }
+  get PetitionSigner() {
+    return gql`
+      fragment SuggestedSigners_PetitionSigner on PetitionSigner {
+        firstName
+        lastName
+        email
       }
-      recipients {
-        ...SuggestedSigners_PublicContact
+    `;
+  },
+  get PublicContact() {
+    return gql`
+      fragment SuggestedSigners_PublicContact on PublicContact {
+        firstName
+        lastName
+        email
+        isMe
       }
-      fields {
+    `;
+  },
+  get PublicPetition() {
+    return gql`
+      fragment SuggestedSigners_PublicPetition on PublicPetition {
         id
-        type
-        title
-        options
-        alias
-        profileType {
-          profileNamePatternFields
-        }
-        replies {
-          id
-          content
-          children {
-            field {
-              id
-              type
-              alias
-              options
-              profileTypeField {
-                id
-                alias
-              }
-            }
-            replies {
-              id
-              content
-            }
+        signatureConfig {
+          signers {
+            ...SuggestedSigners_PetitionSigner
           }
         }
-      }
-      ...useFieldLogic_PublicPetition
-    }
-    ${useFieldLogic.fragments.PublicPetition}
-  `,
-  User: gql`
-    fragment SuggestedSigners_User on User {
-      id
-      email
-      firstName
-      lastName
-    }
-  `,
-  PetitionBase: gql`
-    fragment SuggestedSigners_PetitionBase on PetitionBase {
-      id
-      fields {
-        id
-        type
-        title
-        options
-        alias
-        profileType {
-          profileNamePatternFields
+        recipients {
+          ...SuggestedSigners_PublicContact
         }
-        replies {
+        fields {
           id
-          content
-          children {
-            field {
-              id
-              type
-              alias
-              options
-              profileTypeField {
-                id
-                alias
-              }
-            }
-            replies {
-              id
-              content
-            }
+          type
+          title
+          options
+          alias
+          profileType {
+            profileNamePatternFields
           }
-        }
-      }
-      ... on Petition {
-        accesses {
-          id
-          status
-          contact {
+          replies {
             id
-            email
-            firstName
-            lastName
-          }
-        }
-        signatureRequests {
-          signatureConfig {
-            signers {
-              ...SuggestedSigners_PetitionSigner
+            content
+            children {
+              field {
+                id
+                type
+                alias
+                options
+                profileTypeField {
+                  id
+                  alias
+                }
+              }
+              replies {
+                id
+                content
+              }
             }
           }
         }
+        ...useFieldLogic_PublicPetition
       }
-      ...useFieldLogic_PetitionBase
-    }
-    ${useFieldLogic.fragments.PetitionBase}
-  `,
+      ${useFieldLogic.fragments.PublicPetition}
+      ${this.PetitionSigner}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment SuggestedSigners_User on User {
+        id
+        email
+        firstName
+        lastName
+      }
+    `;
+  },
+  get PetitionBase() {
+    return gql`
+      fragment SuggestedSigners_PetitionBase on PetitionBase {
+        id
+        fields {
+          id
+          type
+          title
+          options
+          alias
+          profileType {
+            profileNamePatternFields
+          }
+          replies {
+            id
+            content
+            children {
+              field {
+                id
+                type
+                alias
+                options
+                profileTypeField {
+                  id
+                  alias
+                }
+              }
+              replies {
+                id
+                content
+              }
+            }
+          }
+        }
+        ... on Petition {
+          accesses {
+            id
+            status
+            contact {
+              id
+              email
+              firstName
+              lastName
+            }
+          }
+          signatureRequests {
+            signatureConfig {
+              signers {
+                ...SuggestedSigners_PetitionSigner
+              }
+            }
+          }
+        }
+        ...useFieldLogic_PetitionBase
+      }
+      ${useFieldLogic.fragments.PetitionBase}
+      ${this.PetitionSigner}
+    `;
+  },
 };

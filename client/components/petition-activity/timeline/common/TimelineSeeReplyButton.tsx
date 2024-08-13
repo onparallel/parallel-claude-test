@@ -40,20 +40,25 @@ export function TimelineSeeReplyButton({ field, replyId, ...props }: TimelineSee
 }
 
 TimelineSeeReplyButton.fragments = {
-  PetitionField: gql`
-    fragment TimelineSeeReplyButton_PetitionField on PetitionField {
-      id
-      replies {
-        ...TimelineSeeReplyButton_PetitionFieldReply
-      }
-    }
-  `,
-  PetitionFieldReply: gql`
-    fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
-      id
-      parent {
+  get PetitionField() {
+    return gql`
+      fragment TimelineSeeReplyButton_PetitionField on PetitionField {
         id
+        replies {
+          ...TimelineSeeReplyButton_PetitionFieldReply
+        }
       }
-    }
-  `,
+      ${this.PetitionFieldReply}
+    `;
+  },
+  get PetitionFieldReply() {
+    return gql`
+      fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
+        id
+        parent {
+          id
+        }
+      }
+    `;
+  },
 };

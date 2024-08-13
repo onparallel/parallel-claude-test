@@ -248,37 +248,45 @@ export const RecipientViewHeader = Object.assign(
   }),
   {
     fragments: {
-      PublicContact: gql`
-        fragment RecipientViewHeader_PublicContact on PublicContact {
-          id
-          fullName
-          firstName
-          email
-          initials
-          ...RecipientViewMenuButton_PublicContact
-        }
-        ${RecipientViewMenuButton.fragments.PublicContact}
-      `,
-      PublicPetition: gql`
-        fragment RecipientViewHeader_PublicPetition on PublicPetition {
-          id
-          organization {
-            name
-            logoUrl72: logoUrl(options: { resize: { height: 72 } })
+      get PublicContact() {
+        return gql`
+          fragment RecipientViewHeader_PublicContact on PublicContact {
+            id
+            fullName
+            firstName
+            email
+            initials
+            ...RecipientViewMenuButton_PublicContact
           }
-        }
-      `,
-      PublicPetitionAccess: gql`
-        fragment RecipientViewHeader_PublicPetitionAccess on PublicPetitionAccess {
-          hasClientPortalAccess
-          petition {
-            ...RecipientViewHeader_PublicPetition
+          ${RecipientViewMenuButton.fragments.PublicContact}
+        `;
+      },
+      get PublicPetition() {
+        return gql`
+          fragment RecipientViewHeader_PublicPetition on PublicPetition {
+            id
+            organization {
+              name
+              logoUrl72: logoUrl(options: { resize: { height: 72 } })
+            }
           }
-          contact {
-            ...RecipientViewHeader_PublicContact
+        `;
+      },
+      get PublicPetitionAccess() {
+        return gql`
+          fragment RecipientViewHeader_PublicPetitionAccess on PublicPetitionAccess {
+            hasClientPortalAccess
+            petition {
+              ...RecipientViewHeader_PublicPetition
+            }
+            contact {
+              ...RecipientViewHeader_PublicContact
+            }
           }
-        }
-      `,
+          ${this.PublicPetition}
+          ${this.PublicContact}
+        `;
+      },
     },
   },
 );
