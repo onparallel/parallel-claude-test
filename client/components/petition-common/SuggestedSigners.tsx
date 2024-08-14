@@ -361,6 +361,7 @@ SuggestedSigners.fragments = {
           options
           alias
           profileType {
+            id
             profileNamePatternFields
           }
           replies {
@@ -411,6 +412,7 @@ SuggestedSigners.fragments = {
           options
           alias
           profileType {
+            id
             profileNamePatternFields
           }
           replies {
