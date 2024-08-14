@@ -93,6 +93,7 @@ export function RecipientViewPetitionFieldIdVerification({
       onRefreshField,
       state,
       field.replies.map((r) => r.id + "-" + r.updatedAt).join(","),
+      requestType,
       sessionReady,
     ],
   );
@@ -152,10 +153,15 @@ export function RecipientViewPetitionFieldIdVerification({
   };
 
   const showStartAgainDialog = useRecipientViewIdVerificationStartAgainDialog();
+  const hasError = field.replies.some(
+    (r) => isDefined(r.content.error) && r.content.error.length > 0,
+  );
 
   const handleStartAgain = async () => {
     try {
-      await showStartAgainDialog({ tone });
+      if (!hasError) {
+        await showStartAgainDialog({ tone });
+      }
       await handleStart();
     } catch {}
   };

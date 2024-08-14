@@ -3185,16 +3185,6 @@
     "context": "Hide recipient view contents"
   },
   {
-    "term": "component.feature-flag-descriptions.id-verification-description",
-    "definition": "Activa el campo de verificación de identidad en la organización.",
-    "context": "Enables the ID Verification petition field on the organization."
-  },
-  {
-    "term": "component.feature-flag-descriptions.id-verification-name",
-    "definition": "Verificación de identidad",
-    "context": "ID Verification"
-  },
-  {
     "term": "component.feature-flag-descriptions.integrations",
     "definition": "Integraciones",
     "context": "Integrations"
@@ -6992,7 +6982,7 @@
   {
     "term": "component.preview-confirm-import-from-profile-dialog.body-2",
     "definition": "Si continúas, la información actual en los campos correspondientes al tipo de perfil será sobrescrita y se perderá la información existente.",
-    "context": "If you continue, the current information in the fields related to this profile type will be overwritten and any existing data will be lost."
+    "context": "If you continue, the profile will be associated with the parallel, but existing responses in fields linked to the profile type will be deleted."
   },
   {
     "term": "component.preview-confirm-import-from-profile-dialog.header",

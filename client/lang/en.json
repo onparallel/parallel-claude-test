@@ -3185,16 +3185,6 @@
     "context": "Hide recipient view contents"
   },
   {
-    "term": "component.feature-flag-descriptions.id-verification-description",
-    "definition": "Enables the ID Verification petition field on the organization.",
-    "context": "Enables the ID Verification petition field on the organization."
-  },
-  {
-    "term": "component.feature-flag-descriptions.id-verification-name",
-    "definition": "ID Verification",
-    "context": "ID Verification"
-  },
-  {
     "term": "component.feature-flag-descriptions.integrations",
     "definition": "Integrations",
     "context": "Integrations"
@@ -6991,8 +6981,8 @@
   },
   {
     "term": "component.preview-confirm-import-from-profile-dialog.body-2",
-    "definition": "If you continue, the current information in the fields related to this profile type will be overwritten and any existing data will be lost.",
-    "context": "If you continue, the current information in the fields related to this profile type will be overwritten and any existing data will be lost."
+    "definition": "If you continue, the profile will be associated with the parallel, but existing responses in fields linked to the profile type will be deleted.",
+    "context": "If you continue, the profile will be associated with the parallel, but existing responses in fields linked to the profile type will be deleted."
   },
   {
     "term": "component.preview-confirm-import-from-profile-dialog.header",

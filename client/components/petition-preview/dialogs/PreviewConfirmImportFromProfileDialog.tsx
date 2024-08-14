@@ -1,4 +1,5 @@
-import { Button, Text } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
+import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
@@ -7,10 +8,15 @@ export function PreviewConfirmImportFromProfileDialog({ ...props }: DialogProps<
   return (
     <ConfirmDialog
       header={
-        <FormattedMessage
-          id="component.preview-confirm-import-from-profile-dialog.header"
-          defaultMessage="No information found"
-        />
+        <Stack direction="row" spacing={2} align="center">
+          <AlertCircleIcon role="presentation" />
+          <Text>
+            <FormattedMessage
+              id="component.preview-confirm-import-from-profile-dialog.header"
+              defaultMessage="No information found"
+            />
+          </Text>
+        </Stack>
       }
       body={
         <>
@@ -23,7 +29,7 @@ export function PreviewConfirmImportFromProfileDialog({ ...props }: DialogProps<
           <Text>
             <FormattedMessage
               id="component.preview-confirm-import-from-profile-dialog.body-2"
-              defaultMessage="If you continue, the current information in the fields related to this profile type will be overwritten and any existing data will be lost."
+              defaultMessage="If you continue, the profile will be associated with the parallel, but existing responses in fields linked to the profile type will be deleted."
             />
           </Text>
         </>
