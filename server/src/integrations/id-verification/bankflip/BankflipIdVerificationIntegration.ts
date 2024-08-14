@@ -385,8 +385,8 @@ export class BankflipIdVerificationIntegration
 
     const numericTimestamp = parseInt(timestamp, 10);
     const diff = new Date().getTime() - numericTimestamp;
-    if (isNaN(diff) || diff > 5000) {
-      // if received timestamp is older than 5 seconds, reject the request as it could be a replay attack
+    if (isNaN(diff) || diff > 30_000) {
+      // if received timestamp is older than 30 seconds, reject the request as it could be a replay attack
       throw new Error("HMAC verification error: Invalid timestamp");
     }
 
