@@ -154,7 +154,7 @@ function useLiquidReferences({
           return (alias: string) =>
             [
               ...values.slice(0, 3).flatMap((value, index) => [
-                `{% ${index === 0 ? "if" : "elsif"} ${alias} contains ${JSON.stringify(value)} %}`,
+                `{% ${index === 0 ? "if" : "elsif"} ${buildAlias(alias)} contains ${JSON.stringify(value)} %}`,
                 intl.formatMessage(
                   {
                     id: "component.more-liquid-references-button.sentence-for-option",
@@ -267,7 +267,7 @@ function useLiquidReferences({
               }),
               builder: (alias: string) =>
                 [
-                  `{% for ${loopVariable} in ${alias} -%}`,
+                  `{% for ${loopVariable} in ${buildAlias(alias)} -%}`,
                   `- ${interpolation}`,
                   `{% endfor %}`,
                 ].join("\n"),
@@ -283,7 +283,7 @@ function useLiquidReferences({
               }),
               builder: (alias: string) =>
                 [
-                  `{% for ${loopVariable} in ${alias} -%}`,
+                  `{% for ${loopVariable} in ${buildAlias(alias)} -%}`,
                   `{% if forloop.first %}{% elsif forloop.last %} ${and} {% else %}, {% endif %}${interpolation}`,
                   `{%- endfor %}`,
                 ].join("\n"),
