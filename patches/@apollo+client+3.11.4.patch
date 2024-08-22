@@ -1,8 +1,8 @@
 diff --git a/node_modules/@apollo/client/apollo-client.cjs b/node_modules/@apollo/client/apollo-client.cjs
-index 17856d7..7feed7c 100644
+index 5c43796..ebdba49 100644
 --- a/node_modules/@apollo/client/apollo-client.cjs
 +++ b/node_modules/@apollo/client/apollo-client.cjs
-@@ -4935,6 +4935,7 @@ var ObservableQuery =  (function (_super) {
+@@ -4984,6 +4984,7 @@ var ObservableQuery =  (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();
@@ -11,10 +11,10 @@ index 17856d7..7feed7c 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/ObservableQuery.js b/node_modules/@apollo/client/core/ObservableQuery.js
-index b8339a6..18b8ab1 100644
+index 23e952b..83e9617 100644
 --- a/node_modules/@apollo/client/core/ObservableQuery.js
 +++ b/node_modules/@apollo/client/core/ObservableQuery.js
-@@ -158,6 +158,7 @@ var ObservableQuery = /** @class */ (function (_super) {
+@@ -160,6 +160,7 @@ var ObservableQuery = /** @class */ (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();
@@ -23,10 +23,10 @@ index b8339a6..18b8ab1 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/core.cjs b/node_modules/@apollo/client/core/core.cjs
-index f15ae51..26648bd 100644
+index 7d03672..61fd4ff 100644
 --- a/node_modules/@apollo/client/core/core.cjs
 +++ b/node_modules/@apollo/client/core/core.cjs
-@@ -294,6 +294,7 @@ var ObservableQuery =  (function (_super) {
+@@ -295,6 +295,7 @@ var ObservableQuery =  (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();
@@ -35,10 +35,10 @@ index f15ae51..26648bd 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/core.cjs.native.js b/node_modules/@apollo/client/core/core.cjs.native.js
-index f15ae51..26648bd 100644
+index 7d03672..61fd4ff 100644
 --- a/node_modules/@apollo/client/core/core.cjs.native.js
 +++ b/node_modules/@apollo/client/core/core.cjs.native.js
-@@ -294,6 +294,7 @@ var ObservableQuery =  (function (_super) {
+@@ -295,6 +295,7 @@ var ObservableQuery =  (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();
