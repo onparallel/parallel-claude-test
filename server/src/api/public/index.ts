@@ -4,7 +4,7 @@ import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
 import { Container } from "inversify";
 import { outdent } from "outdent";
-import { isDefined, omit, pick, uniq, zip } from "remeda";
+import { isDefined, omit, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
@@ -2714,8 +2714,8 @@ export function publicApi(container: Container) {
 
         const task = await client.request(SharePetition_createAddPetitionPermissionTaskDocument, {
           petitionId: params.petitionId,
-          userIds: userIds.length > 0 ? uniq(userIds) : undefined,
-          userGroupIds: userGroupIds.length > 0 ? uniq(userGroupIds) : undefined,
+          userIds: userIds.length > 0 ? unique(userIds) : undefined,
+          userGroupIds: userGroupIds.length > 0 ? unique(userGroupIds) : undefined,
         });
 
         await waitForTask(client, task.createAddPetitionPermissionTask);
@@ -4103,7 +4103,7 @@ export function publicApi(container: Container) {
 
         const resolvedProfileTypeFields: { id: string; alias: string }[] = [];
         if (profileTypeFieldAliases.length > 0) {
-          const profileTypeIds = uniq(profileTypeFieldAliases.map((v) => v.profileTypeId));
+          const profileTypeIds = unique(profileTypeFieldAliases.map((v) => v.profileTypeId));
           const profileTypesResult = await client.request(GetProfiles_profileTypesDocument, {
             profileTypeIds,
             limit: profileTypeIds.length,

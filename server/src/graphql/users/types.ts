@@ -1,5 +1,5 @@
 import { arg, enumType, nonNull, objectType, unionType } from "nexus";
-import { indexBy, isDefined, omit, sortBy, uniq } from "remeda";
+import { indexBy, isDefined, omit, sortBy, unique } from "remeda";
 import { FeatureFlagNameValues, UserLocaleValues, UserStatusValues } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
@@ -232,7 +232,7 @@ export const User = objectType({
           (user) => user.status === "ACTIVE",
         );
         const usersByOrgId = indexBy(users, (u) => u.org_id);
-        const orgs = await ctx.organizations.loadOrg(uniq(users.map((u) => u.org_id)));
+        const orgs = await ctx.organizations.loadOrg(unique(users.map((u) => u.org_id)));
         return sortBy(orgs.filter(isDefined), (o) => usersByOrgId[o.id].created_at);
       },
     });

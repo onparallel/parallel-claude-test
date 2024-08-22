@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("petition_access", (t) => {
@@ -18,7 +18,7 @@ export async function down(knex: Knex): Promise<void> {
   if (petitionAccessIds.length) {
     const events = await knex
       .from("petition_event")
-      .whereIn("petition_id", uniq(accesess.map((a) => a.petition_id)))
+      .whereIn("petition_id", unique(accesess.map((a) => a.petition_id)))
       .whereIn("type", ["ACCESS_ACTIVATED", "ACCESS_DEACTIVATED"])
       .whereIn(knex.raw("(data ->> 'petition_access_id')::int") as any, petitionAccessIds)
       .select("*");

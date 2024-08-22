@@ -1,1 +1,1 @@
-export { createPipe as compose } from "remeda";
+export { piped as compose } from "remeda";

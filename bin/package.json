@@ -50,7 +50,7 @@
     "node-fetch": "^2.6.12",
     "outdent": "^0.8.0",
     "p-map": "^4.0.0",
-    "remeda": "^1.43.0",
+    "remeda": "^1.61.0",
     "rimraf": "^6.0.1",
     "timezone-support": "^3.1.0",
     "ts-essentials": "^10.0.2",

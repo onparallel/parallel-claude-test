@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
-import { difference, isDefined, omit, uniq } from "remeda";
+import { difference, isDefined, omit, unique } from "remeda";
 import {
   ContactLocale,
   ContactLocaleValues,
@@ -419,7 +419,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
   private validateJsonVariablesAndAliases(variables: PetitionVariable[], aliases: string[]) {
     const values = [...variables.map((v) => v.name), ...aliases];
-    const diff = difference(values, uniq(values));
+    const diff = difference(values, unique(values));
     if (diff.length > 0) {
       throw new Error(`Found duplicate petition variables or field aliases: ${diff.join(", ")}`);
     }

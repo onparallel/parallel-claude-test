@@ -1,7 +1,17 @@
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, mapValues, omit, pipe, toPairs, uniq } from "remeda";
+import {
+  entries,
+  groupBy,
+  indexBy,
+  isDefined,
+  mapValues,
+  omit,
+  pipe,
+  toPairs,
+  unique,
+} from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
@@ -38,7 +48,7 @@ export class ContactRepository extends BaseRepository {
         keys,
         groupBy((k) => k.orgId),
         mapValues((keys) => keys.map((k) => k.email)),
-        toPairs,
+        entries(),
       );
       const rows = await this.from("contact", t)
         .whereNull("deleted_at")
@@ -323,7 +333,7 @@ export class ContactRepository extends BaseRepository {
         keys.map(async (k) => await hash(k.cookieValue, k.contactId.toString())),
       );
       const rows = await this.from("contact_authentication", t)
-        .whereIn("contact_id", uniq(keys.map((k) => k.contactId)))
+        .whereIn("contact_id", unique(keys.map((k) => k.contactId)))
         .whereIn("cookie_value_hash", hashes);
       const byKey = indexBy(rows, keyBuilder(["contact_id", "cookie_value_hash"]));
       return keys

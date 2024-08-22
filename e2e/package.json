@@ -17,7 +17,7 @@
     "dotenv": "^16.4.5",
     "imapflow": "^1.0.164",
     "mailparser": "^3.7.1",
-    "remeda": "^1.43.0"
+    "remeda": "^1.61.0"
   },
   "main": "index.js"
 }

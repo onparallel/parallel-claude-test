@@ -19,7 +19,7 @@ import {
   pipe,
   sort,
   sortBy,
-  uniq,
+  unique,
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
@@ -1769,7 +1769,7 @@ export class PetitionRepository extends BaseRepository {
     const [[parent], fields] = partition(_fields, (f) => f.id === parentFieldId);
 
     // check only valid fieldIds and not repeated
-    const _fieldIds = uniq(fieldIds);
+    const _fieldIds = unique(fieldIds);
     const ids = new Set(fields.map((f) => f.id));
     if (
       _fieldIds.length !== fieldIds.length ||
@@ -2369,7 +2369,7 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
 
-    const fieldIds = uniq(dataArray.map((d) => d.petition_field_id));
+    const fieldIds = unique(dataArray.map((d) => d.petition_field_id));
     const fields = await this.loadField(fieldIds);
 
     for (const fieldId of fieldIds) {
@@ -2430,7 +2430,7 @@ export class PetitionRepository extends BaseRepository {
     updater: User | PetitionAccess,
     t?: Knex.Transaction,
   ) {
-    const replyIds = uniq(data.map((d) => d.id));
+    const replyIds = unique(data.map((d) => d.id));
 
     const [fields, oldReplies] = await Promise.all([
       this.loadFieldForReply(replyIds),
@@ -3663,7 +3663,7 @@ export class PetitionRepository extends BaseRepository {
     }
     return await this.withTransaction(async (t) => {
       await this.from("petition_access", t)
-        .whereIn("id", uniq(data.map((r) => r.petition_access_id)))
+        .whereIn("id", unique(data.map((r) => r.petition_access_id)))
         .update({
           reminders_left: this.knex.raw(`"reminders_left" - 1`),
           automatic_reminders_left:
@@ -3991,8 +3991,8 @@ export class PetitionRepository extends BaseRepository {
             q.where("is_internal", false);
           }
         })
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("petition_field_id", unique(keys.map((x) => x.petitionFieldId)))
         .whereNotNull("petition_field_id")
         .whereNull("deleted_at")
         .select<PetitionFieldComment[]>("*");
@@ -4021,7 +4021,7 @@ export class PetitionRepository extends BaseRepository {
             q.where("is_internal", false);
           }
         })
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
         .whereNull("petition_field_id")
         .whereNull("deleted_at")
         .select<PetitionFieldComment[]>("*");
@@ -4062,8 +4062,8 @@ export class PetitionRepository extends BaseRepository {
               .orderBy("is_internal");
           }
         })
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("petition_field_id", unique(keys.map((x) => x.petitionFieldId)))
         .whereNotNull("petition_field_id")
         .whereNull("deleted_at")
         .orderBy("petition_field_id", "desc")
@@ -4103,7 +4103,7 @@ export class PetitionRepository extends BaseRepository {
               .orderBy("is_internal");
           }
         })
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
         .whereNull("petition_field_id")
         .whereNull("deleted_at")
         .orderBy("petition_id", "desc")
@@ -4128,12 +4128,12 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_contact_notification", t)
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("petition_access_id", unique(keys.map((x) => x.accessId)))
         .whereNotNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-          uniq(keys.map((x) => x.petitionFieldId)),
+          unique(keys.map((x) => x.petitionFieldId)),
         )
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
@@ -4173,8 +4173,8 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_contact_notification", t)
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("petition_access_id", unique(keys.map((x) => x.accessId)))
         .whereNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
@@ -4213,8 +4213,8 @@ export class PetitionRepository extends BaseRepository {
           and pcn.read_at is null
       `,
         [
-          this.sqlIn(uniq(keys.map((k) => k.contactId))),
-          this.sqlIn(uniq(keys.map((k) => k.petitionId))),
+          this.sqlIn(unique(keys.map((k) => k.contactId))),
+          this.sqlIn(unique(keys.map((k) => k.petitionId))),
         ],
         t,
       );
@@ -4231,12 +4231,12 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_user_notification", t)
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("user_id", unique(keys.map((x) => x.userId)))
         .whereNotNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-          uniq(keys.map((x) => x.petitionFieldId)),
+          unique(keys.map((x) => x.petitionFieldId)),
         )
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
@@ -4269,8 +4269,8 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_user_notification", t)
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
-        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
+        .whereIn("user_id", unique(keys.map((x) => x.userId)))
         .whereNull(this.knex.raw(/* sql */ `"data" ->> 'petition_field_id'`) as any)
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
@@ -4540,11 +4540,11 @@ export class PetitionRepository extends BaseRepository {
               q.whereNotNull("read_at");
             }
           })
-          .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
+          .whereIn("petition_id", unique(comments.map((c) => c.petition_id)))
           .where((q) => {
             q.whereIn(
               this.knex.raw("data ->> 'petition_field_id'") as any,
-              uniq(comments.map((c) => c.petition_field_id).filter(isDefined)),
+              unique(comments.map((c) => c.petition_field_id).filter(isDefined)),
             );
             if (comments.some((c) => c.petition_field_id === null)) {
               q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4552,7 +4552,7 @@ export class PetitionRepository extends BaseRepository {
           })
           .whereIn(
             this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-            uniq(comments.map((c) => c.id)),
+            unique(comments.map((c) => c.id)),
           )
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
@@ -4656,12 +4656,12 @@ export class PetitionRepository extends BaseRepository {
         t,
       )
         .where("type", "COMMENT_CREATED")
-        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("user_id", unique(keys.map((x) => x.userId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
         .where((q) => {
           q.whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+            unique(keys.map((x) => x.petitionFieldId).filter(isDefined)),
           );
           if (keys.some((x) => x.petitionFieldId === null)) {
             q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4669,7 +4669,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldCommentId)),
+          unique(keys.map((x) => x.petitionFieldCommentId)),
         )
         .select("*");
 
@@ -4704,12 +4704,12 @@ export class PetitionRepository extends BaseRepository {
     async (keys, t) => {
       const rows = await this.from("petition_contact_notification", t)
         .where("type", "COMMENT_CREATED")
-        .whereIn("petition_access_id", uniq(keys.map((x) => x.petitionAccessId)))
-        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_access_id", unique(keys.map((x) => x.petitionAccessId)))
+        .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
         .where((q) => {
           q.whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+            unique(keys.map((x) => x.petitionFieldId).filter(isDefined)),
           );
           if (keys.some((x) => x.petitionFieldId === null)) {
             q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4717,7 +4717,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldCommentId)),
+          unique(keys.map((x) => x.petitionFieldCommentId)),
         )
         .select("*");
 
@@ -5017,11 +5017,11 @@ export class PetitionRepository extends BaseRepository {
     await this.from("petition_contact_notification")
       .where("petition_access_id", accessId)
       .where("type", "COMMENT_CREATED")
-      .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
+      .whereIn("petition_id", unique(comments.map((c) => c.petition_id)))
       .where((q) => {
         q.whereIn(
           this.knex.raw("data ->> 'petition_field_id'") as any,
-          uniq(comments.map((c) => c.petition_field_id)).filter(isDefined),
+          unique(comments.map((c) => c.petition_field_id)).filter(isDefined),
         );
         if (comments.some((c) => c.petition_field_id === null)) {
           q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -5029,7 +5029,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .whereIn(
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-        uniq(comments.map((c) => c.id)),
+        unique(comments.map((c) => c.id)),
       )
       .update({ read_at: this.now(), processed_at: this.now() });
     return comments;
@@ -5180,7 +5180,7 @@ export class PetitionRepository extends BaseRepository {
           and user_id = ?
           and "type" in ?
       `,
-      [this.sqlIn(uniq(ids)), user.id, this.sqlIn(permissions)],
+      [this.sqlIn(unique(ids)), user.id, this.sqlIn(permissions)],
     );
 
     return rows.map((r) => r.petition_id);
@@ -6323,7 +6323,7 @@ export class PetitionRepository extends BaseRepository {
 
     if (isDefined(data.status)) {
       await this.from("petition", t)
-        .whereIn("id", uniq(rows.map((r) => r.petition_id)))
+        .whereIn("id", unique(rows.map((r) => r.petition_id)))
         .update({
           latest_signature_status:
             data.cancel_reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : data.status,
@@ -6743,7 +6743,7 @@ export class PetitionRepository extends BaseRepository {
     const defaultOwnerByTemplateId = indexBy(templateDefaultOwners, (tdp) => tdp.template_id);
     const templateOwnerByTemplateId = indexBy(templateOwners, (t) => t.petition_id);
 
-    const userIds = uniq(
+    const userIds = unique(
       [
         ...templateDefaultOwners.map((tdp) => tdp.user_id),
         ...templateOwners.map((t) => t.user_id),
@@ -7285,7 +7285,7 @@ export class PetitionRepository extends BaseRepository {
       [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null],
     );
 
-    const fromTemplateIds = uniq(orgPetitions.map((p) => p.from_template_id).filter(isDefined));
+    const fromTemplateIds = unique(orgPetitions.map((p) => p.from_template_id).filter(isDefined));
 
     const templates =
       fromTemplateIds.length > 0
@@ -7723,7 +7723,7 @@ export class PetitionRepository extends BaseRepository {
     if (fieldGroupReplies.length > 0) {
       // load empty FIELD_GROUP replies to be able to use those instead of creating new ones
       const emptyFieldGroupReplies = (
-        await this.loadEmptyFieldGroupReplies(uniq(fieldGroupReplies.map((r) => r.fieldId)))
+        await this.loadEmptyFieldGroupReplies(unique(fieldGroupReplies.map((r) => r.fieldId)))
       ).flat();
 
       const emptyFieldGroupRepliesByFieldId = groupBy(
@@ -7845,9 +7845,9 @@ export class PetitionRepository extends BaseRepository {
       if (field.type === "CHECKBOX") {
         // for CHECKBOX fields, a single reply can contain more than 1 option, so each reply is a string[]
         if (fieldReplies.every((r) => typeof r === "string")) {
-          singleReplies.push({ content: { value: uniq(fieldReplies) } });
+          singleReplies.push({ content: { value: unique(fieldReplies) } });
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
-          singleReplies.push(...fieldReplies.map((r) => ({ content: { value: uniq(r) } })));
+          singleReplies.push(...fieldReplies.map((r) => ({ content: { value: unique(r) } })));
         }
       } else if (field.type === "DYNAMIC_SELECT") {
         // for DYNAMIC_SELECT field, a single reply is like ["Cataluña", "Barcelona"]. each element on the array is a selection of that level.
@@ -8205,10 +8205,10 @@ export class PetitionRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("petition_field_reply", t)
-        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereIn("petition_field_id", unique(keys.map((x) => x.petitionFieldId)))
         .whereIn(
           "parent_petition_field_reply_id",
-          uniq(keys.map((x) => x.parentPetitionFieldReplyId)),
+          unique(keys.map((x) => x.parentPetitionFieldReplyId)),
         )
         .whereNotNull("parent_petition_field_reply_id")
         .whereNull("deleted_at")

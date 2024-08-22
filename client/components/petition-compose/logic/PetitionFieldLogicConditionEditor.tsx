@@ -36,7 +36,7 @@ import {
   useIntl,
 } from "react-intl";
 import { createFilter } from "react-select";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { NumeralInput } from "../../common/NumeralInput";
@@ -965,7 +965,7 @@ function ConditionPredicateValueSelect({
       const values = (referencedField.options as FieldOptions["SELECT"] | FieldOptions["CHECKBOX"])
         .values;
 
-      return uniq(values)
+      return unique(values)
         .map((value, index) => {
           let label = (referencedField.options as FieldOptions["SELECT"] | FieldOptions["CHECKBOX"])
             .labels?.[index];
@@ -979,7 +979,7 @@ function ConditionPredicateValueSelect({
         (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
         condition.column!,
       );
-      return uniq(values)
+      return unique(values)
         .sort((a, b) => a.localeCompare(b))
         .map((value) => toSimpleSelectOption(value)!);
     }

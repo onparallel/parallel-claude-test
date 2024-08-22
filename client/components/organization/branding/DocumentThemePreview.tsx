@@ -5,7 +5,7 @@ import { DocumentThemePreview_OrganizationFragment } from "@parallel/graphql/__t
 import { untranslated } from "@parallel/utils/untranslated";
 import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 import { DocumentThemeEditorData } from "./DocumentThemeEditor";
 
 interface DocumentThemePreviewProps {
@@ -56,7 +56,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
   return (
     <Box width="100%" paddingBottom={8}>
       <>
-        {uniq([theme.title1FontFamily, theme.title2FontFamily, theme.textFontFamily])
+        {unique([theme.title1FontFamily, theme.title2FontFamily, theme.textFontFamily])
           .filter((font) => font !== "IBM Plex Sans" && font !== "Source Sans Pro")
           .map((font) => (
             <Fonts key={font} family={font} />

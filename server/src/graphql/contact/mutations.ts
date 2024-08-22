@@ -9,7 +9,7 @@ import {
   objectType,
 } from "nexus";
 import pMap from "p-map";
-import { chunk, countBy, isDefined, uniqBy } from "remeda";
+import { chunk, countBy, isDefined, uniqueBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
@@ -157,7 +157,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     const contacts = (
       await pMap(
         chunk(
-          uniqBy(parsedContacts, (c) => c.email),
+          uniqueBy(parsedContacts, (c) => c.email),
           50,
         ),
         (chunk) =>
@@ -175,7 +175,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     ).flat();
 
     return {
-      contacts: uniqBy(contacts, (c) => c.email),
+      contacts: uniqueBy(contacts, (c) => c.email),
       errors: parsedErrors,
     };
   },

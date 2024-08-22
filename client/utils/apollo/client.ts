@@ -12,7 +12,7 @@ import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { DefinitionNode, Kind, OperationDefinitionNode, OperationTypeNode } from "graphql";
 import { IncomingMessage } from "http";
 import Router from "next/router";
-import { filter, indexBy, map, pick, pipe, sortBy, uniqBy } from "remeda";
+import { filter, indexBy, map, pick, pipe, sortBy, uniqueBy } from "remeda";
 import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
@@ -139,7 +139,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                   return incoming;
                 } else {
                   return {
-                    items: uniqBy([...existing.items, ...incoming.items], (obj) =>
+                    items: uniqueBy([...existing.items, ...incoming.items], (obj) =>
                       readField("id", obj),
                     ),
                     totalCount: incoming.totalCount,
@@ -155,7 +155,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 } else {
                   return variables?.offset
                     ? {
-                        items: uniqBy(
+                        items: uniqueBy(
                           [...(existing.items ?? []), ...(incoming.items ?? [])],
                           (obj) => readField("keycode", obj),
                         ),
@@ -241,7 +241,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 } else {
                   return variables?.offset
                     ? {
-                        items: uniqBy(
+                        items: uniqueBy(
                           [...(existing.items ?? []), ...(incoming.items ?? [])],
                           (obj) => readField("id", obj),
                         ),
@@ -331,7 +331,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                     items: pipe(
                       // incoming first so more recent isUnread status is preserved
                       [...incoming.items, ...existing.items],
-                      (arr) => uniqBy(arr, (obj) => readField("id", obj)),
+                      (arr) => uniqueBy(arr, (obj) => readField("id", obj)),
                       (arr) =>
                         sortBy(arr, [
                           (obj) => new Date(readField("createdAt", obj) as string),

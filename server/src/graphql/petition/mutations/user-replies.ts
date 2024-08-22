@@ -9,7 +9,7 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
@@ -610,7 +610,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
 
-      const fields = await ctx.petitions.loadField(uniq(args.fields.map((field) => field.id)));
+      const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
 
       const fileReplyIds = args.fields
         .filter((field) => isFileTypeField(fields.find((f) => f!.id === field.id)!.type))
@@ -723,7 +723,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
     validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
   ),
   resolve: async (_, args, ctx) => {
-    const replyIds = uniq(args.replies.map((r) => r.id));
+    const replyIds = unique(args.replies.map((r) => r.id));
     const replies = await ctx.petitions.loadFieldReply(replyIds);
 
     const replyInput = args.replies.map((replyData) => {

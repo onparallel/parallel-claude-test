@@ -25,7 +25,7 @@ import {
   pipe,
   range,
   sumBy,
-  uniq,
+  unique,
   zip,
   zipWith,
 } from "remeda";
@@ -418,7 +418,7 @@ export const deletePetitions = mutationField("deletePetitions", {
       petitionIds.push(...folderPetitions.map((p) => p.id));
     }
 
-    petitionIds = uniq(petitionIds);
+    petitionIds = unique(petitionIds);
     if (petitionIds.length === 0) {
       // nothing to delete
       return SUCCESS;
@@ -3328,7 +3328,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       );
 
       // extract file_upload_ids from every reply and profile value. This way we can load it all at once for later usage
-      const fileUploadIds = uniq([
+      const fileUploadIds = unique([
         ...groupReplies.flatMap((r) =>
           r.field.type === "FILE_UPLOAD"
             ? r.replies.map((r) => r.content.file_upload_id as number).filter(isDefined)
@@ -3702,11 +3702,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       if (fieldRelationships.length > 0) {
         const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-          uniq(fieldRelationships.map((r) => r.profile_relationship_type_id)),
+          unique(fieldRelationships.map((r) => r.profile_relationship_type_id)),
         );
 
         // get fieldIds in other side of the relationship
-        const otherFieldIds = uniq(
+        const otherFieldIds = unique(
           fieldRelationships.map((r) =>
             r.left_side_petition_field_id === args.petitionFieldId
               ? r.right_side_petition_field_id
@@ -3787,7 +3787,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
           if (newRelationships.length > 0) {
             const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-              uniq(newRelationships.map((r) => r.profile_relationship_type_id)),
+              unique(newRelationships.map((r) => r.profile_relationship_type_id)),
             );
 
             await ctx.profiles.createEvent(
@@ -3938,7 +3938,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     );
 
     const associations = await ctx.profiles.associateProfilesToPetition(
-      uniq([args.profileId, ...args.prefill.flatMap((p) => p.profileIds)]),
+      unique([args.profileId, ...args.prefill.flatMap((p) => p.profileIds)]),
       petition.id,
       `User:${ctx.user!.id}`,
     );

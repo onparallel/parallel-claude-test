@@ -43,7 +43,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ForwardedRef, forwardRef, useEffect, useMemo, useRef } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqBy } from "remeda";
+import { isDefined, uniqueBy } from "remeda";
 
 type PetitionFieldSelection = UnwrapArray<
   Assert<useAssociateNewPetitionToProfileDialog_PetitionBaseFragment["fields"]>
@@ -123,7 +123,7 @@ function AssociateNewPetitionToProfileDialog({
           : undefined
         : (allFieldGroups
             .map((f) => {
-              const profiles = uniqBy(
+              const profiles = uniqueBy(
                 [
                   ...(selectedGroupId === f.id ? [profile] : []),
                   // filter the available relationships in the profile to suggest the "prefill" in step 3

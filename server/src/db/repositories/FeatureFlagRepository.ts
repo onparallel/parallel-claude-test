@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, uniq } from "remeda";
+import { indexBy, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
@@ -44,8 +44,8 @@ export class FeatureFlagRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const userIds = uniq(keys.map((k) => k.userId));
-      const featureFlags = uniq(keys.map((k) => k.featureFlag));
+      const userIds = unique(keys.map((k) => k.userId));
+      const featureFlags = unique(keys.map((k) => k.featureFlag));
       const rows = await this.raw<{ user_id: number; feature_flag: number; value: boolean }>(
         /* sql */ `
           with selected_user as (
@@ -105,8 +105,8 @@ export class FeatureFlagRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const orgIds = uniq(keys.map((k) => k.orgId));
-      const featureFlags = uniq(keys.map((k) => k.featureFlag));
+      const orgIds = unique(keys.map((k) => k.orgId));
+      const featureFlags = unique(keys.map((k) => k.featureFlag));
       const rows = await this.raw<{ org_id: number; feature_flag: number; value: boolean }>(
         /* sql */ `
           with selected_org as (

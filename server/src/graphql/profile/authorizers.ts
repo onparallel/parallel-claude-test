@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, indexBy, isDefined, pick, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, pick, unique } from "remeda";
 import {
   Profile,
   ProfileStatus,
@@ -88,8 +88,8 @@ export function profileIsAssociatedToPetition<
   petitionIdArg: TPetitionId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileIds = uniq(unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>));
-    const petitionIds = uniq(unMaybeArray(args[petitionIdArg] as unknown as MaybeArray<number>));
+    const profileIds = unique(unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>));
+    const petitionIds = unique(unMaybeArray(args[petitionIdArg] as unknown as MaybeArray<number>));
 
     const count = await ctx.profiles.countProfilesAssociatedToPetitions(profileIds, petitionIds);
 
@@ -130,7 +130,7 @@ export function profileTypeFieldBelongsToProfileType<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileTypeFieldIds = uniq(
+      const profileTypeFieldIds = unique(
         unMaybeArray(
           (typeof profileTypeFieldIdArg === "function"
             ? (profileTypeFieldIdArg as any)(args)
@@ -277,7 +277,7 @@ export function contextUserCanSubscribeUsersToProfile<
   TUserIdsArg extends Arg<TypeName, FieldName, number[]>,
 >(userIdsArg: TUserIdsArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const userIds = uniq(args[userIdsArg] as unknown as number[]);
+    const userIds = unique(args[userIdsArg] as unknown as number[]);
 
     const users = await ctx.users.loadUser(userIds);
 
@@ -453,7 +453,7 @@ export function profilesCanBeAssociated<
     }
 
     const profiles = await ctx.profiles.loadProfile(
-      uniq([profileId, ...relationshipsData.map((r) => r.profileId)]),
+      unique([profileId, ...relationshipsData.map((r) => r.profileId)]),
     );
 
     if (!profiles.every(isDefined)) {

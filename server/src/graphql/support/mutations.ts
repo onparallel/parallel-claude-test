@@ -1,6 +1,6 @@
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { UserGroupPermissionName } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -180,7 +180,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
 
       newMetadata.categories =
         isDefined(args.categories) && args.categories.trim() !== ""
-          ? uniq(args.categories.split(",").map((w) => w.trim()))
+          ? unique(args.categories.split(",").map((w) => w.trim()))
           : templateMd.categories || [];
 
       newMetadata.description =

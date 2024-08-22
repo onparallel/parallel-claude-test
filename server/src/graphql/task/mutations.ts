@@ -11,7 +11,17 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { differenceWith, filter, groupBy, isDefined, pipe, sumBy, uniq, uniqBy, zip } from "remeda";
+import {
+  differenceWith,
+  filter,
+  groupBy,
+  isDefined,
+  pipe,
+  sumBy,
+  unique,
+  uniqueBy,
+  zip,
+} from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
 import { isValidTimezone } from "../../util/time";
@@ -557,7 +567,7 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
           newPermissions,
           filter((p) => isDefined(p.user_id)),
           // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
-          uniqBy((p) => `${p.user_id}:${p.petition_id}`),
+          uniqueBy((p) => `${p.user_id}:${p.petition_id}`),
           // omit users who had access previously
           differenceWith(
             permissionsBefore,
@@ -765,7 +775,7 @@ export const createRemovePetitionPermissionTask = mutationField(
         );
         const deletedPermissionsByPetitionId = groupBy(deletedPermissions, (p) => p.petition_id);
 
-        const deletedPetitionIds = uniq(deletedPermissions.map((p) => p.petition_id));
+        const deletedPetitionIds = unique(deletedPermissions.map((p) => p.petition_id));
 
         const effectivePermissions =
           await ctx.petitions.loadEffectivePermissions(deletedPetitionIds);
@@ -782,7 +792,7 @@ export const createRemovePetitionPermissionTask = mutationField(
 
             // users of deletedPermissions that dont have any effectivePermission lost
             // access to the petitions, their notifications need to be deleted
-            const userIds = uniq(
+            const userIds = unique(
               deletedPermissions
                 .filter((p) => p.user_id !== null)
                 .map((p) => p.user_id!)

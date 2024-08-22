@@ -26,7 +26,7 @@ import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { difference, isDefined, uniq, zip } from "remeda";
+import { difference, isDefined, unique, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
@@ -79,7 +79,7 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
             <ArchiveFieldGroupReplyIntoProfileGrid
               petition={petition}
               onSelectProfile={(profileId) => {
-                unsavedSelectedProfiles.current = uniq([
+                unsavedSelectedProfiles.current = unique([
                   ...unsavedSelectedProfiles.current,
                   profileId,
                 ]);

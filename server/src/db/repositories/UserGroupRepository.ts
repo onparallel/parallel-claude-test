@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, omit, partition, uniq } from "remeda";
+import { groupBy, omit, partition, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import {
@@ -92,8 +92,8 @@ export class UserGroupRepository extends BaseRepository {
     async (keys, t) => {
       const rows = await this.from("user_group_member")
         .whereNull("deleted_at")
-        .whereIn("user_group_id", uniq(keys.map((k) => k.userGroupId)))
-        .whereIn("user_id", uniq(keys.flatMap((k) => k.userIds)))
+        .whereIn("user_group_id", unique(keys.map((k) => k.userGroupId)))
+        .whereIn("user_id", unique(keys.flatMap((k) => k.userIds)))
         .distinct("user_id", "user_group_id");
       const members = new Map<number, Set<number>>();
       for (const row of rows) {

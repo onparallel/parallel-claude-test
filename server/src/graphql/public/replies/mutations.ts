@@ -1,5 +1,5 @@
 import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
@@ -76,7 +76,7 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
     validateCreatePetitionFieldReplyInput((args) => args.fields, "fields"),
   ),
   resolve: async (_, args, ctx) => {
-    const fields = await ctx.petitions.loadField(uniq(args.fields.map((field) => field.id)));
+    const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
 
     const data: CreatePetitionFieldReply[] = args.fields.map((fieldReply) => {
       const field = fields.find((f) => f!.id === fieldReply.id)!;
@@ -132,7 +132,7 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
     validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
   ),
   resolve: async (_, args, ctx) => {
-    const replyIds = uniq(args.replies.map((r) => r.id));
+    const replyIds = unique(args.replies.map((r) => r.id));
     const replies = await ctx.petitions.loadFieldReply(replyIds);
 
     const repliesInput = args.replies.map((replyData) => {

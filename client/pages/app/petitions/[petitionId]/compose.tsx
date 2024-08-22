@@ -89,7 +89,7 @@ import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { waitForElement } from "@parallel/utils/waitForElement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqBy, zip } from "remeda";
+import { isDefined, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -287,7 +287,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (referencingVisibility.length > 0 || referencingMath.length > 0) {
       try {
         await showReferencedFieldDialog({
-          fieldsWithIndices: uniqBy(
+          fieldsWithIndices: uniqueBy(
             [...referencingMath, ...referencingVisibility],
             ([_, fieldIndex]) => fieldIndex,
           ),
@@ -573,7 +573,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         if (referencingVisibility.length || referencingMath.length) {
           try {
             await showReferencedFieldDialog({
-              fieldsWithIndices: uniqBy(
+              fieldsWithIndices: uniqueBy(
                 [...referencingMath, ...referencingVisibility],
                 ([_, fieldIndex]) => fieldIndex,
               ),
@@ -715,7 +715,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         } else {
           try {
             await showReferencedFieldDialog({
-              fieldsWithIndices: uniqBy(
+              fieldsWithIndices: uniqueBy(
                 [...referencingMath, ...referencingVisibility],
                 ([_, fieldIndex]) => fieldIndex,
               ),

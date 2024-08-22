@@ -1,6 +1,6 @@
 import { enumType, inputObjectType } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { isDefined, partition, uniq } from "remeda";
+import { isDefined, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { fromGlobalId } from "../../../util/globalId";
 import { NexusGenInputs } from "../../__types";
@@ -155,7 +155,7 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
       );
       const tagIds = tags.filters.flatMap((f) => f.value);
       assert(
-        (await ctx.tags.loadTag(uniq(tagIds))).every(
+        (await ctx.tags.loadTag(unique(tagIds))).every(
           (t) => t?.organization_id === ctx.user!.org_id,
         ),
         "Tags must belong to the same organization",

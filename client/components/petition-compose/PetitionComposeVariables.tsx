@@ -35,7 +35,7 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PetitionFieldMath, PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqBy } from "remeda";
+import { isDefined, uniqueBy } from "remeda";
 import { HelpCenterLink, NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
 import { OverflownText } from "../common/OverflownText";
@@ -106,7 +106,7 @@ export function PetitionComposeVariables({
 
     if (referencingMath.length || referencingVisibility.length) {
       await showReferencedCalculationsDialog({
-        fieldsWithIndices: uniqBy(
+        fieldsWithIndices: uniqueBy(
           [...referencingMath, ...referencingVisibility],
           ([_, fieldIndex]) => fieldIndex,
         ),

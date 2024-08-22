@@ -11,7 +11,7 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { differenceWith, groupBy, indexBy, isDefined, pipe, uniq, zip } from "remeda";
+import { differenceWith, groupBy, indexBy, isDefined, pipe, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import {
   CreateProfileType,
@@ -1950,7 +1950,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
   },
   resolve: async (_, args, ctx) => {
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-      uniq(args.relationships.map((r) => r.profileRelationshipTypeId)),
+      unique(args.relationships.map((r) => r.profileRelationshipTypeId)),
     );
     await ctx.profiles.withTransaction(async (t) => {
       try {

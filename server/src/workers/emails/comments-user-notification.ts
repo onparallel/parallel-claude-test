@@ -1,5 +1,5 @@
 import pMap from "p-map";
-import { groupBy, isDefined, sortBy, uniq } from "remeda";
+import { groupBy, isDefined, sortBy, unique } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsUserNotification from "../../emails/emails/app/PetitionCommentsUserNotification";
@@ -31,7 +31,7 @@ export async function commentsUserNotification(
 
   const comments = _comments.filter(isDefined);
 
-  const fieldIds = uniq(comments.map((c) => c!.petition_field_id)).filter(isDefined);
+  const fieldIds = unique(comments.map((c) => c!.petition_field_id)).filter(isDefined);
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id ?? "null");
 

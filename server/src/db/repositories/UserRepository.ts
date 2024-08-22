@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, omit, uniq } from "remeda";
+import { groupBy, indexBy, omit, unique } from "remeda";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -201,8 +201,8 @@ export class UserRepository extends BaseRepository {
   >(
     async (externalIds, t) => {
       const users = await this.from("user", t)
-        .whereIn("org_id", uniq(externalIds.map((x) => x.orgId)))
-        .whereIn("external_id", uniq(externalIds.map((x) => x.externalId)))
+        .whereIn("org_id", unique(externalIds.map((x) => x.orgId)))
+        .whereIn("external_id", unique(externalIds.map((x) => x.externalId)))
         .whereNull("deleted_at");
 
       const byId = indexBy(users, keyBuilder(["org_id", "external_id"]));

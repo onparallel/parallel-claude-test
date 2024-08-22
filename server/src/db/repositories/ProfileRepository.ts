@@ -16,8 +16,8 @@ import {
   pipe,
   sortBy,
   times,
-  uniq,
-  uniqBy,
+  unique,
+  uniqueBy,
   zip,
 } from "remeda";
 import { LocalizableUserText } from "../../graphql";
@@ -133,9 +133,9 @@ export class ProfileRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const profileTypeIds = uniq(keys.map((k) => k.profileTypeId));
-      const aliases = uniq(keys.flatMap((k) => k.filter.map((f) => f.alias)).filter(isDefined));
-      const profileTypeFieldIds = uniq(
+      const profileTypeIds = unique(keys.map((k) => k.profileTypeId));
+      const aliases = unique(keys.flatMap((k) => k.filter.map((f) => f.alias)).filter(isDefined));
+      const profileTypeFieldIds = unique(
         keys.flatMap((k) => k.filter.map((f) => f.profileTypeFieldId)).filter(isDefined),
       );
       const rows = await this.from("profile_type_field", t)
@@ -547,7 +547,7 @@ export class ProfileRepository extends BaseRepository {
       );
 
       // check only valid fieldIds and not repeated
-      const _profileTypeFieldIds = uniq(profileTypeFieldIds);
+      const _profileTypeFieldIds = unique(profileTypeFieldIds);
       const ids = new Set(profileTypeFields.map((f) => f.id));
       if (
         _profileTypeFieldIds.length !== profileTypeFieldIds.length ||
@@ -597,8 +597,8 @@ export class ProfileRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const values = await this.from("profile_field_value", t)
-        .whereIn("profile_id", uniq(keys.map((k) => k.profileId)))
-        .whereIn("profile_type_field_id", uniq(keys.map((k) => k.profileTypeFieldId)))
+        .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_field_id", unique(keys.map((k) => k.profileTypeFieldId)))
         .whereNull("removed_at")
         .whereNull("deleted_at");
       const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
@@ -617,8 +617,8 @@ export class ProfileRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const files = await this.from("profile_field_file", t)
-        .whereIn("profile_id", uniq(keys.map((k) => k.profileId)))
-        .whereIn("profile_type_field_id", uniq(keys.map((k) => k.profileTypeFieldId)))
+        .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_field_id", unique(keys.map((k) => k.profileTypeFieldId)))
         .whereNull("removed_at")
         .whereNull("deleted_at");
       const byKey = groupBy(files, keyBuilder(["profile_id", "profile_type_field_id"]));
@@ -2240,7 +2240,7 @@ export class ProfileRepository extends BaseRepository {
   ) {
     const results: Record<string, { profileId: number; profileTypeFieldId: number }[]> = {};
 
-    const profileIds = uniq(pfvs.map((pfv) => pfv.profile_id));
+    const profileIds = unique(pfvs.map((pfv) => pfv.profile_id));
     const profileSubscriptions = (await this.loadProfileSubscribers(profileIds)).flat();
 
     for (const [userId, subscriptions] of Object.entries(
@@ -2332,7 +2332,7 @@ export class ProfileRepository extends BaseRepository {
     return pipe(
       data,
       filter((d) => !(d.is_reciprocal && d.direction === "RIGHT_LEFT")), // remove RIGHT_LEFT if reciprocal, as those are duplicates and redundant
-      uniqBy((d) => `${d.profile_relationship_type_id}-${d.direction}`),
+      uniqueBy((d) => `${d.profile_relationship_type_id}-${d.direction}`),
       map((d) => omit(d, ["is_reciprocal"]) as ProfileRelationshipTypeAllowedProfileType),
     );
   }
@@ -2497,10 +2497,10 @@ export class ProfileRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const relationshipTypeIds = uniq(
+      const relationshipTypeIds = unique(
         keys.flatMap((k) => k.filter.map((f) => f.relationshipTypeId)),
       );
-      const profileIds = uniq(keys.map((k) => k.profileId));
+      const profileIds = unique(keys.map((k) => k.profileId));
       const rows = await this.from("profile_relationship", t)
         .whereNull("deleted_at")
         .whereNull("removed_at")

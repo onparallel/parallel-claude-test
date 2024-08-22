@@ -7,7 +7,7 @@ import {
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, groupBy, isDefined, partition, uniq, zip } from "remeda";
+import { difference, groupBy, isDefined, partition, unique, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -185,7 +185,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
 
     if ((args.userGroupIds ?? []).length > 0) {
       await ctx.userGroups.addUsersToGroups(
-        uniq(args.userGroupIds ?? []),
+        unique(args.userGroupIds ?? []),
         user.id,
         `User:${ctx.user!.id}`,
       );

@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 import { Maybe } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
@@ -29,6 +29,6 @@ export function validPetitionListViewReorder<
   return async (_, args, ctx) => {
     const ids = args[idsArg] as unknown as number[];
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
-    return userViews.length === uniq(ids).length && userViews.every((v) => ids.includes(v.id));
+    return userViews.length === unique(ids).length && userViews.every((v) => ids.includes(v.id));
   };
 }

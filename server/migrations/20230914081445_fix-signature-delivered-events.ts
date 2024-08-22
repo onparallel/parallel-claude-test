@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 import { SignatureDeliveredEvent } from "../src/db/events/PetitionEvent";
 import { PetitionSignatureConfigSigner } from "../src/db/repositories/PetitionRepository";
 import { sqlValues } from "./helpers/knex";
@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     .where("type", "SIGNATURE_DELIVERED")
     .select("*");
 
-  const signatureRequestIds = uniq(events.map((e) => e.data.petition_signature_request_id));
+  const signatureRequestIds = unique(events.map((e) => e.data.petition_signature_request_id));
 
   const signatureRequests = await knex
     .from("petition_signature_request")

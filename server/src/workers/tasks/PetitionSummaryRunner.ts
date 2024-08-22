@@ -1,5 +1,5 @@
 import { IntlShape } from "react-intl";
-import { identity, isDefined, mapToObj, mapValues, pick, pipe, uniq, zip } from "remeda";
+import { identity, isDefined, mapToObj, mapValues, pick, pipe, unique, zip } from "remeda";
 import { Petition, PetitionFieldType } from "../../db/__types";
 import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
@@ -83,7 +83,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       petition.id,
     ]);
     const events = await this.ctx.petitions.getLastPetitionReplyStatusChangeEvents([petition.id]);
-    const userIds = uniq(events.map((e) => e.data.user_id).filter(isDefined));
+    const userIds = unique(events.map((e) => e.data.user_id).filter(isDefined));
     const userDataById = pipe(
       userIds,
       zip(await this.ctx.users.loadUserDataByUserId(userIds)),

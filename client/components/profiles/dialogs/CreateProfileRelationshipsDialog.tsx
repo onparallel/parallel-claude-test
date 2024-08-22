@@ -29,7 +29,7 @@ import {
 } from "@parallel/graphql/__types";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { groupBy, isDefined, uniq } from "remeda";
+import { groupBy, isDefined, unique } from "remeda";
 
 interface CreateProfileRelationshipsDialogProps {
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
@@ -353,7 +353,7 @@ function ProfileRelationshipRow({
           ? "allowedLeftRightProfileTypeIds"
           : "allowedRightLeftProfileTypeIds"
       ]
-    : uniq(
+    : unique(
         profileRelationshipTypesWithDirection?.flatMap(({ direction, profileRelationshipType }) => {
           return profileRelationshipType[
             direction === "LEFT_RIGHT"

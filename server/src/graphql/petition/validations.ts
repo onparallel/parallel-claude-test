@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { groupBy, indexBy, isDefined, mapValues, pipe, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, mapValues, pipe, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
 import { PetitionField } from "../../db/__types";
@@ -143,7 +143,7 @@ export function validateUpdatePetitionFieldReplyInput<
 ) {
   return (async (_, args, ctx, info) => {
     const replyContents = prop(args);
-    const replyIds = uniq(replyContents.map((r) => r.id));
+    const replyIds = unique(replyContents.map((r) => r.id));
     const [fields, replies] = await Promise.all([
       ctx.petitions.loadFieldForReply(replyIds),
       ctx.petitions.loadFieldReply(replyIds),
@@ -279,7 +279,7 @@ async function validateCreateReplyInput(
     );
   }
 
-  const parentReplyIds = uniq(
+  const parentReplyIds = unique(
     fieldReplies.filter((fr) => isDefined(fr.parentReplyId)).map((fr) => fr.parentReplyId!),
   );
   const parentReplies = await ctx.petitions.loadFieldReply(parentReplyIds);

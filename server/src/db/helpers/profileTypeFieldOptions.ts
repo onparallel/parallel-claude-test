@@ -3,7 +3,7 @@ import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
-import { difference, isDefined, uniq } from "remeda";
+import { difference, isDefined, unique } from "remeda";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
 import { ProfileTypeField, ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
 
@@ -203,7 +203,7 @@ export async function validateProfileTypeFieldOptions(
       }
 
       // make sure every value in activation conditions is a valid option on SELECT field
-      const selectValues = uniq(
+      const selectValues = unique(
         (
           await profileTypeFieldSelectValues(
             profileTypeField.options as ProfileTypeFieldOptions["SELECT"],
@@ -211,7 +211,7 @@ export async function validateProfileTypeFieldOptions(
         ).map((v) => v.value),
       );
       if (
-        !uniq(opts.monitoring.activationCondition.values).every((activationValue) =>
+        !unique(opts.monitoring.activationCondition.values).every((activationValue) =>
           selectValues.includes(activationValue),
         )
       ) {
@@ -232,14 +232,14 @@ export async function validateProfileTypeFieldOptions(
       }
 
       // every SELECT value has to be set on variable searchFrequency options
-      const selectValues = uniq(
+      const selectValues = unique(
         (
           await profileTypeFieldSelectValues(
             profileTypeField.options as ProfileTypeFieldOptions["SELECT"],
           )
         ).map((v) => v.value),
       );
-      const searchFrequencyValues = uniq(
+      const searchFrequencyValues = unique(
         opts.monitoring.searchFrequency.options.map((o) => o.value),
       );
       if (

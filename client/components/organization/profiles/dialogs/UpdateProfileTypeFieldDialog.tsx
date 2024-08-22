@@ -20,7 +20,7 @@ import {
 } from "@parallel/utils/useExpirationOptions";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 
 interface UpdateProfileTypeFieldDialogProps {
   fields: useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment[];
@@ -33,7 +33,7 @@ function UpdateProfileTypeFieldDialog({
   UpdateProfileTypeFieldDialogProps,
   { isExpirable: boolean; expiryAlertAheadTime: ExpirationOption }
 >) {
-  const uniqueExpiryAlertAheadTimes = uniq(
+  const uniqueExpiryAlertAheadTimes = unique(
     fields.map((f) =>
       f.isExpirable && f.expiryAlertAheadTime === null
         ? "DO_NOT_REMEMBER"

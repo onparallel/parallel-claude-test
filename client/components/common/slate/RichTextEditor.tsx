@@ -45,7 +45,7 @@ import {
 } from "@udecode/plate-list";
 import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { createPipe, identity, isDefined, omit, pick } from "remeda";
+import { identity, isDefined, omit, pick, piped } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
@@ -209,7 +209,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         initialValue={initialValue}
         onChange={
           !isDisabled
-            ? createPipe(hasPlaceholders ? removePlaceholderInputElements : identity, onChange)
+            ? piped(hasPlaceholders ? removePlaceholderInputElements : identity, onChange)
             : undefined
         }
       >

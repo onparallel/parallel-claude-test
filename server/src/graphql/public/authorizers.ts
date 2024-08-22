@@ -3,7 +3,7 @@ import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition, uniq } from "remeda";
+import { isDefined, partition, unique } from "remeda";
 import { FeatureFlagName } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
@@ -115,7 +115,7 @@ export function fieldBelongsToAccess<
   argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = uniq(
+    const fieldIds = unique(
       unMaybeArray(
         (typeof argFieldId === "function"
           ? (argFieldId as any)(args)
@@ -138,7 +138,7 @@ export function fieldIsExternal<
   argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = uniq(
+    const fieldIds = unique(
       unMaybeArray(
         (typeof argFieldId === "function"
           ? (argFieldId as any)(args)
@@ -163,7 +163,7 @@ export function replyBelongsToAccess<
   argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = uniq(
+    const replyIds = unique(
       unMaybeArray(
         (typeof argReplyId === "function"
           ? (argReplyId as any)(args)
@@ -189,7 +189,7 @@ export function replyBelongsToExternalField<
   argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = uniq(
+    const replyIds = unique(
       unMaybeArray(
         (typeof argReplyId === "function"
           ? (argReplyId as any)(args)

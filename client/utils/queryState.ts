@@ -3,7 +3,7 @@ import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { MouseEvent, useCallback, useMemo } from "react";
-import { equals, isDefined, pick } from "remeda";
+import { isDeepEqual, isDefined, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
 import { useHandleNavigation } from "./navigation";
 import { pathParams, resolveUrl } from "./next";
@@ -35,7 +35,7 @@ export class QueryItem<T> {
     if (this._isDefault) {
       return this._isDefault(value);
     } else {
-      return equals(this.defaultValue, value);
+      return isDeepEqual(this.defaultValue, value);
     }
   }
 

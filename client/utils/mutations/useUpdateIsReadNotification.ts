@@ -6,7 +6,7 @@ import {
   useUpdateIsReadNotification_UserFragmentDoc,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { difference, isDefined, uniq } from "remeda";
+import { difference, isDefined, unique } from "remeda";
 import { getMyId } from "../apollo/getMyId";
 import { updateFragment } from "../apollo/updateFragment";
 import { assert } from "ts-essentials";
@@ -39,7 +39,7 @@ export function useUpdateIsReadNotification() {
                   ? difference(user.unreadNotificationIds, notificationIds)
                   : user.unreadNotificationCount > 0 && user.unreadNotificationIds.length === 0
                     ? []
-                    : uniq([...user.unreadNotificationIds, ...notificationIds]),
+                    : unique([...user.unreadNotificationIds, ...notificationIds]),
               };
             },
           });

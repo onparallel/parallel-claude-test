@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { promises as fs } from "fs";
 import outdent from "outdent";
 import path from "path";
-import { difference, uniq } from "remeda";
+import { difference, unique } from "remeda";
 import yargs from "yargs";
 import { Term } from "./extract-i18n-terms";
 import { readJson, writeJson } from "./utils/json";
@@ -89,7 +89,7 @@ async function generate(
 }
 
 function getValues(elements: MessageFormatElement[]): string[] {
-  return uniq(
+  return unique(
     elements.flatMap((element) => {
       switch (element.type) {
         case TYPE.literal:

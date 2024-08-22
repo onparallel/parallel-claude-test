@@ -1,4 +1,4 @@
-import { isDefined, partition, uniq } from "remeda";
+import { isDefined, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { WorkerContext } from "../../context";
 import {
@@ -58,7 +58,7 @@ async function createCommentPublishedUserNotifications(
   const [userMentions, groupMentions] = partition(mentions, (m) => m.type === "User");
   const groupMembers = await ctx.userGroups.loadUserGroupMembers(groupMentions.map((m) => m.id));
 
-  const mentionedUserIds = uniq([
+  const mentionedUserIds = unique([
     ...userMentions.map((m) => m.id),
     ...groupMembers.flatMap((members) => members.map((m) => m.user_id)),
   ]);

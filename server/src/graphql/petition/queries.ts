@@ -10,7 +10,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { countBy, isDefined, sort, uniq } from "remeda";
+import { countBy, isDefined, sort, unique } from "remeda";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -169,7 +169,7 @@ export const petitionsByIdQuery = queryField("petitionsById", {
       petitionIds.push(...folderPetitions.map((p) => p.id));
     }
 
-    petitionIds = uniq(petitionIds);
+    petitionIds = unique(petitionIds);
     if (petitionIds.length === 0) {
       // nothing to return
       return [];
@@ -267,7 +267,7 @@ export const petitionsSharingInfoQuery = queryField("petitionsSharingInfo", {
       );
       petitionIds.push(...folderPetitions.map((p) => p.id));
     }
-    return uniq(petitionIds);
+    return unique(petitionIds);
   },
 });
 
@@ -413,7 +413,7 @@ export const petitionFolders = queryField("petitionFolders", {
       args.type === "TEMPLATE",
     );
 
-    const fullPaths = uniq(
+    const fullPaths = unique(
       [...petitionPaths, args.currentPath]
         .filter(isDefined)
         .flatMap((path) => pathAndParents(path))

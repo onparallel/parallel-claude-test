@@ -1,6 +1,6 @@
 import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { countBy, isDefined, uniq, zip } from "remeda";
+import { countBy, isDefined, unique, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { RESULT } from "../helpers/Result";
@@ -129,7 +129,7 @@ export const deleteTag = mutationField("deleteTag", {
       );
       const viewsOwners = await ctx.users.loadUser(viewsWithTag.map((v) => v.user_id));
       const usersData = await ctx.users.loadUserData(
-        uniq([
+        unique([
           ...petitionOwners.map((o) => o!.user_data_id),
           ...viewsOwners.map((vo) => vo!.user_data_id),
         ]),
@@ -184,7 +184,7 @@ export const deleteTag = mutationField("deleteTag", {
         const petitionTags = await ctx.tags.untagPetition(id, undefined, t);
         await ctx.tags.deleteTag(id, ctx.user!, t);
 
-        return uniq(petitionTags.map((pt) => pt.petition_id));
+        return unique(petitionTags.map((pt) => pt.petition_id));
       });
 
       for (const petitionId of untaggedPetitionIds) {

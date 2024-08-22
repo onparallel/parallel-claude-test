@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { SignaturitBrandingIdKey } from "../../integrations/signature/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
@@ -168,13 +168,13 @@ export class IntegrationRepository extends BaseRepository {
         throw new Error("Must define type when defining provider");
       }
       const integrations = await this.from("org_integration", t)
-        .whereIn("org_id", uniq(keys.map((k) => k.orgId)))
+        .whereIn("org_id", unique(keys.map((k) => k.orgId)))
         .where((q) => {
-          const types = uniq(keys.map((k) => k.type));
+          const types = unique(keys.map((k) => k.type));
           const allHaveTypes = types.every(isDefined);
           if (types.length > 0 && allHaveTypes) {
             q.whereIn("type", types);
-            const providers = uniq(keys.map((k) => k.provider));
+            const providers = unique(keys.map((k) => k.provider));
             const allHaveProviders = providers.every(isDefined);
             if (providers.length > 0 && allHaveProviders) {
               q.whereIn("provider", providers);

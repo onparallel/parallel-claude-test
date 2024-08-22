@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
 import {
   mapProfileTypeFieldOptions,
@@ -35,7 +35,7 @@ export function validProfileNamePattern<
       const fieldIds = parseTextWithPlaceholders(pattern)
         .filter(discriminator("type", "placeholder" as const))
         .map((p) => fromGlobalId(p.value, "ProfileTypeField").id);
-      const fields = await ctx.profiles.loadProfileTypeField(uniq(fieldIds));
+      const fields = await ctx.profiles.loadProfileTypeField(unique(fieldIds));
       if (
         fields.length === 0 ||
         fields.some(

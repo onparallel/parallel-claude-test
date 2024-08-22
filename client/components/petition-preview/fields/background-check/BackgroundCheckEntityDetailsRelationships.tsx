@@ -9,7 +9,7 @@ import { getOpenSanctionsRelationship } from "@parallel/utils/getOpenSanctionsRe
 import { useRouter } from "next/router";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 
 export function BackgroundCheckEntityDetailsRelationships({
   entityId,
@@ -211,7 +211,7 @@ function useBackgroundCheckRelationshipsColumns(entityId: string) {
           const properties = row.properties ?? {};
           return (
             <>
-              {uniq(
+              {unique(
                 properties.relationship?.map((relationship) =>
                   getOpenSanctionsRelationship({ relationship, intl }),
                 ) ?? [],

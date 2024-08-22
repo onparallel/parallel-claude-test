@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { difference, uniqBy } from "remeda";
+import { difference, uniqueBy } from "remeda";
 import { UserGroupPermissionNameValues } from "../../db/__types";
 import { NexusGenInputs } from "../__types";
 import { ArgValidationError } from "../helpers/errors";
@@ -15,7 +15,7 @@ export function validUserGroupPermissionsInput<TypeName extends string, FieldNam
   return (async (_, args, ctx, info) => {
     const permissions = permissionsProp(args);
 
-    const uniqueByName = uniqBy(permissions, (p) => p.name);
+    const uniqueByName = uniqueBy(permissions, (p) => p.name);
     if (permissions.length !== uniqueByName.length) {
       throw new ArgValidationError(info, argName, "Duplicate permissions");
     }

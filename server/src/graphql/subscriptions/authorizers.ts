@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -40,7 +40,7 @@ export function userHasAccessToEventSubscriptionSignatureKeys<
     if (!keys.every(isDefined)) {
       return false;
     }
-    const subscriptionIds = uniq(keys.map((k) => k!.event_subscription_id));
+    const subscriptionIds = unique(keys.map((k) => k!.event_subscription_id));
     const subscriptions = await ctx.subscriptions.loadEventSubscription(subscriptionIds);
     return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };

@@ -1,7 +1,7 @@
 import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isDefined, uniq } from "remeda";
+import { indexBy, isDefined, unique } from "remeda";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
@@ -320,8 +320,8 @@ export class OrganizationRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const rows = await this.from("organization_usage_limit", t)
-        .whereIn("org_id", uniq(keys.map((k) => k.orgId)))
-        .whereIn("limit_name", uniq(keys.map((k) => k.limitName)))
+        .whereIn("org_id", unique(keys.map((k) => k.orgId)))
+        .whereIn("limit_name", unique(keys.map((k) => k.limitName)))
         .whereNull("period_end_date");
       const byKey = indexBy(rows, keyBuilder(["org_id", "limit_name"]));
       return keys.map(keyBuilder(["orgId", "limitName"])).map((k) => byKey[k] ?? null);

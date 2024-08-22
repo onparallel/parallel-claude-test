@@ -54,7 +54,7 @@ import pMap from "p-map";
 import { useEffect, useRef, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop, omit, sumBy, uniqBy, zip } from "remeda";
+import { noop, omit, sumBy, uniqueBy, zip } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { Divider } from "../common/Divider";
@@ -144,7 +144,7 @@ export const PetitionComposeAttachments = Object.assign(
           ...data!,
           attachmentsList: {
             ...data!.attachmentsList,
-            ANNEX: uniqBy([...data!.attachmentsList.ANNEX, attachment], (obj) => obj.id),
+            ANNEX: uniqueBy([...data!.attachmentsList.ANNEX, attachment], (obj) => obj.id),
           },
         }),
       });

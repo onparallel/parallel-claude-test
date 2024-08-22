@@ -46,7 +46,7 @@ import {
 } from "@parallel/utils/usePetitionsTableColumns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { equals, isDefined, omit, pick } from "remeda";
+import { isDeepEqual, isDefined, omit, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
@@ -509,11 +509,11 @@ const _mutations = [
 
 function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
   return (
-    equals(
+    isDeepEqual(
       omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters"]),
       omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"]),
     ) &&
-    equals(
+    isDeepEqual(
       isDefined(view1.sharedWith)
         ? {
             ...omit(view1.sharedWith, ["__typename"]),
@@ -527,7 +527,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
           }
         : view2.sharedWith,
     ) &&
-    equals(
+    isDeepEqual(
       isDefined(view1.sort)
         ? omit(view1.sort, ["__typename"])
         : { field: "sentAt", direction: "DESC" },
@@ -535,7 +535,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
         ? omit(view2.sort, ["__typename"])
         : { field: "sentAt", direction: "DESC" },
     ) &&
-    equals(
+    isDeepEqual(
       isDefined(view1.tagsFilters)
         ? {
             ...omit(view1.tagsFilters, ["__typename"]),

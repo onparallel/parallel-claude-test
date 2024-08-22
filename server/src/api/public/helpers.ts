@@ -4,7 +4,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import pMap from "p-map";
 import { performance } from "perf_hooks";
-import { filter, isDefined, map, omit, pick, pipe, uniq, zip } from "remeda";
+import { filter, isDefined, map, omit, pick, pipe, unique, zip } from "remeda";
 import { promisify } from "util";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
@@ -741,7 +741,7 @@ export async function resolveContacts(
       { concurrency: 3 },
     );
 
-    return uniq(contactIds);
+    return unique(contactIds);
   } catch (error) {
     if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
       const {

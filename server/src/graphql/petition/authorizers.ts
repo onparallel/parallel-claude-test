@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, indexBy, isDefined, partition, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import {
   FeatureFlagName,
@@ -107,7 +107,7 @@ export function userHasAccessToSignatureRequest<
 
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
-        uniq(signatureRequests.map((s) => s!.petition_id)),
+        unique(signatureRequests.map((s) => s!.petition_id)),
         permissionTypes,
       );
     } catch {}
@@ -159,7 +159,7 @@ export function fieldsBelongsToPetition<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const fieldIds = uniq(
+      const fieldIds = unique(
         unMaybeArray(
           (typeof argNameFieldIds === "function"
             ? (argNameFieldIds as any)(args)
@@ -243,7 +243,7 @@ export function fieldHasType<
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = uniq(
+    const fieldIds = unique(
       unMaybeArray(
         (typeof argFieldId === "function"
           ? (argFieldId as any)(args)
@@ -292,7 +292,7 @@ export function replyIsForFieldOfType<
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = uniq(
+    const replyIds = unique(
       unMaybeArray(
         (typeof argReplyId === "function"
           ? (argReplyId as any)(args)
@@ -392,7 +392,7 @@ export function repliesBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       const petitionId = args[argNamePetitionId] as unknown as number;
-      const replyIds = uniq(
+      const replyIds = unique(
         unMaybeArray(
           (typeof argNameReplyIds === "function"
             ? (argNameReplyIds as any)(args)
@@ -578,7 +578,7 @@ export function petitionHasRepliableFields<
 
       // every FIELD_GROUP must contain at least 1 child field
       const fieldGroups = rootFields.filter((f) => f.type === "FIELD_GROUP");
-      const parentFieldIds = uniq(childrenFields.map((f) => f.parent_petition_field_id!));
+      const parentFieldIds = unique(childrenFields.map((f) => f.parent_petition_field_id!));
       if (fieldGroups.some((f) => !parentFieldIds.includes(f.id))) {
         return false;
       }
@@ -635,7 +635,7 @@ export function replyCanBeUpdated<
   argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = uniq(
+    const replyIds = unique(
       unMaybeArray(
         (typeof argReplyId === "function"
           ? (argReplyId as any)(args)
@@ -1193,7 +1193,7 @@ export function petitionFieldsCanBeAssociated<
     }
 
     const petitionFields = await ctx.petitions.loadField(
-      uniq(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
+      unique(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
     );
 
     if (
@@ -1263,7 +1263,7 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
     }
 
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-      uniq(relationships.map((r) => r.profileRelationshipTypeId)),
+      unique(relationships.map((r) => r.profileRelationshipTypeId)),
     );
 
     if (!relationshipTypes.every((t) => isDefined(t) && t.org_id === ctx.user!.org_id)) {
@@ -1271,7 +1271,7 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
     }
 
     const petitionFields = await ctx.petitions.loadField(
-      uniq(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
+      unique(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
     );
 
     if (!petitionFields.every((f) => isDefined(f) && f.petition_id === petitionId)) {
@@ -1326,7 +1326,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
 
     const inputFieldIds = input.map((i) => i.petitionFieldId);
 
-    if (inputFieldIds.length !== uniq(inputFieldIds).length) {
+    if (inputFieldIds.length !== unique(inputFieldIds).length) {
       throw new ForbiddenError("petitionFieldId should not repeat in prefill input");
     }
 
@@ -1372,7 +1372,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     const relationshipTypes =
       templateRelationships.length > 0
         ? await ctx.profiles.loadProfileRelationshipType(
-            uniq(templateRelationships.map((r) => r.profile_relationship_type_id)),
+            unique(templateRelationships.map((r) => r.profile_relationship_type_id)),
           )
         : [];
 
@@ -1382,7 +1382,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       profileRelationships.length === 0
         ? [{ fieldId: templateFieldId, profileIds: [profileId] }]
         : templateFieldGroups.map((f) => {
-            const profileIds = uniq([
+            const profileIds = unique([
               ...(templateFieldId === f.id ? [profileId] : []),
               ...profileRelationships
                 .filter((pr) => {

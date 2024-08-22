@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
-import { isDefined, pick, sortBy, uniq } from "remeda";
+import { isDefined, pick, sortBy, unique } from "remeda";
 import {
   ProfileRelationshipTypeDirectionValues,
   ProfileStatusValues,
@@ -495,7 +495,7 @@ export const ProfileRelationshipType = objectType({
           await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
             { profileRelationshipTypeId: o.id, direction: "LEFT_RIGHT", orgId: ctx.user!.org_id },
           );
-        return uniq(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+        return unique(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
       },
     });
     t.nonNull.list.nonNull.globalId("allowedRightLeftProfileTypeIds", {
@@ -505,7 +505,7 @@ export const ProfileRelationshipType = objectType({
           await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
             { profileRelationshipTypeId: o.id, direction: "RIGHT_LEFT", orgId: ctx.user!.org_id },
           );
-        return uniq(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+        return unique(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
       },
     });
   },

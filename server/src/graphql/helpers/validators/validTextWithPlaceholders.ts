@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import pMap from "p-map";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { discriminator } from "../../../util/discriminator";
 import { fromGlobalId } from "../../../util/globalId";
 import { parseTextWithPlaceholders } from "../../../util/slate/placeholders";
@@ -85,7 +85,7 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
       return;
     }
 
-    const placeholders = uniq(
+    const placeholders = unique(
       parseTextWithPlaceholders(value).filter(discriminator("type", "placeholder" as const)),
     );
     const invalid = (

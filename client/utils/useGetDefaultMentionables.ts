@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { useGetDefaultMentionables_permissionsQueryDocument } from "@parallel/graphql/__types";
 import { useMemo } from "react";
-import { uniqBy } from "remeda";
+import { uniqueBy } from "remeda";
 import { isTypename } from "./apollo/typename";
 import { createMentionPlugin } from "./slate/MentionPlugin";
 
@@ -11,7 +11,7 @@ export function useGetDefaultMentionables(petitionId: string) {
     fetchPolicy: "cache-and-network",
   });
   return useMemo(() => {
-    return uniqBy(
+    return uniqueBy(
       [
         ...(data?.petition?.permissions
           .filter(isTypename("PetitionUserPermission"))

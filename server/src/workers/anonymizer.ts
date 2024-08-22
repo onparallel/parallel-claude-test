@@ -1,4 +1,4 @@
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { createCronWorker } from "./helpers/createCronWorker";
@@ -36,7 +36,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   // so we need to make sure to only delete the entry in S3 if there are no other files referencing to that object
   const filesToDelete = await ctx.files.getFileUploadsToDelete(DAYS);
   ctx.logger.debug(`Anonymizing ${filesToDelete.length} deleted files`);
-  const filePaths = uniq(filesToDelete.map((f) => f.path));
+  const filePaths = unique(filesToDelete.map((f) => f.path));
   await ctx.storage.fileUploads.deleteFile(filePaths);
   await ctx.files.updateFileUpload(
     filesToDelete.map((f) => f.id),
@@ -164,6 +164,6 @@ async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorker
   }
 
   if (fileIdsToDelete.length > 0) {
-    await ctx.files.deleteFileUpload(uniq(fileIdsToDelete), "AnonymizerWorker");
+    await ctx.files.deleteFileUpload(unique(fileIdsToDelete), "AnonymizerWorker");
   }
 }

@@ -1,4 +1,4 @@
-import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
+import { differenceWith, filter, groupBy, isDefined, pipe, unique, uniqueBy, zip } from "remeda";
 import { User } from "../../db/__types";
 import {
   AddPetitionPermissionsInput,
@@ -66,7 +66,7 @@ export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
         newPermissions,
         filter((p) => isDefined(p.user_id)),
         // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
-        uniqBy((p) => `${p.user_id}:${p.petition_id}`),
+        uniqueBy((p) => `${p.user_id}:${p.petition_id}`),
         // omit users who had access previously
         differenceWith(
           permissionsBefore,
@@ -104,7 +104,7 @@ export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
     );
     const deletedPermissionsByPetitionId = groupBy(deletedPermissions, (p) => p.petition_id);
 
-    const deletedPetitionIds = uniq(deletedPermissions.map((p) => p.petition_id));
+    const deletedPetitionIds = unique(deletedPermissions.map((p) => p.petition_id));
 
     const effectivePermissions =
       await this.ctx.petitions.loadEffectivePermissions(deletedPetitionIds);
@@ -121,7 +121,7 @@ export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
 
         // users of deletedPermissions that dont have any effectivePermission lost
         // access to the petitions, their notifications need to be deleted
-        const userIds = uniq(
+        const userIds = unique(
           deletedPermissions
             .filter((p) => p.user_id !== null)
             .map((p) => p.user_id!)

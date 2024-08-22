@@ -29,7 +29,7 @@ import { useRerender } from "@parallel/utils/useRerender";
 import { useCallback, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniq } from "remeda";
+import { isDefined, unique } from "remeda";
 
 interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
   isTemplate: boolean;
@@ -404,12 +404,12 @@ function FieldGroupRelationship({
     rightFieldGroup?.id,
   ]);
 
-  const allCompatibleLeftRightProfileTypeIds = uniq(
+  const allCompatibleLeftRightProfileTypeIds = unique(
     profileRelationshipTypesWithDirection.flatMap(({ profileRelationshipType }) => {
       return profileRelationshipType.allowedLeftRightProfileTypeIds;
     }),
   );
-  const allCompatibleRightLeftProfileTypeIds = uniq(
+  const allCompatibleRightLeftProfileTypeIds = unique(
     profileRelationshipTypesWithDirection.flatMap(({ profileRelationshipType }) => {
       return profileRelationshipType.allowedRightLeftProfileTypeIds;
     }),

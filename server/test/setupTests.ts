@@ -1,7 +1,7 @@
 import { GraphQLFormattedError } from "graphql";
 import * as matchers from "jest-extended";
 import { outdent } from "outdent";
-import { equals } from "remeda";
+import { isDeepEqual } from "remeda";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -32,7 +32,7 @@ expect.extend({
         pass: expectedErrorCode
           ? errorCode === expectedErrorCode &&
             (expectedExtra
-              ? equals(
+              ? isDeepEqual(
                   { ...(errors[0].extensions ?? {}), ...expectedExtra },
                   errors[0].extensions ?? {},
                 )

@@ -1,4 +1,4 @@
-import { groupBy, indexBy, isDefined, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, unique } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -27,11 +27,11 @@ export async function petitionShared(
   if (!userData) {
     throw new Error(`UserData not found for User:${payload.user_id}`);
   }
-  const userIds = uniq(permissions.filter(isDefined).map((p) => p.user_id!));
+  const userIds = unique(permissions.filter(isDefined).map((p) => p.user_id!));
   const [users, usersData, petitions] = await Promise.all([
     context.users.loadUser(userIds),
     context.users.loadUserDataByUserId(userIds),
-    context.petitions.loadPetition(uniq(permissions.filter(isDefined).map((p) => p.petition_id))),
+    context.petitions.loadPetition(unique(permissions.filter(isDefined).map((p) => p.petition_id))),
   ]);
   const usersById = indexBy(users.filter(isDefined), (p) => p.id);
   const emails: EmailLog[] = [];

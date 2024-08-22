@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isDefined, sumBy, uniqBy } from "remeda";
+import { isDefined, sumBy, uniqueBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
@@ -49,7 +49,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
           },
           {
             author: commentsWithMentions[0].author.name,
-            uniqueAuthorCount: uniqBy(commentsWithMentions, (m) => m.author.id).length,
+            uniqueAuthorCount: uniqueBy(commentsWithMentions, (m) => m.author.id).length,
             petitionName,
           },
         );

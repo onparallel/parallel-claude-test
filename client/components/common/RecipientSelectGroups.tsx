@@ -29,7 +29,7 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { differenceWith, isDefined, uniq, uniqBy, zip } from "remeda";
+import { differenceWith, isDefined, unique, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   RecipientSuggestion,
@@ -95,7 +95,7 @@ export function RecipientSelectGroups({
     const allEmails = emails.flat();
     const contacts = await handleSearchContactsByEmail(allEmails);
 
-    const unknownEmails = uniq(
+    const unknownEmails = unique(
       zip(contacts, allEmails)
         .map(([contact, email]) => (!contact ? email : null))
         .filter(isDefined),
@@ -169,7 +169,7 @@ export function RecipientSelectGroups({
       }
       const newRecipientGroups = [...recipientGroups];
       for (let i = 0; i < emails.length; ++i) {
-        newRecipientGroups[i + groupNumber] = uniqBy(
+        newRecipientGroups[i + groupNumber] = uniqueBy(
           [
             ...(newRecipientGroups[i + groupNumber] ?? []),
             ...emails[i].map((e) => contactByEmail[e]),

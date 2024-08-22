@@ -3,7 +3,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { core } from "nexus";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 
 export function userHasAccessToContacts<
   TypeName extends string,
@@ -14,7 +14,7 @@ export function userHasAccessToContacts<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const contactIds = uniq(
+      const contactIds = unique(
         unMaybeArray(
           (typeof prop === "function"
             ? (prop as any)(args)

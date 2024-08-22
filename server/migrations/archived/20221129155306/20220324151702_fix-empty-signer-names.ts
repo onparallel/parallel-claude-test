@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { indexBy, isDefined, uniq } from "remeda";
+import { indexBy, isDefined, unique } from "remeda";
 
 interface SignatureConfig {
   signersInfo: {
@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
         where signer->>'firstName' = '' and signer->>'lastName' = '';
     `);
 
-  const contactIds = uniq(
+  const contactIds = unique(
     rows.flatMap((r) =>
       r.signature_config.signersInfo
         .filter((i) => i.contactId !== undefined && i.firstName === "" && i.lastName === "")

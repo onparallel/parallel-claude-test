@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { uniq } from "remeda";
+import { unique } from "remeda";
 import { ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
@@ -31,7 +31,7 @@ export function validatePublicTemplateCategories<TypeName extends string, FieldN
     const categories = prop(args);
     if (!categories) return true;
 
-    const categoriesArray = uniq(
+    const categoriesArray = unique(
       categories
         .trim()
         .split(",")
