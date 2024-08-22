@@ -2,7 +2,7 @@
 
 
 # versions
-nodejs_version="20" # https://nodejs.org/en
+nodejs_version="22" # https://nodejs.org/en
 nginx_version="1.26.1" # http://nginx.org/en/download.html
 fail2ban_version="1.1.0" # https://github.com/fail2ban/fail2ban/releases
 modsecurity_version="3.0.12" # https://github.com/SpiderLabs/ModSecurity/releases

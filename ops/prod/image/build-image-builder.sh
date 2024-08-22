@@ -2,7 +2,7 @@ NAME=$1
 sudo hostnamectl set-hostname $NAME
 
 # versions
-nodejs_version="20" # https://nodejs.org/en
+nodejs_version="22" # https://nodejs.org/en
 
 # Add public keys
 cat authorized_keys >> .ssh/authorized_keys
