@@ -170,13 +170,13 @@ export function useUpdatePetitionFieldReply() {
       });
 
       if (isCacheOnly) {
-        const { zonedTimeToUtc } = await import("date-fns-tz");
+        const { fromZonedTime } = await import("date-fns-tz");
         updateReplyContent(client, replyId, (oldContent) => ({
           ...oldContent,
           ...(field?.type === "DATE_TIME"
             ? {
                 ...content,
-                value: zonedTimeToUtc(content.datetime, content.timezone).toISOString(),
+                value: fromZonedTime(content.datetime, content.timezone).toISOString(),
               }
             : content),
         }));
@@ -275,7 +275,7 @@ export function useCreatePetitionFieldReply() {
       });
 
       if (isCacheOnly) {
-        const { zonedTimeToUtc } = await import("date-fns-tz");
+        const { fromZonedTime } = await import("date-fns-tz");
 
         const id = `${fieldId}-${getRandomId()}`;
 
@@ -297,7 +297,7 @@ export function useCreatePetitionFieldReply() {
               field?.type === "DATE_TIME"
                 ? {
                     ...content,
-                    value: zonedTimeToUtc(content.datetime, content.timezone).toISOString(),
+                    value: fromZonedTime(content.datetime, content.timezone).toISOString(),
                   }
                 : content,
             isAnonymized: false,
@@ -326,7 +326,7 @@ export function useCreatePetitionFieldReply() {
                             field?.type === "DATE_TIME"
                               ? {
                                   ...content,
-                                  value: zonedTimeToUtc(
+                                  value: fromZonedTime(
                                     content.datetime,
                                     content.timezone,
                                   ).toISOString(),

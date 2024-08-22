@@ -1,5 +1,5 @@
 import { addDays } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
 import { isDefined, pick, sortBy, uniq } from "remeda";
 import {
@@ -312,7 +312,7 @@ export const ProfileFieldResponse = interfaceType({
       description: "Expiration datetime of the value, considering organization's timezone.",
       resolve: async (o, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
-        return o.expiry_date ? zonedTimeToUtc(new Date(o.expiry_date), org.default_timezone) : null;
+        return o.expiry_date ? fromZonedTime(new Date(o.expiry_date), org.default_timezone) : null;
       },
     });
     t.nullable.string("expiryDate", {
