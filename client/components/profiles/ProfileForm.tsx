@@ -370,7 +370,7 @@ export const ProfileForm = Object.assign(
               );
             } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
               const aggregatedErrors =
-                (e.graphQLErrors[0].extensions.aggregatedErrors as {
+                (e.graphQLErrors[0].extensions!.aggregatedErrors as {
                   profileTypeFieldId: string;
                   code: string;
                 }[]) ?? [];

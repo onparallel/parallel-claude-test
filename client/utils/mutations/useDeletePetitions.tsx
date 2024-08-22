@@ -62,7 +62,7 @@ export function useDeletePetitions() {
           if (!skipConfirmDialogs) {
             // some of the petitions are shared by me to other users, show a confirmation dialog before deleting
             await confirmDeleteSharedPetitions({
-              petitionIds: error.graphQLErrors[0].extensions.petitionIds as string[],
+              petitionIds: error.graphQLErrors[0].extensions!.petitionIds as string[],
               type,
               currentPath,
             });

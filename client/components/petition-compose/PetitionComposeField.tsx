@@ -442,7 +442,7 @@ const _PetitionComposeField = chakraForwardRef<
             />
           ) : null}
           <Box
-            ref={previewRef}
+            ref={previewRef as any}
             className={field.isChild ? "petition-compose-field-children" : "petition-compose-field"}
             display="flex"
             flexDirection="row"
@@ -486,7 +486,7 @@ const _PetitionComposeField = chakraForwardRef<
               <Box width="32px" />
             ) : (
               <Box
-                ref={dragRef}
+                ref={dragRef as any}
                 data-testid="compose-field-drag-handle"
                 display="flex"
                 flexDirection="column"

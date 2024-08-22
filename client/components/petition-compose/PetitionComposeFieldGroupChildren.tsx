@@ -101,7 +101,7 @@ export function PetitionComposeFieldGroupChildren({
         outlineColor={hasDropErrors || (!hasChildren && showError) ? "red.500" : "gray.200"}
         spacing={0}
         position="relative"
-        ref={drop}
+        ref={drop as any}
       >
         {isOver ? (
           <PetitionComposeDragActiveIndicator

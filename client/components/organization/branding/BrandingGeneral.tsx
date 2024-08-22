@@ -142,7 +142,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
         } catch (error) {
           if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
             if (
-              (error.graphQLErrors[0].extensions.extra as any).code === "INVALID_HEX_VALUE_ERROR"
+              (error.graphQLErrors[0].extensions!.extra as any).code === "INVALID_HEX_VALUE_ERROR"
             ) {
               setError("color", { type: "validate" });
             }

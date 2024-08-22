@@ -40,7 +40,7 @@ export function useCreatePetitionComment() {
         });
       } catch (e) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const ids = e.graphQLErrors[0].extensions.ids as string[];
+          const ids = e.graphQLErrors[0].extensions!.ids as string[];
           const { data } = await fetchUsersOrGroups({ ids });
           try {
             const shareResult = await showConfirmCommentMentionAndShareDialog({
@@ -88,7 +88,7 @@ export function useUpdatePetitionComment() {
         });
       } catch (e) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const ids = e.graphQLErrors[0].extensions.ids as string[];
+          const ids = e.graphQLErrors[0].extensions!.ids as string[];
           const { data } = await fetchUsersOrGroups({ ids });
           try {
             const shareResult = await showConfirmCommentMentionAndShareDialog({

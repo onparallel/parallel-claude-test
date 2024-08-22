@@ -67,7 +67,9 @@ CustomError.getInitialProps = async ({ err, ...props }: NextPageContext) => {
       errorCode = window.__NEXT_DATA__.props.pageProps.errorCode;
     } else {
       errorCode =
-        err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions.code : (err as any)?.message;
+        err && isApolloError(err)
+          ? err.graphQLErrors?.[0]?.extensions!.code
+          : (err as any)?.message;
       if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
         Sentry.captureException(err);
       }
@@ -77,7 +79,7 @@ CustomError.getInitialProps = async ({ err, ...props }: NextPageContext) => {
       Sentry.captureException(err);
     }
     errorCode =
-      err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions.code : (err as any)?.message;
+      err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions!.code : (err as any)?.message;
   }
   return { errorCode };
 };

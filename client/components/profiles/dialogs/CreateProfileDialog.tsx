@@ -132,7 +132,7 @@ function CreateProfileDialog({
           } catch (error) {
             if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
               const aggregatedErrors =
-                (error.graphQLErrors[0].extensions.aggregatedErrors as {
+                (error.graphQLErrors[0].extensions!.aggregatedErrors as {
                   profileTypeFieldId: string;
                   code: string;
                 }[]) ?? [];
