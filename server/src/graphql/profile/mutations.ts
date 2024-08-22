@@ -511,7 +511,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
                     alias:
                       updateData.alias !== undefined
                         ? updateData.alias
-                        : profileTypeField.alias ?? null,
+                        : (profileTypeField.alias ?? null),
                   },
                 };
               }),

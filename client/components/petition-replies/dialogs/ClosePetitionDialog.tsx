@@ -51,7 +51,7 @@ export function ClosePetitionDialog({
   const [attachPdfExport, setAttachPdfExport] = useState(false);
   const pdfExportTitleRef = useRef<HTMLInputElement>(null);
   const [pdfExportTitle, setPdfExportTitle] = useState(
-    hasSignedDocument ? null : petition.name ?? "",
+    hasSignedDocument ? null : (petition.name ?? ""),
   );
 
   const [isInvalid, setIsInvalid] = useState(false);

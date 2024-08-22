@@ -41,9 +41,9 @@ export const mapReplyContents = ({
 
       const emptyReplyIds =
         targetField.type === "FIELD_GROUP" && !overwriteExisting
-          ? targetField?.replies
+          ? (targetField?.replies
               .filter((reply) => reply.children?.every((child) => child.replies.length === 0))
-              .map((reply) => reply.id) ?? []
+              .map((reply) => reply.id) ?? [])
           : [];
 
       const groupedReplies = groupBy(replies ?? [], (r) => r?.parent?.id ?? "");

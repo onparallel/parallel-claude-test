@@ -107,12 +107,12 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
 
         const allFieldIds = fieldIds.flatMap((id) => {
           const field = byId[id];
-          return [id, ...("children" in field ? field?.children?.map((c) => c.id) ?? [] : [])];
+          return [id, ...("children" in field ? (field?.children?.map((c) => c.id) ?? []) : [])];
         });
 
         const allNewFieldIds = newFieldIds.flatMap((id) => {
           const field = byId[id];
-          return [id, ...("children" in field ? field?.children?.map((c) => c.id) ?? [] : [])];
+          return [id, ...("children" in field ? (field?.children?.map((c) => c.id) ?? []) : [])];
         });
 
         // check that this order of fields is respecting that visibility only refers to previous fields

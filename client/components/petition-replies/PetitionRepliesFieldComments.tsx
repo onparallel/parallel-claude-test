@@ -105,7 +105,7 @@ export function PetitionRepliesFieldComments({
   const comments =
     showGeneralComments && petitionData?.petition?.__typename === "Petition"
       ? petitionData.petition.generalComments
-      : data?.petitionField.comments ?? [];
+      : (data?.petitionField.comments ?? []);
 
   const markedAsUnreadIdsRef = useRef<string[]>([]);
 

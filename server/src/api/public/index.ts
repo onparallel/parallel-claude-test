@@ -1963,7 +1963,7 @@ export function publicApi(container: Container) {
                   id: data.id,
                   name:
                     data.__typename === "User"
-                      ? data.fullName ?? ""
+                      ? (data.fullName ?? "")
                       : data.name || data.localizableName["en"] || data.localizableName["es"] || "",
                 };
               } else if (mention.startsWith("@[group:")) {

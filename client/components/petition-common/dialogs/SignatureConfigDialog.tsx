@@ -103,10 +103,10 @@ export function SignatureConfigDialog({
     defaultValues: {
       integration:
         signatureConfig?.integration ?? integrations.find((i) => i.isDefault) ?? integrations[0],
-      review: petition.isReviewFlowEnabled ? signatureConfig?.review ?? false : false,
+      review: petition.isReviewFlowEnabled ? (signatureConfig?.review ?? false) : false,
       title: signatureConfig?.title ?? null,
       allowAdditionalSigners: petition.isInteractionWithRecipientsEnabled
-        ? signatureConfig?.allowAdditionalSigners ?? false
+        ? (signatureConfig?.allowAdditionalSigners ?? false)
         : false,
       includePresetSigners: presetSigners.length > 0,
       presetSigners,

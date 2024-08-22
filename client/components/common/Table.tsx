@@ -389,7 +389,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               const headerProps =
                 typeof column.headerProps === "function"
                   ? column.headerProps(_context!)
-                  : column.headerProps ?? {};
+                  : (column.headerProps ?? {});
               return (
                 <DefaultHeader
                   key={column.key}
@@ -540,7 +540,7 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
   const cellProps =
     typeof column.cellProps === "function"
       ? column.cellProps(props.row, props.context)
-      : column.cellProps ?? {};
+      : (column.cellProps ?? {});
   return (
     <Box
       as="td"

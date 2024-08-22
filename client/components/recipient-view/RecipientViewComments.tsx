@@ -94,8 +94,8 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const petition = dataAccess?.access.petition;
 
   const comments = showGeneralComments
-    ? petition?.generalComments ?? []
-    : data?.publicPetitionField.comments ?? [];
+    ? (petition?.generalComments ?? [])
+    : (data?.publicPetitionField.comments ?? []);
 
   const unsortedFieldsWithComments =
     petition?.fields

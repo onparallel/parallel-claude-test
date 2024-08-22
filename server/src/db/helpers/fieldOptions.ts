@@ -392,9 +392,9 @@ export function defaultFieldProperties(
                 ? true
                 : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
                   ? false
-                  : field?.multiple ?? false;
+                  : (field?.multiple ?? false);
 
-  const alias = type === "HEADING" ? null : field?.alias ?? null;
+  const alias = type === "HEADING" ? null : (field?.alias ?? null);
 
   const options = ((): any => {
     switch (type) {
@@ -407,7 +407,7 @@ export function defaultFieldProperties(
         return {
           placeholder:
             isDefined(field) && hasPlaceholder(field.type)
-              ? field.options.placeholder ?? null
+              ? (field.options.placeholder ?? null)
               : null,
           maxLength:
             isDefined(field) &&
@@ -421,7 +421,7 @@ export function defaultFieldProperties(
         return {
           placeholder:
             isDefined(field) && hasPlaceholder(field.type)
-              ? field.options.placeholder ?? null
+              ? (field.options.placeholder ?? null)
               : null,
           maxLength:
             isDefined(field) &&
@@ -447,7 +447,7 @@ export function defaultFieldProperties(
         return {
           placeholder:
             isDefined(field) && hasPlaceholder(field.type)
-              ? field.options.placeholder ?? null
+              ? (field.options.placeholder ?? null)
               : null,
           range: {
             min: 0,
@@ -461,7 +461,7 @@ export function defaultFieldProperties(
         return {
           placeholder:
             isDefined(field) && hasPlaceholder(field.type)
-              ? field.options.placeholder ?? null
+              ? (field.options.placeholder ?? null)
               : null,
         };
       }
@@ -473,7 +473,7 @@ export function defaultFieldProperties(
               : [],
           placeholder:
             isDefined(field) && hasPlaceholder(field.type)
-              ? field.options.placeholder ?? null
+              ? (field.options.placeholder ?? null)
               : null,
         };
       }
@@ -508,7 +508,7 @@ export function defaultFieldProperties(
               : [],
           limit: {
             type: "RADIO",
-            min: optional ?? false ? 0 : 1,
+            min: (optional ?? false) ? 0 : 1,
             max: 1,
           },
         };
@@ -537,15 +537,19 @@ export function defaultFieldProperties(
     optional,
     multiple,
     is_internal:
-      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" ? true : field?.is_internal ?? false,
+      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK"
+        ? true
+        : (field?.is_internal ?? false),
     show_in_pdf:
-      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" ? false : field?.show_in_pdf ?? true,
+      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK"
+        ? false
+        : (field?.show_in_pdf ?? true),
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     require_approval:
       ["HEADING", "FIELD_GROUP"].includes(type) || field?.is_internal
         ? false
-        : field?.require_approval ?? true,
+        : (field?.require_approval ?? true),
     options,
   };
 }

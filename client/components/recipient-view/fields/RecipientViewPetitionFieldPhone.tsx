@@ -323,7 +323,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
           id: "generic.reply-not-available",
           defaultMessage: "Reply not available",
         })
-      : options.placeholder ?? undefined,
+      : (options.placeholder ?? undefined),
     sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   };
 

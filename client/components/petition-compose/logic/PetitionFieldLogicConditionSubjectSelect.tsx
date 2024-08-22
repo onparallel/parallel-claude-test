@@ -66,14 +66,14 @@ export function PetitionFieldLogicConditionSubjectSelect({
 
     const value: ConditionSubjectSelectOption | null =
       "fieldId" in condition
-        ? fieldOptions.find((o) =>
+        ? (fieldOptions.find((o) =>
             o.type === "FIELD"
               ? o.field.id === condition.fieldId && condition.column === undefined
               : o.type === "DYNAMIC_SELECT_OPTION"
                 ? o.field.id === condition.fieldId && o.columnIndex === condition.column
                 : never(),
-          ) ?? null
-        : variableOptions.find((o) => o.variableName === condition.variableName) ?? null;
+          ) ?? null)
+        : (variableOptions.find((o) => o.variableName === condition.variableName) ?? null);
 
     return {
       options: [

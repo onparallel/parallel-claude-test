@@ -43,7 +43,7 @@ export function ProfileFieldShortText({
         control={control}
         rules={{
           validate: (value) => {
-            return isDefined(format) && value?.length ? format.validate?.(value) ?? true : true;
+            return isDefined(format) && value?.length ? (format.validate?.(value) ?? true) : true;
           },
         }}
         render={({ field: { onChange, value, ...rest } }) => {

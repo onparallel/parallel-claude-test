@@ -336,11 +336,11 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
           id: "generic.reply-not-available",
           defaultMessage: "Reply not available",
         })
-      : options.placeholder ??
+      : (options.placeholder ??
         intl.formatMessage({
           id: "component.recipient-view-petition-field-reply.text-placeholder",
           defaultMessage: "Enter your answer",
-        }),
+        })),
     sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   };
 

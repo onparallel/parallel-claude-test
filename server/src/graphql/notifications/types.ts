@@ -111,12 +111,14 @@ export const SignatureCancelledUserNotification = createPetitionUserNotification
     t.nullable.field("errorCode", {
       type: "String",
       resolve: ({ data }) => {
-        return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.error_code ?? null : null;
+        return data.cancel_reason === "REQUEST_ERROR"
+          ? (data.cancel_data?.error_code ?? null)
+          : null;
       },
     });
     t.nullable.json("extraErrorData", {
       resolve: ({ data }) => {
-        return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;
+        return data.cancel_reason === "REQUEST_ERROR" ? (data.cancel_data?.extra ?? null) : null;
       },
     });
   },

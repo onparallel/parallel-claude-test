@@ -637,7 +637,7 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
   t.nullable.field("errorCode", {
     type: "String",
     resolve: ({ data }) => {
-      return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.error_code ?? null : null;
+      return data.cancel_reason === "REQUEST_ERROR" ? (data.cancel_data?.error_code ?? null) : null;
     },
   });
   t.nullable.string("errorMessage", {
@@ -649,13 +649,13 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
           data.cancel_data.error_code,
         ) &&
         typeof data.cancel_data.error === "string"
-        ? data.cancel_data.error ?? null
+        ? (data.cancel_data.error ?? null)
         : null;
     },
   });
   t.nullable.json("extraErrorData", {
     resolve: ({ data }) => {
-      return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;
+      return data.cancel_reason === "REQUEST_ERROR" ? (data.cancel_data?.extra ?? null) : null;
     },
   });
 });

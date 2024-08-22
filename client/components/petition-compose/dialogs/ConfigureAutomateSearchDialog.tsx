@@ -38,7 +38,7 @@ export function ConfigureAutomateSearchDialog({
   const fieldIsChild = field.parent !== null;
 
   const allFields = useMemo(
-    () => petition.fields.flatMap((f) => [f, ...(fieldIsChild ? f.children ?? [] : [])]),
+    () => petition.fields.flatMap((f) => [f, ...(fieldIsChild ? (f.children ?? []) : [])]),
     [petition.fields],
   );
 

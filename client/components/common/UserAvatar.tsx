@@ -11,7 +11,7 @@ export function UserAvatar({ user, showImage, ...props }: UserAvatarProps) {
   return (
     <Avatar
       name={user.fullName ?? undefined}
-      src={showImage ? user.avatarUrl ?? undefined : undefined}
+      src={showImage ? (user.avatarUrl ?? undefined) : undefined}
       getInitials={user.initials ? () => user.initials! : undefined}
       {...props}
     />

@@ -436,7 +436,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
           id: "generic.reply-not-available",
           defaultMessage: "Reply not available",
         })
-      : placeholder ?? defaultPlaceholder,
+      : (placeholder ?? defaultPlaceholder),
     sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   } as ComponentPropsWithRef<typeof NumeralInput>;
 

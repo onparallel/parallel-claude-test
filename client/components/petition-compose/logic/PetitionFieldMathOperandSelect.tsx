@@ -80,9 +80,9 @@ export function PetitionFieldMathOperandSelect({
       operand.type === "NUMBER"
         ? numberOption
         : operand.type === "FIELD"
-          ? fieldOptions.find((o) => o.field.id === operand.fieldId) ?? null
+          ? (fieldOptions.find((o) => o.field.id === operand.fieldId) ?? null)
           : operand.type === "VARIABLE"
-            ? variableOptions.find((o) => o.variableName === operand.name) ?? null
+            ? (variableOptions.find((o) => o.variableName === operand.name) ?? null)
             : never();
 
     return {

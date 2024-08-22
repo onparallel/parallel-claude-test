@@ -307,7 +307,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
               // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
               if (isDefined(parent) && parent.id === field.id) {
                 return groupVisibilityById[referencedField.id]
-                  ? reply.children!.find((c) => c.field.id === referencedField.id)?.replies ?? []
+                  ? (reply.children!.find((c) => c.field.id === referencedField.id)?.replies ?? [])
                   : [];
               } else if (isDefined(parent) && parent.id !== field.id) {
                 // if none of the child replies on that field were visible childFieldReplies[referencedField.id] === undefined
@@ -426,7 +426,7 @@ function fieldConditionIsMet(
   function evaluator(reply: any) {
     const _value =
       condition.column !== undefined
-        ? reply.content.value?.[condition.column]?.[1] ?? null
+        ? (reply.content.value?.[condition.column]?.[1] ?? null)
         : reply.content.value;
 
     return evaluatePredicate(_value, operator, value, petition);

@@ -137,7 +137,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
   const activeFieldWithIndex = useMemo(() => {
     return isDefined(activeFieldId)
-      ? allFieldsWithIndices.find(([field]) => field.id === activeFieldId) ?? null
+      ? (allFieldsWithIndices.find(([field]) => field.id === activeFieldId) ?? null)
       : null;
   }, [allFieldsWithIndices, activeFieldId]);
   const activeField = activeFieldWithIndex?.[0] ?? null;

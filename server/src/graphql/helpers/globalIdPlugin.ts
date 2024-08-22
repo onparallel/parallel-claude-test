@@ -87,7 +87,7 @@ export function globalIdArg(
   opts?: GlobalIdArgOpts,
 ): core.NexusArgDef<any> {
   const { extensions, allowedPrefixes, ...config } =
-    typeof prefixNameOrOpts === "string" ? opts ?? {} : prefixNameOrOpts ?? {};
+    typeof prefixNameOrOpts === "string" ? (opts ?? {}) : (prefixNameOrOpts ?? {});
   const prefixName = typeof prefixNameOrOpts === "string" ? prefixNameOrOpts : null;
   return core.arg({
     ...config,

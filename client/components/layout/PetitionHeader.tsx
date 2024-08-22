@@ -599,7 +599,7 @@ export const PetitionHeader = Object.assign(
               </Button>
             </RestrictedFeaturePopover>
           ) : (
-            actions ?? null
+            (actions ?? null)
           )}
           <Box>
             <MoreOptionsMenuButton

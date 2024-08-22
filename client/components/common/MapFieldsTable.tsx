@@ -653,7 +653,7 @@ const checkMultipleRepliesConflict = (
 
   const repliesLength =
     origin.type === "CHECKBOX"
-      ? origin.replies[0]?.content?.value?.length ?? 0
+      ? (origin.replies[0]?.content?.value?.length ?? 0)
       : origin.replies.length;
 
   return !target.multiple && (origin.multiple || origin.type === "CHECKBOX") && repliesLength > 1;

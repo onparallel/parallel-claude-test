@@ -84,7 +84,7 @@ function CreateProfileDialog({
               field.myPermission !== "WRITE"
                 ? defaultValue
                 : moreShortTextsAfterThis
-                  ? suggestions.shift() ?? ""
+                  ? (suggestions.shift() ?? "")
                   : suggestions.join(" ");
             return {
               profileTypeFieldId: field.id,
@@ -206,7 +206,7 @@ function CreateProfileDialog({
                       rules={{
                         validate: (value) => {
                           return isDefined(format) && value?.length
-                            ? format.validate?.(value) ?? true
+                            ? (format.validate?.(value) ?? true)
                             : true;
                         },
                       }}

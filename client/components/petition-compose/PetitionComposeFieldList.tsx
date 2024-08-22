@@ -156,7 +156,7 @@ export const PetitionComposeFieldList = Object.assign(
                 const index = values.indexOf(c.value);
                 return {
                   ...c,
-                  value: index > newValues.length - 1 ? null : newValues[index] ?? null,
+                  value: index > newValues.length - 1 ? null : (newValues[index] ?? null),
                 };
               } else {
                 return c;

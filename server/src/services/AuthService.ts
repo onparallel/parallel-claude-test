@@ -388,7 +388,7 @@ export class Auth implements IAuth {
       });
       this.setSession(res, token);
       const prefix =
-        userData?.preferred_locale ?? state.has("locale") ? `/${state.get("locale")}` : "";
+        (userData?.preferred_locale ?? state.has("locale")) ? `/${state.get("locale")}` : "";
       const path =
         state.has("redirect") && state.get("redirect")!.startsWith("/")
           ? state.get("redirect")!

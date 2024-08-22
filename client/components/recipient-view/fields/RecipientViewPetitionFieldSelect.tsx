@@ -258,11 +258,11 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
                       id: "generic.reply-not-available",
                       defaultMessage: "Reply not available",
                     })
-                  : options.placeholder ??
+                  : (options.placeholder ??
                     intl.formatMessage({
                       id: "generic.select-an-option",
                       defaultMessage: "Select an option",
-                    })
+                    }))
               }
               styles={{
                 menu: (styles) => ({ ...styles, zIndex: 100 }),

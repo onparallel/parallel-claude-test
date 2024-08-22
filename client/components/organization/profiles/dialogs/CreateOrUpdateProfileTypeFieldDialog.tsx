@@ -149,7 +149,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
       options:
         profileTypeField?.type === "SELECT" || profileTypeField?.type === "BACKGROUND_CHECK"
           ? intialOptions
-          : profileTypeField?.options ?? {},
+          : (profileTypeField?.options ?? {}),
       expiryAlertAheadTime:
         isDefined(profileTypeField) &&
         profileTypeField.isExpirable &&

@@ -93,7 +93,7 @@ export const PetitionSignatureRequest = objectType({
     });
     t.nullable.string("errorCode", {
       resolve: (o) => {
-        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.error_code ?? null : null;
+        return o.cancel_reason === "REQUEST_ERROR" ? (o.cancel_data?.error_code ?? null) : null;
       },
     });
     t.nullable.string("errorMessage", {
@@ -105,13 +105,13 @@ export const PetitionSignatureRequest = objectType({
             o.cancel_data.error_code,
           ) &&
           typeof o.cancel_data.error === "string"
-          ? o.cancel_data.error ?? null
+          ? (o.cancel_data.error ?? null)
           : null;
       },
     });
     t.nullable.json("extraErrorData", {
       resolve: (o) => {
-        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.extra ?? null : null;
+        return o.cancel_reason === "REQUEST_ERROR" ? (o.cancel_data?.extra ?? null) : null;
       },
     });
     t.field("environment", {
@@ -135,14 +135,14 @@ export const PetitionSignatureRequest = objectType({
     t.nullable.string("signedDocumentFilename", {
       resolve: async (o, _, ctx) => {
         return o.file_upload_id
-          ? (await ctx.files.loadFileUpload(o.file_upload_id))?.filename ?? null
+          ? ((await ctx.files.loadFileUpload(o.file_upload_id))?.filename ?? null)
           : null;
       },
     });
     t.nullable.string("auditTrailFilename", {
       resolve: async (o, _, ctx) => {
         return o.file_upload_audit_trail_id
-          ? (await ctx.files.loadFileUpload(o.file_upload_audit_trail_id))?.filename ?? null
+          ? ((await ctx.files.loadFileUpload(o.file_upload_audit_trail_id))?.filename ?? null)
           : null;
       },
     });

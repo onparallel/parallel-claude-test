@@ -68,7 +68,7 @@ export function DateRangePickerButton({
   const quickRanges = useQuickDateRanges();
   const currentActiveRange = useMemo(() => {
     return isDateRangeDefined(value) && isDefined(_value)
-      ? quickRanges.find(({ range }) => isEqualDateRange(_value, range)) ?? null
+      ? (quickRanges.find(({ range }) => isEqualDateRange(_value, range)) ?? null)
       : null;
   }, [_value?.[0]?.valueOf(), _value?.[1]?.valueOf(), quickRanges]);
 

@@ -133,7 +133,7 @@ export function UpdateOrganizationUsageDetailsDialog({
             now,
             multiplyDuration(
               { [periodUnits as keyof Duration]: periodValue },
-              renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0),
+              renewalCycles - (startNewPeriod ? 0 : (currentUsageLimit?.cycleNumber ?? 0)),
             ),
           )
         : add(

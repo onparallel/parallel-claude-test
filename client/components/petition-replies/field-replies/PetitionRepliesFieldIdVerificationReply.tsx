@@ -113,7 +113,7 @@ function IDCardView({
             id: "component.petition-replies-field-id-verification-reply.nationality",
             defaultMessage: "Nationality",
           })}
-          content={nationality ? getCountryName(nationality) ?? nationality : null}
+          content={nationality ? (getCountryName(nationality) ?? nationality) : null}
         />
         <IdVerificationDate
           label={intl.formatMessage({
@@ -187,7 +187,7 @@ function IDCardView({
             id: "component.petition-replies-field-id-verification-reply.issuing-country",
             defaultMessage: "Issuing country",
           })}
-          content={issuingCountry ? getCountryName(issuingCountry) ?? issuingCountry : null}
+          content={issuingCountry ? (getCountryName(issuingCountry) ?? issuingCountry) : null}
         />
         <IdVerificationDate
           label={intl.formatMessage({

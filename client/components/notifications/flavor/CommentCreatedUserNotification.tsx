@@ -40,7 +40,7 @@ export const CommentCreatedUserNotification = Object.assign(
               )}
             </Circle>
           }
-          path={`/replies?comments=${isGeneral ? "general" : notification.field?.id ?? ""}`}
+          path={`/replies?comments=${isGeneral ? "general" : (notification.field?.id ?? "")}`}
         >
           {isGeneral ? (
             isMention ? (

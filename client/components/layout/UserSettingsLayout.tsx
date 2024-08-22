@@ -71,7 +71,7 @@ export function UserSettingsLayout({
       me={me}
       isBase={isBase}
       title={
-        title ?? isBase
+        (title ?? isBase)
           ? intl.formatMessage({
               id: "component.user-settings-layout.page-title",
               defaultMessage: "Settings",
@@ -79,7 +79,7 @@ export function UserSettingsLayout({
           : currentSection!.title
       }
       header={
-        header ?? isBase ? undefined : (
+        (header ?? isBase) ? undefined : (
           <Heading as="h3" size="md">
             {currentSection?.title}
           </Heading>

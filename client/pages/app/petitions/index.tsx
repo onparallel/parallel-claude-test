@@ -417,7 +417,7 @@ function Petitions() {
 
   const columns = usePetitionsTableColumns(
     state.type,
-    state.type === "PETITION" ? state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION : undefined,
+    state.type === "PETITION" ? (state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION) : undefined,
   );
 
   const context = useMemo(() => ({ user: me! }), [me]);

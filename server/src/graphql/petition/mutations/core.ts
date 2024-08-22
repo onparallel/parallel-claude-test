@@ -2092,7 +2092,7 @@ export const sendPetition = mutationField("sendPetition", {
           });
 
           const messageSubject = renderTextWithPlaceholders(
-            index === 0 ? args.subject : petition.email_subject ?? args.subject,
+            index === 0 ? args.subject : (petition.email_subject ?? args.subject),
             getValues,
           );
 

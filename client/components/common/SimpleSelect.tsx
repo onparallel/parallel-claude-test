@@ -71,7 +71,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
     if (props.isMulti) {
       return Array.isArray(value) ? value.map((o) => _options[o]) : [];
     } else {
-      return isDefined(value) ? _options[value as string] ?? null : null;
+      return isDefined(value) ? (_options[value as string] ?? null) : null;
     }
   }, [props.options, props.isMulti, value]);
 
@@ -86,7 +86,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
       value={_value}
       onChange={(option, actionMeta) => {
         onChange(
-          Array.isArray(option) ? option.map((o) => o.value) : (option as any)?.value ?? null,
+          Array.isArray(option) ? option.map((o) => o.value) : ((option as any)?.value ?? null),
           actionMeta,
         );
       }}

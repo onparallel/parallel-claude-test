@@ -200,9 +200,9 @@ function Profiles() {
 
   const profileType =
     queryState.type && queryState.type.length === 1
-      ? profileTypes?.items.find((pt) => pt.id === queryState.type![0]) ??
+      ? (profileTypes?.items.find((pt) => pt.id === queryState.type![0]) ??
         _profileTypeData?.profileType ??
-        null
+        null)
       : null;
 
   const showSubscribersDialog = useProfileSubscribersDialog();

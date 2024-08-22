@@ -222,7 +222,7 @@ const getOptionLabel = (
 };
 
 function mapValue<T extends { field: { id: string } }>(value: { id: string } | null, options: T[]) {
-  return value ? options.find((o) => o.field.id === value.id) ?? null : null;
+  return value ? (options.find((o) => o.field.id === value.id) ?? null) : null;
 }
 
 function SingleValue(

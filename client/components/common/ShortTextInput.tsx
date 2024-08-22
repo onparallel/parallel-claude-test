@@ -16,17 +16,13 @@ export const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function
   ref,
 ) {
   const inputRef = useRef<any>(null);
-  useImperativeHandle(
-    ref,
-    () => {
-      if (format?.type === "MASK") {
-        return inputRef.current?.element;
-      } else {
-        return inputRef.current;
-      }
-    },
-    [format?.type],
-  );
+  useImperativeHandle(ref, () => {
+    if (format?.type === "MASK") {
+      return inputRef.current?.element;
+    } else {
+      return inputRef.current;
+    }
+  }, [format?.type]);
   return (
     <Input
       ref={inputRef}

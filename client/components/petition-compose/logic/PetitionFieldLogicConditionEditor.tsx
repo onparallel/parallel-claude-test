@@ -566,11 +566,11 @@ function ConditionPredicate({
         operator,
         value:
           ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(value)
-            ? value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column)
+            ? (value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column))
             : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) && typeof value === "string"
               ? [value]
               : ["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(operator)
-                ? customLists?.[0]?.name ?? null
+                ? (customLists?.[0]?.name ?? null)
                 : value,
       });
     } else if (

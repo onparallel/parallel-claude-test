@@ -35,7 +35,7 @@ async function generate(
     const compiled: { [term: string]: MessageFormatElement[] } = {};
     let missing = 0;
     for (const { term, definition: _definition } of terms) {
-      const definition = _definition === "" ? extendedTranslations[term] ?? "" : _definition;
+      const definition = _definition === "" ? (extendedTranslations[term] ?? "") : _definition;
       if (definition === "") {
         missing += 1;
       }

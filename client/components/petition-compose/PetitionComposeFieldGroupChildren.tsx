@@ -137,7 +137,7 @@ export function PetitionComposeFieldGroupChildren({
                 hideAddButtons={isReadOnly || isOver}
                 onAddNewField={(linkToPreviousField: boolean) => {
                   const fieldIdToLink = linkToPreviousField
-                    ? children[i - 1]?.id ?? undefined
+                    ? (children[i - 1]?.id ?? undefined)
                     : field.id;
                   showAddField(fieldIdToLink, parentFieldId);
                 }}

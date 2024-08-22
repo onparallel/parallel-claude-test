@@ -57,7 +57,7 @@ export function DateRangePicker({
   const quickRanges = useQuickDateRanges();
   const activeRange = useMemo(() => {
     return isDefined(startDate) && isDefined(endDate)
-      ? quickRanges.find(({ range }) => isEqualDateRange([startDate, endDate], range)) ?? null
+      ? (quickRanges.find(({ range }) => isEqualDateRange([startDate, endDate], range)) ?? null)
       : null;
   }, [startDate?.valueOf(), endDate?.valueOf(), quickRanges]);
 

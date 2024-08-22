@@ -40,7 +40,7 @@ export function PetitionComposeNumberSettings({
   );
   const [prefixOption, setPrefixOption] = useState(isDefined(options.prefix) ? "prefix" : "suffix");
   const [prefixValue, setPrefixValue] = useState(
-    isDefined(options.prefix) ? options.prefix : options.suffix ?? "",
+    isDefined(options.prefix) ? options.prefix : (options.suffix ?? ""),
   );
 
   const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;

@@ -14,7 +14,7 @@ export function useInterval(
   const { delay, isRunning = true } =
     typeof delayOrOptions === "number"
       ? { delay: delayOrOptions, isRunning: true }
-      : delayOrOptions ?? {};
+      : (delayOrOptions ?? {});
   useEffect(() => {
     if (!isRunning) {
       return;

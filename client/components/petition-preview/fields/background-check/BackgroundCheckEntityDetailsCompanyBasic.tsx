@@ -164,7 +164,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
             return (
               <HStack key={nationCode}>
                 {flag}
-                <Text>{nationCode ? getCountryName(nationCode) ?? nationCode : "-"}</Text>
+                <Text>{nationCode ? (getCountryName(nationCode) ?? nationCode) : "-"}</Text>
               </HStack>
             );
           }) ?? <Text>{"-"}</Text>}

@@ -223,7 +223,7 @@ export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
             }))
           : field.type === "DYNAMIC_SELECT"
             ? []
-            : field.options.values ?? [],
+            : (field.options.values ?? []),
     };
   }
   return {
@@ -345,7 +345,7 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
     signers:
       petition.signatureConfig === undefined
         ? undefined // signers not included in response
-        : petition.signatureConfig?.signers ?? null,
+        : (petition.signatureConfig?.signers ?? null),
   };
 }
 
@@ -451,7 +451,9 @@ export function mapReplyResponse(reply: PetitionFieldReplyFragment) {
   return {
     ...reply,
     content:
-      Object.keys(reply.content).length > 1 ? reply.content : reply.content.value ?? reply.content,
+      Object.keys(reply.content).length > 1
+        ? reply.content
+        : (reply.content.value ?? reply.content),
   };
 }
 
@@ -572,8 +574,8 @@ function mapProfileValues<T extends ProfileFragment>(profile: T) {
           [
             p.field.alias,
             p.field.type === "FILE"
-              ? p.files?.map((f) => ({ id: f.id, ...f.file })) ?? null
-              : p.value?.content?.value ?? null,
+              ? (p.files?.map((f) => ({ id: f.id, ...f.file })) ?? null)
+              : (p.value?.content?.value ?? null),
           ] as const,
       ),
       Object.fromEntries,

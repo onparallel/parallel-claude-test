@@ -1556,7 +1556,7 @@ export class PetitionRepository extends BaseRepository {
         {
           org_id: user.org_id,
           document_organization_theme_id: defaultDocumentTheme.id,
-          status: data.is_template ? null : data.status ?? "DRAFT",
+          status: data.is_template ? null : (data.status ?? "DRAFT"),
           variables: this.json(data.variables ?? []),
           custom_lists: this.json(data.custom_lists ?? []),
           ...omit(data, ["status", "variables", "custom_lists"]),
@@ -1993,9 +1993,9 @@ export class PetitionRepository extends BaseRepository {
                     clonedFields.find((f) => f.originalFieldId === id)?.cloned.id ?? id,
                 ),
                 date: isDefined(field.options.autoSearchConfig.date)
-                  ? clonedFields.find(
+                  ? (clonedFields.find(
                       (f) => f.originalFieldId === field.options.autoSearchConfig.date,
-                    )?.cloned.id ?? field.options.autoSearchConfig.date
+                    )?.cloned.id ?? field.options.autoSearchConfig.date)
                   : null,
               },
             },
@@ -3194,7 +3194,7 @@ export class PetitionRepository extends BaseRepository {
           newPetitionId: cloned.id,
           createdBy,
           fromPetitionFieldId:
-            data.is_template ?? sourcePetition.is_template
+            (data.is_template ?? sourcePetition.is_template)
               ? this.knex.raw(`null`)
               : sourcePetition.is_template
                 ? this.knex.raw(`apf.id`)
@@ -3223,7 +3223,7 @@ export class PetitionRepository extends BaseRepository {
             // if cloning a petition clone, the is_subscribed from the original
             is_subscribed: sourcePetition.is_template
               ? true
-              : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
+              : (userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true),
             created_by: createdBy,
             updated_by: createdBy,
           },
@@ -4074,8 +4074,8 @@ export class PetitionRepository extends BaseRepository {
       return keys.map((id) => {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
         return id.loadInternalComments
-          ? comments[0] ?? null
-          : comments.filter((c) => c.is_internal === false)[0] ?? null;
+          ? (comments[0] ?? null)
+          : (comments.filter((c) => c.is_internal === false)[0] ?? null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
@@ -4114,8 +4114,8 @@ export class PetitionRepository extends BaseRepository {
       return keys.map((key) => {
         const comments = this.sortComments(byId[key.petitionId] ?? []);
         return key.loadInternalComments
-          ? comments[0] ?? null
-          : comments.filter((c) => c.is_internal === false)[0] ?? null;
+          ? (comments[0] ?? null)
+          : (comments.filter((c) => c.is_internal === false)[0] ?? null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "loadInternalComments"]) },
@@ -7322,7 +7322,7 @@ export class PetitionRepository extends BaseRepository {
       groupBy(petitionsWithStats, (p) => p.from_template_id ?? 0),
     ).map((group) => {
       const template = isDefined(group[0].from_template_id)
-        ? templates.find((t) => t.id === group[0].from_template_id) ?? null
+        ? (templates.find((t) => t.id === group[0].from_template_id) ?? null)
         : null;
       return [template, group] as const;
     });
@@ -7668,7 +7668,7 @@ export class PetitionRepository extends BaseRepository {
       );
       const messages = await this.createMessages(
         petition.id,
-        args.skipEmailSend ? null : args.scheduledAt ?? null,
+        args.skipEmailSend ? null : (args.scheduledAt ?? null),
         accesses.map((access) => ({
           petition_access_id: access.id,
           status: args.skipEmailSend ? "PROCESSED" : args.scheduledAt ? "SCHEDULED" : "PROCESSING",

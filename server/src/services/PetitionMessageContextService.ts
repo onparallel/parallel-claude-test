@@ -168,8 +168,8 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
           return fullName(user?.first_name, user?.last_name)!;
         case "petition-title":
           return options?.publicContext
-            ? originalMessage?.email_subject ?? ""
-            : petition?.name ?? "";
+            ? (originalMessage?.email_subject ?? "")
+            : (petition?.name ?? "");
         default:
           return "";
       }
