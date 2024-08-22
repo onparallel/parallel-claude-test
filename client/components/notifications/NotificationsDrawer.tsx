@@ -42,6 +42,9 @@ export function NotificationsDrawer() {
   ] = useLazyQuery(NotificationsDrawer_notificationsDocument, {
     pollInterval: POLL_INTERVAL,
     notifyOnNetworkStatusChange: true,
+    variables: {
+      limit: NOTIFICATIONS_LIMIT,
+    },
   });
   const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
   const filterRef = useRef<Focusable>(null);
