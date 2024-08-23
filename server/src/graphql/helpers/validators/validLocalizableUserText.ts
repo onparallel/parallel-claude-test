@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ArgValidationError } from "../errors";
 import { LocalizableUserText } from "../scalars/LocalizableUserText";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
@@ -11,7 +11,7 @@ export function validLocalizableUserText<TypeName extends string, FieldName exte
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
-    if (isDefined(value)) {
+    if (isNonNullish(value)) {
       const keys = Object.keys(value) as (keyof LocalizableUserText)[];
       if (keys.length === 0) {
         throw new ArgValidationError(

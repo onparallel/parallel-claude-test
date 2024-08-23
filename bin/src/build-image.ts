@@ -15,7 +15,7 @@ import {
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
@@ -102,7 +102,7 @@ async function main() {
       chalk.italic`Instance {yellow pending}. Waiting 10 more seconds...`,
       10_000,
     );
-    assert(isDefined(ipAddress));
+    assert(isNonNullish(ipAddress));
     console.log(chalk`Instance {green ✓ running}`);
     await waitForInstance(ipAddress);
     console.log("Uploading build script to the new instance.");

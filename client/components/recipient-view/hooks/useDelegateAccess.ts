@@ -1,9 +1,9 @@
-import { useTone } from "@parallel/components/common/ToneProvider";
-import { useDelegateAccessDialog } from "../dialogs/DelegateAccessDialog";
 import { gql, useMutation } from "@apollo/client";
 import { useToast } from "@chakra-ui/react";
-import { useIntl } from "react-intl";
+import { useTone } from "@parallel/components/common/ToneProvider";
 import { useDelegateAccess_publicDelegateAccessToContactDocument } from "@parallel/graphql/__types";
+import { useIntl } from "react-intl";
+import { useDelegateAccessDialog } from "../dialogs/DelegateAccessDialog";
 
 export function useDelegateAccess() {
   const intl = useIntl();

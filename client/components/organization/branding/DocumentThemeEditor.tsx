@@ -25,7 +25,7 @@ import { untranslated } from "@parallel/utils/untranslated";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined, sort } from "remeda";
+import { isNonNullish, sort } from "remeda";
 import fonts from "../../../utils/fonts.json";
 
 interface DocumentThemeEditorProps {
@@ -72,7 +72,7 @@ export function DocumentThemeEditor({
 
   useEffect(() => {
     const { unsubscribe } = watch((data, { name }) => {
-      if (name === "marginLeft" && isDefined(data["marginLeft"])) {
+      if (name === "marginLeft" && isNonNullish(data["marginLeft"])) {
         setValue("marginRight", data["marginLeft"]);
       }
     });

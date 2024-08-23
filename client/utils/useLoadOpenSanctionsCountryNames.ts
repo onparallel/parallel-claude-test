@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useLoadCountryNames } from "./useLoadCountryNames";
 
 const OTHER_COUNTRIES: Record<string, Record<string, string>> = {
@@ -60,7 +60,7 @@ export function isOpenSanctionsCountryCode(code: string) {
 export function useLoadOpenSanctionsCountryNames(locale: string) {
   const data = useLoadCountryNames(locale);
   return useMemo(() => {
-    if (isDefined(data.countries)) {
+    if (isNonNullish(data.countries)) {
       return {
         ...data,
         countries: {

@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
 
 export async function sendFromDatabase(
@@ -7,5 +7,5 @@ export async function sendFromDatabase(
   },
   context: WorkerContext,
 ) {
-  return (await context.emailLogs.loadEmailLog(payload.email_log_id)).filter(isDefined);
+  return (await context.emailLogs.loadEmailLog(payload.email_log_id)).filter(isNonNullish);
 }

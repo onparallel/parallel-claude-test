@@ -1,8 +1,8 @@
+import { Text } from "@chakra-ui/react";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { PetitionFieldVisibilityType } from "@parallel/utils/fieldLogic/types";
 import { useIntl } from "react-intl";
 import { SimpleSelect, SimpleSelectProps } from "../../common/SimpleSelect";
-import { Text } from "@chakra-ui/react";
 
 export function PetitionFieldVisibilityTypeSelect({
   value,

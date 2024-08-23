@@ -20,6 +20,8 @@ import {
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   SimpleSelect,
   SimpleSelectProps,
@@ -27,10 +29,8 @@ import {
 } from "@parallel/components/common/SimpleSelect";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
+import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import {
   ProfileTypeFieldPermissionType,
   UpdateProfileTypeFieldPermissionInput,
@@ -38,8 +38,8 @@ import {
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
   useProfileTypeFieldPermissionDialog_UserFragment,
   useProfileTypeFieldPermissionDialog_UserGroupFragment,
-  useProfileTypeFieldPermissionDialog_usersDocument,
   useProfileTypeFieldPermissionDialog_userGroupsDocument,
+  useProfileTypeFieldPermissionDialog_usersDocument,
 } from "@parallel/graphql/__types";
 import { assertTypename, isTypename } from "@parallel/utils/apollo/typename";
 import { Focusable } from "@parallel/utils/types";

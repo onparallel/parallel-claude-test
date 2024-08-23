@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
@@ -11,7 +12,6 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../../components/PetitionFieldAndCommentsList";
 import { closing, greetingContact } from "../../components/texts";
-import { isDefined } from "remeda";
 
 type CommentsContactNotificationProps = {
   contactFullName: string;
@@ -51,7 +51,7 @@ const email: Email<CommentsContactNotificationProps> = {
   ) {
     const commentCount = fieldsWithComments.reduce((acc, { comments }) => acc + comments.length, 0);
 
-    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+    const firstFieldWithCommentsId = isNonNullish(fieldsWithComments[0].field)
       ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
       : "general";
 
@@ -91,7 +91,7 @@ const email: Email<CommentsContactNotificationProps> = {
   }: CommentsContactNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fieldsWithComments.reduce((acc, { comments }) => acc + comments.length, 0);
-    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+    const firstFieldWithCommentsId = isNonNullish(fieldsWithComments[0].field)
       ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
       : "general";
 

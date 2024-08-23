@@ -2,6 +2,7 @@ import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -11,15 +12,14 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComponentPropsWithRef, forwardRef, MouseEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+  RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 export interface RecipientViewPetitionFieldNumberProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
@@ -60,8 +60,8 @@ export function RecipientViewPetitionFieldNumber({
 
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
-  const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
-  const isSuffix = isDefined(suffix);
+  const hasPrefix = isNonNullish(prefix) || isNonNullish(suffix) ? true : false;
+  const isSuffix = isNonNullish(suffix);
   const prefixValue = isSuffix ? suffix : prefix;
 
   const defaultPlaceholder = hasPrefix
@@ -89,7 +89,7 @@ export function RecipientViewPetitionFieldNumber({
   }
 
   async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
-    if (isDefined(value)) {
+    if (isNonNullish(value)) {
       event.preventDefault();
       handleAddNewReply();
       await handleCreate.immediateIfPending(value, false);
@@ -179,7 +179,7 @@ export function RecipientViewPetitionFieldNumber({
     ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id] || isInvalid || hasAlreadyRepliedError,
-    onlyPositive: isDefined(range.min) && range.min >= 0,
+    onlyPositive: isNonNullish(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     prefix,
     suffix,
@@ -187,7 +187,7 @@ export function RecipientViewPetitionFieldNumber({
       if (
         isMetaReturn(event) &&
         field.multiple &&
-        isDefined(value) &&
+        isNonNullish(value) &&
         isBetweenLimits(range, value)
       ) {
         await handleCreate.immediate(value, true);
@@ -202,7 +202,7 @@ export function RecipientViewPetitionFieldNumber({
       }
     },
     onBlur: async () => {
-      if (!isDefined(value)) {
+      if (isNullish(value)) {
         handleInvalidReply(field.id, false);
       } else if (!isBetweenLimits(range, value)) {
         handleInvalidReply(field.id, true);
@@ -212,14 +212,14 @@ export function RecipientViewPetitionFieldNumber({
         setShowNewReply(false);
       }
       if (
-        (field.replies.length > 0 && !isDefined(value)) ||
-        (isDefined(value) && isBetweenLimits(range, value))
+        (field.replies.length > 0 && isNullish(value)) ||
+        (isNonNullish(value) && isBetweenLimits(range, value))
       ) {
         setShowNewReply(false);
       }
     },
     onChange: (value) => {
-      if (!isDefined(value)) {
+      if (isNullish(value)) {
         setValue(undefined);
         handleCreate.clear();
       } else {
@@ -236,9 +236,9 @@ export function RecipientViewPetitionFieldNumber({
     placeholder: placeholder ?? defaultPlaceholder,
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
-  const hasRange = isDefined(range.min) || isDefined(range.max);
+  const hasRange = isNonNullish(range.min) || isNonNullish(range.max);
 
-  const isInvalidValue = !isDefined(value) || !isBetweenLimits(range, value!);
+  const isInvalidValue = isNullish(value) || !isBetweenLimits(range, value!);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -258,21 +258,21 @@ export function RecipientViewPetitionFieldNumber({
         >
           {hasRange ? (
             <>
-              {isDefined(range.min) && !isDefined(range.max) ? (
+              {isNonNullish(range.min) && isNullish(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-description"
                   defaultMessage="Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
                   values={{ min: range.min, multiple: field.multiple }}
                 />
               ) : null}
-              {isDefined(range.max) && !isDefined(range.min) ? (
+              {isNonNullish(range.max) && isNullish(range.min) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-max-description"
                   defaultMessage="Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
                   values={{ max: range.max, multiple: field.multiple }}
                 />
               ) : null}
-              {isDefined(range.min) && isDefined(range.max) ? (
+              {isNonNullish(range.min) && isNonNullish(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-max-description"
                   defaultMessage="Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
@@ -361,8 +361,8 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
 ) {
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
-  const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
-  const isSuffix = isDefined(suffix);
+  const hasPrefix = isNonNullish(prefix) || isNonNullish(suffix) ? true : false;
+  const isSuffix = isNonNullish(suffix);
   const prefixValue = isSuffix ? suffix : prefix;
 
   const intl = useIntl();
@@ -401,7 +401,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
-    onlyPositive: isDefined(range.min) && range.min >= 0,
+    onlyPositive: isNonNullish(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     paddingInlineEnd: 10,
     onKeyDown: async (event) => {
@@ -414,20 +414,20 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       }
     },
     onBlur: async () => {
-      if (isDefined(value) && value !== reply.content.value) {
+      if (isNonNullish(value) && value !== reply.content.value) {
         if (isBetweenLimits(range, value)) {
           await debouncedUpdateReply.immediate(value);
         } else {
           setIsInvalid(true);
         }
-      } else if (!isDefined(value)) {
+      } else if (isNullish(value)) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
     onChange: (value) => {
       setValue(value);
-      if (isDefined(value)) {
+      if (isNonNullish(value)) {
         setIsInvalid(!isBetweenLimits(range, value));
       }
     },

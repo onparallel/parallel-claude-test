@@ -3,7 +3,7 @@ import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind, ValueNode } 
 import { Maybe } from "graphql/jsutils/Maybe";
 import { ObjMap } from "graphql/jsutils/ObjMap";
 import { arg, core, scalarType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"];
 
@@ -37,14 +37,14 @@ function ensureDuration(value: any, strict: boolean): _Duration {
   }
   if (strict) {
     const unknownKey = Object.keys(value).find((key) => !(KEYS as string[]).includes(key));
-    if (isDefined(unknownKey)) {
+    if (isNonNullish(unknownKey)) {
       throw new Error(
         `Value is not a valid Duration: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
       );
     }
   }
   return Object.fromEntries(
-    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value !== 0),
+    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isNonNullish(value) && value !== 0),
   );
 }
 

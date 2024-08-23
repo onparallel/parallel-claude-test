@@ -20,14 +20,14 @@ import {
 import { usePetitionSummaryBackgroundTask } from "@parallel/utils/tasks/usePetitionSummaryBackgroundTask";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MarkdownRender } from "../common/MarkdownRender";
+import { ScrollShadows } from "../common/ScrollShadows";
 import { SupportButton } from "../common/SupportButton";
 import { SupportLink } from "../common/SupportLink";
-import { ScrollShadows } from "../common/ScrollShadows";
 
 interface PetitionRepliesSummaryProps {
   petition: PetitionRepliesSummary_PetitionFragment;
@@ -41,7 +41,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
 
   const request = petition.latestSummaryRequest;
   const summary =
-    !isLoading && request?.status !== "PENDING" && isDefined(request?.completion)
+    !isLoading && request?.status !== "PENDING" && isNonNullish(request?.completion)
       ? request!.completion
       : null;
 
@@ -156,9 +156,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
               onClick={handleRegenerateSummary}
               icon={<RepeatIcon />}
               isDisabled={
-                petition.isAnonymized ||
-                !user.hasSummaryAccess ||
-                !isDefined(petition.summaryConfig)
+                petition.isAnonymized || !user.hasSummaryAccess || isNullish(petition.summaryConfig)
               }
             />
           </HStack>
@@ -177,9 +175,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
               colorScheme="primary"
               onClick={handleGenerateSummary}
               isDisabled={
-                petition.isAnonymized ||
-                !user.hasSummaryAccess ||
-                !isDefined(petition.summaryConfig)
+                petition.isAnonymized || !user.hasSummaryAccess || isNullish(petition.summaryConfig)
               }
             >
               <FormattedMessage

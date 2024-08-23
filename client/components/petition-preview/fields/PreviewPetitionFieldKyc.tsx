@@ -1,11 +1,4 @@
 import { gql } from "@apollo/client";
-import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
-import { FormattedMessage } from "react-intl";
-import {
-  RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
-  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
-} from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
 import {
   Box,
   Button,
@@ -30,6 +23,7 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
+import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
 import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
@@ -38,8 +32,13 @@ import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
-import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
+import {
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+} from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 export interface PreviewPetitionFieldKycProps
   extends Omit<
@@ -84,7 +83,7 @@ export function PreviewPetitionFieldKyc({
   const browserTabRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (isDefined(browserTabRef.current) && browserTabRef.current.closed) {
+      if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
@@ -99,7 +98,7 @@ export function PreviewPetitionFieldKyc({
     "message",
     (e) => {
       const browserTab = browserTabRef.current;
-      if (isDefined(browserTab) && e.source === browserTab && e.data === "refresh") {
+      if (isNonNullish(browserTab) && e.source === browserTab && e.data === "refresh") {
         onRefreshField();
       }
     },

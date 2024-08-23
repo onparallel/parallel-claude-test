@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ResponseWrapper } from "./core";
 
 interface ErrorBody {
@@ -113,7 +113,7 @@ export class InvalidParameterError extends HttpError {
       InvalidParameterError.status,
       InvalidParameterError.code,
       `Invalid ${location} parameter ${JSON.stringify(name)} with value ${
-        isDefined(value) ? JSON.stringify(value) : "<missing parameter>"
+        isNonNullish(value) ? JSON.stringify(value) : "<missing parameter>"
       }: ${message}`,
     );
   }

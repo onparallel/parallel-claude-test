@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ContactLocale, ContactLocaleValues } from "../../db/__types";
 import {
   EnhancedOrgIntegration,
@@ -63,7 +63,7 @@ export class SignaturitIntegration extends GenericIntegration<
           return { locale, tone, brandingId: settings[key]! };
         }
       }),
-    ).filter(isDefined);
+    ).filter(isNonNullish);
     const apiKey = settings.CREDENTIALS.API_KEY;
     return {
       apiKeyHint: apiKey.slice(0, 10),

@@ -36,18 +36,18 @@ import {
   Tone,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import Color from "color";
 import { useMemo, useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { sort } from "remeda";
 import fonts from "../../../utils/webSafeFonts.json";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
-import { sort } from "remeda";
 
 interface BrandingGeneralProps {
   user: BrandingGeneral_UserFragment;

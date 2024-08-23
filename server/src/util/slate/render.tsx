@@ -1,5 +1,5 @@
 import { Fragment, ReactNode, createElement } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 import { renderToString } from "react-dom/server";
 import { paragraphIsEmpty } from "./utils";
@@ -106,7 +106,7 @@ export function renderSlateToReactNodes(
         );
       }
       default:
-        if (isDefined(opts.override[node.type])) {
+        if (isNonNullish(opts.override[node.type])) {
           return opts.override[node.type](node);
         } else {
           return null;
@@ -182,7 +182,7 @@ export function renderSlateToText(nodes: SlateNode[], options?: Partial<RenderSl
         case "link":
           return `${node.children.map((child) => render(child, node)).join("")}`;
         default:
-          if (isDefined(opts.override[node.type])) {
+          if (isNonNullish(opts.override[node.type])) {
             return opts.override[node.type](node);
           } else {
             return "";

@@ -5,7 +5,7 @@ import {
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PetitionFieldIndex } from "./fieldIndices";
 import { FieldOptions } from "./petitionFields";
 
@@ -132,7 +132,7 @@ export function validatePetitionFields<T extends PartialField>(
   const dynamicSelectFieldsWithoutOptions = fieldsWithIndices.filter(([field]) => {
     if (field.type === "DYNAMIC_SELECT") {
       const { file } = field.options as FieldOptions["DYNAMIC_SELECT"];
-      return !isDefined(file);
+      return isNullish(file);
     }
     return false;
   });
@@ -156,7 +156,7 @@ export function validatePetitionFields<T extends PartialField>(
   const numberFieldsWithInvalidLimits = fieldsWithIndices.filter(([field]) => {
     if (field.type === "NUMBER") {
       const { range } = field.options as FieldOptions["NUMBER"];
-      return isDefined(range.min) && isDefined(range.max) && range.min > range.max;
+      return isNonNullish(range.min) && isNonNullish(range.max) && range.min > range.max;
     }
     return false;
   });

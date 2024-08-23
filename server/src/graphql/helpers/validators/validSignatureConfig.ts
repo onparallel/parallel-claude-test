@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { isValidTimezone } from "../../../util/time";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
@@ -19,7 +19,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
-        !isDefined(integration) ||
+        isNullish(integration) ||
         integration.type !== "SIGNATURE" ||
         !integration.is_enabled ||
         integration.org_id !== ctx.user!.org_id
@@ -38,7 +38,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         );
       }
 
-      if (isDefined(instructions) && instructions.length > 300) {
+      if (isNonNullish(instructions) && instructions.length > 300) {
         throw new ArgValidationError(
           info,
           `${argName}.instructions`,

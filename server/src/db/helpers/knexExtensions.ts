@@ -1,6 +1,6 @@
+import ASCIIFolder from "fold-to-ascii";
 import { Knex, knex } from "knex";
 import { escapeLike } from "./utils";
-import ASCIIFolder from "fold-to-ascii";
 
 (knex as any).QueryBuilder.extend("whereSearch", function <
   TRecord extends {} = any,

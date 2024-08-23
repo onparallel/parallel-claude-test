@@ -27,7 +27,7 @@ import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionCompo
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { intersection, isDefined } from "remeda";
+import { intersection, isNonNullish, isNullish } from "remeda";
 import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
 import { useEditPetitionFieldCalculationsDialog } from "./dialogs/EditPetitionFieldCalculationsDialog";
@@ -200,9 +200,9 @@ export const PetitionComposeFieldList = Object.assign(
           } else {
             const index = fields.findIndex((f) => f.id === field.id);
 
-            const prevField = isDefined(field.parent)
+            const prevField = isNonNullish(field.parent)
               ? fields[index - 1]
-              : fields.slice(0, index).findLast((f) => !isDefined(f.parent))!;
+              : fields.slice(0, index).findLast((f) => isNullish(f.parent))!;
 
             // if the previous field has a visibility setting copy it
             if (prevField.visibility) {
@@ -376,7 +376,8 @@ export const PetitionComposeFieldList = Object.assign(
                   index={i}
                   isActive={field.id === activeFieldId}
                   activeChildFieldId={
-                    isDefined(field.children) && field.children.some((f) => f.id === activeFieldId)
+                    isNonNullish(field.children) &&
+                    field.children.some((f) => f.id === activeFieldId)
                       ? activeFieldId
                       : null
                   }

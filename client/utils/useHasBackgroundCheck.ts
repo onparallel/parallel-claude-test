@@ -1,13 +1,13 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { useHasBackgroundCheck_MeDocument } from "@parallel/graphql/__types";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { useConstant } from "./useConstant";
 
 export function useHasBackgroundCheck() {
   const client = useApolloClient();
   const hasBackgroundCheck = useConstant(() => {
     const data = client.readQuery({ query: useHasBackgroundCheck_MeDocument });
-    if (!isDefined(data)) {
+    if (isNullish(data)) {
       throw new Error("me.hasBackgroundCheck missing on cache");
     }
     return data!.me.hasBackgroundCheck;

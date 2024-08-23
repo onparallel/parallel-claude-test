@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import {
   ELEMENT_PLACEHOLDER,
   PlaceholderElement,
@@ -42,7 +42,7 @@ export function textWithPlaceholderToSlateNodes(
     for (const part of parts) {
       if (part.type === "placeholder") {
         const placeholder = placeholders.find((p) => p.key === part.value);
-        if (isDefined(placeholder)) {
+        if (isNonNullish(placeholder)) {
           children.push({
             type: ELEMENT_PLACEHOLDER,
             placeholder: placeholder.key,

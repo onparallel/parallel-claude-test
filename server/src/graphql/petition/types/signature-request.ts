@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
@@ -100,7 +100,7 @@ export const PetitionSignatureRequest = objectType({
       resolve: (o) => {
         // expose error message only for specific errors
         return o.cancel_reason === "REQUEST_ERROR" &&
-          isDefined(o.cancel_data?.error_code) &&
+          isNonNullish(o.cancel_data?.error_code) &&
           ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
             o.cancel_data.error_code,
           ) &&

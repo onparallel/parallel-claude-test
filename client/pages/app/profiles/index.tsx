@@ -83,7 +83,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -196,7 +196,7 @@ function Profiles() {
     navigate(`/app/profiles/${row.id}`, event);
   }, []);
 
-  const hasMultipleProfileTypes = isDefined(queryState.type) && queryState.type.length > 1;
+  const hasMultipleProfileTypes = isNonNullish(queryState.type) && queryState.type.length > 1;
 
   const profileType =
     queryState.type && queryState.type.length === 1
@@ -304,7 +304,7 @@ function Profiles() {
                       id: "page.profiles.multiple-profile-types",
                       defaultMessage: "Multiple types",
                     })
-                  : isDefined(profileType)
+                  : isNonNullish(profileType)
                     ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
                     : intl.formatMessage({
                         id: "page.profiles.all-profiles",

@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import * as redis from "redis";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 
 export interface IRedis {
@@ -66,7 +66,7 @@ export class Redis implements IRedis {
   }
 
   async set(key: string, value: string, duration?: number) {
-    if (isDefined(duration)) {
+    if (isNonNullish(duration)) {
       await this.client.set(key, value, { EX: duration });
     } else {
       await this.client.set(key, value);

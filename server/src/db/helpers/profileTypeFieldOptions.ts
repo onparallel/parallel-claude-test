@@ -3,7 +3,7 @@ import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
-import { difference, isDefined, unique } from "remeda";
+import { difference, isNonNullish, unique } from "remeda";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
 import { ProfileTypeField, ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
 
@@ -190,7 +190,7 @@ export async function validateProfileTypeFieldOptions(
   // make sure user has access to the referenced profileTypeFields in BACKGROUND_CHECK options
   if (type === "BACKGROUND_CHECK") {
     const opts = options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
-    if (isDefined(opts.monitoring?.activationCondition?.profileTypeFieldId)) {
+    if (isNonNullish(opts.monitoring?.activationCondition?.profileTypeFieldId)) {
       const profileTypeField = await ctx.loadProfileTypeField(
         opts.monitoring.activationCondition.profileTypeFieldId,
       );
@@ -265,7 +265,7 @@ const EU_COUNTRIES =
 export async function profileTypeFieldSelectValues(
   options: ProfileTypeFieldOptions["SELECT"],
 ): Promise<ProfileTypeFieldOptions["SELECT"]["values"]> {
-  if (isDefined(options.standardList)) {
+  if (isNonNullish(options.standardList)) {
     switch (options.standardList) {
       case "COUNTRIES": {
         const countriesByLocale = Object.fromEntries(
@@ -348,7 +348,7 @@ export async function profileTypeFieldSelectValues(
                   code as keyof (typeof currenciesByUserLocale)["en"]
                 ] ?? currenciesByUserLocale["en"][code]; // VED currency is missing in es, ca, it, pt. fallback to en for this case
 
-              return [locale, label.filter(isDefined).join(" - ")];
+              return [locale, label.filter(isNonNullish).join(" - ")];
             }),
           ) as Record<UserLocale, string>,
           isStandard: true,

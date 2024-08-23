@@ -23,8 +23,8 @@ import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import {
   BarElement,
   CategoryScale,
-  Chart as ChartJS,
   ChartData,
+  Chart as ChartJS,
   ChartOptions,
   Legend,
   LinearScale,
@@ -34,7 +34,7 @@ import {
 import { useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface CalculatedData {
   id: string;
@@ -561,7 +561,7 @@ function useDownloadConversionReportExcel() {
         },
         {
           templateId,
-          range: isDefined(range)
+          range: isNonNullish(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
         },

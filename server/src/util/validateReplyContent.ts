@@ -1,5 +1,5 @@
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { difference, isDefined } from "remeda";
+import { difference, isNonNullish, isNullish } from "remeda";
 import { PetitionField } from "../db/__types";
 import { selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
@@ -110,7 +110,7 @@ export async function validateReplyContent(
           `Reply exceeds max length allowed of ${maxLength} chars.`,
         );
       }
-      if (isDefined(field.options.format)) {
+      if (isNonNullish(field.options.format)) {
         if (!(await validateShortTextFormat(content.value, field.options.format))) {
           throw new ValidateReplyContentError(
             "INVALID_FORMAT",
@@ -251,7 +251,7 @@ export async function validateReplyContent(
       }
       if (
         !("petitionFieldReplyId" in content) ||
-        !isDefined(content.petitionFieldReplyId) ||
+        isNullish(content.petitionFieldReplyId) ||
         !isGlobalId(content.petitionFieldReplyId, "PetitionFieldReply")
       ) {
         throw new ValidateReplyContentError(

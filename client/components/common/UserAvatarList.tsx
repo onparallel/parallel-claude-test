@@ -6,8 +6,8 @@ import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
 } from "@parallel/graphql/__types";
-import { UserGroupReference } from "./UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
+import { UserGroupReference } from "./UserGroupReference";
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {

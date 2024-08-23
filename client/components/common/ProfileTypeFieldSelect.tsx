@@ -17,7 +17,7 @@ import {
   components,
 } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { localizableUserTextRender } from "./LocalizableUserTextRender";
 
@@ -81,10 +81,10 @@ export function ProfileTypeFieldSelect<
         label,
       };
     });
-    if (isDefined(filterFields)) {
+    if (isNonNullish(filterFields)) {
       options = options.filter(({ field }) => filterFields(field));
     }
-    if (isDefined(suggestedPropertyName)) {
+    if (isNonNullish(suggestedPropertyName)) {
       options.push({
         type: "SUGGESTION",
         field: {} as any,

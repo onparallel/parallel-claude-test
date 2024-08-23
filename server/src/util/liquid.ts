@@ -1,9 +1,9 @@
+import { format as formatDate, startOfToday } from "date-fns";
 import { Liquid } from "liquidjs";
 import { IntlShape } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { DateLiquidValue, DateTimeLiquidValue } from "../pdf/utils/liquid/LiquidValue";
 import { FORMATS, prettifyTimezone } from "./dates";
-import { startOfToday, format as formatDate } from "date-fns";
 
 export function createLiquid() {
   const engine = new Liquid({ cache: true });
@@ -129,7 +129,7 @@ export function createLiquid() {
       if (value === undefined) {
         return "";
       }
-      if (!isDefined(format) || !["LL", "L", "ISO"].includes(format)) {
+      if (isNullish(format) || !["LL", "L", "ISO"].includes(format)) {
         format = "LL";
       }
       let _value: string | number | Date | undefined;
@@ -157,7 +157,7 @@ export function createLiquid() {
       if (value === undefined) {
         return "";
       }
-      if (!isDefined(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
+      if (isNullish(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
         format = "LLL";
       }
       let _value: string | number | Date | undefined;

@@ -1,5 +1,4 @@
 import { Knex } from "knex";
-import { isDefined } from "remeda";
 
 const validEnvironments = ["local", "staging", "production"];
 
@@ -25,7 +24,7 @@ const encryptedCredentialsMap: { [key: string]: Record<string, string> } = {
 export async function up(knex: Knex): Promise<void> {
   return;
   const environment = process.env.MIGRATION_ENV ?? "local";
-  if (!isDefined(environment) || !validEnvironments.includes(environment)) {
+  if (isNullish(environment) || !validEnvironments.includes(environment)) {
     throw new Error(
       `run this migration as: MIGRATION_ENV=<env> yarn migrate. <env>: ${validEnvironments.join(
         " | ",

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Duration } from "date-fns";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { isDefined, range } from "remeda";
+import { isNonNullish, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
@@ -343,7 +343,7 @@ export class Mocks {
             name: faker.word.words(),
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
-            ...(isDefined(rest.variables)
+            ...(isNonNullish(rest.variables)
               ? { ...rest, variables: this.knex.raw(`?::jsonb`, JSON.stringify(rest.variables)) }
               : rest),
           };

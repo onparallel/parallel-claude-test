@@ -9,7 +9,7 @@ import {
   usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { withError } from "../promises/withError";
 
@@ -32,7 +32,7 @@ export function usePublicPrintPdfTask() {
             mutation: usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
             variables: { keycode },
           });
-          if (!isDefined(data)) {
+          if (isNullish(data)) {
             throw new Error();
           }
           return data.publicCreatePrintPdfTask;

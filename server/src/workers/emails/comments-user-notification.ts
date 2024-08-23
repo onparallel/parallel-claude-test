@@ -1,5 +1,5 @@
 import pMap from "p-map";
-import { groupBy, isDefined, sortBy, unique } from "remeda";
+import { groupBy, isNonNullish, sortBy, unique } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsUserNotification from "../../emails/emails/app/PetitionCommentsUserNotification";
@@ -29,14 +29,17 @@ export async function commentsUserNotification(
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
 
-  const comments = _comments.filter(isDefined);
+  const comments = _comments.filter(isNonNullish);
 
-  const fieldIds = unique(comments.map((c) => c!.petition_field_id)).filter(isDefined);
-  const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
+  const fieldIds = unique(comments.map((c) => c!.petition_field_id)).filter(isNonNullish);
+  const _fields = (await context.petitions.loadField(fieldIds)).filter(isNonNullish);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id ?? "null");
 
   const fieldsWithComments = await pMap(
-    [...(isDefined(commentsByField["null"]) ? [null] : []), ...sortBy(_fields, (f) => f.position)],
+    [
+      ...(isNonNullish(commentsByField["null"]) ? [null] : []),
+      ...sortBy(_fields, (f) => f.position),
+    ],
     (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id),
   );
 

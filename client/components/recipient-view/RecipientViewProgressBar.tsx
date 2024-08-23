@@ -1,16 +1,16 @@
 import { gql } from "@apollo/client";
 import {
+  Button,
   Flex,
   HStack,
   Heading,
-  Text,
-  Button,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
+  Text,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -25,7 +25,7 @@ import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion, UnwrapArray } from "@parallel/utils/types";
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
 
@@ -137,7 +137,7 @@ export const RecipientViewProgressBar = Object.assign(
             />
           </ProgressTrack>
         </Flex>
-        {isDefined(onFinalize) ? (
+        {isNonNullish(onFinalize) ? (
           <Popover
             returnFocusOnClose={false}
             isOpen={!isDisabled && replied + optional === total && !isCompleted && !poppoverClosed}

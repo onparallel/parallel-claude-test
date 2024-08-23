@@ -3,7 +3,7 @@ import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { ArcElement, Chart as ChartJS, ChartData, ChartOptions, Legend, Tooltip } from "chart.js";
+import { ArcElement, ChartData, Chart as ChartJS, ChartOptions, Legend, Tooltip } from "chart.js";
 import { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";

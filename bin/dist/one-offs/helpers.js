@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.request = exports.paginatedRequest = void 0;
+exports.paginatedRequest = paginatedRequest;
+exports.request = request;
 /**
  * fetches all items of a paginated endpoint
  */
@@ -22,7 +23,6 @@ async function* paginatedRequest(path, { query = new URLSearchParams(), method =
         offset = index;
     } while (index < totalCount);
 }
-exports.paginatedRequest = paginatedRequest;
 async function request(path, { query, method = "GET", body, }) {
     const res = await fetch(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
         method,
@@ -34,4 +34,3 @@ async function request(path, { query, method = "GET", body, }) {
     });
     return (await res.json());
 }
-exports.request = request;

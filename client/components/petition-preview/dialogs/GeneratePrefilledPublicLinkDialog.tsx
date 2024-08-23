@@ -30,7 +30,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { toCanvas } from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, noop } from "remeda";
 
 export function GeneratePrefilledPublicLinkDialog({
   petitionId,
@@ -60,7 +60,7 @@ export function GeneratePrefilledPublicLinkDialog({
 
   const fieldsWithIndices = useFieldsWithIndices(data).filter(
     ([field]) =>
-      isDefined(field.alias) &&
+      isNonNullish(field.alias) &&
       !isFileTypeField(field.type) &&
       field.type !== "FIELD_GROUP" &&
       !field.isReadOnly &&

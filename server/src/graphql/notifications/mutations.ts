@@ -1,6 +1,6 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { outdent } from "outdent";
-import { isDefined, sortBy } from "remeda";
+import { isNonNullish, sortBy } from "remeda";
 import { PetitionUserNotification } from "../../db/notifications";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -45,7 +45,7 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
         args.petitionUserNotificationIds,
         args.petitionIds,
         args.petitionFieldCommentIds,
-      ].reduce((result, element) => (isDefined(element) ? result + 1 : result), 0);
+      ].reduce((result, element) => (isNonNullish(element) ? result + 1 : result), 0);
 
       if (argCount > 1) {
         throw new ArgValidationError(

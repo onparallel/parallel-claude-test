@@ -18,7 +18,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface SignupFormData {
   email: string;
@@ -269,7 +269,7 @@ export async function getServerSideProps({
   req,
 }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<SignupProps>> {
   const client = createApolloClient({}, { req });
-  if (isDefined(code) && typeof code === "string") {
+  if (isNonNullish(code) && typeof code === "string") {
     try {
       const { data } = await client.query({
         query: Signup_publicLicenseCodeDocument,

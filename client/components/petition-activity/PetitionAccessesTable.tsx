@@ -33,7 +33,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { ContactReference } from "../common/ContactReference";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
@@ -351,7 +351,7 @@ function usePetitionAccessesColumns(): TableColumn<
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
           // if the contact is deleted have no actions
-          if (!isContactless && !isDefined(contact)) return null;
+          if (!isContactless && isNullish(contact)) return null;
 
           if (status === "INACTIVE") {
             const contactHasActiveAccess = petition.accesses.some(
@@ -377,7 +377,7 @@ function usePetitionAccessesColumns(): TableColumn<
 
           return (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
-              {isContactless && isDefined(recipientUrl) ? (
+              {isContactless && isNonNullish(recipientUrl) ? (
                 <CopyToClipboardButton
                   copyLabel={intl.formatMessage({
                     id: "generic.copy-link",

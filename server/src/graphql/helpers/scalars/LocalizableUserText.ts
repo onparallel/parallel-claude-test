@@ -1,6 +1,6 @@
 import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind } from "graphql";
 import { scalarType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { UserLocale, UserLocaleValues } from "../../../db/__types";
 
 export const LOCALIZABLE_USER_TEXT_SCHEMA = {
@@ -37,7 +37,7 @@ function ensureLocalizableUserText(value: any, strict: boolean): LocalizableUser
     const unknownKey = Object.keys(value).find(
       (key) => !(UserLocaleValues as string[]).includes(key),
     );
-    if (isDefined(unknownKey)) {
+    if (isNonNullish(unknownKey)) {
       throw new Error(
         `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
       );
@@ -45,7 +45,7 @@ function ensureLocalizableUserText(value: any, strict: boolean): LocalizableUser
   }
   return Object.fromEntries(
     UserLocaleValues.map((key) => [key, value[key]]).filter(
-      ([, value]) => isDefined(value) && value.length > 0,
+      ([, value]) => isNonNullish(value) && value.length > 0,
     ),
   );
 }

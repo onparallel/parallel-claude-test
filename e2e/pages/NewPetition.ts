@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { openMenu } from "../helpers/chakra/openMenu";
 import { openTab } from "../helpers/chakra/openTab";
 import { fillUserSelect, UserOrGroup } from "../helpers/react-select/fillUserSelect";
@@ -35,7 +35,7 @@ export class NewPetition extends AppLayout {
     await fillUserSelect(this.page, select, usersOrGroups);
     const checkbox = this.page.getByTestId("notify-users-checkbox");
     await checkbox.setChecked(true);
-    if (isDefined(message)) {
+    if (isNonNullish(message)) {
       await this.page.getByTestId("notify-users-message").fill(message);
     }
     await this.page.getByTestId("share-petition-send-button").click();

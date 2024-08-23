@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import pMap from "p-map";
-import { PetitionSignatureConfigSigner } from "../src/db/repositories/PetitionRepository";
 import { PetitionSignatureRequest } from "../src/db/__types";
+import { PetitionSignatureConfigSigner } from "../src/db/repositories/PetitionRepository";
 
 export async function up(knex: Knex): Promise<void> {
   const signatures = await knex

@@ -6,7 +6,7 @@ import { isDialogError } from "@parallel/components/common/dialogs/DialogProvide
 import { PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigDocument } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useConfigureAutomateSearchDialog } from "../../dialogs/ConfigureAutomateSearchDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
@@ -121,7 +121,7 @@ export function PetitionComposeBackgroundCheckSettings({
             </HelpPopover>
           </HStack>
         }
-        isActive={isDefined(options.autoSearchConfig)}
+        isActive={isNonNullish(options.autoSearchConfig)}
         onAdd={() => handleAutomateSearchChange()}
         onRemove={() => handleAutomateSearchChange(true)}
         onConfig={() => handleAutomateSearchChange()}

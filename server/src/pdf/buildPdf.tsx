@@ -1,13 +1,13 @@
-import { renderToStream, Font } from "@react-pdf/renderer";
+import { Font, renderToStream } from "@react-pdf/renderer";
+import hyphen from "hyphen";
 import { createElement } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
+import { isNullish } from "remeda";
+import { ContactLocale } from "../db/__types";
 import { loadMessages } from "../util/loadMessages";
-import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
 import fonts from "./utils/fonts.json";
 import internationalFonts from "./utils/international_fonts.json";
-import { ContactLocale } from "../db/__types";
-import hyphen from "hyphen";
-import { isDefined } from "remeda";
+import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
 
 let hasInit = false;
 
@@ -79,7 +79,7 @@ async function createHyphenationCallback(locale: ContactLocale) {
   const cache = new Map<string, string[]>();
 
   return (word: string | null) => {
-    if (!isDefined(word)) {
+    if (isNullish(word)) {
       return [];
     }
     if (!cache.has(word)) {

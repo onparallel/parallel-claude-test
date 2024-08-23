@@ -9,7 +9,7 @@ import { getOpenSanctionsRelationship } from "@parallel/utils/getOpenSanctionsRe
 import { useRouter } from "next/router";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 
 export function BackgroundCheckEntityDetailsRelationships({
   entityId,
@@ -26,17 +26,17 @@ export function BackgroundCheckEntityDetailsRelationships({
     entityId: string,
     relationship?: BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationshipFragment,
   ) {
-    if (!isDefined(relationship)) {
+    if (isNullish(relationship)) {
       return null;
     }
     let entity: (typeof relationship)["properties"]["entityA"];
     if (
-      isDefined(relationship.properties.entityA) &&
+      isNonNullish(relationship.properties.entityA) &&
       relationship.properties.entityA.id !== entityId
     ) {
       entity = relationship.properties.entityA;
     } else if (
-      isDefined(relationship.properties.entityB) &&
+      isNonNullish(relationship.properties.entityB) &&
       relationship.properties.entityB.id !== entityId
     ) {
       entity = relationship.properties.entityB;
@@ -60,7 +60,7 @@ export function BackgroundCheckEntityDetailsRelationships({
       row: BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationshipFragment,
     ) {
       const entity = getOtherEntity(entityId, row);
-      if (isDefined(entity)) {
+      if (isNonNullish(entity)) {
         const { token, name, date, type, readonly } = query;
         router.push(
           `/app/background-check/${entity.id}?${new URLSearchParams({

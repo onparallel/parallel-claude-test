@@ -5,7 +5,7 @@ import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
 import { GreetingUser } from "../../components/Greeting";
 import { Layout, LayoutProps } from "../../components/Layout";
-import { greetingUser, closing } from "../../components/texts";
+import { closing, greetingUser } from "../../components/texts";
 
 export type AppsumoActivateAccountProps = {
   redirectUrl: string;

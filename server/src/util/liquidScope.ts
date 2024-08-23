@@ -1,5 +1,6 @@
+import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { PetitionField } from "../db/__types";
 import {
   DateLiquidValue,
@@ -9,7 +10,6 @@ import {
 import { getFieldsWithIndices } from "./fieldIndices";
 import { FieldLogicResult } from "./fieldLogic";
 import { isFileTypeField } from "./isFileTypeField";
-import { Drop } from "liquidjs";
 
 interface InnerPetitionFieldLiquidScope
   extends Pick<PetitionField, "type" | "multiple" | "alias" | "options"> {
@@ -48,7 +48,7 @@ function getReplyValue(
     case "SELECT":
       // in case of standard SELECT lists, this options will already have it correctly filled, as it comes from a graphql query
       const options = field.options as { labels?: string[]; values: string[] };
-      if (isDefined(options.labels)) {
+      if (isNonNullish(options.labels)) {
         const label =
           zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
         return new WithLabelLiquidValue(intl, content, label);
@@ -57,7 +57,7 @@ function getReplyValue(
       }
     case "CHECKBOX": {
       const options = field.options as { labels?: string[]; values: string[] };
-      if (isDefined(options.labels)) {
+      if (isNonNullish(options.labels)) {
         return (content.value ?? []).map((value: string) => {
           const label =
             zip(options.labels!, options.values).find(([, v]) => v === value)?.[0] ?? "";
@@ -88,13 +88,13 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
         )) {
           const values = _replies.map((r) => getReplyValue(field, r.content, intl));
           scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
-          if (isDefined(field.alias)) {
+          if (isNonNullish(field.alias)) {
             scope[field.alias] = scope._[fieldIndex];
           }
           const value = field.multiple ? values : values?.[0];
           if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
             reply._[fieldIndex] = value;
-            if (isDefined(field.alias)) {
+            if (isNonNullish(field.alias)) {
               reply[field.alias] = value;
             }
           }
@@ -107,7 +107,7 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
     const value = field.multiple ? values : values?.[0];
     if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
       scope._[fieldIndex] = value;
-      if (isDefined(field.alias)) {
+      if (isNonNullish(field.alias)) {
         scope[field.alias] = value;
       }
     }

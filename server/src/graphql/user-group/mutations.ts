@@ -11,13 +11,13 @@ import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
+import { userHasFeatureFlag } from "../petition/authorizers";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { userGroupCanBeDeleted, userGroupHasType, userHasAccessToUserGroups } from "./authorizers";
 import { validUserGroupPermissionsInput } from "./validations";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { userHasFeatureFlag } from "../petition/authorizers";
 
 export const createUserGroup = mutationField("createUserGroup", {
   description: "Creates a group in the user's organization",

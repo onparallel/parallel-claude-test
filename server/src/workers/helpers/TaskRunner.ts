@@ -1,8 +1,8 @@
 import fastSafeStringify from "fast-safe-stringify";
 import { Readable } from "stream";
 import { WorkerContext } from "../../context";
-import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
 import { TaskName } from "../../db/__types";
+import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
 import { random } from "../../util/token";
 
 export abstract class TaskRunner<T extends TaskName> {

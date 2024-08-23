@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { centeredPopup, openNewWindow } from "./openNewWindow";
 import { useInterval } from "./useInterval";
 import { useWindowEvent } from "./useWindowEvent";
@@ -25,8 +25,8 @@ export function useDocusignConsentPopup() {
     "message",
     (m) => {
       const window = windowRef.current;
-      if (isDefined(window) && m.source === windowRef.current) {
-        if (isDefined(m.data.success)) {
+      if (isNonNullish(window) && m.source === windowRef.current) {
+        if (isNonNullish(m.data.success)) {
           if (m.data.success === true) {
             setIsRunning(false);
             promiseArgsRef.current?.[0]();

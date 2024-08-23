@@ -7,7 +7,7 @@ import {
   isScalarType,
 } from "graphql";
 import { core, dynamicInputMethod, dynamicOutputMethod, plugin } from "nexus";
-import { isDefined, mapValues } from "remeda";
+import { isNonNullish, isNullish, mapValues } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { If, UnwrapArray } from "../../util/types";
 import { ForbiddenError } from "./errors";
@@ -106,11 +106,11 @@ function mapGlobalIds(
   prefixName?: string,
   allowedPrefixes?: string[],
 ): any {
-  if (isDefined(value)) {
+  if (isNonNullish(value)) {
     if (isScalarType(type) && type.name === "GID") {
       try {
         const decoded = fromGlobalId(value, prefixName);
-        if (isDefined(allowedPrefixes) && !allowedPrefixes.includes(decoded.type)) {
+        if (isNonNullish(allowedPrefixes) && !allowedPrefixes.includes(decoded.type)) {
           throw new Error();
         }
         return decoded.id;
@@ -168,10 +168,10 @@ export function globalIdPlugin() {
         const result = await next(root, _args, ctx, info);
         if (config.type === "GID") {
           const prefixName = (fieldConfig.extensions as any)["PREFIX_NAME"] as string;
-          if (!isDefined(result)) {
+          if (isNullish(result)) {
             return result;
           } else if (config.wrapping?.includes("List") && Array.isArray(result)) {
-            return result.map((x) => (isDefined(x) ? toGlobalId(prefixName, x) : null));
+            return result.map((x) => (isNonNullish(x) ? toGlobalId(prefixName, x) : null));
           } else {
             return toGlobalId(prefixName, result as number);
           }

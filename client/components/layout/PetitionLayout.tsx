@@ -32,7 +32,7 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
@@ -114,7 +114,7 @@ export function PetitionLayout({
 
   useTempQueryParam("new", () => {
     setTimeout(() => {
-      if (!isDefined(petition.name)) {
+      if (isNullish(petition.name)) {
         headerRef.current?.focusName();
       }
     });
@@ -123,7 +123,7 @@ export function PetitionLayout({
 
   useConfirmDiscardDraftDialog(petition);
 
-  const drawerIsOpenRef = useUpdatingRef(isDefined(drawer));
+  const drawerIsOpenRef = useUpdatingRef(isNonNullish(drawer));
   const bodyRef = useRef<HTMLDivElement>(null);
   const [drawerIsShown, setDrawerIsShown] = useState(false);
 
@@ -335,7 +335,7 @@ export function usePetitionLayoutContext() {
 export function createUseContextSlice<K extends keyof PetitionLayoutContext>(key: K, name: string) {
   return function () {
     const [state, setState] = usePetitionLayoutContext();
-    if (!isDefined(state)) {
+    if (isNullish(state)) {
       throw new Error(`${name} is being used without using withPetitionLayoutContext`);
     }
     return useStateSlice(state!, setState!, key);
@@ -354,7 +354,7 @@ export function usePetitionStateWrapper() {
   const showError = useErrorDialog();
   const intl = useIntl();
   const [, setState] = usePetitionState();
-  if (!isDefined(setState)) {
+  if (isNullish(setState)) {
     throw new Error(
       "usePetitionStateWrapper is being used without using withPetitionLayoutContext",
     );

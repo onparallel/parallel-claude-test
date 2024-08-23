@@ -17,6 +17,7 @@ import { WithIntl } from "@parallel/components/common/WithIntl";
 import { withProps } from "@parallel/components/common/withProps";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
+import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/template/PetitionTemplateFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
@@ -31,13 +32,12 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isDefined, maxBy, minBy } from "remeda";
+import { isNonNullish, maxBy, minBy } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
 import { usePetitionSignatureStatusLabels } from "./usePetitionSignatureStatusLabels";
 import { usePetitionStatusLabels } from "./usePetitionStatusLabels";
-import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/template/PetitionTemplateFilter";
 
 type PetitionBase = usePetitionsTableColumns_PetitionBaseFragment;
 type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
@@ -175,7 +175,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
         const recipients = (row.accesses ?? [])
-          .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+          .filter((a) => a.status === "ACTIVE" && isNonNullish(a.contact))
           .map((a) => a.contact!);
         if (recipients.length === 0) {
           return null;
@@ -226,8 +226,9 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     Filter: PetitionTemplateFilter,
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
-        return isDefined(row.fromTemplate) ? (
-          isDefined(row.fromTemplate.myEffectivePermission) || row.fromTemplate.isPublicTemplate ? (
+        return isNonNullish(row.fromTemplate) ? (
+          isNonNullish(row.fromTemplate.myEffectivePermission) ||
+          row.fromTemplate.isPublicTemplate ? (
             <OverflownText
               display="block"
               as={Link}
@@ -283,7 +284,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
           }
         : {},
     CellContent: ({ row }) =>
-      row.__typename === "Petition" && isDefined(row.progress) ? (
+      row.__typename === "Petition" && isNonNullish(row.progress) ? (
         <PetitionStatusCellContent petition={row} />
       ) : null,
   },
@@ -332,7 +333,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     align: "left",
     cellProps: { minWidth: "132px" },
     CellContent: ({ row, column }) =>
-      row.__typename === "Petition" && isDefined(row.permissions) ? (
+      row.__typename === "Petition" && isNonNullish(row.permissions) ? (
         <Flex justifyContent={column.align}>
           <UserAvatarList
             usersOrGroups={row.permissions.map((p) =>
@@ -368,7 +369,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     label: (intl) => intl.formatMessage({ id: "generic.created-at", defaultMessage: "Created at" }),
     cellProps: { minWidth: "160px" },
     CellContent: ({ row }) => {
-      return row.__typename === "Petition" && isDefined(row.createdAt) ? (
+      return row.__typename === "Petition" && isNonNullish(row.createdAt) ? (
         <DateTime value={row.createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
       ) : null;
     },
@@ -381,14 +382,14 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         defaultMessage: "Reminders",
       }),
     CellContent: ({ row }) => {
-      if (row.__typename === "Petition" && isDefined(row.accesses)) {
+      if (row.__typename === "Petition" && isNonNullish(row.accesses)) {
         const lastReminderDate = maxBy(
-          row.accesses.map((a) => a.reminders?.[0]?.createdAt).filter(isDefined),
+          row.accesses.map((a) => a.reminders?.[0]?.createdAt).filter(isNonNullish),
           (date) => new Date(date).valueOf(),
         );
 
         const nextReminderAt = minBy(
-          row.accesses.map((a) => a.nextReminderAt).filter(isDefined),
+          row.accesses.map((a) => a.nextReminderAt).filter(isNonNullish),
           (date) => new Date(date).valueOf(),
         );
         const redirect = useGoToPetition();
@@ -402,7 +403,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             }}
             whiteSpace="nowrap"
           >
-            {isDefined(lastReminderDate) ? (
+            {isNonNullish(lastReminderDate) ? (
               <DateTime value={lastReminderDate} format={FORMATS.MMMdd} whiteSpace="nowrap" />
             ) : (
               <Text as="span" textStyle="hint">
@@ -412,7 +413,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                 />
               </Text>
             )}
-            {isDefined(nextReminderAt) ? (
+            {isNonNullish(nextReminderAt) ? (
               <WithIntl>
                 {(intl) => (
                   <SmallPopover
@@ -465,7 +466,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     isFilterable: true,
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
-      row.__typename === "Petition" && isDefined(row.tags) ? (
+      row.__typename === "Petition" && isNonNullish(row.tags) ? (
         <PetitionTagListCellContent petition={row} />
       ) : null,
   },
@@ -481,7 +482,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       const redirect = useGoToPetition();
       return row.__typename === "Petition" ? (
-        isDefined(row.lastActivityAt) ? (
+        isNonNullish(row.lastActivityAt) ? (
           <DateTime
             value={row.lastActivityAt}
             format={FORMATS.LLL}
@@ -515,7 +516,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       const redirect = useGoToPetition();
       return row.__typename === "Petition" ? (
-        isDefined(row.lastRecipientActivityAt) ? (
+        isNonNullish(row.lastRecipientActivityAt) ? (
           <DateTime
             value={row.lastRecipientActivityAt}
             format={FORMATS.LLL}
@@ -604,7 +605,7 @@ export const TEMPLATES_COLUMNS = (
     align: "left",
     cellProps: { minWidth: "132px" },
     CellContent: ({ row, column }) =>
-      row.__typename === "PetitionTemplate" && isDefined(row.permissions) ? (
+      row.__typename === "PetitionTemplate" && isNonNullish(row.permissions) ? (
         <Flex justifyContent={column.align}>
           <UserAvatarList
             usersOrGroups={row.permissions.map((p) =>
@@ -624,7 +625,7 @@ export const TEMPLATES_COLUMNS = (
     label: (intl) => intl.formatMessage({ id: "generic.created-at", defaultMessage: "Created at" }),
     cellProps: { width: "1%" },
     CellContent: ({ row }) =>
-      row.__typename === "PetitionTemplate" && isDefined(row.createdAt) ? (
+      row.__typename === "PetitionTemplate" && isNonNullish(row.createdAt) ? (
         <DateTime value={row.createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
       ) : null,
   },
@@ -644,7 +645,7 @@ export const TEMPLATES_COLUMNS = (
     isFilterable: true,
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
-      row.__typename === "PetitionTemplate" && isDefined(row.tags) ? (
+      row.__typename === "PetitionTemplate" && isNonNullish(row.tags) ? (
         <PetitionTagListCellContent petition={row} />
       ) : null,
   },

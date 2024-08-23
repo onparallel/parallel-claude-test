@@ -4,9 +4,9 @@ import { indexBy, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
+import { FeatureFlagName, FeatureFlagOverride } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { FeatureFlagName, FeatureFlagOverride } from "../__types";
 
 @injectable()
 export class FeatureFlagRepository extends BaseRepository {

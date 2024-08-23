@@ -39,7 +39,7 @@ import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { ReactNode, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface ResolveProfilePropertiesConflictsDialogProps {
   petitionId: string;
@@ -84,7 +84,7 @@ function ResolveProfilePropertiesConflictsDialog({
 
   useEffect(() => {
     if (!loading) {
-      const conflicts = isDefined(data?.profile)
+      const conflicts = isNonNullish(data?.profile)
         ? profileTypeFieldsWithReplies
             .map(([petitionField]) => {
               const property = data.profile.properties.find(
@@ -99,7 +99,7 @@ function ResolveProfilePropertiesConflictsDialog({
                 action: property.field.type === "FILE" ? "APPEND" : "OVERWRITE",
               };
             })
-            .filter(isDefined)
+            .filter(isNonNullish)
         : [];
       replace(conflicts as ResolveProfilePropertiesConflictsTableData["conflicts"]);
     }
@@ -276,7 +276,7 @@ function TableRow({
             content?.query?.name,
             content?.query?.date,
           ]
-            .filter(isDefined)
+            .filter(isNonNullish)
             .join(" | ");
     }
 
@@ -470,7 +470,7 @@ function TextValueRadioGroup({
           <Radio {...getRadioProps({ value: "OVERWRITE" })} />
           <Flex minWidth={0}>
             {newValueIcon}
-            <OverflownText as="span" textStyle={isDefined(newValue) ? undefined : "hint"}>
+            <OverflownText as="span" textStyle={isNonNullish(newValue) ? undefined : "hint"}>
               {newValue ??
                 intl.formatMessage({
                   id: "component.resolve-profile-properties-conflicts-dialog.no-value",

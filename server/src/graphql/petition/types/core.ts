@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { findLast, isDefined, minBy, pick } from "remeda";
+import { findLast, isNonNullish, isNullish, minBy, pick } from "remeda";
 import {
   ContactLocaleValues,
   PetitionAttachment,
@@ -8,19 +8,19 @@ import {
   PetitionAttachmentTypeValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
+import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
-import { fullName } from "../../../util/fullName";
-import { toGlobalId } from "../../../util/globalId";
-import { isFileTypeField } from "../../../util/isFileTypeField";
-import { safeJsonParse } from "../../../util/safeJsonParse";
-import { renderSlateToHtml } from "../../../util/slate/render";
 import {
   PetitionFieldMath,
   PetitionFieldVisibility,
   mapFieldLogicCondition,
   mapFieldMathOperation,
 } from "../../../util/fieldLogic";
-import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
+import { fullName } from "../../../util/fullName";
+import { toGlobalId } from "../../../util/globalId";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { safeJsonParse } from "../../../util/safeJsonParse";
+import { renderSlateToHtml } from "../../../util/slate/render";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -533,13 +533,13 @@ export const Petition = objectType({
     t.nullable.jsonObject("summaryConfig", {
       description: "The summary configuration for the petition.",
       // don't expose config for now, just if it exists or not
-      resolve: (o) => (isDefined(o.summary_config) ? {} : null),
+      resolve: (o) => (isNonNullish(o.summary_config) ? {} : null),
     });
     t.nullable.field("latestSummaryRequest", {
       type: "AiCompletionLog",
       description: "The latest summary request for this petition",
       resolve: async (root, _, ctx) => {
-        if (!isDefined(root.summary_ai_completion_log_id)) {
+        if (isNullish(root.summary_ai_completion_log_id)) {
           return null;
         }
         return await ctx.petitions.loadPetitionSummaryRequest(root.summary_ai_completion_log_id);
@@ -789,7 +789,7 @@ export const PetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
-        if (isDefined(o.visibility)) {
+        if (isNonNullish(o.visibility)) {
           const visibility = o.visibility as PetitionFieldVisibility;
           return {
             ...visibility,
@@ -803,7 +803,7 @@ export const PetitionField = objectType({
     t.nullable.list.nonNull.jsonObject("math", {
       description: "A JSON object representing the math to be performed on the field",
       resolve: (o) => {
-        if (isDefined(o.math)) {
+        if (isNonNullish(o.math)) {
           const math = o.math as PetitionFieldMath[];
           return math.map((m) => ({
             ...m,
@@ -850,7 +850,7 @@ export const PetitionField = objectType({
     t.nullable.field("parent", {
       type: "PetitionField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.parent_petition_field_id)) {
+        if (isNonNullish(o.parent_petition_field_id)) {
           return await ctx.petitions.loadField(o.parent_petition_field_id);
         }
         return null;
@@ -860,15 +860,15 @@ export const PetitionField = objectType({
       resolve: (o) => o.parent_petition_field_id !== null,
     });
     t.nonNull.boolean("isLinkedToProfileType", {
-      resolve: (o) => isDefined(o.profile_type_id),
+      resolve: (o) => isNonNullish(o.profile_type_id),
     });
     t.nonNull.boolean("isLinkedToProfileTypeField", {
-      resolve: (o) => isDefined(o.profile_type_field_id),
+      resolve: (o) => isNonNullish(o.profile_type_field_id),
     });
     t.nullable.field("profileType", {
       type: "ProfileType",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.profile_type_id)) {
+        if (isNonNullish(o.profile_type_id)) {
           return await ctx.profiles.loadProfileType(o.profile_type_id);
         }
         return null;
@@ -877,7 +877,7 @@ export const PetitionField = objectType({
     t.nullable.field("profileTypeField", {
       type: "ProfileTypeField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.profile_type_field_id)) {
+        if (isNonNullish(o.profile_type_field_id)) {
           return await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
         }
         return null;
@@ -1167,7 +1167,7 @@ export const PetitionFieldReply = objectType({
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         if (isFileTypeField(root.type)) {
-          const file = isDefined(root.content.file_upload_id)
+          const file = isNonNullish(root.content.file_upload_id)
             ? await ctx.files.loadFileUpload(root.content.file_upload_id)
             : null;
           return file
@@ -1193,13 +1193,13 @@ export const PetitionFieldReply = objectType({
                 };
         } else if (root.type === "BACKGROUND_CHECK") {
           return {
-            query: isDefined(root.content.query)
+            query: isNonNullish(root.content.query)
               ? pick(root.content.query, ["name", "date", "type"])
               : null,
-            search: isDefined(root.content.search)
+            search: isNonNullish(root.content.search)
               ? pick(root.content.search, ["totalCount"])
               : null,
-            entity: isDefined(root.content.entity)
+            entity: isNonNullish(root.content.entity)
               ? {
                   ...pick(root.content.entity, ["id", "type", "name"]),
                   properties: pick(root.content.entity.properties, ["topics"]),
@@ -1249,7 +1249,7 @@ export const PetitionFieldReply = objectType({
           return null;
         }
 
-        if (isDefined(event.data.user_id)) {
+        if (isNonNullish(event.data.user_id)) {
           const user = await ctx.users.loadUser(event.data.user_id);
           return user && { __type: "User", ...user };
         } else {
@@ -1283,7 +1283,7 @@ export const PetitionFieldReply = objectType({
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_STATUS_CHANGED",
         ) as ReplyStatusChangedEvent;
-        if (!isDefined(event)) {
+        if (isNullish(event)) {
           return null;
         }
 
@@ -1300,7 +1300,7 @@ export const PetitionFieldReply = objectType({
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_STATUS_CHANGED",
         ) as ReplyStatusChangedEvent;
-        if (!isDefined(event)) {
+        if (isNullish(event)) {
           return null;
         }
         return event.created_at;
@@ -1310,7 +1310,7 @@ export const PetitionFieldReply = objectType({
     t.nullable.field("parent", {
       type: "PetitionFieldReply",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.parent_petition_field_reply_id)) {
+        if (isNonNullish(o.parent_petition_field_reply_id)) {
           return await ctx.petitions.loadFieldReply(o.parent_petition_field_reply_id);
         }
         return null;
@@ -1333,7 +1333,7 @@ export const PetitionFieldReply = objectType({
     t.nullable.field("associatedProfile", {
       type: "Profile",
       resolve: async (o, _, ctx) => {
-        if (!isDefined(o.associated_profile_id)) {
+        if (isNullish(o.associated_profile_id)) {
           return null;
         }
 

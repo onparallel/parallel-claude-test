@@ -1,5 +1,5 @@
 import pMap from "p-map";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { MaybePromise } from "./types";
 
 export async function validateObject<T extends {}>(
@@ -12,7 +12,7 @@ export async function validateObject<T extends {}>(
   await pMap(
     Object.entries(validateKeys),
     async ([key, validator]) => {
-      if (isDefined(object[key as keyof T])) {
+      if (isNonNullish(object[key as keyof T])) {
         try {
           const valid: boolean = await (validator as any)(object[key as keyof T]);
           if (!valid) {

@@ -19,7 +19,7 @@ import {
   components,
   mergeStyles,
 } from "react-select";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { OptionBase } from "./types";
 
 export const SIZES = {
@@ -245,7 +245,7 @@ export function useReactSelectProps<
         return {
           ...styles,
           backgroundColor:
-            typeof data === "object" && isDefined(data) && "isInvalid" in (data as any)
+            typeof data === "object" && isNonNullish(data) && "isInvalid" in (data as any)
               ? backgroundColorError
               : backgroundColor,
           borderRadius: radii["sm"],
@@ -264,7 +264,7 @@ export function useReactSelectProps<
           },
         } = theme;
         return typeof data === "object" &&
-          isDefined(data) &&
+          isNonNullish(data) &&
           "isDisabled" in data &&
           data.isDisabled
           ? { display: "none" }
@@ -275,7 +275,7 @@ export function useReactSelectProps<
               ":hover": {
                 backgroundColor:
                   typeof data === "object" &&
-                  isDefined(data) &&
+                  isNonNullish(data) &&
                   "isInvalid" in data &&
                   data.isInvalid
                     ? backgroundColorHoverError
@@ -291,13 +291,16 @@ export function useReactSelectProps<
         return {
           ...omit(styles, ["borderRadius"]),
           paddingEnd:
-            typeof data === "object" && isDefined(data) && "isDisabled" in data && data.isDisabled
+            typeof data === "object" &&
+            isNonNullish(data) &&
+            "isDisabled" in data &&
+            data.isDisabled
               ? 6
               : undefined,
         };
       },
     };
-    return isDefined(_styles) ? mergeStyles(styles as any, _styles) : styles;
+    return isNonNullish(_styles) ? mergeStyles(styles as any, _styles) : styles;
   }, [_styles]);
 
   const rehydrated = useRehydrated();

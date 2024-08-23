@@ -2,8 +2,8 @@ import { Container } from "inversify";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { KNEX } from "../../knex";
 import { Organization, User } from "../../__types";
+import { KNEX } from "../../knex";
 import { FeatureFlagRepository } from "../FeatureFlagRepository";
 import { Mocks } from "./mocks";
 

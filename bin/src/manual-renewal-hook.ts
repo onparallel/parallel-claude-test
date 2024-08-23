@@ -19,7 +19,7 @@ import {
   ListResourceRecordSetsCommand,
   Route53Client,
 } from "@aws-sdk/client-route-53";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
 
@@ -35,7 +35,7 @@ async function main() {
     CERTBOT_DOMAIN: domain,
     CERTBOT_VALIDATION: challenge,
   } = process.env;
-  const isCleanup = isDefined(output);
+  const isCleanup = isNonNullish(output);
   if (isCleanup) {
     await removeRecord(domain!, challenge!);
   } else {
@@ -89,7 +89,7 @@ async function removeRecord(domain: string, challenge: string) {
       StartRecordType: "TXT",
     }),
   );
-  if (isDefined(response.ResourceRecordSets)) {
+  if (isNonNullish(response.ResourceRecordSets)) {
     if (
       response.ResourceRecordSets[0]?.ResourceRecords?.length === 1 &&
       response.ResourceRecordSets[0].ResourceRecords[0].Value === `"${challenge}"`

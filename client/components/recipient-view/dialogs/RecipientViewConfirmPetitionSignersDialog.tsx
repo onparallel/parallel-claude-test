@@ -32,7 +32,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
@@ -296,7 +296,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                   <GrowingTextarea
                     {...register("message", {
                       required: showMessage,
-                      validate: (m) => !showMessage || (isDefined(m) && m.length > 0),
+                      validate: (m) => !showMessage || (isNonNullish(m) && m.length > 0),
                     })}
                     maxHeight="30vh"
                     aria-label={intl.formatMessage(

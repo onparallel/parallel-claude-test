@@ -1,8 +1,8 @@
 import families from "./../../../pdf/utils/fonts.json";
 
 import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validFontFamily<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,

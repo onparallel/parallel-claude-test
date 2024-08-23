@@ -5,7 +5,7 @@ import {
   isReplyContentCompatible_PetitionFieldFragment,
   mapReplyContents_PetitionFieldDataFragment,
 } from "@parallel/graphql/__types";
-import { difference, groupBy, isDefined } from "remeda";
+import { difference, groupBy, isNonNullish, isNullish } from "remeda";
 import { isFileTypeField } from "./isFileTypeField";
 import { FieldOptions } from "./petitionFields";
 
@@ -32,7 +32,7 @@ export const mapReplyContents = ({
     const targetField = fields.find((field) => field.id === targetId);
     const originField = sourcePetitionFields.find((field) => field.id === originId);
 
-    if (isDefined(targetField) && isDefined(originField)) {
+    if (isNonNullish(targetField) && isNonNullish(originField)) {
       const originIsChild = originField.parent?.id;
 
       //if origin is child whe need to get all replies to groupBy parent (field group) and then map to target
@@ -51,7 +51,7 @@ export const mapReplyContents = ({
       if (replies.length) {
         const mappedReplies = Object.values(groupedReplies).flatMap((replies) => {
           return replies
-            .filter((r) => isDefined(r) && !isDefined(r.content.error))
+            .filter((r) => isNonNullish(r) && isNullish(r.content.error))
             .flatMap((reply, index) => {
               if (originIsChild && originField.multiple && !targetField.multiple && index > 0) {
                 return null;
@@ -130,9 +130,9 @@ export const mapReplyContents = ({
         });
 
         if (originIsChild) {
-          childrenReplyInput = childrenReplyInput.concat(mappedReplies.filter(isDefined));
+          childrenReplyInput = childrenReplyInput.concat(mappedReplies.filter(isNonNullish));
         } else {
-          fieldsReplyInput = fieldsReplyInput.concat(mappedReplies.filter(isDefined));
+          fieldsReplyInput = fieldsReplyInput.concat(mappedReplies.filter(isNonNullish));
         }
       }
     }
@@ -261,7 +261,7 @@ export const isReplyContentCompatible = (
         }
 
         // Check if the number is within the specified range
-        if ((isDefined(min) && number < min) || (isDefined(max) && number > max)) {
+        if ((isNonNullish(min) && number < min) || (isNonNullish(max) && number > max)) {
           return false;
         }
 

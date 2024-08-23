@@ -18,7 +18,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 
@@ -60,7 +60,7 @@ export function PetitionFieldMathOperandSelect({
       .filter(
         ([f]) =>
           f.type === "NUMBER" &&
-          (isDefined(f.parent)
+          (isNonNullish(f.parent)
             ? f.multiple === false && f.parent.id === field.parent?.id
             : f.multiple === false),
       )
@@ -68,7 +68,7 @@ export function PetitionFieldMathOperandSelect({
         type: "FIELD" as const,
         field: f,
         fieldIndex,
-        isChild: isDefined(f.parent),
+        isChild: isNonNullish(f.parent),
       }));
 
     const variableOptions = variables.map((v) => ({
@@ -116,7 +116,7 @@ export function PetitionFieldMathOperandSelect({
       options={options as any}
       value={value}
       onChange={(value) => {
-        assert(isDefined(value));
+        assert(isNonNullish(value));
         if (value.type === "FIELD") {
           onChange({ type: "FIELD", fieldId: value.field.id });
         } else if (value.type === "VARIABLE") {

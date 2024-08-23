@@ -6,8 +6,8 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
-import { isDefined } from "remeda";
 
 interface NewSignerInfo {
   firstName: string;
@@ -45,7 +45,7 @@ function AddNewSignerDialog({
     <ConfirmDialog
       {...props}
       closeOnOverlayClick={false}
-      initialFocusRef={isDefined(email) ? firstNameRef : emailRef}
+      initialFocusRef={isNonNullish(email) ? firstNameRef : emailRef}
       content={{
         as: "form",
         onSubmit: handleSubmit((data) =>

@@ -2,9 +2,9 @@ import { gql } from "@apollo/client";
 import { Text } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
-import { mergeStyles } from "../utils/styles";
+import { isNonNullish } from "remeda";
 import { Maybe, UserReference_UserFragment } from "../__types";
+import { mergeStyles } from "../utils/styles";
 
 interface UserReferenceProps {
   user?: Maybe<UserReference_UserFragment>;
@@ -13,7 +13,7 @@ interface UserReferenceProps {
 }
 
 export function UserReference({ user, _deleted, ...props }: UserReferenceProps) {
-  return isDefined(user) ? (
+  return isNonNullish(user) ? (
     <Text {...props}>{user.fullName}</Text>
   ) : (
     <Text {...props} style={mergeStyles(props.style, _deleted, { fontStyle: "italic" })}>

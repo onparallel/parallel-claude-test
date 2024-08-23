@@ -1,4 +1,5 @@
-import { differenceWith, filter, groupBy, isDefined, pipe, unique, uniqueBy, zip } from "remeda";
+import pMap from "p-map";
+import { differenceWith, filter, groupBy, isNonNullish, pipe, unique, uniqueBy, zip } from "remeda";
 import { User } from "../../db/__types";
 import {
   AddPetitionPermissionsInput,
@@ -6,7 +7,6 @@ import {
   RemovePetitionPermissionsInput,
 } from "../../db/repositories/TaskRepository";
 import { TaskRunner } from "../helpers/TaskRunner";
-import pMap from "p-map";
 
 export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
   async run() {
@@ -64,7 +64,7 @@ export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
     if (args.notify) {
       const newUserPermissions = pipe(
         newPermissions,
-        filter((p) => isDefined(p.user_id)),
+        filter((p) => isNonNullish(p.user_id)),
         // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
         uniqueBy((p) => `${p.user_id}:${p.petition_id}`),
         // omit users who had access previously

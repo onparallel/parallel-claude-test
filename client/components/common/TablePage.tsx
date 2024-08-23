@@ -6,7 +6,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { SimpleMenuSelect } from "./SimpleMenuSelect";
 import { useSimpleSelectOptions } from "./SimpleSelect";
 
@@ -172,7 +172,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         position="relative"
         overflowX="auto"
       >
-        {!isDefined(rows) && loading ? (
+        {isNullish(rows) && loading ? (
           <Flex
             position="absolute"
             inset={0}

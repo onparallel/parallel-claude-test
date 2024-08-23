@@ -1,4 +1,4 @@
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { PetitionField } from "../db/__types";
 import { UnwrapArray } from "./types";
 
@@ -81,7 +81,7 @@ export function getAllFieldsWithIndices<
   return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
     return [
       [field, fieldIndex],
-      ...(isDefined(field.children)
+      ...(isNonNullish(field.children)
         ? (zip(field.children, childrenFieldIndices!) as [ChildOf<T>, PetitionFieldIndex][])
         : []),
     ];

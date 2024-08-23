@@ -1,10 +1,10 @@
 import { Box, Button, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
+import { useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { useEffect, useRef } from "react";
 
 export interface AdminOrganizationsListTableHeaderProps {
   search: string | null;

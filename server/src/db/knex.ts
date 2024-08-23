@@ -2,16 +2,16 @@ import { createTaggedDecorator, interfaces } from "inversify";
 import { Knex, knex } from "knex";
 import pg from "pg";
 import { parse } from "postgres-interval";
-import { isDefined } from "remeda";
+import { hrtime } from "process";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import { ILogger, LOGGER } from "../services/Logger";
 import { TableTypes } from "./__types";
 import "./helpers/knexExtensions";
-import { hrtime } from "process";
 
 pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
   const { milliseconds, seconds, ...rest } = parse(value);
-  if (isDefined(seconds) || isDefined(milliseconds)) {
+  if (isNonNullish(seconds) || isNonNullish(milliseconds)) {
     return {
       ...rest,
       seconds: (seconds ?? 0) + (milliseconds ?? 0) / 1000,

@@ -1,6 +1,7 @@
 import { Center, Flex, FormControl, HStack, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -22,7 +23,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -30,7 +31,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -192,7 +192,9 @@ export function RecipientViewPetitionFieldShortText({
   };
 
   const formats = useShortTextFormats();
-  const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
+  const format = isNonNullish(options.format)
+    ? formats.find((f) => f.value === options.format)
+    : null;
 
   const inputProps = {
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
@@ -322,7 +324,7 @@ export function RecipientViewPetitionFieldShortText({
             </Center>
           </Flex>
         ) : null}
-        {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+        {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
       </FormControl>
     </RecipientViewPetitionFieldLayout>
   );
@@ -369,7 +371,9 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   );
 
   const formats = useShortTextFormats();
-  const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
+  const format = isNonNullish(options.format)
+    ? formats.find((f) => f.value === options.format)
+    : null;
   const props: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref,
@@ -457,7 +461,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
           })}
         />
       </HStack>
-      {isInvalid && isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+      {isInvalid && isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
     </FormControl>
   );
 });

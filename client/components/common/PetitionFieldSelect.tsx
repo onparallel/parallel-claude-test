@@ -19,7 +19,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 
 type FieldOf<T extends PetitionFieldSelect_PetitionBaseFragment> = UnwrapArray<
   Exclude<T["fields"], null | undefined>
@@ -97,7 +97,7 @@ export function PetitionFieldSelect<
         }
       },
     );
-    if (isDefined(filterFields)) {
+    if (isNonNullish(filterFields)) {
       options = options.filter(({ field }) => filterFields(field));
     }
 

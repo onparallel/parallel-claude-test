@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import {
@@ -241,7 +241,7 @@ describe("repositories/ProfileRepository", () => {
 
       const result = await repo.getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
         organization.id,
-        (_, monitoring) => isDefined(monitoring),
+        (_, monitoring) => isNonNullish(monitoring),
       );
       expect(result.map((r) => r.id)).toIncludeSameMembers([values[0].id, values[2].id]);
     });

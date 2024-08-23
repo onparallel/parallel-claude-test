@@ -1,7 +1,7 @@
 import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
 import { IntlShape } from "react-intl";
-import { isDefined, minBy, partition, sortBy } from "remeda";
+import { isNonNullish, minBy, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import {
   PetitionField,
@@ -31,7 +31,7 @@ function getPetitionSignatureStatus({
   signatureConfig?: any;
 }) {
   if (
-    isDefined(signatureConfig) &&
+    isNonNullish(signatureConfig) &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
       currentSignatureRequest.status === "COMPLETED" ||
@@ -43,14 +43,14 @@ function getPetitionSignatureStatus({
     return "PENDING_START";
   }
 
-  if (isDefined(currentSignatureRequest)) {
+  if (isNonNullish(currentSignatureRequest)) {
     // signature request is already started, return the current status
     if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
       return "PROCESSING";
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
-  } else if (isDefined(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
+  } else if (isNonNullish(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   }
@@ -155,7 +155,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           (f) => f.type !== "HEADING",
         );
 
-        const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
+        const contacts = petitionsAccessesContacts[petitionIndex].filter(isNonNullish);
         const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
         const petitionFirstMessageUserData = petitionsFirstMessageUserData[petitionIndex];
         const firstSendDate =
@@ -254,7 +254,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             case "DYNAMIC_SELECT":
               return (r.content.value as string[][])
                 .map((value) => (value[1] !== null ? value.join(": ") : null))
-                .filter(isDefined)
+                .filter(isNonNullish)
                 .join(", ");
             case "DATE_TIME":
               return intl.formatDate(r.content.value, {
@@ -284,7 +284,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           replies: Pick<PetitionFieldReply, "content" | "type">[],
         ) {
           const columnId = `field-${field.from_petition_field_id ?? field.id}`.concat(
-            isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+            isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
           );
 
           // make sure header is defined on this field
@@ -302,7 +302,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
               id: columnId,
               parent_petition_field_id: parent?.from_petition_field_id,
               title: title.concat(
-                isDefined(parent) && isDefined(field.reply_group_index)
+                isNonNullish(parent) && isNonNullish(field.reply_group_index)
                   ? ` [${titleize(
                       parent.options.groupName ??
                         intl.formatMessage({
@@ -314,7 +314,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
               ),
             };
 
-            if (isDefined(parent?.from_petition_field_id)) {
+            if (isNonNullish(parent?.from_petition_field_id)) {
               // for FIELD_GROUP replies, insert new header after the last header of the group
               // this way, 2nd to nth FIELD_GROUP reply will be just after the 1st one
               const lastIndex = headers.findLastIndex(
@@ -548,7 +548,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
       headers.push({
         id: `field-${field.id}`.concat(
-          isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+          isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
         ),
         parent_petition_field_id: field.parent_petition_field_id,
         title: title.concat(

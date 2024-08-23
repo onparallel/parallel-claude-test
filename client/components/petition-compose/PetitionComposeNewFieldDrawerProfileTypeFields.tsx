@@ -12,7 +12,7 @@ import {
 import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { LocalizableUserText } from "../common/LocalizableUserTextRender";
 import { SearchInput } from "../common/SearchInput";
@@ -51,7 +51,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
         hasLinkedFields,
       });
 
-      if (isDefined(profileTypeId)) {
+      if (isNonNullish(profileTypeId)) {
         await linkFieldGroupToProfileType({
           variables: {
             petitionId: petition.id,
@@ -61,7 +61,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
         });
       }
 
-      if (isDefined(groupName)) {
+      if (isNonNullish(groupName)) {
         // TODO: Check if the field has the settings open will update it
         onFieldEdit(petitionField.id, {
           options: {
@@ -76,7 +76,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
   const filteredFields = profileType?.fields.filter(({ alias, name }) => {
     return search
       ? [alias, name.en, name.es]
-          .filter(isDefined)
+          .filter(isNonNullish)
           .some((keyword: string) =>
             removeDiacriticsAndLowercase(keyword).includes(removeDiacriticsAndLowercase(search)),
           )
@@ -148,7 +148,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
             />
           </Button>
         </Stack>
-      ) : isDefined(filteredFields) ? (
+      ) : isNonNullish(filteredFields) ? (
         <>
           <HStack padding={4}>
             <SearchInput

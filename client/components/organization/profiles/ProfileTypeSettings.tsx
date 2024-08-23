@@ -19,10 +19,10 @@ import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderI
 import { ProfileTypeSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isNotEmptyText } from "@parallel/utils/strings";
+import { MaybePromise } from "@parallel/utils/types";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
-import { MaybePromise } from "@parallel/utils/types";
 
 interface ProfileTypeSettingsProps extends CardProps {
   profileType: ProfileTypeSettings_ProfileTypeFragment;

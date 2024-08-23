@@ -20,7 +20,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FormattedMessage } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNullish, noop } from "remeda";
 import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
@@ -75,7 +75,7 @@ export const AppLayout = Object.assign(
         if (options.shallow) {
           return;
         }
-        if (!isDefined(timeoutRef.current)) {
+        if (isNullish(timeoutRef.current)) {
           timeoutRef.current = window.setTimeout(() => {
             timeoutRef.current = undefined;
             setIsLoading(true);

@@ -1,9 +1,9 @@
-import { core } from "nexus";
 import { FileUpload } from "graphql-upload/Upload.js";
+import { core } from "nexus";
+import { MaybeArray } from "../../../util/types";
 import { validateAnd } from "../validateArgs";
 import { contentType as contentTypeValidator } from "./contentType";
 import { maxFileSize } from "./maxFileSize";
-import { MaybeArray } from "../../../util/types";
 
 export function validateFile<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,

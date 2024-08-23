@@ -1,10 +1,10 @@
 import { IncomingMessage } from "http";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { ApiContext } from "../context";
 
 export async function authenticateFromRequest(req: IncomingMessage, ctx: ApiContext) {
   const users = await ctx.auth.validateRequestAuthentication(req);
-  if (!isDefined(users)) {
+  if (isNullish(users)) {
     return false;
   }
   const [user, realUser] = users;

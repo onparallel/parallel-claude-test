@@ -1,4 +1,4 @@
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import BackgroundCheckMonitoringChanges from "../../emails/emails/app/BackgroundCheckMonitoringChanges";
@@ -23,7 +23,7 @@ export async function backgroundCheckMonitoringChanges(
 
   const profileFieldValues = (
     await context.profiles.loadProfileFieldValue(payload.profileFieldValues)
-  ).filter(isDefined);
+  ).filter(isNonNullish);
 
   const userData = (await context.users.loadUserData(user.user_data_id))!;
 

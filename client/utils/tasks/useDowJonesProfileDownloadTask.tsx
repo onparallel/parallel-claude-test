@@ -10,7 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { withError } from "../promises/withError";
 
@@ -30,7 +30,7 @@ export function useDowJonesProfileDownloadTask() {
             mutation: useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument,
             variables: { profileId },
           });
-          if (!isDefined(data)) {
+          if (isNullish(data)) {
             throw new Error();
           }
           return data.createDowJonesProfileDownloadTask;

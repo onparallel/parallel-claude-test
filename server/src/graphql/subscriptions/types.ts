@@ -1,5 +1,5 @@
 import { interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export const EventSubscription = interfaceType({
   name: "EventSubscription",
@@ -37,8 +37,8 @@ export const PetitionEventSubscription = objectType({
     t.nullable.list.nonNull.field("fromTemplateFields", {
       type: "PetitionFieldMini",
       resolve: async (o, _, ctx) => {
-        return isDefined(o.from_template_field_ids)
-          ? (await ctx.petitions.loadField(o.from_template_field_ids)).filter(isDefined)
+        return isNonNullish(o.from_template_field_ids)
+          ? (await ctx.petitions.loadField(o.from_template_field_ids)).filter(isNonNullish)
           : null;
       },
     });
@@ -66,7 +66,7 @@ export const ProfileEventSubscription = objectType({
     t.nullable.list.nullable.field("fromProfileTypeFields", {
       type: "ProfileTypeField",
       resolve: async (o, _, ctx) => {
-        return isDefined(o.from_profile_type_field_ids)
+        return isNonNullish(o.from_profile_type_field_ids)
           ? await ctx.profiles.loadProfileTypeField(o.from_profile_type_field_ids)
           : null;
       },

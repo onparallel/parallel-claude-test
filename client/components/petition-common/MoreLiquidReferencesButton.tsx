@@ -21,7 +21,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
 
@@ -332,7 +332,7 @@ function useLiquidReferences({
               }),
               builder: (alias: string) => {
                 const fields = field.children!.filter(
-                  (f) => isDefined(f.alias) && !isFileTypeField(f.type),
+                  (f) => isNonNullish(f.alias) && !isFileTypeField(f.type),
                 );
                 const groupName = field.options.groupName ?? defaultGroupName;
                 return [
@@ -359,7 +359,7 @@ function useLiquidReferences({
               }),
               builder: (alias: string) => {
                 const fields = field.children!.filter(
-                  (f) => isDefined(f.alias) && !isFileTypeField(f.type),
+                  (f) => isNonNullish(f.alias) && !isFileTypeField(f.type),
                 );
                 const groupName = field.options.groupName ?? defaultGroupName;
                 return [

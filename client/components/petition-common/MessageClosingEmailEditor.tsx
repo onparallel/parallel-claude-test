@@ -1,10 +1,10 @@
+import { gql } from "@apollo/client";
 import { FormControl, FormLabel } from "@chakra-ui/react";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
+import { MessageClosingEmailEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
-import { gql } from "@apollo/client";
-import { MessageClosingEmailEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 
 export function MessageClosingEmailEditor({
   id,

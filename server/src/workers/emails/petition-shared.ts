@@ -1,4 +1,4 @@
-import { groupBy, indexBy, isDefined, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, unique } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -27,24 +27,26 @@ export async function petitionShared(
   if (!userData) {
     throw new Error(`UserData not found for User:${payload.user_id}`);
   }
-  const userIds = unique(permissions.filter(isDefined).map((p) => p.user_id!));
+  const userIds = unique(permissions.filter(isNonNullish).map((p) => p.user_id!));
   const [users, usersData, petitions] = await Promise.all([
     context.users.loadUser(userIds),
     context.users.loadUserDataByUserId(userIds),
-    context.petitions.loadPetition(unique(permissions.filter(isDefined).map((p) => p.petition_id))),
+    context.petitions.loadPetition(
+      unique(permissions.filter(isNonNullish).map((p) => p.petition_id)),
+    ),
   ]);
-  const usersById = indexBy(users.filter(isDefined), (p) => p.id);
+  const usersById = indexBy(users.filter(isNonNullish), (p) => p.id);
   const emails: EmailLog[] = [];
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(user.org_id);
 
   const permissionsByUserId = groupBy(
-    permissions.filter((p) => isDefined(p?.user_id)),
+    permissions.filter((p) => isNonNullish(p?.user_id)),
     (p) => p!.user_id!,
   );
 
   for (const [userId, permissions] of Object.entries(permissionsByUserId)) {
     const _petitions = petitions.filter(
-      (p) => isDefined(p) && permissions.some((permission) => permission!.petition_id === p.id),
+      (p) => isNonNullish(p) && permissions.some((permission) => permission!.petition_id === p.id),
     );
     const permissionUser = usersById[userId!];
     const permissionUserData = usersData.find((ud) => ud!.id === permissionUser.user_data_id)!;

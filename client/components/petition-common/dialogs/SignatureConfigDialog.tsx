@@ -55,7 +55,7 @@ import {
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isDefined, noop, partition, pick } from "remeda";
+import { isNonNullish, noop, partition, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
@@ -95,7 +95,7 @@ export function SignatureConfigDialog({
     (petition.__typename === "Petition" ? petition.currentSignatureRequest?.signatureConfig : null);
 
   const [presetSigners, otherSigners] = partition(
-    (signatureConfig?.signers ?? []).filter(isDefined),
+    (signatureConfig?.signers ?? []).filter(isNonNullish),
     (s) => s.isPreset,
   );
   const form = useForm<SignatureConfigFormData>({
@@ -113,7 +113,7 @@ export function SignatureConfigDialog({
       signingMode: signatureConfig?.signingMode ?? "PARALLEL",
       minSigners: signatureConfig?.minSigners ?? 1,
       instructions: signatureConfig?.instructions ?? null,
-      showInstructions: isDefined(signatureConfig?.instructions),
+      showInstructions: isNonNullish(signatureConfig?.instructions),
       useCustomDocument: signatureConfig?.useCustomDocument ?? false,
     },
   });

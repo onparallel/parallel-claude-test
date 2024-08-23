@@ -23,7 +23,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 
@@ -103,7 +103,7 @@ function ConfirmCommentMentionAndShareDialog({
                         .formatMessage({ id: "generic.groups", defaultMessage: "Teams" })
                         .toLowerCase()
                     : null,
-                ].filter(isDefined),
+                ].filter(isNonNullish),
                 { type: "conjunction" },
               ),
             }}

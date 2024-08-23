@@ -1,4 +1,5 @@
-import { indexBy, isDefined } from "remeda";
+import { indexBy, isNonNullish, isNullish } from "remeda";
+import { Readable } from "stream";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
 import { PetitionField, UserLocale } from "../../db/__types";
@@ -9,7 +10,6 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
 import { Maybe, UnwrapArray } from "../../util/types";
-import { Readable } from "stream";
 
 interface GetPetitionFilesOptions {
   locale: UserLocale;
@@ -46,13 +46,13 @@ export async function* getPetitionFiles(
   const fileReplies = allReplies.filter(
     (r) =>
       isFileTypeField(r.type) &&
-      isDefined(r.content.file_upload_id) &&
-      !isDefined(r.content.error) &&
+      isNonNullish(r.content.file_upload_id) &&
+      isNullish(r.content.error) &&
       r.status !== "REJECTED",
   );
 
   const backgroundCheckEntityReplies = allReplies.filter(
-    (r) => r.type === "BACKGROUND_CHECK" && isDefined(r.content.entity),
+    (r) => r.type === "BACKGROUND_CHECK" && isNonNullish(r.content.entity),
   );
 
   const textReplies = allReplies.filter((r) => !isFileTypeField(r.type));
@@ -60,7 +60,7 @@ export async function* getPetitionFiles(
   const files = await ctx.files.loadFileUpload(
     fileReplies.map((reply) => reply.content["file_upload_id"]),
   );
-  const filesById = indexBy(files.filter(isDefined), (f) => f.id);
+  const filesById = indexBy(files.filter(isNonNullish), (f) => f.id);
 
   const latestPetitionSignature =
     await ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
@@ -71,8 +71,8 @@ export async function* getPetitionFiles(
         (textReplies.length > 0 ? 1 : 0) + // text replies excel
           fileReplies.length +
           backgroundCheckEntityReplies.length + // each reply is 1 pdf file
-          Number(isDefined(latestPetitionSignature?.file_upload_id)) +
-          Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
+          Number(isNonNullish(latestPetitionSignature?.file_upload_id)) +
+          Number(isNonNullish(latestPetitionSignature?.file_upload_audit_trail_id)),
         1,
       );
   let processedFiles = 0;
@@ -150,7 +150,7 @@ export async function* getPetitionFiles(
     } else if (field.type === "BACKGROUND_CHECK") {
       // on BACKGROUND_CHECK fields, export the PDF if reply has set "entity"
       if (!options.xlsxOnly) {
-        for (const reply of field.replies.filter((r) => isDefined(r.content.entity))) {
+        for (const reply of field.replies.filter((r) => isNonNullish(r.content.entity))) {
           yield {
             filename: resolveFileName(
               field,
@@ -182,7 +182,7 @@ export async function* getPetitionFiles(
   }
 
   if (latestPetitionSignature?.status === "COMPLETED" && !options.xlsxOnly) {
-    if (isDefined(latestPetitionSignature.file_upload_id)) {
+    if (isNonNullish(latestPetitionSignature.file_upload_id)) {
       const signedPetition = await ctx.files.loadFileUpload(latestPetitionSignature.file_upload_id);
       if (signedPetition?.upload_complete) {
         yield {
@@ -192,7 +192,7 @@ export async function* getPetitionFiles(
         await options.onProgress?.(++processedFiles / totalFiles);
       }
     }
-    if (isDefined(latestPetitionSignature.file_upload_audit_trail_id)) {
+    if (isNonNullish(latestPetitionSignature.file_upload_audit_trail_id)) {
       const auditTrail = await ctx.files.loadFileUpload(
         latestPetitionSignature.file_upload_audit_trail_id,
       );

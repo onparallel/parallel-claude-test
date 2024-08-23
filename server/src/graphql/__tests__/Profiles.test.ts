@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
-import { isDefined, omit, range, times } from "remeda";
+import { isNonNullish, omit, range, times } from "remeda";
 import {
   FileUpload,
   Organization,
@@ -72,7 +72,7 @@ describe("GraphQL/Profiles", () => {
       `,
       { profileTypeId },
     );
-    if (isDefined(fields) && fields.length > 0) {
+    if (isNonNullish(fields) && fields.length > 0) {
       return await updateProfileValue(data.createProfile.id, fields);
     } else {
       return data.createProfile;
@@ -103,7 +103,7 @@ describe("GraphQL/Profiles", () => {
       `,
       { profileId, fields },
     );
-    if (isDefined(errors)) {
+    if (isNonNullish(errors)) {
       throw errors;
     }
     return data.updateProfileFieldValue;

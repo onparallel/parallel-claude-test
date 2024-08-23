@@ -1,7 +1,7 @@
 import { Button, Image, Stack, Text } from "@chakra-ui/react";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link, NakedLink } from "./Link";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 
 interface UserDropdownEmptyProps {
   search: string;

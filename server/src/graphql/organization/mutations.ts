@@ -10,7 +10,7 @@ import {
   nullable,
   stringArg,
 } from "nexus";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { ContactLocaleValues, Organization, OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { fullName } from "../../util/fullName";
@@ -24,12 +24,14 @@ import { validateAnd } from "../helpers/validateArgs";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";
 import { maxLength } from "../helpers/validators/maxLength";
+import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { validateFile } from "../helpers/validators/validateFile";
 import { userHasFeatureFlag } from "../petition/authorizers";
+import { superAdminAccess } from "../support/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasPermission } from "../users/authorizers";
 import {
@@ -37,8 +39,6 @@ import {
   organizationThemeIsNotDefault,
   userHasAccessToOrganizationTheme,
 } from "./authorizers";
-import { notEmptyObject } from "../helpers/validators/notEmptyObject";
-import { superAdminAccess } from "../support/authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -198,10 +198,10 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
         );
       }
       const updateData: Partial<OrganizationTheme> = {};
-      if (isDefined(args.name)) {
+      if (isNonNullish(args.name)) {
         updateData.name = args.name;
       }
-      if (isDefined(args.data)) {
+      if (isNonNullish(args.data)) {
         updateData.data = {
           ...pick(theme.data, ["paginationPosition", "logoPosition"]),
           ...args.data,
@@ -404,11 +404,11 @@ export const updateOrganization = mutationField("updateOrganization", {
   resolve: async (_, { orgId, data }, ctx) => {
     const updatedOrgData = {} as Organization;
 
-    if (isDefined(data.name)) {
+    if (isNonNullish(data.name)) {
       updatedOrgData.name = data.name;
     }
 
-    if (isDefined(data.status)) {
+    if (isNonNullish(data.status)) {
       updatedOrgData.status = data.status;
     }
     return await ctx.organizations.updateOrganization(

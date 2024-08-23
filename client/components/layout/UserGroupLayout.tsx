@@ -2,13 +2,13 @@ import { gql, useMutation } from "@apollo/client";
 import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import {
-  SettingsTabsInnerLayout,
-  TabDefinition,
-} from "@parallel/components/layout/SettingsTabsInnerLayout";
-import {
   UserGroupReference,
   userGroupReferenceText,
 } from "@parallel/components/common/UserGroupReference";
+import {
+  SettingsTabsInnerLayout,
+  TabDefinition,
+} from "@parallel/components/layout/SettingsTabsInnerLayout";
 import {
   UserGroupLayout_QueryFragment,
   UserGroupLayout_UserGroupFragment,

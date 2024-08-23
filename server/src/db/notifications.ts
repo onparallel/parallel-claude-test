@@ -1,10 +1,10 @@
 import { If } from "../util/types";
 import {
-  PetitionSignatureCancelReason,
-  PetitionUserNotification as DbPetitionUserNotification,
   PetitionContactNotification as DbPetitionContactNotification,
-  PetitionUserNotificationType,
+  PetitionUserNotification as DbPetitionUserNotification,
   PetitionContactNotificationType,
+  PetitionSignatureCancelReason,
+  PetitionUserNotificationType,
 } from "./__types";
 
 export type PetitionUserNotificationPayload<TType extends PetitionUserNotificationType> = {

@@ -24,7 +24,7 @@ const ZONE_MAP = {
 const route53 = new client_route_53_1.Route53Client({});
 async function main() {
     const { CERTBOT_AUTH_OUTPUT: output, CERTBOT_DOMAIN: domain, CERTBOT_VALIDATION: challenge, } = process.env;
-    const isCleanup = (0, remeda_1.isDefined)(output);
+    const isCleanup = (0, remeda_1.isNonNullish)(output);
     if (isCleanup) {
         await removeRecord(domain, challenge);
     }
@@ -73,7 +73,7 @@ async function removeRecord(domain, challenge) {
         StartRecordName: recordName,
         StartRecordType: "TXT",
     }));
-    if ((0, remeda_1.isDefined)(response.ResourceRecordSets)) {
+    if ((0, remeda_1.isNonNullish)(response.ResourceRecordSets)) {
         if (((_b = (_a = response.ResourceRecordSets[0]) === null || _a === void 0 ? void 0 : _a.ResourceRecords) === null || _b === void 0 ? void 0 : _b.length) === 1 &&
             response.ResourceRecordSets[0].ResourceRecords[0].Value === `"${challenge}"`) {
             console.log(`Removing TXT record from ${recordName}`);

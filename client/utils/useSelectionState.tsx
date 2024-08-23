@@ -1,5 +1,5 @@
 import { MouseEvent, useMemo, useState } from "react";
-import { countBy, isDefined } from "remeda";
+import { countBy, isNonNullish } from "remeda";
 import { debounce } from "./debounce";
 import { KeyProp, getKey } from "./keyProp";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
@@ -116,7 +116,8 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
 export function useSelection<T>(items: T[] | undefined, keyProp: KeyProp<T>) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedRows = useMemo(
-    () => selectedIds.map((id) => items?.find((r) => getKey(r, keyProp) === id)).filter(isDefined),
+    () =>
+      selectedIds.map((id) => items?.find((r) => getKey(r, keyProp) === id)).filter(isNonNullish),
     [selectedIds, items, keyProp],
   );
   return {

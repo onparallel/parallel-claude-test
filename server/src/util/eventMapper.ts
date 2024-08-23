@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionEvent } from "../db/events/PetitionEvent";
 import { ProfileEvent } from "../db/events/ProfileEvent";
 import { toGlobalId } from "./globalId";
@@ -14,7 +14,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
     case "ACCESS_DEACTIVATED": {
       return {
         petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         reason: event.data.reason,
       };
     }
@@ -38,7 +38,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id,
         ),
-        petitionFieldId: isDefined(event.data.petition_field_id)
+        petitionFieldId: isNonNullish(event.data.petition_field_id)
           ? toGlobalId("PetitionField", event.data.petition_field_id)
           : null,
         userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
@@ -50,14 +50,14 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id,
         ),
-        petitionFieldId: isDefined(event.data.petition_field_id)
+        petitionFieldId: isNonNullish(event.data.petition_field_id)
           ? toGlobalId("PetitionField", event.data.petition_field_id)
           : null,
       };
     }
     case "MESSAGE_CANCELLED": {
       return {
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
         reason: event.data.reason,
       };
@@ -93,7 +93,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
       };
     }
     case "PETITION_COMPLETED": {
-      return isDefined(event.data.user_id)
+      return isNonNullish(event.data.user_id)
         ? {
             userId: toGlobalId("User", event.data.user_id),
           }
@@ -166,7 +166,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           };
           break;
         case "REQUEST_RESTARTED":
-          cancelData = isDefined(event.data.cancel_data.petition_access_id)
+          cancelData = isNonNullish(event.data.cancel_data.petition_access_id)
             ? {
                 petitionAccessId: toGlobalId(
                   "PetitionAccess",
@@ -414,7 +414,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_FIELD_EXPIRY_UPDATED": {
       return {
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         expiryDate: event.data.expiry_date,
         alias: event.data.alias,
@@ -438,7 +438,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_FIELD_VALUE_UPDATED": {
       return {
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         alias: event.data.alias,
       };
@@ -455,7 +455,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_UPDATED": {
       return {
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
       };
     }
     case "PROFILE_RELATIONSHIP_CREATED": {
@@ -470,7 +470,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_RELATIONSHIP_REMOVED": {
       return {
-        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         profileRelationshipId: toGlobalId(
           "ProfileRelationship",
           event.data.profile_relationship_id,

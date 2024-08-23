@@ -8,15 +8,15 @@ import { User } from "../src/db/__types";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
-import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
-import { IAnalyticsService } from "../src/services/AnalyticsService";
-import { IAuth } from "../src/services/AuthService";
-import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
 import {
   IDowJonesClient,
   RiskEntityProfilePdfResult,
   RiskEntityProfileResult,
 } from "../src/integrations/dow-jones/DowJonesClient";
+import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
+import { IAnalyticsService } from "../src/services/AnalyticsService";
+import { IAuth } from "../src/services/AuthService";
+import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
 import { IEmailsService } from "../src/services/EmailsService";
 import { IFetchService } from "../src/services/FetchService";
 import { IQueuesService } from "../src/services/QueuesService";

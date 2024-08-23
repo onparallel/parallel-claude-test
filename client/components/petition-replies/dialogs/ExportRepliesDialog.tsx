@@ -21,8 +21,8 @@ import {
   PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
 import {
-  ExportRepliesDialog_PetitionFragment,
   ExportRepliesDialog_PetitionFieldFragment,
+  ExportRepliesDialog_PetitionFragment,
   ExportRepliesDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";

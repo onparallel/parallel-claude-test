@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
@@ -230,10 +230,10 @@ export class BankflipService implements IBankflipService {
 
     // filter model-request replies that have been successful or have document_not_found error
     const successfulModelRequestReplies = fieldReplies
-      .filter((r) => !isDefined(r.content.type) || r.content.type === "model-request")
+      .filter((r) => isNullish(r.content.type) || r.content.type === "model-request")
       .filter(
         (r) =>
-          !isDefined(r.content.error) ||
+          isNullish(r.content.error) ||
           (Array.isArray(r.content.error) && r.content.error[0]?.reason === "document_not_found"),
       );
 
@@ -246,13 +246,13 @@ export class BankflipService implements IBankflipService {
     );
 
     const successfulIdentityVerificationReply = fieldReplies.find(
-      (r) => r.content.type === "identity-verification" && !isDefined(r.content.error),
+      (r) => r.content.type === "identity-verification" && isNullish(r.content.error),
     );
 
     // if identity-verification was configured and there's no successful reply, retry with the same configuration
     const identityVerification =
-      isDefined(field?.options.identityVerification) &&
-      !isDefined(successfulIdentityVerificationReply)
+      isNonNullish(field?.options.identityVerification) &&
+      isNullish(successfulIdentityVerificationReply)
         ? field!.options.identityVerification
         : null;
 
@@ -299,7 +299,7 @@ export class BankflipService implements IBankflipService {
     if (hasRemoveParallelBranding) {
       customization["companyName"] = organization!.name;
       const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
-      if (isDefined(customLogoPath)) {
+      if (isNonNullish(customLogoPath)) {
         customization["companyLogo"] = await this.images.getImageUrl(customLogoPath, {
           resize: { height: 150, width: 150, fit: "fill" },
         });

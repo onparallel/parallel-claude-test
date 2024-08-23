@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { openMenu } from "../helpers/chakra/openMenu";
 import { fillContactSelect } from "../helpers/react-select/fillContactSelect";
 import { fillRte, RteInput } from "../helpers/rte/fillRte";
@@ -76,7 +76,7 @@ export class PetitionLayout extends AppLayout {
     }
     await this.page.getByTestId("petition-email-subject-input").fill(subject);
     await fillRte(this.page, this.page.getByTestId("petition-email-body-rte"), body);
-    if (isDefined(reminders)) {
+    if (isNonNullish(reminders)) {
       await this.page.getByTestId("enable-reminders-checkbox").setChecked(true);
       await this.page.getByTestId("reminders-config-offset-input").fill(`${reminders.offset}`);
       await this.page.getByTestId("reminders-config-time-input").fill(reminders.time);

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { waitForRehydration } from "../helpers/waitForRehydration";
 import { Login } from "../pages/Login";
 

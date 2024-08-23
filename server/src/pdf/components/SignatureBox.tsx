@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { mergeStyles } from "../utils/styles";
 import { useTheme } from "../utils/ThemeProvider";
 
@@ -55,12 +55,12 @@ export function SignatureBox({
   });
   return (
     <View style={mergeStyles(styles.box, style)}>
-      {isDefined(wordAnchor) ? <Text style={styles.anchor}>{wordAnchor}</Text> : null}
-      {isDefined(signatureImageUrl) ? (
+      {isNonNullish(wordAnchor) ? <Text style={styles.anchor}>{wordAnchor}</Text> : null}
+      {isNonNullish(signatureImageUrl) ? (
         <Image style={styles.signatureImage} src={signatureImageUrl} />
       ) : null}
-      {isDefined(fullName) ? <Text style={styles.text}>{fullName}</Text> : null}
-      {isDefined(date) ? <Text style={[styles.text, styles.date]}>{date}</Text> : null}
+      {isNonNullish(fullName) ? <Text style={styles.text}>{fullName}</Text> : null}
+      {isNonNullish(date) ? <Text style={[styles.text, styles.date]}>{date}</Text> : null}
     </View>
   );
 }

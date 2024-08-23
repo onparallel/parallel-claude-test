@@ -1,10 +1,10 @@
 import { inject } from "inversify";
 import { Knex } from "knex";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { random } from "../../util/token";
+import { CreateLicenseCode, LicenseCodeStatus } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateLicenseCode, LicenseCodeStatus } from "../__types";
 
 export class LicenseCodeRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
@@ -14,7 +14,7 @@ export class LicenseCodeRepository extends BaseRepository {
   readonly loadLicenseCode = this.buildLoadBy("license_code", "code");
 
   async createLicenseCode(source: string, details: any, createdBy: string) {
-    if (source === "AppSumo" && isDefined(details.uuid)) {
+    if (source === "AppSumo" && isNonNullish(details.uuid)) {
       // for AppSumo licenses, we have to make sure there is no other license with same UUID that has already been redeemed
       const [license] = await this.from("license_code")
         .where("source", "AppSumo")

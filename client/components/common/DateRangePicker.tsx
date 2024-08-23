@@ -17,7 +17,7 @@ import {
 } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import {
   CalendarMonth,
   CalendarMonthDateProps,
@@ -56,7 +56,7 @@ export function DateRangePicker({
   const firstDayOfWeek = 1;
   const quickRanges = useQuickDateRanges();
   const activeRange = useMemo(() => {
-    return isDefined(startDate) && isDefined(endDate)
+    return isNonNullish(startDate) && isNonNullish(endDate)
       ? (quickRanges.find(({ range }) => isEqualDateRange([startDate, endDate], range)) ?? null)
       : null;
   }, [startDate?.valueOf(), endDate?.valueOf(), quickRanges]);
@@ -71,12 +71,12 @@ export function DateRangePicker({
       if (edgeSelection === "START") {
         onChange([
           startOfDay(date),
-          isDefined(endDate) && isBefore(endDate, startOfDay(date)) ? null : endDate,
+          isNonNullish(endDate) && isBefore(endDate, startOfDay(date)) ? null : endDate,
         ]);
         setEdgeSelection("END");
       } else {
         onChange([
-          isDefined(startDate) && isAfter(startDate, endOfDay(date)) ? null : startDate,
+          isNonNullish(startDate) && isAfter(startDate, endOfDay(date)) ? null : startDate,
           endOfDay(date),
         ]);
         setEdgeSelection("START");
@@ -97,11 +97,11 @@ export function DateRangePicker({
           ((!isPastAllowed && isPast(date) && !isToday(date)) ||
             (!isFutureAllowed && isFuture(date) && !isToday(date))) ??
           false,
-        ...((isDefined(startDate) && isEqual(date, startDate)) ||
-        (isDefined(endDate) && isEqual(endOfDay(date), endDate))
+        ...((isNonNullish(startDate) && isEqual(date, startDate)) ||
+        (isNonNullish(endDate) && isEqual(endOfDay(date), endDate))
           ? { variant: "solid", colorScheme: "primary" }
-          : isDefined(startDate) &&
-              isDefined(endDate) &&
+          : isNonNullish(startDate) &&
+              isNonNullish(endDate) &&
               isAfter(date, startDate) &&
               isBefore(endOfDay(date), endDate)
             ? {
@@ -127,8 +127,8 @@ export function DateRangePicker({
       return {
         position: "relative",
         sx: {
-          ...(isDefined(startDate) &&
-          isDefined(endDate) &&
+          ...(isNonNullish(startDate) &&
+          isNonNullish(endDate) &&
           isAfterOrEqual(date, startDate) &&
           isBeforeOrEqual(endOfDay(date), endDate)
             ? {
@@ -150,19 +150,19 @@ export function DateRangePicker({
                 },
               }
             : {}),
-          ...(isDefined(hoveredDate) &&
+          ...(isNonNullish(hoveredDate) &&
           // selecting END and date is range [endDate ?? startDate, hoveredDate]
-          ((isDefined(startDate) &&
+          ((isNonNullish(startDate) &&
             isBeforeOrEqual(date, hoveredDate) &&
             edgeSelection === "END" &&
-            (isDefined(endDate)
+            (isNonNullish(endDate)
               ? isAfterOrEqual(endOfDay(date), endDate)
               : isAfterOrEqual(date, startDate))) ||
             // selecting START and date is range [hoveredDate, startDate ?? endDate]
-            (isDefined(endDate) &&
+            (isNonNullish(endDate) &&
               edgeSelection === "START" &&
               isAfterOrEqual(date, hoveredDate) &&
-              (isDefined(startDate)
+              (isNonNullish(startDate)
                 ? isBeforeOrEqual(date, startDate)
                 : isBeforeOrEqual(endOfDay(date), endDate))))
             ? {
@@ -176,11 +176,11 @@ export function DateRangePicker({
                   ...// if hovering opposite edge, don't show
                   (isEqual(date, hoveredDate) &&
                   ((edgeSelection === "START" &&
-                    (isDefined(startDate)
+                    (isNonNullish(startDate)
                       ? isEqual(date, startDate)
                       : isEqual(endOfDay(date), endDate!))) ||
                     (edgeSelection === "END" &&
-                      (isDefined(endDate)
+                      (isNonNullish(endDate)
                         ? isEqual(endOfDay(date), endDate)
                         : isEqual(date, startDate!))))
                     ? {}
@@ -215,7 +215,7 @@ export function DateRangePicker({
         <Box>
           <Stack display={{ base: "none", md: "flex" }}>
             {quickRanges.map(({ key, range, text }) => {
-              const isActive = isDefined(activeRange) && activeRange.key === key;
+              const isActive = isNonNullish(activeRange) && activeRange.key === key;
               return (
                 <Button
                   key={key}
@@ -244,7 +244,7 @@ export function DateRangePicker({
               }
             }}
             sx={{
-              "&": { color: !isDefined(activeRange) ? "gray.400" : "inherit" },
+              "&": { color: isNullish(activeRange) ? "gray.400" : "inherit" },
               "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
             }}
@@ -266,7 +266,7 @@ export function DateRangePicker({
               variant="outline"
               onClick={() => {
                 setEdgeSelection("START");
-                if (isDefined(startDate)) {
+                if (isNonNullish(startDate)) {
                   setCurrentMonth(startOfMonth(startDate));
                 }
               }}
@@ -275,7 +275,7 @@ export function DateRangePicker({
               flex="1"
               justifyContent="space-between"
             >
-              {isDefined(startDate)
+              {isNonNullish(startDate)
                 ? intl.formatDate(startDate, FORMATS.L)
                 : intl.formatMessage({
                     id: "component.date-range-picker.date-placeholder",
@@ -290,7 +290,7 @@ export function DateRangePicker({
               variant="outline"
               onClick={() => {
                 setEdgeSelection("END");
-                if (isDefined(endDate)) {
+                if (isNonNullish(endDate)) {
                   setCurrentMonth(startOfMonth(endDate));
                 }
               }}
@@ -299,7 +299,7 @@ export function DateRangePicker({
               flex="1"
               justifyContent="space-between"
             >
-              {isDefined(endDate)
+              {isNonNullish(endDate)
                 ? intl.formatDate(endDate, FORMATS.L)
                 : intl.formatMessage({
                     id: "component.date-range-picker.date-placeholder",

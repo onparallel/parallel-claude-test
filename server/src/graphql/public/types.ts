@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import {
@@ -57,7 +57,7 @@ export const PublicPetitionAccess = objectType({
       resolve: async (root, _, ctx) => {
         const petition = await ctx.petitions.loadPetition(root.petition_id);
         return (
-          isDefined(petition) &&
+          isNonNullish(petition) &&
           ctx.featureFlags.orgHasFeatureFlag(petition.org_id, "CLIENT_PORTAL")
         );
       },
@@ -169,9 +169,9 @@ export const PublicPetition = objectType({
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
         const contactIds = accesses
-          .filter((a) => a.status === "ACTIVE" && isDefined(a.contact_id))
+          .filter((a) => a.status === "ACTIVE" && isNonNullish(a.contact_id))
           .map((a) => a.contact_id!);
-        return (await ctx.contacts.loadContact(contactIds)).filter(isDefined);
+        return (await ctx.contacts.loadContact(contactIds)).filter(isNonNullish);
       },
     });
     t.boolean("isRecipientViewContentsHidden", {
@@ -465,7 +465,7 @@ export const PublicPetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
-        if (isDefined(o.visibility)) {
+        if (isNonNullish(o.visibility)) {
           const visibility = o.visibility as PetitionFieldVisibility;
           return {
             ...visibility,
@@ -479,7 +479,7 @@ export const PublicPetitionField = objectType({
     t.nullable.list.nonNull.jsonObject("math", {
       description: "A JSON object representing the math to be performed on the field",
       resolve: (o) => {
-        if (isDefined(o.math)) {
+        if (isNonNullish(o.math)) {
           const math = o.math as PetitionFieldMath[];
           return math.map((m) => ({
             ...m,
@@ -514,7 +514,7 @@ export const PublicPetitionField = objectType({
     t.nullable.field("parent", {
       type: "PublicPetitionField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.parent_petition_field_id)) {
+        if (isNonNullish(o.parent_petition_field_id)) {
           return await ctx.petitions.loadField(o.parent_petition_field_id);
         }
         return null;
@@ -523,7 +523,7 @@ export const PublicPetitionField = objectType({
     t.nullable.field("profileType", {
       type: "PublicProfileType",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.profile_type_id)) {
+        if (isNonNullish(o.profile_type_id)) {
           return await ctx.profiles.loadProfileType(o.profile_type_id);
         }
         return null;
@@ -533,7 +533,7 @@ export const PublicPetitionField = objectType({
       type: "PublicProfileTypeField",
       description: "Linked profile type field.",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.profile_type_field_id)) {
+        if (isNonNullish(o.profile_type_field_id)) {
           return await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
         }
         return null;
@@ -646,7 +646,7 @@ export const PublicOrganization = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.organizations.loadOrgLogoPath(root.id);
-        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.boolean("hasRemoveParallelBranding", {
@@ -683,7 +683,7 @@ export const PublicPetitionFieldReply = objectType({
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
         if (isFileTypeField(root.type)) {
-          const file = isDefined(root.content.file_upload_id)
+          const file = isNonNullish(root.content.file_upload_id)
             ? await ctx.files.loadFileUpload(root.content.file_upload_id)
             : null;
           return file
@@ -723,7 +723,7 @@ export const PublicPetitionFieldReply = objectType({
     t.nullable.field("parent", {
       type: "PublicPetitionFieldReply",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.parent_petition_field_reply_id)) {
+        if (isNonNullish(o.parent_petition_field_reply_id)) {
           return await ctx.petitions.loadFieldReply(o.parent_petition_field_reply_id);
         }
         return null;
@@ -858,20 +858,20 @@ export const PublicPetitionFieldComment = objectType({
     t.nullable.string("contentPlainText", {
       description: "The text content of the comment.",
       resolve: async (root, _, ctx) => {
-        return isDefined(root.content_json) ? renderSlateToText(root.content_json) : null;
+        return isNonNullish(root.content_json) ? renderSlateToText(root.content_json) : null;
       },
     });
     t.nullable.string("contentHtml", {
       description: "The HTML content of the comment.",
       resolve: (root) => {
-        if (!isDefined(root.content_json)) return null;
+        if (isNullish(root.content_json)) return null;
         return renderSlateWithMentionsToHtml(root.content_json);
       },
     });
     t.nullable.string("excerptHtml", {
       description: "The HTML content of the comment.",
       resolve: async (root, _, ctx) => {
-        return isDefined(root.content_json)
+        return isNonNullish(root.content_json)
           ? renderSlateWithMentionsToHtml(root.content_json[0])
           : null;
       },
@@ -894,7 +894,7 @@ export const PublicPetitionFieldComment = objectType({
     t.nullable.field("field", {
       type: "PublicPetitionField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.petition_field_id)) {
+        if (isNonNullish(o.petition_field_id)) {
           return await ctx.petitions.loadField(o.petition_field_id);
         }
         return null;

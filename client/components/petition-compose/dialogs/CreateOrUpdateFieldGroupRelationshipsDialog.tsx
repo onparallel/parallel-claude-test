@@ -29,7 +29,7 @@ import { useRerender } from "@parallel/utils/useRerender";
 import { useCallback, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 
 interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
   isTemplate: boolean;
@@ -71,7 +71,7 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
   const petition = petitionData?.petition ?? { id: petitionId, fields: [], fieldRelationships: [] };
   const petitionField = petition?.fields.find((f) => f.id === petitionFieldId) ?? null;
 
-  const isUpdating = isDefined(petition) && petition.fieldRelationships.length > 0;
+  const isUpdating = isNonNullish(petition) && petition.fieldRelationships.length > 0;
 
   const defaultRow = {
     relationshipId: null,
@@ -151,7 +151,7 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
           if (!petition) return;
           try {
             const relationships = data.relationships
-              .filter((r) => isDefined(r.leftFieldGroup))
+              .filter((r) => isNonNullish(r.leftFieldGroup))
               .map<UpdatePetitionFieldGroupRelationshipInput>(
                 ({
                   relationshipId,
@@ -415,7 +415,7 @@ function FieldGroupRelationship({
     }),
   );
 
-  const [allowedLeftRightProfileTypeIds, allowedRightLeftProfileTypeIds] = isDefined(
+  const [allowedLeftRightProfileTypeIds, allowedRightLeftProfileTypeIds] = isNonNullish(
     selectedProfileRelationshipTypeWithDirection,
   )
     ? [
@@ -437,7 +437,7 @@ function FieldGroupRelationship({
       : allowedRightLeftProfileTypeIds;
 
   const options =
-    isDefined(leftFieldGroup) && !isDefined(rightFieldGroup)
+    isNonNullish(leftFieldGroup) && isNullish(rightFieldGroup)
       ? profileRelationshipTypesWithDirection.filter((prtwd) =>
           prtwd.profileRelationshipType[
             prtwd.direction === "LEFT_RIGHT"
@@ -445,7 +445,7 @@ function FieldGroupRelationship({
               : "allowedRightLeftProfileTypeIds"
           ].includes(leftFieldGroup.profileType!.id),
         )
-      : isDefined(rightFieldGroup) && !isDefined(leftFieldGroup)
+      : isNonNullish(rightFieldGroup) && isNullish(leftFieldGroup)
         ? profileRelationshipTypesWithDirection.filter((prtwd) =>
             prtwd.profileRelationshipType[
               prtwd.direction === "LEFT_RIGHT"
@@ -453,7 +453,7 @@ function FieldGroupRelationship({
                 : "allowedLeftRightProfileTypeIds"
             ].includes(rightFieldGroup.profileType!.id),
           )
-        : isDefined(rightFieldGroup) && isDefined(leftFieldGroup)
+        : isNonNullish(rightFieldGroup) && isNonNullish(leftFieldGroup)
           ? profileRelationshipTypesWithDirection.filter(
               (prtwd) =>
                 prtwd.profileRelationshipType[
@@ -476,14 +476,14 @@ function FieldGroupRelationship({
     return (
       f.isLinkedToProfileType &&
       f.type === "FIELD_GROUP" &&
-      (isDefined(selectedProfileRelationshipTypeWithDirection) &&
+      (isNonNullish(selectedProfileRelationshipTypeWithDirection) &&
       selectedProfileRelationshipTypeWithDirection.profileRelationshipType.isReciprocal === false
         ? f.id !== rightFieldGroup?.id
         : true) &&
-      (isDefined(rightFieldGroup)
+      (isNonNullish(rightFieldGroup)
         ? rightSideIds.includes(rightFieldGroup.profileType!.id)
         : true) &&
-      (isDefined(rightFieldGroup) || isDefined(selectedProfileRelationshipTypeWithDirection)
+      (isNonNullish(rightFieldGroup) || isNonNullish(selectedProfileRelationshipTypeWithDirection)
         ? leftSideIds.includes(f.profileType!.id)
         : true)
     );
@@ -493,36 +493,38 @@ function FieldGroupRelationship({
     return (
       f.isLinkedToProfileType &&
       f.type === "FIELD_GROUP" &&
-      (isDefined(selectedProfileRelationshipTypeWithDirection) &&
+      (isNonNullish(selectedProfileRelationshipTypeWithDirection) &&
       selectedProfileRelationshipTypeWithDirection.profileRelationshipType.isReciprocal === false
         ? f.id !== leftFieldGroup?.id
         : true) &&
-      (isDefined(leftFieldGroup) ? leftSideIds.includes(leftFieldGroup.profileType!.id) : true) &&
-      (isDefined(leftFieldGroup) || isDefined(selectedProfileRelationshipTypeWithDirection)
+      (isNonNullish(leftFieldGroup)
+        ? leftSideIds.includes(leftFieldGroup.profileType!.id)
+        : true) &&
+      (isNonNullish(leftFieldGroup) || isNonNullish(selectedProfileRelationshipTypeWithDirection)
         ? rightSideIds.includes(f.profileType!.id)
         : true)
     );
   };
 
-  const hasLeftGroupError = isDefined(errors.relationships?.[index]?.leftFieldGroup);
+  const hasLeftGroupError = isNonNullish(errors.relationships?.[index]?.leftFieldGroup);
 
   const hasRelationshipError =
     errors.relationships?.[index]?.leftFieldGroup?.type === "duplicated" ||
-    isDefined(errors.relationships?.[index]?.profileRelationshipTypeWithDirection);
+    isNonNullish(errors.relationships?.[index]?.profileRelationshipTypeWithDirection);
 
   const hasRightGroupError =
     errors.relationships?.[index]?.leftFieldGroup?.type === "duplicated" ||
-    isDefined(errors.relationships?.[index]?.rightFieldGroup);
+    isNonNullish(errors.relationships?.[index]?.rightFieldGroup);
 
   const hasSomethingSelected =
-    isDefined(leftFieldGroup) ||
-    isDefined(rightFieldGroup) ||
-    isDefined(selectedProfileRelationshipTypeWithDirection);
+    isNonNullish(leftFieldGroup) ||
+    isNonNullish(rightFieldGroup) ||
+    isNonNullish(selectedProfileRelationshipTypeWithDirection);
 
   return (
     <FormControl
       as={NoElement}
-      isInvalid={isDefined(errors.relationships?.[index]?.leftFieldGroup?.type)}
+      isInvalid={isNonNullish(errors.relationships?.[index]?.leftFieldGroup?.type)}
     >
       <FormControl isDisabled={isDisabled} minWidth={0} isInvalid={hasLeftGroupError}>
         <Controller
@@ -550,9 +552,9 @@ function FieldGroupRelationship({
                 const others = values.filter(
                   ({ leftFieldGroupId, rightFieldGroupId, profileRelationshipTypeId }, i) =>
                     i !== index &&
-                    isDefined(leftFieldGroupId) &&
-                    isDefined(rightFieldGroupId) &&
-                    isDefined(profileRelationshipTypeId),
+                    isNonNullish(leftFieldGroupId) &&
+                    isNonNullish(rightFieldGroupId) &&
+                    isNonNullish(profileRelationshipTypeId),
                 );
 
                 if (!others.length) return true;
@@ -678,7 +680,7 @@ function FieldGroupRelationship({
         })}
       />
 
-      {isDefined(errors.relationships?.[index]?.leftFieldGroup?.type) &&
+      {isNonNullish(errors.relationships?.[index]?.leftFieldGroup?.type) &&
       errors.relationships?.[index]?.leftFieldGroup?.type === "duplicated" ? (
         <FormErrorMessage gridColumn={"1 / -1"} margin={0}>
           <FormattedMessage

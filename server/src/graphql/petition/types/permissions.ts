@@ -1,5 +1,5 @@
 import { enumType, interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export const PetitionPermissionTypeRW = enumType({
   name: "PetitionPermissionTypeRW",
@@ -17,9 +17,9 @@ export const PetitionPermission = interfaceType({
   name: "PetitionPermission",
   sourceType: "db.PetitionPermission",
   resolveType: (o) => {
-    if (isDefined(o.user_id)) {
+    if (isNonNullish(o.user_id)) {
       return "PetitionUserPermission";
-    } else if (isDefined(o.user_group_id)) {
+    } else if (isNonNullish(o.user_group_id)) {
       return "PetitionUserGroupPermission";
     }
     throw new Error(
@@ -106,9 +106,9 @@ export const TemplateDefaultPermission = interfaceType({
   name: "TemplateDefaultPermission",
   sourceType: "db.TemplateDefaultPermission",
   resolveType: (o) => {
-    if (isDefined(o.user_id)) {
+    if (isNonNullish(o.user_id)) {
       return "TemplateDefaultUserPermission";
-    } else if (isDefined(o.user_group_id)) {
+    } else if (isNonNullish(o.user_group_id)) {
       return "TemplateDefaultUserGroupPermission";
     }
     throw new Error(

@@ -1,5 +1,5 @@
 import { json, Router } from "express";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { ApiContext } from "../context";
 import { CreateUser, CreateUserData, User, UserData, UserStatus } from "../db/__types";
 import { Maybe } from "../util/types";
@@ -81,7 +81,7 @@ scim
         emails?: { type: string; value: string }[];
       };
 
-      if (!isDefined(name) || !isDefined(emails)) {
+      if (isNullish(name) || isNullish(emails)) {
         return res.status(401).send("'emails' and 'name' are required fields");
       }
 
@@ -252,7 +252,7 @@ scim
           }
         }
       }
-      if (isDefined(userUpdate.status)) {
+      if (isNonNullish(userUpdate.status)) {
         const user = await req.context.users.loadUserByExternalId.raw({
           orgId: req.context.organization!.id,
           externalId: req.params.externalId,
@@ -289,7 +289,7 @@ scim
           );
         }
       }
-      if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
+      if (isNonNullish(userDataUpdate.first_name) || isNonNullish(userDataUpdate.last_name)) {
         await req.context.users.updateUserDataByExternalId(
           req.params.externalId,
           req.context.organization!.id,
@@ -320,13 +320,13 @@ scim
     try {
       const userUpdate: Partial<CreateUser> = {};
       const userDataUpdate: Partial<CreateUserData> = {};
-      if (isDefined(req.body.name.givenName)) {
+      if (isNonNullish(req.body.name.givenName)) {
         userDataUpdate.first_name = req.body.name.givenName;
       }
-      if (isDefined(req.body.name.familyName)) {
+      if (isNonNullish(req.body.name.familyName)) {
         userDataUpdate.last_name = req.body.name.familyName;
       }
-      if (isDefined(req.body.active)) {
+      if (isNonNullish(req.body.active)) {
         const user = await req.context.users.loadUserByExternalId({
           externalId: req.params.externalId,
           orgId: req.context.organization!.id,
@@ -338,7 +338,7 @@ scim
         );
       }
 
-      if (isDefined(userUpdate.status)) {
+      if (isNonNullish(userUpdate.status)) {
         const user = await req.context.users.loadUserByExternalId({
           externalId: req.params.externalId,
           orgId: req.context.organization!.id,
@@ -373,7 +373,7 @@ scim
           );
         }
       }
-      if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
+      if (isNonNullish(userDataUpdate.first_name) || isNonNullish(userDataUpdate.last_name)) {
         await req.context.users.updateUserDataByExternalId(
           req.params.externalId,
           req.context.organization!.id,

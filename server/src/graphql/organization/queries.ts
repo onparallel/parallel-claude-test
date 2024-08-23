@@ -2,8 +2,8 @@ import { arg, nonNull, nullable, queryField } from "nexus";
 import { authenticateAnd, or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import { contextUserBelongsToOrg } from "./authorizers";
 import { superAdminAccess } from "../support/authorizers";
+import { contextUserBelongsToOrg } from "./authorizers";
 
 export const organizationQueries = queryField((t) => {
   t.nullable.field("organization", {

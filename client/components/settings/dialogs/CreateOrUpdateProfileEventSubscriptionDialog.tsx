@@ -22,6 +22,7 @@ import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboa
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Steps } from "@parallel/components/common/Steps";
@@ -35,13 +36,12 @@ import {
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
-import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
-import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 interface CreateOrUpdateProfileEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment;
   initialStep?: number;
@@ -127,7 +127,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
     defaultValues: {
       name: eventSubscription?.name ?? "",
       eventsUrl: eventSubscription?.eventsUrl ?? "",
-      eventsMode: isDefined(eventSubscription?.profileEventTypes) ? "SPECIFIC" : "ALL",
+      eventsMode: isNonNullish(eventSubscription?.profileEventTypes) ? "SPECIFIC" : "ALL",
       eventTypes: eventSubscription?.profileEventTypes ?? [],
       fromProfileTypeId: eventSubscription?.fromProfileType?.id ?? null,
       fromProfileTypeFieldIds: eventSubscription?.fromProfileTypeFields?.map((f) => f?.id) ?? [],
@@ -144,7 +144,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
 
   const { data } = useQuery(CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument, {
     variables: fromProfileTypeId ? { profileTypeId: fromProfileTypeId } : undefined,
-    skip: !isDefined(fromProfileTypeId),
+    skip: isNullish(fromProfileTypeId),
     fetchPolicy: "no-cache",
   });
 
@@ -215,7 +215,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                   eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
                   fromProfileTypeId: data.fromProfileTypeId,
                   fromProfileTypeFieldIds:
-                    isDefined(data.fromProfileTypeId) && data.fromProfileTypeFieldIds.length > 0
+                    isNonNullish(data.fromProfileTypeId) && data.fromProfileTypeFieldIds.length > 0
                       ? data.fromProfileTypeFieldIds
                       : null,
                 }),
@@ -488,7 +488,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
       confirm={
         <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
           {currentStep === 0 ? (
-            isDefined(newSubscriptionId) ? (
+            isNonNullish(newSubscriptionId) ? (
               <FormattedMessage id="generic.continue" defaultMessage="Continue" />
             ) : (
               <FormattedMessage id="generic.create" defaultMessage="Create" />

@@ -3,10 +3,10 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/emails/recipient/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { applyFieldVisibility } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
-import { completedFieldReplies } from "../../util/completedFieldReplies";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },

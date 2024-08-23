@@ -9,7 +9,7 @@ import {
   useExportRepliesTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { withError } from "../promises/withError";
 import { Maybe } from "../types";
@@ -29,7 +29,7 @@ export function useExportRepliesTask() {
             mutation: useExportRepliesTask_createExportRepliesTaskDocument,
             variables: { petitionId, pattern },
           });
-          if (!isDefined(data)) {
+          if (isNullish(data)) {
             throw new Error();
           }
           return data.createExportRepliesTask;

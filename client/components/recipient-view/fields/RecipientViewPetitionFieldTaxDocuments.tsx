@@ -6,11 +6,10 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
-import { isDefined } from "@udecode/plate-common";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { pick, zip } from "remeda";
+import { isNonNullish, pick, zip } from "remeda";
 import { useEsTaxDocumentsChangePersonDialog } from "../dialogs/EsTaxDocumentsChangePersonDialog";
 import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import {
@@ -100,7 +99,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
-        if (isDefined(popupRef.current) && popupRef.current.closed && !bankflipSessionReady) {
+        if (isNonNullish(popupRef.current) && popupRef.current.closed && !bankflipSessionReady) {
           setState("IDLE");
           done();
         } else {
@@ -124,7 +123,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     "message",
     (e) => {
       const popup = popupRef.current;
-      if (isDefined(popup) && e.source === popup) {
+      if (isNonNullish(popup) && e.source === popup) {
         if (e.data.name === "session_completed") {
           setBankflipSessionReady(true);
         }
@@ -194,10 +193,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
 
   const hasErrorDocuments = field.replies.some(
     (r) =>
-      ((isDefined(r.content.error) &&
+      ((isNonNullish(r.content.error) &&
         Array.isArray(r.content.error) &&
         r.content.error[0]?.reason !== "document_not_found") ||
-        isDefined(r.content.warning)) &&
+        isNonNullish(r.content.warning)) &&
       r.status !== "APPROVED",
   );
 

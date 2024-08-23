@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { authenticate } from "../../api/helpers/authenticate";
 import { IntegrationType } from "../../db/__types";
 import {
@@ -59,7 +59,7 @@ export abstract class OAuthIntegration<
       name,
       isDefault: isDefault === "true",
     } as TState;
-    if (isDefined(id)) {
+    if (isNonNullish(id)) {
       state.id = fromGlobalId(id, "OrgIntegration").id;
     }
     return state;
@@ -78,7 +78,7 @@ export abstract class OAuthIntegration<
 
   private async getState(key: string): Promise<TState> {
     const result = await this.redis.get(`oauth.${key}`);
-    if (!isDefined(result)) {
+    if (isNullish(result)) {
       throw new Error("Missing state");
     }
     return JSON.parse(result);
@@ -116,7 +116,7 @@ export abstract class OAuthIntegration<
             const state = await this.getState(key);
 
             const settings = await this.fetchIntegrationSettings(code, state);
-            if (isDefined(state.id)) {
+            if (isNonNullish(state.id)) {
               await this.updateOrgIntegration(state.id, {
                 name: state.name,
                 is_default: state.isDefault,

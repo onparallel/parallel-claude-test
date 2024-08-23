@@ -23,7 +23,7 @@ import { PetitionFieldMath } from "@parallel/utils/fieldLogic/types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionFieldMathEditor } from "../logic/PetitionFieldMathEditor";
 import { useCreateOrUpdatePetitionVariableDialog } from "./CreateOrUpdatePetitionVariableDialog";
@@ -149,7 +149,7 @@ function EditPetitionFieldCalculationsDialog({
                         ("fieldId" in c && !c.fieldId) ||
                         ("variableName" in c && !c.variableName) ||
                         (!("fieldId" in c) && !("variableName" in c)) ||
-                        !isDefined(c.value)
+                        isNullish(c.value)
                       );
                     }),
                 ))

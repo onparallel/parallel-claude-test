@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { groupBy, indexBy, isDefined, mapValues, pipe, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, mapValues, pipe, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
 import { PetitionField } from "../../db/__types";
@@ -105,7 +105,7 @@ export function validateCreatePetitionFieldReplyInput<
         const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
 
         const isValid =
-          isDefined(petitionFieldReply) &&
+          isNonNullish(petitionFieldReply) &&
           ((field.type === "FILE_UPLOAD" &&
             ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(
               petitionFieldReply.type,
@@ -114,7 +114,7 @@ export function validateCreatePetitionFieldReplyInput<
 
         const hasAccess =
           isValid &&
-          isDefined(ctx.user) &&
+          isNonNullish(ctx.user) &&
           (await ctx.petitions.userHasAccessToPetitionFieldReply(
             petitionFieldReply.id,
             ctx.user.id,
@@ -187,9 +187,9 @@ export function validateCreateFileReplyInput<TypeName extends string, FieldName 
     };
     const input = prop(args);
 
-    if (isDefined(input.file)) {
+    if (isNonNullish(input.file)) {
       const field = await ctx.petitions.loadField(input.id);
-      assert(isDefined(field), `Field ${input.id} not found`);
+      assert(isNonNullish(field), `Field ${input.id} not found`);
       assert(field.type === "FILE_UPLOAD", `Field ${input.id} is not a FILE_UPLOAD field`);
       const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
 
@@ -203,7 +203,7 @@ export function validateCreateFileReplyInput<TypeName extends string, FieldName 
         );
       }
 
-      if (isDefined(options.accepts)) {
+      if (isNonNullish(options.accepts)) {
         const acceptedFormats = options.accepts.flatMap((format) => formats[format]);
         if (!acceptedFormats.includes(input.file.contentType)) {
           throw new ArgValidationError(
@@ -234,7 +234,7 @@ export function validateUpdateFileReplyInput<TypeName extends string, FieldName 
     const file = fileProp(args);
 
     const field = await ctx.petitions.loadFieldForReply(replyId);
-    assert(isDefined(field), `Field for reply ${replyId} not found`);
+    assert(isNonNullish(field), `Field for reply ${replyId} not found`);
     assert(field.type === "FILE_UPLOAD", `Field for reply ${replyId} is not a FILE_UPLOAD field`);
     const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
 
@@ -248,7 +248,7 @@ export function validateUpdateFileReplyInput<TypeName extends string, FieldName 
       );
     }
 
-    if (isDefined(options.accepts)) {
+    if (isNonNullish(options.accepts)) {
       const acceptedFormats = options.accepts.flatMap((format) => formats[format]);
       if (!acceptedFormats.includes(file.contentType)) {
         throw new ArgValidationError(
@@ -270,8 +270,8 @@ async function validateCreateReplyInput(
 ) {
   const fields = await ctx.petitions.loadField(fieldReplies.map((fr) => fr.id));
 
-  if (!fields.every(isDefined)) {
-    const index = fields.findIndex((f) => !isDefined(f));
+  if (!fields.every(isNonNullish)) {
+    const index = fields.findIndex((f) => isNullish(f));
     throw new InvalidReplyError(
       info,
       argName + `[${index}].id`,
@@ -280,16 +280,16 @@ async function validateCreateReplyInput(
   }
 
   const parentReplyIds = unique(
-    fieldReplies.filter((fr) => isDefined(fr.parentReplyId)).map((fr) => fr.parentReplyId!),
+    fieldReplies.filter((fr) => isNonNullish(fr.parentReplyId)).map((fr) => fr.parentReplyId!),
   );
   const parentReplies = await ctx.petitions.loadFieldReply(parentReplyIds);
-  if (!parentReplies.every(isDefined)) {
-    const index = parentReplies.findIndex((r) => !isDefined(r));
+  if (!parentReplies.every(isNonNullish)) {
+    const index = parentReplies.findIndex((r) => isNullish(r));
     throw new InvalidReplyError(
       info,
       argName + `[${index}].parentReplyId`,
       `Invalid PetitionFieldReply ${
-        isDefined(fieldReplies[index].parentReplyId)
+        isNonNullish(fieldReplies[index].parentReplyId)
           ? toGlobalId("PetitionFieldReply", fieldReplies[index].parentReplyId!) // use globalIds as this messages are exposed on the API
           : null
       }`,
@@ -299,10 +299,10 @@ async function validateCreateReplyInput(
   for (const fieldReply of fieldReplies) {
     const field = fields.find((f) => f.id === fieldReply.id)!;
     // if replying into a child field, make sure the parentReplyId is passed and references the parent field
-    if (isDefined(field.parent_petition_field_id) || isDefined(fieldReply.parentReplyId)) {
+    if (isNonNullish(field.parent_petition_field_id) || isNonNullish(fieldReply.parentReplyId)) {
       const parentReply = parentReplies.find((r) => r.id === fieldReply.parentReplyId);
       if (
-        !isDefined(parentReply) ||
+        isNullish(parentReply) ||
         parentReply.petition_field_id !== field.parent_petition_field_id
       ) {
         const index = fieldReplies.findIndex((r) => r.id === fieldReply.id);
@@ -310,7 +310,7 @@ async function validateCreateReplyInput(
           info,
           argName + `[${index}].parentReplyId`,
           `Invalid PetitionFieldReply ${
-            isDefined(fieldReply.parentReplyId)
+            isNonNullish(fieldReply.parentReplyId)
               ? toGlobalId("PetitionFieldReply", fieldReply.parentReplyId!)
               : null
           }`,

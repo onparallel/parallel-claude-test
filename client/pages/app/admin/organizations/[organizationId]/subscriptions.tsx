@@ -37,7 +37,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { add, Duration } from "date-fns";
 import { useMemo } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 type AdminOrganizationsSubscriptionsProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsSubscriptions.getInitialProps>
 >;
@@ -328,7 +328,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
               defaultMessage: "Signatures",
             })}
             buttonLabel={
-              !isDefined(organization.usageDetails.SIGNATURIT_SHARED_APIKEY)
+              isNullish(organization.usageDetails.SIGNATURIT_SHARED_APIKEY)
                 ? intl.formatMessage({
                     id: "page.admin-organizations-subscriptions.activate-signature-button",
                     defaultMessage: "Activate signature",
@@ -337,7 +337,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
             }
             onAction={handleUpdateOrganizationSignaturesSubscription}
           >
-            {isDefined(organization.usageDetails.SIGNATURIT_SHARED_APIKEY) ? (
+            {isNonNullish(organization.usageDetails.SIGNATURIT_SHARED_APIKEY) ? (
               <Grid as="dl" templateColumns="auto 1fr" gap={4} width="100%">
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
@@ -564,10 +564,10 @@ export function OrganizationUsagePeriodsTable({
               }}
             />
           </HStack>
-          {isDefined(items?.items?.[0]) ? (
+          {isNonNullish(items?.items?.[0]) ? (
             <Button
               onClick={onModifyCurrentPeriod}
-              isDisabled={isDefined(items?.items[0]?.periodEndDate)}
+              isDisabled={isNonNullish(items?.items[0]?.periodEndDate)}
             >
               <FormattedMessage
                 id="component.organization-usage-periods-table.modify-ongoing-period-button"

@@ -1,5 +1,6 @@
 import { Button, Menu, MenuButton, MenuList, Portal } from "@chakra-ui/react";
 import { FilterIcon } from "@parallel/chakra/icons";
+import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenuItemOptionProps";
 import {
   defaultFieldsFilter,
   PetitionFieldFilter,
@@ -7,7 +8,6 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { FormattedMessage } from "react-intl";
-import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenuItemOptionProps";
 
 type PetitionRepliesFilterButtonProps = ValueProps<PetitionFieldFilter, false>;
 

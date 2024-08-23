@@ -1,9 +1,9 @@
 import {
+  IMjmlSectionProps,
+  IMjmlTextProps,
   MjmlColumn,
   MjmlSection,
-  IMjmlSectionProps,
   MjmlText,
-  IMjmlTextProps,
 } from "@faire/mjml-react";
 import { ReactNode } from "react";
 

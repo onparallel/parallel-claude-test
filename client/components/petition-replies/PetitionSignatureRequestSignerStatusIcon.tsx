@@ -3,8 +3,8 @@ import { Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
   DatesList_SignerStatusFragment,
+  PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
   SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";

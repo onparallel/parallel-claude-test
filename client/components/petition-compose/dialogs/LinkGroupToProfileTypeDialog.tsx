@@ -19,7 +19,7 @@ import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance } from "react-select";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 function LinkGroupToProfileTypeDialog({
   defaultProfileTypeId,
@@ -54,8 +54,8 @@ function LinkGroupToProfileTypeDialog({
         as: "form",
         onSubmit: handleSubmit(async ({ profileTypeId, groupName }) => {
           props.onResolve({
-            profileTypeId: isDefined(dirtyFields.profileTypeId) ? profileTypeId : null,
-            groupName: isDefined(dirtyFields.groupName) ? groupName : null,
+            profileTypeId: isNonNullish(dirtyFields.profileTypeId) ? profileTypeId : null,
+            groupName: isNonNullish(dirtyFields.groupName) ? groupName : null,
           });
         }),
       }}

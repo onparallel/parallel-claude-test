@@ -12,7 +12,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { waitFor } from "../promises/waitFor";
 import { withError } from "../promises/withError";
@@ -34,7 +34,7 @@ export function usePrintPdfTask() {
             mutation: usePrintPdfTask_createPrintPdfTaskDocument,
             variables: { petitionId },
           });
-          if (!isDefined(data)) {
+          if (isNullish(data)) {
             throw new Error();
           }
           return data.createPrintPdfTask;

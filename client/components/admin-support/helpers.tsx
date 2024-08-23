@@ -6,7 +6,7 @@ import {
   IntrospectionNamedTypeRef,
   IntrospectionType,
 } from "graphql";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function findNamedTypeRef<T extends IntrospectionType>(
   type: IntrospectionNamedTypeRef<T>,
@@ -49,7 +49,7 @@ export function getDefaultInputTypeValue(
       if (type.name === "Upload") {
         return null;
       } else if (type.name === "Boolean") {
-        return isDefined(defaultValue) ? defaultValue === "true" : false;
+        return isNonNullish(defaultValue) ? defaultValue === "true" : false;
       }
       return "";
     default:

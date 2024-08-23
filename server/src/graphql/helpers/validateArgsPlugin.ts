@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from "graphql";
-import { plugin, core } from "nexus";
+import { core, plugin } from "nexus";
 
 const fieldDefTypes = core.printedGenTyping({
   optional: true,

@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { openMenu } from "../helpers/chakra/openMenu";
 import { selectInSimpleSelect } from "../helpers/react-select/selectInSimpleSelect";
 import { PetitionFieldType } from "../helpers/types";
@@ -30,7 +30,7 @@ export class PetitionCompose extends PetitionLayout {
     }: { title?: string; description?: string; required?: boolean; options?: string[] },
   ) {
     const field = this.getField(index);
-    if (isDefined(title)) {
+    if (isNonNullish(title)) {
       const titleInput = field.getByTestId("compose-field-title");
       await titleInput.fill(title);
       await Promise.all([
@@ -38,7 +38,7 @@ export class PetitionCompose extends PetitionLayout {
         titleInput.blur(),
       ]);
     }
-    if (isDefined(description)) {
+    if (isNonNullish(description)) {
       const descriptionTextArea = field.getByTestId("compose-field-description");
       await descriptionTextArea.fill(description);
       await Promise.all([
@@ -46,7 +46,7 @@ export class PetitionCompose extends PetitionLayout {
         descriptionTextArea.blur(),
       ]);
     }
-    if (isDefined(required)) {
+    if (isNonNullish(required)) {
       await field.hover();
       const isChecked = await field.getByTestId("compose-field-required").isChecked();
       if (isChecked !== required) {
@@ -59,7 +59,7 @@ export class PetitionCompose extends PetitionLayout {
         ]);
       }
     }
-    if (isDefined(options)) {
+    if (isNonNullish(options)) {
       await field.getByTestId("compose-field-options").type(options.join("\n"));
       await Promise.all([
         waitForGraphQL(this.page, (o) => o.operationName === "PetitionCompose_updatePetitionField"),

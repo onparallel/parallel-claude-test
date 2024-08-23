@@ -3,7 +3,7 @@ import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { MouseEvent, useCallback, useMemo } from "react";
-import { isDeepEqual, isDefined, pick } from "remeda";
+import { isDeepEqual, isNonNullish, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
 import { useHandleNavigation } from "./navigation";
 import { pathParams, resolveUrl } from "./next";
@@ -73,7 +73,7 @@ export class QueryItem<T> {
       },
       (value) =>
         value
-          .filter(isDefined)
+          .filter(isNonNullish)
           .map((v) => this.serialize(v))
           .join(","),
     );
@@ -108,7 +108,7 @@ export function date() {
   return new QueryItem<Date | null>(
     (value) => {
       const parsed = typeof value === "string" ? new Date(parseInt(value)) : null;
-      return isDefined(parsed) && !isNaN(parsed.valueOf()) ? parsed : null;
+      return isNonNullish(parsed) && !isNaN(parsed.valueOf()) ? parsed : null;
     },
     (value: Date) => {
       return value.valueOf().toString();

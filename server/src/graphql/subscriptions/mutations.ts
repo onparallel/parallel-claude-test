@@ -1,5 +1,5 @@
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { EventSubscription } from "../../db/__types";
 import { IFetchService } from "../../services/FetchService";
 import { generateEDKeyPair } from "../../util/keyPairs";
@@ -234,10 +234,10 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
   ),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
-    if (isDefined(args.isEnabled)) {
+    if (isNonNullish(args.isEnabled)) {
       data.is_enabled = args.isEnabled;
     }
-    if (isDefined(args.eventsUrl)) {
+    if (isNonNullish(args.eventsUrl)) {
       const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
         args.id,
       );
@@ -301,10 +301,10 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
   ),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
-    if (isDefined(args.isEnabled)) {
+    if (isNonNullish(args.isEnabled)) {
       data.is_enabled = args.isEnabled;
     }
-    if (isDefined(args.eventsUrl)) {
+    if (isNonNullish(args.eventsUrl)) {
       const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
         args.id,
       );

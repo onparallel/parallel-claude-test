@@ -1,9 +1,9 @@
+import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
-import { core } from "nexus";
-import { unique } from "remeda";
 
 export function userHasAccessToContacts<
   TypeName extends string,

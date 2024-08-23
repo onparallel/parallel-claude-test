@@ -23,7 +23,7 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { RecipientViewPetitionFieldLayout } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 function getRandomId() {
@@ -862,7 +862,7 @@ export function useCreateFieldGroupReplyFromProfile() {
         const { data } = await getProfile({ variables: { profileId } });
 
         const linkedFields =
-          field?.children?.filter((field) => isDefined(field.profileTypeField)) ?? [];
+          field?.children?.filter((field) => isNonNullish(field.profileTypeField)) ?? [];
 
         for (const linkedField of linkedFields) {
           const property = data?.profile?.properties.find((property) => {

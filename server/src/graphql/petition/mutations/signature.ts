@@ -1,5 +1,6 @@
 import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
+import { toBytes } from "../../../util/fileSize";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
@@ -17,7 +18,6 @@ import {
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
 } from "../authorizers";
-import { toBytes } from "../../../util/fileSize";
 
 export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
@@ -42,7 +42,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
 
       if (
         petition.signature_config.useCustomDocument &&
-        !isDefined(args.customDocumentTemporaryFileId)
+        isNullish(args.customDocumentTemporaryFileId)
       ) {
         throw new ApolloError(
           `Petition:${petition.id} requires a custom document to be uploaded`,
@@ -50,10 +50,10 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         );
       }
 
-      if (isDefined(args.customDocumentTemporaryFileId)) {
+      if (isNonNullish(args.customDocumentTemporaryFileId)) {
         try {
           const tmpFile = await ctx.files.loadTemporaryFile(args.customDocumentTemporaryFileId);
-          if (!isDefined(tmpFile)) {
+          if (isNullish(tmpFile)) {
             throw new Error();
           }
           await ctx.storage.temporaryFiles.getFileMetadata(tmpFile.path);

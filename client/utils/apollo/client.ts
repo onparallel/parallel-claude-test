@@ -2,8 +2,8 @@ import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/c
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
 import { setContext } from "@apollo/client/link/context";
 import { split } from "@apollo/client/link/core";
-import { RetryLink } from "@apollo/client/link/retry";
 import { onError } from "@apollo/client/link/error";
+import { RetryLink } from "@apollo/client/link/retry";
 import { getOperationName } from "@apollo/client/utilities";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
 import { Login_currentUserDocument } from "@parallel/graphql/__types";

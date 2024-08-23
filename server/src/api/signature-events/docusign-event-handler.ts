@@ -1,5 +1,5 @@
 import { json, RequestHandler, Router } from "express";
-import { isDefined, maxBy, pick } from "remeda";
+import { isNonNullish, isNullish, maxBy, pick } from "remeda";
 import { ApiContext } from "../../context";
 import { SignatureDeliveredEvent } from "../../db/events/PetitionEvent";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
@@ -149,7 +149,7 @@ export const docusignEventHandlers: RequestHandler = Router()
           `DOCUSIGN/${body.data.envelopeId}`,
         );
 
-        if (!isDefined(signature) || signature.status === "CANCELLED") {
+        if (isNullish(signature) || signature.status === "CANCELLED") {
           // status 200 to kill request but avoid sending an error to signaturit
           return res.sendStatus(200).end();
         }
@@ -444,7 +444,7 @@ async function upsertSignatureDeliveredEvent(
 
   const signerEvent = events.find((e) => e.data.signer.externalId === signer.externalId);
 
-  if (isDefined(signerEvent)) {
+  if (isNonNullish(signerEvent)) {
     await ctx.petitions.updateEvent(signerEvent.id, {
       ...signerEvent,
       data: {

@@ -29,15 +29,15 @@ import {
   ProfileFieldBackgroundCheckSettings_ProfileTypeFragment,
 } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
+import { Maybe } from "@parallel/utils/types";
 import { useEffect, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import {
   CreateOrUpdateProfileTypeFieldDialogData,
   useCreateOrUpdateProfileTypeFieldDialog,
 } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
-import { Maybe } from "@parallel/utils/types";
-import { isDefined } from "remeda";
 
 type FrequencyFixedOption =
   | "5_YEARS"
@@ -167,7 +167,7 @@ export function ProfileFieldBackgroundCheckSettings({
   } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"BACKGROUND_CHECK">>();
   const hasMonitoring = watch("options.hasMonitoring");
   const monitoring = watch("options.monitoring");
-  const hasActivationCondition = isDefined(monitoring?.activationCondition);
+  const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
 
   function handleActivationConditionChange(event: React.ChangeEvent<HTMLInputElement>) {
     setValue(

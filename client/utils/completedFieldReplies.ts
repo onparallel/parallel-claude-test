@@ -7,7 +7,7 @@ import {
   completedFieldReplies_PetitionFieldFragment,
   completedFieldReplies_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { FieldLogicResult } from "./fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "./types";
 
@@ -38,7 +38,7 @@ export function completedFieldReplies(
   }
   switch (field.type) {
     case "FIELD_GROUP":
-      if (isDefined(fieldLogic)) {
+      if (isNonNullish(fieldLogic)) {
         return zip(replies as PetitionFieldReplySelection[], fieldLogic!.groupChildrenLogic!)
           .filter(([reply, childLogic]) =>
             zip(reply.children! as PetitionFieldChildReplySelection[], childLogic)

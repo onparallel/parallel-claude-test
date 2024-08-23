@@ -13,7 +13,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/graphql/__types";
 import match from "mime-match";
 import { IntlShape, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export interface FileIconProps {
   filename: Maybe<string>;
@@ -135,8 +135,8 @@ function useGetIconAndLabelForFile({
   }
   for (const { icon, name, contentTypes, extensions } of FILE_TYPES) {
     if (
-      (isDefined(contentType) && contentTypes.some((t) => match(contentType, t))) ||
-      (isDefined(filename) && extensions.some((e) => filename.toLowerCase().endsWith(e)))
+      (isNonNullish(contentType) && contentTypes.some((t) => match(contentType, t))) ||
+      (isNonNullish(filename) && extensions.some((e) => filename.toLowerCase().endsWith(e)))
     ) {
       return [icon, name(intl)];
     }

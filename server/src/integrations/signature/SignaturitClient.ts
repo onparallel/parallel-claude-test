@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { BodyInit } from "node-fetch";
 import pMap from "p-map";
 import { flatten } from "q-flat";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, isNullish, omit } from "remeda";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
 import { ContactLocale } from "../../db/__types";
@@ -190,7 +190,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
           { maxRetries: 3, delay: 5_000 },
         );
 
-        if (!isDefined(response.id) || !isDefined(response.documents)) {
+        if (isNullish(response.id) || isNullish(response.documents)) {
           throw new Error(
             `Invalid response: ${stringify({ petitionId, opts, recipients, response })}`,
           );
@@ -383,7 +383,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
 
   private isSignaturitError(e: unknown): e is SignaturitError {
     return (
-      isDefined(e) &&
+      isNonNullish(e) &&
       typeof e === "object" &&
       "status_code" in e &&
       typeof e.status_code === "number" &&
@@ -412,7 +412,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
 
   private isInvalidGrantError(e: unknown): e is { error: string; error_message: string } {
     return (
-      isDefined(e) &&
+      isNonNullish(e) &&
       typeof e === "object" &&
       "error" in e &&
       typeof e.error === "string" &&
@@ -444,10 +444,10 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
       // we can't be sure who was the last person to sign the document.
       // so we take the last configured signer, their name will be used in the PetitionCompleted email
       const lastSigner = signature.documents.at(-1)!;
-      if (!isDefined(signatureRequest.file_upload_audit_trail_id)) {
+      if (isNullish(signatureRequest.file_upload_audit_trail_id)) {
         await this.signature.storeAuditTrail(signatureRequest, `${signature.id}/${lastSigner.id}`);
       }
-      if (!isDefined(signatureRequest.file_upload_id)) {
+      if (isNullish(signatureRequest.file_upload_id)) {
         await this.signature.storeSignedDocument(
           signatureRequest,
           `${signature.id}/${lastSigner.id}`,

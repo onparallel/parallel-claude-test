@@ -1,6 +1,5 @@
 import { Icon } from "@chakra-ui/react";
 import {
-  ShortSearchIcon,
   DowJonesIcon,
   FieldCheckboxIcon,
   FieldDateIcon,
@@ -16,6 +15,7 @@ import {
   FieldTaxDocumentsIcon,
   FieldTextIcon,
   IdVerificationIcon,
+  ShortSearchIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";

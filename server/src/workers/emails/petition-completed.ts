@@ -1,7 +1,7 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
-import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
+import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/emails/app/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -63,10 +63,10 @@ export async function petitionCompleted(
 
   const subscribedUserIds = permissions.filter((p) => p.is_subscribed).map((p) => p.user_id!);
   const subscribedUsersData = (await context.users.loadUserDataByUserId(subscribedUserIds)).filter(
-    isDefined,
+    isNonNullish,
   );
 
-  const isSigned = isDefined(payload.signer);
+  const isSigned = isNonNullish(payload.signer);
   const isManualStartSignature = !isSigned && petition.signature_config?.review === true;
 
   for (const userData of subscribedUsersData) {

@@ -1,7 +1,7 @@
 import { Knex } from "knex";
+import { addFeatureFlag, removeFeatureFlag } from "./helpers/featureFlags";
 import { sqlValues } from "./helpers/knex";
 import { timestamps } from "./helpers/timestamps";
-import { addFeatureFlag, removeFeatureFlag } from "./helpers/featureFlags";
 import { addUserGroupType, removeUserGroupType } from "./helpers/userGroupsTypes";
 
 const PERMISSIONS = {

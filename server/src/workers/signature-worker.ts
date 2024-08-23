@@ -1,6 +1,6 @@
 import { readFile, unlink } from "fs/promises";
 import pMap from "p-map";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../context";
 import { ContactLocale, OrgIntegration } from "../db/__types";
 import { IntegrationProvider, IntegrationSettings } from "../db/repositories/IntegrationRepository";
@@ -162,7 +162,7 @@ async function startSignatureProcess(
       cancel_data: {
         error_code: errorCode,
         error:
-          isDefined(error) && typeof error === "object" && "message" in error
+          isNonNullish(error) && typeof error === "object" && "message" in error
             ? error.message
             : null,
       },
@@ -185,7 +185,7 @@ async function startSignatureProcess(
     }
   } finally {
     try {
-      if (isDefined(documentTmpPath)) {
+      if (isNonNullish(documentTmpPath)) {
         await unlink(documentTmpPath);
       }
     } catch {}
@@ -275,7 +275,7 @@ async function storeSignedDocument(
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-    if (isDefined(signature.file_upload_id)) {
+    if (isNonNullish(signature.file_upload_id)) {
       // signed document is already available on signature, do nothing
       return;
     }
@@ -345,7 +345,7 @@ async function storeAuditTrail(
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-    if (isDefined(signature.file_upload_audit_trail_id)) {
+    if (isNonNullish(signature.file_upload_audit_trail_id)) {
       // audit trail is already available on signature, do nothing
       return;
     }
@@ -390,7 +390,7 @@ async function updateOrganizationBranding(
     signatureIntegrations,
     async (integration) => {
       // if targeting a single integration for update, make sure to skip every other
-      if (isDefined(payload.integrationId) && integration.id !== payload.integrationId) {
+      if (isNonNullish(payload.integrationId) && integration.id !== payload.integrationId) {
         return;
       }
 

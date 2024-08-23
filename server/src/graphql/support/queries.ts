@@ -1,11 +1,11 @@
 import { idArg, nonNull, queryField, stringArg } from "nexus";
-import { isDefined, zip } from "remeda";
+import { outdent } from "outdent";
+import { isNonNullish, isNullish, zip } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash } from "../../util/token";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
 import { superAdminAccess } from "./authorizers";
-import { outdent } from "outdent";
 
 export const globalIdDecode = queryField("globalIdDecode", {
   description: "Decodes the given Global ID into an entity in the database.",
@@ -55,13 +55,13 @@ export const getApiTokenOwner = queryField("getApiTokenOwner", {
     try {
       const tokenHash = await hash(token, "");
       const userToken = await ctx.userAuthentication.loadUserAuthenticationByTokenHash(tokenHash);
-      if (!isDefined(userToken)) {
+      if (isNullish(userToken)) {
         throw new Error("Token not found");
       }
       const user = await ctx.users.loadUser(userToken.user_id);
       const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
 
-      if (!isDefined(user) || !isDefined(userData)) {
+      if (isNullish(user) || isNullish(userData)) {
         throw new Error("Token found but user is deleted");
       }
       return {
@@ -117,7 +117,7 @@ export const petitionInformation = queryField("petitionInformation", {
       const permissions = (await ctx.petitions.loadEffectivePermissions(petitionId))!;
       const userDatas = (
         await ctx.users.loadUserDataByUserId(permissions.map((p) => p.user_id!))
-      ).filter(isDefined);
+      ).filter(isNonNullish);
 
       return {
         result: RESULT.SUCCESS,

@@ -6,11 +6,11 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../../../common/UserReference";
 import {
   SentReminderMessageDialog,
   useSentReminderMessageDialog,
 } from "../../dialogs/SentReminderMessageDialog";
-import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

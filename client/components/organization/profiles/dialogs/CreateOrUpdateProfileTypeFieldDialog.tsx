@@ -53,15 +53,15 @@ import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, pick } from "remeda";
+import { isNonNullish, omit, pick } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
 import { ProfileFieldBackgroundCheckSettings } from "../settings/ProfileFieldBackgroundCheckSettings";
 import {
   ProfileFieldSelectSettings,
   SelectOptionValue,
 } from "../settings/ProfileFieldSelectSettings";
-import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
 import { ProfileFieldShortTextSettings } from "../settings/ProfileFieldShortTextSettings";
+import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
 
 export interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileType: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment;
@@ -93,7 +93,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
 >) {
   const intl = useIntl();
 
-  const isUpdating = isDefined(profileTypeField) && "id" in profileTypeField;
+  const isUpdating = isNonNullish(profileTypeField) && "id" in profileTypeField;
   const hasBackgroundCheck = useHasBackgroundCheck();
   const isStandard = isUpdating ? profileTypeField!.isStandard : false;
 
@@ -107,7 +107,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const referencedPropertiesNames = referencedIn
     .map((field) => field.name[intl.locale as UserLocale])
-    .filter(isDefined);
+    .filter(isNonNullish);
 
   const isDisabled = referencedIn.length > 0;
 
@@ -131,7 +131,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
     } else if (profileTypeField?.type === "BACKGROUND_CHECK") {
       const options = profileTypeField.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
       return {
-        hasMonitoring: isDefined(options.monitoring),
+        hasMonitoring: isNonNullish(options.monitoring),
         monitoring: options.monitoring ?? {
           searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
         },
@@ -151,7 +151,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
           ? intialOptions
           : (profileTypeField?.options ?? {}),
       expiryAlertAheadTime:
-        isDefined(profileTypeField) &&
+        isNonNullish(profileTypeField) &&
         profileTypeField.isExpirable &&
         profileTypeField.expiryAlertAheadTime === null
           ? "DO_NOT_REMEMBER"
@@ -279,7 +279,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 const hasStandardList =
                   formData.options.listingType === "STANDARD" && formData.options.standardList;
 
-                const options = isDefined(dirtyData.options)
+                const options = isNonNullish(dirtyData.options)
                   ? {
                       showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
                       standardList: hasStandardList ? dirtyData.options.standardList : null,
@@ -300,7 +300,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           ? {}
                           : {
                               ...dirtyData,
-                              ...(isDefined(dirtyData.alias)
+                              ...(isNonNullish(dirtyData.alias)
                                 ? { alias: dirtyData.alias || null }
                                 : {}),
                             }),
@@ -332,7 +332,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                         profileTypeFieldId: profileTypeField.id,
                         data: {
                           ...(isStandard ? {} : dirtyData),
-                          ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
+                          ...(isNonNullish(dirtyData.alias)
+                            ? { alias: dirtyData.alias || null }
+                            : {}),
                           options,
                           isExpirable: formData.isExpirable,
                           expiryAlertAheadTime,
@@ -352,7 +354,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       profileTypeFieldId: profileTypeField.id,
                       data: {
                         ...dirtyData,
-                        ...(isDefined(dirtyData.alias) ? { alias: dirtyData.alias || null } : {}),
+                        ...(isNonNullish(dirtyData.alias)
+                          ? { alias: dirtyData.alias || null }
+                          : {}),
                         options:
                           formData.type === "DATE"
                             ? pick(formData.options, ["useReplyAsExpiryDate"])

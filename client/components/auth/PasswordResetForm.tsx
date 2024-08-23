@@ -12,7 +12,7 @@ import {
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 

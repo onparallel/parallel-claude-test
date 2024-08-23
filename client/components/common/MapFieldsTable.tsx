@@ -30,7 +30,7 @@ import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies"
 import useMergedRef from "@react-hook/merged-ref";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { groupBy, isDefined, omit } from "remeda";
+import { groupBy, isNonNullish, isNullish, omit } from "remeda";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { ReplyNotAvailable } from "../petition-replies/PetitionRepliesFieldReply";
 import { AlertPopover } from "./AlertPopover";
@@ -77,7 +77,7 @@ export const MapFieldsTable = Object.assign(
     const sourcePetitionFields = sourcePetition.fields.map((f) => ({
       ...f,
       replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
-        ? f.replies.filter((r) => !isDefined(r.content.error))
+        ? f.replies.filter((r) => isNullish(r.content.error))
         : f.replies,
     }));
 
@@ -543,7 +543,7 @@ function TableRow({
               </Text>
             </AlertPopover>
           ) : null}
-          {isDefined(field.visibility) ? (
+          {isNonNullish(field.visibility) ? (
             <SmallPopover
               content={
                 <Text fontSize="sm">

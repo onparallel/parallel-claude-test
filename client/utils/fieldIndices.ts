@@ -7,7 +7,7 @@ import {
   useFieldsWithIndices_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { UnwrapArray } from "./types";
 
 export type PetitionFieldIndex = string;
@@ -133,7 +133,7 @@ export function useAllFieldsWithIndices<T extends useAllFieldsWithIndices_Petiti
     return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
       return [
         [field, fieldIndex],
-        ...(isDefined(field.children)
+        ...(isNonNullish(field.children)
           ? (zip(field.children, childrenFieldIndices!) as [
               ChildOf<FieldOf<T>>,
               PetitionFieldIndex,

@@ -54,7 +54,7 @@ import { RefObject, useCallback, useEffect, useImperativeHandle, useRef, useStat
 import { XYCoord, useDrag, useDrop } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, sumBy, takeWhile } from "remeda";
+import { isNonNullish, omit, sumBy, takeWhile } from "remeda";
 import { ConfimationPopover } from "../common/ConfirmationPopover";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -85,6 +85,7 @@ import { ChevronFilledIcon } from "@parallel/chakra/icons";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import usePrevious from "@react-hook/previous";
 import { NativeTypes } from "react-dnd-html5-backend";
@@ -94,7 +95,6 @@ import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
-import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -778,7 +778,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         {"isLinkedToProfileTypeField" in field &&
         field.isLinkedToProfileTypeField &&
         "profileTypeField" in field &&
-        isDefined(field.profileTypeField) ? (
+        isNonNullish(field.profileTypeField) ? (
           <SmallPopover
             width="auto"
             content={
@@ -808,7 +808,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         {"isLinkedToProfileType" in field &&
         field.isLinkedToProfileType &&
         "profileType" in field &&
-        isDefined(field.profileType) ? (
+        isNonNullish(field.profileType) ? (
           <SmallPopover
             width="auto"
             content={
@@ -1610,7 +1610,7 @@ function useDragAndDrop(
     }),
     hover(item, monitor) {
       // if is dragging files over do nothing
-      if (isDefined(item.files)) return;
+      if (isNonNullish(item.files)) return;
 
       if (!elementRef.current) {
         return;

@@ -1,5 +1,5 @@
 import pMap from "p-map";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
 import {
   CreateIdentityVerificationSessionRequest,
@@ -35,7 +35,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       "userId" in session.metadata ? fromGlobalId(session.metadata.userId, "User").id : null;
 
     try {
-      if (isDefined(userId)) {
+      if (isNonNullish(userId)) {
         await this.ctx.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
       }
 
@@ -62,7 +62,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
   ) {
     const petitionId = fromGlobalId(session.metadata.petitionId, "Petition").id;
     const fieldId = fromGlobalId(session.metadata.fieldId, "PetitionField").id;
-    const parentReplyId = isDefined(session.metadata.parentReplyId)
+    const parentReplyId = isNonNullish(session.metadata.parentReplyId)
       ? fromGlobalId(session.metadata.parentReplyId, "PetitionFieldReply").id
       : null;
     const userId =
@@ -71,12 +71,14 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       "accessId" in session.metadata
         ? fromGlobalId(session.metadata.accessId, "PetitionAccess").id
         : null;
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+    const createdBy = isNonNullish(userId)
+      ? `User:${userId}`
+      : `PetitionAccess:${petitionAccessId!}`;
 
     const field = await this.ctx.petitions.loadField(fieldId);
-    assert(isDefined(field), "Field not found");
+    assert(isNonNullish(field), "Field not found");
 
-    if (isDefined(session.identityVerification)) {
+    if (isNonNullish(session.identityVerification)) {
       const integrationId = fromGlobalId(session.metadata.integrationId, "OrgIntegration").id;
       await this.ctx.petitions.createPetitionFieldReply(
         petitionId,
@@ -103,7 +105,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
   private async createIdVerificationReplies(session: IdentityVerificationSessionResponse) {
     const petitionId = fromGlobalId(session.metadata.petitionId, "Petition").id;
     const fieldId = fromGlobalId(session.metadata.fieldId, "PetitionField").id;
-    const parentReplyId = isDefined(session.metadata.parentReplyId)
+    const parentReplyId = isNonNullish(session.metadata.parentReplyId)
       ? fromGlobalId(session.metadata.parentReplyId, "PetitionFieldReply").id
       : null;
     const userId =
@@ -112,12 +114,14 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       "accessId" in session.metadata
         ? fromGlobalId(session.metadata.accessId, "PetitionAccess").id
         : null;
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+    const createdBy = isNonNullish(userId)
+      ? `User:${userId}`
+      : `PetitionAccess:${petitionAccessId!}`;
 
     const field = await this.ctx.petitions.loadField(fieldId);
-    assert(isDefined(field), "Field not found");
+    assert(isNonNullish(field), "Field not found");
 
-    const idVerificationReplies = isDefined(session.identityVerification)
+    const idVerificationReplies = isNonNullish(session.identityVerification)
       ? await this.extractAndUploadIdentityVerificationDocuments(session, createdBy)
       : [];
 
@@ -157,7 +161,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       return [];
     }
     assert(
-      isDefined(session.identityVerification),
+      isNonNullish(session.identityVerification),
       "session identityVerification expected to be defined",
     );
 
@@ -198,7 +202,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
     const documentsData: IdentityVerificationDocumentReply[] = await pMap(
       summary.documents ?? [],
       async (doc) => {
-        if (!isDefined(doc.imagesDocument)) {
+        if (isNullish(doc.imagesDocument)) {
           return {
             content: {
               file_upload_id: null,
@@ -251,7 +255,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
               jsonContents.surname,
               jsonContents.firstName,
             ]
-              .filter(isDefined)
+              .filter(isNonNullish)
               .join("_")
               .replace(/\s/g, "_")}`
           : doc.imagesDocument.name;
@@ -293,7 +297,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
             integration_id: integrationId,
             external_id: session.id,
           },
-          metadata: isDefined(jsonContents?.type)
+          metadata: isNonNullish(jsonContents?.type)
             ? {
                 inferred_type: jsonContents.type,
                 inferred_data: jsonContents,
@@ -306,7 +310,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
 
     replies.push(...documentsData);
 
-    if (isDefined(summary.selfie?.videoDocument)) {
+    if (isNonNullish(summary.selfie?.videoDocument)) {
       const videoBuffer = await this.ctx.idVerification.fetchBinaryDocumentContents(
         integrationId,
         summary.selfie.videoDocument.id,

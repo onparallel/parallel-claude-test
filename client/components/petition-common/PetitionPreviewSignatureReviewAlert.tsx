@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, AlertProps, Text, Stack } from "@chakra-ui/react";
+import { Alert, AlertIcon, AlertProps, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function PetitionPreviewSignatureReviewAlert(props: AlertProps) {

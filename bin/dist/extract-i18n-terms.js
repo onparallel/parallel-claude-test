@@ -10,10 +10,10 @@ const detective_typescript_1 = __importDefault(require("detective-typescript"));
 const fast_glob_1 = require("fast-glob");
 const promises_1 = require("fs/promises");
 const path_1 = __importDefault(require("path"));
+const remeda_1 = require("remeda");
+const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
-const yargs_1 = __importDefault(require("yargs"));
-const remeda_1 = require("remeda");
 async function extractTerms(cwd, glob, excludePragma) {
     const queue = (0, fast_glob_1.sync)(glob, {
         cwd,
@@ -26,7 +26,7 @@ async function extractTerms(cwd, glob, excludePragma) {
         : undefined;
     while ((file = queue.pop())) {
         const source = await (0, promises_1.readFile)(file, { encoding: "utf-8" });
-        if ((0, remeda_1.isDefined)(excludeRegex) && source.match(excludeRegex)) {
+        if ((0, remeda_1.isNonNullish)(excludeRegex) && source.match(excludeRegex)) {
             continue;
         }
         files.add(file);
@@ -34,13 +34,13 @@ async function extractTerms(cwd, glob, excludePragma) {
         for (const dependecy of dependencies) {
             if (dependecy.startsWith("@parallel/")) {
                 const [resolved] = (0, fast_glob_1.sync)(path_1.default.resolve(cwd, dependecy.replace("@parallel/", "./")) + ".{ts,tsx}");
-                if ((0, remeda_1.isDefined)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+                if ((0, remeda_1.isNonNullish)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
                     queue.push(resolved);
                 }
             }
             else if (dependecy.startsWith("./") || dependecy.startsWith("../")) {
                 const [resolved] = (0, fast_glob_1.sync)(path_1.default.resolve(path_1.default.dirname(file), dependecy) + ".{ts,tsx}");
-                if ((0, remeda_1.isDefined)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+                if ((0, remeda_1.isNonNullish)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
                     queue.push(resolved);
                 }
             }

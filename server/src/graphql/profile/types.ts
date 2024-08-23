@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
-import { isDefined, pick, sortBy, unique } from "remeda";
+import { isNonNullish, isNullish, pick, sortBy, unique } from "remeda";
 import {
   ProfileRelationshipTypeDirectionValues,
   ProfileStatusValues,
@@ -257,7 +257,7 @@ export const Profile = objectType({
         ),
       },
       resolve: async (o, args, ctx) => {
-        if (isDefined(args.filter) && args.filter.length > 0) {
+        if (isNonNullish(args.filter) && args.filter.length > 0) {
           return await ctx.profiles.loadProfileRelationshipsByProfileIdFiltered({
             profileId: o.id,
             filter: args.filter,
@@ -302,7 +302,7 @@ export const ProfileFieldResponse = interfaceType({
     t.nullable.field("createdBy", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        if (!isDefined(root.created_by_user_id)) {
+        if (isNullish(root.created_by_user_id)) {
           return null;
         }
         return await ctx.users.loadUser(root.created_by_user_id);
@@ -411,13 +411,13 @@ export const ProfileFieldValue = objectType({
       resolve: (root, _, ctx) => {
         if (root.type === "BACKGROUND_CHECK") {
           return {
-            query: isDefined(root.content.query)
+            query: isNonNullish(root.content.query)
               ? pick(root.content.query, ["name", "date", "type"])
               : null,
-            search: isDefined(root.content.search)
+            search: isNonNullish(root.content.search)
               ? pick(root.content.search, ["totalCount", "createdAt"])
               : null,
-            entity: isDefined(root.content.entity)
+            entity: isNonNullish(root.content.entity)
               ? {
                   ...pick(root.content.entity, ["id", "type", "name", "createdAt"]),
                   properties: pick(root.content.entity.properties, ["topics"]),

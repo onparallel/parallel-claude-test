@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 const validEnvironments = ["local", "staging", "production"];
 // for each environment, an object where key: first 6 chars of decrypted signaturit API_KEY; value: encrypted CREDENTIALS object containing that API_KEY
@@ -41,7 +41,7 @@ const encryptedCredentialsMap: { [key: string]: Record<string, string> } = {
 export async function up(knex: Knex): Promise<void> {
   return;
   const environment = process.env.MIGRATION_ENV ?? "local";
-  if (!isDefined(environment) || !validEnvironments.includes(environment)) {
+  if (isNullish(environment) || !validEnvironments.includes(environment)) {
     throw new Error(
       `run this migration as: MIGRATION_ENV=<env> yarn migrate. <env>: ${validEnvironments.join(
         " | ",
@@ -57,7 +57,7 @@ export async function up(knex: Knex): Promise<void> {
 
   // make sure every key in database is defined on the encryptedKeys map
   rows
-    .filter(({ key }) => isDefined(key))
+    .filter(({ key }) => isNonNullish(key))
     .forEach(({ key }) => {
       const encrypted = encryptedKeys.find(([hint]) => key.startsWith(hint));
       if (!encrypted) {

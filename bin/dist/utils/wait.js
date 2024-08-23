@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitFor = exports.wait = void 0;
+exports.wait = wait;
+exports.waitFor = waitFor;
 async function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
-exports.wait = wait;
 async function waitFor(fn, message, ms) {
     const _ms = typeof message === "number" ? message : ms;
     const _message = typeof message === "number" ? undefined : message;
@@ -17,4 +17,3 @@ async function waitFor(fn, message, ms) {
         iteration++;
     }
 }
-exports.waitFor = waitFor;

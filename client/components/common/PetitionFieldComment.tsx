@@ -15,11 +15,11 @@ import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { UserOrContactReference } from "./UserOrContactReference";
 import { DateTime } from "./DateTime";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 import { PetitionFieldCommentContent } from "./PetitionFieldCommentContent";
 import { SmallPopover } from "./SmallPopover";
+import { UserOrContactReference } from "./UserOrContactReference";
 import {
   CommentEditor,
   CommentEditorInstance,

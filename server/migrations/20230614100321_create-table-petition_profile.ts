@@ -1,6 +1,6 @@
 import { Knex } from "knex";
-import { timestamps } from "./helpers/timestamps";
 import { addPetitionEvent, removePetitionEvent } from "./helpers/petitionEvents";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("petition_profile", (t) => {

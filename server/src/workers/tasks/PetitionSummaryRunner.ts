@@ -1,5 +1,15 @@
 import { IntlShape } from "react-intl";
-import { identity, isDefined, mapToObj, mapValues, pick, pipe, unique, zip } from "remeda";
+import {
+  identity,
+  isNonNullish,
+  isNullish,
+  mapToObj,
+  mapValues,
+  pick,
+  pipe,
+  unique,
+  zip,
+} from "remeda";
 import { Petition, PetitionFieldType } from "../../db/__types";
 import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
@@ -34,14 +44,14 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
 
     const summaryConfig = petition?.summary_config;
 
-    if (!isDefined(petition) || petition.is_template || !isDefined(summaryConfig)) {
+    if (isNullish(petition) || petition.is_template || isNullish(summaryConfig)) {
       throw new Error("Petition not found or summary_config is not defined");
     }
 
     const integration = await this.ctx.integrations.loadIntegration(summaryConfig.integration_id);
 
     if (
-      !isDefined(integration) ||
+      isNullish(integration) ||
       integration.type !== "AI_COMPLETION" ||
       integration.org_id !== user.org_id
     ) {
@@ -83,7 +93,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       petition.id,
     ]);
     const events = await this.ctx.petitions.getLastPetitionReplyStatusChangeEvents([petition.id]);
-    const userIds = unique(events.map((e) => e.data.user_id).filter(isDefined));
+    const userIds = unique(events.map((e) => e.data.user_id).filter(isNonNullish));
     const userDataById = pipe(
       userIds,
       zip(await this.ctx.users.loadUserDataByUserId(userIds)),
@@ -91,7 +101,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     );
     const eventsByReplyId = mapToObj(events, (e) => [e.data.petition_field_reply_id, e]);
     const reviewedByByReplyId = mapValues(eventsByReplyId, (e) => {
-      const user = isDefined(e.data.user_id) ? userDataById[e.data.user_id] : null;
+      const user = isNonNullish(e.data.user_id) ? userDataById[e.data.user_id] : null;
       return (
         user && {
           full_name: fullName(user.first_name, user.last_name),

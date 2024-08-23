@@ -56,7 +56,7 @@ import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { BaseSyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { isDefined, noop, omit } from "remeda";
+import { isNonNullish, noop, omit } from "remeda";
 import { assert } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
@@ -128,7 +128,7 @@ export function AddPetitionAccessDialog({
   const [isReady, setIsReady] = useState(false);
   //reset the form when the petition is loaded
   useEffect(() => {
-    if (!loading && isDefined(petition)) {
+    if (!loading && isNonNullish(petition)) {
       reset({
         signatureConfig: petition.signatureConfig ?? null,
         recipientGroups: [[]],
@@ -140,7 +140,7 @@ export function AddPetitionAccessDialog({
         sendAsUser:
           // make sure the "send as" is one of the available delegated users
           // it may not be an allowed user when setting default from the template's Messages tab.
-          isDefined(petition.defaultOnBehalf) &&
+          isNonNullish(petition.defaultOnBehalf) &&
           (userCanSendOnBehalfOfAnyone ||
             sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id))
             ? petition.defaultOnBehalf
@@ -156,7 +156,7 @@ export function AddPetitionAccessDialog({
   const sendAsUser = watch("sendAsUser");
 
   const isMissingSigners =
-    isDefined(signatureConfig) &&
+    isNonNullish(signatureConfig) &&
     !signatureConfig.review &&
     !signatureConfig.allowAdditionalSigners &&
     signatureConfig.signers.length < signatureConfig.minSigners;
@@ -189,7 +189,7 @@ export function AddPetitionAccessDialog({
     return async (event: BaseSyntheticEvent) => {
       try {
         await handleSubmit(async (data) => {
-          assert(isDefined(data.body));
+          assert(isNonNullish(data.body));
           const scheduledAt = schedule ? await showScheduleMessageDialog() : null;
           // if the petition has signer contacts configured,
           // ask user if they want that contact(s) to sign all the petitions
@@ -200,7 +200,7 @@ export function AddPetitionAccessDialog({
             data.recipientGroups.length > 1
           ) {
             const option = await showCopySignatureConfigDialog({
-              signers: data.signatureConfig.signers.filter(isDefined),
+              signers: data.signatureConfig.signers.filter(isNonNullish),
             });
 
             bulkSendSigningMode = option;
@@ -284,7 +284,7 @@ export function AddPetitionAccessDialog({
           },
         });
 
-        if (isDefined(newAccess.data)) {
+        if (isNonNullish(newAccess.data)) {
           link = newAccess.data.createContactlessPetitionAccess.recipientUrl!;
         }
       }
@@ -316,7 +316,7 @@ export function AddPetitionAccessDialog({
       }
       body={
         isReady ? (
-          (assert(isDefined(petition)),
+          (assert(isNonNullish(petition)),
           (
             <Stack spacing={4}>
               {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (

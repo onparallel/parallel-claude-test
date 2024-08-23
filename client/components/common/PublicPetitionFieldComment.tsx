@@ -5,7 +5,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { DateTime } from "./DateTime";
 import { GrowingTextarea } from "./GrowingTextarea";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
@@ -75,7 +75,7 @@ export function PublicPetitionFieldComment({
             <Text as="strong" fontStyle="italic">
               <FormattedMessage id="generic.you" defaultMessage="You" />
             </Text>
-          ) : isDefined(comment.author) ? (
+          ) : isNonNullish(comment.author) ? (
             <Text as="strong">{comment.author.fullName}</Text>
           ) : (
             <FormattedMessage id="generic.unknown" defaultMessage="Unknown" />

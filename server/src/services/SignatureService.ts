@@ -1,6 +1,6 @@
 import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { countBy, isDefined, omit } from "remeda";
+import { countBy, isNonNullish, isNullish, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   PetitionAccess,
@@ -322,12 +322,12 @@ export class SignatureService implements ISignatureService {
 
     if (
       signatureConfig.useCustomDocument &&
-      !isDefined(signatureConfig.customDocumentTemporaryFileId)
+      isNullish(signatureConfig.customDocumentTemporaryFileId)
     ) {
       throw new Error("Custom document for signature not provided");
     }
 
-    if (isDefined(signatureConfig.customDocumentTemporaryFileId)) {
+    if (isNonNullish(signatureConfig.customDocumentTemporaryFileId)) {
       const file = await this.files.loadTemporaryFile(
         signatureConfig.customDocumentTemporaryFileId,
       );

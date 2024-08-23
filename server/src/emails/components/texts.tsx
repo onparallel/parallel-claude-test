@@ -1,8 +1,8 @@
-import { IntlShape } from "react-intl";
 import outdent from "outdent";
+import { IntlShape } from "react-intl";
+import { Tone } from "../utils/types";
 import { DateTimeProps } from "./DateTime";
 import { PetitionField } from "./PetitionFieldList";
-import { Tone } from "../utils/types";
 
 export function closing({}, intl: IntlShape) {
   return outdent`

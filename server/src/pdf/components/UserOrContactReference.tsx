@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { UserOrContactReference_UserOrPetitionAccessFragment } from "../__types";
 import { Style } from "@react-pdf/types";
-import { Maybe } from "../__types";
+import { Maybe, UserOrContactReference_UserOrPetitionAccessFragment } from "../__types";
 import { ContactReference } from "./ContactReference";
 import { UserReference } from "./UserReference";
 

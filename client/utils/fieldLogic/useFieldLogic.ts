@@ -11,9 +11,10 @@ import {
   useFieldLogic_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
-import { filter, flatMap, flatMapToObj, indexBy, isDefined, pipe } from "remeda";
+import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
 import { completedFieldReplies } from "../completedFieldReplies";
+import { UnwrapArray } from "../types";
 import {
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionOperator,
@@ -24,7 +25,6 @@ import {
   PetitionFieldMathOperation,
   PetitionFieldVisibility,
 } from "./types";
-import { UnwrapArray } from "../types";
 
 type PetitionSelection = useFieldLogic_PetitionBaseFragment | useFieldLogic_PublicPetitionFragment;
 
@@ -67,7 +67,7 @@ export function useFieldLogic(
           );
           const parentById = pipe(
             fields,
-            filter((f) => isDefined(f.children)),
+            filter((f) => isNonNullish(f.children)),
             flatMapToObj((f) => f.children!.map((c) => [c.id, f])),
           );
           const visibilitiesById: { [fieldId: string]: boolean } = {};
@@ -84,7 +84,7 @@ export function useFieldLogic(
               | UnwrapArray<PetitionFieldSelection["children"]>,
           ) {
             const parent = parentById[referencedField.id];
-            return isDefined(parent)
+            return isNonNullish(parent)
               ? // if field has parent use collected replies
                 childFieldReplies[referencedField.id]
               : visibilitiesById[referencedField.id]
@@ -135,7 +135,7 @@ export function useFieldLogic(
             } else {
               visibilitiesById[field.id] = true;
             }
-            if (visibilitiesById[field.id] && isDefined(field.math)) {
+            if (visibilitiesById[field.id] && isNonNullish(field.math)) {
               for (const {
                 conditions,
                 operator,
@@ -155,7 +155,7 @@ export function useFieldLogic(
                 }
               }
             }
-            if (isDefined(field.children)) {
+            if (isNonNullish(field.children)) {
               for (const child of field.children) {
                 childFieldReplies[child.id] = [];
               }
@@ -171,12 +171,12 @@ export function useFieldLogic(
                 ) {
                   const parent = parentById[referencedField.id];
                   // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
-                  if (isDefined(parent) && parent.id === field.id) {
+                  if (isNonNullish(parent) && parent.id === field.id) {
                     return groupVisibilityById[referencedField.id]
                       ? (reply.children!.find((c) => c.field.id === referencedField.id)?.replies ??
                           [])
                       : [];
-                  } else if (isDefined(parent) && parent.id !== field.id) {
+                  } else if (isNonNullish(parent) && parent.id !== field.id) {
                     // if none of the child replies on that field were visible childFieldReplies[referencedField.id] === undefined
                     return childFieldReplies[referencedField.id] ?? [];
                   } else {
@@ -237,7 +237,7 @@ export function useFieldLogic(
                     childFieldReplies[child.id].push(
                       ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                     );
-                    if (isDefined(child.math)) {
+                    if (isNonNullish(child.math)) {
                       for (const {
                         conditions,
                         operator,
@@ -411,7 +411,7 @@ function evaluatePredicate(
         assert(typeof _reply === "string");
         assert(typeof value === "string");
         const list = petition.customLists.find((l) => l.name === value);
-        assert(isDefined(list));
+        assert(isNonNullish(list));
         const result = list.values.some((v) => v.toLowerCase() === _reply);
         return operator.startsWith("NOT_") ? !result : result;
       }

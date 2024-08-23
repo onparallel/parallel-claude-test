@@ -5,8 +5,6 @@ import { ILogger, LOGGER } from "../../services/Logger";
 import { unMaybeArray } from "../../util/arrays";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { MaybeArray } from "../../util/types";
-import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
 import {
   CreateFileUpload,
   CreatePublicFileUpload,
@@ -14,6 +12,8 @@ import {
   FileUpload,
   PublicFileUpload,
 } from "../__types";
+import { BaseRepository } from "../helpers/BaseRepository";
+import { KNEX } from "../knex";
 
 @injectable()
 export class FileRepository extends BaseRepository {

@@ -4,7 +4,7 @@ import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/Conf
 import { useDeleteTag_deleteTagDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
 
 export function useDeleteTag() {
@@ -128,7 +128,7 @@ function useConfirmDeleteTagDialog() {
                             { count: petitionListViewCount },
                           )
                         : null,
-                    ].filter(isDefined),
+                    ].filter(isNonNullish),
                   )})`}</Text>
                 );
               })}

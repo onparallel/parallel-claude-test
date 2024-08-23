@@ -1,13 +1,13 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { pick } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { KNEX } from "../../knex";
 import { Organization, Petition, User, UserGroup } from "../../__types";
+import { KNEX } from "../../knex";
 import { PetitionRepository } from "../PetitionRepository";
 import { UserGroupRepository } from "../UserGroupRepository";
 import { Mocks } from "./mocks";
-import { pick } from "remeda";
 
 describe("repositories/UserGroupRepository", () => {
   let container: Container;

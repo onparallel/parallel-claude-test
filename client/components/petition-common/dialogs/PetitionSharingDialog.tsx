@@ -25,11 +25,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
 import {
@@ -47,10 +47,11 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { usePetitionSharingBackgroundTask } from "@parallel/utils/tasks/usePetitionSharingTask";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { ReactNode, useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
 import { HelpPopover } from "../../common/HelpPopover";
@@ -59,7 +60,6 @@ import { UserAvatar } from "../../common/UserAvatar";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
-import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 interface PetitionSharingDialogData {
   selection: UserSelectSelection<true>[];
@@ -220,7 +220,7 @@ export function PetitionSharingDialog({
     permissionType,
   }: PetitionPermissionProps) => {
     try {
-      if (isDefined(permissionType) && permissionType !== "OWNER") {
+      if (isNonNullish(permissionType) && permissionType !== "OWNER") {
         if (user?.id === userId && permissionType === "READ") {
           await confirmEditPetitionPermission();
         }
@@ -245,8 +245,8 @@ export function PetitionSharingDialog({
 
       try {
         await addPetitionPermission({
-          petitionIds: isDefined(petitionIds) && petitionIds.length > 0 ? petitionIds : null,
-          folders: isDefined(folderIds) && folderIds.length > 0 ? { folderIds, type } : null,
+          petitionIds: isNonNullish(petitionIds) && petitionIds.length > 0 ? petitionIds : null,
+          folders: isNonNullish(folderIds) && folderIds.length > 0 ? { folderIds, type } : null,
           userIds: users.length ? users : null,
           userGroupIds: groups.length ? groups : null,
           permissionType,

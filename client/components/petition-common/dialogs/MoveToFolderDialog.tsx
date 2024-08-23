@@ -1,8 +1,8 @@
 import { Button, Text } from "@chakra-ui/react";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
-import { GenericFolderDialog, GenericFolderDialogProps } from "./GenericFolderDialog";
 import { PathName } from "../../common/PathName";
+import { GenericFolderDialog, GenericFolderDialogProps } from "./GenericFolderDialog";
 
 type MoveToFolderDialogProps = Omit<GenericFolderDialogProps, "header" | "body" | "confirm">;
 

@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import { isDefined } from "remeda";
-import { DowJonesIntegration } from "./DowJonesIntegration";
+import { isNonNullish } from "remeda";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
+import { Maybe } from "../../util/types";
 import { ExpiredCredentialsError } from "../helpers/ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "../helpers/GenericIntegration";
-import { Maybe } from "../../util/types";
-import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
+import { DowJonesIntegration } from "./DowJonesIntegration";
 
 export const DOW_JONES_CLIENT = Symbol.for("DOW_JONES_CLIENT");
 
@@ -137,7 +137,7 @@ export class DowJonesClient implements IDowJonesClient {
       return name.name;
     } else {
       return [name.surname ? name.surname + "," : null, name.middle_name, name.first_name]
-        .filter(isDefined)
+        .filter(isNonNullish)
         .join(" ");
     }
   }

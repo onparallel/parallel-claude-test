@@ -18,13 +18,13 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { GenericFolderDialog_foldersDocument, PetitionBaseType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { ComponentType, createElement, useEffect, useMemo, useRef, useState } from "react";
 import TreeView, { INode } from "react-accessible-treeview";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { PathName } from "../../common/PathName";
-import { isNotEmptyText } from "@parallel/utils/strings";
 
 interface PathNode extends INode {
   path: string;
@@ -67,7 +67,7 @@ export function GenericFolderDialog({
   const [selectedPath, setSelectedPath] = useState(currentPath);
   const [treeViewData, setTreeViewData] = useState<PathNode[] | null>(null);
   useEffect(() => {
-    if (isDefined(data)) {
+    if (isNonNullish(data)) {
       const nodes: PathNode[] = [
         { id: 0, name: "", parent: null, children: [1], path: "" },
         { id: 1, name: "", parent: 0, children: [], path: "/" },
@@ -88,10 +88,10 @@ export function GenericFolderDialog({
       }
       setTreeViewData(nodes);
     }
-  }, [isDefined(data)]);
+  }, [isNonNullish(data)]);
 
   const treeViewProps = useMemo(() => {
-    if (isDefined(treeViewData)) {
+    if (isNonNullish(treeViewData)) {
       return {
         defaultSelectedIds: [treeViewData.find((n) => n.path === currentPath)!.id],
         defaultExpandedIds: treeViewData
@@ -217,7 +217,7 @@ export function GenericFolderDialog({
             },
           }}
         >
-          {isDefined(treeViewData) ? (
+          {isNonNullish(treeViewData) ? (
             <>
               {createElement(body, componentProps)}
               <TreeView

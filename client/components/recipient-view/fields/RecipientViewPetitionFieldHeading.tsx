@@ -4,7 +4,7 @@ import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldLayout_PetitionFieldSelection } from "./RecipientViewPetitionFieldLayout";
 
@@ -33,7 +33,7 @@ export const RecipientViewPetitionFieldHeading = chakraForwardRef<
           </Heading>
         </Box>
         {(field.hasCommentsEnabled || field.__typename === "PetitionField") &&
-        isDefined(onCommentsButtonClick) ? (
+        isNonNullish(onCommentsButtonClick) ? (
           <Box paddingEnd={2}>
             <CommentsButton
               commentCount={field.commentCount}

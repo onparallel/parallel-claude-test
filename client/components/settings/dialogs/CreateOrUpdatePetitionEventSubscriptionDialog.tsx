@@ -47,7 +47,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
 import Select from "react-select/async";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
 interface CreateOrUpdatePetitionEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment;
@@ -174,7 +174,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
     defaultValues: {
       name: eventSubscription?.name ?? "",
       eventsUrl: eventSubscription?.eventsUrl ?? "",
-      eventsMode: isDefined(eventSubscription?.eventTypes) ? "SPECIFIC" : "ALL",
+      eventsMode: isNonNullish(eventSubscription?.eventTypes) ? "SPECIFIC" : "ALL",
       eventTypes: eventSubscription?.eventTypes ?? [],
       fromTemplate: eventSubscription?.fromTemplate ?? null,
       fromTemplateFields: [],
@@ -263,7 +263,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
     CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsDocument,
     {
       variables: fromTemplate ? { petitionId: fromTemplate.id } : undefined,
-      skip: !isDefined(fromTemplate),
+      skip: isNullish(fromTemplate),
       fetchPolicy: "no-cache",
     },
   );
@@ -280,8 +280,8 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
     // set initial fields
     setTimeout(() => {
       if (
-        isDefined(eventSubscription) &&
-        isDefined(eventSubscription.fromTemplateFields) &&
+        isNonNullish(eventSubscription) &&
+        isNonNullish(eventSubscription.fromTemplateFields) &&
         petition.fields.length > 0 &&
         !initialFieldsSetRef.current
       ) {
@@ -314,7 +314,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                   eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
                   fromTemplateId: data.fromTemplate?.id ?? null,
                   fromTemplateFieldIds:
-                    isDefined(data.fromTemplate) && data.fromTemplateFields.length > 0
+                    isNonNullish(data.fromTemplate) && data.fromTemplateFields.length > 0
                       ? data.fromTemplateFields.map((f) => f.id)
                       : null,
                 }),
@@ -597,7 +597,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
       confirm={
         <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
           {currentStep === 0 ? (
-            isDefined(newSubscriptionId) ? (
+            isNonNullish(newSubscriptionId) ? (
               <FormattedMessage id="generic.continue" defaultMessage="Continue" />
             ) : (
               <FormattedMessage id="generic.create" defaultMessage="Create" />

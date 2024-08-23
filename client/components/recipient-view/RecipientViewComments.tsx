@@ -26,24 +26,24 @@ import {
   RecipientViewComments_publicUpdatePetitionCommentDocument,
   Tone,
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
+import { useMetadata } from "@parallel/utils/withMetadata";
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { CloseButton } from "../common/CloseButton";
-import { PublicPetitionFieldComment } from "../common/PublicPetitionFieldComment";
-import { useTone } from "../common/ToneProvider";
-import { FORMATS } from "@parallel/utils/dates";
-import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
-import { useMetadata } from "@parallel/utils/withMetadata";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
+import { CloseButton } from "../common/CloseButton";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { PublicPetitionFieldComment } from "../common/PublicPetitionFieldComment";
 import { PublicPetitionFieldCommentExcerpt } from "../common/PublicPetitionFieldCommentExcerpt";
 import { Spacer } from "../common/Spacer";
+import { useTone } from "../common/ToneProvider";
 
 interface RecipientViewCommentsProps {
   keycode: string;
@@ -66,7 +66,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const { data, loading: isLoadingField } = useQuery(
     RecipientViewComments_publicPetitionFieldDocument,
     {
-      skip: !isDefined(fieldId) || showGeneralComments,
+      skip: isNullish(fieldId) || showGeneralComments,
       variables: { keycode, petitionFieldId: fieldId! },
       fetchPolicy: "cache-and-network",
     },
@@ -74,14 +74,14 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   const { data: dataAccess, loading: isLoadingAccess } = useQuery(
     RecipientViewComments_accessDocument,
     {
-      skip: isDefined(fieldId) && !showGeneralComments,
+      skip: isNonNullish(fieldId) && !showGeneralComments,
       variables: { keycode },
       fetchPolicy: "cache-and-network",
     },
   );
 
   useEffect(() => {
-    if (isDefined(fieldId) && !showGeneralComments) {
+    if (isNonNullish(fieldId) && !showGeneralComments) {
       const element = document.getElementById(`field-${fieldId}`);
       if (element) {
         smoothScrollIntoView(element, { block: "center", behavior: "smooth" });
@@ -99,7 +99,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
   const unsortedFieldsWithComments =
     petition?.fields
-      .filter((f) => isDefined(f.lastComment) && f.hasCommentsEnabled)
+      .filter((f) => isNonNullish(f.lastComment) && f.hasCommentsEnabled)
       .map((f) => {
         return {
           id: f.id,
@@ -110,7 +110,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
         };
       }) ?? [];
 
-  if (isDefined(petition?.lastGeneralComment)) {
+  if (isNonNullish(petition?.lastGeneralComment)) {
     unsortedFieldsWithComments.push({
       id: "general",
       title: intl.formatMessage({
@@ -140,7 +140,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   }
 
   async function handleSubmitClick() {
-    if (draft.length > 0 && isDefined(fieldId)) {
+    if (draft.length > 0 && isNonNullish(fieldId)) {
       try {
         await publicCreatePetitionComment({
           variables: {
@@ -215,7 +215,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
   // Scroll to bottom when open a field comments view and focus the editor
   useEffect(() => {
-    if (isDefined(fieldId)) {
+    if (isNonNullish(fieldId)) {
       commentsRef.current?.scrollTo({ top: 99999 });
       setTimeout(() => editorRef.current?.focus());
     }
@@ -223,7 +223,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
   const { deviceType } = useMetadata();
 
-  const hasGeneralComments = isDefined(petition?.lastGeneralComment);
+  const hasGeneralComments = isNonNullish(petition?.lastGeneralComment);
 
   const handleStartGeneralComment = () => {
     setFieldId("general");
@@ -239,7 +239,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
         justify="space-between"
         height="56px"
       >
-        {isDefined(field) || showGeneralComments ? (
+        {isNonNullish(field) || showGeneralComments ? (
           <HStack>
             <IconButtonWithTooltip
               variant="ghost"
@@ -248,7 +248,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               label={intl.formatMessage({ id: "generic.go-back", defaultMessage: "Go back" })}
               onClick={() => setFieldId(null)}
             />
-            {isDefined(field) ? (
+            {isNonNullish(field) ? (
               field.title ? (
                 <Heading as="h3" size="sm" fontWeight={500} noOfLines={2}>
                   {field.title}
@@ -292,7 +292,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
       </HStack>
 
       <Stack padding={0} overflow="auto" height="100%" spacing={0}>
-        {!isDefined(fieldId) ? (
+        {isNullish(fieldId) ? (
           fieldsWithComments.length === 0 && isLoadingAccess ? (
             <LoadingSpinner />
           ) : fieldsWithComments.length === 0 ? (
@@ -353,7 +353,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                     defaultMessage: "Write a comment",
                   })}
                   value={draft}
-                  isDisabled={!isDefined(fieldId) || field?.hasCommentsEnabled === false}
+                  isDisabled={isNullish(fieldId) || field?.hasCommentsEnabled === false}
                   onKeyDown={handleKeyDown}
                   onChange={(e) => setDraft(e.target.value)}
                 />
@@ -370,7 +370,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               <Box>
                 <Button
                   colorScheme="primary"
-                  isDisabled={draft.length === 0 || !isDefined(fieldId)}
+                  isDisabled={draft.length === 0 || isNullish(fieldId)}
                   onClick={handleSubmitClick}
                 >
                   <FormattedMessage id="generic.submit" defaultMessage="Submit" />
@@ -380,7 +380,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
           </>
         )}
       </Stack>
-      {!isDefined(fieldId) && !hasGeneralComments && fieldsWithComments.length > 0 ? (
+      {isNullish(fieldId) && !hasGeneralComments && fieldsWithComments.length > 0 ? (
         <Flex padding={2} borderTop="1px solid" borderColor="gray.200" justify="end">
           <Button leftIcon={<EditIcon />} onClick={handleStartGeneralComment}>
             <FormattedMessage id="generic.add-comment" defaultMessage="Add comment" />
@@ -768,7 +768,7 @@ function LastFieldComment({
             {`${
               isAuthor
                 ? intl.formatMessage({ id: "generic.you", defaultMessage: "You" })
-                : isDefined(comment.author)
+                : isNonNullish(comment.author)
                   ? comment.author.fullName
                   : intl.formatMessage({
                       id: "generic.unknown",

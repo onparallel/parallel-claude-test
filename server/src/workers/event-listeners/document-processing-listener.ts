@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PetitionFieldOptions } from "../../db/helpers/fieldOptions";
 import {
   InvalidCredentialsError,
@@ -13,7 +13,7 @@ export const documentProcessingListener = listener(
     if (
       !reply ||
       reply.type !== "FILE_UPLOAD" ||
-      !isDefined(reply.content.file_upload_id) ||
+      isNullish(reply.content.file_upload_id) ||
       Number.isNaN(reply.content.file_upload_id)
     ) {
       return;
@@ -27,7 +27,7 @@ export const documentProcessingListener = listener(
     }
 
     const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
-    if (isDefined(options.documentProcessing)) {
+    if (isNonNullish(options.documentProcessing)) {
       const integrations = await ctx.integrations.loadIntegrationsByOrgId(
         petition.org_id,
         "DOCUMENT_PROCESSING",
@@ -44,7 +44,7 @@ export const documentProcessingListener = listener(
         : `PetitionAccess:${event.data.petition_access_id}`;
 
       try {
-        if (!isDefined(integration)) {
+        if (isNullish(integration)) {
           throw new InvalidRequestError("INTEGRATION_NOT_FOUND");
         }
 

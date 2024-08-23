@@ -12,7 +12,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface NewPetitionCategoryMenuFilterProps extends ValueProps<string> {
   categories: string[];
@@ -36,7 +36,7 @@ export const NewPetitionCategoryMenuFilter = chakraForwardRef<
 
   const options = [
     defaultOption,
-    ...categories.map((value) => allCategories.find((c) => c.slug === value)).filter(isDefined),
+    ...categories.map((value) => allCategories.find((c) => c.slug === value)).filter(isNonNullish),
   ];
 
   const selectedOption = options.find((o) => o.slug === value) ?? defaultOption;

@@ -12,7 +12,7 @@ import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "@parallel/utils/types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick, uniqueBy, zip } from "remeda";
+import { isNonNullish, isNullish, pick, uniqueBy, zip } from "remeda";
 import { useAddNewSignerDialog } from "../recipient-view/dialogs/AddNewSignerDialog";
 
 type PetitionSelection =
@@ -95,7 +95,7 @@ export function SuggestedSigners({
           const value = replies[0]?.content?.value;
           const profileTypeFieldAlias = field.profileTypeField?.alias ?? null;
 
-          if ((field.type === "SHORT_TEXT" || field.type === "SELECT") && isDefined(value)) {
+          if ((field.type === "SHORT_TEXT" || field.type === "SELECT") && isNonNullish(value)) {
             if (
               field.type === "SHORT_TEXT" &&
               (field.options?.format === "EMAIL" ||
@@ -104,7 +104,7 @@ export function SuggestedSigners({
             ) {
               contact.email = value;
             } else if (
-              isDefined(field.profileTypeField) &&
+              isNonNullish(field.profileTypeField) &&
               profileTypeNamePatternFields.includes(field.profileTypeField.id)
             ) {
               if (foundProfileNamePatternFields === 0) {
@@ -141,7 +141,7 @@ export function SuggestedSigners({
       const filteredSuggestions = suggestions.filter((suggestion) => {
         const contactKey = [suggestion.email, suggestion.firstName, suggestion.lastName].join("|");
         const isInvalid =
-          !isDefined(suggestion.email) ||
+          isNullish(suggestion.email) ||
           !EMAIL_REGEX.test(suggestion.email) ||
           currentSigners.some(
             (s) =>
@@ -167,16 +167,16 @@ export function SuggestedSigners({
     })
     .filter((g) => g.suggestions.length > 0);
 
-  if (petition.__typename === "Petition" && isDefined(user)) {
+  if (petition.__typename === "Petition" && isNonNullish(user)) {
     suggestions = uniqueBy(
       [
         ...emailFieldsSuggestions,
         ...(petition.signatureRequests.flatMap((s) => s.signatureConfig.signers) ?? [])
-          .filter(isDefined)
+          .filter(isNonNullish)
           .map((signer) => pick(signer, ["firstName", "lastName", "email"])),
 
         ...petition.accesses
-          .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+          .filter((a) => a.status === "ACTIVE" && isNonNullish(a.contact))
           .map((a) => ({
             contactId: a.contact!.id,
             email: a.contact!.email,
@@ -206,7 +206,7 @@ export function SuggestedSigners({
         ),
       (s) => [s.email, s.firstName, s.lastName].join("|"),
     );
-  } else if (petition.__typename === "PublicPetition" && isDefined(contact)) {
+  } else if (petition.__typename === "PublicPetition" && isNonNullish(contact)) {
     suggestions = uniqueBy(
       [
         ...emailFieldsSuggestions,
@@ -272,8 +272,8 @@ function SuggestedSignersRow({
 
   const handleAddSigner = async (signer: SuggestionType) => {
     if (
-      (isDefined(signer.firstName) && signer.firstName.length > 0) ||
-      (isDefined(signer.lastName) && signer.lastName.length > 0)
+      (isNonNullish(signer.firstName) && signer.firstName.length > 0) ||
+      (isNonNullish(signer.lastName) && signer.lastName.length > 0)
     ) {
       onAddSigner(signer);
     } else {

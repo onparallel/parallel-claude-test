@@ -3,13 +3,13 @@
  * Don't forget to update it as well!
  */
 
-import { filter, flatMap, flatMapToObj, indexBy, isDefined, pipe, zip } from "remeda";
+import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionField, PetitionFieldReply } from "../db/__types";
+import type { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { fromGlobalId, toGlobalId } from "./globalId";
 import { Maybe, UnwrapArray } from "./types";
-import type { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
 
 type PetitionFieldVisibilityType = "SHOW" | "HIDE";
 
@@ -211,7 +211,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
       );
       const parentById = pipe(
         fields,
-        filter((f) => isDefined(f.children)),
+        filter((f) => isNonNullish(f.children)),
         flatMapToObj((f) => f.children!.map((c) => [c.id, f])),
       );
       const visibilitiesById: { [fieldId: string]: boolean } = {};
@@ -224,7 +224,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
 
       function getReplies(referencedField: FieldLogicPetitionFieldInput) {
         const parent = parentById[referencedField.id];
-        return isDefined(parent)
+        return isNonNullish(parent)
           ? // if field has parent use collected replies
             childFieldReplies[referencedField.id]
           : visibilitiesById[referencedField.id]
@@ -276,7 +276,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
         } else {
           visibilitiesById[field.id] = true;
         }
-        if (visibilitiesById[field.id] && isDefined(field.math)) {
+        if (visibilitiesById[field.id] && isNonNullish(field.math)) {
           for (const { conditions, operator, operations } of field.math as PetitionFieldMath[]) {
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
               evaluateCondition(c, petition),
@@ -292,7 +292,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
             }
           }
         }
-        if (isDefined(field.children)) {
+        if (isNonNullish(field.children)) {
           for (const child of field.children) {
             childFieldReplies[child.id] = [];
           }
@@ -305,11 +305,11 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
             ) {
               const parent = parentById[referencedField.id];
               // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
-              if (isDefined(parent) && parent.id === field.id) {
+              if (isNonNullish(parent) && parent.id === field.id) {
                 return groupVisibilityById[referencedField.id]
                   ? (reply.children!.find((c) => c.field.id === referencedField.id)?.replies ?? [])
                   : [];
-              } else if (isDefined(parent) && parent.id !== field.id) {
+              } else if (isNonNullish(parent) && parent.id !== field.id) {
                 // if none of the child replies on that field were visible childFieldReplies[referencedField.id] === undefined
                 return childFieldReplies[referencedField.id] ?? [];
               } else {
@@ -367,7 +367,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
                 childFieldReplies[child.id].push(
                   ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                 );
-                if (isDefined(child.math)) {
+                if (isNonNullish(child.math)) {
                   for (const {
                     conditions,
                     operator,
@@ -539,7 +539,7 @@ function evaluatePredicate(
         assert(typeof _reply === "string");
         assert(typeof value === "string");
         const list = petition.custom_lists?.find((l) => l.name === value);
-        assert(isDefined(list));
+        assert(isNonNullish(list));
         const result = list.values.some((v) => v.toLowerCase() === _reply);
         return operator.startsWith("NOT_") ? !result : result;
       }

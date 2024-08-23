@@ -1,8 +1,6 @@
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { WorkerContext } from "../../context";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   Petition,
@@ -11,6 +9,8 @@ import {
   PetitionUserNotification,
   User,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { deleteAllData } from "../../util/knexUtils";
 import { userNotificationsListener } from "../event-listeners/user-notifications-listener";
 

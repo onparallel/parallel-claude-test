@@ -13,7 +13,7 @@ import {
 } from "date-fns";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export type DateRange<IsNullable extends boolean = false> = IsNullable extends true
   ? [startDate: Date | null, endDate: Date | null]
@@ -24,7 +24,7 @@ export function isEqualDateRange(range: DateRange, rangeToCompare: DateRange) {
 }
 
 export function isDateRangeDefined(range: DateRange<true>): range is DateRange<false> {
-  return isDefined(range[0]) && isDefined(range[1]);
+  return isNonNullish(range[0]) && isNonNullish(range[1]);
 }
 
 export function useQuickDateRanges() {

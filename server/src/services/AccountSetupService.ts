@@ -9,13 +9,13 @@ import {
   UserGroupPermissionName,
 } from "../db/__types";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { PetitionViewRepository } from "../db/repositories/PetitionViewRepository";
 import { UserGroupRepository } from "../db/repositories/UserGroupRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { IIntegrationsSetupService, INTEGRATIONS_SETUP_SERVICE } from "./IntegrationsSetupService";
-import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./ProfilesSetupService";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./OrgLimitsService";
-import { PetitionViewRepository } from "../db/repositories/PetitionViewRepository";
+import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./ProfilesSetupService";
 
 export const ACCOUNT_SETUP_SERVICE = Symbol.for("ACCOUNT_SETUP_SERVICE");
 export interface IAccountSetupService {

@@ -3,10 +3,10 @@ import { StandardListSelect } from "@parallel/components/common/StandardListSele
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { FormattedMessage } from "react-intl";
+import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwriteOptionsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
 import { SettingsRow } from "../rows/SettingsRow";
-import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwriteOptionsDialog";
 
 export function PetitionComposeSelectSettings({
   field,

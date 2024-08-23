@@ -32,7 +32,7 @@ import { useFeatureFlags } from "@parallel/utils/useFeatureFlags";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 
 type AdminOrganizationsFeaturesProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsFeatures.getInitialProps>
@@ -118,7 +118,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
                             </FormLabel>
                             <HelpPopover popoverWidth="xs">
                               <Text fontSize="sm">{description}</Text>
-                              {isDefined(articleId) ? (
+                              {isNonNullish(articleId) ? (
                                 <HelpCenterLink articleId={articleId} width="fit-content">
                                   <FormattedMessage
                                     id="generic.help-center-article"

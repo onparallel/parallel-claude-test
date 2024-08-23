@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
+import { CreatePetitionListView, PetitionListView, User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreatePetitionListView, PetitionListView, User } from "../__types";
-import { unMaybeArray } from "../../util/arrays";
 
 @injectable()
 export class PetitionViewRepository extends BaseRepository {

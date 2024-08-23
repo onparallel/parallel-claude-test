@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
@@ -37,7 +37,7 @@ export class OrganizationLayoutService implements IOrganizationLayoutService {
       this.organizations.loadOrgLogoPath(orgId),
       this.organizations.loadOrgBrandTheme(orgId),
     ]);
-    const logoUrl = isDefined(logoPath)
+    const logoUrl = isNonNullish(logoPath)
       ? await this.images.getImageUrl(logoPath, { resize: { width: 400 } })
       : null;
     if (!org) {

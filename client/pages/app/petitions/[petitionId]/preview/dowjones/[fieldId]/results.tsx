@@ -29,7 +29,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 type DowJonesFieldSearchResults_Selection =
   DowJonesFieldSearchResults_DowJonesKycEntitySearchResultFragment;
@@ -78,7 +78,7 @@ function DowJonesFieldSearchResults({
 
   const showGenericErrorToast = useGenericErrorToast();
 
-  if (isDefined(error)) {
+  if (isNonNullish(error)) {
     showGenericErrorToast();
   }
 

@@ -28,7 +28,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { RadioTab, RadioTabList } from "../common/RadioTab";
@@ -52,7 +52,7 @@ export const ViewTabs = Object.assign(
     const handleViewChange = async (viewId: string) => {
       if (viewId !== "ALL") {
         const view = views.find((v) => v.id === viewId);
-        if (isDefined(view)) {
+        if (isNonNullish(view)) {
           onStateChange({
             view: view.id,
             ...omit(view.data, ["__typename"]),
@@ -113,25 +113,25 @@ export const ViewTabs = Object.assign(
             name,
             data: {
               ...omit(view.data, ["__typename", "sharedWith", "tagsFilters", "sort"]),
-              sharedWith: isDefined(view.data.sharedWith)
+              sharedWith: isNonNullish(view.data.sharedWith)
                 ? {
                     ...omit(view.data.sharedWith, ["__typename"]),
                     filters: view.data.sharedWith.filters.map(omit(["__typename"])),
                   }
                 : view.data.sharedWith,
-              tagsFilters: isDefined(view.data.tagsFilters)
+              tagsFilters: isNonNullish(view.data.tagsFilters)
                 ? {
                     ...omit(view.data.tagsFilters, ["__typename"]),
                     filters: view.data.tagsFilters.filters.map(omit(["__typename"])),
                   }
                 : view.data.tagsFilters,
-              sort: isDefined(view.data.sort)
+              sort: isNonNullish(view.data.sort)
                 ? omit(view.data.sort, ["__typename"])
                 : view.data.sort,
             },
           },
         });
-        if (isDefined(data)) {
+        if (isNonNullish(data)) {
           onStateChange({
             view: data.createPetitionListView.id,
             ...omit(data.createPetitionListView.data, ["__typename"]),

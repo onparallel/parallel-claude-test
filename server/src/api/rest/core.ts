@@ -2,6 +2,7 @@ import { json, Request, RequestHandler, Response, Router } from "express";
 import { OpenAPIV3 } from "openapi-types";
 import pProps from "p-props";
 import { omit } from "remeda";
+import { Readable } from "stream";
 import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
 import { unMaybeArray } from "../../util/arrays";
@@ -10,7 +11,6 @@ import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError
 import { ParseError } from "./params";
 import { Text } from "./responses";
 import { JsonSchemaFor } from "./schemas";
-import { Readable } from "stream";
 
 /*
  * We wrap multer files in a class with a custom .toString so that unflatten doesn't rebuild the object.

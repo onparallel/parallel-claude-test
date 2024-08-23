@@ -1,6 +1,6 @@
 import { createReadStream } from "fs";
 import { unlink } from "fs/promises";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -14,9 +14,9 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         include_netdocuments_links: includeNetDocumentsLinks,
       } = this.task.input;
 
-      const hasAccess = isDefined(this.task.user_id)
+      const hasAccess = isNonNullish(this.task.user_id)
         ? await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [petitionId])
-        : isDefined(this.task.petition_access_id)
+        : isNonNullish(this.task.petition_access_id)
           ? this.ctx.petitions.recipientHasAccessToPetition(
               this.task.petition_access_id,
               petitionId,
@@ -25,7 +25,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       if (!hasAccess) {
         throw new Error(
           `${
-            isDefined(this.task.user_id)
+            isNonNullish(this.task.user_id)
               ? `User:${this.task.user_id}`
               : `PetitionAccess:${this.task.petition_access_id}`
           } has no access to petition ${petitionId}`,
@@ -35,10 +35,10 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         this.ctx.petitions.loadPetition(petitionId),
         this.ctx.petitions.loadPetitionOwner(petitionId),
       ]);
-      if (!isDefined(petition)) {
+      if (isNullish(petition)) {
         throw new Error(`Petition:${petitionId} not found`);
       }
-      if (!isDefined(owner)) {
+      if (isNullish(owner)) {
         throw new Error(`Owner of petition Petition:${petitionId} not found`);
       }
 
@@ -64,7 +64,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       return { temporary_file_id: tmpFile.id };
     } finally {
       try {
-        if (isDefined(tmpFilePath)) {
+        if (isNonNullish(tmpFilePath)) {
           await unlink(tmpFilePath);
         }
       } catch {}

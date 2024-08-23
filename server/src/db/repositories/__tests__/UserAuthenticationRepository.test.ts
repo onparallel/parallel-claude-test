@@ -3,8 +3,8 @@ import { Knex } from "knex";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { hash } from "../../../util/token";
-import { KNEX } from "../../knex";
 import { User, UserAuthenticationToken } from "../../__types";
+import { KNEX } from "../../knex";
 import { UserAuthenticationRepository } from "../UserAuthenticationRepository";
 import { Mocks } from "./mocks";
 

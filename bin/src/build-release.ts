@@ -16,7 +16,7 @@ import {
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
@@ -162,7 +162,7 @@ async function main() {
       chalk.italic`Instance {yellow pending}. Waiting 10 more seconds...`,
       10_000,
     );
-    assert(isDefined(ipAddress));
+    assert(isNonNullish(ipAddress));
     await waitForInstance(ipAddress);
     await ec2.send(
       new AttachVolumeCommand({

@@ -4,7 +4,7 @@ import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import sanitizeFilename from "sanitize-filename";
 import {
   FileUpload,
@@ -107,7 +107,7 @@ export class PetitionBinder implements IPetitionBinder {
 
       const mainDocPaths: string[] = [];
 
-      if (!isDefined(customDocumentTemporaryFileId)) {
+      if (isNullish(customDocumentTemporaryFileId)) {
         mainDocPaths.push(
           await this.writeTemporaryFile(
             await this.printer.petitionExport(userId, {
@@ -180,7 +180,7 @@ export class PetitionBinder implements IPetitionBinder {
                 await this.files.loadFileUpload(
                   attachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
                 )
-              ).filter(isDefined),
+              ).filter(isNonNullish),
               userId,
               documentTheme,
             ),
@@ -330,7 +330,7 @@ export class PetitionBinder implements IPetitionBinder {
                   return null;
                 }
               })
-              .filter(isDefined);
+              .filter(isNonNullish);
             if (damagedFilePaths.length > 0) {
               this.info(`Found ${damagedFilePaths.length} damaged files. Attempting to repair...`);
               filePaths = await pMap(
@@ -407,8 +407,8 @@ export class PetitionBinder implements IPetitionBinder {
       .flatMap((field) =>
         field.replies.filter(
           (r) =>
-            !isDefined(r.content.error) &&
-            isDefined(r.content.file_upload_id) &&
+            isNullish(r.content.error) &&
+            isNonNullish(r.content.file_upload_id) &&
             r.status !== "REJECTED",
         ),
       )
@@ -418,7 +418,7 @@ export class PetitionBinder implements IPetitionBinder {
 
     return fileTypeFields.flatMap(({ replies, ...field }) => {
       const fileUploadIds: number[] = replies
-        .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+        .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
         .map((r) => r.content.file_upload_id);
 
       if (fileUploadIds.length === 0) {
@@ -426,7 +426,7 @@ export class PetitionBinder implements IPetitionBinder {
       }
 
       const printable = files
-        .filter(isDefined)
+        .filter(isNonNullish)
         .filter(
           (file) =>
             fileUploadIds.includes(file.id) &&
@@ -463,7 +463,7 @@ export class PetitionBinder implements IPetitionBinder {
         },
         { concurrency: 1 },
       )
-    ).filter(isDefined);
+    ).filter(isNonNullish);
   }
 
   private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>, extension: string) {

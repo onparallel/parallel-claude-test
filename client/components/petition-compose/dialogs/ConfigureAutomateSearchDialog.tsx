@@ -13,7 +13,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface ConfigureAutomateSearchDialogInput {
   petitionId: string;
@@ -44,11 +44,11 @@ export function ConfigureAutomateSearchDialog({
 
   const { handleSubmit, control, watch } = useForm({
     mode: "onSubmit",
-    defaultValues: isDefined(autoSearchConfig)
+    defaultValues: isNonNullish(autoSearchConfig)
       ? {
           name: autoSearchConfig.name
             .map((id) => allFields.find((f) => f.id === id))
-            .filter(isDefined),
+            .filter(isNonNullish),
           date: allFields.find((field) => autoSearchConfig.date === field.id) ?? null,
           type: autoSearchConfig.type,
         }
@@ -195,7 +195,7 @@ export function ConfigureAutomateSearchDialog({
         </Stack>
       }
       alternative={
-        isDefined(autoSearchConfig) ? (
+        isNonNullish(autoSearchConfig) ? (
           <Button
             type="submit"
             colorScheme="red"

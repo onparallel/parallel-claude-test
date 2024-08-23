@@ -1,10 +1,10 @@
-import { run } from "./utils/run";
+import { Presets, SingleBar } from "cli-progress";
+import { writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import pMap from "p-map";
-import yargs from "yargs";
-import { writeFile } from "fs/promises";
 import path from "path";
-import { SingleBar, Presets } from "cli-progress";
+import yargs from "yargs";
+import { run } from "./utils/run";
 
 async function main() {
   const { output } = await yargs.option("output", {

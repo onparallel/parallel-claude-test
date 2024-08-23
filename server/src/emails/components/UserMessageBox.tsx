@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlText, MjmlSection, MjmlWrapper } from "@faire/mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
 import { ReactNode } from "react";
 
 interface UserMessageBoxProps {

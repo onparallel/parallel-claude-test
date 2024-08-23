@@ -2,7 +2,7 @@ import { Polygon, Svg, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import gql from "graphql-tag";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { DateTime } from "../../emails/components/DateTime";
 import { FORMATS } from "../../util/dates";
 import { FieldActivity_PetitionFieldReplyFragment } from "../__types";
@@ -28,7 +28,7 @@ export function FieldActivity({
         },
       ]}
     >
-      {isDefined(reply.repliedAt) ? (
+      {isNonNullish(reply.repliedAt) ? (
         <Text>
           <FormattedMessage
             id="document.petition-export.reply-updated-by"
@@ -50,7 +50,7 @@ export function FieldActivity({
           />
         </Text>
       ) : null}
-      {isDefined(reply.lastReviewedBy) &&
+      {isNonNullish(reply.lastReviewedBy) &&
       reply.status === "APPROVED" &&
       reply.field?.requireApproval ? (
         <View style={[{ flexDirection: "row", marginTop: "1mm" }]}>

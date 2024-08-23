@@ -35,7 +35,7 @@ import {
   useWatch,
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, isNullish, noop } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
@@ -79,7 +79,8 @@ export function ProfileField(props: ProfileFieldProps) {
   const expiryDate = fieldValue?.expiryDate;
   const content = fieldValue?.content;
 
-  const fieldHasValue = field.type === "FILE" ? isDefined(props.files) : isDefined(props.value);
+  const fieldHasValue =
+    field.type === "FILE" ? isNonNullish(props.files) : isNonNullish(props.value);
   const [showSuggestions, setShowSuggestions] = useState(!fieldHasValue);
 
   useEffect(() => {
@@ -117,14 +118,14 @@ export function ProfileField(props: ProfileFieldProps) {
     fieldIsEmpty = false;
   } else if (
     field.type !== "FILE" &&
-    isDefined(content?.value) &&
+    isNonNullish(content?.value) &&
     typeof content?.value === "string" &&
     content?.value?.length > 0
   ) {
     fieldIsEmpty = false;
   } else if (
     field.type === "BACKGROUND_CHECK" &&
-    (isDefined(content?.search) || isDefined(content?.entity))
+    (isNonNullish(content?.search) || isNonNullish(content?.entity))
   ) {
     fieldIsEmpty = false;
   }
@@ -143,13 +144,13 @@ export function ProfileField(props: ProfileFieldProps) {
           return false;
         }
         if (field.type === "FILE") {
-          return !isDefined(reply.content.error);
+          return isNullish(reply.content.error);
         } else if (field.type === "SELECT") {
           // Match by label or value, check all locales
 
           const options = field.options as ProfileTypeFieldOptions<"SELECT">;
           return (
-            isDefined(reply.content.value) &&
+            isNonNullish(reply.content.value) &&
             options.values.some(({ label, value }) => {
               return (
                 locales.some(({ key }) => {
@@ -164,7 +165,7 @@ export function ProfileField(props: ProfileFieldProps) {
             })
           );
         } else {
-          return isDefined(reply.content.value);
+          return isNonNullish(reply.content.value);
         }
       })
       .flatMap((reply) => {
@@ -313,8 +314,8 @@ export function ProfileField(props: ProfileFieldProps) {
   };
 
   const alertIsActive =
-    isDefined(expiryDate) &&
-    isDefined(field.expiryAlertAheadTime) &&
+    isNonNullish(expiryDate) &&
+    isNonNullish(field.expiryAlertAheadTime) &&
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
   return (

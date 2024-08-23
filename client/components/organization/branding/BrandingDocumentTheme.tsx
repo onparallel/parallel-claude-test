@@ -2,8 +2,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Grid, HStack, Heading, Stack } from "@chakra-ui/react";
 import { EditIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   DocumentThemeEditor,
@@ -24,7 +24,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import {
   useAutoConfirmDiscardChangesDialog,
   useConfirmDiscardChangesDialog,
@@ -85,7 +85,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       const { data } = await createOrganizationPdfDocumentTheme({
         variables: { name, isDefault },
       });
-      if (isDefined(data)) {
+      if (isNonNullish(data)) {
         const theme = data.createOrganizationPdfDocumentTheme.pdfDocumentThemes[0];
         reset(theme.data);
         setSelectedTheme(theme);
@@ -105,7 +105,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       const { data } = await updateOrganizationPdfDocumentTheme({
         variables: { orgThemeId: selectedTheme.id, name, isDefault },
       });
-      if (isDefined(data)) {
+      if (isNonNullish(data)) {
         const theme = data.updateOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
           (t) => t.id === selectedTheme.id,
         )!;
@@ -119,7 +119,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           const { data } = await deleteOrganizationPdfDocumentTheme({
             variables: { orgThemeId: selectedTheme.id },
           });
-          if (isDefined(data)) {
+          if (isNonNullish(data)) {
             setSelectedTheme(
               data.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find((t) => t.isDefault)!,
             );
@@ -155,7 +155,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               data: value,
             },
           });
-          if (isDefined(data)) {
+          if (isNonNullish(data)) {
             const theme = data.updateOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
               (t) => t.id === selectedTheme.id,
             )!;

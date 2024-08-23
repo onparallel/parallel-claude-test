@@ -1,8 +1,8 @@
 import { useToast } from "@chakra-ui/react";
+import * as Sentry from "@sentry/nextjs";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import * as Sentry from "@sentry/nextjs";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function useGenericErrorToast(title?: string, description?: string) {
   const intl = useIntl();
@@ -10,7 +10,7 @@ export function useGenericErrorToast(title?: string, description?: string) {
 
   return useCallback(
     function (error?: any) {
-      if (isDefined(error)) {
+      if (isNonNullish(error)) {
         Sentry.captureException(error);
       }
       toast({

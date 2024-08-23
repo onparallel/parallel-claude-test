@@ -2,9 +2,9 @@ import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
-import { isDefined } from "remeda";
 
 export interface AppLayoutNavbarLinkProps {
   section: string;
@@ -32,7 +32,7 @@ export function AppLayoutNavbarLink({
 
   const navbarBox = (
     <Box
-      as={isDefined(onClick) ? "button" : "a"}
+      as={isNonNullish(onClick) ? "button" : "a"}
       cursor="pointer"
       data-link={`navbar-${section}`}
       position="relative"
@@ -82,7 +82,7 @@ export function AppLayoutNavbarLink({
 
   return isAvailable ? (
     <NakedLink href={href!}>{navbarBox}</NakedLink>
-  ) : isDefined(onClick) ? (
+  ) : isNonNullish(onClick) ? (
     navbarBox
   ) : (
     <Tooltip

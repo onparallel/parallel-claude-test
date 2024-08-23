@@ -29,7 +29,7 @@ import {
   components,
 } from "react-select";
 import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-creatable";
-import { isDefined, pick, range, zip } from "remeda";
+import { isNonNullish, isNullish, pick, range, zip } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
 
@@ -97,7 +97,7 @@ export const ContactSelect = Object.assign(
       }
 
       const exclude: string[] = [];
-      if (isDefined(value)) {
+      if (isNonNullish(value)) {
         for (const recipient of unMaybeArray(value)) {
           if (!recipient.isInvalid) {
             exclude.push(recipient.id);
@@ -116,7 +116,7 @@ export const ContactSelect = Object.assign(
       setIsCreating(true);
       try {
         const contact = await onCreateContact({ email });
-        if (!isDefined(contact)) {
+        if (isNullish(contact)) {
           setIsCreating(false);
           return;
         }

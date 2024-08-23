@@ -1,5 +1,5 @@
 import { DependencyList, useEffect } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface UserIntervalOptions {
   delay?: number;
@@ -21,7 +21,7 @@ export function useInterval(
     }
     let interval: any = undefined;
     const clear = () => {
-      if (isDefined(interval)) {
+      if (isNonNullish(interval)) {
         clearInterval(interval);
         interval = undefined;
       }

@@ -9,7 +9,7 @@ import {
   useBackgroundCheckProfileDownloadTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { withError } from "../promises/withError";
 
@@ -32,7 +32,7 @@ export function useBackgroundCheckProfileDownloadTask() {
               useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePdfTaskDocument,
             variables: { token, entityId },
           });
-          if (!isDefined(data)) {
+          if (isNullish(data)) {
             throw new Error();
           }
           return data.createBackgroundCheckProfilePdfTask;

@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { core } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionField } from "../../../db/__types";
 import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
@@ -179,14 +179,14 @@ export function validateReferencingFieldsPositions<
   let fieldPosition = field.position;
   let referencedFieldPosition = referencedField.position;
   if (
-    isDefined(field.parent_petition_field_id) &&
-    !isDefined(referencedField.parent_petition_field_id)
+    isNonNullish(field.parent_petition_field_id) &&
+    isNullish(referencedField.parent_petition_field_id)
   ) {
     // child references a normal field, use parent position
     fieldPosition = allFields.find((f) => f.id === field.parent_petition_field_id)!.position;
   } else if (
-    isDefined(field.parent_petition_field_id) &&
-    isDefined(referencedField.parent_petition_field_id) &&
+    isNonNullish(field.parent_petition_field_id) &&
+    isNonNullish(referencedField.parent_petition_field_id) &&
     field.parent_petition_field_id !== referencedField.parent_petition_field_id
   ) {
     // child references a child of another field group, use parent position for both
@@ -195,8 +195,8 @@ export function validateReferencingFieldsPositions<
       (f) => f.id === referencedField.parent_petition_field_id,
     )!.position;
   } else if (
-    !isDefined(field.parent_petition_field_id) &&
-    isDefined(referencedField.parent_petition_field_id)
+    isNullish(field.parent_petition_field_id) &&
+    isNonNullish(referencedField.parent_petition_field_id)
   ) {
     // field references a child of a field group, use parent position for referenced child
     referencedFieldPosition = allFields.find(
@@ -416,7 +416,7 @@ export function validFieldVisibility<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     try {
       const fieldVisibility = prop(args);
-      if (!isDefined(fieldVisibility)) {
+      if (isNullish(fieldVisibility)) {
         return;
       }
 
@@ -455,7 +455,7 @@ export function validFieldMath<TypeName extends string, FieldName extends string
   return (async (_, args, ctx, info) => {
     try {
       const fieldMath = prop(args);
-      if (!isDefined(fieldMath)) {
+      if (isNullish(fieldMath)) {
         return;
       }
 

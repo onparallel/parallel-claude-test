@@ -129,7 +129,7 @@ async function main() {
             const instance = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0];
             return ((_c = instance === null || instance === void 0 ? void 0 : instance.State) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
         }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-        (0, ts_essentials_1.assert)((0, remeda_1.isDefined)(ipAddress));
+        (0, ts_essentials_1.assert)((0, remeda_1.isNonNullish)(ipAddress));
         await waitForInstance(ipAddress);
         await ec2.send(new client_ec2_1.AttachVolumeCommand({
             InstanceId: instanceId,

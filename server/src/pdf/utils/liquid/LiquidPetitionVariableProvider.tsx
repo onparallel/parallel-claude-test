@@ -1,5 +1,5 @@
 import { PropsWithChildren, useContext, useMemo } from "react";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { FieldLogicResult } from "../../../util/fieldLogic";
 import { buildPetitionVariablesLiquidScope } from "../../../util/liquidScope";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
@@ -11,7 +11,7 @@ export function LiquidPetitionVariableProvider({
   logic: FieldLogicResult;
 }>) {
   const parent = useContext(LiquidScopeContext);
-  if (!isDefined(parent)) {
+  if (isNullish(parent)) {
     throw new Error(
       "<LiquidPetitionVariableProvider/> must be used within a <LiquidScopeProvider/>",
     );

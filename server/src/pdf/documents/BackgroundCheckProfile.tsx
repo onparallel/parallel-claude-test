@@ -1,5 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Fragment } from "react";
 import { useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import {
   EntityDetailsResponse,
   EntitySearchRequest,
@@ -8,10 +10,8 @@ import {
 import { FORMATS } from "../../util/dates";
 import { Header } from "../components/background-check/Header";
 import { RiskLabel } from "../components/background-check/RiskLabel";
-import { formatPartialDate } from "../utils/formatPartialDate";
-import { isDefined } from "remeda";
 import { WithInternationalFontFamily } from "../components/WithInternationalFontFamily";
-import { Fragment } from "react";
+import { formatPartialDate } from "../utils/formatPartialDate";
 
 export interface BackgroundCheckProfileProps {
   assetsUrl: string;
@@ -453,7 +453,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
     <Document>
       <Page style={styles.page} wrap>
         <Header assetsUrl={props.assetsUrl} />
-        {isDefined(props.search) ? (
+        {isNonNullish(props.search) ? (
           <>
             <Text style={styles.sectionTitle}>Search Summary</Text>
             <View style={styles.dividerLine} />

@@ -1,6 +1,6 @@
-import { isDefined } from "remeda";
-import { SlateNode } from "./render";
 import pMap from "p-map";
+import { isNonNullish } from "remeda";
+import { SlateNode } from "./render";
 
 // @[id:12345]
 // @[group:Developers]
@@ -70,7 +70,7 @@ export function walkSlateNodes(
 ): SlateNode[] {
   return nodes.map((node) => {
     const result = visit(node) ?? node;
-    if (isDefined(result.children)) {
+    if (isNonNullish(result.children)) {
       return { ...result, children: walkSlateNodes(result.children, visit) };
     }
     return result;

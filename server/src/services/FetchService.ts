@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { RetryOptions, StopRetryError, retry } from "../util/retry";
 
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
@@ -23,7 +23,7 @@ export class FetchService implements IFetchService {
           let controller: AbortController | undefined;
           let cancelTimeout: NodeJS.Timeout | undefined;
           const options = { ...init };
-          if (isDefined(timeout)) {
+          if (isNonNullish(timeout)) {
             controller = new AbortController();
             init.signal?.addEventListener("abort", () => controller!.abort());
             options.signal = controller.signal as any;
@@ -44,7 +44,7 @@ export class FetchService implements IFetchService {
             }
             throw e;
           } finally {
-            if (isDefined(cancelTimeout)) {
+            if (isNonNullish(cancelTimeout)) {
               clearTimeout(cancelTimeout);
             }
           }

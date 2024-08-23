@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
 import {
   mapProfileTypeFieldOptions,
@@ -31,7 +31,7 @@ export function validProfileNamePattern<
   return async (_, args, ctx) => {
     const profileTypeId = args[profileTypeIdArg] as unknown as number;
     const pattern = args[profileNamePatternArg] as unknown as Maybe<string>;
-    if (isDefined(pattern)) {
+    if (isNonNullish(pattern)) {
       const fieldIds = parseTextWithPlaceholders(pattern)
         .filter(discriminator("type", "placeholder" as const))
         .map((p) => fromGlobalId(p.value, "ProfileTypeField").id);
@@ -40,7 +40,7 @@ export function validProfileNamePattern<
         fields.length === 0 ||
         fields.some(
           (f) =>
-            !isDefined(f) ||
+            isNullish(f) ||
             f.profile_type_id !== profileTypeId ||
             !["SHORT_TEXT", "SELECT"].includes(f.type) ||
             !isAtLeast(f.permission, "READ"),
@@ -61,7 +61,7 @@ export function validProfileTypeFieldOptions<
   return (async (_, args, ctx, info) => {
     const profileTypeId = args[profileTypeIdArg] as unknown as number;
     const data = args[dataArg] as unknown as NexusGenInputs["CreateProfileTypeFieldInput"];
-    if (isDefined(data.options)) {
+    if (isNonNullish(data.options)) {
       try {
         const options = await mapProfileTypeFieldOptions(
           data.type,
@@ -108,7 +108,7 @@ export async function validateProfileFieldValue(
       return;
     }
     case "SHORT_TEXT": {
-      if (isDefined(field.options.format)) {
+      if (isNonNullish(field.options.format)) {
         if (!(await validateShortTextFormat(content.value, field.options.format))) {
           throw new Error(`Value is not valid according to format ${field.options.format}.`);
         }
@@ -182,10 +182,10 @@ export function validProfileTypeFieldSubstitution<
   return (async (_, args, ctx, info) => {
     const data = args[dataArg] as unknown as NexusGenInputs["UpdateProfileTypeFieldInput"];
 
-    if (isDefined(data.substitutions) && isDefined(data.options?.values)) {
+    if (isNonNullish(data.substitutions) && isNonNullish(data.options?.values)) {
       const values = await profileTypeFieldSelectValues(data.options as any);
       if (
-        !data.substitutions.every((s) => !isDefined(s.new) || values.some((v) => v.value === s.new))
+        !data.substitutions.every((s) => isNullish(s.new) || values.some((v) => v.value === s.new))
       ) {
         throw new ArgValidationError(
           info,

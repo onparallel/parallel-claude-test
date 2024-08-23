@@ -1,7 +1,6 @@
+import { faker } from "@faker-js/faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Contact,
   Organization,
@@ -12,11 +11,12 @@ import {
   User,
   UserGroup,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
-import { faker } from "@faker-js/faker";
 import { random } from "../../util/token";
+import { initServer, TestClient } from "./server";
 
 describe("GraphQL/PublicPetitionLink", () => {
   let testClient: TestClient;

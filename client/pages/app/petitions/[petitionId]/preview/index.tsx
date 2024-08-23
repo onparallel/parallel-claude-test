@@ -112,7 +112,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, sumBy } from "remeda";
+import { isNonNullish, omit, sumBy } from "remeda";
 import { noop } from "ts-essentials";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
@@ -142,7 +142,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 
   useEffect(() => {
-    if (isDefined(query.fromTemplate)) {
+    if (isNonNullish(query.fromTemplate)) {
       toast({
         id: "petition-created-toast",
         title: intl.formatMessage({
@@ -214,7 +214,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const highlight = useHighlightElement();
   useEffect(() => {
-    if (isDefined(router.query.field)) {
+    if (isNonNullish(router.query.field)) {
       const { field: fieldId, parentReply: parentReplyId, sufix } = router.query;
 
       const field = allFields.find((f) => f.id === fieldId);
@@ -229,7 +229,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       }
     }
 
-    if (isDefined(router.query.comments)) {
+    if (isNonNullish(router.query.comments)) {
       // when navigating from comments email, it will always go to page 1 but field might be in another page
       const fieldId = router.query.comments as string;
       const page =
@@ -324,13 +324,13 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         } else {
           await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
           const firstId = fieldsWithIndices[0][0].id;
-          if (isDefined(petitionId) && typeof petitionId === "string") {
+          if (isNonNullish(petitionId) && typeof petitionId === "string") {
             goToPetition(petitionId, "compose", { query: { field: firstId } });
           }
         }
       } else {
         await withError(showErrorDialog({ message }));
-        if (isDefined(petitionId) && typeof petitionId === "string") {
+        if (isNonNullish(petitionId) && typeof petitionId === "string") {
           goToPetition(petitionId, "compose");
         }
       }
@@ -505,7 +505,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     petition.__typename === "PetitionTemplate" &&
     petition.publicLink?.isActive &&
     petition.fields.some(
-      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0,
+      (f) => !isFileTypeField(f.type) && isNonNullish(f.alias) && f.previewReplies.length > 0,
     );
 
   const showSendToButton =

@@ -1,4 +1,4 @@
-import { inputObjectType, enumType } from "nexus";
+import { enumType, inputObjectType } from "nexus";
 
 export const ImageOptions = inputObjectType({
   name: "ImageOptions",

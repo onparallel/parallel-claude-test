@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const run_1 = require("./utils/run");
+const cli_progress_1 = require("cli-progress");
+const promises_1 = require("fs/promises");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const p_map_1 = __importDefault(require("p-map"));
-const yargs_1 = __importDefault(require("yargs"));
-const promises_1 = require("fs/promises");
 const path_1 = __importDefault(require("path"));
-const cli_progress_1 = require("cli-progress");
+const yargs_1 = __importDefault(require("yargs"));
+const run_1 = require("./utils/run");
 async function main() {
     const { output } = await yargs_1.default.option("output", {
         required: true,

@@ -5,10 +5,10 @@ import detective from "detective-typescript";
 import { sync as globSync } from "fast-glob";
 import { readFile } from "fs/promises";
 import path from "path";
+import { isNonNullish } from "remeda";
+import yargs from "yargs";
 import { readJson, writeJson } from "./utils/json";
 import { run } from "./utils/run";
-import yargs from "yargs";
-import { isDefined } from "remeda";
 
 export interface Term {
   term: string;
@@ -41,7 +41,7 @@ async function extractTerms(cwd: string, glob: string | string[], excludePragma?
     : undefined;
   while ((file = queue.pop())) {
     const source = await readFile(file, { encoding: "utf-8" });
-    if (isDefined(excludeRegex) && source.match(excludeRegex)) {
+    if (isNonNullish(excludeRegex) && source.match(excludeRegex)) {
       continue;
     }
     files.add(file);
@@ -51,12 +51,12 @@ async function extractTerms(cwd: string, glob: string | string[], excludePragma?
         const [resolved] = globSync(
           path.resolve(cwd, dependecy.replace("@parallel/", "./")) + ".{ts,tsx}",
         );
-        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+        if (isNonNullish(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
           queue.push(resolved);
         }
       } else if (dependecy.startsWith("./") || dependecy.startsWith("../")) {
         const [resolved] = globSync(path.resolve(path.dirname(file), dependecy) + ".{ts,tsx}");
-        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+        if (isNonNullish(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
           queue.push(resolved);
         }
       }

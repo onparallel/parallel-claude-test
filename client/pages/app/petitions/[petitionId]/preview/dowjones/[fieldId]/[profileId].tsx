@@ -51,7 +51,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 function DowJonesFieldProfileDetails({
   petitionId,
@@ -68,7 +68,7 @@ function DowJonesFieldProfileDetails({
     variables: { profileId },
   });
 
-  if (isDefined(error)) {
+  if (isNonNullish(error)) {
     showGenericErrorToast();
   }
 
@@ -135,7 +135,7 @@ function DowJonesFieldProfileDetails({
   const handleSanctionsRowClick = useCallback(function (
     row: DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment,
   ) {
-    if (isDefined(row.sources[0])) {
+    if (isNonNullish(row.sources[0])) {
       try {
         openNewWindow(row.sources[0]);
       } catch {}
@@ -145,7 +145,7 @@ function DowJonesFieldProfileDetails({
   const handleRelationshipsRowClick = useCallback(function (
     row: DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment,
   ) {
-    if (isDefined(row.profileId)) {
+    if (isNonNullish(row.profileId)) {
       const { petitionId, fieldId } = query;
       router.push(`/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${row.profileId}`);
     }

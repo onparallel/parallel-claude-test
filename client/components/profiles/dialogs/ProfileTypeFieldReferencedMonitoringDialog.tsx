@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
+import { Button, Text } from "@chakra-ui/react";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   UserLocale,
   useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Button, Text } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 
 function ProfileTypeFieldReferencedMonitoringDialog({
   properties,

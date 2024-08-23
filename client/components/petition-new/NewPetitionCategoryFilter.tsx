@@ -3,7 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface NewPetitionCategoryFilterProps extends ValueProps<string> {
   categories: string[];
@@ -23,7 +23,9 @@ export const NewPetitionCategoryFilter = chakraForwardRef<"div", NewPetitionCate
         }),
         slug: "all",
       },
-      ...categories.map((value) => allCategories.find((c) => c.slug === value)).filter(isDefined),
+      ...categories
+        .map((value) => allCategories.find((c) => c.slug === value))
+        .filter(isNonNullish),
     ];
 
     const { getRootProps, getRadioProps } = useRadioGroup({

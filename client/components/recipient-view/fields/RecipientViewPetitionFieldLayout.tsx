@@ -15,7 +15,7 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CommentsButton } from "../CommentsButton";
 
 export type RecipientViewPetitionFieldLayout_PetitionFieldSelection =
@@ -76,7 +76,7 @@ export function RecipientViewPetitionFieldLayout({
             )}
           </Heading>
         </Box>
-        {(field.hasCommentsEnabled || isPetitionField) && isDefined(onCommentsButtonClick) ? (
+        {(field.hasCommentsEnabled || isPetitionField) && isNonNullish(onCommentsButtonClick) ? (
           <CommentsButton
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}

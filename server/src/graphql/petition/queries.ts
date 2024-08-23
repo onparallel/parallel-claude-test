@@ -10,7 +10,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { countBy, isDefined, sort, unique } from "remeda";
+import { countBy, isNonNullish, sort, unique } from "remeda";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -78,7 +78,7 @@ export const petitionsQuery = queryField((t) => {
       validPetitionTagFilter((args) => args.filters?.tags, "filters.tags"),
       async (_, args, ctx, info) => {
         const fromTemplateId = args.filters?.fromTemplateId;
-        if (isDefined(fromTemplateId)) {
+        if (isNonNullish(fromTemplateId)) {
           const hasAccess = await ctx.petitions.userHasAccessToPetitions(
             ctx.user!.id,
             fromTemplateId,
@@ -94,7 +94,7 @@ export const petitionsQuery = queryField((t) => {
       { offset, limit, search, sortBy, filters, searchByNameOnly, excludeAnonymized },
       ctx,
     ) => {
-      if (isDefined(limit) && limit > 100) {
+      if (isNonNullish(limit) && limit > 100) {
         ctx.logger.info(`User:${ctx.user!.id} from Org:${ctx.user!.org_id} using limit ${limit}`);
       }
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
@@ -159,7 +159,7 @@ export const petitionsByIdQuery = queryField("petitionsById", {
   ),
   resolve: async (_, args, ctx) => {
     let petitionIds = args.ids ?? [];
-    if (isDefined(args.folders)) {
+    if (isNonNullish(args.folders)) {
       const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
       const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
         folderIds,
@@ -258,7 +258,7 @@ export const petitionsSharingInfoQuery = queryField("petitionsSharingInfo", {
   ),
   resolve: async (_, args, ctx) => {
     const petitionIds = args.ids ?? [];
-    if (isDefined(args.folders)) {
+    if (isNonNullish(args.folders)) {
       const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
       const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
         folderIds,
@@ -415,7 +415,7 @@ export const petitionFolders = queryField("petitionFolders", {
 
     const fullPaths = unique(
       [...petitionPaths, args.currentPath]
-        .filter(isDefined)
+        .filter(isNonNullish)
         .flatMap((path) => pathAndParents(path))
         .filter((p) => p !== "/"),
     );

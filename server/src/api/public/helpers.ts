@@ -4,7 +4,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import pMap from "p-map";
 import { performance } from "perf_hooks";
-import { filter, isDefined, map, omit, pick, pipe, unique, zip } from "remeda";
+import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } from "remeda";
 import { promisify } from "util";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
@@ -216,7 +216,7 @@ export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
         "optional",
       ]),
       options:
-        ["CHECKBOX", "SELECT"].includes(field.type) && isDefined(field.options.labels)
+        ["CHECKBOX", "SELECT"].includes(field.type) && isNonNullish(field.options.labels)
           ? zip(field.options.values, field.options.labels).map(([value, label]) => ({
               value,
               label,
@@ -295,7 +295,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
           return replies.map((r) =>
             Object.fromEntries(
               r.children
-                ?.filter((child) => isDefined(child.field.alias) && child.replies.length > 0)
+                ?.filter((child) => isNonNullish(child.field.alias) && child.replies.length > 0)
                 .map((child) => [
                   child.field.alias!,
                   mapReplyContentsForAlias({
@@ -308,7 +308,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
         } else {
           return Object.fromEntries(
             replies[0].children
-              ?.filter((child) => isDefined(child.field.alias) && child.replies.length > 0)
+              ?.filter((child) => isNonNullish(child.field.alias) && child.replies.length > 0)
               .map((child) => [
                 child.field.alias!,
                 mapReplyContentsForAlias({
@@ -325,7 +325,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
 
   const replies: Record<string, any> = {};
   petition.replies?.forEach((field) => {
-    if (isDefined(field.alias) && field.replies.length > 0) {
+    if (isNonNullish(field.alias) && field.replies.length > 0) {
       replies[field.alias] = mapReplyContentsForAlias(field);
     }
   });
@@ -379,7 +379,7 @@ function mapPetitionSignatures<T extends Pick<PetitionFragment, "signatures">>(p
 export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(signature: T) {
   return {
     ...pick(signature, ["id", "status", "environment", "createdAt", "updatedAt"]),
-    signers: signature.signatureConfig.signers.filter(isDefined),
+    signers: signature.signatureConfig.signers.filter(isNonNullish),
   };
 }
 
@@ -506,7 +506,7 @@ export async function buildTagsFilter(
   if (tags.length > 0) {
     const items = await getTags(client, tags);
     const _tags = tags.map((tagName) => items.find((t) => t.name === tagName));
-    if (_tags.some((t) => !isDefined(t))) {
+    if (_tags.some((t) => isNullish(t))) {
       throw new Error("UNKNOWN_TAG_NAME");
     }
 
@@ -533,7 +533,7 @@ export async function buildTagsFilter(
 }
 
 export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content: string }>) {
-  return isDefined(message)
+  return isNonNullish(message)
     ? message.format === "PLAIN_TEXT"
       ? fromPlainText(message.content)
       : emptyRTEValue()
@@ -568,7 +568,7 @@ function mapProfileValues<T extends ProfileFragment>(profile: T) {
     ...profile,
     values: pipe(
       profile.properties,
-      filter((p) => isDefined(p.field.alias)),
+      filter((p) => isNonNullish(p.field.alias)),
       map(
         (p) =>
           [
@@ -704,8 +704,8 @@ export async function resolveContacts(
           const contact = result.contacts[0];
           if (contact) {
             if (
-              (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
-              (contact.lastName !== data.lastName && isDefined(data.lastName))
+              (contact.firstName !== data.firstName && isNonNullish(data.firstName)) ||
+              (contact.lastName !== data.lastName && isNonNullish(data.lastName))
             ) {
               const _mutation = gql`
                 mutation CreatePetitionRecipients_updateContact(
@@ -775,7 +775,7 @@ export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
     author:
       comment.author?.__typename === "User"
         ? { type: "USER" as const, ...omit(comment.author, ["__typename"]) }
-        : comment.author?.__typename === "PetitionAccess" && isDefined(comment.author.contact)
+        : comment.author?.__typename === "PetitionAccess" && isNonNullish(comment.author.contact)
           ? { type: "CONTACT" as const, ...comment.author.contact }
           : null,
     mentions:
@@ -811,7 +811,7 @@ export function parseProfileTypeFieldInput<
   return Object.entries(input).map(([alias, value]) => {
     // map every value to { value, expiryDate } format
     const field = profileTypeFields.find((f) => f.alias === alias);
-    if (!isDefined(field)) {
+    if (isNullish(field)) {
       throw new Error(`Unknown alias '${alias}' in values object`);
     }
 
@@ -832,11 +832,11 @@ export function parseProfileTypeFieldInput<
           : value
     ) as { value?: string | number | FormDataFile[] | null; expiryDate?: string };
 
-    if (!field.isExpirable && isDefined(content.expiryDate)) {
+    if (!field.isExpirable && isNonNullish(content.expiryDate)) {
       throw new Error(`Can't set expiryDate on field '${field.alias}', as it is not expirable`);
     }
 
-    if (isDefined(content.expiryDate) && !isValidDate(content.expiryDate)) {
+    if (isNonNullish(content.expiryDate) && !isValidDate(content.expiryDate)) {
       throw new Error(`Invalid expiry date '${content.expiryDate}' for field '${field.alias}'`);
     }
 

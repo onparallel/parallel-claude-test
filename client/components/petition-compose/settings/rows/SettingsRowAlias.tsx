@@ -22,7 +22,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { REFERENCE_REGEX, isFirstCharacterNumber } from "@parallel/utils/validation";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { SettingsRow } from "./SettingsRow";
 
 export type AliasErrorType = "UNIQUE" | "INVALID";
@@ -100,7 +100,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
           </Text>
         }
         controlId="alias-field"
-        isInvalid={isDefined(aliasError)}
+        isInvalid={isNonNullish(aliasError)}
       >
         <Stack flex={1} minWidth={0}>
           <HStack>

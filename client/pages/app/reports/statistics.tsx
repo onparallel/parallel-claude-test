@@ -22,7 +22,7 @@ import { useTemplateStatsReportBackgroundTask } from "@parallel/utils/tasks/useT
 import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export interface ReportTypeStatistics {
   from_template_id: string;
@@ -116,7 +116,7 @@ export function ReportsTemplates() {
         status: "LOADING",
       }));
       taskAbortController.current?.abort();
-      if (isDefined(queryState.template)) {
+      if (isNonNullish(queryState.template)) {
         taskAbortController.current = new AbortController();
         // add a fake delay
         const { task } = await stallFor(
@@ -219,7 +219,7 @@ export function ReportsTemplates() {
             <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
           </Button>
         </Stack>
-        {isDefined(report) && (status === "IDLE" || status === "LOADED") ? (
+        {isNonNullish(report) && (status === "IDLE" || status === "LOADED") ? (
           <Stack spacing={6}>
             <ReportsStatisticsAverage
               report={report}

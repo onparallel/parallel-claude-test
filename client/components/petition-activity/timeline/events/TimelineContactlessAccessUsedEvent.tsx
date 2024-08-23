@@ -2,11 +2,11 @@ import { gql } from "@apollo/client";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
-import { TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment } from "@parallel/graphql/__types";
 
 export interface TimelineContactlessAccessUsedEventProps {
   event: TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment;

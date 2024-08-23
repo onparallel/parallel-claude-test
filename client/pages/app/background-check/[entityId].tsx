@@ -32,7 +32,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 type BackgroundCheckProfileDetails_Selection = { createdAt: string } & (
   | ({
@@ -74,7 +74,7 @@ function BackgroundCheckProfileDetails({
   );
 
   const showGenericErrorToast = useGenericErrorToast();
-  if (isDefined(error)) {
+  if (isNonNullish(error)) {
     showGenericErrorToast();
   }
 
@@ -212,7 +212,9 @@ function BackgroundCheckProfileDetails({
                 />
                 {": "}
               </Text>
-              <Text as="span">{[entityTypeLabel, name, date].filter(isDefined).join(" | ")}</Text>
+              <Text as="span">
+                {[entityTypeLabel, name, date].filter(isNonNullish).join(" | ")}
+              </Text>
             </Box>
           </HStack>
 
@@ -330,11 +332,11 @@ function BackgroundCheckProfileDetails({
               <BackgroundCheckEntityDetailsPersonOverview overview={details} />
             ) : null}
 
-            {isDefined(details.properties.sanctions) ? (
+            {isNonNullish(details.properties.sanctions) ? (
               <BackgroundCheckEntityDetailsSanctions sanctions={details.properties.sanctions} />
             ) : null}
 
-            {isDefined(details.properties.relationships) ? (
+            {isNonNullish(details.properties.relationships) ? (
               <BackgroundCheckEntityDetailsRelationships
                 entityId={entityId}
                 relationships={details.properties.relationships}

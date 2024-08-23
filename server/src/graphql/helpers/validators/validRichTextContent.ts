@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { core } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { fromGlobalId, isGlobalId } from "../../../util/globalId";
 import { SlateNode } from "../../../util/slate/render";
 import { ArgValidationError } from "../errors";
@@ -133,7 +133,7 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
       for (const node of nodes) {
         if (
           node.type === "placeholder" &&
-          isDefined(node.placeholder) &&
+          isNonNullish(node.placeholder) &&
           isGlobalId(node.placeholder)
         ) {
           if (!isGlobalId(node.placeholder, "PetitionField")) {
@@ -143,14 +143,14 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
           const fieldId = fromGlobalId(node.placeholder).id;
           const field = await ctx.petitions.loadField(fieldId);
 
-          if (isDefined(field) && field.petition_id !== petitionId) {
+          if (isNonNullish(field) && field.petition_id !== petitionId) {
             throw new Error(
               `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`,
             );
           }
         }
 
-        if (isDefined(node.children)) {
+        if (isNonNullish(node.children)) {
           await validateGlobalIdReferences(node.children, petitionId);
         }
       }
@@ -163,7 +163,7 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
       }
       validateRichTextContent(value);
 
-      if (isDefined(petitionIdProp)) {
+      if (isNonNullish(petitionIdProp)) {
         await validateGlobalIdReferences(value as SlateNode[], petitionIdProp(args));
       }
     } catch (e: any) {

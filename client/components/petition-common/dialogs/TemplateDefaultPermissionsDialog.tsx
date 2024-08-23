@@ -26,6 +26,7 @@ import {
   UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -33,7 +34,6 @@ import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
-import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 export interface TemplateDefaultPermissionsDialogProps {
   petitionId: string;

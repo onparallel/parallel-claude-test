@@ -1,4 +1,4 @@
-import { FocusEventHandler, useMemo, useState, useRef } from "react";
+import { FocusEventHandler, useMemo, useRef, useState } from "react";
 
 export function useFocus<T = any>({
   onFocus,

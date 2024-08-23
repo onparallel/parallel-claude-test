@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import pMap from "p-map";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { discriminator } from "../../../util/discriminator";
 import { fromGlobalId } from "../../../util/globalId";
 import { parseTextWithPlaceholders } from "../../../util/slate/placeholders";
@@ -32,7 +32,7 @@ export function validPetitionSubject<TypeName extends string, FieldName extends 
     try {
       const field = await ctx.petitions.loadField(fromGlobalId(placeholder, "PetitionField").id);
       const petitionId = petitionIdProp(args);
-      if (isDefined(field) && field.petition_id !== petitionId) {
+      if (isNonNullish(field) && field.petition_id !== petitionId) {
         throw new ArgValidationError(info, argName, `PetitionField does not belong to Petition`);
       }
       return true;

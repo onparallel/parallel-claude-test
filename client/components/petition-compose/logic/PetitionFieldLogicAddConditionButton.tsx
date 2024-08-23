@@ -3,7 +3,7 @@ import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 
 interface PetitionFieldLogicAddConditionButtonProps extends ButtonOptions, ThemingProps<"Button"> {
@@ -28,7 +28,7 @@ export const PetitionFieldLogicAddConditionButton = chakraForwardRef<
         const referencedField =
           "fieldId" in last ? fieldsWithIndices.find(([f]) => f.id === last.fieldId)![0] : null;
         if (
-          isDefined(referencedField) &&
+          isNonNullish(referencedField) &&
           (referencedField.type === "CHECKBOX" ||
             (referencedField.type === "SELECT" &&
               !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator)))

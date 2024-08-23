@@ -1,5 +1,5 @@
 import { RequestHandler, Router, urlencoded } from "express";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { ApiContext } from "../../context";
 import { SignatureDeliveredEvent } from "../../db/events/PetitionEvent";
 import {
@@ -52,7 +52,7 @@ export const signaturitEventHandlers: RequestHandler = Router()
         `SIGNATURIT/${body.document.signature.id}`,
       );
 
-      if (!isDefined(signature) || signature.status === "CANCELLED") {
+      if (isNullish(signature) || signature.status === "CANCELLED") {
         // status 200 to kill request but avoid sending an error to signaturit
         return res.sendStatus(200).end();
       }
@@ -280,8 +280,8 @@ async function upsertSignatureDeliveredEvent(
 
   const signerEvent = events.find((e) => e.data.signer.externalId === signer.externalId);
 
-  if (isDefined(signerEvent)) {
-    if (isDefined(signerEvent.data.email_opened_at) && isDefined(data.email_opened_at)) {
+  if (isNonNullish(signerEvent)) {
+    if (isNonNullish(signerEvent.data.email_opened_at) && isNonNullish(data.email_opened_at)) {
       // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
       return;
     }

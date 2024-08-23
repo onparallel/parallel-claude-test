@@ -1,5 +1,5 @@
 import { arg, enumType, nonNull, objectType, unionType } from "nexus";
-import { indexBy, isDefined, omit, sortBy, unique } from "remeda";
+import { indexBy, isNonNullish, omit, sortBy, unique } from "remeda";
 import { FeatureFlagNameValues, UserLocaleValues, UserStatusValues } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
@@ -193,7 +193,7 @@ export const User = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.users.loadAvatarPathByUserDataId(root.user_data_id);
-        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.field("preferredLocale", {
@@ -233,7 +233,7 @@ export const User = objectType({
         );
         const usersByOrgId = indexBy(users, (u) => u.org_id);
         const orgs = await ctx.organizations.loadOrg(unique(users.map((u) => u.org_id)));
-        return sortBy(orgs.filter(isDefined), (o) => usersByOrgId[o.id].created_at);
+        return sortBy(orgs.filter(isNonNullish), (o) => usersByOrgId[o.id].created_at);
       },
     });
     t.list.field("petitionListViews", {

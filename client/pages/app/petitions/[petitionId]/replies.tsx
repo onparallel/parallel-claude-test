@@ -117,7 +117,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sumBy, zip } from "remeda";
+import { isNonNullish, sumBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -418,7 +418,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
 
   const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter((r) =>
-    isDefined(r.associatedProfile),
+    isNonNullish(r.associatedProfile),
   ).length;
 
   const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();

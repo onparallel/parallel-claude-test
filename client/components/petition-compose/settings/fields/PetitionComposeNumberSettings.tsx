@@ -21,7 +21,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 
@@ -36,14 +36,17 @@ export function PetitionComposeNumberSettings({
   const [decimals, setDecimals] = useState(options.decimals ?? 2);
 
   const [hasPrefix, setHasPrefix] = useState(
-    isDefined(options.prefix) || isDefined(options.suffix) ? true : false,
+    isNonNullish(options.prefix) || isNonNullish(options.suffix) ? true : false,
   );
-  const [prefixOption, setPrefixOption] = useState(isDefined(options.prefix) ? "prefix" : "suffix");
+  const [prefixOption, setPrefixOption] = useState(
+    isNonNullish(options.prefix) ? "prefix" : "suffix",
+  );
   const [prefixValue, setPrefixValue] = useState(
-    isDefined(options.prefix) ? options.prefix : (options.suffix ?? ""),
+    isNonNullish(options.prefix) ? options.prefix : (options.suffix ?? ""),
   );
 
-  const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
+  const isRangeInvalid =
+    isNonNullish(range.min) && isNonNullish(range.max) && range.min > range.max;
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
 

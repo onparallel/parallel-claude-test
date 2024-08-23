@@ -9,7 +9,7 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
@@ -351,7 +351,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
         orgId: toGlobalId("Organization", ctx.user!.org_id),
         fieldId: toGlobalId("PetitionField", fieldId),
         userId: toGlobalId("User", ctx.user!.id),
-        parentReplyId: isDefined(parentReplyId)
+        parentReplyId: isNonNullish(parentReplyId)
           ? toGlobalId("PetitionFieldReply", parentReplyId)
           : null,
       });
@@ -364,7 +364,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       const options = field.options as PetitionFieldOptions["ID_VERIFICATION"];
       let integrationId = options.integrationId;
 
-      if (!isDefined(integrationId)) {
+      if (isNullish(integrationId)) {
         const integrations = await ctx.integrations.loadIntegrationsByOrgId(
           ctx.user!.org_id,
           "ID_VERIFICATION",
@@ -372,7 +372,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
 
         integrationId = integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
 
-        if (!isDefined(integrationId)) {
+        if (isNullish(integrationId)) {
           throw new ApolloError(
             "An enabled integration is required for ID_VERIFICATION field",
             "MISSING_ID_VERIFICATION_INTEGRATION",
@@ -429,7 +429,7 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
       orgId: toGlobalId("Organization", ctx.user!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       userId: toGlobalId("User", ctx.user!.id),
-      parentReplyId: isDefined(parentReplyId)
+      parentReplyId: isNonNullish(parentReplyId)
         ? toGlobalId("PetitionFieldReply", parentReplyId)
         : null,
     });
@@ -574,11 +574,11 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
     fieldCanBeReplied((args) => args.fields, "overwriteExisting"),
     replyIsForFieldOfType(
-      (args) => args.fields.map((field) => field.parentReplyId).filter(isDefined),
+      (args) => args.fields.map((field) => field.parentReplyId).filter(isNonNullish),
       "FIELD_GROUP",
     ),
     repliesBelongsToPetition("petitionId", (args) =>
-      args.fields.map((field) => field.parentReplyId).filter(isDefined),
+      args.fields.map((field) => field.parentReplyId).filter(isNonNullish),
     ),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
@@ -619,7 +619,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
 
       const fileReplies =
         fileReplyIds.length > 0
-          ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isDefined)
+          ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isNonNullish)
           : [];
 
       if (args.overwriteExisting) {
@@ -770,11 +770,11 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
       const reply = replies.find(
         (r) =>
           r.type === "BACKGROUND_CHECK" &&
-          isDefined(r.content.query) &&
+          isNonNullish(r.content.query) &&
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
 
-      if (!isDefined(reply)) {
+      if (isNullish(reply)) {
         throw new ApolloError(`Can't find BACKGROUND_CHECK reply`, "REPLY_NOT_FOUND");
       }
 
@@ -788,7 +788,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         throw new ForbiddenError("FORBIDDEN");
       }
 
-      const entity = isDefined(entityId)
+      const entity = isNonNullish(entityId)
         ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
         : null;
 
@@ -833,14 +833,14 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         (pfv) =>
           pfv.type === "BACKGROUND_CHECK" &&
           pfv.profile_type_field_id === params.profileTypeFieldId &&
-          isDefined(pfv.content.query),
+          isNonNullish(pfv.content.query),
       );
 
-      if (!isDefined(pfv)) {
+      if (isNullish(pfv)) {
         throw new ApolloError(`Can't find BACKGROUND_CHECK profile field value`, "REPLY_NOT_FOUND");
       }
 
-      const entity = isDefined(entityId)
+      const entity = isNonNullish(entityId)
         ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
         : null;
 

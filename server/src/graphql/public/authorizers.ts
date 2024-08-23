@@ -3,7 +3,7 @@ import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition, unique } from "remeda";
+import { isNonNullish, isNullish, partition, unique } from "remeda";
 import { FeatureFlagName } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
@@ -31,7 +31,7 @@ export function authenticatePublicAccess<
       return true;
     }
     const contactId = ctx.contact?.id;
-    if (!isDefined(contactId)) {
+    if (isNullish(contactId)) {
       throw new ApolloError("Contact not found", "CONTACT_NOT_FOUND");
     }
     const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
@@ -230,12 +230,12 @@ export function validPublicPetitionLinkSlug<
   return async (_, args, ctx) => {
     const slug = args[argSlug] as unknown as string;
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
-    if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
+    if (isNullish(publicPetitionLink) || !publicPetitionLink.is_active) {
       throw new ForbiddenError("Public link not found or inactive");
     }
     const template = await ctx.petitions.loadPetition(publicPetitionLink.template_id);
 
-    if (!isDefined(template)) {
+    if (isNullish(template)) {
       throw new ForbiddenError("Template not found");
     }
 
@@ -266,7 +266,7 @@ export function validPublicPetitionLinkPrefill<
       const slug = args[argSlug] as unknown as string;
       const prefill = args[argPrefill] as unknown as string;
       const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
-      if (isDefined(publicLink?.prefill_secret)) {
+      if (isNonNullish(publicLink?.prefill_secret)) {
         await verify(prefill!, publicLink!.prefill_secret, {});
         return true;
       }

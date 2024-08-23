@@ -1,4 +1,4 @@
-import { isDefined, unique } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { createCronWorker } from "./helpers/createCronWorker";
@@ -119,7 +119,7 @@ async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorker
                 orgId: r.org_id,
               },
         ])
-        .filter(isDefined);
+        .filter(isNonNullish);
 
       await ctx.profiles.createEvent(
         eventsData.map((d) => ({

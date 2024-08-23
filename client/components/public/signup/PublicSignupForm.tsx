@@ -19,7 +19,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface PublicSignupFormData {
   email: string;
@@ -97,7 +97,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
           )}
         </Text>
         <Text marginBottom={2}>
-          {isDefined(email) ? (
+          {isNonNullish(email) ? (
             <FormattedMessage
               id="component.public-signup-form.description-plan"
               defaultMessage="Create your account now and automate your workflow agilely and safely."

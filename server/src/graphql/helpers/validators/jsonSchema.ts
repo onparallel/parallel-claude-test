@@ -1,7 +1,7 @@
-import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-import { ArgValidationError } from "../errors";
 import Ajv from "ajv";
+import { core } from "nexus";
+import { ArgValidationError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function jsonSchema(schema: any) {
   return <TypeName extends string, FieldName extends string>(

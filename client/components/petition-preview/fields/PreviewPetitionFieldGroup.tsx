@@ -39,7 +39,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, isNullish, zip } from "remeda";
 import { usePreviewConfirmImportFromProfileDialog } from "../dialogs/PreviewConfirmImportFromProfileDialog";
 import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromProfileDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
@@ -131,12 +131,12 @@ export function PreviewPetitionFieldGroup({
   const replies =
     isCacheOnly && field.__typename === "PetitionField" ? field.previewReplies : field.replies;
 
-  const isLinkedToProfileType = isDefined(field.profileType);
+  const isLinkedToProfileType = isNonNullish(field.profileType);
 
   const showPreviewImportFromProfileDialog = usePreviewImportFromProfileDialog();
   const showConfirmImportFromProfileDialog = usePreviewConfirmImportFromProfileDialog();
   const handleImportFromProfile = async (parentReplyId: string) => {
-    if (!isDefined(field.profileType)) {
+    if (isNullish(field.profileType)) {
       return;
     }
     let profileId = "";

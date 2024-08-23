@@ -27,10 +27,10 @@ import Select, {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
-import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
+import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
 import { UserSelectOption } from "./UserSelectOption";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =

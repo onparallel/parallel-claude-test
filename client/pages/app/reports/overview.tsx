@@ -42,7 +42,7 @@ import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined, sortBy, sumBy } from "remeda";
+import { isNonNullish, sortBy, sumBy } from "remeda";
 
 interface PetitionStatusCount {
   all: number;
@@ -232,7 +232,7 @@ export function Overview() {
             <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
           </Button>
         </Stack>
-        {isDefined(report) && (status === "LOADED" || status === "IDLE") ? (
+        {isNonNullish(report) && (status === "LOADED" || status === "IDLE") ? (
           <>
             <Grid
               templateColumns={{
@@ -736,7 +736,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                   minWidth: "120px",
                 },
                 CellContent: ({ row }) =>
-                  isDefined(row.times.signature_completed) ? (
+                  isNonNullish(row.times.signature_completed) ? (
                     <TimeSpan duration={row.times.signature_completed} />
                   ) : (
                     <Text>
@@ -804,7 +804,7 @@ function useDownloadOverviewExcel() {
           defaultMessage: "overview-report-{range}",
         },
         {
-          range: isDefined(range)
+          range: isNonNullish(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
         },
@@ -935,7 +935,7 @@ function useDownloadOverviewExcel() {
             total_time:
               ((row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)) / 3600,
             time_to_complete: (row.times.pending_to_complete ?? 0) / 3600,
-            time_to_sign: isDefined(row.times.signature_completed)
+            time_to_sign: isNonNullish(row.times.signature_completed)
               ? (row.times.signature_completed ?? 0) / 3600
               : "",
             time_to_close: (row.times.complete_to_close ?? 0) / 3600,

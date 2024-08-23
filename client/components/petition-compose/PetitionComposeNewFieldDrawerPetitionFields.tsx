@@ -14,6 +14,9 @@ import {
 import { getPetitionFieldTypeDescription } from "@parallel/utils/getPetitionFieldTypeDescription";
 import { getPetitionFieldTypeKeywords } from "@parallel/utils/getPetitionFieldTypeKeywords";
 import { getPetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
+import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { difference } from "remeda";
@@ -21,9 +24,6 @@ import { PaidBadge } from "../common/PaidBadge";
 import { SearchInput } from "../common/SearchInput";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
-import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
-import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
-import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 

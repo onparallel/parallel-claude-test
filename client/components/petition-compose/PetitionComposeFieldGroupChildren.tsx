@@ -8,7 +8,7 @@ import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useDrop } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { useAddNewFieldPlaceholderContext } from "./AddNewFieldPlaceholderProvider";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
 import type { PetitionComposeFieldProps, PetitionComposeFieldRef } from "./PetitionComposeField";
@@ -57,7 +57,7 @@ export function PetitionComposeFieldGroupChildren({
   showAddField,
 }: PetitionComposeFieldGroupChildrenProps) {
   const { fields: children, onFieldMove } = usePetitionComposeFieldReorder({
-    fields: field.children?.filter(isDefined) ?? [],
+    fields: field.children?.filter(isNonNullish) ?? [],
     onUpdateFieldPositions: (fieldPositions) => {
       onUpdateFieldPositions(fieldPositions, field.id);
     },
@@ -85,7 +85,7 @@ export function PetitionComposeFieldGroupChildren({
     [afterFieldId],
   );
 
-  const hasChildren = isDefined(field.children) && field.children.length > 0;
+  const hasChildren = isNonNullish(field.children) && field.children.length > 0;
   const hasDropErrors = FIELD_GROUP_EXCLUDED_FIELD_TYPES.includes(draggedFieldType) && isOver;
   const newFieldPlaceholderIndex = children.findIndex((f) => f.id === afterFieldId);
   return (

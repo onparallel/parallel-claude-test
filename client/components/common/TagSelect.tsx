@@ -30,6 +30,7 @@ import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { useRerender } from "@parallel/utils/useRerender";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
   DependencyList,
@@ -57,14 +58,13 @@ import {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
-import { indexBy, isDefined, zip } from "remeda";
+import { indexBy, isNonNullish, isNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { Tag } from "./Tag";
-import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { NoElement } from "./NoElement";
-import { useRerender } from "@parallel/utils/useRerender";
+import { Tag } from "./Tag";
+import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -111,7 +111,7 @@ export const TagSelect = Object.assign(
           if (firstLoadRef.current) {
             firstLoadRef.current = false;
           } else {
-            if (!isDefined(data.tags) && partial) {
+            if (isNullish(data.tags) && partial) {
               rerender();
             }
           }
@@ -214,7 +214,7 @@ export const TagSelect = Object.assign(
               })
         }
         isOptionDisabled={(_, selection) => {
-          if (isDefined(maxItems) && selection.length >= maxItems) {
+          if (isNonNullish(maxItems) && selection.length >= maxItems) {
             return true;
           }
           return false;
@@ -594,7 +594,7 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
             />
           </FormControl>
           <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
-            <FormControl as={NoElement} isDisabled={!isDefined(tagId)} isInvalid={!!errors.name}>
+            <FormControl as={NoElement} isDisabled={isNullish(tagId)} isInvalid={!!errors.name}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="component.manage-tags-dialog.rename"
@@ -617,7 +617,7 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
                 )}
               </FormErrorMessage>
             </FormControl>
-            <FormControl as={NoElement} isDisabled={!isDefined(tagId)}>
+            <FormControl as={NoElement} isDisabled={isNullish(tagId)}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="component.manage-tags-dialog.color-label"

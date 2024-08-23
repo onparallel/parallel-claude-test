@@ -35,7 +35,7 @@ import {
 } from "@udecode/plate-mention";
 import { ReactNode, RefObject, createContext, useCallback, useContext } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { Node } from "slate";
 import { useFocused, useSelected } from "slate-react";
 import { usePetitionFieldTypeColor } from "../petitionFields";
@@ -108,7 +108,7 @@ export function createPlaceholderPlugin<
                   p.key === part.value ||
                   ("data" in p && "field" in p.data && p.data.field.alias === part.value),
               );
-              if (isDefined(placeholder)) {
+              if (isNonNullish(placeholder)) {
                 editor.insertNode({
                   type: ELEMENT_PLACEHOLDER,
                   placeholder: placeholder.key,
@@ -157,7 +157,7 @@ export function createPlaceholderPlugin<
             const placeholder = placeholdersRef.current?.find(
               (n) => n.key === (node as PlaceholderElement).placeholder,
             );
-            return isDefined(placeholder);
+            return isNonNullish(placeholder);
           }
           return true;
         });
@@ -283,7 +283,7 @@ function PlaceholderElement({
   }
   const placeholder = placeholders.find((p) => p.key === element.placeholder);
   const color = usePetitionFieldTypeColor(
-    isDefined(placeholder) && "data" in placeholder && "field" in placeholder.data
+    isNonNullish(placeholder) && "data" in placeholder && "field" in placeholder.data
       ? placeholder.data.field.type
       : (undefined as any),
   );
@@ -291,7 +291,7 @@ function PlaceholderElement({
   const isFocused = useFocused();
 
   const hasNoReplies =
-    isDefined(placeholder) &&
+    isNonNullish(placeholder) &&
     "data" in placeholder &&
     "field" in placeholder.data &&
     placeholder.data.petition.__typename === "Petition" &&
@@ -299,9 +299,9 @@ function PlaceholderElement({
 
   return (
     <SmallPopover
-      isDisabled={!(hasNoReplies || !isDefined(placeholder))}
+      isDisabled={!(hasNoReplies || isNullish(placeholder))}
       content={
-        !isDefined(placeholder) ? (
+        isNullish(placeholder) ? (
           <Text fontSize="sm">
             <FormattedMessage
               id="placeholder-plugin.deleted-field"
@@ -329,7 +329,7 @@ function PlaceholderElement({
         fontSize="sm"
         height="21px"
         marginX="1px"
-        {...(!isDefined(placeholder)
+        {...(isNullish(placeholder)
           ? {
               backgroundColor: "gray.100",
               color: "gray.800",
@@ -353,7 +353,7 @@ function PlaceholderElement({
         }}
         paddingX={1}
       >
-        {!isDefined(placeholder) ? (
+        {isNullish(placeholder) ? (
           <>
             <Box
               as="span"
@@ -371,7 +371,7 @@ function PlaceholderElement({
           </>
         ) : "data" in placeholder &&
           "field" in placeholder.data &&
-          isDefined(placeholder.data.field) ? (
+          isNonNullish(placeholder.data.field) ? (
           <>
             <Box
               as="span"

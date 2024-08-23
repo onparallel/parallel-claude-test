@@ -1,11 +1,11 @@
 import { lookup } from "geoip-country";
 import { arg, idArg, list, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
+import { NexusGenObjects } from "../__types";
 import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { NexusGenObjects } from "../__types";
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
@@ -41,7 +41,7 @@ export const remindersOptOut = queryField("remindersOptOut", {
     const logoPath = await ctx.organizations.loadOrgLogoPath(organization.id);
 
     return {
-      orgLogoUrl: isDefined(logoPath) ? await ctx.images.getImageUrl(logoPath) : null,
+      orgLogoUrl: isNonNullish(logoPath) ? await ctx.images.getImageUrl(logoPath) : null,
       orgName: organization.name,
     };
   },
@@ -97,13 +97,13 @@ export const metadata = queryField("metadata", {
   resolve: async (_, args, ctx) => {
     const data: NexusGenObjects["ConnectionMetadata"] = {};
     const ip = getClientIp(ctx.req);
-    if (isDefined(ip)) {
+    if (isNonNullish(ip)) {
       data.ip = ip;
       const geo = lookup(ip);
       data.country = geo?.country ?? null;
     }
     const userAgent = ctx.req.headers["user-agent"];
-    if (isDefined(userAgent)) {
+    if (isNonNullish(userAgent)) {
       const ua = new UAParser(userAgent);
       const browser = ua.getBrowser();
       data.browserName = browser.name;

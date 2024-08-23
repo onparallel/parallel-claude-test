@@ -16,7 +16,7 @@ import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ActionMeta } from "react-select";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface CreateOrUpdateUserDialogProps {
   user?: useCreateOrUpdateUserDialog_UserFragment;
@@ -33,7 +33,7 @@ function CreateOrUpdateUserDialog({
   user,
   ...props
 }: DialogProps<CreateOrUpdateUserDialogProps, CreateOrUpdateUserDialogData>) {
-  const isUpdate = isDefined(user);
+  const isUpdate = isNonNullish(user);
   const intl = useIntl();
   const { handleSubmit, register, formState, control } = useForm<CreateOrUpdateUserDialogData>({
     mode: "onChange",

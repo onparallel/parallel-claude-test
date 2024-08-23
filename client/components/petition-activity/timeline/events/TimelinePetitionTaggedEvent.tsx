@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
+import { TagIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionTaggedEvent_PetitionTaggedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { TagReference } from "../../../common/TagReference";
 import { UserReference } from "../../../common/UserReference";
-import { TimelineItem } from "../common/TimelineItem";
-import { TagIcon } from "@parallel/chakra/icons";
 import { TimelineIcon } from "../common/TimelineIcon";
+import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelinePetitionTaggedEventProps {
   event: TimelinePetitionTaggedEvent_PetitionTaggedEventFragment;

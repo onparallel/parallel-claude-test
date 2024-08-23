@@ -3,8 +3,8 @@ import { Image, Link, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Fragment, useMemo } from "react";
 import { range, zip } from "remeda";
 import { cleanupText } from "../utils/cleanupText";
-import { useTheme } from "../utils/ThemeProvider";
 import { useLiquid } from "../utils/liquid/useLiquid";
+import { useTheme } from "../utils/ThemeProvider";
 
 interface FieldDescriptionProps {
   description: string;

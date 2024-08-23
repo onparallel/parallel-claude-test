@@ -1,6 +1,6 @@
 import { ConnectionMetadata } from "@parallel/graphql/__types";
 import { ComponentType, createContext, useContext } from "react";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 
 const MetadataContext = createContext<Partial<ConnectionMetadata> | null>(null);
 
@@ -23,7 +23,7 @@ export function withMetadata<P>(
 
 export function useMetadata() {
   const metadata = useContext(MetadataContext);
-  if (process.env.NODE_ENV === "development" && !isDefined(metadata)) {
+  if (process.env.NODE_ENV === "development" && isNullish(metadata)) {
     console.warn("useMetadata is being used without using withMetadata");
     return {};
   }

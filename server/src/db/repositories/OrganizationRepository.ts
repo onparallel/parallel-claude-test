@@ -1,7 +1,7 @@
 import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isDefined, unique } from "remeda";
+import { indexBy, isNonNullish, unique } from "remeda";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
@@ -134,7 +134,7 @@ export class OrganizationRepository extends BaseRepository {
             );
           }
 
-          if (isDefined(status) && status.length > 0) {
+          if (isNonNullish(status) && status.length > 0) {
             q.whereIn("status", status);
           }
         })
@@ -334,7 +334,7 @@ export class OrganizationRepository extends BaseRepository {
     limitName: OrganizationUsageLimitName,
     t?: Knex.Transaction,
   ): Promise<OrganizationUsageLimit | null> {
-    if (isDefined(t)) {
+    if (isNonNullish(t)) {
       return await this._loadCurrentOrganizationUsageLimit.raw({ orgId, limitName }, t);
     } else {
       return await this._loadCurrentOrganizationUsageLimit({ orgId, limitName });
@@ -356,7 +356,7 @@ export class OrganizationRepository extends BaseRepository {
       })
       .select("*");
 
-    if (isDefined(currentLimit)) {
+    if (isNonNullish(currentLimit)) {
       const [updatedLimit] = await this.from("organization_usage_limit", t)
         .where("id", currentLimit.id)
         .update(

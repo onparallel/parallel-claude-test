@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { toDate } from "date-fns-tz";
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { isDefined, pick, range, sortBy } from "remeda";
+import { isNonNullish, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import {
   IProfilesSetupService,
@@ -1107,7 +1107,7 @@ describe("repositories/PetitionRepository", () => {
         }
         // deletes every file_upload on replies
         const currentFiles = await filesRepo.loadFileUpload.raw(fileUploadIds);
-        expect(currentFiles.filter(isDefined)).toHaveLength(0);
+        expect(currentFiles.filter(isNonNullish)).toHaveLength(0);
       });
 
       it("erases the content of every comment", async () => {
@@ -1182,7 +1182,7 @@ describe("repositories/PetitionRepository", () => {
 
         const emailLogs = (
           await emailLogsRepo.loadEmailLog([messageEmailLog.id, reminderEmailLog.id])
-        ).filter(isDefined);
+        ).filter(isNonNullish);
 
         expect(emailLogs.length).toBeGreaterThan(0);
         expect(
@@ -1234,10 +1234,10 @@ describe("repositories/PetitionRepository", () => {
         ).toEqual(true);
 
         const signedFileIds = signatures
-          .filter((s) => isDefined(s.file_upload_id))
+          .filter((s) => isNonNullish(s.file_upload_id))
           .map((s) => s.id);
         expect(signedFileIds.length).toBeGreaterThan(0);
-        const fileUploads = (await filesRepo.loadFileUpload(signedFileIds)).filter(isDefined);
+        const fileUploads = (await filesRepo.loadFileUpload(signedFileIds)).filter(isNonNullish);
         expect(fileUploads).toHaveLength(0);
       });
     });

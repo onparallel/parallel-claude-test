@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { ibanDefinitions, ibanRegex } from "./iban";
 import { useLoadCountryNames } from "./useLoadCountryNames";
 import { EMAIL_REGEX } from "./validation";
@@ -176,7 +176,7 @@ export function useShortTextFormatsSelectOptions() {
     if (countryNames.loading) {
       return { grouped: [], allFormats: [], loading: true };
     }
-    const countries = unique(formats.filter((f) => isDefined(f.country)).map((f) => f.country!))
+    const countries = unique(formats.filter((f) => isNonNullish(f.country)).map((f) => f.country!))
       .map((countryCode) => {
         const countryName = countryNames.countries![countryCode];
         return {
@@ -191,7 +191,7 @@ export function useShortTextFormatsSelectOptions() {
           id: "util.use-short-text-formats.group-generic",
           defaultMessage: "Generic",
         }),
-        options: formats.filter((f) => !isDefined(f.country)),
+        options: formats.filter((f) => isNullish(f.country)),
       },
       ...countries.map((country) => ({
         label: country.countryName,

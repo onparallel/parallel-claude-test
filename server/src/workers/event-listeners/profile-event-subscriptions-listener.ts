@@ -1,5 +1,5 @@
 import { DatabaseError } from "pg";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ProfileEventTypeValues } from "../../db/__types";
 import { mapProfileEvent } from "../../util/eventMapper";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
@@ -51,12 +51,12 @@ export const profileEventSubscriptionsListener = listener(
         if (s.from_profile_type_id !== null && s.from_profile_type_id !== profile.profile_type_id) {
           return false;
         }
-        if (isDefined(s.from_profile_type_field_ids) && "profile_type_field_id" in event.data) {
+        if (isNonNullish(s.from_profile_type_field_ids) && "profile_type_field_id" in event.data) {
           const profileTypeField = await ctx.profiles.loadProfileTypeField(
             event.data.profile_type_field_id,
           );
           if (
-            !isDefined(profileTypeField) ||
+            isNullish(profileTypeField) ||
             !s.from_profile_type_field_ids.includes(profileTypeField.id)
           ) {
             return false;

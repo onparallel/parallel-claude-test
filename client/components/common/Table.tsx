@@ -51,7 +51,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { identity, isDefined, noop, pick } from "remeda";
+import { identity, isNonNullish, noop, pick } from "remeda";
 import { Card } from "./Card";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -190,7 +190,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 
   const _columns = useMemo(() => {
     const updated =
-      selectedCount > 0 && isDefined(actions)
+      selectedCount > 0 && isNonNullish(actions)
         ? ([
             {
               ...pick(columns[0], ["key", "CellContent", "cellProps"]),
@@ -781,7 +781,7 @@ function preventClickWhenSelection<T extends (...args: any[]) => void>(
   return function (...args: any[]) {
     setTimeout(() => {
       const selection = document.getSelection();
-      if (isDefined(selection)) {
+      if (isNonNullish(selection)) {
         if (
           !selection.isCollapsed &&
           (selection.anchorNode?.nodeType === Node.TEXT_NODE || selection.rangeCount > 1)

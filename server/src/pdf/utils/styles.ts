@@ -1,10 +1,10 @@
 import { Style } from "@react-pdf/types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function mergeStyles(...styles: (Style | Style[] | undefined)[]) {
   const merged = [];
   for (const style of styles) {
-    if (isDefined(style)) {
+    if (isNonNullish(style)) {
       if (Array.isArray(style)) {
         merged.push(...style);
       } else {

@@ -41,7 +41,7 @@ import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQu
 import { compose } from "@parallel/utils/compose";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface ComplianceFormData {
   period: number | null;
@@ -83,7 +83,7 @@ function OrganizationCompliance() {
   } = useForm<ComplianceFormData>({
     defaultValues: {
       period: defaultPeriod,
-      isActive: isDefined(defaultPeriod),
+      isActive: isNonNullish(defaultPeriod),
     },
   });
 

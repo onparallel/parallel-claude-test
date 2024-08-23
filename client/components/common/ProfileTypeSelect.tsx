@@ -24,7 +24,7 @@ import Select, {
   components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
-import { indexBy, isDefined, zip } from "remeda";
+import { indexBy, isNonNullish, zip } from "remeda";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 
@@ -145,7 +145,7 @@ export const ProfileTypeSelect = Object.assign(
     }, [
       needsLoading,
       // Rerun when value changes
-      isDefined(value)
+      isNonNullish(value)
         ? needsLoading
           ? // value is string | string[]
             unMaybeArray(value as any).join(",")
@@ -270,7 +270,7 @@ function useGetProfileTypes() {
         },
       );
 
-      const fromServerById = indexBy(profiles.filter(isDefined), (x) => x.id);
+      const fromServerById = indexBy(profiles.filter(isNonNullish), (x) => x.id);
       const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];
     } else {

@@ -1,4 +1,4 @@
-import { useRef, useMemo, RefObject, DependencyList } from "react";
+import { DependencyList, RefObject, useMemo, useRef } from "react";
 import { assignRef } from "./assignRef";
 
 export function useUpdatingRef<T>(value: T) {

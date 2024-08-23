@@ -3,9 +3,9 @@ import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
+import { SmallPopover } from "./SmallPopover";
 import { UserGroupReference } from "./UserGroupReference";
 import { UserReference } from "./UserReference";
-import { SmallPopover } from "./SmallPopover";
 
 export function ShareButton({
   petition,

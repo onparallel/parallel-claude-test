@@ -2,7 +2,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { PetitionComposeFieldSelection } from "@parallel/components/petition-compose/PetitionComposeField";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { indexBy, isDefined } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
 import { PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic/types";
 import { Maybe } from "./types";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
@@ -75,7 +75,7 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
   return {
     fields: useMemo(() => {
       const byId = indexBy(fields, (f) => f.id);
-      return fieldIds.map((id) => byId[id]).filter(isDefined);
+      return fieldIds.map((id) => byId[id]).filter(isNonNullish);
     }, [fields, fieldIds.join(",")]),
     onFieldMove: useCallback(async (dragIndex: number, hoverIndex: number, dropped?: boolean) => {
       startDragIndex.current = startDragIndex.current ?? dragIndex;
@@ -123,14 +123,14 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
           // The first field in a group cannot be internal if the group is not
           const hasFirstChildInternalError =
             "parent" in field &&
-            isDefined(field.parent) &&
+            isNonNullish(field.parent) &&
             !field.parent.isInternal &&
             field.isInternal &&
             position === 0;
 
           // The first field in a group cannot have visibility conditions
           const hasFirstChildVisibilityError =
-            isFieldGroup && position === 0 && isDefined(field.visibility);
+            isFieldGroup && position === 0 && isNonNullish(field.visibility);
 
           if (hasFirstChildVisibilityError || hasFirstChildInternalError) {
             try {

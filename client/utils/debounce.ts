@@ -1,9 +1,9 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function debounce<T extends (...args: any[]) => void>(callback: T, ms?: number) {
   let timerId: ReturnType<typeof setTimeout> | null = null;
   return ((...args) => {
-    if (isDefined(timerId)) {
+    if (isNonNullish(timerId)) {
       clearTimeout(timerId);
     }
     timerId = setTimeout(() => {

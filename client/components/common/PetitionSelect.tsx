@@ -1,4 +1,6 @@
 import { gql, useApolloClient } from "@apollo/client";
+import { Center, Text } from "@chakra-ui/react";
+import { SearchIcon } from "@parallel/chakra/icons";
 import {
   PetitionPermissionType,
   PetitionSelect_PetitionBaseFragmentDoc,
@@ -11,6 +13,7 @@ import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import pMap from "p-map";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
@@ -22,13 +25,10 @@ import Select, {
   components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
+import { indexBy, isNonNullish, zip } from "remeda";
 import { PetitionSelect_PetitionBaseFragment } from "../../graphql/__types";
 import { OverflownText } from "./OverflownText";
 import { PetitionSelectOption } from "./PetitionSelectOption";
-import { indexBy, isDefined, zip } from "remeda";
-import pMap from "p-map";
-import { Center, Text } from "@chakra-ui/react";
-import { SearchIcon } from "@parallel/chakra/icons";
 
 export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
 
@@ -290,7 +290,7 @@ function useGetPetitions() {
         },
       );
 
-      const fromServerById = indexBy(petitions.filter(isDefined), (x) => x.id);
+      const fromServerById = indexBy(petitions.filter(isNonNullish), (x) => x.id);
       const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];
     } else {

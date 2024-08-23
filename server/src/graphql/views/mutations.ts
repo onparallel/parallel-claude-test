@@ -1,5 +1,5 @@
 import { list, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { isDefined, maxBy } from "remeda";
+import { isNonNullish, maxBy } from "remeda";
 import { PetitionListView } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -44,7 +44,7 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
   validateArgs: validPetitionListViewData((args) => args.data, "data"),
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionListView> = {};
-    if (isDefined(args.name)) {
+    if (isNonNullish(args.name)) {
       data.name = args.name;
     }
     if (args.data !== undefined) {

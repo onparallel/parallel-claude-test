@@ -1,5 +1,5 @@
 import { objectType, unionType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import {
   collectMentionsFromSlate,
   renderSlateWithMentionsToHtml,
@@ -45,7 +45,7 @@ export const PetitionFieldCommentMention = unionType({
     t.members("PetitionFieldCommentUserMention", "PetitionFieldCommentUserGroupMention");
   },
   resolveType: (o) => {
-    if (isDefined(o.__type)) {
+    if (isNonNullish(o.__type)) {
       return `PetitionFieldComment${o.__type}Mention` as const;
     }
     throw new Error("Missing __type on UserOrPetitionAccess");
@@ -126,7 +126,7 @@ export const PetitionFieldComment = objectType({
     t.nullable.string("contentHtml", {
       description: "The HTML content of the comment.",
       resolve: async (root, _, ctx) => {
-        return isDefined(root.content_json)
+        return isNonNullish(root.content_json)
           ? renderSlateWithMentionsToHtml(root.content_json)
           : null;
       },
@@ -134,7 +134,7 @@ export const PetitionFieldComment = objectType({
     t.nullable.string("excerptHtml", {
       description: "The HTML content of the comment.",
       resolve: async (root, _, ctx) => {
-        return isDefined(root.content_json)
+        return isNonNullish(root.content_json)
           ? renderSlateWithMentionsToHtml(root.content_json[0])
           : null;
       },
@@ -183,7 +183,7 @@ export const PetitionFieldComment = objectType({
     t.nullable.field("field", {
       type: "PetitionField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.petition_field_id)) {
+        if (isNonNullish(o.petition_field_id)) {
           return await ctx.petitions.loadField(o.petition_field_id);
         }
         return null;

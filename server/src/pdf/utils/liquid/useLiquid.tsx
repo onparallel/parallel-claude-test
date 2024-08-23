@@ -1,14 +1,14 @@
 import { LiquidError } from "liquidjs";
 import { useContext } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { LiquidContext } from "./LiquidContext";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
 
 export function useLiquid(text: string) {
   const intl = useIntl();
   const scope = useContext(LiquidScopeContext);
-  if (!isDefined(scope)) {
+  if (isNullish(scope)) {
     throw new Error("useLiquid must be used within a <LiquidScopeProvider/>");
   }
   const liquid = useContext(LiquidContext)!;

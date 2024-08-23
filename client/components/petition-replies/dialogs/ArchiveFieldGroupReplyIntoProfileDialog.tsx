@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Box, Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, EditIcon, RepeatIcon, SaveIcon } from "@parallel/chakra/icons";
+import { AlertPopover } from "@parallel/components/common/AlertPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import {
@@ -26,10 +27,9 @@ import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { difference, isDefined, unique, zip } from "remeda";
+import { difference, isNonNullish, isNullish, unique, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
-import { AlertPopover } from "@parallel/components/common/AlertPopover";
 
 interface ArchiveFieldGroupReplyIntoProfileDialogProps {
   petitionId: string;
@@ -75,7 +75,7 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
               defaultMessage="Select in which profile you want to save the information of each group."
             />
           </Text>
-          {!loading && isDefined(petition) && petition.__typename === "Petition" ? (
+          {!loading && isNonNullish(petition) && petition.__typename === "Petition" ? (
             <ArchiveFieldGroupReplyIntoProfileGrid
               petition={petition}
               onSelectProfile={(profileId) => {
@@ -181,7 +181,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
 
   const profile = reply.associatedProfile ?? null;
   const repliesWithProfileFields = reply.children
-    ?.filter(({ field }) => isDefined(field.profileTypeField))
+    ?.filter(({ field }) => isNonNullish(field.profileTypeField))
     .map(({ field, replies }) => [field, replies]) as [
     useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment,
     useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment[],
@@ -193,7 +193,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   });
 
   const [selectedProfile, setSelectedProfile] = useState<ProfileSelectSelection | null>(profile);
-  const [isSaved, setIsSaved] = useState(isDefined(profile));
+  const [isSaved, setIsSaved] = useState(isNonNullish(profile));
   const [isEditing, setIsEditing] = useState(false);
 
   const savedProfile = useRef<ProfileSelectSelection | null>(profile);
@@ -207,7 +207,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   const reopenProfile = useReopenProfile();
 
   useEffect(() => {
-    if (isDefined(selectedProfile)) {
+    if (isNonNullish(selectedProfile)) {
       if (!isSaved || (isEditing && savedProfile.current?.id !== selectedProfile.id)) {
         onSelectProfile(reply.id);
       } else {
@@ -224,7 +224,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
         ? reply.children
             ?.filter(
               ({ field }) =>
-                isDefined(field.profileTypeField) && field.profileTypeField.isUsedInProfileName,
+                isNonNullish(field.profileTypeField) && field.profileTypeField.isUsedInProfileName,
             )
             .map(({ field }) => ({
               action: "IGNORE",
@@ -248,7 +248,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
       if (
         reply.children?.some(({ field }) => {
           return (
-            isDefined(field.profileTypeField) && field.profileTypeField.myPermission !== "WRITE"
+            isNonNullish(field.profileTypeField) && field.profileTypeField.myPermission !== "WRITE"
           );
         })
       ) {
@@ -335,7 +335,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   }
 
   const needUpdateProfile =
-    isDefined(profile) &&
+    isNonNullish(profile) &&
     repliesWithProfileFields.some(([f, replies]) => {
       const profileField = profile.properties
         .filter(({ field }) => field.myPermission === "WRITE")
@@ -343,7 +343,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           return field.id === f.profileTypeField?.id;
         });
 
-      if (isDefined(profileField)) {
+      if (isNonNullish(profileField)) {
         if (f.type === "BACKGROUND_CHECK") {
           const fieldContent = replies?.[0]?.content;
           const profileFieldContent = profileField.value?.content;
@@ -369,11 +369,11 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           const profileFilesToString =
             profileField?.files
               ?.map((file) => {
-                if (!isDefined(file) || !isDefined(file.file)) return null;
+                if (isNullish(file) || isNullish(file.file)) return null;
                 const { filename, size, contentType } = file.file;
                 return `${filename}-${size}-${contentType})`;
               })
-              .filter(isDefined) ?? [];
+              .filter(isNonNullish) ?? [];
 
           return (
             petitionFilesToString.length !== profileFilesToString.length ||
@@ -418,7 +418,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             value={selectedProfile}
             onChange={(profile, meta) => {
               setSelectedProfile(profile);
-              if (isDefined(profile) && meta.action === "create-option") {
+              if (isNonNullish(profile) && meta.action === "create-option") {
                 archiveProfile(profile, true);
               }
             }}

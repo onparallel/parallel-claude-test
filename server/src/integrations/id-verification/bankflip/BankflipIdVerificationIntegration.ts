@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { Request, Response, Router, json } from "express";
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
-import { isDefined, omit, pick } from "remeda";
+import { isNonNullish, omit, pick } from "remeda";
 import { CONFIG, Config } from "../../../config";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import {
@@ -235,7 +235,7 @@ export class BankflipIdVerificationIntegration
       return {
         id: session.id,
         metadata: session.metadata,
-        identityVerification: isDefined(session.identityVerification)
+        identityVerification: isNonNullish(session.identityVerification)
           ? {
               ...pick(session.identityVerification, ["id", "koReason", "koSubreason", "state"]),
               request: {
@@ -366,7 +366,7 @@ export class BankflipIdVerificationIntegration
     if (hasRemoveParallelBranding) {
       customization["companyName"] = organization!.name;
       const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
-      if (isDefined(customLogoPath)) {
+      if (isNonNullish(customLogoPath)) {
         customization["companyLogo"] = await this.images.getImageUrl(customLogoPath, {
           resize: { height: 150, width: 150, fit: "fill" },
         });
@@ -458,8 +458,8 @@ export class BankflipIdVerificationIntegration
         "createdAt",
       ]),
       type: this.mapDocumentType(doc.type),
-      dataDocument: isDefined(doc.dataDocument) ? this.mapDocumentInfo(doc.dataDocument) : null,
-      imagesDocument: isDefined(doc.imagesDocument)
+      dataDocument: isNonNullish(doc.dataDocument) ? this.mapDocumentInfo(doc.dataDocument) : null,
+      imagesDocument: isNonNullish(doc.imagesDocument)
         ? this.mapDocumentInfo(doc.imagesDocument)
         : null,
     };
@@ -468,10 +468,10 @@ export class BankflipIdVerificationIntegration
   private mapIdVerificationSelfie(selfie: BankflipSelfieDocument): SelfieDocument {
     return {
       ...pick(selfie, ["onlyOneFace", "liveness", "createdAt"]),
-      pictureDocument: isDefined(selfie.pictureDocument)
+      pictureDocument: isNonNullish(selfie.pictureDocument)
         ? this.mapDocumentInfo(selfie.pictureDocument)
         : null,
-      videoDocument: isDefined(selfie.videoDocument)
+      videoDocument: isNonNullish(selfie.videoDocument)
         ? this.mapDocumentInfo(selfie.videoDocument)
         : null,
     };

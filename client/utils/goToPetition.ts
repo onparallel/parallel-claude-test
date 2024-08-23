@@ -1,7 +1,7 @@
 import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useRef } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useHandleNavigation } from "./navigation";
 
 export type PetitionSection = "compose" | "replies" | "activity" | "preview";
@@ -46,7 +46,7 @@ export function useBuildUrlToPetitionSection() {
   return useCallback(
     function (section: PetitionSection, query?: Record<string, string>) {
       const petitionId = router.query.petitionId as string;
-      const fromTemplate = isDefined(router.query.fromTemplate);
+      const fromTemplate = isNonNullish(router.query.fromTemplate);
       return buildUrlToPetition(petitionId, section, {
         ...(fromTemplate ? { fromTemplate: "" } : {}),
         ...(shouldConfirmNavigationRef.current ? { new: "" } : {}),

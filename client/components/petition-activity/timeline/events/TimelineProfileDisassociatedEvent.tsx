@@ -5,10 +5,10 @@ import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
-import { UserOrContactReference } from "../../../common/UserOrContactReference";
 
 export interface TimelineProfileDisassociatedEventProps {
   event: TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment;

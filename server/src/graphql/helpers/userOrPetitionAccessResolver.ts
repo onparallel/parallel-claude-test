@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ApiContext } from "../../context";
 import { PetitionAccess, User } from "../../db/__types";
 
@@ -7,10 +7,10 @@ export async function userOrPetitionAccessResolver(
   _: {},
   ctx: ApiContext,
 ): Promise<(User & { __type: "User" }) | (PetitionAccess & { __type: "PetitionAccess" }) | null> {
-  if (isDefined(root.data.user_id)) {
+  if (isNonNullish(root.data.user_id)) {
     const user = await ctx.users.loadUser(root.data.user_id);
     return user && { __type: "User", ...user };
-  } else if (isDefined(root.data.petition_access_id)) {
+  } else if (isNonNullish(root.data.petition_access_id)) {
     const access = await ctx.petitions.loadAccess(root.data.petition_access_id);
     return access && { __type: "PetitionAccess", ...access };
   }

@@ -20,7 +20,7 @@ import { Maybe } from "@parallel/utils/types";
 import { addMonths } from "date-fns";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useConfirmCompliancePeriodDialog } from "./ConfirmCompliancePeriodDialog";
 
 interface CompliancePeriodDialogInput {
@@ -49,7 +49,7 @@ export function CompliancePeriodDialog({
   const showConfirmCompliancePeriodDialog = useConfirmCompliancePeriodDialog();
   async function handleFormSubmit(data: CompliancePeriodDialogData) {
     try {
-      if (petition.__typename === "Petition" && isDefined(petition.closedAt)) {
+      if (petition.__typename === "Petition" && isNonNullish(petition.closedAt)) {
         const anonymizeAt = addMonths(new Date(petition.closedAt), data.anonymizeAfterMonths);
         if (new Date() >= anonymizeAt) {
           await showConfirmCompliancePeriodDialog({ months: data.anonymizeAfterMonths });

@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const chalk_1 = __importDefault(require("chalk"));
 const p_map_1 = __importDefault(require("p-map"));
@@ -11,7 +12,6 @@ const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
 const wait_1 = require("./utils/wait");
-const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const INSTANCE_TYPES = {
     production: "t3.large",
     staging: "t3.medium",

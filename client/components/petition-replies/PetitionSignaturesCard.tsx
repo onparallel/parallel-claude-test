@@ -18,7 +18,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, pick } from "remeda";
+import { isNonNullish, isNullish, omit, pick } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -171,7 +171,7 @@ export const PetitionSignaturesCard = Object.assign(
      */
     if (
       petition.signatureConfig &&
-      isDefined(current) &&
+      isNonNullish(current) &&
       ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
     ) {
       older.unshift(current);
@@ -227,7 +227,7 @@ export const PetitionSignaturesCard = Object.assign(
     async function handleAddNewSignature() {
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       try {
-        if (current?.status === "COMPLETED" && isDefined(current.signatureConfig.integration)) {
+        if (current?.status === "COMPLETED" && isNonNullish(current.signatureConfig.integration)) {
           await showConfirmRestartSignature();
           await updateSignatureConfig({
             variables: {
@@ -365,10 +365,10 @@ function usePetitionSignaturesCardPolling(petition: PetitionSignaturesCard_Petit
   });
 
   useEffect(() => {
-    if (current && current.status !== "CANCELLED" && !isDefined(current.auditTrailFilename)) {
+    if (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) {
       startPolling(POLL_INTERVAL);
     } else if (
-      (current?.status === "COMPLETED" && isDefined(current.auditTrailFilename)) ||
+      (current?.status === "COMPLETED" && isNonNullish(current.auditTrailFilename)) ||
       current?.status === "CANCELLED"
     ) {
       stopPolling();

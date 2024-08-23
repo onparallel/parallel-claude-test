@@ -1,9 +1,9 @@
 import { render } from "@faire/mjml-react/utils/render";
+import htmlnano from "htmlnano";
 import { ComponentType, createElement } from "react";
 import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
 import { ContactLocale, UserLocale } from "../db/__types";
 import { loadMessages } from "../util/loadMessages";
-import htmlnano from "htmlnano";
 
 export interface EmailOptions {
   locale: ContactLocale | UserLocale;

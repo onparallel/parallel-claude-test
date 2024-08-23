@@ -1,9 +1,9 @@
 import { Badge, Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
+import { SupportButton } from "../SupportButton";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
-import { SupportButton } from "../SupportButton";
 
 function ProfilesContactUsDialog({ ...props }: DialogProps<{}>) {
   const intl = useIntl();

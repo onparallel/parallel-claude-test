@@ -24,20 +24,20 @@ import { PetitionFieldType } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
+import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
 import { MaybePromise } from "@parallel/utils/types";
+import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
-import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
-import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -210,7 +210,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
                   />
                 ) : (
                   [reply.content.request.model.type, reply.content.request.model.year]
-                    .filter(isDefined)
+                    .filter(isNonNullish)
                     .join("_")
                 )}
               </Text>

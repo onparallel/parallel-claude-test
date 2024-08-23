@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { arg, enumType, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -27,9 +27,9 @@ export const profileTypes = queryField((t) => {
     },
     validateArgs: (_, args, ctx, info) => {
       if (
-        isDefined(args.sortBy) &&
+        isNonNullish(args.sortBy) &&
         args.sortBy.some((s) => s.startsWith("name_")) &&
-        !isDefined(args.locale)
+        isNullish(args.locale)
       ) {
         throw new ArgValidationError(
           info,
@@ -122,7 +122,7 @@ export const profiles = queryField((t) => {
       }),
     },
     validateArgs: (_, args, ctx, info) => {
-      if (isDefined(args.filter?.values)) {
+      if (isNonNullish(args.filter?.values)) {
         for (const valueFilter of args.filter.values) {
           if (valueFilter.operator === "IS_ONE_OF" || valueFilter.operator === "NOT_IS_ONE_OF") {
             if (!Array.isArray(valueFilter.value)) {

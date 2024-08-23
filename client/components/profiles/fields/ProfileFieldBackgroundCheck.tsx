@@ -34,7 +34,7 @@ import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { useConfirmRemoveEntityDialog } from "../dialogs/ConfirmRemoveEntityDialog";
 import { useConfirmUpdateEntityDialog } from "../dialogs/ConfirmUpdateEntityDialog";
@@ -69,7 +69,7 @@ export function ProfileFieldBackgroundCheck({
   const router = useRouter();
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
 
-  const hasReply = isDefined(props.value?.content);
+  const hasReply = isNonNullish(props.value?.content);
   const [showSuggestions, setShowSuggestions] = useState(!hasReply);
   const browserTabRef = useRef<Window>();
   const entityButtonRef = useRef<HTMLButtonElement>(null);
@@ -100,18 +100,18 @@ export function ProfileFieldBackgroundCheck({
 
   const { entity, query, search } = props.value?.content ?? {};
 
-  const isSearch = !isDefined(entity) && isDefined(query);
+  const isSearch = isNullish(entity) && isNonNullish(query);
 
   const savedOn = isSearch ? search?.createdAt : entity?.createdAt;
 
   const entityTypeLabel = getEntityTypeLabel(intl, query?.type);
 
   const entityOrSearchName =
-    entity?.name ?? [entityTypeLabel, query?.name, query?.date].filter(isDefined).join(" | ");
+    entity?.name ?? [entityTypeLabel, query?.name, query?.date].filter(isNonNullish).join(" | ");
 
   useInterval(
     async (done) => {
-      if (isDefined(browserTabRef.current) && browserTabRef.current.closed) {
+      if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
@@ -124,7 +124,7 @@ export function ProfileFieldBackgroundCheck({
 
   useEffect(() => {
     const handleRouteChange = () => {
-      if (isDefined(browserTabRef.current)) {
+      if (isNonNullish(browserTabRef.current)) {
         browserTabRef.current.close();
       }
     };
@@ -138,7 +138,7 @@ export function ProfileFieldBackgroundCheck({
     "message",
     async (e) => {
       const browserTab = browserTabRef.current;
-      if (!isDefined(browserTab) || e.source !== browserTab) {
+      if (isNullish(browserTab) || e.source !== browserTab) {
         return;
       }
       if (e.data === "refresh") {
@@ -152,7 +152,7 @@ export function ProfileFieldBackgroundCheck({
         browserTab.postMessage(
           {
             event: "info-updated",
-            entityIds: [entity?.id].filter(isDefined),
+            entityIds: [entity?.id].filter(isNonNullish),
           },
           browserTab.origin,
         );
@@ -163,8 +163,8 @@ export function ProfileFieldBackgroundCheck({
 
   const { monitoring } = field.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
 
-  const hasActivationCondition = isDefined(monitoring?.activationCondition);
-  const hasMonitoring = isDefined(monitoring);
+  const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
+  const hasMonitoring = isNonNullish(monitoring);
 
   const checkIfMonitoringIsActive = () => {
     const conditions = monitoring!.activationCondition;
@@ -326,7 +326,7 @@ export function ProfileFieldBackgroundCheck({
         if (reply.isAnonymized) {
           return false;
         }
-        return isDefined(reply.content.entity) || isDefined(reply.content.query);
+        return isNonNullish(reply.content.entity) || isNonNullish(reply.content.query);
       })
       .flatMap((reply) => {
         return unMaybeArray({
@@ -337,12 +337,12 @@ export function ProfileFieldBackgroundCheck({
                 reply.content.query.name,
                 reply.content.query.date,
               ]
-                .filter(isDefined)
+                .filter(isNonNullish)
                 .join(" | "),
           value:
             reply.content.entity?.id ??
             [reply.content.query.type, reply.content.query.name, reply.content.query.date]
-              .filter(isDefined)
+              .filter(isNonNullish)
               .join("-"),
           icon: reply.content.entity ? (
             reply.content.entity.type === "Person" ? (
@@ -357,7 +357,9 @@ export function ProfileFieldBackgroundCheck({
           .filter(({ value }) => {
             // remove current values
             if (isSearch) {
-              return value !== [query?.type, query?.name, query?.date].filter(isDefined).join("-");
+              return (
+                value !== [query?.type, query?.name, query?.date].filter(isNonNullish).join("-")
+              );
             }
             return value !== entity?.id;
           })
@@ -390,7 +392,7 @@ export function ProfileFieldBackgroundCheck({
       onToggleSuggestions={() => setShowSuggestions((v) => !v)}
     >
       <Stack flex="1">
-        {isDefined(props.value?.content) ? (
+        {isNonNullish(props.value?.content) ? (
           <Stack border="1px solid" borderColor="gray.200" borderRadius="md" padding={2}>
             <HStack alignItems="flex-start">
               <Flex paddingTop={1}>

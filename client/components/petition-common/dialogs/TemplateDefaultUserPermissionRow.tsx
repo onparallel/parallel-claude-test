@@ -20,7 +20,7 @@ import {
   TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 
 interface TemplateDefaultUserPermissionRowProps {
@@ -42,7 +42,7 @@ export function TemplateDefaultUserPermissionRow({
 }: TemplateDefaultUserPermissionRowProps) {
   return (
     <Flex alignItems="center">
-      {isDefined(permission) ? (
+      {isNonNullish(permission) ? (
         <UserAvatar user={permission?.user ?? {}} role="presentation" size="sm" />
       ) : (
         <Avatar
@@ -55,7 +55,7 @@ export function TemplateDefaultUserPermissionRow({
       )}
 
       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
-        {isDefined(permission) ? (
+        {isNonNullish(permission) ? (
           <>
             <Stack direction={"row"} spacing={1} align="center">
               <Text noOfLines={1} wordBreak="break-all">
@@ -81,7 +81,7 @@ export function TemplateDefaultUserPermissionRow({
           />
         )}
       </Box>
-      {isDefined(permission) ? (
+      {isNonNullish(permission) ? (
         <Menu placement="bottom-end">
           <MenuButton as={Button} variant="ghost" size="sm" rightIcon={<ChevronDownIcon />}>
             <PetitionPermissionTypeText type={permission.permissionType} />

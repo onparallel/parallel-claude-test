@@ -34,7 +34,7 @@ async function generate(locales, input, pickMissingFrom, rawOutput, compiledOutp
         const compiled = {};
         let missing = 0;
         for (const { term, definition: _definition } of terms) {
-            const definition = _definition === "" ? (_a = extendedTranslations[term]) !== null && _a !== void 0 ? _a : "" : _definition;
+            const definition = _definition === "" ? ((_a = extendedTranslations[term]) !== null && _a !== void 0 ? _a : "") : _definition;
             if (definition === "") {
                 missing += 1;
             }
@@ -77,7 +77,7 @@ async function generate(locales, input, pickMissingFrom, rawOutput, compiledOutp
     }
 }
 function getValues(elements) {
-    return (0, remeda_1.uniq)(elements.flatMap((element) => {
+    return (0, remeda_1.unique)(elements.flatMap((element) => {
         switch (element.type) {
             case icu_messageformat_parser_1.TYPE.literal:
                 return [];

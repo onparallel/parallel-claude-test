@@ -38,7 +38,7 @@ import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCa
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -72,7 +72,7 @@ function LandingTemplateDetails({
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])
     .map((c) => categoryList.find((category) => category.slug === c))
-    .filter(isDefined);
+    .filter(isNonNullish);
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 

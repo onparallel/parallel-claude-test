@@ -1,5 +1,5 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
 export const PetitionUserNotificationFilter = enumType({
@@ -20,7 +20,7 @@ export const PetitionUserNotification = interfaceType({
       },
     });
     t.boolean("isRead", {
-      resolve: (o) => isDefined(o.read_at),
+      resolve: (o) => isNonNullish(o.read_at),
     });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
@@ -75,7 +75,7 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
     t.nullable.field("field", {
       type: "PetitionField",
       resolve: async (o, _, ctx) => {
-        if (isDefined(o.data.petition_field_id)) {
+        if (isNonNullish(o.data.petition_field_id)) {
           return await ctx.petitions.loadField(o.data.petition_field_id);
         }
         return null;
@@ -85,7 +85,7 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
       resolve: (o) => o.data.is_mentioned ?? false,
     });
     t.boolean("isGeneral", {
-      resolve: (o) => !isDefined(o.data.petition_field_id),
+      resolve: (o) => isNullish(o.data.petition_field_id),
     });
   },
 );

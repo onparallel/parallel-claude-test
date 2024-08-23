@@ -2,15 +2,15 @@ import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { FieldOptions } from "@parallel/utils/petitionFields";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { FieldOptions } from "@parallel/utils/petitionFields";
-import { zip } from "remeda";
 
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<

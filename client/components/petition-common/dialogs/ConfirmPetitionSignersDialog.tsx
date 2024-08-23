@@ -22,6 +22,7 @@ import {
   ContactSelectInstance,
   ContactSelectSelection,
 } from "@parallel/components/common/ContactSelect";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
@@ -40,6 +41,8 @@ import {
   ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { fullName } from "@parallel/utils/fullName";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
@@ -49,13 +52,10 @@ import { useRef, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, partition } from "remeda";
+import { isNonNullish, partition } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
-import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
@@ -84,7 +84,7 @@ export function ConfirmPetitionSignersDialog(
 ) {
   const { minSigners, instructions, signingMode, useCustomDocument } = props.signatureConfig;
   const [presetSigners, otherSigners] = partition(
-    props.signatureConfig.signers.filter(isDefined),
+    props.signatureConfig.signers.filter(isNonNullish),
     (s) => s.isPreset,
   );
 
@@ -187,7 +187,7 @@ export function ConfirmPetitionSignersDialog(
     } else if (files.length === 1) {
       const file = files[0];
 
-      if (isDefined(file)) {
+      if (isNonNullish(file)) {
         setFileDropError(null);
         setCustomDocument(file);
         const { data } = await createCustomSignatureDocumentUploadLink({
@@ -292,7 +292,7 @@ export function ConfirmPetitionSignersDialog(
                 id: "component.confirm-petition-signers-dialog.upload-document-sign",
                 defaultMessage: "Upload the document you want to sign",
               })}:`}</Text>
-              {isDefined(customDocument) ? (
+              {isNonNullish(customDocument) ? (
                 <HStack>
                   <Center
                     boxSize={10}
@@ -317,7 +317,7 @@ export function ConfirmPetitionSignersDialog(
                         <FileSize value={customDocument.size} />
                       </Text>
                     </HStack>
-                    {isDefined(uploadTime) ? (
+                    {isNonNullish(uploadTime) ? (
                       <DateTime
                         fontSize="xs"
                         value={uploadTime}

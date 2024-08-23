@@ -1,8 +1,8 @@
 import { Button, Select, Stack, StackProps } from "@chakra-ui/react";
 import { ArrowShortRightIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
-import { resolveUrl } from "@parallel/utils/next";
 import { useSupportedUserLocales } from "@parallel/utils/locales";
+import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

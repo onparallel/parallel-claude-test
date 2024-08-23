@@ -7,7 +7,7 @@ import { PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment } fr
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import {
   InvalidIcon,
   PetitionRepliesMetadataDate,
@@ -59,11 +59,11 @@ interface InferredDataIDCard {
 export function PetitionRepliesFieldIdVerificationReply({
   reply,
 }: PetitionRepliesFieldIdVerificationReplyProps) {
-  if (isDefined(reply.content.error) && reply.content.error.length > 0) {
+  if (isNonNullish(reply.content.error) && reply.content.error.length > 0) {
     return <ErrorMessageContent />;
   }
 
-  if (isDefined(reply.metadata.inferred_type)) {
+  if (isNonNullish(reply.metadata.inferred_type)) {
     return <IDCardView reply={reply} />;
   }
 
@@ -101,7 +101,7 @@ function IDCardView({
   const idNumber = metadata.inferred_data.idNumber;
   const firstName = metadata.inferred_data.firstName;
   const surname = metadata.inferred_data.surname;
-  const hasName = isDefined(firstName) || isDefined(surname);
+  const hasName = isNonNullish(firstName) || isNonNullish(surname);
   const fullName = `${surname}, ${firstName}`;
   return (
     <HStack paddingBottom={3} flexWrap="wrap-reverse" width="100%" spacing={6}>
@@ -179,13 +179,13 @@ function IDCardView({
               </Stack>
             }
           >
-            {metadataScores.some(({ score }) => !isDefined(score) || score < 50) ? (
+            {metadataScores.some(({ score }) => isNullish(score) || score < 50) ? (
               <InvalidIcon />
             ) : (
               <ValidIcon />
             )}
           </SmallPopover>
-          {isDefined(idNumber) ? (
+          {isNonNullish(idNumber) ? (
             <CopyToClipboardButton size="xs" fontSize="md" text={idNumber} />
           ) : null}
         </HStack>
@@ -305,7 +305,7 @@ function useMetadataScores(
   const metadataScores = useMemo(() => {
     const metadata = reply.metadata as MetadataIDCard;
 
-    if (!isDefined(metadata.inferred_type) || isDefined(reply.content.error)) {
+    if (isNullish(metadata.inferred_type) || isNonNullish(reply.content.error)) {
       return [];
     }
 

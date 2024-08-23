@@ -1,17 +1,17 @@
 /** no-recipient */
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
-import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
-import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import {
   ComboboxItemProps,
   ComboboxProps,
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
+import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
 import {
   UserGroupReference,
   userGroupReferenceText,
 } from "@parallel/components/common/UserGroupReference";
+import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import { UserLocale, createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
   PlateEditor,

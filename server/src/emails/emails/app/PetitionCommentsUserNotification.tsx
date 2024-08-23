@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isDefined, sumBy, uniqueBy } from "remeda";
+import { isNonNullish, sumBy, uniqueBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
@@ -75,7 +75,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       sumBy(fieldsWithComments, ({ comments }) => comments.length) - mentionCount;
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
-    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+    const firstFieldWithCommentsId = isNonNullish(fieldsWithComments[0].field)
       ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
       : "general";
 
@@ -144,7 +144,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const onlyComments = mentionCount === 0;
     const onlyMentions = commentCount === 0;
 
-    const firstFieldWithCommentsId = isDefined(fieldsWithComments[0].field)
+    const firstFieldWithCommentsId = isNonNullish(fieldsWithComments[0].field)
       ? toGlobalId("PetitionField", fieldsWithComments[0].field.id)
       : "general";
 

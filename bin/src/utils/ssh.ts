@@ -1,5 +1,5 @@
 import { exec as _exec } from "child_process";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export async function executeRemoteCommand(ipAddress: string, command: string) {
   return await exec(
@@ -32,7 +32,7 @@ export async function copyToRemoteServer(ipAddress: string, from: string, to: st
 async function exec(command: string) {
   return await new Promise<void>((resolve, reject) => {
     const cp = _exec(command, (error) => {
-      if (isDefined(error)) {
+      if (isNonNullish(error)) {
         reject(error);
       } else {
         resolve();

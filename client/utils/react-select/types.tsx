@@ -1,4 +1,4 @@
-import { GroupBase, Props as SelectProps, ActionMeta } from "react-select";
+import { ActionMeta, GroupBase, Props as SelectProps } from "react-select";
 import { AsyncProps } from "react-select/async";
 import { AsyncCreatableProps } from "react-select/async-creatable";
 import { If } from "../types";

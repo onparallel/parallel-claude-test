@@ -1,12 +1,12 @@
-import { isDefined } from "remeda";
+import { createElement } from "react";
+import { isNullish } from "remeda";
 import { fromGlobalId } from "../globalId";
 import { Maybe } from "../types";
-import { walkSlateNodes } from "./utils";
 import { SlateNode, renderSlateToHtml, renderSlateToReactNodes, renderSlateToText } from "./render";
-import { createElement } from "react";
+import { walkSlateNodes } from "./utils";
 
 export function collectMentionsFromSlate(value: Maybe<SlateNode[]>) {
-  if (!isDefined(value)) {
+  if (isNullish(value)) {
     return [];
   }
   const seen: Record<string, boolean> = {};

@@ -3,7 +3,7 @@ import { SystemStyleObject, Text, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
 
@@ -20,7 +20,7 @@ export const ContactReference = Object.assign(
     { contact, withEmail, asLink = true, _activeContact, ...props },
     ref,
   ) {
-    return isDefined(contact) ? (
+    return isNonNullish(contact) ? (
       <Tooltip isDisabled={withEmail} label={contact.email}>
         <Text
           ref={ref}

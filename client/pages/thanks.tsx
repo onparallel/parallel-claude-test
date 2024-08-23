@@ -15,7 +15,7 @@ import { untranslated } from "@parallel/utils/untranslated";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 function ThanksForSigning() {
   const { query } = useRouter();
@@ -48,7 +48,7 @@ function ThanksForSigning() {
           justifyContent="center"
         >
           <Center>
-            {isDefined(organization.logoUrl400) ? (
+            {isNonNullish(organization.logoUrl400) ? (
               <Image src={organization.logoUrl400} maxWidth="200px" maxHeight="200px" />
             ) : (
               <Logo width="200px" />
@@ -170,7 +170,7 @@ ThanksForSigning.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
     const { data } = await fetchQuery(Thanks_publicOrganizationDocument, {
       variables: { id: query.o as string },
     });
-    if (!isDefined(data?.publicOrg)) {
+    if (isNullish(data?.publicOrg)) {
       throw new RedirectError("/");
     }
   } else {

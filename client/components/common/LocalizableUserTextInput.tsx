@@ -26,7 +26,7 @@ import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import useMergedRef from "@react-hook/merged-ref";
 import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { LocalizableUserText } from "./LocalizableUserTextRender";
 
 interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
@@ -51,7 +51,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
           asSupportedUserLocale(intl.locale),
           "en" as UserLocale,
           Object.keys(value)[0] as UserLocale,
-        ].find((locale) => isDefined(value[locale])) || (intl.locale as UserLocale),
+        ].find((locale) => isNonNullish(value[locale])) || (intl.locale as UserLocale),
     );
     const [inputValue, setInputValue] = useState(() => value[selectedLocale] ?? "");
     function handleChangeLocale(locale: UserLocale) {
@@ -137,7 +137,7 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
               />
               <Text as="span">{locale.localizedLabel}</Text>
               <Spacer />
-              {isDefined(localizableUserText[locale.key]) &&
+              {isNonNullish(localizableUserText[locale.key]) &&
               localizableUserText[locale.key]!.trim().length ? (
                 <Badge variant="subtle" colorScheme="green">
                   <FormattedMessage

@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "@react-pdf/renderer";
 import gql from "graphql-tag";
 import { useIntl } from "react-intl";
-import { chunk, isDefined, times } from "remeda";
+import { chunk, isNonNullish, times } from "remeda";
 import { ContactLocale } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { isEmptyRTEValue } from "../../util/slate/utils";
@@ -41,7 +41,7 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
 
   const signers: SignatureBoxProps[] = [];
 
-  if (process.env.NODE_ENV === "production" && isDefined(templateId)) {
+  if (process.env.NODE_ENV === "production" && isNonNullish(templateId)) {
     if (
       [
         "EAwW2jXkP4C9LjU2b3",
@@ -186,7 +186,7 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
       style={{ paddingTop: "4mm", display: "flex", flexDirection: "column", gap: "5mm" }}
       wrap={false}
     >
-      {isDefined(legalText) && !isEmptyRTEValue(legalText) ? (
+      {isNonNullish(legalText) && !isEmptyRTEValue(legalText) ? (
         <View style={[styles.text]}>
           <RichTextBlock>{legalText}</RichTextBlock>
         </View>

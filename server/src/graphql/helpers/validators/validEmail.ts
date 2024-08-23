@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import pMap from "p-map";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { unMaybeArray } from "../../../util/arrays";
 import { MaybeArray } from "../../../util/types";
 import { ArgValidationError } from "../errors";
@@ -15,7 +15,7 @@ export function validEmail<TypeName extends string, FieldName extends string>(
   onlyRegex = false,
 ) {
   return (async (_, args, ctx, info) => {
-    const emails = unMaybeArray(prop(args)).filter(isDefined);
+    const emails = unMaybeArray(prop(args)).filter(isNonNullish);
     if (emails) {
       await pMap(
         emails,

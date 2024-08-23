@@ -1,5 +1,5 @@
 import Excel from "exceljs";
-import { isDefined, partition, sortBy } from "remeda";
+import { isNonNullish, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import { PetitionField, PetitionFieldReply, PetitionFieldType } from "../../db/__types";
 import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
@@ -49,7 +49,9 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
     );
 
     const headers = this.buildExcelHeaders(
-      allTemplateFields.filter((f) => isDefined(f.alias)).map((f) => ({ ...f, alias: f.alias! })),
+      allTemplateFields
+        .filter((f) => isNonNullish(f.alias))
+        .map((f) => ({ ...f, alias: f.alias! })),
     );
 
     let rows: Record<string, Maybe<string | Date>>[] = [];
@@ -66,9 +68,9 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
       rows = petitions.map((petition, petitionIndex) => {
         const aliasedPetitionFields = applyFieldVisibility(
           petitionsComposedFields[petitionIndex],
-        ).filter((f) => f.type !== "HEADING" && isDefined(f.alias));
+        ).filter((f) => f.type !== "HEADING" && isNonNullish(f.alias));
 
-        const [contact] = petitionsAccessesContacts[petitionIndex].filter(isDefined);
+        const [contact] = petitionsAccessesContacts[petitionIndex].filter(isNonNullish);
 
         const row: Record<string, Maybe<string | Date>> = {
           "parallel-id": toGlobalId("Petition", petition.id),
@@ -98,7 +100,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
             case "DYNAMIC_SELECT":
               return (r.content.value as string[][])
                 .map((value) => value[1])
-                .filter(isDefined)
+                .filter(isNonNullish)
                 .map(valueMap)
                 .join(",");
             case "BACKGROUND_CHECK":
@@ -127,7 +129,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           replies: Pick<PetitionFieldReply, "content" | "type">[],
         ) {
           const columnId = `field-${field.from_petition_field_id ?? field.id}`.concat(
-            isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+            isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
           );
 
           // make sure header is defined on this field
@@ -141,7 +143,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
                 : field.alias,
             };
 
-            if (isDefined(parent?.from_petition_field_id)) {
+            if (isNonNullish(parent?.from_petition_field_id)) {
               // for FIELD_GROUP replies, insert new header after the last header of the group
               // this way, 2nd to nth FIELD_GROUP reply will be just after the 1st one
               const lastIndex = headers.findLastIndex(
@@ -180,7 +182,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           if (field.type === "FIELD_GROUP") {
             for (const groupReply of field.replies) {
               for (const replyChild of (groupReply.children ?? []).filter((child) =>
-                isDefined(child.field.alias),
+                isNonNullish(child.field.alias),
               )) {
                 fillRow(
                   {
@@ -296,7 +298,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
     for (const field of headerFields) {
       headers.push({
         id: `field-${field.id}`.concat(
-          isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+          isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
         ),
         parent_petition_field_id: field.parent_petition_field_id,
         title: field.parent_alias

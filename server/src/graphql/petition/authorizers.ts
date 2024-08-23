@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, indexBy, isDefined, partition, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import {
   FeatureFlagName,
@@ -33,9 +33,9 @@ function createPetitionAuthorizer<TRest extends any[] = []>(
       }
       const petitions = await ctx.petitions.loadPetition(petitionIds);
       const result = petitions.every(
-        (petition) => isDefined(petition) && predicate(petition, ...rest),
+        (petition) => isNonNullish(petition) && predicate(petition, ...rest),
       );
-      if (!result && isDefined(message)) {
+      if (!result && isNonNullish(message)) {
         throw new ForbiddenError(message);
       } else {
         return result;
@@ -55,7 +55,7 @@ function createPetitionAccessAuthorizer<TRest extends any[] = []>(
           return true;
         }
         const accesses = await ctx.petitions.loadAccess(accessIds);
-        return accesses.every((access) => isDefined(access) && predicate(access, ...rest));
+        return accesses.every((access) => isNonNullish(access) && predicate(access, ...rest));
       } catch {}
       return false;
     };
@@ -101,7 +101,7 @@ export function userHasAccessToSignatureRequest<
         return true;
       }
       const signatureRequests = await ctx.petitions.loadPetitionSignatureById(signatureRequestIds);
-      if (signatureRequests.some((s) => !isDefined(s))) {
+      if (signatureRequests.some((s) => isNullish(s))) {
         return false;
       }
 
@@ -217,7 +217,7 @@ export function fieldCanBeReplied<
   return async (_, args, ctx) => {
     const _fields = unMaybeArray(fieldsArg(args));
 
-    const overwriteExisting = isDefined(overWriteArg)
+    const overwriteExisting = isNonNullish(overWriteArg)
       ? ((typeof overWriteArg === "boolean"
           ? overWriteArg
           : (args as any)[overWriteArg]) as boolean)
@@ -589,8 +589,8 @@ export function petitionHasRepliableFields<
   };
 }
 
-export const petitionsAreEditable = createPetitionAuthorizer(
-  (petition) => !isDefined(petition.restricted_at),
+export const petitionsAreEditable = createPetitionAuthorizer((petition) =>
+  isNullish(petition.restricted_at),
 );
 
 export function templateDoesNotHavePublicPetitionLink<
@@ -792,7 +792,7 @@ export function petitionsAreInPath<
       }
       const path = args[argPath] as unknown as string;
       const petitions = await ctx.petitions.loadPetition(petitionIds);
-      return petitions.every((p) => isDefined(p) && p.path === path);
+      return petitions.every((p) => isNonNullish(p) && p.path === path);
     } catch {}
     return false;
   };
@@ -859,7 +859,7 @@ export function defaultOnBehalfUserBelongsToContextOrganization<
   return async (_, args, ctx) => {
     const data = args[dataArg] as unknown as NexusGenInputs["UpdatePetitionInput"];
     const defaultOnBehalfUserId = data.defaultOnBehalfId;
-    if (!isDefined(defaultOnBehalfUserId)) {
+    if (isNullish(defaultOnBehalfUserId)) {
       return true;
     }
 
@@ -957,7 +957,7 @@ export function firstChildHasType<
     const [firstChild] = await ctx.petitions.loadPetitionFieldChildren(fieldId);
     const validFieldTypes = unMaybeArray(fieldType);
 
-    return isDefined(firstChild) && validFieldTypes.includes(firstChild.type);
+    return isNonNullish(firstChild) && validFieldTypes.includes(firstChild.type);
   };
 }
 
@@ -988,13 +988,13 @@ export function fieldIsNotBeingReferencedByAnotherFieldLogic<
 
     const referencingFields = petitionFields.filter(
       (f) =>
-        (!isDefined(f.parent_petition_field_id) ||
+        (isNullish(f.parent_petition_field_id) ||
           !targetFields.map((f) => f.id).includes(f.parent_petition_field_id)) && // filter children of target fields
-        ((isDefined(f.visibility) &&
+        ((isNonNullish(f.visibility) &&
           (f.visibility as PetitionFieldVisibility).conditions.some(
             (c) => "fieldId" in c && fieldIds.includes(c.fieldId),
           )) ||
-          (isDefined(f.math) &&
+          (isNonNullish(f.math) &&
             (f.math as PetitionFieldMath[]).some(
               (math) =>
                 math.conditions.some(
@@ -1070,7 +1070,7 @@ export function fieldCanBeLinkedToProfileType<
     if (
       relationships.some(
         (r) =>
-          isDefined(r) &&
+          isNonNullish(r) &&
           (r.left_side_petition_field_id === petitionFieldId ||
             r.right_side_petition_field_id === petitionFieldId),
       )
@@ -1097,7 +1097,7 @@ export function profileTypeFieldCanBeLinkedToFieldGroup<
     const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
 
     const parentField = (await ctx.petitions.loadField(parentFieldId))!;
-    if (!isDefined(parentField.profile_type_id)) {
+    if (isNullish(parentField.profile_type_id)) {
       // first check if the parent field has a profile_type_id
       return false;
     }
@@ -1126,7 +1126,7 @@ export function fieldIsLinkedToProfileTypeField<
     const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
 
     const fields = await ctx.petitions.loadField(fieldIds);
-    return fields.every((f) => isDefined(f) && f.profile_type_field_id !== null);
+    return fields.every((f) => isNonNullish(f) && f.profile_type_field_id !== null);
   };
 }
 
@@ -1139,7 +1139,7 @@ export function fieldIsLinkedToProfileType<
     const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
 
     const fields = await ctx.petitions.loadField(fieldIds);
-    return fields.every((f) => isDefined(f) && f.profile_type_id !== null);
+    return fields.every((f) => isNonNullish(f) && f.profile_type_id !== null);
   };
 }
 
@@ -1161,7 +1161,7 @@ export function petitionFieldsCanBeAssociated<
       await ctx.profiles.loadProfileRelationshipType(
         relationships.map((r) => r.profileRelationshipTypeId),
       )
-    ).filter(isDefined);
+    ).filter(isNonNullish);
 
     // if both sides have the same fieldId, the relationship must be reciprocal
     if (
@@ -1198,7 +1198,7 @@ export function petitionFieldsCanBeAssociated<
 
     if (
       !petitionFields.every(
-        (f) => isDefined(f) && f.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+        (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
       )
     ) {
       // every field must be of type FIELD_GROUP and have a defined profile_type_id
@@ -1253,7 +1253,7 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
       ] as unknown as NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][],
     );
 
-    const fieldGroupRelationshipIds = relationships.map((r) => r.id).filter(isDefined);
+    const fieldGroupRelationshipIds = relationships.map((r) => r.id).filter(isNonNullish);
     if (fieldGroupRelationshipIds.length > 0) {
       const fieldGroupRelationships =
         await ctx.petitions.loadPetitionFieldGroupRelationship(fieldGroupRelationshipIds);
@@ -1266,7 +1266,7 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
       unique(relationships.map((r) => r.profileRelationshipTypeId)),
     );
 
-    if (!relationshipTypes.every((t) => isDefined(t) && t.org_id === ctx.user!.org_id)) {
+    if (!relationshipTypes.every((t) => isNonNullish(t) && t.org_id === ctx.user!.org_id)) {
       return false;
     }
 
@@ -1274,7 +1274,7 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
       unique(relationships.flatMap((r) => [r.leftSidePetitionFieldId, r.rightSidePetitionFieldId])),
     );
 
-    if (!petitionFields.every((f) => isDefined(f) && f.petition_id === petitionId)) {
+    if (!petitionFields.every((f) => isNonNullish(f) && f.petition_id === petitionId)) {
       return false;
     }
 
@@ -1318,7 +1318,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     }
 
     const inputEntry = input.find((i) => i.petitionFieldId === templateFieldId);
-    if (!isDefined(inputEntry) || !inputEntry.profileIds.some((id) => id === profileId)) {
+    if (isNullish(inputEntry) || !inputEntry.profileIds.some((id) => id === profileId)) {
       throw new ForbiddenError(
         "provided petitionFieldId must be in the prefill input and include the main profileId",
       );
@@ -1332,7 +1332,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
 
     const inputFields = await ctx.petitions.loadField(inputFieldIds);
 
-    if (!inputFields.every(isDefined)) {
+    if (!inputFields.every(isNonNullish)) {
       throw new ForbiddenError("Invalid fields");
     }
 
@@ -1345,14 +1345,14 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
     }
 
     const templateFieldGroups = (await ctx.petitions.loadFieldsForPetition(templateId)).filter(
-      (f) => isDefined(f) && f.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
     );
 
     const inputProfileIds = input.flatMap((i) => i.profileIds);
     const inputProfiles =
       inputProfileIds.length > 0 ? await ctx.profiles.loadProfile(inputProfileIds) : [];
 
-    if (!inputProfiles.every(isDefined)) {
+    if (!inputProfiles.every(isNonNullish)) {
       throw new ForbiddenError("Invalid profiles");
     }
     if (!inputProfiles.every((p) => ["OPEN", "CLOSED"].includes(p.status))) {
@@ -1402,7 +1402,7 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
                       );
 
                       assert(
-                        isDefined(relationshipType),
+                        isNonNullish(relationshipType),
                         "relationshipType expected to be defined",
                       );
                       if (relationshipType.is_reciprocal) {

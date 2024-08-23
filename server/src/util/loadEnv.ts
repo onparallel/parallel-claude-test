@@ -4,7 +4,7 @@ import DataLoader from "dataloader";
 import { config } from "dotenv";
 import pMap from "p-map";
 import path from "path";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { safeJsonParse } from "./safeJsonParse";
 
 const SECRETS_MANAGER_REGEX = /^sm:\/\/([^#]+)#(.+)$/;
@@ -49,7 +49,7 @@ export async function loadEnv(overrides?: string) {
   // iterates over all env variables and replaces the ones that are secrets from AWS Secrets Manager
   await pMap(
     Object.entries(process.env).filter(
-      ([, value]) => isDefined(value) && SECRETS_MANAGER_REGEX.test(value),
+      ([, value]) => isNonNullish(value) && SECRETS_MANAGER_REGEX.test(value),
     ),
     async ([key, value]) => {
       try {
@@ -57,7 +57,7 @@ export async function loadEnv(overrides?: string) {
         const secret = path
           .split("/")
           .reduce((acc, curr) => acc?.[curr], await secretsLoader.load(arn));
-        if (!isDefined(secret)) {
+        if (isNullish(secret)) {
           throw new Error(`Unknown path ${path} in secret ${arn}`);
         }
         process.env[key] = secret;

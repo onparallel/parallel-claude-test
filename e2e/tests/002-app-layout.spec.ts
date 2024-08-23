@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { login } from "../helpers/login";
-import { AppLayout } from "../layouts/AppLayout";
 import { waitForRehydration } from "../helpers/waitForRehydration";
+import { AppLayout } from "../layouts/AppLayout";
 
 test.beforeEach(async ({ page }) => {
   await login(page, {

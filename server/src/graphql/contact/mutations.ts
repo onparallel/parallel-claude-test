@@ -9,7 +9,7 @@ import {
   objectType,
 } from "nexus";
 import pMap from "p-map";
-import { chunk, countBy, isDefined, uniqueBy } from "remeda";
+import { chunk, countBy, isNonNullish, isNullish, uniqueBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
@@ -49,7 +49,7 @@ export const createContact = mutationField("createContact", {
     ),
   },
   validateArgs: validateIf(
-    (args) => !isDefined(args.force),
+    (args) => isNullish(args.force),
     validEmail((args) => args.data.email, "data.email"),
   ),
   resolve: async (_, args, ctx) => {
@@ -99,7 +99,7 @@ export const updateContact = mutationField("updateContact", {
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
     const data: Partial<CreateContact> = {};
-    if (isDefined(firstName)) {
+    if (isNonNullish(firstName)) {
       data.first_name = firstName.trim();
     }
     if (lastName !== undefined) {
@@ -147,7 +147,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
 
     const [parsedErrors, parsedContacts] = await parseContactList(importResult!, {
       validateEmail: (email: string) => ctx.emails.validateEmail(email),
-      force: isDefined(args.force) && args.force ? true : false,
+      force: isNonNullish(args.force) && args.force ? true : false,
     });
 
     if (parsedContacts.length === 0) {
@@ -205,7 +205,7 @@ export const deleteContacts = mutationField("deleteContacts", {
         // fill extra error data only if we wanted to delete 1 contact
         const petitions = (
           await ctx.petitions.loadPetition(activeAccesses[0].map((a) => a.petition_id))
-        ).filter(isDefined);
+        ).filter(isNonNullish);
         data = {
           PENDING: countBy(petitions, (p) => p.status === "PENDING"),
           COMPLETED: countBy(petitions, (p) => p.status === "COMPLETED"),

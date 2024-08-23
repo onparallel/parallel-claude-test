@@ -7,7 +7,7 @@ import {
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, groupBy, isDefined, partition, unique, zip } from "remeda";
+import { difference, groupBy, isNonNullish, isNullish, partition, unique, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -277,7 +277,7 @@ export const deactivateUser = mutationField("deactivateUser", {
               ownedPermissions.map((p) => p.petition_id),
               t,
             )
-          ).filter(isDefined);
+          ).filter(isNonNullish);
           const draftsIds = petitions.filter((p) => p.status === "DRAFT").map((p) => p.id);
           const ownedPetitionIds = petitions
             .filter((p) => (includeDrafts ? true : p.status !== "DRAFT"))
@@ -327,7 +327,7 @@ export const deactivateUser = mutationField("deactivateUser", {
 
           await ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId, ctx.user!, t);
 
-          if (isDefined(tagIds) && ownedPetitionIds.length > 0) {
+          if (isNonNullish(tagIds) && ownedPetitionIds.length > 0) {
             const petitionTags = await ctx.tags.tagPetition(tagIds, ownedPetitionIds, ctx.user!, t);
             if (petitionTags.length > 0) {
               const petitionTagsByPetitionId = groupBy(petitionTags, (pt) => pt.petition_id);
@@ -427,7 +427,7 @@ export const signUp = mutationField("signUp", {
     emailIsAvailable((args) => args.email),
     emailDomainIsNotSSO((args) => args.email),
     validateIf(
-      (args) => isDefined(args.organizationLogo),
+      (args) => isNonNullish(args.organizationLogo),
       validateFile(
         (args) => args.organizationLogo!,
         { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
@@ -437,7 +437,7 @@ export const signUp = mutationField("signUp", {
   ),
   resolve: async (_, args, ctx) => {
     let licenseCode: LicenseCode | null = null;
-    if (isDefined(args.licenseCode)) {
+    if (isNonNullish(args.licenseCode)) {
       licenseCode = await ctx.licenseCodes.loadLicenseCode(args.licenseCode);
       if (licenseCode?.status !== "PENDING") {
         throw new ApolloError(
@@ -693,7 +693,7 @@ export const changeOrganization = mutationField("changeOrganization", {
   resolve: async (_, args, ctx) => {
     const users = await ctx.users.loadUsersByUserDataId(ctx.realUser!.user_data_id);
     const user = users.find((u) => u.org_id === args.orgId);
-    if (!isDefined(user)) {
+    if (isNullish(user)) {
       throw new ForbiddenError("Not authorized");
     }
     try {

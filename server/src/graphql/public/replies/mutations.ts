@@ -1,5 +1,5 @@
 import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
@@ -62,13 +62,13 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
     fieldCanBeReplied((args) => args.fields),
     fieldIsExternal((args) => args.fields.map((f) => f.id)),
     replyIsForFieldOfType(
-      (args) => args.fields.map((f) => f.parentReplyId).filter(isDefined),
+      (args) => args.fields.map((f) => f.parentReplyId).filter(isNonNullish),
       "FIELD_GROUP",
     ),
     and(
       publicPetitionIsNotClosed(),
       fieldBelongsToAccess((args) => args.fields.map((f) => f.id)),
-      replyBelongsToAccess((args) => args.fields.map((f) => f.parentReplyId).filter(isDefined)),
+      replyBelongsToAccess((args) => args.fields.map((f) => f.parentReplyId).filter(isNonNullish)),
     ),
   ),
   validateArgs: validateAnd(
@@ -385,7 +385,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
         orgId: toGlobalId("Organization", petition!.org_id),
         fieldId: toGlobalId("PetitionField", fieldId),
         accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-        parentReplyId: isDefined(parentReplyId)
+        parentReplyId: isNonNullish(parentReplyId)
           ? toGlobalId("PetitionFieldReply", parentReplyId)
           : null,
       });
@@ -398,7 +398,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       const options = field.options as PetitionFieldOptions["ID_VERIFICATION"];
       let integrationId = options.integrationId;
 
-      if (!isDefined(integrationId)) {
+      if (isNullish(integrationId)) {
         const integrations = await ctx.integrations.loadIntegrationsByOrgId(
           petition.org_id,
           "ID_VERIFICATION",
@@ -406,7 +406,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
 
         integrationId = integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
 
-        if (!isDefined(integrationId)) {
+        if (isNullish(integrationId)) {
           throw new ApolloError(
             "An enabled integration is required for ID_VERIFICATION field",
             "MISSING_ID_VERIFICATION_INTEGRATION",
@@ -463,7 +463,7 @@ export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFi
       orgId: toGlobalId("Organization", petition!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-      parentReplyId: isDefined(parentReplyId)
+      parentReplyId: isNonNullish(parentReplyId)
         ? toGlobalId("PetitionFieldReply", parentReplyId)
         : null,
     });

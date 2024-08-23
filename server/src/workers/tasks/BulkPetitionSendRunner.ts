@@ -2,7 +2,7 @@ import { addMinutes } from "date-fns";
 import Excel from "exceljs";
 import safeStringify from "fast-safe-stringify";
 import pMap from "p-map";
-import { chunk, isDefined } from "remeda";
+import { chunk, isNonNullish, isNullish } from "remeda";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import {
@@ -20,11 +20,11 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
     const skipEmailSend = process.env.ENV === "staging";
 
     const template = await this.ctx.petitions.loadPetition(templateId);
-    const user = isDefined(this.task.user_id)
+    const user = isNonNullish(this.task.user_id)
       ? await this.ctx.users.loadUser(this.task.user_id)
       : null;
 
-    if (!template || !isDefined(user)) {
+    if (!template || isNullish(user)) {
       // should not happen, just in case
       return {
         status: "FAILED" as const,
@@ -92,9 +92,9 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               // if recipient is set to be signer and its not already added to the signers list on the petition, add it
               // template must have signature_config previously defined
               if (
-                isDefined(row.recipientAsSigner) &&
+                isNonNullish(row.recipientAsSigner) &&
                 row.recipientAsSigner !== "" &&
-                isDefined(petition.signature_config) &&
+                isNonNullish(petition.signature_config) &&
                 petition.signature_config.signersInfo.every(
                   (signer) => signer.email !== contact.email,
                 )
@@ -148,7 +148,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                   petition_access_id: access.id,
                   status: skipEmailSend
                     ? "PROCESSED"
-                    : isDefined(scheduledAt)
+                    : isNonNullish(scheduledAt)
                       ? "SCHEDULED"
                       : "PROCESSING",
                   email_subject: emailSubject,
@@ -195,7 +195,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
   }
 
   private async validateContactData(row: Record<string, any>) {
-    if (!isDefined(row.email) || !isDefined(row.firstName)) {
+    if (isNullish(row.email) || isNullish(row.firstName)) {
       throw new Error(`Missing 'email' or 'firstName' columns`);
     }
 
@@ -255,7 +255,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
     for (const entry of sendData) {
       for (const [key, value] of Object.entries(entry)) {
         if (Array.isArray(value)) {
-          entry[key] = value.filter(isDefined);
+          entry[key] = value.filter(isNonNullish);
         }
       }
     }

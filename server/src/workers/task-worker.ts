@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { WorkerContext } from "../context";
 import { TaskName } from "../db/__types";
 import { Task } from "../db/repositories/TaskRepository";
@@ -46,7 +46,7 @@ createQueueWorker(
   "task-worker",
   async ({ taskId }, ctx) => {
     const task = await ctx.tasks.pickupTask(taskId, ctx.config.instanceName);
-    if (!isDefined(task)) {
+    if (isNullish(task)) {
       return;
     }
     const Runner = RUNNERS[task.name];

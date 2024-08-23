@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
 import { PetitionEventType, ProfileEventType, SystemEventType } from "../../db/__types";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
@@ -59,7 +59,7 @@ export class EventProcessor {
           ctx.config.instanceName,
         );
 
-        if (isDefined(event)) {
+        if (isNonNullish(event)) {
           for (const listener of this.listeners.get(event.type)!) {
             try {
               await listener(event, ctx);

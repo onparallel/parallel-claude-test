@@ -1,5 +1,5 @@
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { MaybeArray, unMaybeArray } from "@parallel/utils/types";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { ReactNode } from "react";
 
 interface WhenPermissionProps {

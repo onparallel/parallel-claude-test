@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pipe } from "remeda";
+import { isNonNullish, pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
 import { Editor, Point, Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -74,7 +74,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
 
       const hasLabels =
         ["SELECT", "CHECKBOX"].includes(field.type) &&
-        isDefined(field.options.labels) &&
+        isNonNullish(field.options.labels) &&
         field.options.values.length === field.options.labels.length;
 
       useEffect(() => {
@@ -215,7 +215,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               return (
                 <ListItem key={index} _before={{ content: "'-'", marginEnd: 1 }}>
                   {value}
-                  {isDefined(label) ? `: ${label}` : null}
+                  {isNonNullish(label) ? `: ${label}` : null}
                 </ListItem>
               );
             })}

@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { hash, random } from "../../util/token";
+import { User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { User } from "../__types";
 
 @injectable()
 export class UserAuthenticationRepository extends BaseRepository {
@@ -34,7 +34,7 @@ export class UserAuthenticationRepository extends BaseRepository {
         return null;
       }
 
-      if (!isDefined(uat.token_hint) || uat.token_hint.length < 7) {
+      if (isNullish(uat.token_hint) || uat.token_hint.length < 7) {
         await this.from("user_authentication_token", t)
           .where("id", uat.id)
           .update({ token_hint: token.slice(0, 7) });

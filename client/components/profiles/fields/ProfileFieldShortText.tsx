@@ -2,7 +2,7 @@ import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/com
 import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
@@ -25,7 +25,7 @@ export function ProfileFieldShortText({
 }: ProfileFieldShortTextProps) {
   const intl = useIntl();
   const formats = useShortTextFormats();
-  const format = isDefined(field.options.format)
+  const format = isNonNullish(field.options.format)
     ? formats.find((f) => f.value === field.options.format)
     : null;
 
@@ -43,7 +43,9 @@ export function ProfileFieldShortText({
         control={control}
         rules={{
           validate: (value) => {
-            return isDefined(format) && value?.length ? (format.validate?.(value) ?? true) : true;
+            return isNonNullish(format) && value?.length
+              ? (format.validate?.(value) ?? true)
+              : true;
           },
         }}
         render={({ field: { onChange, value, ...rest } }) => {
@@ -52,7 +54,7 @@ export function ProfileFieldShortText({
               value={value ?? ""}
               borderColor="transparent"
               placeholder={
-                isDefined(format)
+                isNonNullish(format)
                   ? intl.formatMessage(
                       {
                         id: "generic.for-example",
@@ -80,7 +82,7 @@ export function ProfileFieldShortText({
         }}
       />
 
-      {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+      {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
     </ProfileFieldInputGroup>
   );
 }

@@ -1,6 +1,6 @@
 import { G, Link, Path, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
-import { FormattedMessage } from "react-intl";
 import { Style } from "@react-pdf/types";
+import { FormattedMessage } from "react-intl";
 import { mergeStyles } from "../utils/styles";
 
 interface NetDocumentsExternalLinkProps {

@@ -6,7 +6,7 @@ import {
 } from "@parallel/graphql/__types";
 import { PropsWithChildren, createContext, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { PetitionFieldIndex, useFieldsWithIndices } from "../fieldIndices";
 import { isFileTypeField } from "../isFileTypeField";
 import { ArrayUnionToUnion, UnwrapArray } from "../types";
@@ -41,13 +41,13 @@ export function LiquidScopeProvider({
           >(r.children! as any, childrenFieldIndices!)) {
             const values = _replies.map((r) => getReplyValue(field, r.content));
             scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
-            if (isDefined(field.alias)) {
+            if (isNonNullish(field.alias)) {
               scope[field.alias] = scope._[fieldIndex];
             }
             const value = field.multiple ? values : values?.[0];
             if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
               reply._[fieldIndex] = value;
-              if (isDefined(field.alias)) {
+              if (isNonNullish(field.alias)) {
                 reply[field.alias] = value;
               }
             }
@@ -60,7 +60,7 @@ export function LiquidScopeProvider({
       const value = field.multiple ? values : values?.[0];
       if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
         scope._[fieldIndex] = value;
-        if (isDefined(field.alias)) {
+        if (isNonNullish(field.alias)) {
           scope[field.alias] = value;
         }
       }
@@ -75,7 +75,7 @@ export function LiquidScopeProvider({
           return new DateTimeLiquidValue(intl, content);
         case "SELECT":
           const options = field.options as { labels?: string[]; values: string[] };
-          if (isDefined(options.labels)) {
+          if (isNonNullish(options.labels)) {
             const label =
               zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
             return new WithLabelLiquidValue(intl, content, label);
@@ -84,7 +84,7 @@ export function LiquidScopeProvider({
           }
         case "CHECKBOX": {
           const options = field.options as { labels?: string[]; values: string[] };
-          if (isDefined(options.labels)) {
+          if (isNonNullish(options.labels)) {
             return (content.value ?? []).map((value: string) => {
               const label =
                 zip(options.labels!, options.values).find(([, v]) => v === value)?.[0] ?? "";

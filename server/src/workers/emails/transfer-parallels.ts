@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -27,7 +27,7 @@ export async function transferParallels(
 
   const emailRecipientDatas = (
     await context.users.loadUserData(emailRecipients.map((a) => a.user_data_id))
-  ).filter(isDefined);
+  ).filter(isNonNullish);
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const emails: EmailLog[] = [];

@@ -4,7 +4,7 @@ import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
 import { Container } from "inversify";
 import { outdent } from "outdent";
-import { isDefined, omit, pick, unique, zip } from "remeda";
+import { isNonNullish, isNullish, omit, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
@@ -695,7 +695,7 @@ export function publicApi(container: Container) {
       },
       async ({ client, query }) => {
         let tags: PetitionTagFilter | undefined = undefined;
-        if (isDefined(query.tags)) {
+        if (isNonNullish(query.tags)) {
           try {
             tags = await buildTagsFilter(client, query.tags);
           } catch (e) {
@@ -918,12 +918,12 @@ export function publicApi(container: Container) {
         `;
 
         const inputData: UpdatePetitionInput = omit(body, ["signers"]);
-        if (isDefined(body.signers)) {
+        if (isNonNullish(body.signers)) {
           const queryResult = await client.request(UpdatePetition_petitionDocument, {
             petitionId: params.petitionId,
           });
 
-          if (!isDefined(queryResult.petition!.signatureConfig)) {
+          if (isNullish(queryResult.petition!.signatureConfig)) {
             throw new ConflictError(
               "Cannot update signers on a petition without a signature configuration",
             );
@@ -1139,7 +1139,7 @@ export function publicApi(container: Container) {
       // must have a 100% match on the result
       let tagId = queryResult.tagsByName.items[0]?.id;
 
-      if (!isDefined(tagId)) {
+      if (isNullish(tagId)) {
         const _mutation = gql`
           mutation TagPetition_createTag($name: String!, $color: String!) {
             createTag(name: $name, color: $color) {
@@ -1221,7 +1221,7 @@ export function publicApi(container: Container) {
         });
         const tagId = queryResult.tagsByName.items[0]?.id;
 
-        if (!isDefined(tagId)) {
+        if (isNullish(tagId)) {
           throw new ResourceNotFoundError(`Label '${params.name}' not found`);
         }
 
@@ -1467,7 +1467,7 @@ export function publicApi(container: Container) {
           ${PetitionFragment}
         `;
 
-        if (!isDefined(subject) || !isDefined(message)) {
+        if (isNullish(subject) || isNullish(message)) {
           /* 
           email body and subject are required in the sendPetition mutation, so if those are not defined on the request
           we need to fetch it from the petition. If they are not defined in the petition either, an error will be thrown
@@ -1478,7 +1478,7 @@ export function publicApi(container: Container) {
 
           subject = subject ?? query.petition?.emailSubject ?? null;
           message = message ?? query.petition?.emailBody ?? null;
-          if (!isDefined(subject) || !isDefined(message)) {
+          if (isNullish(subject) || isNullish(message)) {
             throw new BadRequestError(
               "The subject or the message are missing and not defined on the parallel",
             );
@@ -1488,7 +1488,7 @@ export function publicApi(container: Container) {
         let senderId: string | null = null;
         const EMAIL_REGEX =
           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (isDefined(body.sendAs)) {
+        if (isNonNullish(body.sendAs)) {
           if (isGlobalId(body.sendAs, "User")) {
             senderId = body.sendAs;
           } else if (EMAIL_REGEX.test(body.sendAs)) {
@@ -1796,7 +1796,7 @@ export function publicApi(container: Container) {
         `;
 
         let options;
-        if (isDefined(body.options)) {
+        if (isNonNullish(body.options)) {
           options =
             typeof body.options[0] === "string"
               ? { values: body.options, labels: null }
@@ -1984,7 +1984,7 @@ export function publicApi(container: Container) {
                   firstGroup.name,
                   firstGroup.localizableName["en"],
                   firstGroup.localizableName["es"],
-                ].filter(isDefined);
+                ].filter(isNonNullish);
 
                 if (name.every((name) => name.toLowerCase() !== search.toLowerCase())) {
                   throw new Error(); // group name must fully match search term, case-insensitive
@@ -2099,13 +2099,13 @@ export function publicApi(container: Container) {
         const field = fields?.find((f) => f.id === params.fieldId);
 
         try {
-          if (field?.isChild && !isDefined(body.parentReplyId)) {
+          if (field?.isChild && isNullish(body.parentReplyId)) {
             throw new BadRequestError("You must specify a parentReplyId for this field");
           }
           const fieldType = field?.type;
           let newReply;
 
-          if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+          if (isNonNullish(fieldType) && isFileTypeField(fieldType)) {
             const file = body.reply as FormDataFile;
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
@@ -2148,11 +2148,11 @@ export function publicApi(container: Container) {
             }));
           }
 
-          if (isDefined(body.status) && fieldType === "FIELD_GROUP") {
+          if (isNonNullish(body.status) && fieldType === "FIELD_GROUP") {
             throw new BadRequestError("You can't set the status of a FIELD_GROUP reply");
           }
 
-          if (isDefined(body.status)) {
+          if (isNonNullish(body.status)) {
             const replyId = newReply.id;
             const { updatePetitionFieldRepliesStatus } = await client.request(
               UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
@@ -2233,7 +2233,7 @@ export function publicApi(container: Container) {
           const fieldType = field?.type;
           let updatedReply;
 
-          if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+          if (isNonNullish(fieldType) && isFileTypeField(fieldType)) {
             const file = body.reply as FormDataFile;
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
@@ -2691,7 +2691,7 @@ export function publicApi(container: Container) {
           ${PermissionFragment}
         `;
         const userIds = body.userIds ?? [];
-        if (isDefined(body.emails)) {
+        if (isNonNullish(body.emails)) {
           if (!body.emails.every((email) => email.match(EMAIL_REGEX))) {
             throw new BadRequestError("Some of the provided emails are invalid");
           }
@@ -2891,18 +2891,18 @@ export function publicApi(container: Container) {
           ${PermissionFragment}
         `;
         if (
-          (!isDefined(query.userId) && !isDefined(query.email)) ||
-          (isDefined(query.userId) && isDefined(query.email))
+          (isNullish(query.userId) && isNullish(query.email)) ||
+          (isNonNullish(query.userId) && isNonNullish(query.email))
         ) {
           throw new BadRequestError("Bad user input. You must specify a userId or an email");
         }
 
-        if (isDefined(query.email) && !query.email.match(EMAIL_REGEX)) {
+        if (isNonNullish(query.email) && !query.email.match(EMAIL_REGEX)) {
           throw new BadRequestError("Invalid email");
         }
 
         let userId = query.userId;
-        if (isDefined(query.email)) {
+        if (isNonNullish(query.email)) {
           const queryResponse = await client.request(TransferPetition_searchUserByEmailDocument, {
             search: query.email,
           });
@@ -2911,7 +2911,7 @@ export function publicApi(container: Container) {
           if (user && user.email === query.email) {
             userId = user.id;
           }
-          if (!isDefined(userId)) {
+          if (isNullish(userId)) {
             throw new BadRequestError("User not found");
           }
         }
@@ -3009,7 +3009,7 @@ export function publicApi(container: Container) {
 
         try {
           let customDocumentTemporaryFileId: string | undefined;
-          if (isDefined(body.file)) {
+          if (isNonNullish(body.file)) {
             const file = body.file as unknown as FormDataFile;
             const uploadData = await client.request(
               StartSignature_createCustomSignatureDocumentUploadLinkDocument,
@@ -3260,7 +3260,7 @@ export function publicApi(container: Container) {
 
         return Ok(
           response.petition.profiles
-            .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
+            .filter((p) => isNullish(query.type) || query.type.includes(p.profileType.id))
             .map((p) => mapProfile(p, includes)),
         );
       },
@@ -3388,7 +3388,7 @@ export function publicApi(container: Container) {
     },
     async ({ client, query }) => {
       let tags: PetitionTagFilter | undefined = undefined;
-      if (isDefined(query.tags)) {
+      if (isNonNullish(query.tags)) {
         try {
           tags = await buildTagsFilter(client, query.tags);
         } catch (e) {
@@ -3896,7 +3896,7 @@ export function publicApi(container: Container) {
 
       return Ok(
         result.petitionEvents
-          .filter((e) => isDefined(e.petition))
+          .filter((e) => isNonNullish(e.petition))
           .map((e) => ({
             id: e.id,
             petitionId: e.petition!.id,
@@ -3951,7 +3951,7 @@ export function publicApi(container: Container) {
 
       return Ok(
         result.profileEvents
-          .filter((e) => isDefined(e.profile))
+          .filter((e) => isNonNullish(e.profile))
           .map((e) => ({
             id: e.id,
             profileId: e.profile!.id,
@@ -4098,7 +4098,7 @@ export function publicApi(container: Container) {
         `;
 
         const profileTypeFieldAliases = (query.values ?? [])
-          .filter((v) => isDefined(v.alias))
+          .filter((v) => isNonNullish(v.alias))
           .map((v) => ({ alias: v.alias as string, profileTypeId: v.profileTypeId as string }));
 
         const resolvedProfileTypeFields: { id: string; alias: string }[] = [];
@@ -4118,16 +4118,16 @@ export function publicApi(container: Container) {
                   alias,
                   id: profileType.fields.find((f) => f.alias === alias)?.id,
                 }))
-                .filter((v) => isDefined(v.id)) as typeof resolvedProfileTypeFields),
+                .filter((v) => isNonNullish(v.id)) as typeof resolvedProfileTypeFields),
             );
           }
         }
         const valuesFilter = query.values?.map((valueFilter) => {
-          if (isDefined(valueFilter.alias)) {
+          if (isNonNullish(valueFilter.alias)) {
             const profileTypeField = resolvedProfileTypeFields.find(
               (f) => f.alias === valueFilter.alias,
             );
-            if (!isDefined(profileTypeField)) {
+            if (isNullish(profileTypeField)) {
               throw new BadRequestError(`Field with alias ${valueFilter.alias} not found`);
             }
             return {
@@ -4306,7 +4306,7 @@ export function publicApi(container: Container) {
             profileTypeId: body.profileTypeId,
           });
 
-          const profileTypeFields = profileType.fields.filter((f) => isDefined(f.alias));
+          const profileTypeFields = profileType.fields.filter((f) => isNonNullish(f.alias));
 
           const createFields: UpdateProfileFieldValueInput[] = [];
           const uploadFiles: {
@@ -4605,7 +4605,7 @@ export function publicApi(container: Container) {
         });
 
         const profileTypeFields = profile.properties
-          .filter((p) => isDefined(p.field.alias))
+          .filter((p) => isNonNullish(p.field.alias))
           .map((p) => p.field);
 
         const updateFields: UpdateProfileFieldValueInput[] = [];
@@ -4896,7 +4896,7 @@ export function publicApi(container: Container) {
             (rt) => rt.alias === body.relationshipTypeAlias,
           )?.id;
         }
-        if (!isDefined(relationshipTypeId)) {
+        if (isNullish(relationshipTypeId)) {
           throw new BadRequestError("Unknown relationship type");
         }
         const _mutation = gql`

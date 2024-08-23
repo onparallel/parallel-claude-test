@@ -15,7 +15,7 @@ import { CommentIcon, EditIcon } from "@parallel/chakra/icons";
 import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { DateTime } from "../common/DateTime";
 import { PetitionFieldCommentExcerpt } from "../common/PetitionFieldCommentExcerpt";
 import { UserOrContactReference } from "../common/UserOrContactReference";
@@ -29,7 +29,7 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
   const intl = useIntl();
 
   const unsortedFieldsWithComments = petition.fields
-    .filter((f) => isDefined(f.lastComment))
+    .filter((f) => isNonNullish(f.lastComment))
     .map((f) => {
       return {
         id: f.id,
@@ -39,7 +39,7 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
       };
     });
 
-  if (petition.__typename === "Petition" && isDefined(petition?.lastGeneralComment)) {
+  if (petition.__typename === "Petition" && isNonNullish(petition?.lastGeneralComment)) {
     unsortedFieldsWithComments.push({
       id: "general",
       title: intl.formatMessage({

@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { Organization, Petition, PetitionSignatureRequest, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionSignatureRequest, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 

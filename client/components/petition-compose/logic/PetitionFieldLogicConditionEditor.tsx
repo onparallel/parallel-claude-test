@@ -36,7 +36,7 @@ import {
   useIntl,
 } from "react-intl";
 import { createFilter } from "react-select";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { NumeralInput } from "../../common/NumeralInput";
@@ -63,9 +63,10 @@ export function PetitionFieldLogicConditionEditor({
     "fieldId" in condition
       ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
       : undefined;
-  const isMultipleValue = isDefined(referencedField)
+  const isMultipleValue = isNonNullish(referencedField)
     ? referencedField.multiple ||
-      (isDefined(referencedField.parent) && referencedField.parent.id !== (field as any).parent?.id)
+      (isNonNullish(referencedField.parent) &&
+        referencedField.parent.id !== (field as any).parent?.id)
     : false;
   const Wrapper = isReadOnly ? Box : Fragment;
   return (
@@ -250,14 +251,14 @@ function ConditionPredicate({
     ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
     : undefined;
   const referencedVariable = isVariableCondition ? condition.variableName : undefined;
-  const isMultipleValue = isDefined(referencedField)
+  const isMultipleValue = isNonNullish(referencedField)
     ? referencedField.multiple ||
-      (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
+      (isNonNullish(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
     : false;
   const options = useSimpleSelectOptions(
     (intl) => {
       const options: SimpleOption<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
-      if (isVariableCondition && isDefined(referencedVariable)) {
+      if (isVariableCondition && isNonNullish(referencedVariable)) {
         options.push(
           { label: "=", value: "EQUAL" },
           { label: "≠", value: "NOT_EQUAL" },
@@ -266,7 +267,7 @@ function ConditionPredicate({
           { label: "≤", value: "LESS_THAN_OR_EQUAL" },
           { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
         );
-      } else if (isFieldCondition && isDefined(referencedField)) {
+      } else if (isFieldCondition && isNonNullish(referencedField)) {
         if (
           (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
           referencedField.type === "NUMBER"
@@ -420,7 +421,7 @@ function ConditionPredicate({
             );
           }
         } else if (
-          isDefined(referencedField) &&
+          isNonNullish(referencedField) &&
           !isFileTypeField(referencedField.type) &&
           referencedField.type !== "DYNAMIC_SELECT" &&
           referencedField.type !== "BACKGROUND_CHECK"
@@ -551,7 +552,7 @@ function ConditionPredicate({
       onChange({ ...condition, operator });
     } else if (
       isFieldCondition &&
-      isDefined(referencedField) &&
+      isNonNullish(referencedField) &&
       ["SELECT", "DYNAMIC_SELECT"].includes(referencedField.type) &&
       condition.modifier !== "NUMBER_OF_REPLIES"
     ) {
@@ -575,7 +576,7 @@ function ConditionPredicate({
       });
     } else if (
       isFieldCondition &&
-      isDefined(referencedField) &&
+      isNonNullish(referencedField) &&
       (condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES")
     ) {
       // override existing "has replies/does not have replies"
@@ -585,7 +586,7 @@ function ConditionPredicate({
         operator,
         modifier: "ANY",
         value: ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
-          ? isDefined(defaultValue) && typeof defaultValue === "string"
+          ? isNonNullish(defaultValue) && typeof defaultValue === "string"
             ? [defaultValue]
             : null
           : defaultValue,
@@ -663,7 +664,7 @@ function ConditionPredicate({
           />
         ) : condition.modifier === "NUMBER_OF_REPLIES" ||
           condition.operator === "NUMBER_OF_SUBREPLIES" ||
-          !isDefined(referencedField) ? (
+          isNullish(referencedField) ? (
           <ConditionPredicateValueNumber
             value={condition}
             onChange={onChange}
@@ -736,7 +737,7 @@ function ConditionPredicateValueDate({
   }, [condition.value]);
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <FormattedDate value={condition.value as string} {...FORMATS.L} />
     ) : (
       <Box as="span" textStyle="hint">
@@ -801,7 +802,7 @@ function ConditionPredicateValueDatetime({
   );
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <>
         <FormattedDate value={condition.value as string} {...FORMATS["L+LT"]} />{" "}
         <Box as="span" position="relative" top="-1.5px">
@@ -850,7 +851,7 @@ function ConditionPredicateValueFloat({
   }, [condition.value]);
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <FormattedNumber value={condition.value as number} />
     ) : (
       <Box as="span" textStyle="hint">
@@ -889,7 +890,7 @@ function ConditionPredicateValueNumber({
 
   const [value, setValue] = useState((condition.value as number) ?? 0);
   const maxValue =
-    isDefined(referencedField) && referencedField.type === "CHECKBOX"
+    isNonNullish(referencedField) && referencedField.type === "CHECKBOX"
       ? referencedField.options.values.length
       : Infinity;
 
@@ -904,13 +905,13 @@ function ConditionPredicateValueNumber({
       setValue(maxValue);
       onChange({ ...condition, value: maxValue });
     }
-    if (!isDefined(condition.value)) {
+    if (isNullish(condition.value)) {
       onChange({ ...condition, value: 0 });
     }
   }, [maxValue]);
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <FormattedNumber value={condition.value as number} maximumFractionDigits={0} />
     ) : (
       <Box as="span" textStyle="hint">
@@ -969,7 +970,7 @@ function ConditionPredicateValueSelect({
         .map((value, index) => {
           let label = (referencedField.options as FieldOptions["SELECT"] | FieldOptions["CHECKBOX"])
             .labels?.[index];
-          label = `${value}${isDefined(label) ? `: ${label}` : ""}`;
+          label = `${value}${isNonNullish(label) ? `: ${label}` : ""}`;
 
           return { label, value } as SimpleOption<string>;
         })
@@ -989,7 +990,7 @@ function ConditionPredicateValueSelect({
     condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
 
   return isReadOnly ? (
-    isDefined(condition.value) &&
+    isNonNullish(condition.value) &&
     (Array.isArray(condition.value) ? condition.value.length > 0 : true) ? (
       <FormattedList
         value={unMaybeArray(condition.value as string | string[]).map((value, index) => (
@@ -1053,7 +1054,7 @@ function ConditionPredicateValueString({
   }, [condition.value]);
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <Box as="span" fontStyle="italic">
         {'"'}
         {Number.isNaN(Number(condition.value)) ? (
@@ -1100,7 +1101,7 @@ function ConditionPredicateListSelect({
   }, [customLists]);
 
   return isReadOnly ? (
-    isDefined(condition.value) ? (
+    isNonNullish(condition.value) ? (
       <Box as="span" fontStyle="italic">
         {'"'}
         {condition.value}

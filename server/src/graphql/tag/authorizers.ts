@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -12,7 +12,7 @@ export function userHasAccessToTags<
   return async (_, args, ctx) => {
     try {
       const arg = args[argName] as Maybe<MaybeArray<number>>;
-      if (!isDefined(arg)) {
+      if (isNullish(arg)) {
         return true;
       }
       const tagIds = unMaybeArray(arg);

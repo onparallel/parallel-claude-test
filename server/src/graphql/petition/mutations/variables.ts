@@ -1,6 +1,8 @@
 import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { validateAnd } from "../../helpers/validateArgs";
+import { maxLength } from "../../helpers/validators/maxLength";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import {
   petitionIsNotAnonymized,
@@ -11,8 +13,6 @@ import {
   petitionVariableCanBeCreated,
   variableIsNotBeingReferencedByFieldLogic,
 } from "./authorizers";
-import { validateAnd } from "../../helpers/validateArgs";
-import { maxLength } from "../../helpers/validators/maxLength";
 
 export const FIELD_REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
 

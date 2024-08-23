@@ -2,6 +2,7 @@ import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
@@ -20,7 +21,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -28,7 +29,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldPhoneProps
   extends Omit<
@@ -171,7 +171,7 @@ export function RecipientViewPetitionFieldPhone({
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
-      } else if (event.key === "Backspace" && (!isDefined(value) || value === "")) {
+      } else if (event.key === "Backspace" && (isNullish(value) || value === "")) {
         if (field.replies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
@@ -242,12 +242,12 @@ export function RecipientViewPetitionFieldPhone({
                 // prevent creating 2 replies
                 return;
               }
-              if (isDefined(value) && isValid) {
+              if (isNonNullish(value) && isValid) {
                 handleCreate(value, true);
               } else {
                 handleCreate.clear();
               }
-              setIsInvalidValue(!isValid && isDefined(value));
+              setIsInvalidValue(!isValid && isNonNullish(value));
               setValue(value);
             }}
             onBlur={async (value: string, { isValid }) => {
@@ -312,7 +312,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
-      } else if (event.key === "Backspace" && !isDefined(value)) {
+      } else if (event.key === "Backspace" && isNullish(value)) {
         event.preventDefault();
         debouncedUpdateReply.clear();
         onDelete(true);
@@ -333,13 +333,13 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         <PhoneInputLazy
           value={value}
           onChange={(value: string, { isValid }) => {
-            setIsInvalidValue(!isValid && isDefined(value));
+            setIsInvalidValue(!isValid && isNonNullish(value));
             setValue(value);
           }}
           onBlur={async (value: string, { isValid }) => {
-            if (isValid && isDefined(value) && value !== reply.content.value) {
+            if (isValid && isNonNullish(value) && value !== reply.content.value) {
               await debouncedUpdateReply.immediate(value);
-            } else if (!isDefined(value)) {
+            } else if (isNullish(value)) {
               debouncedUpdateReply.clear();
               onDelete();
             }

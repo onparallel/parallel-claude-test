@@ -6,12 +6,12 @@ import {
   PetitionSharedWithFilterLine,
   UserSelect_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { useSearchUsers } from "../../../../utils/useSearchUsers";
 import { UserSelect } from "../../../common/UserSelect";
-import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 
 export interface PetitionListSharedWithFilterProps
   extends ValueProps<PetitionSharedWithFilterLine, false> {

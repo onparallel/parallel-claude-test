@@ -1,4 +1,4 @@
-import { indexBy, isDefined } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
 import { ProfileFieldValue, User } from "../../db/__types";
 import {
   ProfileFieldExpiryUpdatedEvent,
@@ -22,7 +22,7 @@ export function buildProfileUpdatedEventsData(
       f.expiryDate !== undefined &&
       (previous?.expiry_date?.valueOf() ?? null) !== (f.expiryDate?.valueOf() ?? null);
     return [
-      ...(isDefined(current) || isDefined(previous)
+      ...(isNonNullish(current) || isNonNullish(previous)
         ? [
             {
               org_id: user.org_id,

@@ -15,7 +15,7 @@ import { useExportExcelBackgroundTask } from "@parallel/utils/tasks/useExportExc
 import { usePrintPdfBackgroundTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe } from "@parallel/utils/types";
 import { MutableRefObject, useRef } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
 export class CuatrecasasExportError extends Error {
@@ -235,7 +235,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
         );
       } catch (e) {
         if (
-          isDefined(e) &&
+          isNonNullish(e) &&
           typeof e === "object" &&
           "Status" in e &&
           e.Status === false &&

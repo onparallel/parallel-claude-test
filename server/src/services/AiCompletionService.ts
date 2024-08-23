@@ -8,14 +8,14 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import {
-  InvalidCredentialsError,
-  InvalidRequestError,
-} from "../integrations/helpers/GenericIntegration";
-import {
   AI_COMPLETION_CLIENT,
   AiCompletionPrompt,
   IAiCompletionClient,
 } from "../integrations/ai-completion/AiCompletionClient";
+import {
+  InvalidCredentialsError,
+  InvalidRequestError,
+} from "../integrations/helpers/GenericIntegration";
 
 export const AI_COMPLETION_SERVICE = Symbol.for("AI_COMPLETION_SERVICE");
 

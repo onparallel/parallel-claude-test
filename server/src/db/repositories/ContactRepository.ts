@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { entries, groupBy, indexBy, isDefined, mapValues, omit, pipe, unique } from "remeda";
+import { entries, groupBy, indexBy, isNonNullish, mapValues, omit, pipe, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
@@ -219,7 +219,7 @@ export class ContactRepository extends BaseRepository {
               );
             })
             .mmodify((q) => {
-              if (isDefined(opts.status) && opts.status.length > 0) {
+              if (isNonNullish(opts.status) && opts.status.length > 0) {
                 q.whereIn("p.status", opts.status);
               }
               if (opts.search) {

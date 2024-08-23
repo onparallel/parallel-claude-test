@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
@@ -11,7 +11,7 @@ export function inRange<TypeName extends string, FieldName extends string>(
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
-    if (isDefined(value) && (value < lowerLimit || value > upperLimit)) {
+    if (isNonNullish(value) && (value < lowerLimit || value > upperLimit)) {
       throw new ArgValidationError(
         info,
         argName,

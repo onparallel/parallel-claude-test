@@ -22,7 +22,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 export function useSendPetitionHandler(
   user: useSendPetitionHandler_UserFragment,
@@ -50,7 +50,7 @@ export function useSendPetitionHandler(
 
     try {
       const currentRecipientIds = petition.accesses
-        .filter((a) => isDefined(a.contact) && a.status === "ACTIVE")
+        .filter((a) => isNonNullish(a.contact) && a.status === "ACTIVE")
         .map((a) => a.contact!.id);
 
       await showTestSignatureDialog(
@@ -112,7 +112,7 @@ export function useSendPetitionHandler(
         );
       }
       const { data } = await task;
-      if (!isDefined(data) || data.sendPetition.some((r) => r.result !== "SUCCESS")) {
+      if (isNullish(data) || data.sendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,
           status: "error",

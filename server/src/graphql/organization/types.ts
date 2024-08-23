@@ -10,16 +10,16 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
+import { ContactLocaleValues } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
-import { and, or } from "../helpers/authorize";
 import { addDuration, multiplyDuration } from "../../util/duration";
+import { and, or } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import { isOwnOrgOrSuperAdmin } from "./authorizers";
-import { contextUserHasPermission } from "../users/authorizers";
-import { ContactLocaleValues } from "../../db/__types";
 import { validEmail } from "../helpers/validators/validEmail";
+import { contextUserHasPermission } from "../users/authorizers";
+import { isOwnOrgOrSuperAdmin } from "./authorizers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -134,7 +134,7 @@ export const Organization = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.organizations.loadOrgLogoPath(root.id);
-        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.nullable.string("iconUrl", {
@@ -144,7 +144,7 @@ export const Organization = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.organizations.loadOrgIconPath(root.id);
-        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.field("status", {

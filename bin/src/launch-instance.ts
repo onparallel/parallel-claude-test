@@ -1,3 +1,4 @@
+import { CloudWatchClient, PutMetricAlarmCommand } from "@aws-sdk/client-cloudwatch";
 import {
   DescribeImagesCommand,
   DescribeInstanceStatusCommand,
@@ -19,7 +20,6 @@ import yargs from "yargs";
 import { run } from "./utils/run";
 import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
 import { wait, waitFor } from "./utils/wait";
-import { CloudWatchClient, PutMetricAlarmCommand } from "@aws-sdk/client-cloudwatch";
 
 type Environment = "staging" | "production";
 

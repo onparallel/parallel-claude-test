@@ -7,7 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { SignerReference } from "../common/SignerReference";
 
 interface NewSignatureRequestRowProps {
@@ -23,7 +23,7 @@ export function NewSignatureRequestRow({
   onRefetch,
   isDisabled,
 }: NewSignatureRequestRowProps) {
-  const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
+  const signers = petition.signatureConfig?.signers.filter(isNonNullish) ?? [];
 
   const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
     user,

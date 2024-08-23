@@ -1,11 +1,11 @@
 import detective from "detective-typescript";
 import { sync as globSync } from "fast-glob";
 import { readFile } from "fs/promises";
+import { outdent } from "outdent";
 import path from "path";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import { outdent } from "outdent";
 
 async function logPath(cwd: string, from: string | string[], to: string) {
   const parent: Record<string, string> = {};
@@ -24,13 +24,13 @@ async function logPath(cwd: string, from: string | string[], to: string) {
         const [resolved] = globSync(
           path.resolve(cwd, dependecy.replace("@parallel/", "./")) + ".{ts,tsx}",
         );
-        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+        if (isNonNullish(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
           parent[resolved] = file;
           queue.push(resolved);
         }
       } else if (dependecy.startsWith("./") || dependecy.startsWith("../")) {
         const [resolved] = globSync(path.resolve(path.dirname(file), dependecy) + ".{ts,tsx}");
-        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+        if (isNonNullish(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
           parent[resolved] = file;
           queue.push(resolved);
         }

@@ -1,6 +1,6 @@
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
-import { groupBy, isDefined, pick, zip } from "remeda";
+import { groupBy, isNonNullish, isNullish, pick, zip } from "remeda";
 import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import {
   IdentityVerification,
@@ -32,7 +32,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     const summary = await this.ctx.bankflip.fetchSessionSummary(metadata.orgId, sessionId);
 
     try {
-      if (isDefined(userId)) {
+      if (isNonNullish(userId)) {
         await this.ctx.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
       }
 
@@ -72,18 +72,20 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
   ) {
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-    const parentReplyId = isDefined(metadata.parentReplyId)
+    const parentReplyId = isNonNullish(metadata.parentReplyId)
       ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
       : null;
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
     const petitionAccessId =
       "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+    const createdBy = isNonNullish(userId)
+      ? `User:${userId}`
+      : `PetitionAccess:${petitionAccessId!}`;
 
     const errorContents: any[] = [];
-    if (isDefined(summary.identityVerification)) {
+    if (isNonNullish(summary.identityVerification)) {
       const field = await this.ctx.petitions.loadField(fieldId);
-      if (isDefined(field?.options.identityVerification)) {
+      if (isNonNullish(field?.options.identityVerification)) {
         errorContents.push({
           file_upload_id: null,
           type: "identity-verification",
@@ -125,13 +127,15 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
   ) {
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-    const parentReplyId = isDefined(metadata.parentReplyId)
+    const parentReplyId = isNonNullish(metadata.parentReplyId)
       ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
       : null;
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
     const petitionAccessId =
       "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+    const createdBy = isNonNullish(userId)
+      ? `User:${userId}`
+      : `PetitionAccess:${petitionAccessId!}`;
 
     // fetch replies with request that have previously errored
     // and try to update their content with the new data
@@ -158,7 +162,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         );
         // the first document will be the one to update, the rest will be new documents
         const [updateReply, ...newReplies] = documents;
-        if (isDefined(updateReply)) {
+        if (isNonNullish(updateReply)) {
           updateRepliesData.push({
             id: reply.id,
             content: updateReply.content,
@@ -181,10 +185,10 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     const idVerificationErrorReplies = fieldReplies.filter(
       (r) =>
         r.content.type === "identity-verification" &&
-        (isDefined(r.content.error) || isDefined(r.content.warning)),
+        (isNonNullish(r.content.error) || isNonNullish(r.content.warning)),
     );
 
-    const idVerificationNewDocuments = isDefined(summary.identityVerification)
+    const idVerificationNewDocuments = isNonNullish(summary.identityVerification)
       ? await this.extractAndUploadIdentityVerificationDocuments(
           metadata,
           summary.identityVerification,
@@ -197,8 +201,8 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
     const modelRequestErrorReplies = fieldReplies.filter(
       (r) =>
-        (!isDefined(r.content.type) || r.content.type === "model-request") &&
-        isDefined(r.content.error) &&
+        (isNullish(r.content.type) || r.content.type === "model-request") &&
+        isNonNullish(r.content.error) &&
         Array.isArray(r.content.error) &&
         r.content.error[0]?.reason !== "document_not_found",
     );
@@ -213,7 +217,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     fillRepliesArrays(modelRequestErrorReplies, modelRequestNewDocuments);
 
     if (updateRepliesData.length > 0) {
-      const updater = isDefined(userId)
+      const updater = isNonNullish(userId)
         ? await this.ctx.users.loadUser(userId)
         : await this.ctx.petitions.loadAccess(petitionAccessId!);
       await this.ctx.petitions.updatePetitionFieldRepliesContent(
@@ -246,15 +250,17 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
   ) {
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-    const parentReplyId = isDefined(metadata.parentReplyId)
+    const parentReplyId = isNonNullish(metadata.parentReplyId)
       ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
       : null;
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
     const petitionAccessId =
       "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+    const createdBy = isNonNullish(userId)
+      ? `User:${userId}`
+      : `PetitionAccess:${petitionAccessId!}`;
 
-    const idVerificationReplies = isDefined(summary.identityVerification)
+    const idVerificationReplies = isNonNullish(summary.identityVerification)
       ? await this.extractAndUploadIdentityVerificationDocuments(
           metadata,
           summary.identityVerification,
@@ -297,7 +303,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     sessionId: string,
     createdBy: string,
   ): Promise<Pick<CreatePetitionFieldReply, "content" | "metadata">[]> {
-    if (isDefined(modelRequestOutcome.noDocumentReasons)) {
+    if (isNonNullish(modelRequestOutcome.noDocumentReasons)) {
       return [
         {
           content: {
@@ -425,7 +431,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     return await pMap(
       idVerification.documents,
       async (doc) => {
-        if (!isDefined(doc.imagesDocument)) {
+        if (isNullish(doc.imagesDocument)) {
           return {
             content: {
               file_upload_id: null,
@@ -443,7 +449,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         );
 
         let jsonContents: any = null;
-        if (isDefined(doc.dataDocument) && doc.dataDocument.extension === "json") {
+        if (isNonNullish(doc.dataDocument) && doc.dataDocument.extension === "json") {
           jsonContents = await this.ctx.bankflip.fetchJsonDocumentContents(
             metadata.orgId,
             doc.dataDocument.id,
@@ -464,7 +470,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
               jsonContents.surname,
               jsonContents.firstName,
             ]
-              .filter(isDefined)
+              .filter(isNonNullish)
               .join("_")
               .replace(/\s/g, "_")}`
           : doc.imagesDocument.name;
@@ -498,7 +504,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
                 : undefined,
             bankflip_session_id: sessionId,
           },
-          metadata: isDefined(jsonContents?.type)
+          metadata: isNonNullish(jsonContents?.type)
             ? {
                 inferred_type: jsonContents.type,
                 inferred_data: jsonContents,

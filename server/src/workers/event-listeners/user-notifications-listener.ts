@@ -1,4 +1,4 @@
-import { isDefined, partition, unique } from "remeda";
+import { isNonNullish, isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { WorkerContext } from "../../context";
 import {
@@ -26,13 +26,13 @@ async function createPetitionCompletedUserNotifications(
   const users = await ctx.petitions.getUsersOnPetition(event.petition_id, {
     onlySubscribed: true,
     // if a user completed it, avoid creating a notification for that user
-    excludeUserIds: isDefined(event.data.user_id) ? [event.data.user_id] : undefined,
+    excludeUserIds: isNonNullish(event.data.user_id) ? [event.data.user_id] : undefined,
   });
 
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "PETITION_COMPLETED",
-      data: isDefined(event.data.petition_access_id)
+      data: isNonNullish(event.data.petition_access_id)
         ? { petition_access_id: event.data.petition_access_id }
         : { user_id: event.data.user_id! },
       petition_id: event.petition_id,
@@ -49,7 +49,7 @@ async function createCommentPublishedUserNotifications(
   if (!petition) return;
 
   let comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id);
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     // if the comment is already deleted, avoid sending notification
     return;
   }
@@ -84,7 +84,7 @@ async function createCommentPublishedUserNotifications(
   comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
     refresh: true,
   });
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     return;
   }
 
@@ -106,7 +106,7 @@ async function createCommentPublishedUserNotifications(
   comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
     refresh: true,
   });
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     await ctx.petitions.deleteCommentCreatedNotifications(event.petition_id, [
       event.data.petition_field_comment_id,
     ]);
@@ -121,7 +121,7 @@ async function createCommentPublishedContactNotifications(
   if (!petition) return;
 
   let comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id);
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     // if the comment is already deleted, avoid sending notification
     return;
   }
@@ -136,7 +136,7 @@ async function createCommentPublishedContactNotifications(
       (a) =>
         a.status === "ACTIVE" && // active access
         a.id !== comment!.petition_access_id && // don't notify comment author
-        isDefined(a.contact_id), // filter contactless
+        isNonNullish(a.contact_id), // filter contactless
     )
     .map((a) => a.id);
 
@@ -144,7 +144,7 @@ async function createCommentPublishedContactNotifications(
   comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
     refresh: true,
   });
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     return;
   }
 
@@ -165,7 +165,7 @@ async function createCommentPublishedContactNotifications(
   comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
     refresh: true,
   });
-  if (!isDefined(comment)) {
+  if (isNullish(comment)) {
     await ctx.petitions.deleteCommentCreatedNotifications(event.petition_id, [
       event.data.petition_field_comment_id,
     ]);
@@ -180,10 +180,10 @@ async function createPetitionMessageBouncedUserNotifications(
   if (!petition) return;
 
   const message = await ctx.petitions.loadMessage(event.data.petition_message_id);
-  assert(isDefined(message), `PetitionMessage:${event.data.petition_message_id} not found.`);
+  assert(isNonNullish(message), `PetitionMessage:${event.data.petition_message_id} not found.`);
 
   const sender = await ctx.users.loadUser(message.sender_id);
-  assert(isDefined(sender), `User:${message.sender_id} not found.`);
+  assert(isNonNullish(sender), `User:${message.sender_id} not found.`);
 
   if (!(await ctx.petitions.isUserSubscribedToPetition(sender.id, event.petition_id))) {
     return;
@@ -209,13 +209,13 @@ async function createPetitionReminderBouncedUserNotifications(
   if (!petition) return;
 
   const reminder = await ctx.petitions.loadReminder(event.data.petition_reminder_id);
-  assert(isDefined(reminder), `PetitionReminder:${event.data.petition_reminder_id} not found.`);
+  assert(isNonNullish(reminder), `PetitionReminder:${event.data.petition_reminder_id} not found.`);
 
   const senderId =
     reminder.sender_id ??
     (await ctx.petitions.loadAccess(reminder.petition_access_id))?.granter_id ??
     null;
-  assert(isDefined(senderId), `Petition owner not found on Reminder:${reminder.id}.`);
+  assert(isNonNullish(senderId), `Petition owner not found on Reminder:${reminder.id}.`);
 
   if (!(await ctx.petitions.isUserSubscribedToPetition(senderId, event.petition_id))) {
     return;

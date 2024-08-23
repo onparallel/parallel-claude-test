@@ -1,6 +1,6 @@
 import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { countBy, isDefined, unique, zip } from "remeda";
+import { countBy, isNonNullish, unique, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { RESULT } from "../helpers/Result";
@@ -221,7 +221,7 @@ export const tagPetition = mutationField("tagPetition", {
   resolve: async (_, args, ctx) => {
     const [petitionTag] = await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
 
-    if (isDefined(petitionTag)) {
+    if (isNonNullish(petitionTag)) {
       const tag = (await ctx.tags.loadTag(petitionTag.tag_id))!;
       await ctx.petitions.createEvent({
         petition_id: args.petitionId,
@@ -254,7 +254,7 @@ export const untagPetition = mutationField("untagPetition", {
   resolve: async (_, args, ctx) => {
     const [petitionTag] = await ctx.tags.untagPetition(args.tagId, args.petitionId);
 
-    if (isDefined(petitionTag)) {
+    if (isNonNullish(petitionTag)) {
       const tag = (await ctx.tags.loadTag(petitionTag.tag_id))!;
       await ctx.petitions.createEvent({
         petition_id: args.petitionId,

@@ -65,7 +65,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sort } from "remeda";
+import { isNonNullish, sort } from "remeda";
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
@@ -131,7 +131,7 @@ function OrganizationUsers() {
 
   useEffect(() => {
     if (showTransferUserDialog.current) {
-      if (isDefined(state.search) && isDefined(users)) {
+      if (isNonNullish(state.search) && isNonNullish(users)) {
         const user = users.items.find((user) => user!.email === state.search);
         if (user?.status === "ON_HOLD") {
           handleUpdateUser(user);

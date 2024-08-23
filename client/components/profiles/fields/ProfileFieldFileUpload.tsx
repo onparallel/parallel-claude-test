@@ -16,7 +16,7 @@ import { nanoid } from "nanoid";
 import { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { differenceWith, isDefined, noop, sumBy } from "remeda";
+import { differenceWith, isNullish, noop, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
 
@@ -103,7 +103,7 @@ export function ProfileFieldFileUpload({
                   actions.filter(discriminator("type", "DELETE")),
                   (file, action) => action.id === file.id,
                 ).map(({ id, file }) => {
-                  if (!isDefined(file)) {
+                  if (isNullish(file)) {
                     return null;
                   }
                   const { filename, contentType, size } = file;

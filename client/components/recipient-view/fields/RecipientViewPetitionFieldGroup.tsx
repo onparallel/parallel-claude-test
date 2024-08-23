@@ -36,7 +36,7 @@ import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQuer
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, isNullish, zip } from "remeda";
 import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 import {
   RecipientViewPetitionFieldLayout,
@@ -327,7 +327,7 @@ export function RecipientViewPetitionFieldGroupLayout({
               )}
             </Heading>
           </Box>
-          {(field.hasCommentsEnabled || isPetitionField) && isDefined(onCommentsButtonClick) ? (
+          {(field.hasCommentsEnabled || isPetitionField) && isNonNullish(onCommentsButtonClick) ? (
             <CommentsButton
               commentCount={field.commentCount}
               hasUnreadComments={field.unreadCommentCount > 0}
@@ -389,7 +389,7 @@ export function RecipientViewPetitionFieldGroupLayout({
         ) : null}
       </Stack>
       {children}
-      {(field.replies.length > 0 && !field.multiple) || !isDefined(onAddNewGroup) ? null : (
+      {(field.replies.length > 0 && !field.multiple) || isNullish(onAddNewGroup) ? null : (
         <HStack paddingX={4} spacing={4}>
           <Button onClick={onAddNewGroup} leftIcon={<AddIcon />}>
             <Text>
@@ -410,7 +410,7 @@ export function RecipientViewPetitionFieldGroupLayout({
               )}
             </Text>
           </Button>
-          {isDefined(addNewGroupAndFillWithProfileButton)
+          {isNonNullish(addNewGroupAndFillWithProfileButton)
             ? addNewGroupAndFillWithProfileButton
             : null}
         </HStack>
@@ -456,7 +456,7 @@ export function RecipientViewPetitionFieldGroupCard({
             } ${index + 1}`}
           </Text>
 
-          {isDefined(onRemoveReply) ? (
+          {isNonNullish(onRemoveReply) ? (
             <ConfimationPopover
               description={
                 <FormattedMessage

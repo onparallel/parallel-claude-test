@@ -98,7 +98,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, map, maxBy, omit, pick, pipe } from "remeda";
+import { isNonNullish, isNullish, map, maxBy, omit, pick, pipe } from "remeda";
 
 const SORTING = [
   "name",
@@ -195,7 +195,7 @@ function Petitions() {
   function handleTypeChange(type: PetitionBaseType) {
     if (type === "PETITION") {
       const defaultView = me.petitionListViews.find((v) => v.isDefault);
-      if (isDefined(defaultView)) {
+      if (isNonNullish(defaultView)) {
         setQueryState({
           type,
           view: defaultView.id,
@@ -938,7 +938,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
 
   if (state.type === "PETITION") {
     let tags: PetitionTagFilter | undefined = undefined;
-    if (isDefined(query.tags)) {
+    if (isNonNullish(query.tags)) {
       const tagsState = parseQuery(query, {
         tags: new QueryItem<string[] | null>((value) =>
           typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null,
@@ -971,9 +971,9 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
 
     const tagsFiltersOrNothing = tags ? { tagsFilters: tags } : {};
 
-    if (!isDefined(state.view)) {
+    if (isNullish(state.view)) {
       const defaultView = views.find((v) => v.isDefault);
-      if (isDefined(defaultView)) {
+      if (isNonNullish(defaultView)) {
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,
@@ -998,7 +998,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
       }
     } else if (state.view !== "ALL") {
       const view = views.find((v) => v.id === state.view);
-      if (!isDefined(view)) {
+      if (isNullish(view)) {
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,

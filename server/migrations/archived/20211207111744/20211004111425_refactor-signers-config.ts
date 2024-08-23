@@ -1,8 +1,8 @@
 import { Knex } from "knex";
 import pMap from "p-map";
-import { isDefined, omit } from "remeda";
-import { RecipientSignedEvent, SignatureCancelledEvent } from "../src/db/events";
+import { isNonNullish, omit } from "remeda";
 import { Contact, Petition, PetitionSignatureRequest } from "../src/db/__types";
+import { RecipientSignedEvent, SignatureCancelledEvent } from "../src/db/events";
 import { unMaybeArray } from "../src/util/arrays";
 import { MaybeArray } from "../src/util/types";
 
@@ -122,7 +122,7 @@ const PetitionSignatureRequestsMigration = {
         // signers that were specified by recipients don't come with a contactId, so those will be discarded
         const contactIds = (signatureRequest.signature_config.signersInfo as MappedContact[])
           .map((signer) => signer.contactId)
-          .filter(isDefined);
+          .filter(isNonNullish);
 
         const newSignerStatus: Record<string, string> = {};
         Object.keys(signatureRequest.signer_status).forEach((signerIndex) => {
@@ -200,12 +200,12 @@ const PetitionsMigration = {
               ...omit(petition.signature_config, ["signersInfo", "additionalSignersInfo"]),
               contactIds: ((petition.signature_config.signersInfo ?? []) as MappedContact[])
                 .map((signer) => signer.contactId)
-                .filter(isDefined),
+                .filter(isNonNullish),
               additionalSignerContactIds: (
                 (petition.signature_config.additionalSignersInfo ?? []) as MappedContact[]
               )
                 .map((signer) => signer.contactId)
-                .filter(isDefined),
+                .filter(isNonNullish),
             }),
           );
       },
@@ -268,7 +268,7 @@ const PetitionEventsMigration = {
       events,
       async (event) => {
         if (event.type === "RECIPIENT_SIGNED") {
-          if (isDefined((event.data as any).contact_id)) {
+          if (isNonNullish((event.data as any).contact_id)) {
             await knex
               .from("petition_event")
               .where("id", event.id)
@@ -287,7 +287,7 @@ const PetitionEventsMigration = {
           event.type === "SIGNATURE_CANCELLED" &&
           event.data.cancel_reason === "DECLINED_BY_SIGNER"
         ) {
-          if (isDefined(event.data.cancel_data.canceller_id)) {
+          if (isNonNullish(event.data.cancel_data.canceller_id)) {
             await knex
               .from("petition_event")
               .where("id", event.id)

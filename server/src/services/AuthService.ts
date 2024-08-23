@@ -32,7 +32,7 @@ import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import fetch from "node-fetch";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL, URLSearchParams } from "url";
@@ -290,14 +290,14 @@ export class Auth implements IAuth {
         Buffer.from(req.query.state as string, "base64").toString("ascii"),
       );
       const orgId = state.has("orgId") ? parseInt(state.get("orgId")!) : null;
-      if (!isDefined(orgId) || Number.isNaN(orgId)) {
+      if (isNullish(orgId) || Number.isNaN(orgId)) {
         throw new Error("Invalid state");
       }
       const org = await this.orgs.loadOrg(orgId);
-      if (!isDefined(org)) {
+      if (isNullish(org)) {
         throw new Error("Invalid state");
       }
-      if (isDefined(org.custom_host) && org.custom_host !== req.hostname) {
+      if (isNonNullish(org.custom_host) && org.custom_host !== req.hostname) {
         const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
         return res.redirect(
           302,
@@ -328,10 +328,10 @@ export class Auth implements IAuth {
       // TODO check this when users have more than 1 organization
       let user = users.find((u) => u.org_id === orgId);
       const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
-      if (!isDefined(user)) {
+      if (isNullish(user)) {
         const [, domain] = email.split("@");
         const integration = await this.integrations.loadSSOIntegrationByDomain(domain);
-        if (!isDefined(integration) || integration.org_id !== orgId) {
+        if (isNullish(integration) || integration.org_id !== orgId) {
           throw new Error("Invalid user");
         }
         const preferredLocale = this.asUserLocale(state.get("locale"));
@@ -710,9 +710,9 @@ export class Auth implements IAuth {
     }
     const result = await this.getUserFromToken.load({ token, req });
     this.getUserFromToken.clearAll();
-    if (isDefined(result)) {
+    if (isNonNullish(result)) {
       const [user, realUser] = result;
-      if (user.status !== "ACTIVE" || (isDefined(realUser) && realUser.status !== "ACTIVE")) {
+      if (user.status !== "ACTIVE" || (isNonNullish(realUser) && realUser.status !== "ACTIVE")) {
         return null;
       }
     } else {
@@ -756,17 +756,17 @@ export class Auth implements IAuth {
           }
           const meta = await this.redis.get(`session:${token}:meta`);
           const users = await this.users.loadUsersByCognitoId(cognitoId);
-          if (isDefined(meta)) {
+          if (isNonNullish(meta)) {
             const { userId, asUserId } = JSON.parse(meta) as {
               userId: number;
               asUserId?: number;
             };
             const user = users.find((u) => u.id === userId);
-            if (!isDefined(user)) {
+            if (isNullish(user)) {
               // who dis
               return null;
             }
-            if (isDefined(asUserId) && asUserId !== user.id) {
+            if (isNonNullish(asUserId) && asUserId !== user.id) {
               const userPermissions = await this.users.loadUserPermissions(user.id);
               // make sure user can ghost login
               if (
@@ -777,7 +777,7 @@ export class Auth implements IAuth {
               }
               const org = (await this.orgs.loadOrg(user.org_id))!;
               const asUser = await this.users.loadUser(asUserId);
-              if (!isDefined(asUser)) {
+              if (isNullish(asUser)) {
                 // who dis
                 return null;
               }
@@ -808,7 +808,7 @@ export class Auth implements IAuth {
       return null;
     }
     const user = await this.userAuthentication.getUserFromUat(token);
-    if (!isDefined(user) || user.status !== "ACTIVE") {
+    if (isNullish(user) || user.status !== "ACTIVE") {
       return null;
     }
     return [user];
@@ -823,7 +823,7 @@ export class Auth implements IAuth {
     try {
       const { userId } = await verify(token, this.config.security.jwtSecret);
       const user = await this.users.loadUser(userId);
-      if (!isDefined(user) || !["ACTIVE", "ON_HOLD"].includes(user.status)) {
+      if (isNullish(user) || !["ACTIVE", "ON_HOLD"].includes(user.status)) {
         return null;
       }
       return [user];
@@ -881,7 +881,7 @@ export class Auth implements IAuth {
       throw new Error(`Can't login as ${asUserId}`);
     }
     const token = this.getSessionToken(req);
-    if (!isDefined(token)) {
+    if (isNullish(token)) {
       throw new Error("Missing session token");
     }
     await this.redis.set(
@@ -893,7 +893,7 @@ export class Auth implements IAuth {
 
   async restoreSessionLogin(req: Request, userId: number) {
     const token = this.getSessionToken(req);
-    if (!isDefined(token)) {
+    if (isNullish(token)) {
       throw new Error("Missing session token");
     }
     await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
@@ -904,7 +904,7 @@ export class Auth implements IAuth {
       this.users.loadUsersByEmail(email),
       this.getUser(email),
     ]);
-    const definedUsers = users.filter(isDefined);
+    const definedUsers = users.filter(isNonNullish);
     if (definedUsers.length === 0) {
       throw new ForbiddenError("Not authorized");
     }
@@ -932,7 +932,7 @@ export class Auth implements IAuth {
     }
 
     // user already changed their tmp password
-    if (cognitoUser.UserStatus !== "FORCE_CHANGE_PASSWORD" || isDefined(user.last_active_at)) {
+    if (cognitoUser.UserStatus !== "FORCE_CHANGE_PASSWORD" || isNonNullish(user.last_active_at)) {
       throw new ApolloError(`Wrong user status`, "RESET_USER_PASSWORD_STATUS_ERROR");
     }
 

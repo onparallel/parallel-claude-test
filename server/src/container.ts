@@ -3,8 +3,8 @@ import { CONFIG, Config, buildConfig } from "./config";
 import { ApiContext, WorkerContext } from "./context";
 import { dbModule } from "./db/module";
 import { integrationsModule } from "./integrations/module";
-import { servicesModule } from "./services/module";
 import { backgroundCheckClientsModule } from "./services/background-check-clients/module";
+import { servicesModule } from "./services/module";
 
 export function createContainer() {
   const container = new Container();

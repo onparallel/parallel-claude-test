@@ -1,5 +1,5 @@
-import { Fragment } from "react";
 import { MjmlText } from "@faire/mjml-react";
+import { Fragment } from "react";
 import { FormattedMessage } from "react-intl";
 
 export interface PetitionField {

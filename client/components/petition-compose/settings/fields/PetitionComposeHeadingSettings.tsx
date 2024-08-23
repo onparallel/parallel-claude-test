@@ -1,9 +1,9 @@
 import { Text } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
-import { isDefined } from "remeda";
 
 export function PetitionComposeHeadingSettings({
   field,
@@ -26,7 +26,7 @@ export function PetitionComposeHeadingSettings({
           })
         }
         disabledReadon={
-          isDefined(field.visibility) ? (
+          isNonNullish(field.visibility) ? (
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.petition-compose-heading-settings.visibility"

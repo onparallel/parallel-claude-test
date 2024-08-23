@@ -1,8 +1,8 @@
 import { prettifyTimezone } from "@parallel/utils/dates";
+import timezones from "@parallel/utils/timezones.json";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { concat, filter, groupBy, map, pipe, sort } from "remeda";
-import timezones from "@parallel/utils/timezones.json";
 import { SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
 interface TimezoneSelectProps extends Omit<SimpleSelectProps, "options"> {}

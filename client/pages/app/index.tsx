@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Center, Circle, Image, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
+import { Box, Center, Circle, Flex, Grid, Heading, Image, Stack } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
@@ -21,7 +21,7 @@ import Head from "next/head";
 import Router from "next/router";
 import { MouseEvent, MouseEventHandler } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 type ChooseOrgProps = UnwrapPromise<ReturnType<typeof ChooseOrg.getInitialProps>>;
 
@@ -187,7 +187,7 @@ const _mutations = [
 ];
 
 ChooseOrg.getInitialProps = async ({ fetchQuery, query }: WithApolloDataContext) => {
-  if (isDefined(query.continue)) {
+  if (isNonNullish(query.continue)) {
     const { data } = await fetchQuery(ChooseOrg_petitionsDocument);
     throw new RedirectError(data.petitions.totalCount ? "/app/petitions" : "/app/petitions/new");
   } else {

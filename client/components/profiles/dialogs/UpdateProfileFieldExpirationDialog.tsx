@@ -26,7 +26,7 @@ import { Duration, isPast, sub } from "date-fns";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface UpdateProfileFieldExpirationDialogResult {
   expiryDate: string | null;
@@ -54,7 +54,7 @@ function UpdateProfileFieldExpirationDialog({
 
   const expirationDate = watch("expiryDate");
 
-  const checkIfIsPast = (value: string | null) => isDefined(value) && isPast(new Date(value));
+  const checkIfIsPast = (value: string | null) => isNonNullish(value) && isPast(new Date(value));
   const [isPastDate, setIsPastDate] = useState(checkIfIsPast(expirationDate));
   const handleOnBlur = () => setIsPastDate(checkIfIsPast(expirationDate));
 
@@ -138,7 +138,7 @@ function UpdateProfileFieldExpirationDialog({
                   date: intl.formatDate(notificationDate, FORMATS.L),
                 }}
               />
-            ) : isDefined(expiryAlertAheadTime?.days) ? (
+            ) : isNonNullish(expiryAlertAheadTime?.days) ? (
               <FormattedMessage
                 id="component.update-profile-field-expiration-dialog.alert-duration-days"
                 defaultMessage="We will let you know {count, select, 1 {one day} 7 {seven days} 15 {fifteen days} other {# days}} {isAfter, select, true {after} other {before}}."
@@ -147,7 +147,7 @@ function UpdateProfileFieldExpirationDialog({
                   isAfter: (expiryAlertAheadTime?.days || 1) < 0,
                 }}
               />
-            ) : isDefined(expiryAlertAheadTime?.months) ? (
+            ) : isNonNullish(expiryAlertAheadTime?.months) ? (
               <FormattedMessage
                 id="component.update-profile-field-expiration-dialog.alert-duration-months"
                 defaultMessage="We will let you know {count, select, 1 {one month} 2 {two months} 3 {three months} other {# months}} {isAfter, select, true {after} other {before}}."

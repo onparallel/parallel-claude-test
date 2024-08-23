@@ -1,5 +1,5 @@
 import { subMonths, subYears } from "date-fns";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
 import { ProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import {
@@ -36,12 +36,12 @@ function passesActivationCondition(
   >["activationCondition"],
   selectValues: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
 ) {
-  if (isDefined(activationCondition)) {
+  if (isNonNullish(activationCondition)) {
     const selectValue = selectValues.find(
       (v) => v.profile_type_field_id === activationCondition.profileTypeFieldId,
     )?.content?.value;
 
-    return isDefined(selectValue) && activationCondition.values.includes(selectValue);
+    return isNonNullish(selectValue) && activationCondition.values.includes(selectValue);
   }
 
   return true;
@@ -53,7 +53,7 @@ export function requiresRefresh(currentDate: Date) {
     monitoring: ProfileTypeFieldOptions["BACKGROUND_CHECK"]["monitoring"],
     selectValues: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
   ) => {
-    if (!isDefined(monitoring)) {
+    if (isNullish(monitoring)) {
       return false;
     }
     if (!passesActivationCondition(monitoring.activationCondition, selectValues)) {

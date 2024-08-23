@@ -62,7 +62,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { assert } from "ts-essentials";
 
 const PAGE_SIZE = 100;
@@ -100,11 +100,11 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     updateIsReadNotification({ isRead: true, filter: "OTHER", petitionIds: [petitionId] });
   }, []);
 
-  assert(isDefined(petitionData.petition));
+  assert(isNonNullish(petitionData.petition));
   assertTypename(petitionData.petition, "Petition");
   const petition = petitionData.petition;
 
-  assert(isDefined(eventsData.petition));
+  assert(isNonNullish(eventsData.petition));
   assertTypename(eventsData.petition, "Petition");
   const events = eventsData.petition.events;
 
@@ -306,7 +306,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           return;
         }
 
-        const start = isDefined(remindersConfig);
+        const start = isNonNullish(remindersConfig);
         await switchReminders({
           variables: {
             start,
@@ -417,7 +417,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       await showConfirmDisassociateProfileDialog({
         petitionName: petition.name,
         profileName:
-          profileIds.length === 1 && isDefined(profile) ? (
+          profileIds.length === 1 && isNonNullish(profile) ? (
             <ProfileReference profile={profile} />
           ) : (
             ""

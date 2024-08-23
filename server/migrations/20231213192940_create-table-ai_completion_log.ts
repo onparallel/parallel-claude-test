@@ -1,8 +1,8 @@
 import { Knex } from "knex";
-import { addIntegrationType, removeIntegrationType } from "./helpers/integrationTypes";
-import { timestamps } from "./helpers/timestamps";
 import { addFeatureFlag, removeFeatureFlag } from "./helpers/featureFlags";
+import { addIntegrationType, removeIntegrationType } from "./helpers/integrationTypes";
 import { addTaskName, removeTaskName } from "./helpers/taskNames";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("ai_completion_log", (t) => {

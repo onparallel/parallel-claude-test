@@ -1,11 +1,11 @@
+import { format as formatDate, startOfToday } from "date-fns";
 import { Liquid } from "liquidjs";
 import { createContext, PropsWithChildren } from "react";
 import { IntlShape } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { FORMATS, prettifyTimezone } from "../dates";
 import { useConstant } from "../useConstant";
 import { DateLiquidValue, DateTimeLiquidValue } from "./LiquidValue";
-import { startOfToday, format as formatDate } from "date-fns";
 
 function useCreateLiquid() {
   return useConstant(() => {
@@ -132,7 +132,7 @@ function useCreateLiquid() {
         if (value === undefined) {
           return "";
         }
-        if (!isDefined(format) || !["LL", "L", "ISO"].includes(format)) {
+        if (isNullish(format) || !["LL", "L", "ISO"].includes(format)) {
           format = "LL";
         }
         let _value: string | number | Date | undefined;
@@ -160,7 +160,7 @@ function useCreateLiquid() {
         if (value === undefined) {
           return "";
         }
-        if (!isDefined(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
+        if (isNullish(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
           format = "LLL";
         }
         let _value: string | number | Date | undefined;

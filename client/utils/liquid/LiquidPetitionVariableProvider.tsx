@@ -1,8 +1,8 @@
+import { Drop } from "liquidjs";
 import { PropsWithChildren, useContext, useMemo } from "react";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { FieldLogic } from "../fieldLogic/useFieldLogic";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
-import { Drop } from "liquidjs";
 
 export function LiquidPetitionVariableProvider({
   logic,
@@ -11,7 +11,7 @@ export function LiquidPetitionVariableProvider({
   logic: FieldLogic;
 }>) {
   const parent = useContext(LiquidScopeContext);
-  if (!isDefined(parent)) {
+  if (isNullish(parent)) {
     throw new Error(
       "<LiquidPetitionVariableProvider/> must be used within a <LiquidScopeProvider/>",
     );

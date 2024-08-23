@@ -1,5 +1,5 @@
 import { arg, booleanArg, list, nonNull, objectType, queryField, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -67,7 +67,7 @@ export const LandingTemplate = objectType({
       resolve: async (o, _, ctx) => {
         const owner = (await ctx.petitions.loadPetitionOwner(o.id))!;
         const path = await ctx.users.loadAvatarPathByUserDataId(owner.user_data_id);
-        return isDefined(path)
+        return isNonNullish(path)
           ? await ctx.images.getImageUrl(path, { resize: { width: 80, height: 80, fit: "cover" } })
           : null;
       },
@@ -86,7 +86,7 @@ export const LandingTemplate = objectType({
     t.boolean("hasConditionals", {
       resolve: async (o, _, ctx) => {
         const fields = await ctx.petitions.loadAllFieldsByPetitionId(o.id);
-        return fields.some((f) => isDefined(f.visibility));
+        return fields.some((f) => isNonNullish(f.visibility));
       },
     });
     t.datetime("updatedAt", { resolve: (o) => o.updated_at });

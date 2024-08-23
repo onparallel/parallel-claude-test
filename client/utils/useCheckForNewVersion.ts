@@ -1,6 +1,6 @@
 import { assignRef } from "@chakra-ui/hooks";
 import { useRef, useState } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useInterval } from "./useInterval";
 
 export function useCheckForNewVersion() {
@@ -11,7 +11,7 @@ export function useCheckForNewVersion() {
       try {
         const res = await fetch("/status");
         const version = await res.text();
-        if (isDefined(currentVersionRef.current) && currentVersionRef.current !== version) {
+        if (isNonNullish(currentVersionRef.current) && currentVersionRef.current !== version) {
           setHasNewVersion(true);
         }
         assignRef(currentVersionRef, version);

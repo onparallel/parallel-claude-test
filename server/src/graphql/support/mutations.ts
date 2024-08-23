@@ -1,6 +1,6 @@
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { UserGroupPermissionName } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -153,7 +153,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
     validateHexColor((args) => args.backgroundColor, "backgroundColor"),
     validateRegex((args) => args.slug, "slug", /^[0-9a-z-]+$/),
     validateIf(
-      (args) => isDefined(args.image),
+      (args) => isNonNullish(args.image),
       validateFile(
         (args) => args.image!,
         { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
@@ -174,22 +174,22 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       const newMetadata: any = {};
 
       newMetadata.background_color =
-        isDefined(args.backgroundColor) && args.backgroundColor.trim() !== ""
+        isNonNullish(args.backgroundColor) && args.backgroundColor.trim() !== ""
           ? args.backgroundColor
           : templateMd.background_color || null;
 
       newMetadata.categories =
-        isDefined(args.categories) && args.categories.trim() !== ""
+        isNonNullish(args.categories) && args.categories.trim() !== ""
           ? unique(args.categories.split(",").map((w) => w.trim()))
           : templateMd.categories || [];
 
       newMetadata.description =
-        isDefined(args.description) && args.description.trim() !== ""
+        isNonNullish(args.description) && args.description.trim() !== ""
           ? args.description.trim()
           : templateMd.description || null;
 
       newMetadata.slug =
-        isDefined(args.slug) && args.slug.trim() !== ""
+        isNonNullish(args.slug) && args.slug.trim() !== ""
           ? args.slug.trim()
           : templateMd.slug || null;
 

@@ -26,10 +26,11 @@ import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { useUpdateContact } from "@parallel/utils/mutations/useUpdateContact";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { differenceWith, isDefined, unique, uniqueBy, zip } from "remeda";
+import { differenceWith, isNonNullish, unique, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   RecipientSuggestion,
@@ -48,7 +49,6 @@ import { SuggestionsButton } from "./SuggestionsButton";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, isDialogError, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
-import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -98,7 +98,7 @@ export function RecipientSelectGroups({
     const unknownEmails = unique(
       zip(contacts, allEmails)
         .map(([contact, email]) => (!contact ? email : null))
-        .filter(isDefined),
+        .filter(isNonNullish),
     );
     try {
       if (unknownEmails.length > 0) {
@@ -257,19 +257,19 @@ export function RecipientSelectGroups({
           firstName,
           lastName,
         });
-        if (isDefined(newContact)) {
+        if (isNonNullish(newContact)) {
           addNewContact([...recipientGroups[groupNumber], newContact]);
         }
       } else {
         const contactNeedsUpdate =
-          (isDefined(firstName) && firstName.length && contact.firstName !== firstName) ||
-          (isDefined(lastName) && lastName.length && contact.lastName !== lastName);
+          (isNonNullish(firstName) && firstName.length && contact.firstName !== firstName) ||
+          (isNonNullish(lastName) && lastName.length && contact.lastName !== lastName);
 
         const updatedContact = contactNeedsUpdate
           ? await updateContact({ id: contact.id, firstName, lastName })
           : contact;
 
-        if (isDefined(updatedContact)) {
+        if (isNonNullish(updatedContact)) {
           addNewContact([...recipientGroups[groupNumber], updatedContact]);
         }
       }
@@ -281,7 +281,7 @@ export function RecipientSelectGroups({
   const allFieldsWithIndices = useFieldsWithIndices(petition);
   // filter visible fields
   const fieldsWithIndices = zip(allFieldsWithIndices, fieldLogic)
-    .filter(([[field], { isVisible }]) => isVisible && isDefined(field))
+    .filter(([[field], { isVisible }]) => isVisible && isNonNullish(field))
     .map(([[field, fieldIndex, childrenFieldIndices], { groupChildrenLogic }]) => {
       return [
         field.type === "FIELD_GROUP"
@@ -305,7 +305,9 @@ export function RecipientSelectGroups({
     ([f]) =>
       f.type === "FIELD_GROUP" &&
       f.isLinkedToProfileType &&
-      f.replies.some((r) => r.children?.some((c) => c.replies.some((cr) => isDefined(cr.content)))),
+      f.replies.some((r) =>
+        r.children?.some((c) => c.replies.some((cr) => isNonNullish(cr.content))),
+      ),
   );
 
   const fieldsWithIndicesRepliedWithEmail = useMemo(
@@ -324,7 +326,7 @@ export function RecipientSelectGroups({
                   (c.field.isLinkedToProfileTypeField &&
                     c.field.profileTypeField?.alias?.toLowerCase().includes("email")) ||
                   c.field.options.format === "EMAIL") &&
-                c.replies.some((cr) => isDefined(cr.content)),
+                c.replies.some((cr) => isNonNullish(cr.content)),
             ),
           );
         }
@@ -348,7 +350,7 @@ export function RecipientSelectGroups({
               }
               return null;
             })
-            .filter(isDefined);
+            .filter(isNonNullish);
         } else if (field.type === "FIELD_GROUP") {
           return field.replies
             .map((r, i) => {
@@ -364,7 +366,7 @@ export function RecipientSelectGroups({
                 const value = replies[0]?.content?.value;
                 const profileTypeFieldAlias = field.profileTypeField?.alias;
 
-                if (field.type === "SHORT_TEXT" && isDefined(value)) {
+                if (field.type === "SHORT_TEXT" && isNonNullish(value)) {
                   if (
                     field.options?.format === "EMAIL" ||
                     field.alias?.toLowerCase().includes("email") ||
@@ -383,7 +385,7 @@ export function RecipientSelectGroups({
 
               return suggestion;
             })
-            .filter((s) => isDefined(s.email));
+            .filter((s) => isNonNullish(s.email));
         }
       }),
     [fieldsWithIndicesRepliedWithEmail],

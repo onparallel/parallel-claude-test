@@ -3,7 +3,7 @@ import {
   getPetitionSignatureStatus_PetitionFragment,
   PetitionSignatureStatusFilter,
 } from "@parallel/graphql/__types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function getPetitionSignatureStatus({
   status,
@@ -11,7 +11,7 @@ export function getPetitionSignatureStatus({
   signatureConfig,
 }: getPetitionSignatureStatus_PetitionFragment): PetitionSignatureStatusFilter {
   if (
-    isDefined(signatureConfig) &&
+    isNonNullish(signatureConfig) &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
       currentSignatureRequest.status === "COMPLETED" ||
@@ -23,14 +23,14 @@ export function getPetitionSignatureStatus({
     return "PENDING_START";
   }
 
-  if (isDefined(currentSignatureRequest)) {
+  if (isNonNullish(currentSignatureRequest)) {
     // signature request is already started, return the current status
     if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
       return "PROCESSING";
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
-  } else if (isDefined(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
+  } else if (isNonNullish(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   }

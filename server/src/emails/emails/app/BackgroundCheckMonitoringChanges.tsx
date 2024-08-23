@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlTable, MjmlText } from "@faire/mjml-react";
 import { outdent } from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { Email } from "../../buildEmail";
 import { GreetingUser } from "../../components/Greeting";
 import { Layout, LayoutProps } from "../../components/Layout";
@@ -36,9 +36,9 @@ const email: Email<BackgroundCheckMonitoringChangesProps> = {
     const propertyList = properties
       .map((value) => {
         const title =
-          isDefined(value.content.query) && !isDefined(value.content.entity)
-            ? [value.content.query.name, value.content.query.date].filter(isDefined).join(" | ")
-            : isDefined(value.content.entity)
+          isNonNullish(value.content.query) && isNullish(value.content.entity)
+            ? [value.content.query.name, value.content.query.date].filter(isNonNullish).join(" | ")
+            : isNonNullish(value.content.entity)
               ? value.content.entity.name
               : "";
 
@@ -153,9 +153,9 @@ function MonitoredValueRow({ value, assetsUrl, parallelUrl }: MonitoredValueRowP
   const propertyHref = `${parallelUrl}/${intl.locale}/app/profiles/${value.profileId}?profileTypeField=${value.profileTypeFieldId}`;
 
   const title =
-    isDefined(value.content.query) && !isDefined(value.content.entity)
-      ? [value.content.query.name, value.content.query.date].filter(isDefined).join(" | ")
-      : isDefined(value.content.entity)
+    isNonNullish(value.content.query) && isNullish(value.content.entity)
+      ? [value.content.query.name, value.content.query.date].filter(isNonNullish).join(" | ")
+      : isNonNullish(value.content.entity)
         ? value.content.entity.name
         : "";
 

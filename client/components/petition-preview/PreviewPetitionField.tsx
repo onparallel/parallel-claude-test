@@ -14,6 +14,7 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useCallback, useEffect, useRef } from "react";
 import { pick } from "remeda";
@@ -25,6 +26,7 @@ import { RecipientViewPetitionFieldDateTime } from "../recipient-view/fields/Rec
 import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
+import { RecipientViewPetitionFieldIdVerification } from "../recipient-view/fields/RecipientViewPetitionFieldIdVerification";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -46,8 +48,6 @@ import {
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
-import { RecipientViewPetitionFieldIdVerification } from "../recipient-view/fields/RecipientViewPetitionFieldIdVerification";
-import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 
 export interface PreviewPetitionFieldProps
   extends Omit<

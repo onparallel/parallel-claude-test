@@ -6,8 +6,8 @@ import {
   Tone,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
-import { isDefined } from "remeda";
 
 interface RecipientViewPetitionStatusAlertProps {
   petition: RecipientViewPetitionStatusAlert_PublicPetitionFragment;
@@ -22,7 +22,7 @@ export function RecipientViewPetitionStatusAlert({
 }: RecipientViewPetitionStatusAlertProps) {
   const intl = useIntl();
 
-  const name = isDefined(granter) ? (
+  const name = isNonNullish(granter) ? (
     <b>{granter.fullName}</b>
   ) : (
     <i>

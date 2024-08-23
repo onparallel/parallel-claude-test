@@ -61,7 +61,7 @@ import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/type
 import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 function Subscriptions() {
   const intl = useIntl();
@@ -114,7 +114,7 @@ function Subscriptions() {
       },
     ) => {
       let subscriptionId = id;
-      if (isDefined(id)) {
+      if (isNonNullish(id)) {
         await updatePetitionEventSubscription({
           variables: {
             id,
@@ -166,7 +166,7 @@ function Subscriptions() {
       },
     ) => {
       let subscriptionId = id;
-      if (isDefined(id)) {
+      if (isNonNullish(id)) {
         await updateProfileEventSubscription({
           variables: {
             id,
@@ -614,7 +614,7 @@ function useTemplateSubscriptionsColumns(): TableColumn<
         cellProps: { minWidth: "170px", width: "10%", whiteSpace: "nowrap" },
         CellContent: ({ row }) => {
           assertTypename(row, "PetitionEventSubscription");
-          return !isDefined(row.eventTypes) ? (
+          return isNullish(row.eventTypes) ? (
             <Text fontSize="sm">
               <FormattedMessage id="generic.all-event-types" defaultMessage="All events" />
             </Text>
@@ -778,7 +778,7 @@ function useProfileSubscriptionsColumns(): TableColumn<
           maxWidth: 0,
         },
         CellContent: ({ row }) => {
-          if (!isDefined(row.fromProfileType)) {
+          if (isNullish(row.fromProfileType)) {
             return (
               <Text textStyle="hint">
                 <FormattedMessage
@@ -817,7 +817,7 @@ function useProfileSubscriptionsColumns(): TableColumn<
         cellProps: { minWidth: "170px", width: "10%", whiteSpace: "nowrap" },
         CellContent: ({ row }) => {
           assertTypename(row, "ProfileEventSubscription");
-          return !isDefined(row.profileEventTypes) ? (
+          return isNullish(row.profileEventTypes) ? (
             <Text fontSize="sm">
               <FormattedMessage id="generic.all-event-types" defaultMessage="All events" />
             </Text>

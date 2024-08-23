@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { SignaturitBrandingIdKey } from "../../integrations/signature/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
@@ -190,18 +190,18 @@ export class IntegrationRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      if (keys.some((k) => !isDefined(k.type) && isDefined(k.provider))) {
+      if (keys.some((k) => isNullish(k.type) && isNonNullish(k.provider))) {
         throw new Error("Must define type when defining provider");
       }
       const integrations = await this.from("org_integration", t)
         .whereIn("org_id", unique(keys.map((k) => k.orgId)))
         .where((q) => {
           const types = unique(keys.map((k) => k.type));
-          const allHaveTypes = types.every(isDefined);
+          const allHaveTypes = types.every(isNonNullish);
           if (types.length > 0 && allHaveTypes) {
             q.whereIn("type", types);
             const providers = unique(keys.map((k) => k.provider));
-            const allHaveProviders = providers.every(isDefined);
+            const allHaveProviders = providers.every(isNonNullish);
             if (providers.length > 0 && allHaveProviders) {
               q.whereIn("provider", providers);
             }
@@ -214,8 +214,8 @@ export class IntegrationRepository extends BaseRepository {
         integrations.filter(
           (i) =>
             i.org_id === orgId &&
-            (!isDefined(type) || i.type === type) &&
-            (!isDefined(provider) || i.provider === provider),
+            (isNullish(type) || i.type === type) &&
+            (isNullish(provider) || i.provider === provider),
         ),
       );
     },
@@ -233,7 +233,7 @@ export class IntegrationRepository extends BaseRepository {
     provider?: TProvider | null,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<TType, TProvider, true>[]> {
-    if (isDefined(t)) {
+    if (isNonNullish(t)) {
       return (await this._loadIntegrationsByOrgId.raw(
         { orgId, type, provider },
         t,

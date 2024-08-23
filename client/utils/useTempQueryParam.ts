@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { MaybePromise } from "./types";
 import { useAsyncEffect } from "./useAsyncEffect";
 import { useUpdatingRef } from "./useUpdatingRef";
@@ -11,7 +11,7 @@ export function useTempQueryParam(
   const routerRef = useUpdatingRef(useRouter());
   useAsyncEffect(async (isMounted) => {
     const { query, pathname } = routerRef.current;
-    if (isDefined(query[paramName])) {
+    if (isNonNullish(query[paramName])) {
       const result = await effect(query[paramName] as string);
       if (isMounted() && result !== false) {
         routerRef.current.replace(

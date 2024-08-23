@@ -1,9 +1,9 @@
 import { IMjmlProps, MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 import { SlateNode, renderSlateToHtml, renderSlateToReactNodes } from "../../util/slate/render";
 import { Maybe } from "../../util/types";
 import { UserMessageBox } from "./UserMessageBox";
-import { isDefined } from "remeda";
 
 interface FieldComment {
   id: number;
@@ -61,7 +61,7 @@ export function PetitionFieldAndComments({ fieldsWithComments }: PetitionFieldAn
                 <MjmlText padding="0 20px 0 50px" lineHeight="24px">
                   <ul style={{ margin: 0, padding: 0 }}>
                     <li value={position + 1} style={{ margin: 0, padding: 0 }}>
-                      {isDefined(field) ? (
+                      {isNonNullish(field) ? (
                         title ? (
                           <span>{title}</span>
                         ) : (

@@ -1,6 +1,6 @@
 import { HeadObjectOutput } from "@aws-sdk/client-s3";
 import { createReadStream } from "fs";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
@@ -118,7 +118,7 @@ export async function petitionClosedNotification(
       let res: HeadObjectOutput | undefined;
       let filename: string | undefined;
       // if the parallel has a completed signature request, use that instead of the binder
-      if (latestSignature?.status === "COMPLETED" && isDefined(latestSignature.file_upload_id)) {
+      if (latestSignature?.status === "COMPLETED" && isNonNullish(latestSignature.file_upload_id)) {
         const fileUpload = await context.files.loadFileUpload(latestSignature.file_upload_id);
         assert(fileUpload, "Expected FileUpload to be defined on latest signature");
         res = await context.storage.temporaryFiles.uploadFile(

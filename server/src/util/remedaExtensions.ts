@@ -1,4 +1,4 @@
-import { isDefined, purry } from "remeda";
+import { isNonNullish, purry } from "remeda";
 
 type ObjectPredicate<K extends string | number | symbol, V> = (entry: [K, V]) => boolean;
 
@@ -30,5 +30,5 @@ export function removeKeys() {
 export function removeNotDefined<T extends {}>(
   object: T,
 ): { [P in keyof T]?: Exclude<T[P], null> } {
-  return removeKeys(object, ([_, value]) => isDefined(value));
+  return removeKeys(object, ([_, value]) => isNonNullish(value));
 }

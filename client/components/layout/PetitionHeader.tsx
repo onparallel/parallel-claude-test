@@ -60,7 +60,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { Divider } from "../common/Divider";
 import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -308,7 +308,7 @@ export const PetitionHeader = Object.assign(
                   "data-testid": "petition-section-preview",
                 },
               },
-            ].filter(isDefined),
+            ].filter(isNonNullish),
       [status, petition.isRestricted, petition.isInteractionWithRecipientsEnabled, intl.locale],
     );
 
@@ -566,9 +566,9 @@ export const PetitionHeader = Object.assign(
           {sections.map(({ section, label, rightIcon, attributes }) => {
             let href = `/app/petitions/${petition.id}/${section}`;
 
-            if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
+            if (isNonNullish(router.query.fromTemplate) || shouldConfirmNavigation) {
               href += `?${new URLSearchParams({
-                ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+                ...(isNonNullish(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
                 ...(shouldConfirmNavigation ? { new: "" } : {}),
               })}`;
             }

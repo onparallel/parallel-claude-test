@@ -1,6 +1,6 @@
+import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
 import { FORMATS, prettifyTimezone } from "../dates";
-import { Drop } from "liquidjs";
 
 const INTL = Symbol("intl");
 

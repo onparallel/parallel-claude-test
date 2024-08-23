@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { OpenAPIV3 } from "openapi-types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { If, MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
@@ -339,7 +339,7 @@ export function objectParam<
         throw new ParseError(value, ajv.errorsText());
       }
 
-      if (isDefined(options.validate)) {
+      if (isNonNullish(options.validate)) {
         try {
           for (const [key, val] of Object.entries(value)) {
             options.validate(key, val);

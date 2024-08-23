@@ -10,7 +10,7 @@ import Document, {
 } from "next/document";
 import { outdent } from "outdent";
 import { IntlConfig } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 
 const MESSAGES_CACHE = new Map<string, IntlConfig["messages"]>();
 
@@ -71,7 +71,7 @@ class MyDocument extends Document<MyDocumentProps> {
     const isRecipientPage =
       ["/maintenance", "/thanks", "/update", "/404"].includes(ctx.pathname) ||
       ["/petition/", "/pp/"].some((prefix) => ctx.pathname.startsWith(prefix));
-    if (!isDefined(locale)) {
+    if (isNullish(locale)) {
       ctx.res!.writeHead(302, { Location: "/" }).end();
       return { html: "" } as any;
     } else if (!isRecipientPage && !["en", "es"].includes(locale)) {

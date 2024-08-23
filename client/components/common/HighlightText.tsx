@@ -2,7 +2,7 @@ import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import escapeStringRegexp from "escape-string-regexp";
 import { Fragment } from "react";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 
 export interface HighlightTextProps {
   children?: string;
@@ -13,7 +13,7 @@ export const HighlightText = chakraForwardRef<"p", HighlightTextProps>(function 
   { children, search, ...props },
   ref,
 ) {
-  if (search === "" || !isDefined(search) || !isDefined(children)) {
+  if (search === "" || isNullish(search) || isNullish(children)) {
     return (
       <Text ref={ref} {...props}>
         {children}

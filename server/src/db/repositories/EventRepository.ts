@@ -1,7 +1,7 @@
 import { inject } from "inversify";
+import { Knex } from "knex";
 import { BaseRepository, TableTypes } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { Knex } from "knex";
 
 export class EventRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {

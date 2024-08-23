@@ -5,9 +5,9 @@ import {
   IconButtonWithTooltipProps,
 } from "@parallel/components/common/IconButtonWithTooltip";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
+import { Duration } from "date-fns";
 import { useIntl } from "react-intl";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
-import { Duration } from "date-fns";
 
 interface ProfileFieldExpirationButtonProps
   extends Omit<IconButtonWithTooltipProps, "onChange" | "label"> {

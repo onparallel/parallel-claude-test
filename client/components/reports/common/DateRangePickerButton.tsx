@@ -28,7 +28,7 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import { endOfDay, startOfDay } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { DateRangePicker, DateRangePickerProps } from "../../common/DateRangePicker";
 import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
 import {
@@ -67,7 +67,7 @@ export function DateRangePickerButton({
 
   const quickRanges = useQuickDateRanges();
   const currentActiveRange = useMemo(() => {
-    return isDateRangeDefined(value) && isDefined(_value)
+    return isDateRangeDefined(value) && isNonNullish(_value)
       ? (quickRanges.find(({ range }) => isEqualDateRange(_value, range)) ?? null)
       : null;
   }, [_value?.[0]?.valueOf(), _value?.[1]?.valueOf(), quickRanges]);
@@ -85,15 +85,15 @@ export function DateRangePickerButton({
   const mainButton = (
     <Button
       leftIcon={<FieldDateIcon position="relative" top="-1px" />}
-      color={isDefined(_value) ? "purple.600" : undefined}
-      fontWeight={isDefined(_value) ? "600" : "500"}
+      color={isNonNullish(_value) ? "purple.600" : undefined}
+      fontWeight={isNonNullish(_value) ? "600" : "500"}
       onClick={onOpen}
       width="100%"
       isDisabled={isDisabled}
     >
-      {isDefined(currentActiveRange)
+      {isNonNullish(currentActiveRange)
         ? currentActiveRange.text
-        : isDefined(_value)
+        : isNonNullish(_value)
           ? _value.map((date) => intl.formatDate(date, FORMATS.ll)).join(" - ")
           : intl.formatMessage({
               id: "component.date-range-picker-button.default-text",
@@ -102,7 +102,7 @@ export function DateRangePickerButton({
     </Button>
   );
 
-  const clearRangeButton = isDefined(_value) ? (
+  const clearRangeButton = isNonNullish(_value) ? (
     <IconButtonWithTooltip
       icon={<CloseIcon fontSize={12} />}
       onClick={() => onChange(null)}

@@ -1,6 +1,6 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { Controller } from "react-hook-form";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
@@ -41,7 +41,7 @@ export function ProfileFieldPhone({
             value={value ?? ""}
             onChange={(value: string, { isValid }) => {
               onChange(value ?? "");
-              if (isDefined(value) && !isValid && !fieldState.error) {
+              if (isNonNullish(value) && !isValid && !fieldState.error) {
                 setError(`fields.${index}.content.value`, { type: "validate" });
               } else if (isValid && fieldState.error) {
                 clearErrors(`fields.${index}.content.value`);

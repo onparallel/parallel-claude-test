@@ -19,7 +19,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 
@@ -135,10 +135,10 @@ export function PetitionFieldLogicConditionSubjectSelect({
       options={options as any}
       value={value}
       onChange={(_value) => {
-        assert(isDefined(_value));
+        assert(isNonNullish(_value));
         if (_value.type === "FIELD") {
           if (
-            isDefined(value) &&
+            isNonNullish(value) &&
             value.type === "FIELD" &&
             isValueCompatible(value.field.type, _value.field.type)
           ) {

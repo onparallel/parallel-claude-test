@@ -1,7 +1,7 @@
 import { If } from "../../util/types";
 import {
-  OrganizationUsageLimitName,
   SystemEvent as DbSystemEvent,
+  OrganizationUsageLimitName,
   SystemEventType,
 } from "../__types";
 

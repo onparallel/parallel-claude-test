@@ -1,5 +1,5 @@
 import { arg, booleanArg, mutationField, nonNull, nullable } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { collectMentionsFromSlate } from "../../../util/slate/mentions";
 import { and, authenticateAnd, ifArgDefined, ifArgEquals, not } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
@@ -131,7 +131,7 @@ export const deletePetitionComment = mutationField("deletePetitionComment", {
       ctx.user!,
     );
 
-    if (isDefined(comment?.petition_field_id)) {
+    if (isNonNullish(comment?.petition_field_id)) {
       const petitionField = await ctx.petitions.loadField(comment?.petition_field_id);
       if (!petitionField) {
         throw new ApolloError("Petition field not found", "PETITION_FIELD_NOT_FOUND");

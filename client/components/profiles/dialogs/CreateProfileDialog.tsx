@@ -17,7 +17,7 @@ import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldSelectInner } from "../fields/ProfileFieldSelect";
 
 interface CreateProfileDialogResult {
@@ -59,11 +59,11 @@ function CreateProfileDialog({
   const _profileTypeId = watch("profileTypeId");
   const { data: profileTypeData } = useQuery(useCreateProfileDialog_profileTypeDocument, {
     variables: { profileTypeId: _profileTypeId! },
-    skip: !isDefined(_profileTypeId),
+    skip: isNullish(_profileTypeId),
   });
 
   useEffect(() => {
-    if (isDefined(profileTypeData)) {
+    if (isNonNullish(profileTypeData)) {
       const fields = profileTypeData.profileType.fields.filter((f) => f.isUsedInProfileName);
       if (profileFieldValues) {
         replace(
@@ -121,7 +121,7 @@ function CreateProfileDialog({
               variables: {
                 profileTypeId: profileTypeId!,
                 fields: fieldValues.filter(
-                  (value) => isDefined(value?.content?.value) && value!.content!.value !== "",
+                  (value) => isNonNullish(value?.content?.value) && value!.content!.value !== "",
                 ),
               },
             });
@@ -156,7 +156,7 @@ function CreateProfileDialog({
       }
       body={
         <Stack spacing={4}>
-          <FormControl isInvalid={!!errors.profileTypeId} isDisabled={isDefined(profileTypeId)}>
+          <FormControl isInvalid={!!errors.profileTypeId} isDisabled={isNonNullish(profileTypeId)}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-profile-dialog.profile-type"
@@ -189,7 +189,7 @@ function CreateProfileDialog({
             const profileTypeField = profileTypeData!.profileType.fields.find(
               (f) => f.id === field.profileTypeFieldId,
             )!;
-            const format = isDefined(profileTypeField.options.format)
+            const format = isNonNullish(profileTypeField.options.format)
               ? formats.find((f) => f.value === profileTypeField.options.format)
               : null;
 
@@ -205,7 +205,7 @@ function CreateProfileDialog({
                       control={control}
                       rules={{
                         validate: (value) => {
-                          return isDefined(format) && value?.length
+                          return isNonNullish(format) && value?.length
                             ? (format.validate?.(value) ?? true)
                             : true;
                         },
@@ -218,7 +218,7 @@ function CreateProfileDialog({
                             disabled={profileTypeField.myPermission !== "WRITE"}
                             format={format}
                             placeholder={
-                              isDefined(format)
+                              isNonNullish(format)
                                 ? intl.formatMessage(
                                     {
                                       id: "generic.for-example",
@@ -234,7 +234,7 @@ function CreateProfileDialog({
                         );
                       }}
                     />
-                    {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+                    {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
                   </>
                 ) : (
                   <Controller

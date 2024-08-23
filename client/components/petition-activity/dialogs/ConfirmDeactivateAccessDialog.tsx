@@ -5,7 +5,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ConfirmDeactivateAccessDialog_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function ConfirmDeactivateAccessDialog({
   access,
@@ -21,7 +21,7 @@ export function ConfirmDeactivateAccessDialog({
         />
       }
       body={
-        isDefined(access.contact) ? (
+        isNonNullish(access.contact) ? (
           <FormattedMessage
             id="component.confirm-deactivate-access-dialog.body"
             defaultMessage="Are you sure you want to <b>remove access</b> to {contact}?"

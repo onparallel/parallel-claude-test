@@ -7,7 +7,7 @@ import {
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { flatMap, isDefined, pipe, zip } from "remeda";
+import { flatMap, isNonNullish, pipe, zip } from "remeda";
 import { sanitizeFilenameWithSuffix } from "./sanitizeFilenameWithSuffix";
 import { PlaceholderOption } from "./slate/PlaceholderPlugin";
 import { parseTextWithPlaceholders } from "./slate/textWithPlaceholder";
@@ -52,7 +52,7 @@ export function useFilenamePlaceholdersRename(
       fieldsWithIndices,
       flatMap(([field, fieldIndex, childrenFieldIndices]) => [
         [field.id, fieldIndex] as const,
-        ...(isDefined(field.children)
+        ...(isNonNullish(field.children)
           ? zip(
               field.children.map((f) => f.id),
               childrenFieldIndices!,

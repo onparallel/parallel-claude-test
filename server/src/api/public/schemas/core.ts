@@ -11,8 +11,8 @@ import {
 } from "../../../db/__types";
 import { toGlobalId } from "../../../util/globalId";
 import { JsonSchema, JsonSchemaFor, schema } from "../../rest/schemas";
-import { PetitionEvent, ProfileEvent } from "./events";
 import { UserLocale } from "../__types";
+import { PetitionEvent, ProfileEvent } from "./events";
 
 function _ListOf<T extends JsonSchema>(item: T) {
   return {

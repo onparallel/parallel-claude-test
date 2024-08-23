@@ -18,7 +18,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 type DocumentThemeSelection = Omit<
   CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment,
@@ -30,7 +30,7 @@ export function CreateOrUpdateDocumentThemeDialog({
   theme,
   ...props
 }: DialogProps<{ theme: Maybe<DocumentThemeSelection> }, CreateOrUpdateDocumentThemeDialogResult>) {
-  const isUpdate = isDefined(theme);
+  const isUpdate = isNonNullish(theme);
 
   const {
     handleSubmit,
@@ -102,7 +102,7 @@ export function CreateOrUpdateDocumentThemeDialog({
         </Stack>
       }
       alternative={
-        isDefined(theme) && !theme.isDefault ? (
+        isNonNullish(theme) && !theme.isDefault ? (
           <Button colorScheme="red" variant="ghost" onClick={() => props.onReject("DELETE_THEME")}>
             <FormattedMessage
               id="component.create-or-update-document-theme-dialog.delete-theme-button"

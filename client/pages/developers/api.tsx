@@ -1,9 +1,9 @@
-import { InferGetServerSidePropsType } from "next";
-import { default as nodeFetch } from "node-fetch";
-import Head from "next/head";
-import { useEffect, useRef } from "react";
-import Script from "next/script";
 import { untranslated } from "@parallel/utils/untranslated";
+import { InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Script from "next/script";
+import { default as nodeFetch } from "node-fetch";
+import { useEffect, useRef } from "react";
 
 function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const ref = useRef<HTMLDivElement>(null);

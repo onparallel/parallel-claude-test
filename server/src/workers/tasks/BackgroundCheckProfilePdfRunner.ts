@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { parseBackgroundCheckToken } from "../../graphql/integrations/utils";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -35,7 +35,7 @@ export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHEC
       )?.content;
     }
 
-    const props = isDefined(replyContent)
+    const props = isNonNullish(replyContent)
       ? {
           entity: replyContent.entity,
           query: replyContent.query,

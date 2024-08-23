@@ -2,7 +2,7 @@ import "./../init";
 // keep this space to prevent import sorting removing init from top
 import { Knex } from "knex";
 import pMap from "p-map";
-import { isDefined, maxBy } from "remeda";
+import { isNonNullish, maxBy } from "remeda";
 import yargs from "yargs";
 import { createContainer } from "../container";
 import {
@@ -155,7 +155,7 @@ async function main() {
     .whereNull("deleted_at")
     .where("is_org_owner", true)
     .mmodify((q) => {
-      if (isDefined(orgId)) {
+      if (isNonNullish(orgId)) {
         q.where("org_id", orgId);
       }
     })
@@ -250,7 +250,7 @@ async function main() {
             const selectOptions = existingProperty.options as ProfileTypeFieldOptions["SELECT"];
 
             if (
-              isDefined(optionsDefinition.standardList) &&
+              isNonNullish(optionsDefinition.standardList) &&
               selectOptions.standardList !== optionsDefinition.standardList
             ) {
               update = true;

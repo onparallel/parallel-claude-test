@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileReference_ProfileFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { Link } from "./Link";
 
 interface ProfileReferenceProps {
@@ -20,7 +20,7 @@ export const ProfileReference = Object.assign(
     ref,
   ) {
     if (
-      isDefined(profile) &&
+      isNonNullish(profile) &&
       (showNameEvenIfDeleted || ["OPEN", "CLOSED"].includes(profile.status))
     ) {
       const Content = (

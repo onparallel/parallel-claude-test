@@ -6,10 +6,10 @@ import {
   useUpdateIsReadNotification_UserFragmentDoc,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { difference, isDefined, unique } from "remeda";
+import { difference, isNonNullish, unique } from "remeda";
+import { assert } from "ts-essentials";
 import { getMyId } from "../apollo/getMyId";
 import { updateFragment } from "../apollo/updateFragment";
-import { assert } from "ts-essentials";
 
 export function useUpdateIsReadNotification() {
   const [updateIsReadNotification] = useMutation(
@@ -32,7 +32,7 @@ export function useUpdateIsReadNotification() {
             fragment: useUpdateIsReadNotification_UserFragmentDoc,
             id: getMyId(cache),
             data: (user) => {
-              assert(isDefined(user), "User exists in cache");
+              assert(isNonNullish(user), "User exists in cache");
               return {
                 ...user,
                 unreadNotificationIds: variables.isRead

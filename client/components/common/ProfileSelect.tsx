@@ -28,7 +28,7 @@ import Select, {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
-import { indexBy, isDefined, zip } from "remeda";
+import { indexBy, isNonNullish, zip } from "remeda";
 import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
@@ -138,7 +138,7 @@ export const ProfileSelect = Object.assign(
             offset: 0,
             limit: 100,
             filter: {
-              profileTypeId: isDefined(profileTypeId) ? unMaybeArray(profileTypeId) : null,
+              profileTypeId: isNonNullish(profileTypeId) ? unMaybeArray(profileTypeId) : null,
               status: ["OPEN", "CLOSED"],
             },
             search,
@@ -299,7 +299,7 @@ export const ProfileSelect = Object.assign(
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         onCreateOption={handleCreateOption}
-        isValidNewOption={isDefined(defaultCreateProfileName) ? () => true : undefined}
+        isValidNewOption={isNonNullish(defaultCreateProfileName) ? () => true : undefined}
         placeholder={
           placeholder ??
           intl.formatMessage(
@@ -391,7 +391,7 @@ function useGetProfiles() {
         },
       );
 
-      const fromServerById = indexBy(profiles.filter(isDefined), (x) => x.id);
+      const fromServerById = indexBy(profiles.filter(isNonNullish), (x) => x.id);
       const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];
     } else {

@@ -1,7 +1,7 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import pAll from "p-all";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { withError } from "../../util/promises/withError";
@@ -118,7 +118,7 @@ export function ifArgDefined<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
-    if (isDefined(value)) {
+    if (isNonNullish(value)) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
       return await elseAuthorizer(root, args, ctx, info);
@@ -186,7 +186,7 @@ export function argIsDefined<
   TArg extends Arg<TypeName, FieldName>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    return isDefined(args[argName]);
+    return isNonNullish(args[argName]);
   };
 }
 

@@ -3,8 +3,8 @@ import { Knex } from "knex";
 import { sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { KNEX } from "../../knex";
 import { Organization, Petition, PetitionTag, Tag, User } from "../../__types";
+import { KNEX } from "../../knex";
 import { TagRepository } from "../TagRepository";
 import { Mocks } from "./mocks";
 

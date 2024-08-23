@@ -3,7 +3,7 @@ import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionName_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface PetitionNameWithPathProps {
   petition: PetitionName_PetitionBaseFragment;
@@ -19,7 +19,7 @@ export const PetitionNameWithPath = Object.assign(
     return (
       <Text as="span" {...props}>
         <Text as="span" fontWeight="normal">
-          {isDefined(relativePath) && petition.path.startsWith(relativePath)
+          {isNonNullish(relativePath) && petition.path.startsWith(relativePath)
             ? petition.path.slice(relativePath.length)
             : null}
         </Text>

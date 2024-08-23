@@ -8,7 +8,7 @@ import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from 
 import { FORMATS } from "@parallel/utils/dates";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { useDeclinedSignatureReasonDialog } from "../../dialogs/DeclinedSignatureReasonDialog";
 import { useSignatureCancelledRequestErrorDialog } from "../../dialogs/SignatureCancelledRequestErrorDialog";
@@ -86,7 +86,7 @@ export function TimelineSignatureCancelledEvent({ event }: TimelineSignatureCanc
           )}
           {event.cancelType === "REQUEST_ERROR" ? requestErrorMessage(event) : null}
         </Box>
-        {event.cancelType === "REQUEST_ERROR" && isDefined(event.errorMessage) ? (
+        {event.cancelType === "REQUEST_ERROR" && isNonNullish(event.errorMessage) ? (
           <Button
             onClick={() => handleSeeRequestErrorMessageClick(event)}
             size="sm"

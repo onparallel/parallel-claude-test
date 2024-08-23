@@ -1,4 +1,3 @@
-import { isDefined } from "@chakra-ui/utils";
 import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionBase } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
@@ -19,7 +18,7 @@ import Select, {
   SelectInstance,
   Props as SelectProps,
 } from "react-select";
-import { indexBy } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
 
 export interface SimpleOption<T extends string = string> extends OptionBase {
   value: T;
@@ -71,7 +70,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
     if (props.isMulti) {
       return Array.isArray(value) ? value.map((o) => _options[o]) : [];
     } else {
-      return isDefined(value) ? (_options[value as string] ?? null) : null;
+      return isNonNullish(value) ? (_options[value as string] ?? null) : null;
     }
   }, [props.options, props.isMulti, value]);
 

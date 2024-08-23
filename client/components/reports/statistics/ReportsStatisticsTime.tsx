@@ -25,12 +25,13 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { BoxAndWiskers, BoxPlotController } from "@sgratzl/chartjs-chart-boxplot";
 import {
   CategoryScale,
-  Chart as ChartJS,
   ChartData,
+  Chart as ChartJS,
   ChartOptions,
   LinearScale,
   Tooltip,
@@ -38,9 +39,8 @@ import {
 import { useMemo, useState } from "react";
 import { Chart } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { getTimeSpan, TimeSpan } from "../common/TimeSpan";
-import { untranslated } from "@parallel/utils/untranslated";
 
 type RadioValues = "opened" | "first_reply" | "completed" | "signed" | "closed";
 
@@ -101,7 +101,7 @@ export function ReportsStatisticsTime({
           defaultMessage: "Completed",
         }),
       },
-      ...(hasSignature || isDefined(timeStatistics.signed.max)
+      ...(hasSignature || isNonNullish(timeStatistics.signed.max)
         ? [
             {
               value: "signed" as RadioValues,
@@ -123,22 +123,22 @@ export function ReportsStatisticsTime({
   }, [intl.locale, timeStatistics.signed.max, hasSignature]);
 
   const labelStringTimeSpans = {
-    min: isDefined(timeStatistics[selectedValue]!.min)
+    min: isNonNullish(timeStatistics[selectedValue]!.min)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.min ?? 0)
       : "-",
-    max: isDefined(timeStatistics[selectedValue]!.max)
+    max: isNonNullish(timeStatistics[selectedValue]!.max)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.max ?? 0)
       : "-",
-    mean: isDefined(timeStatistics[selectedValue]!.mean)
+    mean: isNonNullish(timeStatistics[selectedValue]!.mean)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.mean ?? 0)
       : "-",
-    q1: isDefined(timeStatistics[selectedValue]!.q1)
+    q1: isNonNullish(timeStatistics[selectedValue]!.q1)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.q1 ?? 0)
       : "-",
-    median: isDefined(timeStatistics[selectedValue]!.median)
+    median: isNonNullish(timeStatistics[selectedValue]!.median)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.median ?? 0)
       : "-",
-    q3: isDefined(timeStatistics[selectedValue]!.q3)
+    q3: isNonNullish(timeStatistics[selectedValue]!.q3)
       ? getTimeSpan(intl, timeStatistics[selectedValue]!.q3 ?? 0)
       : "-",
   };
@@ -439,28 +439,28 @@ export function ReportsStatisticsTime({
                           </Radio>
                         </Td>
                         <Td textAlign="end">
-                          {isDefined(timeStatistics[value]!.q1) ? (
+                          {isNonNullish(timeStatistics[value]!.q1) ? (
                             <TimeSpan duration={timeStatistics[value]!.q1 ?? 0} />
                           ) : (
                             "-"
                           )}
                         </Td>
                         <Td textAlign="end">
-                          {isDefined(timeStatistics[value]!.median) ? (
+                          {isNonNullish(timeStatistics[value]!.median) ? (
                             <TimeSpan duration={timeStatistics[value]!.median ?? 0} />
                           ) : (
                             "-"
                           )}
                         </Td>
                         <Td textAlign="end">
-                          {isDefined(timeStatistics[value]!.q3) ? (
+                          {isNonNullish(timeStatistics[value]!.q3) ? (
                             <TimeSpan duration={timeStatistics[value]!.q3 ?? 0} />
                           ) : (
                             "-"
                           )}
                         </Td>
                         <Td textAlign="end">
-                          {isDefined(timeStatistics[value]!.max) ? (
+                          {isNonNullish(timeStatistics[value]!.max) ? (
                             <TimeSpan duration={timeStatistics[value]!.max ?? 0} />
                           ) : (
                             "-"
@@ -516,7 +516,7 @@ function useDownloadTimeReportExcel() {
         },
         {
           templateId,
-          range: isDefined(range)
+          range: isNonNullish(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
         },
@@ -602,22 +602,22 @@ function useDownloadTimeReportExcel() {
         worksheet.addRows(
           labels.map(({ value, label }) => ({
             steps: label,
-            min: isDefined(timeStatistics[value]!.min)
+            min: isNonNullish(timeStatistics[value]!.min)
               ? (timeStatistics[value]!.min ?? 0) / 3_600
               : "-",
-            q1: isDefined(timeStatistics[value]!.q1)
+            q1: isNonNullish(timeStatistics[value]!.q1)
               ? (timeStatistics[value]!.q1 ?? 0) / 3_600
               : "-",
-            mean: isDefined(timeStatistics[value]!.mean)
+            mean: isNonNullish(timeStatistics[value]!.mean)
               ? (timeStatistics[value]!.mean ?? 0) / 3_600
               : "-",
-            median: isDefined(timeStatistics[value]!.median)
+            median: isNonNullish(timeStatistics[value]!.median)
               ? (timeStatistics[value]!.median ?? 0) / 3_600
               : "-",
-            q3: isDefined(timeStatistics[value]!.q3)
+            q3: isNonNullish(timeStatistics[value]!.q3)
               ? (timeStatistics[value]!.q3 ?? 0) / 3_600
               : "-",
-            max: isDefined(timeStatistics[value]!.max)
+            max: isNonNullish(timeStatistics[value]!.max)
               ? (timeStatistics[value]!.max ?? 0) / 3_600
               : "-",
           })),

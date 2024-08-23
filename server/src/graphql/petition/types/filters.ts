@@ -1,6 +1,6 @@
 import { enumType, inputObjectType } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { isDefined, partition, unique } from "remeda";
+import { isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { fromGlobalId } from "../../../util/globalId";
 import { NexusGenInputs } from "../../__types";
@@ -41,7 +41,7 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
 ) {
   return (async (_, args, ctx, info) => {
     const sharedWith = prop(args);
-    if (!isDefined(sharedWith)) {
+    if (isNullish(sharedWith)) {
       return;
     }
     try {
@@ -142,7 +142,7 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
 ) {
   return (async (_, args, ctx, info) => {
     const tags = prop(args);
-    if (!isDefined(tags)) {
+    if (isNullish(tags)) {
       return;
     }
     try {

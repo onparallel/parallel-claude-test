@@ -1,9 +1,9 @@
+import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { OrganizationThemeType, OrganizationUsageLimitName } from "../../db/__types";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { core } from "nexus";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   "Organization",
@@ -81,7 +81,7 @@ export function userHasAccessToOrganizationTheme<
       );
       return (
         theme?.org_id === ctx.user!.org_id &&
-        ((isDefined(themeType) && theme.type === themeType) || !isDefined(themeType))
+        ((isNonNullish(themeType) && theme.type === themeType) || isNullish(themeType))
       );
     } catch {}
     return false;
@@ -116,7 +116,7 @@ export function organizationHasOngoingUsagePeriod<
       const limitName = args[limitNameArg] as unknown as OrganizationUsageLimitName;
 
       const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(orgId, limitName);
-      return isDefined(limit);
+      return isNonNullish(limit);
     } catch {}
     return false;
   };

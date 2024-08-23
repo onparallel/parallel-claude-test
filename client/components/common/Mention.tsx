@@ -3,16 +3,16 @@ import { Box, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
-import { UserGroupReference } from "./UserGroupReference";
+import { isNonNullish, isNullish } from "remeda";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
+import { UserGroupReference } from "./UserGroupReference";
 
 export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMentionFragment }) {
   const intl = useIntl();
-  if (isDefined(mention.__typename)) {
+  if (isNonNullish(mention.__typename)) {
     if (mention.__typename === "PetitionFieldCommentUserMention") {
       const user = mention.user;
-      if (!isDefined(user)) {
+      if (isNullish(user)) {
         return (
           <MentionBadge mentionId={mention.mentionedId} isFaded fontStyle="italic">
             <FormattedMessage id="generic.deleted-user" defaultMessage="Deleted user" />
@@ -40,7 +40,7 @@ export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMent
       }
     } else if (mention.__typename === "PetitionFieldCommentUserGroupMention") {
       const userGroup = mention.userGroup;
-      if (!isDefined(userGroup)) {
+      if (isNullish(userGroup)) {
         return (
           <MentionBadge mentionId={mention.mentionedId} isFaded fontStyle="italic">
             <FormattedMessage id="generic.deleted-user-group" defaultMessage="Deleted team" />

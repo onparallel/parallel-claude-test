@@ -1,7 +1,7 @@
 import ReactPDF, { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick, sortBy, sumBy, times, zip } from "remeda";
+import { isNonNullish, isNullish, pick, sortBy, sumBy, times, zip } from "remeda";
 import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { FORMATS, prettifyTimezone } from "../../../util/dates";
 import { FieldLogicResult, evaluateFieldLogic } from "../../../util/fieldLogic";
@@ -193,7 +193,7 @@ export default function PetitionExport({
                 {i === pages.length - 1 &&
                 showSignatureBoxes &&
                 petition.__typename === "Petition" &&
-                isDefined(petition.currentSignatureRequest) ? (
+                isNonNullish(petition.currentSignatureRequest) ? (
                   <SignaturesBlock
                     signatureConfig={petition.currentSignatureRequest.signatureConfig}
                     templateId={petition.fromTemplate?.id ?? null}
@@ -300,7 +300,7 @@ function PetitionExportField({
   const orderedReplies = isFileTypeField(field.type)
     ? sortBy(
         replies.filter((r) => r.status !== "REJECTED"),
-        (r) => isDefined(r.content.error),
+        (r) => isNonNullish(r.content.error),
       )
     : replies;
 
@@ -308,7 +308,7 @@ function PetitionExportField({
     options: { values: string[]; labels?: MaybeArray<string>[] },
     value: string,
   ) {
-    if (isDefined(options.labels)) {
+    if (isNonNullish(options.labels)) {
       const index = options.values.indexOf(value);
       const label = options.labels[index];
       return index >= 0 ? label : value;
@@ -358,7 +358,7 @@ function PetitionExportField({
             ).map(([reply, groupLogic], replyNumber) => (
               <View key={reply.id}>
                 {isFileTypeField(field.type) ? (
-                  !isDefined(reply.content.error) ? (
+                  isNullish(reply.content.error) ? (
                     <View
                       style={[
                         {
@@ -394,7 +394,7 @@ function PetitionExportField({
                           />
                         ) : (
                           [reply.content.request.model.type, reply.content.request.model.year]
-                            .filter(isDefined)
+                            .filter(isNonNullish)
                             .join("_")
                         )}{" "}
                         <FormattedMessage
@@ -487,7 +487,7 @@ function PetitionExportField({
                   <Text style={[styles.text]}>{reply.content.value}</Text>
                 )}
                 {isPetition &&
-                ((isDefined(field.parent) && field.parent.showActivityInPdf) ||
+                ((isNonNullish(field.parent) && field.parent.showActivityInPdf) ||
                   (field.showActivityInPdf && field.type !== "FIELD_GROUP")) ? (
                   <FieldActivity reply={reply} style={styles.text} />
                 ) : null}

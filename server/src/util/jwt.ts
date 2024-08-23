@@ -1,9 +1,9 @@
 import {
+  sign as _sign,
+  verify as _verify,
   JwtPayload,
   Secret,
-  sign as _sign,
   SignOptions,
-  verify as _verify,
   VerifyOptions,
 } from "jsonwebtoken";
 import { promisify } from "util";

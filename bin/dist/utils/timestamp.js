@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.timestamp = void 0;
+exports.timestamp = timestamp;
 function timestamp() {
     const date = new Date();
     return [
@@ -14,4 +14,3 @@ function timestamp() {
         .map((n) => (n < 10 ? "0" : "") + n)
         .join("");
 }
-exports.timestamp = timestamp;

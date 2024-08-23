@@ -3,7 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { NumberFormatValues, NumericFormat, SourceInfo } from "react-number-format";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
@@ -60,7 +60,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       thousandSeparator={thousandSeparator}
       decimalSeparator={decimalSeparator}
       decimalScale={decimals ?? 5}
-      allowNegative={isDefined(onlyPositive) ? !onlyPositive : true}
+      allowNegative={isNonNullish(onlyPositive) ? !onlyPositive : true}
       value={_value ?? ""}
       onValueChange={handleOnValueChange}
       {...props}

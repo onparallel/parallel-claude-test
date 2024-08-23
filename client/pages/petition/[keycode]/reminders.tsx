@@ -32,7 +32,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 
 type OptOutProps = UnwrapPromise<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -241,7 +241,7 @@ export async function getServerSideProps({
     query: OptOut_remindersOptOutDocument,
     variables: { keycode: params!.keycode },
   });
-  if (!isDefined(data?.remindersOptOut)) {
+  if (isNullish(data?.remindersOptOut)) {
     return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
   }
   return { props: { keycode: params!.keycode, optOut: data.remindersOptOut } };

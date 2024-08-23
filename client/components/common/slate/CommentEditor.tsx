@@ -1,11 +1,12 @@
 import { Box, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { UserLocale } from "@parallel/graphql/__types";
 import {
   createMentionPlugin,
+  MENTION_TYPE,
   MentionCombobox,
   MentionComboboxProps,
   MentionElement,
   MentionInputElement,
-  MENTION_TYPE,
 } from "@parallel/utils/slate/MentionPlugin";
 import { isEmptyParagraph } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
@@ -24,16 +25,15 @@ import {
   PlateProvider,
   withProps,
 } from "@udecode/plate-common";
+import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { isDefined, omit, pick } from "remeda";
+import { useIntl } from "react-intl";
+import { isNonNullish, omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
-import { useIntl } from "react-intl";
-import { UserLocale } from "@parallel/graphql/__types";
-import { ELEMENT_LINK, createLinkPlugin } from "@udecode/plate-link";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
@@ -48,7 +48,7 @@ type CommentEditorBlockContent = CommentEditorText | MentionElement | MentionInp
 type CommentPEditor = CustomEditor<CommentEditorValue>;
 
 export function isEmptyCommentEditorValue(content: Maybe<CommentEditorValue>) {
-  return isDefined(content) && content.every((element) => isEmptyParagraph(element));
+  return isNonNullish(content) && content.every((element) => isEmptyParagraph(element));
 }
 
 export function emptyCommentEditorValue(): CommentEditorValue {
@@ -132,7 +132,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             createParagraphPlugin(),
             createComboboxPlugin(),
             createLinkPlugin(),
-            ...(isDefined(onSearchMentionables)
+            ...(isNonNullish(onSearchMentionables)
               ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
               : []),
           ],
@@ -144,7 +144,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             },
           },
         ),
-      [isDefined(onSearchMentionables)],
+      [isNonNullish(onSearchMentionables)],
     );
     const formControl = useFormControl({
       id,

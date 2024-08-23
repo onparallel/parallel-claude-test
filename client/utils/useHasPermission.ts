@@ -1,8 +1,8 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { useHasPermission_MeDocument } from "@parallel/graphql/__types";
+import { isNullish } from "remeda";
 import { MaybeArray, unMaybeArray } from "./types";
 import { useConstant } from "./useConstant";
-import { isDefined } from "remeda";
 
 export function useHasPermission(permission: string): boolean;
 export function useHasPermission(permissions: string[], operator?: "AND" | "OR"): boolean;
@@ -10,7 +10,7 @@ export function useHasPermission(permissions: MaybeArray<string>, operator: "AND
   const client = useApolloClient();
   const userPermissions = useConstant(() => {
     const data = client.readQuery({ query: useHasPermission_MeDocument });
-    if (!isDefined(data)) {
+    if (isNullish(data)) {
       throw new Error("me.permissions missing on cache");
     }
     return new Set(data!.me.permissions);

@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/recipient/PetitionMessage";
@@ -50,11 +50,11 @@ export async function petitionMessage(
   const contactIds = accesses
     .filter((a) => a.status === "ACTIVE")
     .map((a) => a.contact_id)
-    .filter(isDefined)
+    .filter(isNonNullish)
     .filter((cId) => cId !== access.contact_id);
 
   const recipients = contactIds.length
-    ? (await context.contacts.loadContact(contactIds)).filter(isDefined).map((r) => ({
+    ? (await context.contacts.loadContact(contactIds)).filter(isNonNullish).map((r) => ({
         name: fullName(r.first_name, r.last_name),
         email: r.email,
       }))

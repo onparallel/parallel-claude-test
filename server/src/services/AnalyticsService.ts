@@ -1,6 +1,6 @@
 import { Analytics } from "@segment/analytics-node";
 import { inject, injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   OrganizationUsageLimitName,
@@ -291,7 +291,7 @@ export class AnalyticsService implements IAnalyticsService {
 
   trackEvent(events: MaybeArray<AnalyticsEvent | null>) {
     unMaybeArray(events)
-      .filter(isDefined)
+      .filter(isNonNullish)
       .map((event) => {
         this.analytics?.track({
           userId: toGlobalId("User", event.user_id),

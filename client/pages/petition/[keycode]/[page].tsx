@@ -66,7 +66,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
@@ -109,7 +109,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
 
   const highlight = useHighlightElement();
   useEffect(() => {
-    if (isDefined(router.query.reply)) {
+    if (isNonNullish(router.query.reply)) {
       const replyId = router.query.reply;
       const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
 
@@ -123,7 +123,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       }
     }
     const allFields = petition.fields.flatMap((f) => [f, ...(f.children ?? [])]);
-    if (isDefined(router.query.field)) {
+    if (isNonNullish(router.query.field)) {
       const { field: fieldId, parentReply: parentReplyId } = router.query;
 
       const field = allFields.find((f) => f.id === fieldId);
@@ -136,7 +136,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         highlight(element, true);
       }
     }
-    if (isDefined(router.query.comments)) {
+    if (isNonNullish(router.query.comments)) {
       // when navigating from comments email, it will always go to page 1 but field might be in another page
       const fieldId = router.query.comments as string;
       const page =
@@ -180,7 +180,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           });
           if (petition.signatureConfig?.review) {
             await showReviewBeforeSigningDialog({
-              name: isDefined(granter)
+              name: isNonNullish(granter)
                 ? granter.fullName
                 : intl.formatMessage({
                     id: "generic.deleted-user",
@@ -189,7 +189,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               tone,
             });
           }
-          if (showFullScreenDialog && isDefined(data)) {
+          if (showFullScreenDialog && isNonNullish(data)) {
             await showCompletingMessageDialog({
               petition: data!.publicCompletePetition,
               hasClientPortalAccess: access.hasClientPortalAccess,
@@ -288,7 +288,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             brandTheme={petition.organization.brandTheme}
           >
             <Head>
-              {isDefined(message) ? (
+              {isNonNullish(message) ? (
                 <title>{`${message.subject!} | ${titleOrgName}`}</title>
               ) : (
                 <title>{titleOrgName}</title>

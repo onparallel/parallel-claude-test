@@ -35,7 +35,7 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PetitionFieldMath, PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqueBy } from "remeda";
+import { isNonNullish, uniqueBy } from "remeda";
 import { HelpCenterLink, NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
 import { OverflownText } from "../common/OverflownText";
@@ -147,7 +147,7 @@ export function PetitionComposeVariables({
               operations,
             };
           })
-          .filter(isDefined);
+          .filter(isNonNullish);
 
         await handleEditField(field.id, {
           math: newMath.length > 0 ? newMath : null,

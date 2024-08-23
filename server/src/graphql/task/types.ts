@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { TaskNameValues, TaskStatusValues } from "../../db/__types";
 import { TaskOutput } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
@@ -27,7 +27,7 @@ export const Task = objectType({
           return null;
         }
 
-        if (isDefined(t.output?.temporary_file_id)) {
+        if (isNonNullish(t.output?.temporary_file_id)) {
           return {};
         }
 

@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import {
   ContactLocale,
   CreatePetitionField,
@@ -49,10 +49,10 @@ export function mapProfileTypeFieldToPetitionField(
     case "SELECT":
       const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
       defaultProperties.options.standardList = options.standardList ?? null;
-      defaultProperties.options.values = isDefined(options.standardList)
+      defaultProperties.options.values = isNonNullish(options.standardList)
         ? []
         : options.values.map((v) => v.value);
-      defaultProperties.options.labels = isDefined(options.standardList)
+      defaultProperties.options.labels = isNonNullish(options.standardList)
         ? []
         : options.values.map(
             (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,

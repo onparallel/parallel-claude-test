@@ -15,7 +15,8 @@ import {
   differenceWith,
   filter,
   groupBy,
-  isDefined,
+  isNonNullish,
+  isNullish,
   pipe,
   sumBy,
   unique,
@@ -23,6 +24,7 @@ import {
   zip,
 } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
+import { toBytes } from "../../util/fileSize";
 import { toGlobalId } from "../../util/globalId";
 import { isValidTimezone } from "../../util/time";
 import { random } from "../../util/token";
@@ -51,7 +53,6 @@ import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
-import { toBytes } from "../../util/fileSize";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
@@ -291,7 +292,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"TEMPLATE_REPLIES_CSV_EXPORT">
       | Task<"BACKGROUND_CHECK_PROFILE_PDF">;
 
-    const file = isDefined(task.output)
+    const file = isNonNullish(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
       : null;
 
@@ -503,14 +504,14 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
     notEmptyArray((args) => args.userGroupIds, "userGroupId"),
     maxLength((args) => args.message, "message", 1000),
     (_, args, ctx, info) => {
-      if (!isDefined(args.userIds) && !isDefined(args.userGroupIds)) {
+      if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
         throw new ArgValidationError(
           info,
           "userIds, userGroupIds",
           "Either userIds or userGroupIds must be defined",
         );
       }
-      if (!isDefined(args.folders) && !isDefined(args.petitionIds)) {
+      if (isNullish(args.folders) && isNullish(args.petitionIds)) {
         throw new ArgValidationError(
           info,
           "folders, petitionIds",
@@ -528,7 +529,7 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
       ["OWNER", "WRITE"],
     );
 
-    const groupMembers = isDefined(args.userGroupIds)
+    const groupMembers = isNonNullish(args.userGroupIds)
       ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
       : [0];
 
@@ -565,7 +566,7 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
       if (args.notify) {
         const newUserPermissions = pipe(
           newPermissions,
-          filter((p) => isDefined(p.user_id)),
+          filter((p) => isNonNullish(p.user_id)),
           // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
           uniqueBy((p) => `${p.user_id}:${p.petition_id}`),
           // omit users who had access previously
@@ -650,7 +651,7 @@ export const createEditPetitionPermissionTask = mutationField("createEditPetitio
     notEmptyArray((args) => args.userIds, "userIds"),
     notEmptyArray((args) => args.userGroupIds, "userGroupId"),
     (_, args, ctx, info) => {
-      if (!isDefined(args.userIds) && !isDefined(args.userGroupIds)) {
+      if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
         throw new ArgValidationError(
           info,
           "userIds, userGroupIds",
@@ -660,7 +661,7 @@ export const createEditPetitionPermissionTask = mutationField("createEditPetitio
     },
   ),
   resolve: async (_, args, ctx) => {
-    const groupMembers = isDefined(args.userGroupIds)
+    const groupMembers = isNonNullish(args.userGroupIds)
       ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
       : [0];
 
@@ -741,7 +742,7 @@ export const createRemovePetitionPermissionTask = mutationField(
       notEmptyArray((args) => args.userIds, "userIds"),
       notEmptyArray((args) => args.userGroupIds, "userGroupId"),
       (_, args, ctx, info) => {
-        if (!args.removeAll && !isDefined(args.userIds) && !isDefined(args.userGroupIds)) {
+        if (!args.removeAll && isNullish(args.userIds) && isNullish(args.userGroupIds)) {
           throw new ArgValidationError(
             info,
             "userIds, userGroupIds",
@@ -750,12 +751,12 @@ export const createRemovePetitionPermissionTask = mutationField(
         }
       },
       validateIf(
-        (args) => !isDefined(args.userIds) && !isDefined(args.userGroupIds),
+        (args) => isNullish(args.userIds) && isNullish(args.userGroupIds),
         validBooleanValue((args) => args.removeAll, "removeAll", true),
       ),
     ),
     resolve: async (_, args, ctx) => {
-      const groupMembers = isDefined(args.userGroupIds)
+      const groupMembers = isNonNullish(args.userGroupIds)
         ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
         : [0];
 

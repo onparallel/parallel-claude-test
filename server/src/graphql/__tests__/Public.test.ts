@@ -1,29 +1,29 @@
 import { serialize as serializeCookie } from "cookie";
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { pick } from "remeda";
 import {
   Contact,
   Organization,
   OrganizationUsageLimit,
+  Petition,
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
-  Petition,
+  PetitionFieldType,
   Task,
   User,
-  PetitionFieldType,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { EMAILS, IEmailsService } from "../../services/EmailsService";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { TestClient, initServer } from "./server";
 import {
   BACKGROUND_CHECK_SERVICE,
   IBackgroundCheckService,
 } from "../../services/BackgroundCheckService";
-import { pick } from "remeda";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { TestClient, initServer } from "./server";
 
 function setCookieHeader(testClient: TestClient, contactId: number, cookieValue: string) {
   testClient.setNextReq({

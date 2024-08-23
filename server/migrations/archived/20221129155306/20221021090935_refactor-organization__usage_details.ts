@@ -1,6 +1,6 @@
 import { Duration } from "date-fns";
 import { Knex } from "knex";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 import { OrganizationUsageDetails } from "../src/db/repositories/OrganizationRepository";
 
@@ -30,7 +30,7 @@ function durationToString(duration: Duration) {
     duration.minutes ? `${duration.minutes} minutes` : null,
     duration.seconds ? `${duration.seconds} seconds` : null,
   ]
-    .filter(isDefined)
+    .filter(isNonNullish)
     .join(" ");
 }
 

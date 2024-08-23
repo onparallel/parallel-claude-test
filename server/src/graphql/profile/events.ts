@@ -1,5 +1,5 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ProfileEventTypeValues } from "../../db/__types";
 import { mapProfileEventPayload } from "../../util/eventMapper";
 import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
@@ -86,7 +86,7 @@ export const ProfileFieldValueUpdatedEvent = createProfileEvent(
     t.nullable.field("user", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        if (!isDefined(root.data.user_id)) {
+        if (isNullish(root.data.user_id)) {
           return null;
         }
         return await ctx.users.loadUser(root.data.user_id);
@@ -119,7 +119,7 @@ export const ProfileFieldExpiryUpdatedEvent = createProfileEvent(
     t.nullable.field("user", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        if (!isDefined(root.data.user_id)) {
+        if (isNullish(root.data.user_id)) {
           return null;
         }
         return await ctx.users.loadUser(root.data.user_id);
@@ -144,7 +144,7 @@ export const PetitionDisassociatedEvent = createProfileEvent("PetitionDisassocia
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      if (isDefined(root.data.user_id)) {
+      if (isNonNullish(root.data.user_id)) {
         return await ctx.users.loadUser(root.data.user_id);
       }
       return null;
@@ -219,7 +219,7 @@ export const ProfileRelationshipRemovedEvent = createProfileEvent(
     t.nullable.field("user", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        if (!isDefined(root.data.user_id)) {
+        if (isNullish(root.data.user_id)) {
           return null;
         }
         return await ctx.users.loadUser(root.data.user_id);

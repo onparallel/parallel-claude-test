@@ -1,12 +1,12 @@
 import { Center, Flex } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
-import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 
 interface ProfileFieldDateProps
   extends ProfileFieldProps,
@@ -28,8 +28,8 @@ export function ProfileFieldDate({
   const { browserName } = useMetadata();
 
   const alertIsActive =
-    isDefined(expiryDate) &&
-    isDefined(field.expiryAlertAheadTime) &&
+    isNonNullish(expiryDate) &&
+    isNonNullish(field.expiryAlertAheadTime) &&
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
   const { useReplyAsExpiryDate } = field.options as ProfileTypeFieldOptions<"DATE">;

@@ -3,12 +3,14 @@ import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { groupBy, indexBy, isDefined, times } from "remeda";
+import { groupBy, indexBy, isNonNullish, times } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
+import { hashString } from "../../util/token";
 import { KeysOfType, MaybeArray, Replace } from "../../util/types";
+import type * as db from "../__types";
 import { CreatePetitionEvent, PetitionEvent } from "../events/PetitionEvent";
 import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
@@ -20,8 +22,6 @@ import {
   PetitionSummaryConfig,
   PetitionVariable,
 } from "../repositories/PetitionRepository";
-import type * as db from "../__types";
-import { hashString } from "../../util/token";
 
 export interface TableTypes
   extends Replace<
@@ -310,7 +310,7 @@ export class BaseRepository {
   }
 
   protected sqlIn(array: readonly Knex.RawBinding[], castAs?: string) {
-    const q = isDefined(castAs) ? `?::${castAs}` : "?";
+    const q = isNonNullish(castAs) ? `?::${castAs}` : "?";
     if (array.length === 0) {
       throw new Error("array can't be empty");
     }
@@ -318,12 +318,12 @@ export class BaseRepository {
   }
 
   protected sqlArray(array: readonly Knex.RawBinding[], castAs?: string) {
-    const q = isDefined(castAs) ? `?::${castAs}` : "?";
+    const q = isNonNullish(castAs) ? `?::${castAs}` : "?";
     return this.knex.raw(/* sql */ `array[${array.map(() => q).join(", ")}]`, [...array]);
   }
 
   protected sqlValues(tuples: readonly Knex.RawBinding[][], castAs?: string[]) {
-    if (process.env.NODE_ENV !== "production" && isDefined(castAs)) {
+    if (process.env.NODE_ENV !== "production" && isNonNullish(castAs)) {
       if (!tuples.every((tuple) => tuple.length === castAs.length)) {
         throw new Error("All tuples must have the same length as the castAs parameter");
       }
@@ -337,7 +337,7 @@ export class BaseRepository {
         throw new Error("All tuples must have the same length as the castAs parameter");
       }
     }
-    const q = isDefined(castAs)
+    const q = isNonNullish(castAs)
       ? `(${castAs.map((element) => `?::${element}`).join(", ")})`
       : `(${times(tupleLength, () => "?").join(", ")})`;
     return this.knex.raw(/* sql */ `values ${tuples.map(() => q).join(", ")}`, [

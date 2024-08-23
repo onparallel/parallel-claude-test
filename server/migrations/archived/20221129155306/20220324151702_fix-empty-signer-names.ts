@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { indexBy, isDefined, unique } from "remeda";
+import { indexBy, isNonNullish, unique } from "remeda";
 
 interface SignatureConfig {
   signersInfo: {
@@ -38,8 +38,8 @@ export async function up(knex: Knex): Promise<void> {
         signersInfo: r.signature_config.signersInfo.map((signer) => {
           if (
             signer.firstName === "" &&
-            isDefined(signer.contactId) &&
-            isDefined(contactsById[signer.contactId])
+            isNonNullish(signer.contactId) &&
+            isNonNullish(contactsById[signer.contactId])
           ) {
             const contact = contactsById[signer.contactId];
             return contact

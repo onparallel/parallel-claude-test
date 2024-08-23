@@ -6,8 +6,8 @@ import {
 } from "../../db/repositories/IntegrationRepository";
 import { EncryptionService } from "../../services/EncryptionService";
 
-import { GenericIntegration } from "./GenericIntegration";
 import { Router } from "express";
+import { GenericIntegration } from "./GenericIntegration";
 
 @injectable()
 export abstract class WebhookIntegration<

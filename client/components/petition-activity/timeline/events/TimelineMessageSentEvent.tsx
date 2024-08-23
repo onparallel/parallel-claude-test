@@ -7,11 +7,11 @@ import { EmailEventsIndicator } from "@parallel/components/petition-activity/Ema
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../../../common/UserReference";
 import {
   SentPetitionMessageDialog,
   useSentPetitionMessageDialog,
 } from "../../dialogs/SentPetitionMessageDialog";
-import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 

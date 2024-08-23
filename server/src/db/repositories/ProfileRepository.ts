@@ -6,7 +6,8 @@ import {
   filter,
   groupBy,
   indexBy,
-  isDefined,
+  isNonNullish,
+  isNullish,
   map,
   mapToObj,
   mapValues,
@@ -134,9 +135,11 @@ export class ProfileRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const profileTypeIds = unique(keys.map((k) => k.profileTypeId));
-      const aliases = unique(keys.flatMap((k) => k.filter.map((f) => f.alias)).filter(isDefined));
+      const aliases = unique(
+        keys.flatMap((k) => k.filter.map((f) => f.alias)).filter(isNonNullish),
+      );
       const profileTypeFieldIds = unique(
-        keys.flatMap((k) => k.filter.map((f) => f.profileTypeFieldId)).filter(isDefined),
+        keys.flatMap((k) => k.filter.map((f) => f.profileTypeFieldId)).filter(isNonNullish),
       );
       const rows = await this.from("profile_type_field", t)
         .whereIn("profile_type_id", profileTypeIds)
@@ -187,7 +190,7 @@ export class ProfileRepository extends BaseRepository {
         t,
       );
       const byId = indexBy(profileTypes, (pt) => pt.profile_id);
-      return keys.map((id) => (isDefined(byId[id]) ? omit(byId[id], ["profile_id"]) : null));
+      return keys.map((id) => (isNonNullish(byId[id]) ? omit(byId[id], ["profile_id"]) : null));
     },
   );
 
@@ -438,7 +441,7 @@ export class ProfileRepository extends BaseRepository {
           profile_type_id: profileTypeId,
           position: max === null ? index : max + 1 + index,
           ...d,
-          expiry_alert_ahead_time: isDefined(d.expiry_alert_ahead_time)
+          expiry_alert_ahead_time: isNonNullish(d.expiry_alert_ahead_time)
             ? this.interval(d.expiry_alert_ahead_time)
             : d.expiry_alert_ahead_time,
           created_by: createdBy,
@@ -461,7 +464,7 @@ export class ProfileRepository extends BaseRepository {
       .update(
         {
           ...data,
-          expiry_alert_ahead_time: isDefined(data.expiry_alert_ahead_time)
+          expiry_alert_ahead_time: isNonNullish(data.expiry_alert_ahead_time)
             ? this.interval(data.expiry_alert_ahead_time)
             : data.expiry_alert_ahead_time,
           updated_by: updatedBy,
@@ -688,17 +691,17 @@ export class ProfileRepository extends BaseRepository {
                 .or.whereSearch(this.knex.raw("p.localizable_name->>'es'"), search),
             );
           }
-          if (isDefined(filter?.profileId)) {
+          if (isNonNullish(filter?.profileId)) {
             q.whereIn("p.id", filter!.profileId);
           }
-          if (isDefined(filter?.profileTypeId)) {
+          if (isNonNullish(filter?.profileTypeId)) {
             q.whereIn("p.profile_type_id", filter!.profileTypeId);
           }
-          if (isDefined(filter?.status) && filter!.status.length > 0) {
+          if (isNonNullish(filter?.status) && filter!.status.length > 0) {
             q.whereIn("p.status", filter!.status);
           }
 
-          if (isDefined(filter?.values) && filter.values.length > 0) {
+          if (isNonNullish(filter?.values) && filter.values.length > 0) {
             const entries = Object.entries(groupBy(filter.values, (v) => v.profileTypeFieldId));
             for (const entry of entries) {
               const index = entries.indexOf(entry);
@@ -773,7 +776,7 @@ export class ProfileRepository extends BaseRepository {
               });
             }
           }
-          if (isDefined(sortBy)) {
+          if (isNonNullish(sortBy)) {
             q.orderBy(
               sortBy.map(({ field, order }) => {
                 return { column: field, order };
@@ -891,7 +894,7 @@ export class ProfileRepository extends BaseRepository {
     const profileValuesWithSelectLabels = profileValues.map((pv) => ({
       profileId: pv.profileId,
       values: mapValues(pv.values, (value, fieldId) => {
-        if (isDefined(selectValuesById[fieldId])) {
+        if (isNonNullish(selectValuesById[fieldId])) {
           const selectValue = selectValuesById[fieldId].find((v) => v.value === value);
           return selectValue
             ? { en: selectValue.label["en"], es: selectValue.label["es"] }
@@ -931,7 +934,7 @@ export class ProfileRepository extends BaseRepository {
         ...pattern.map((p) =>
           typeof p === "string"
             ? p
-            : isDefined(selectValuesById[p])
+            : isNonNullish(selectValuesById[p])
               ? this.knex.raw(`coalesce(pv.values->?->>'en', pv.values->?->>'es', '')`, [
                   `${p}`,
                   `${p}`,
@@ -941,7 +944,7 @@ export class ProfileRepository extends BaseRepository {
         ...pattern.map((p) =>
           typeof p === "string"
             ? p
-            : isDefined(selectValuesById[p])
+            : isNonNullish(selectValuesById[p])
               ? this.knex.raw(`coalesce(pv.values->?->>'es', pv.values->?->>'en', '')`, [
                   `${p}`,
                   `${p}`,
@@ -1394,7 +1397,7 @@ export class ProfileRepository extends BaseRepository {
     is_expired: boolean;
   }> {
     const filter = (q: Knex.QueryBuilder) => {
-      if (isDefined(opts.search)) {
+      if (isNonNullish(opts.search)) {
         q.whereExists((q2) =>
           q2
             .select(this.knex.raw("1"))
@@ -1402,22 +1405,22 @@ export class ProfileRepository extends BaseRepository {
             .whereSearch("value", opts.search!),
         );
       }
-      if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
+      if (isNonNullish(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
         q.whereIn("p.profile_type_id", opts.filter!.profileTypeId);
       }
       if (
-        isDefined(opts.filter?.profileTypeFieldId) &&
+        isNonNullish(opts.filter?.profileTypeFieldId) &&
         opts.filter!.profileTypeFieldId.length > 0
       ) {
         q.whereIn("pfx.profile_type_field_id", opts.filter!.profileTypeFieldId);
       }
-      if (isDefined(opts.filter?.isInAlert)) {
+      if (isNonNullish(opts.filter?.isInAlert)) {
         q.whereRaw(
           /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now()`,
           [defaultTimezone],
         );
       }
-      if (isDefined(opts.filter?.subscribedByUserId)) {
+      if (isNonNullish(opts.filter?.subscribedByUserId)) {
         q.join(this.knex.ref("profile_subscription").as("ps"), "ps.profile_id", "p.id")
           .whereNull("ps.deleted_at")
           .where("ps.user_id", opts.filter!.subscribedByUserId);
@@ -1710,7 +1713,7 @@ export class ProfileRepository extends BaseRepository {
         const customPermission: Maybe<ProfileTypeFieldPermissionType> =
           byKey[`${k.profileTypeFieldId},${k.userId}`]?.permission ?? null;
         const defaultPermission = byKey[`${k.profileTypeFieldId},null`].permission;
-        if (!isDefined(customPermission)) {
+        if (isNullish(customPermission)) {
           return defaultPermission;
         }
         return isAtLeast(customPermission, defaultPermission)
@@ -2055,7 +2058,7 @@ export class ProfileRepository extends BaseRepository {
         .returning("*");
 
       const fieldsWithContent = previousValues
-        .filter((f) => data.find((d) => d.old === f.content.value && isDefined(d.new)))
+        .filter((f) => data.find((d) => d.old === f.content.value && isNonNullish(d.new)))
         .map((f) => ({ ...f, newContent: data.find((d) => d.old === f.content.value)!.new }));
 
       let currentValues: ProfileFieldValue[] = [];
@@ -2091,15 +2094,15 @@ export class ProfileRepository extends BaseRepository {
       select pe.* from user_profile_event_log upel
       join profile_event pe on upel.profile_event_id = pe.id
       where upel.user_id = ?
-        ${isDefined(options.before) ? /* sql */ `and upel.profile_event_id < ?` : ""}
-        ${isDefined(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
+        ${isNonNullish(options.before) ? /* sql */ `and upel.profile_event_id < ?` : ""}
+        ${isNonNullish(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
       order by pe.id desc
       limit ${options.limit};
     `,
       [
         userId,
-        ...(isDefined(options.before) ? [options.before] : []),
-        ...(isDefined(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
+        ...(isNonNullish(options.before) ? [options.before] : []),
+        ...(isNonNullish(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
       ],
     );
   }
@@ -2144,7 +2147,7 @@ export class ProfileRepository extends BaseRepository {
       return [];
     }
 
-    if (!isDefined(monitoring?.activationCondition)) {
+    if (isNullish(monitoring?.activationCondition)) {
       // if no activation conditions are provided, return all profiles as every profile will have active monitoring
       return profiles.map((p) => p.id);
     }
@@ -2323,7 +2326,7 @@ export class ProfileRepository extends BaseRepository {
         .where("prt.org_id", orgId)
         .whereNull("prt.deleted_at")
         .mmodify((q) => {
-          if (isDefined(fixedProfileTypeId)) {
+          if (isNonNullish(fixedProfileTypeId)) {
             q.where("prta.allowed_profile_type_id", fixedProfileTypeId);
           }
         })

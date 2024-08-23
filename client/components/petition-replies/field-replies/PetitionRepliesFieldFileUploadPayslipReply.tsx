@@ -2,7 +2,7 @@ import { HStack, Stack, Text } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionRepliesMetadataText } from "./PetitionRepliesMetadata";
 
 interface CurrencyAmount {
@@ -47,7 +47,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
   }
 
   function formatCurrencyAmount(value: CurrencyAmount | null) {
-    return isDefined(value)
+    return isNonNullish(value)
       ? intl.formatNumber(value.value, { style: "currency", currency: value.currency })
       : null;
   }

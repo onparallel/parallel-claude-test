@@ -3,7 +3,7 @@ import {
   useLoginAs_loginAsDocument,
   useLoginAs_restoreLoginDocument,
 } from "@parallel/graphql/__types";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 const _mutations = [
   gql`
@@ -23,7 +23,7 @@ export function useLoginAs() {
   const [restoreLogin] = useMutation(useLoginAs_restoreLoginDocument);
   const apollo = useApolloClient();
   return async function (userId: string | null) {
-    if (isDefined(userId)) {
+    if (isNonNullish(userId)) {
       await loginAs({ variables: { userId } });
     } else {
       await restoreLogin();

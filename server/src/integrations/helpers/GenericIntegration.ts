@@ -2,7 +2,7 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { injectable } from "inversify";
 import { Knex } from "knex";
-import { isDefined, omit } from "remeda";
+import { isNullish, omit } from "remeda";
 import { assert } from "ts-essentials";
 import { IntegrationType } from "../../db/__types";
 import {
@@ -53,7 +53,7 @@ export abstract class GenericIntegration<
     const integration = (await this.integrations.loadIntegration(
       orgIntegrationId,
     )) as EnhancedOrgIntegration<TType, TProvider>;
-    if (!isDefined(integration)) {
+    if (isNullish(integration)) {
       throw new Error(`Invalid org integration ID ${orgIntegrationId}`);
     }
     assert("CREDENTIALS" in integration.settings);

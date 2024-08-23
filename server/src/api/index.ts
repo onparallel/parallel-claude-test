@@ -2,12 +2,12 @@ import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
 import { ILogger, LOGGER } from "../services/Logger";
 import { auth } from "./auth";
+import { integrations } from "./integrations";
 import { lambdas } from "./lambdas";
 import { monitor } from "./monitor";
 import { oauth } from "./oauth";
 import { publicApi } from "./public/index";
 import { webhooks } from "./webhooks";
-import { integrations } from "./integrations";
 
 export function api(container: Container) {
   const logger = container.get<ILogger>(LOGGER);

@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
-import { difference, isDefined, omit, unique } from "remeda";
+import { difference, isNonNullish, omit, unique } from "remeda";
 import {
   ContactLocale,
   ContactLocaleValues,
@@ -12,12 +12,12 @@ import {
 } from "../db/__types";
 import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository, PetitionVariable } from "../db/repositories/PetitionRepository";
+import { FIELD_REFERENCE_REGEX } from "../graphql";
 import { validateFieldLogic } from "../graphql/helpers/validators/validFieldLogic";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
 import { safeJsonParse } from "../util/safeJsonParse";
 import { Maybe } from "../util/types";
-import { FIELD_REFERENCE_REGEX } from "../graphql";
-import { PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
 
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
 
@@ -186,7 +186,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
         optional: field.optional,
         multiple: field.multiple,
         options: omit(field.options, ["file", "autoSearchConfig"]),
-        visibility: isDefined(field.visibility)
+        visibility: isNonNullish(field.visibility)
           ? {
               ...field.visibility,
               conditions: (field.visibility as PetitionFieldVisibility).conditions.map((c) => {
@@ -202,7 +202,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
             }
           : null,
         alias: field.alias,
-        math: isDefined(field.math)
+        math: isNonNullish(field.math)
           ? (field.math as PetitionFieldMath[]).map((math) => ({
               ...math,
               conditions: math.conditions.map((c) => {
@@ -264,7 +264,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
       throw new Error(ajv.errorsText());
     }
 
-    if (isDefined(json.templateDescription)) {
+    if (isNonNullish(json.templateDescription)) {
       validateRichTextContent(json.templateDescription);
     }
 
@@ -290,7 +290,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
       })) ?? []),
     ]);
 
-    const fieldAliases = allJsonFields.map((f) => f.alias).filter(isDefined);
+    const fieldAliases = allJsonFields.map((f) => f.alias).filter(isNonNullish);
     const variables = json.variables.map((v) => ({
       name: v.name,
       default_value: v.defaultValue,
@@ -309,7 +309,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
           name: json.name,
           recipient_locale: json.locale as ContactLocale,
           is_template: json.isTemplate,
-          template_description: isDefined(json.templateDescription)
+          template_description: isNonNullish(json.templateDescription)
             ? JSON.stringify(json.templateDescription)
             : null,
           variables: json.variables.map((v) => ({
@@ -341,7 +341,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
               optional: jsonField.optional,
               multiple: jsonField.multiple,
               options: jsonField.options,
-              visibility: isDefined(jsonField.visibility)
+              visibility: isNonNullish(jsonField.visibility)
                 ? {
                     ...jsonField.visibility,
                     conditions: jsonField.visibility.conditions.map((c) => {
@@ -368,7 +368,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
               show_activity_in_pdf: jsonField.showActivityInPdf,
               has_comments_enabled: jsonField.hasCommentsEnabled,
             },
-            isDefined(jsonField.parent_petition_field_id)
+            isNonNullish(jsonField.parent_petition_field_id)
               ? newFieldIds[jsonField.parent_petition_field_id]
               : null,
             jsonField.position,
@@ -379,7 +379,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
           newFieldIds[jsonField.id] = field.id;
 
           // update math conditions after creating the field in DB, as they may reference themselves
-          if (isDefined(field.math)) {
+          if (isNonNullish(field.math)) {
             const updatedMath = (field.math as PetitionFieldMath[]).map((math) => ({
               ...math,
               conditions: math.conditions.map((c) => {

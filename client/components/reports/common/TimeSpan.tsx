@@ -1,6 +1,6 @@
 import { Duration } from "date-fns";
 import { FormattedList, IntlShape, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 function quotientAndRemainder(divident: number, divisor: number) {
   return [Math.floor(divident / divisor), divident % divisor];
@@ -17,7 +17,7 @@ function cleanDuration(value: Duration | number): Duration {
       minutes: minutes > 0 ? minutes : seconds > 0 ? 1 : 0,
     };
   } else {
-    return Object.fromEntries(Object.entries(value).filter(([, value]) => isDefined(value)));
+    return Object.fromEntries(Object.entries(value).filter(([, value]) => isNonNullish(value)));
   }
 }
 
@@ -68,7 +68,7 @@ function getParts(intl: IntlShape, duration: Duration) {
           { n: duration.hours },
         )
       : null,
-    isDefined(duration.minutes)
+    isNonNullish(duration.minutes)
       ? intl.formatMessage(
           {
             id: "component.timespan.minutes-part",
@@ -77,7 +77,7 @@ function getParts(intl: IntlShape, duration: Duration) {
           { n: duration.minutes },
         )
       : null,
-    isDefined(duration.seconds)
+    isNonNullish(duration.seconds)
       ? intl.formatMessage(
           {
             id: "component.timespan.seconds-part",
@@ -86,7 +86,7 @@ function getParts(intl: IntlShape, duration: Duration) {
           { n: duration.seconds },
         )
       : null,
-  ].filter(isDefined);
+  ].filter(isNonNullish);
 }
 
 export function TimeSpan(props: { duration: Duration | number }) {

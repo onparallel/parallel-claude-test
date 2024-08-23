@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { SlateNode, renderSlateToHtml, renderSlateToText, renderWhiteSpace } from "./render";
 import { walkSlateNodes } from "./utils";
 
@@ -40,7 +40,7 @@ export function replacePlaceholdersInSlate(
   replacer: (value: string) => string,
 ): SlateNode[] {
   return walkSlateNodes(nodes, (node) => {
-    if (node.type === "placeholder" && isDefined(node.placeholder)) {
+    if (node.type === "placeholder" && isNonNullish(node.placeholder)) {
       return {
         ...node,
         placeholder: replacer(node.placeholder),

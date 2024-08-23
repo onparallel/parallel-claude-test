@@ -1,6 +1,6 @@
 import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { NakedLink } from "./Link";
 
 interface SupportButton extends ButtonOptions, ThemingProps<"Button"> {
@@ -26,7 +26,7 @@ export const SupportButton = chakraForwardRef<"a", SupportButton>(function Suppo
         as="a"
         {...(props as any)}
         onClick={(event) => {
-          if (isDefined(window.Intercom)) {
+          if (isNonNullish(window.Intercom)) {
             event.preventDefault();
             window.Intercom("showNewMessage", message);
           }

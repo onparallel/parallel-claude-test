@@ -4,7 +4,7 @@ import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboa
 import { FORMATS } from "@parallel/utils/dates";
 import { ReactNode, forwardRef } from "react";
 import { FormattedDate, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 export function PetitionRepliesMetadataDate({
   label,
@@ -21,9 +21,11 @@ export function PetitionRepliesMetadataDate({
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
         {label}:
       </Text>
-      <Text as="span">{isDefined(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}</Text>
+      <Text as="span">
+        {isNonNullish(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}
+      </Text>
       {rightIcon}
-      {isDefined(date) ? (
+      {isNonNullish(date) ? (
         <CopyToClipboardButton size="xs" fontSize="md" text={intl.formatDate(date, FORMATS.L)} />
       ) : null}
     </HStack>
@@ -42,8 +44,10 @@ export function PetitionRepliesMetadataText({
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
         {label}:
       </Text>
-      <Text as="span">{isDefined(content) ? content : "-"}</Text>
-      {isDefined(content) ? <CopyToClipboardButton size="xs" fontSize="md" text={content} /> : null}
+      <Text as="span">{isNonNullish(content) ? content : "-"}</Text>
+      {isNonNullish(content) ? (
+        <CopyToClipboardButton size="xs" fontSize="md" text={content} />
+      ) : null}
     </HStack>
   );
 }
@@ -92,7 +96,7 @@ export function PetitionRepliesMetadataScoreIcon({
   threshold: number;
   maxScore: number;
 }) {
-  if (!isDefined(score)) return <Text>{"-"}</Text>;
+  if (isNullish(score)) return <Text>{"-"}</Text>;
 
   return score >= threshold ? (
     <HStack spacing={1}>

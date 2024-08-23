@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import type { Cell } from "write-excel-file";
 
 interface ExcelColumn<K extends string> {
@@ -28,7 +28,7 @@ export async function generateExcel<K extends string>({
           const value = r[c.key];
           if (typeof value === "string") {
             return { value };
-          } else if (isDefined(value)) {
+          } else if (isNonNullish(value)) {
             return value as Cell;
           } else {
             return {};

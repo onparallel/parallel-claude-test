@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { getAriaControls } from "../aria/getAriaControls";
 import { waitForSelectLoading } from "./waitForSelectLoading";
 
@@ -22,12 +22,12 @@ export async function fillContactSelect(
       await page.waitForTimeout(1000);
       if ((await createOption.count()) === 1) {
         await createOption.click();
-        if (!isDefined(recipient.firstName)) {
+        if (isNullish(recipient.firstName)) {
           throw new Error("Contact doesn't exist and first name was not provided.");
         }
         await page.waitForTimeout(1);
         await page.getByTestId("create-contact-first-name-input").fill(recipient.firstName);
-        if (isDefined(recipient.lastName)) {
+        if (isNonNullish(recipient.lastName)) {
           await page.getByTestId("create-contact-last-name-input").fill(recipient.lastName);
         }
         await page.getByTestId("create-contact-button").click();

@@ -1,4 +1,4 @@
-import { isDefined, maxBy } from "remeda";
+import { isNonNullish, maxBy } from "remeda";
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedEvent,
@@ -27,8 +27,8 @@ import {
   UserCreatedEvent,
   UserLoggedInEvent,
 } from "../../db/events/SystemEvent";
-import { listener } from "../helpers/EventProcessor";
 import { toGlobalId } from "../../util/globalId";
+import { listener } from "../helpers/EventProcessor";
 
 async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {
   const user = await ctx.petitions.loadPetitionOwner(petitionId);
@@ -215,13 +215,13 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
     type: "PETITION_COMPLETED",
     user_id: owner.id,
     data: {
-      ...(isDefined(event.data.petition_access_id)
+      ...(isNonNullish(event.data.petition_access_id)
         ? { petition_access_id: event.data.petition_access_id }
         : { user_id: event.data.user_id! }),
       org_id: toGlobalId("Organization", owner.org_id),
       company_id: toGlobalId("Organization", owner.org_id),
       petition_id: event.petition_id,
-      requires_signature: isDefined(petition.signature_config),
+      requires_signature: isNonNullish(petition.signature_config),
       same_domain: ownerData.email.split("@")[1] === completedByEmail.split("@")[1],
     },
   });
@@ -397,7 +397,7 @@ async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: Worker
   ]);
 
   /* make sure it's the first reply of a recipient (users can submit replies too) */
-  const recipientEvents = replyCreatedEvents.filter((e) => isDefined(e.data.petition_access_id));
+  const recipientEvents = replyCreatedEvents.filter((e) => isNonNullish(e.data.petition_access_id));
   if (recipientEvents.length === 1) {
     await ctx.analytics.trackEvent({
       type: "FIRST_REPLY_CREATED",
@@ -423,7 +423,7 @@ async function trackCommentPublishedEvent(event: CommentPublishedEvent, ctx: Wor
     return;
   }
 
-  const from = isDefined(comment.petition_access_id) ? "recipient" : "user";
+  const from = isNonNullish(comment.petition_access_id) ? "recipient" : "user";
   await ctx.analytics.trackEvent({
     type: "COMMENT_PUBLISHED",
     user_id: user.id,

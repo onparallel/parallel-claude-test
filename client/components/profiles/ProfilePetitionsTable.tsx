@@ -33,7 +33,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, noop } from "remeda";
 import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -94,7 +94,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     try {
       await showConfirmDisassociateProfileDialog({
         petitionName: selectedRows[0].name,
-        profileName: isDefined(profile) ? <ProfileReference profile={profile} /> : undefined,
+        profileName: isNonNullish(profile) ? <ProfileReference profile={profile} /> : undefined,
         selectedPetitions: selectedRows.length,
       });
 
@@ -132,7 +132,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   const showAssociateNewPetitionToProfileDialog = useAssociateNewPetitionToProfileDialog();
   const handleCreateNewPetition = async () => {
     try {
-      if (isDefined(profile)) {
+      if (isNonNullish(profile)) {
         await showAssociateNewPetitionToProfileDialog({
           profile,
         });
@@ -312,7 +312,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
         },
         CellContent: ({ row }) => {
           const recipients = row.accesses
-            .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+            .filter((a) => a.status === "ACTIVE" && isNonNullish(a.contact))
             .map((a) => a.contact!);
           if (recipients.length === 0) {
             return null;

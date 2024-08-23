@@ -2,7 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { NormalLink } from "./Link";
 
 interface HelpCenterLinkProps {
@@ -37,7 +37,7 @@ export const NakedHelpCenterLink = chakraForwardRef<"a", NakedHelpCenterLinkProp
         target="_blank"
         rel="noopener"
         onClick={(event) => {
-          if (isDefined(window.Intercom)) {
+          if (isNonNullish(window.Intercom)) {
             event.preventDefault();
             window.Intercom("showArticle", articleId);
           }

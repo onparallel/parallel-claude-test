@@ -11,7 +11,7 @@ import { useInterval } from "@parallel/utils/useInterval";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 interface TaskProgressDialogProps {
@@ -46,12 +46,12 @@ export function TaskProgressDialog({
   useInterval(
     async (done) => {
       const task = taskRef.current;
-      if (!isDefined(task)) {
+      if (isNullish(task)) {
         return;
       }
       try {
         let updatedTask: TaskProgressDialog_TaskFragment;
-        if (isDefined(keycode)) {
+        if (isNonNullish(keycode)) {
           const { data } = await apollo.query({
             query: TaskProgressDialog_publicTaskDocument,
             variables: { taskId: task.id, keycode },
@@ -101,11 +101,11 @@ export function TaskProgressDialog({
         <Progress
           size="md"
           hasStripe={task?.status === "PROCESSING"}
-          isAnimated={isDefined(task) && (task.progress ?? 0) < 100}
+          isAnimated={isNonNullish(task) && (task.progress ?? 0) < 100}
           value={task?.progress ?? 0}
           colorScheme="green"
           borderRadius="full"
-          isIndeterminate={!isDefined(task) || task.status === "ENQUEUED"}
+          isIndeterminate={isNullish(task) || task.status === "ENQUEUED"}
         />
       }
       confirm={

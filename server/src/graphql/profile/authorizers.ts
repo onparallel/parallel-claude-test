@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, indexBy, isDefined, pick, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, pick, unique } from "remeda";
 import {
   Profile,
   ProfileStatus,
@@ -28,7 +28,7 @@ function createProfileTypeAuthorizer<TRest extends any[] = []>(
       }
       const profileTypes = await ctx.profiles.loadProfileType(profileTypeIds);
       return profileTypes.every(
-        (profileType) => isDefined(profileType) && predicate(profileType, ...rest),
+        (profileType) => isNonNullish(profileType) && predicate(profileType, ...rest),
       );
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
@@ -44,7 +44,7 @@ function createProfileAuthorizer<TRest extends any[] = []>(
         return true;
       }
       const profiles = await ctx.profiles.loadProfile(profileIds);
-      return profiles.every((profile) => isDefined(profile) && predicate(profile, ...rest));
+      return profiles.every((profile) => isNonNullish(profile) && predicate(profile, ...rest));
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
@@ -60,15 +60,18 @@ function createProfileTypeFieldAuthorizer<TRest extends any[] = []>(
       }
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
       return profileTypeFields.every(
-        (profileTypeField) => isDefined(profileTypeField) && predicate(profileTypeField, ...rest),
+        (profileTypeField) =>
+          isNonNullish(profileTypeField) && predicate(profileTypeField, ...rest),
       );
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
-export const profileTypeIsArchived = createProfileTypeAuthorizer((p) => isDefined(p.archived_at));
+export const profileTypeIsArchived = createProfileTypeAuthorizer((p) =>
+  isNonNullish(p.archived_at),
+);
 
-export const profileIsNotAnonymized = createProfileAuthorizer((p) => !isDefined(p.anonymized_at));
+export const profileIsNotAnonymized = createProfileAuthorizer((p) => isNullish(p.anonymized_at));
 
 export const profileTypeIsNotStandard = createProfileTypeAuthorizer(
   (p) => p.standard_type === null,
@@ -111,7 +114,7 @@ export function userHasAccessToProfileType<
       const ids = unMaybeArray(args[profileTypeIdArg] as unknown as MaybeArray<number>);
 
       const profileTypes = await ctx.profiles.loadProfileType(ids);
-      return profileTypes.every((p) => isDefined(p) && p.org_id === ctx.user!.org_id);
+      return profileTypes.every((p) => isNonNullish(p) && p.org_id === ctx.user!.org_id);
     } catch {}
     return false;
   };
@@ -140,7 +143,7 @@ export function profileTypeFieldBelongsToProfileType<
       const profileTypeId = args[profileTypeIdArg] as unknown as number;
 
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
-      return profileTypeFields.every((p) => isDefined(p) && p.profile_type_id === profileTypeId);
+      return profileTypeFields.every((p) => isNonNullish(p) && p.profile_type_id === profileTypeId);
     } catch {
       return false;
     }
@@ -167,9 +170,9 @@ export function profileHasProfileTypeFieldId<
         ctx.profiles.loadProfile(profileId),
       ]);
       return (
-        isDefined(profile) &&
+        isNonNullish(profile) &&
         profileTypeFields.every(
-          (p) => isDefined(p) && p.profile_type_id === profile.profile_type_id,
+          (p) => isNonNullish(p) && p.profile_type_id === profile.profile_type_id,
         )
       );
     } catch {
@@ -220,7 +223,7 @@ export function profileTypeFieldIsOfType<
           : unMaybeArray(args[profileTypeFieldIdArg] as unknown as MaybeArray<number>);
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
 
-      return profileTypeFields.every((p) => isDefined(p) && types.includes(p.type));
+      return profileTypeFields.every((p) => isNonNullish(p) && types.includes(p.type));
     } catch {
       return false;
     }
@@ -237,7 +240,7 @@ export function userHasAccessToProfile<
       const ids = unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>);
 
       const profiles = await ctx.profiles.loadProfile(ids);
-      return profiles.every((p) => isDefined(p) && p.org_id === ctx.user!.org_id);
+      return profiles.every((p) => isNonNullish(p) && p.org_id === ctx.user!.org_id);
     } catch {
       return false;
     }
@@ -282,7 +285,7 @@ export function contextUserCanSubscribeUsersToProfile<
     const users = await ctx.users.loadUser(userIds);
 
     // every user has to belong to same organization as context user
-    if (users.some((u) => !isDefined(u) || u.org_id !== ctx.user!.org_id)) {
+    if (users.some((u) => isNullish(u) || u.org_id !== ctx.user!.org_id)) {
       return false;
     }
 
@@ -324,7 +327,7 @@ export function profileHasStatus<
     const validStatuses = unMaybeArray(status);
 
     const profiles = await ctx.profiles.loadProfile(profileIds);
-    return profiles.every((p) => isDefined(p) && validStatuses.includes(p.status));
+    return profiles.every((p) => isNonNullish(p) && validStatuses.includes(p.status));
   };
 }
 
@@ -456,7 +459,7 @@ export function profilesCanBeAssociated<
       unique([profileId, ...relationshipsData.map((r) => r.profileId)]),
     );
 
-    if (!profiles.every(isDefined)) {
+    if (!profiles.every(isNonNullish)) {
       return false;
     }
 
@@ -506,7 +509,7 @@ export function relationshipBelongsToProfile<
     const relationships = await ctx.profiles.loadProfileRelationship(profileRelationshipIds);
     return relationships.every(
       (r) =>
-        isDefined(r) &&
+        isNonNullish(r) &&
         r.org_id === ctx.user!.org_id &&
         (r.left_side_profile_id === profileId || r.right_side_profile_id === profileId),
     );
@@ -532,8 +535,8 @@ export function profileHasSameProfileTypeAsField<
     ]);
 
     return (
-      isDefined(profile) &&
-      isDefined(petitionField) &&
+      isNonNullish(profile) &&
+      isNonNullish(petitionField) &&
       profile.profile_type_id === petitionField.profile_type_id
     );
   };
@@ -557,9 +560,9 @@ export function profileTypeFieldBelongsToPetitionFieldProfileType<
     ]);
 
     return (
-      isDefined(petitionField) &&
+      isNonNullish(petitionField) &&
       profileTypeFields.every(
-        (ptf) => isDefined(ptf) && ptf.profile_type_id === petitionField.profile_type_id,
+        (ptf) => isNonNullish(ptf) && ptf.profile_type_id === petitionField.profile_type_id,
       )
     );
   };
@@ -572,6 +575,6 @@ export function profileTypeFieldsAreExpirable<TypeName extends string, FieldName
     const profileTypeFieldIds = profileTypeFieldIdsArg(args);
 
     const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
-    return profileTypeFields.every((ptf) => isDefined(ptf) && ptf.is_expirable);
+    return profileTypeFields.every((ptf) => isNonNullish(ptf) && ptf.is_expirable);
   };
 }

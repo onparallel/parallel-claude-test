@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, unique } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -37,7 +37,7 @@ export function userHasAccessToEventSubscriptionSignatureKeys<
   return async (_, args, ctx) => {
     const ids = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKey(ids);
-    if (!keys.every(isDefined)) {
+    if (!keys.every(isNonNullish)) {
       return false;
     }
     const subscriptionIds = unique(keys.map((k) => k!.event_subscription_id));
@@ -60,6 +60,6 @@ export function petitionFieldsBelongsToTemplate<
     const petitionId = args[petitionIdArg] as unknown as number;
     const fields = await ctx.petitions.loadField(fieldIds);
 
-    return fields.every((f) => isDefined(f) && f.petition_id === petitionId);
+    return fields.every((f) => isNonNullish(f) && f.petition_id === petitionId);
   };
 }

@@ -9,8 +9,8 @@ import {
   filter,
   groupBy,
   indexBy,
-  isDefined,
   isNonNullish,
+  isNullish,
   map,
   mapValues,
   minBy,
@@ -1168,7 +1168,7 @@ export class PetitionRepository extends BaseRepository {
       keycode: random(16),
       reminders_left: 10,
       automatic_reminders_left: Math.min(remindersConfig?.limit ?? 0, 10),
-      reminders_active: isDefined(remindersConfig),
+      reminders_active: isNonNullish(remindersConfig),
       reminders_config: remindersConfig,
       next_reminder_at: null, // will be set once this access is linked to a specific contact
       status: "ACTIVE",
@@ -1309,7 +1309,7 @@ export class PetitionRepository extends BaseRepository {
         data: {
           petition_message_id: message.id,
           user_id: userId,
-          reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
+          reason: (isNonNullish(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
       t,
@@ -1346,7 +1346,7 @@ export class PetitionRepository extends BaseRepository {
         data: {
           petition_access_id: access.id,
           user_id: userId,
-          reason: isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED",
+          reason: isNonNullish(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED",
         },
       })),
       t,
@@ -1423,7 +1423,7 @@ export class PetitionRepository extends BaseRepository {
       .update(
         {
           contact_id: contactId,
-          next_reminder_at: isDefined(access.reminders_config)
+          next_reminder_at: isNonNullish(access.reminders_config)
             ? calculateNextReminder(new Date(), access.reminders_config)
             : null,
           updated_at: this.now(),
@@ -1789,9 +1789,9 @@ export class PetitionRepository extends BaseRepository {
     }
 
     // first child must not have visibility conditions after reorder
-    if (isDefined(parent)) {
+    if (isNonNullish(parent)) {
       const firstChild = fields.find((f) => f.id === fieldIds[0]);
-      if (isDefined(firstChild?.visibility)) {
+      if (isNonNullish(firstChild?.visibility)) {
         throw new Error("FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR");
       }
       // first child of an external field must be external
@@ -1811,9 +1811,9 @@ export class PetitionRepository extends BaseRepository {
       });
 
       for (const field of reorderedFields.filter(
-        (f) => isDefined(f.visibility) || isDefined(f.math),
+        (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
       )) {
-        if (isDefined(field.visibility)) {
+        if (isNonNullish(field.visibility)) {
           for (const condition of (field.visibility as PetitionFieldVisibility).conditions) {
             if ("fieldId" in condition) {
               const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
@@ -1822,7 +1822,7 @@ export class PetitionRepository extends BaseRepository {
           }
         }
 
-        if (isDefined(field.math)) {
+        if (isNonNullish(field.math)) {
           for (const math of field.math as PetitionFieldMath[]) {
             for (const condition of math.conditions) {
               if ("fieldId" in condition) {
@@ -1862,7 +1862,7 @@ export class PetitionRepository extends BaseRepository {
 
       this.validateFieldReorder(allFields, fieldIds, parentFieldId);
 
-      const parent = isDefined(parentFieldId)
+      const parent = isNonNullish(parentFieldId)
         ? allFields.find((f) => f.id === parentFieldId)
         : undefined;
 
@@ -1874,7 +1874,7 @@ export class PetitionRepository extends BaseRepository {
         sortBy([(f) => f.position, "asc"]),
       )
         .map((f, i) => (fieldIds[i] === f.id ? null : [f.id, fieldIds.indexOf(f.id)]))
-        .filter(isDefined);
+        .filter(isNonNullish);
 
       if (fieldsToUpdate.length > 0) {
         await this.raw(
@@ -1976,11 +1976,11 @@ export class PetitionRepository extends BaseRepository {
           .filter(
             (f) =>
               f.type === "BACKGROUND_CHECK" &&
-              isDefined(f.options.autoSearchConfig) &&
+              isNonNullish(f.options.autoSearchConfig) &&
               (f.options.autoSearchConfig.name.some((id: number) =>
                 originalChildrenIds.includes(id),
               ) ||
-                (isDefined(f.options.autoSearchConfig.date) &&
+                (isNonNullish(f.options.autoSearchConfig.date) &&
                   originalChildrenIds.includes(f.options.autoSearchConfig.date))),
           )
           .map((field) => ({
@@ -1993,7 +1993,7 @@ export class PetitionRepository extends BaseRepository {
                   (id: number) =>
                     clonedFields.find((f) => f.originalFieldId === id)?.cloned.id ?? id,
                 ),
-                date: isDefined(field.options.autoSearchConfig.date)
+                date: isNonNullish(field.options.autoSearchConfig.date)
                   ? (clonedFields.find(
                       (f) => f.originalFieldId === field.options.autoSearchConfig.date,
                     )?.cloned.id ?? field.options.autoSearchConfig.date)
@@ -2085,7 +2085,7 @@ export class PetitionRepository extends BaseRepository {
 
       const updatedCloned = updatedFields.find((f) => f.id === cloned.id);
       // if the cloned field was updated, we need to return the updated version
-      if (isDefined(updatedCloned)) {
+      if (isNonNullish(updatedCloned)) {
         return updatedCloned;
       }
     }
@@ -2127,7 +2127,7 @@ export class PetitionRepository extends BaseRepository {
     if (dataArr.length === 0) {
       return [];
     }
-    const parent = isDefined(parentFieldId) ? await this.loadField(parentFieldId) : null;
+    const parent = isNonNullish(parentFieldId) ? await this.loadField(parentFieldId) : null;
     const fields = await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
         .where({
@@ -2416,8 +2416,8 @@ export class PetitionRepository extends BaseRepository {
 
     if (
       (!petition.enable_interaction_with_recipients &&
-        fields.some((f) => isDefined(f) && f.type !== "BACKGROUND_CHECK")) ||
-      fields.some((f) => isDefined(f) && !f.is_internal)
+        fields.some((f) => isNonNullish(f) && f.type !== "BACKGROUND_CHECK")) ||
+      fields.some((f) => isNonNullish(f) && !f.is_internal)
     ) {
       await this.updatePetition(
         petitionId,
@@ -2488,8 +2488,8 @@ export class PetitionRepository extends BaseRepository {
 
     if (
       (!petition.enable_interaction_with_recipients &&
-        fields.some((f) => isDefined(f) && f.type !== "BACKGROUND_CHECK")) ||
-      fields.some((f) => isDefined(f) && !f.is_internal)
+        fields.some((f) => isNonNullish(f) && f.type !== "BACKGROUND_CHECK")) ||
+      fields.some((f) => isNonNullish(f) && !f.is_internal)
     ) {
       await this.updatePetition(
         petitionId,
@@ -2626,7 +2626,7 @@ export class PetitionRepository extends BaseRepository {
     const fileUploadIds = deletedReplies
       .filter((r) => isFileTypeField(r.type))
       .map((r) => r.content["file_upload_id"] as number)
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     if (fileUploadIds.length > 0) {
       await this.files.deleteFileUpload(fileUploadIds, deletedBy);
@@ -2997,7 +2997,7 @@ export class PetitionRepository extends BaseRepository {
       this.loadUserPermissionsByPetitionId(petitionId),
     ]);
 
-    if (!isDefined(sourcePetition)) {
+    if (isNullish(sourcePetition)) {
       throw new Error(`Petition:${petitionId} not found`);
     }
 
@@ -3287,7 +3287,7 @@ export class PetitionRepository extends BaseRepository {
 
       // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
       const rteUpdateData: Partial<Petition> = {};
-      if (isDefined(cloned.email_subject)) {
+      if (isNonNullish(cloned.email_subject)) {
         rteUpdateData.email_subject = replacePlaceholdersInText(
           cloned.email_subject,
           (placeholder) => {
@@ -3300,7 +3300,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       for (const key of ["email_body", "closing_email_body", "completing_message_body"] as const) {
-        if (isDefined(cloned[key])) {
+        if (isNonNullish(cloned[key])) {
           rteUpdateData[key] = JSON.stringify(
             replacePlaceholdersInSlate(safeJsonParse(cloned[key]) as SlateNode[], (placeholder) => {
               if (isGlobalId(placeholder, "PetitionField")) {
@@ -3324,7 +3324,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       const fieldLogicUpdate = clonedFields.filter(
-        (f) => isDefined(f.visibility) || isDefined(f.math),
+        (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
       );
       if (fieldLogicUpdate.length > 0) {
         // update visibility conditions and math on cloned fields
@@ -3397,7 +3397,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       const backgroundCheckFieldsUpdate = clonedFields.filter(
-        (f) => f.type === "BACKGROUND_CHECK" && isDefined(f.options.autoSearchConfig),
+        (f) => f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig),
       );
 
       // update field references in autoSearchConfig to point to cloned fields
@@ -3422,7 +3422,7 @@ export class PetitionRepository extends BaseRepository {
                       name: field.options.autoSearchConfig.name.map(
                         (id: number) => newFieldIds[id],
                       ),
-                      date: isDefined(field.options.autoSearchConfig.date)
+                      date: isNonNullish(field.options.autoSearchConfig.date)
                         ? newFieldIds[field.options.autoSearchConfig.date]
                         : null,
                     },
@@ -3506,8 +3506,8 @@ export class PetitionRepository extends BaseRepository {
       (e) =>
         // there could be events for fields and replies that are deleted in the original petition
         // so we need to make sure the petition_field_id and petition_field_reply_id in the events are present in the maps before inserting
-        isDefined(fieldsMap[e.data.petition_field_id]) &&
-        isDefined(repliesMap[e.data.petition_field_reply_id]),
+        isNonNullish(fieldsMap[e.data.petition_field_id]) &&
+        isNonNullish(repliesMap[e.data.petition_field_reply_id]),
     );
 
     if (events.length > 0) {
@@ -3604,7 +3604,7 @@ export class PetitionRepository extends BaseRepository {
     // we allow to have more than 1 public link on the same template, but always use the first one
     const publicLink = publicLinks.at(0);
 
-    if (isDefined(publicLink)) {
+    if (isNonNullish(publicLink)) {
       await retry(
         async () => {
           try {
@@ -3847,15 +3847,15 @@ export class PetitionRepository extends BaseRepository {
       select pe.* from user_petition_event_log upel
       join petition_event pe on upel.petition_event_id = pe.id
       where upel.user_id = ?
-        ${isDefined(options.before) ? /* sql */ `and upel.petition_event_id < ?` : ""}
-        ${isDefined(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
+        ${isNonNullish(options.before) ? /* sql */ `and upel.petition_event_id < ?` : ""}
+        ${isNonNullish(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
       order by pe.id desc
       limit ${options.limit};
     `,
       [
         userId,
-        ...(isDefined(options.before) ? [options.before] : []),
-        ...(isDefined(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
+        ...(isNonNullish(options.before) ? [options.before] : []),
+        ...(isNonNullish(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
       ],
     );
   }
@@ -3946,8 +3946,8 @@ export class PetitionRepository extends BaseRepository {
       latestEvent &&
       (latestEvent.type === "REPLY_CREATED" || latestEvent.type === "REPLY_UPDATED") &&
       replies.find((r) => r.id === latestEvent.data.petition_field_reply_id) &&
-      ((isDefined(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
-        (isDefined(updater.petition_access_id) &&
+      ((isNonNullish(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
+        (isNonNullish(updater.petition_access_id) &&
           latestEvent.data.petition_access_id === updater.petition_access_id)) &&
       differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS &&
       // if all replies are file uploads, we will create a new REPLY_UPDATED event instead of updating the REPLY_CREATED
@@ -4231,7 +4231,7 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
       const byKey = indexBy(rows, keyBuilder(["contact_id", "petition_id"]));
-      return keys.map(keyBuilder(["contactId", "petitionId"])).map((k) => isDefined(byKey[k]));
+      return keys.map(keyBuilder(["contactId", "petitionId"])).map((k) => isNonNullish(byKey[k]));
     },
     { cacheKeyFn: keyBuilder(["contactId", "petitionId"]) },
   );
@@ -4556,7 +4556,7 @@ export class PetitionRepository extends BaseRepository {
           .where((q) => {
             q.whereIn(
               this.knex.raw("data ->> 'petition_field_id'") as any,
-              unique(comments.map((c) => c.petition_field_id).filter(isDefined)),
+              unique(comments.map((c) => c.petition_field_id).filter(isNonNullish)),
             );
             if (comments.some((c) => c.petition_field_id === null)) {
               q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4673,7 +4673,7 @@ export class PetitionRepository extends BaseRepository {
         .where((q) => {
           q.whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
-            unique(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+            unique(keys.map((x) => x.petitionFieldId).filter(isNonNullish)),
           );
           if (keys.some((x) => x.petitionFieldId === null)) {
             q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4721,7 +4721,7 @@ export class PetitionRepository extends BaseRepository {
         .where((q) => {
           q.whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
-            unique(keys.map((x) => x.petitionFieldId).filter(isDefined)),
+            unique(keys.map((x) => x.petitionFieldId).filter(isNonNullish)),
           );
           if (keys.some((x) => x.petitionFieldId === null)) {
             q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -4850,7 +4850,7 @@ export class PetitionRepository extends BaseRepository {
       `User:${user.id}`,
     );
 
-    if (isDefined(comment)) {
+    if (isNonNullish(comment)) {
       await this.createEvent({
         type: "COMMENT_DELETED",
         petition_id: petitionId,
@@ -4875,7 +4875,7 @@ export class PetitionRepository extends BaseRepository {
       `PetitionAccess:${access.id}`,
     );
 
-    if (isDefined(comment)) {
+    if (isNonNullish(comment)) {
       await this.createEvent({
         type: "COMMENT_DELETED",
         petition_id: petitionId,
@@ -4905,7 +4905,7 @@ export class PetitionRepository extends BaseRepository {
         "*",
       );
 
-    if (isDefined(comment)) {
+    if (isNonNullish(comment)) {
       await this.deleteCommentCreatedNotifications(comment.petition_id, [comment.id]);
     }
 
@@ -5033,7 +5033,7 @@ export class PetitionRepository extends BaseRepository {
       .where((q) => {
         q.whereIn(
           this.knex.raw("data ->> 'petition_field_id'") as any,
-          unique(comments.map((c) => c.petition_field_id)).filter(isDefined),
+          unique(comments.map((c) => c.petition_field_id)).filter(isNonNullish),
         );
         if (comments.some((c) => c.petition_field_id === null)) {
           q.orWhereNull(this.knex.raw("data ->> 'petition_field_id'") as any);
@@ -6333,7 +6333,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    if (isDefined(data.status)) {
+    if (isNonNullish(data.status)) {
       await this.from("petition", t)
         .whereIn("id", unique(rows.map((r) => r.petition_id)))
         .update({
@@ -6357,7 +6357,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    if (isDefined(data.status)) {
+    if (isNonNullish(data.status)) {
       await this.from("petition")
         .where("id", row.petition_id)
         .update({
@@ -6759,7 +6759,7 @@ export class PetitionRepository extends BaseRepository {
       [
         ...templateDefaultOwners.map((tdp) => tdp.user_id),
         ...templateOwners.map((t) => t.user_id),
-      ].filter(isDefined),
+      ].filter(isNonNullish),
     );
 
     const users = await this.from("user", t)
@@ -6768,7 +6768,7 @@ export class PetitionRepository extends BaseRepository {
       .select("*");
 
     return templateIds.map((templateId) => {
-      const isDefault = isDefined(defaultOwnerByTemplateId[templateId]?.user_id);
+      const isDefault = isNonNullish(defaultOwnerByTemplateId[templateId]?.user_id);
       const ownerId =
         defaultOwnerByTemplateId[templateId]?.user_id ??
         templateOwnerByTemplateId[templateId]?.user_id;
@@ -7010,7 +7010,7 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
 
-      if (isDefined(petition.summary_ai_completion_log_id)) {
+      if (isNonNullish(petition.summary_ai_completion_log_id)) {
         await this.updatePetitionSummaryAiCompletionLogId(petition, null, "AnonymizerWorker", t);
       }
 
@@ -7036,10 +7036,10 @@ export class PetitionRepository extends BaseRepository {
 
       await this.anonymizeEmailLogs(
         [
-          ...messages.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
-          ...reminders.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
+          ...messages.filter((m) => isNonNullish(m.email_log_id)).map((m) => m.email_log_id!),
+          ...reminders.filter((m) => isNonNullish(m.email_log_id)).map((m) => m.email_log_id!),
           ...events
-            .filter((e) => isDefined((e.data as any).email_log_id))
+            .filter((e) => isNonNullish((e.data as any).email_log_id))
             .map((e) => (e.data as any).email_log_id!),
         ],
         t,
@@ -7089,7 +7089,7 @@ export class PetitionRepository extends BaseRepository {
       .filter(
         (r) =>
           isFileTypeField(r.type) &&
-          isDefined(r.content.file_upload_id) &&
+          isNonNullish(r.content.file_upload_id) &&
           r.anonymized_at === null,
       )
       .map((r) => r.content.file_upload_id as number);
@@ -7217,9 +7217,9 @@ export class PetitionRepository extends BaseRepository {
       );
 
     const fileUploadIds = [
-      ...signatures.filter((s) => isDefined(s.file_upload_id)).map((s) => s.file_upload_id!),
+      ...signatures.filter((s) => isNonNullish(s.file_upload_id)).map((s) => s.file_upload_id!),
       ...signatures
-        .filter((s) => isDefined(s.file_upload_audit_trail_id))
+        .filter((s) => isNonNullish(s.file_upload_audit_trail_id))
         .map((s) => s.file_upload_audit_trail_id!),
     ];
 
@@ -7297,7 +7297,9 @@ export class PetitionRepository extends BaseRepository {
       [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null],
     );
 
-    const fromTemplateIds = unique(orgPetitions.map((p) => p.from_template_id).filter(isDefined));
+    const fromTemplateIds = unique(
+      orgPetitions.map((p) => p.from_template_id).filter(isNonNullish),
+    );
 
     const templates =
       fromTemplateIds.length > 0
@@ -7333,7 +7335,7 @@ export class PetitionRepository extends BaseRepository {
     const templatesWithPetitionsWithStats = Object.values(
       groupBy(petitionsWithStats, (p) => p.from_template_id ?? 0),
     ).map((group) => {
-      const template = isDefined(group[0].from_template_id)
+      const template = isNonNullish(group[0].from_template_id)
         ? (templates.find((t) => t.id === group[0].from_template_id) ?? null)
         : null;
       return [template, group] as const;
@@ -7350,11 +7352,13 @@ export class PetitionRepository extends BaseRepository {
         },
         times: {
           pending_to_complete: average(
-            petitions.map((p) => p.pending_to_complete).filter(isDefined),
+            petitions.map((p) => p.pending_to_complete).filter(isNonNullish),
           ),
-          complete_to_close: average(petitions.map((p) => p.complete_to_close).filter(isDefined)),
+          complete_to_close: average(
+            petitions.map((p) => p.complete_to_close).filter(isNonNullish),
+          ),
           signature_completed: average(
-            petitions.map((p) => p.signature_completed).filter(isDefined),
+            petitions.map((p) => p.signature_completed).filter(isNonNullish),
           ),
         },
       };
@@ -7384,7 +7388,7 @@ export class PetitionRepository extends BaseRepository {
           aggregation_type: "NO_TEMPLATE" as const,
           ...groupStats(
             templatesWithPetitionsWithStats
-              .filter(([t]) => !isDefined(t))
+              .filter(([t]) => isNullish(t))
               .flatMap(([, petitions]) => petitions),
           ),
         },
@@ -7447,16 +7451,16 @@ export class PetitionRepository extends BaseRepository {
 
       return {
         pending_to_complete:
-          isDefined(completedAt) && isDefined(pendingAt) && completedAt > pendingAt
+          isNonNullish(completedAt) && isNonNullish(pendingAt) && completedAt > pendingAt
             ? (completedAt - pendingAt) / 1000
             : null,
         complete_to_close:
-          isDefined(closedAt) && isDefined(completedAt) && closedAt > completedAt
+          isNonNullish(closedAt) && isNonNullish(completedAt) && closedAt > completedAt
             ? (closedAt - completedAt) / 1000
             : null,
         signature_completed:
-          isDefined(signatureStartedAt) &&
-          isDefined(signatureCompletedAt) &&
+          isNonNullish(signatureStartedAt) &&
+          isNonNullish(signatureCompletedAt) &&
           signatureCompletedAt > signatureStartedAt
             ? (signatureCompletedAt - signatureStartedAt) / 1000
             : null,
@@ -7614,7 +7618,7 @@ export class PetitionRepository extends BaseRepository {
             ...userGroupIdsWithNoPermissions.map((id) => toGlobalId("UserGroup", id)),
           ],
         };
-      } else if (isDefined(sharePetition)) {
+      } else if (isNonNullish(sharePetition)) {
         await this.addPetitionPermissions(
           [petitionId],
           [
@@ -7749,7 +7753,7 @@ export class PetitionRepository extends BaseRepository {
         async (reply) => {
           const emptyReply = emptyFieldGroupRepliesByFieldId[reply.fieldId]?.pop();
 
-          if (isDefined(emptyReply)) {
+          if (isNonNullish(emptyReply)) {
             return emptyReply;
           }
 
@@ -7770,7 +7774,7 @@ export class PetitionRepository extends BaseRepository {
 
       // create "children" replies for each FIELD_GROUP reply
       for (const [parentReply, { childrenReplies }] of zip(replies, fieldGroupReplies)) {
-        if (isDefined(childrenReplies) && childrenReplies.length > 0) {
+        if (isNonNullish(childrenReplies) && childrenReplies.length > 0) {
           await this.createPetitionFieldReply(
             petitionId,
             childrenReplies.map((reply) => ({
@@ -8032,7 +8036,8 @@ export class PetitionRepository extends BaseRepository {
         // also pass every child of other FIELD_GROUP's so we can validate reorder
         ...allFields.filter(
           (f) =>
-            isDefined(f.parent_petition_field_id) && f.parent_petition_field_id !== parentFieldId,
+            isNonNullish(f.parent_petition_field_id) &&
+            f.parent_petition_field_id !== parentFieldId,
         ),
       ];
 
@@ -8057,7 +8062,7 @@ export class PetitionRepository extends BaseRepository {
             ? null
             : [updatedField.id, updatedField.position, updatedField.parent_petition_field_id];
         })
-        .filter(isDefined);
+        .filter(isNonNullish);
 
       if (fieldsToUpdate.length > 0) {
         await this.raw(
@@ -8103,7 +8108,7 @@ export class PetitionRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    if (isDefined(childrenFieldIds) && childrenFieldIds.length === 0) {
+    if (isNonNullish(childrenFieldIds) && childrenFieldIds.length === 0) {
       throw new Error("childrenFieldIds can't be empty");
     }
 
@@ -8145,7 +8150,8 @@ export class PetitionRepository extends BaseRepository {
         // also pass every child of other FIELD_GROUP's so we can validate reorder
         ...allFields.filter(
           (f) =>
-            isDefined(f.parent_petition_field_id) && f.parent_petition_field_id !== parentFieldId,
+            isNonNullish(f.parent_petition_field_id) &&
+            f.parent_petition_field_id !== parentFieldId,
         ),
       ];
 
@@ -8170,7 +8176,7 @@ export class PetitionRepository extends BaseRepository {
             ? null
             : [updatedField.id, updatedField.position, updatedField.parent_petition_field_id];
         })
-        .filter(isDefined);
+        .filter(isNonNullish);
 
       if (fieldsToUpdate.length > 0) {
         await this.raw(
@@ -8423,7 +8429,7 @@ export class PetitionRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    if (isDefined(petition.summary_ai_completion_log_id)) {
+    if (isNonNullish(petition.summary_ai_completion_log_id)) {
       await this.from("ai_completion_log", t)
         .where({
           id: petition.summary_ai_completion_log_id,
@@ -8466,9 +8472,8 @@ export class PetitionRepository extends BaseRepository {
     fields: { id: number; parentReplyId?: number | null }[],
     overwrite: boolean,
   ) {
-    const [_fieldsNoParent, _fieldsWithParent] = partition(
-      fields,
-      (f) => !isDefined(f.parentReplyId),
+    const [_fieldsNoParent, _fieldsWithParent] = partition(fields, (f) =>
+      isNullish(f.parentReplyId),
     );
 
     const [fieldsNoParent, fieldsNoParentReplies, fieldsWithParent, fieldsChildReplies] =
@@ -8519,12 +8524,12 @@ export class PetitionRepository extends BaseRepository {
 
   async repliesCanBeUpdated(replyIds: number[]) {
     const replies = await this.loadFieldReply(replyIds);
-    if (replies.some((r) => !isDefined(r))) {
+    if (replies.some((r) => isNullish(r))) {
       // field or reply could be already deleted, throw FORBIDDEN error
       return "REPLY_NOT_FOUND";
     }
 
-    const fieldGroupReplies = replies.filter(isDefined).filter((r) => r.type === "FIELD_GROUP");
+    const fieldGroupReplies = replies.filter(isNonNullish).filter((r) => r.type === "FIELD_GROUP");
 
     const allReplies = replies;
 
@@ -8575,8 +8580,8 @@ export class PetitionRepository extends BaseRepository {
 
     return fields.every(
       (f) =>
-        isDefined(f?.parent_petition_field_id) &&
-        (!isDefined(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
+        isNonNullish(f?.parent_petition_field_id) &&
+        (isNullish(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
     );
   }
 
@@ -8633,7 +8638,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const [relationshipsWithId, relationshipsNoId] = partition(relationships, (r) =>
-      isDefined(r.id),
+      isNonNullish(r.id),
     );
 
     // 1st, remove every relationship not present in array,
@@ -8683,7 +8688,7 @@ export class PetitionRepository extends BaseRepository {
         ),
         updatedBy,
         petitionId,
-      ].filter(isDefined),
+      ].filter(isNonNullish),
     );
 
     // 2nd, update relationships that contain the id

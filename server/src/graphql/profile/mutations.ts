@@ -11,7 +11,16 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { differenceWith, groupBy, indexBy, isDefined, pipe, unique, zip } from "remeda";
+import {
+  differenceWith,
+  groupBy,
+  indexBy,
+  isNonNullish,
+  isNullish,
+  pipe,
+  unique,
+  zip,
+} from "remeda";
 import { assert } from "ts-essentials";
 import {
   CreateProfileType,
@@ -130,10 +139,10 @@ export const updateProfileType = mutationField("updateProfileType", {
   resolve: async (_, { profileTypeId, name, profileNamePattern }, ctx) => {
     const updateData: Partial<CreateProfileType> = {};
 
-    if (isDefined(name)) {
+    if (isNonNullish(name)) {
       updateData.name = name;
     }
-    if (isDefined(profileNamePattern)) {
+    if (isNonNullish(profileNamePattern)) {
       updateData.profile_name_pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
         p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text,
       );
@@ -144,7 +153,7 @@ export const updateProfileType = mutationField("updateProfileType", {
       `User:${ctx.user!.id}`,
     );
 
-    if (isDefined(updateData.profile_name_pattern)) {
+    if (isNonNullish(updateData.profile_name_pattern)) {
       await ctx.tasks.createTask(
         {
           name: "PROFILE_NAME_PATTERN_UPDATED",
@@ -179,7 +188,7 @@ export const cloneProfileType = mutationField("cloneProfileType", {
   resolve: async (_, { profileTypeId, name }, ctx) => {
     const createData: Partial<CreateProfileType> = {};
 
-    if (isDefined(name)) {
+    if (isNonNullish(name)) {
       createData.name = name;
     }
     return await ctx.profiles.cloneProfileType(profileTypeId, createData, `User:${ctx.user!.id}`);
@@ -285,7 +294,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
       );
 
       // mapper fills SELECT field values when passing a standardList, but we don't want to store every value in DB
-      if (isDefined(options.standardList)) {
+      if (isNonNullish(options.standardList)) {
         options.values = [];
       }
 
@@ -373,21 +382,21 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
   resolve: async (_, args, ctx, info) => {
     const updateData: Partial<CreateProfileTypeField> = {};
     const profileTypeField = (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
-    if (isDefined(args.data.name)) {
+    if (isNonNullish(args.data.name)) {
       updateData.name = { ...profileTypeField.name, ...args.data.name };
     }
 
     if (args.data.alias !== undefined) {
       updateData.alias = args.data.alias || null; // empty string should nullify the alias
     }
-    if (isDefined(args.data.isExpirable)) {
+    if (isNonNullish(args.data.isExpirable)) {
       updateData.is_expirable = args.data.isExpirable;
       updateData.expiry_alert_ahead_time = args.data.isExpirable
         ? args.data.expiryAlertAheadTime
         : null;
     }
 
-    if (isDefined(args.data.options)) {
+    if (isNonNullish(args.data.options)) {
       if (profileTypeField.type === "SHORT_TEXT" && args.data.options.format !== undefined) {
         throw new ArgValidationError(
           info,
@@ -481,7 +490,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             );
           }
         }
-        if (isDefined(args.data.substitutions) && args.data.substitutions.length > 0) {
+        if (isNonNullish(args.data.substitutions) && args.data.substitutions.length > 0) {
           const { currentValues, previousValues } =
             await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
               profileTypeField.id,
@@ -595,7 +604,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           const profileType = await ctx.profiles.loadProfileType.raw(args.profileTypeId, t);
           const isProfileNamePatternUpdated =
             profileTypeField.type === "SELECT" &&
-            isDefined(updateData.options) &&
+            isNonNullish(updateData.options) &&
             profileType?.profile_name_pattern.includes(profileTypeField.id);
 
           return { updatedProfileTypeField, isProfileNamePatternUpdated };
@@ -671,7 +680,7 @@ export const updateProfileTypeFieldPermission = mutationField("updateProfileType
         );
       }
     }
-    if (isDefined(args.defaultPermission)) {
+    if (isNonNullish(args.defaultPermission)) {
       await ctx.profiles.updateProfileTypeField(
         args.profileTypeFieldId,
         { permission: args.defaultPermission },
@@ -801,7 +810,7 @@ export const createProfile = mutationField("createProfile", {
   },
   resolve: async (_, args, ctx) => {
     const profileTypeFields =
-      isDefined(args.fields) && args.fields.length > 0
+      isNonNullish(args.fields) && args.fields.length > 0
         ? await ctx.profiles.loadProfileTypeField(args.fields.map((f) => f.profileTypeFieldId))
         : [];
 
@@ -830,14 +839,14 @@ export const createProfile = mutationField("createProfile", {
             "EXPIRY_ON_NON_EXPIRABLE_FIELD",
           );
         }
-        if (field.expiryDate !== undefined && !isDefined(field.content)) {
+        if (field.expiryDate !== undefined && isNullish(field.content)) {
           throw new ApolloError(
             `Can't set expiry on a field with no value`,
             "EXPIRY_ON_NONEXISTING_VALUE",
           );
         }
 
-        if (isDefined(field.content)) {
+        if (isNonNullish(field.content)) {
           try {
             // validate fields content before creating the profile.
             // this way we can avoid creating the profile if the content is invalid
@@ -864,7 +873,7 @@ export const createProfile = mutationField("createProfile", {
             : // else, check option useReplyAsExpiryDate for DATE replies
               profileTypeField.type === "DATE" &&
                 profileTypeField.options.useReplyAsExpiryDate &&
-                isDefined(field.content?.value)
+                isNonNullish(field.content?.value)
               ? (field.content!.value as string)
               : null,
         };
@@ -970,7 +979,7 @@ export const deleteProfile = mutationField("deleteProfile", {
                 profileRelationshipTypeId: r.profile_relationship_type_id,
               },
         ])
-        .filter(isDefined);
+        .filter(isNonNullish);
 
       await ctx.profiles.createEvent(
         eventsData.map((d) => ({
@@ -1031,20 +1040,20 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     ]);
     // check profileTypeFieldIds match the profileId
     if (
-      !isDefined(profile) ||
-      profileTypeFields.some((p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id)
+      isNullish(profile) ||
+      profileTypeFields.some((p) => isNullish(p) || p.profile_type_id !== profile!.profile_type_id)
     ) {
       throw new ForbiddenError("invalid properties in fields arg");
     }
 
-    assert(profileTypeFields.every(isDefined), "ProfileTypeField not found");
+    assert(profileTypeFields.every(isNonNullish), "ProfileTypeField not found");
 
     if (
       fields.some((field) => {
         const property = profileTypeFields.find((ptf) => ptf.id === field.profileTypeFieldId)!;
         return (
           (property.type === "BACKGROUND_CHECK" || property.type === "FILE") &&
-          isDefined(field.content)
+          isNonNullish(field.content)
         );
       })
     ) {
@@ -1071,7 +1080,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
 
         if (
-          isDefined(field.content) &&
+          isNonNullish(field.content) &&
           field.content.value !== null &&
           field.content.value !== ""
         ) {
@@ -1103,7 +1112,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         if (
           field.expiryDate !== undefined &&
           field.content === undefined &&
-          !isDefined(valuesByPtfId[field.profileTypeFieldId])
+          isNullish(valuesByPtfId[field.profileTypeFieldId])
         ) {
           throw new ApolloError(
             `Can't set expiry on a field with no value`,
@@ -1121,7 +1130,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
             : // else, check option useReplyAsExpiryDate for DATE replies
               profileTypeField.type === "DATE" &&
                 profileTypeField.options.useReplyAsExpiryDate &&
-                isDefined(field.content?.value)
+                isNonNullish(field.content?.value)
               ? (field.content!.value as string)
               : null,
         };
@@ -1320,7 +1329,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
     if (
       profileFieldFiles.some(
         (pff) =>
-          !isDefined(pff) ||
+          isNullish(pff) ||
           pff.profile_id !== profileId ||
           pff.profile_type_field_id !== profileTypeFieldId,
       )
@@ -1368,7 +1377,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
   resolve: async (_, { profileId, profileFieldFileIds, profileTypeFieldId }, ctx) => {
     try {
       let deletedProfileFieldFiles: ProfileFieldFile[] = [];
-      if (isDefined(profileFieldFileIds)) {
+      if (isNonNullish(profileFieldFileIds)) {
         deletedProfileFieldFiles = await ctx.profiles.deleteProfileFieldFiles(
           profileFieldFileIds,
           ctx.user!.id,
@@ -1436,11 +1445,11 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
   resolve: async (_, { profileId, profileTypeFieldId, fileReplyIds, expiryDate }, ctx) => {
     const fileReplies =
       fileReplyIds.length > 0
-        ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isDefined)
+        ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isNonNullish)
         : [];
 
     const fileUploadIds = fileReplies
-      .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+      .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
       .map((r) => r.content.file_upload_id as number);
 
     const clonedFiles = await ctx.files.cloneFileUpload(fileUploadIds);

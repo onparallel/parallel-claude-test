@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PetitionField, PetitionFieldReply } from "../db/__types";
 import { ComposedPetition } from "../db/repositories/PetitionRepository";
 import { EntitySearchRequest } from "../services/background-check-clients/BackgroundCheckClient";
@@ -46,7 +46,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
     .filter(
       (f) =>
         f.type === "BACKGROUND_CHECK" &&
-        isDefined(f.options.autoSearchConfig?.name) &&
+        isNonNullish(f.options.autoSearchConfig?.name) &&
         Array.isArray(f.options.autoSearchConfig.name) &&
         f.options.autoSearchConfig.name.length > 0,
     )
@@ -55,7 +55,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
       const nameReplies: Pick<PetitionFieldReply, "content">[] =
         backgroundCheck.options.autoSearchConfig.name
           .map((id: number) => visibleFields.find((f) => f.id === id)?.replies?.[0]) // take only 1st reply
-          .filter(isDefined);
+          .filter(isNonNullish);
 
       const nameValue =
         nameReplies
@@ -63,7 +63,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
           .join(" ")
           .trim() || null;
 
-      if (!isDefined(nameValue)) {
+      if (isNullish(nameValue)) {
         // if name field is empty, we don't have any information to automate search so ignore.
         return null;
       }
@@ -79,7 +79,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
       const currentBackgroundCheckReply = backgroundCheck.replies.at(0);
       if (
         currentBackgroundCheckReply?.status === "APPROVED" ||
-        isDefined(currentBackgroundCheckReply?.content.entity) ||
+        isNonNullish(currentBackgroundCheckReply?.content.entity) ||
         (currentBackgroundCheckReply?.content.query.name === nameValue &&
           currentBackgroundCheckReply?.content.query.date === dateValue &&
           currentBackgroundCheckReply?.content.query.type === typeValue)
@@ -99,7 +99,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
         },
       };
     })
-    .filter(isDefined);
+    .filter(isNonNullish);
 
   // same as before, but for BACKGROUND_CHECK children of FIELD_GROUPs
   const emptyBackgroundCheckChildFields = visibleFields
@@ -110,7 +110,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
         f.children!.some(
           (c) =>
             c.type === "BACKGROUND_CHECK" &&
-            isDefined(c.options.autoSearchConfig?.name) &&
+            isNonNullish(c.options.autoSearchConfig?.name) &&
             Array.isArray(c.options.autoSearchConfig.name) &&
             c.options.autoSearchConfig.name.length > 0,
         ),
@@ -121,7 +121,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
         .children!.filter(
           (c) =>
             c.type === "BACKGROUND_CHECK" &&
-            isDefined(c.options.autoSearchConfig?.name) &&
+            isNonNullish(c.options.autoSearchConfig?.name) &&
             Array.isArray(c.options.autoSearchConfig.name) &&
             c.options.autoSearchConfig.name.length > 0,
         )
@@ -139,11 +139,11 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
                       .find((f) => f.id === id)
                       ?.replies.filter(
                         (r) =>
-                          !isDefined(r.parent_petition_field_reply_id) ||
+                          isNullish(r.parent_petition_field_reply_id) ||
                           r.parent_petition_field_reply_id === groupReply.id,
                       )?.[0],
                 )
-                .filter(isDefined);
+                .filter(isNonNullish);
 
             const nameValue =
               nameReplies
@@ -151,7 +151,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
                 .join(" ")
                 .trim() || null;
 
-            if (!isDefined(nameValue)) {
+            if (isNullish(nameValue)) {
               return null;
             }
 
@@ -160,7 +160,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
               .find((f) => f.id === backgroundCheck.options.autoSearchConfig.date)
               ?.replies.filter(
                 (r) =>
-                  !isDefined(r.parent_petition_field_reply_id) ||
+                  isNullish(r.parent_petition_field_reply_id) ||
                   r.parent_petition_field_reply_id === groupReply.id,
               )?.[0];
 
@@ -172,7 +172,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
               ?.replies.at(0);
             if (
               currentBackgroundCheckReply?.status === "APPROVED" ||
-              isDefined(currentBackgroundCheckReply?.content.entity) ||
+              isNonNullish(currentBackgroundCheckReply?.content.entity) ||
               (currentBackgroundCheckReply?.content.query.name === nameValue &&
                 currentBackgroundCheckReply?.content.query.date === dateValue &&
                 currentBackgroundCheckReply?.content.query.type === typeValue)
@@ -194,7 +194,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: Comp
           }),
         ),
     )
-    .filter(isDefined);
+    .filter(isNonNullish);
 
   return [...backgroundCheckRootFields, ...emptyBackgroundCheckChildFields];
 }

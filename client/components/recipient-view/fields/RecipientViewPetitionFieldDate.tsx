@@ -2,12 +2,15 @@ import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { isValidDateString } from "@parallel/utils/validation";
+import { useMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
@@ -21,14 +24,11 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+  RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { useMetadata } from "@parallel/utils/withMetadata";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldDateProps
   extends Omit<

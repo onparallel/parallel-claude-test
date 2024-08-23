@@ -1,4 +1,4 @@
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { ProfileFieldValue } from "../db/__types";
 import { createCronWorker } from "./helpers/createCronWorker";
 import {
@@ -24,7 +24,7 @@ createCronWorker("background-check-monitor", async (ctx) => {
     >[] = [];
 
     for (const value of valuesForRefresh) {
-      if (isDefined(value.content.entity)) {
+      if (isNonNullish(value.content.entity)) {
         ctx.logger.info(
           `[Organization:${org.id}][Profile:${value.profile_id}][ProfileFieldValue:${value.id}] Updating entity details`,
         );
@@ -82,7 +82,7 @@ createCronWorker("background-check-monitor", async (ctx) => {
             `[Organization:${org.id}][Profile:${value.profile_id}][ProfileFieldValue:${value.id}] Entity details have not changed`,
           );
         }
-      } else if (isDefined(value.content.query) && isDefined(value.content.search)) {
+      } else if (isNonNullish(value.content.query) && isNonNullish(value.content.search)) {
         ctx.logger.info(
           `[Organization:${org.id}][Profile:${value.profile_id}][ProfileFieldValue:${value.id}] Updating search results`,
         );

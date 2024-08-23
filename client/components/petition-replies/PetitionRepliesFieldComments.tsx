@@ -20,6 +20,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
@@ -27,7 +28,7 @@ import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
 import usePrevious from "@react-hook/previous";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -37,7 +38,6 @@ import {
   PetitionCommentsAndNotesEditor,
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
-import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
@@ -64,7 +64,7 @@ export function PetitionRepliesFieldComments({
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
 
-  const hasCommentsEnabled = isDefined(field)
+  const hasCommentsEnabled = isNonNullish(field)
     ? field.isInternal
       ? false
       : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled
@@ -77,7 +77,7 @@ export function PetitionRepliesFieldComments({
   const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
   const [fieldId] = useFieldCommentsQueryState();
 
-  const showGeneralComments = !isDefined(field) && fieldId === "general";
+  const showGeneralComments = isNullish(field) && fieldId === "general";
 
   const { data, loading: loadingField } = useQuery(
     PetitionRepliesFieldComments_petitionFieldQueryDocument,
@@ -195,7 +195,7 @@ export function PetitionRepliesFieldComments({
             fontWeight={500}
             noOfLines={2}
             sx={
-              !isDefined(field?.title)
+              isNullish(field?.title)
                 ? { color: "gray.500", fontWeight: "normal", fontStyle: "italic" }
                 : {}
             }

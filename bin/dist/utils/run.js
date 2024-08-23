@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
+exports.run = run;
 function run(main) {
     main()
         .then()
@@ -9,4 +9,3 @@ function run(main) {
         process.exit(1);
     });
 }
-exports.run = run;

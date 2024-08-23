@@ -16,7 +16,7 @@ import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js";
 import { ChangeEvent, FocusEvent, Ref, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
   inputRef?: Ref<HTMLInputElement>;
@@ -50,7 +50,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   useEffect(() => {
     if (formatter.getNumberValue() !== value) {
       formatter.reset();
-      if (isDefined(value) && value !== "") {
+      if (isNonNullish(value) && value !== "") {
         formatter.input(value);
       }
       const formatted = (formatter as any).formattedOutput;

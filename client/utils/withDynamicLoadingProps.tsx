@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ComponentType, forwardRef } from "react";
+import { ComponentType, createContext, forwardRef, useContext } from "react";
 
 export function withDynamicLoadingProps<Props = {}>(
   loader: (useLoadingProps: () => Props) => ComponentType<Props>,

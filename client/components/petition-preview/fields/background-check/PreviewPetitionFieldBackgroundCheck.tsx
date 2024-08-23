@@ -12,13 +12,13 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
-  ShortSearchIcon,
   BusinessIcon,
   CheckIcon,
   CloseIcon,
   DeleteIcon,
   EyeIcon,
   QuestionIcon,
+  ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -41,7 +41,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isNonNullish, isNullish, zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -127,7 +127,7 @@ export function PreviewPetitionFieldBackgroundCheck({
   const browserTabRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (isDefined(browserTabRef.current) && browserTabRef.current.closed) {
+      if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
@@ -140,7 +140,7 @@ export function PreviewPetitionFieldBackgroundCheck({
 
   useEffect(() => {
     const handleRouteChange = () => {
-      if (isDefined(browserTabRef.current)) {
+      if (isNonNullish(browserTabRef.current)) {
         browserTabRef.current.close();
       }
     };
@@ -154,7 +154,7 @@ export function PreviewPetitionFieldBackgroundCheck({
     "message",
     async (e) => {
       const browserTab = browserTabRef.current;
-      if (!isDefined(browserTab) || e.source !== browserTab) {
+      if (isNullish(browserTab) || e.source !== browserTab) {
         return;
       }
       if (e.data === "refresh") {
@@ -168,7 +168,7 @@ export function PreviewPetitionFieldBackgroundCheck({
         browserTab.postMessage(
           {
             event: "info-updated",
-            entityIds: field.replies.map((r) => r?.content?.entity?.id).filter(isDefined),
+            entityIds: field.replies.map((r) => r?.content?.entity?.id).filter(isNonNullish),
           },
           browserTab.origin,
         );
@@ -232,7 +232,7 @@ export function PreviewPetitionFieldBackgroundCheck({
       if (type) {
         searchParams.set("type", type);
       }
-    } else if (isDefined(options.autoSearchConfig)) {
+    } else if (isNonNullish(options.autoSearchConfig)) {
       const fields = parentReplyId
         ? visibleFields.flatMap((f) => [f, ...(f.children ?? [])])
         : visibleFields;
@@ -248,7 +248,7 @@ export function PreviewPetitionFieldBackgroundCheck({
           }
           return null;
         })
-        .filter(isDefined)
+        .filter(isNonNullish)
         .join(" ")
         .trim();
 
@@ -444,7 +444,7 @@ export function KYCResearchFieldReplyProfile({
               <Flex flexWrap="wrap" gap={2} alignItems="center">
                 <Text as="span">
                   {[entityTypeLabel, reply.content?.query?.name, reply.content?.query?.date]
-                    .filter(isDefined)
+                    .filter(isNonNullish)
                     .join(" | ")}
                 </Text>
                 <Text as="span" color="gray.500" fontSize="sm">
@@ -508,7 +508,7 @@ export function KYCResearchFieldReplyProfile({
         size="md"
         placement="bottom"
         label={
-          isDefined(reply.content?.entity)
+          isNonNullish(reply.content?.entity)
             ? intl.formatMessage({
                 id: "component.preview-petition-field-background-check.view-details",
                 defaultMessage: "View details",

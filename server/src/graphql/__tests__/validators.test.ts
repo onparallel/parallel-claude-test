@@ -1,9 +1,9 @@
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
+import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
 import { ApolloError } from "../helpers/errors";

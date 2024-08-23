@@ -49,9 +49,9 @@ import pMap from "p-map";
 import { useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, partition } from "remeda";
-import { Link } from "../common/Link";
+import { isNonNullish, partition } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { Link } from "../common/Link";
 import { ProfileReference } from "../common/ProfileReference";
 
 export interface ProfileFormData {
@@ -166,7 +166,7 @@ export const ProfileForm = Object.assign(
 
     const [deleteProfileFieldFile] = useMutation(ProfileForm_deleteProfileFieldFileDocument);
 
-    const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
+    const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isNonNullish(f)).length;
 
     const fieldsWithIndices = useAllFieldsWithIndices(petition ?? { fields: [] });
 
@@ -177,12 +177,12 @@ export const ProfileForm = Object.assign(
           (property) =>
             [
               property,
-              isDefined(property.field.alias) || property.field.type === "BACKGROUND_CHECK"
+              isNonNullish(property.field.alias) || property.field.type === "BACKGROUND_CHECK"
                 ? fieldsWithIndices.filter(
                     ([pf]) =>
                       SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(pf.type) &&
                       (property.field.type === "BACKGROUND_CHECK" ||
-                        (isDefined(pf.alias) &&
+                        (isNonNullish(pf.alias) &&
                           (normalize(pf.alias).includes(normalize(property.field.alias!)) ||
                             normalize(property.field.alias!).includes(normalize(pf.alias))))),
                   )
@@ -234,7 +234,7 @@ export const ProfileForm = Object.assign(
                         return {
                           profileTypeFieldId,
                           content:
-                            isDefined(content?.value) && content!.value !== "" ? content : null,
+                            isNonNullish(content?.value) && content!.value !== "" ? content : null,
                           expiryDate:
                             content?.value && prop?.field.isExpirable
                               ? useValueAsExpiryDate
@@ -244,7 +244,7 @@ export const ProfileForm = Object.assign(
                         };
                       }
                     })
-                    .filter(isDefined),
+                    .filter(isNonNullish),
                 },
               });
             }
@@ -285,7 +285,7 @@ export const ProfileForm = Object.assign(
                   });
                 }
 
-                if (copyFiles.length && isDefined(petitionId)) {
+                if (copyFiles.length && isNonNullish(petitionId)) {
                   await copyFileReplyToProfileFieldFile({
                     variables: {
                       profileId,

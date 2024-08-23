@@ -1,4 +1,4 @@
-import { chunk, countBy, difference, findLast, isDefined, sortBy } from "remeda";
+import { chunk, countBy, difference, findLast, isNonNullish, sortBy } from "remeda";
 import { PetitionStatus } from "../../db/__types";
 import {
   PetitionEvent,
@@ -87,15 +87,15 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
     const { status, times } = this.getPetitionsStatusAndTimes(petitionsWithEvents);
 
     const repliedUnsentPetition = petitionsWithEvents.find(({ is_sent: isSent, events }) => {
-      return !isSent && isDefined(this.findFirstRecipientReplyEvent(events));
+      return !isSent && isNonNullish(this.findFirstRecipientReplyEvent(events));
     });
 
-    const hasSignature = isDefined(template.signature_config);
+    const hasSignature = isNonNullish(template.signature_config);
     const funnel = this.getPetitionsConversionFunnel(petitionsWithEvents, hasSignature);
 
     return {
       from_template_id: toGlobalId("Petition", template.id),
-      has_replied_unsent: isDefined(repliedUnsentPetition),
+      has_replied_unsent: isNonNullish(repliedUnsentPetition),
       has_signature_config: hasSignature,
       status,
       times,
@@ -125,9 +125,9 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
         signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
       },
       times: {
-        pending_to_complete: average(times.map((p) => p.pending_to_complete).filter(isDefined)),
-        complete_to_close: average(times.map((p) => p.complete_to_close).filter(isDefined)),
-        signature_completed: average(times.map((p) => p.signature_completed).filter(isDefined)),
+        pending_to_complete: average(times.map((p) => p.pending_to_complete).filter(isNonNullish)),
+        complete_to_close: average(times.map((p) => p.complete_to_close).filter(isNonNullish)),
+        signature_completed: average(times.map((p) => p.signature_completed).filter(isNonNullish)),
       },
     };
   }
@@ -215,38 +215,38 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
     // STEP 3
     const firstReply = opened.filter(({ status, events }) => {
-      const hasRecipientReply = isDefined(this.findFirstRecipientReplyEvent(events));
+      const hasRecipientReply = isNonNullish(this.findFirstRecipientReplyEvent(events));
       if (hasRecipientReply) {
         return true;
       }
 
       // if the petition has no recipient replies, but its completed by a recipient, consider it "replied" (the petition may have all optional fields)
       const completedByRecipientEvent = events.find(
-        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
+        (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.petition_access_id),
       );
 
-      return isDefined(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
+      return isNonNullish(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
     });
 
     // STEP 4. use subset "opened" instead of "firstReply"
     const completed = opened.filter(({ status, events }) => {
       const completedByRecipientEvent = events.find(
-        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
+        (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.petition_access_id),
       );
 
-      return isDefined(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
+      return isNonNullish(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
     });
 
     // STEP 5
     const signed = completed.filter(({ latest_signature_status: signature, events }) => {
       const signatureCompletedEvent = events.find((e) => e.type === "SIGNATURE_COMPLETED");
-      return signature === "COMPLETED" && isDefined(signatureCompletedEvent);
+      return signature === "COMPLETED" && isNonNullish(signatureCompletedEvent);
     });
 
     // STEP 6
     const closed = (templateHasSignature ? signed : completed).filter(({ status, events }) => {
       const petitionClosedEvent = events.find((e) => e.type === "PETITION_CLOSED");
-      return status === "CLOSED" && isDefined(petitionClosedEvent);
+      return status === "CLOSED" && isNonNullish(petitionClosedEvent);
     });
 
     return {
@@ -298,7 +298,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
         return this.getTimeInterval(firstOpenedAt, firstActivatedAt);
       })
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     const firstReplyTimes = funnel.opened
       .map(({ events }) => {
@@ -309,7 +309,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
         return this.getTimeInterval(firstRepliedByRecipientAt, firstOpenedAt);
       })
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     const completedTimes = funnel.opened
       .map(({ status, events }) => {
@@ -323,12 +323,12 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.user_id),
         )?.created_at.getTime();
 
         return this.getTimeInterval(
@@ -336,7 +336,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
           firstRepliedByRecipientAt ?? firstOpenedAt,
         );
       })
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     const signedTimes = funnel.completed
       .map(({ status, latest_signature_status: signature, events }) => {
@@ -346,12 +346,12 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.user_id),
         )?.created_at.getTime();
 
         const lastSignatureCompletedAt = findLast(
@@ -364,7 +364,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
           lastCompletedByRecipientAt ?? lastCompletedByUserAt,
         );
       })
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     const closedTimes = (templateHasSignature ? funnel.signed : funnel.completed)
       .map(({ status, events }) => {
@@ -374,12 +374,12 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
+          (e) => e.type === "PETITION_COMPLETED" && isNonNullish(e.data.user_id),
         )?.created_at.getTime();
 
         const lastClosedAt = findLast(
@@ -392,7 +392,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
           lastCompletedByRecipientAt ?? lastCompletedByUserAt,
         );
       })
-      .filter(isDefined);
+      .filter(isNonNullish);
 
     return {
       opened: this.getTimeStatisticsValues(openTimes),
@@ -420,7 +420,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
       .filter(
         (e) =>
           (e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED") &&
-          isDefined(e.data.petition_access_id),
+          isNonNullish(e.data.petition_access_id),
       )
       .map((e) => (e as ReplyCreatedEvent | ReplyUpdatedEvent).data.petition_field_reply_id);
 
@@ -433,12 +433,14 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
     return events.find(
       (e) =>
         (e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED") &&
-        isDefined(e.data.petition_access_id) &&
+        isNonNullish(e.data.petition_access_id) &&
         currentReplyIds.includes(e.data.petition_field_reply_id),
     );
   }
 
   private getTimeInterval(timeA?: number, timeB?: number) {
-    return isDefined(timeA) && isDefined(timeB) && timeA > timeB ? (timeA - timeB) / 1000 : null;
+    return isNonNullish(timeA) && isNonNullish(timeB) && timeA > timeB
+      ? (timeA - timeB) / 1000
+      : null;
   }
 }

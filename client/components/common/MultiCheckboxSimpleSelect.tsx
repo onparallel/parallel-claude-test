@@ -1,7 +1,7 @@
 import { Box, Checkbox } from "@chakra-ui/react";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useMemo } from "react";
 import { CSSObjectWithLabel, OptionProps, components, mergeStyles } from "react-select";
-import { isDefined, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import {
   SimpleOption,
   SimpleSelect,
@@ -46,7 +46,7 @@ export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimple
         };
       },
     };
-    return isDefined(_styles) ? mergeStyles(styles, _styles) : styles;
+    return isNonNullish(_styles) ? mergeStyles(styles, _styles) : styles;
   }, [_styles]);
 
   return (

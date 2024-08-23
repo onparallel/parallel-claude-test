@@ -1,11 +1,11 @@
 import { GetQueueAttributesCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { Container } from "inversify";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
+import { RateLimitGuard } from "../workers/helpers/RateLimitGuard";
 import { RestApi } from "./rest/core";
 import { enumParam, numberParam } from "./rest/params";
-import { Text, PlainTextResponse } from "./rest/responses";
-import { RateLimitGuard } from "../workers/helpers/RateLimitGuard";
+import { PlainTextResponse, Text } from "./rest/responses";
 
 export function monitor(container: Container) {
   const config = container.get<Config>(CONFIG);
@@ -47,7 +47,7 @@ export function monitor(container: Container) {
           }),
         );
         const length = parseInt(response.Attributes!.ApproximateNumberOfMessages!);
-        if (isDefined(limit)) {
+        if (isNonNullish(limit)) {
           if (length > limit) {
             return Text("NOT OK", { status: 418 });
           } else {

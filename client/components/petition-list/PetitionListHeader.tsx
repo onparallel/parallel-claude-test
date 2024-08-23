@@ -46,7 +46,7 @@ import {
 } from "@parallel/utils/usePetitionsTableColumns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDeepEqual, isDefined, omit, pick } from "remeda";
+import { isDeepEqual, isNonNullish, omit, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
@@ -185,7 +185,7 @@ export function PetitionListHeader({
           } as PetitionListViewDataInput,
         },
       });
-      if (isDefined(data)) {
+      if (isNonNullish(data)) {
         onStateChange({
           view: data.createPetitionListView.id,
           ...omit(data.createPetitionListView.data, ["__typename"]),
@@ -249,7 +249,7 @@ export function PetitionListHeader({
       !c.isFixed &&
       !selection.includes(c.key as PetitionsTableColumn) &&
       c.isFilterable &&
-      Object.entries(state).some(([key, value]) => isDefined(value) && key === c.key),
+      Object.entries(state).some(([key, value]) => isNonNullish(value) && key === c.key),
   );
 
   return (
@@ -514,13 +514,13 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
       omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"]),
     ) &&
     isDeepEqual(
-      isDefined(view1.sharedWith)
+      isNonNullish(view1.sharedWith)
         ? {
             ...omit(view1.sharedWith, ["__typename"]),
             filters: view1.sharedWith.filters.map(omit(["__typename"])),
           }
         : view1.sharedWith,
-      isDefined(view2.sharedWith)
+      isNonNullish(view2.sharedWith)
         ? {
             ...omit(view2.sharedWith, ["__typename"]),
             filters: view2.sharedWith.filters.map(omit(["__typename"])),
@@ -528,21 +528,21 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
         : view2.sharedWith,
     ) &&
     isDeepEqual(
-      isDefined(view1.sort)
+      isNonNullish(view1.sort)
         ? omit(view1.sort, ["__typename"])
         : { field: "sentAt", direction: "DESC" },
-      isDefined(view2.sort)
+      isNonNullish(view2.sort)
         ? omit(view2.sort, ["__typename"])
         : { field: "sentAt", direction: "DESC" },
     ) &&
     isDeepEqual(
-      isDefined(view1.tagsFilters)
+      isNonNullish(view1.tagsFilters)
         ? {
             ...omit(view1.tagsFilters, ["__typename"]),
             filters: view1.tagsFilters.filters.map(omit(["__typename"])),
           }
         : view1.tagsFilters,
-      isDefined(view2.tagsFilters)
+      isNonNullish(view2.tagsFilters)
         ? {
             ...omit(view2.tagsFilters, ["__typename"]),
             filters: view2.tagsFilters.filters.map(omit(["__typename"])),

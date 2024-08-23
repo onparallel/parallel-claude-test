@@ -2,7 +2,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
 import { join } from "path";
-import { isDefined, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
 import {
@@ -426,13 +426,13 @@ export function defaultFieldProperties(
       case "TEXT": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type)
+            isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
               : null,
           maxLength:
-            isDefined(field) &&
+            isNonNullish(field) &&
             ["TEXT", "SHORT_TEXT"].includes(field.type) &&
-            isDefined(field.options.maxLength)
+            isNonNullish(field.options.maxLength)
               ? field.options.maxLength
               : null,
         };
@@ -440,13 +440,13 @@ export function defaultFieldProperties(
       case "SHORT_TEXT": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type)
+            isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
               : null,
           maxLength:
-            isDefined(field) &&
+            isNonNullish(field) &&
             ["TEXT", "SHORT_TEXT"].includes(field.type) &&
-            isDefined(field.options.maxLength)
+            isNonNullish(field.options.maxLength)
               ? field.options.maxLength
               : null,
           format: null,
@@ -466,7 +466,7 @@ export function defaultFieldProperties(
       case "NUMBER": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type)
+            isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
               : null,
           range: {
@@ -480,7 +480,7 @@ export function defaultFieldProperties(
       case "PHONE": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type)
+            isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
               : null,
         };
@@ -488,11 +488,11 @@ export function defaultFieldProperties(
       case "SELECT": {
         return {
           values:
-            isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
+            isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
               : [],
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type)
+            isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
               : null,
         };
@@ -523,7 +523,7 @@ export function defaultFieldProperties(
       case "CHECKBOX": {
         return {
           values:
-            isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
+            isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
               : [],
           limit: {
@@ -623,7 +623,7 @@ export async function selectOptionsValuesAndLabels(
       const currenciesCodes = Object.keys(currencies);
       return {
         values: currenciesCodes,
-        labels: currenciesCodes.map((code) => currencies[code].filter(isDefined).join(" - ")),
+        labels: currenciesCodes.map((code) => currencies[code].filter(isNonNullish).join(" - ")),
       };
     }
     default:
@@ -646,7 +646,7 @@ export async function mapFieldOptions(
               name: options.autoSearchConfig.name.map((id: number) =>
                 toGlobalId("PetitionField", id),
               ),
-              date: isDefined(options.autoSearchConfig.date)
+              date: isNonNullish(options.autoSearchConfig.date)
                 ? toGlobalId("PetitionField", options.autoSearchConfig.date)
                 : null,
             },

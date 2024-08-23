@@ -1,6 +1,6 @@
 import { ImapFlow } from "imapflow";
 import { simpleParser, Source } from "mailparser";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, noop } from "remeda";
 import { promisify } from "util";
 import { Email, EmailEnvelope } from "./types";
 
@@ -41,7 +41,7 @@ export async function waitForEmail(
             }
           }
         }
-        if (isDefined(uid)) {
+        if (isNonNullish(uid)) {
           const message = await client.fetchOne(`${uid}`, { source: true }, { uid: true });
           await client.messageFlagsAdd(`${uid}`, ["\\Seen"], { uid: true });
           return await parseEmail(message.source);

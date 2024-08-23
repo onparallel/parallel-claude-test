@@ -1,13 +1,13 @@
 import { Alert, Button, HStack, Input, Text } from "@chakra-ui/react";
+import { ProfilesIcon } from "@parallel/chakra/icons";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
-import { ProfilesIcon } from "@parallel/chakra/icons";
-import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 
 export function PetitionComposeFieldGroupSettings({
   petition,

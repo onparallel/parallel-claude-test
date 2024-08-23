@@ -5,12 +5,12 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReplyCreatedEvent_ReplyCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 import { PetitionFieldReference } from "../../../common/PetitionFieldReference";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
-import { isDefined } from "remeda";
 
 export interface TimelineReplyCreatedEventProps {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
@@ -46,7 +46,7 @@ export function TimelineReplyCreatedEvent({
 
   if (field?.type === "BACKGROUND_CHECK") {
     message = isChildren ? (
-      isDefined(reply?.content?.entity) ? (
+      isNonNullish(reply?.content?.entity) ? (
         <FormattedMessage
           id="component.timeline-reply-created-event.description-background-check-entity-children-of-group"
           defaultMessage="{someone} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
@@ -68,7 +68,7 @@ export function TimelineReplyCreatedEvent({
           }}
         />
       )
-    ) : isDefined(reply?.content?.entity) ? (
+    ) : isNonNullish(reply?.content?.entity) ? (
       <FormattedMessage
         id="component.timeline-reply-created-event.description-background-check-entity"
         defaultMessage="{someone} saved an entity in the field {field} {timeAgo}"

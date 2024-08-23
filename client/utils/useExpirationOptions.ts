@@ -1,6 +1,6 @@
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Duration } from "date-fns";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function expirationToDuration(expiration: ExpirationOption): Duration {
   const [value, period, beforeAfter] = expiration.split("_") as [
@@ -16,9 +16,9 @@ export function expirationToDuration(expiration: ExpirationOption): Duration {
 }
 
 export function durationToExpiration(duration: Duration): ExpirationOption {
-  if (isDefined(duration.months) && duration.months !== 0) {
+  if (isNonNullish(duration.months) && duration.months !== 0) {
     return `${Math.abs(duration.months)}_MONTHS_${duration.months > 0 ? "BEFORE" : "AFTER"}` as any;
-  } else if (isDefined(duration.days) && duration.days !== 0) {
+  } else if (isNonNullish(duration.days) && duration.days !== 0) {
     return `${Math.abs(duration.days)}_DAYS_${duration.days > 0 ? "BEFORE" : "AFTER"}` as any;
   } else {
     throw new Error(`Unexpected duration ${JSON.stringify(duration)}`);

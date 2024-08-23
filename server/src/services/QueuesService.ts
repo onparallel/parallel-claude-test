@@ -2,7 +2,7 @@ import { SendMessageBatchCommand, SendMessageCommand, SQSClient } from "@aws-sdk
 import { createHash } from "crypto";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { chunk, isDefined } from "remeda";
+import { chunk, isNonNullish } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
 import { TableTypes } from "../db/helpers/BaseRepository";
@@ -67,7 +67,7 @@ export class QueuesService implements IQueuesService {
       | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction,
   ) {
-    if (isDefined(t)) {
+    if (isNonNullish(t)) {
       if (!t.isCompleted()) {
         t.executionPromise
           .then(() => this.sendSQSMessage(queue, messages))
@@ -136,7 +136,7 @@ export class QueuesService implements IQueuesService {
     delaySeconds?: number,
     t?: Knex.Transaction,
   ) {
-    const _events = unMaybeArray(events).filter(isDefined);
+    const _events = unMaybeArray(events).filter(isNonNullish);
     if (_events.length > 0) {
       if (delaySeconds && delaySeconds > 0) {
         await this.enqueueMessages(

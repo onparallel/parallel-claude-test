@@ -1,9 +1,9 @@
 import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { Tone } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
-import { Tone } from "@parallel/graphql/__types";
 
 function EsTaxDocumentsChangePersonDialog({ tone, ...props }: DialogProps<{ tone: Tone }>) {
   const focusRef = useRef<HTMLButtonElement>(null);

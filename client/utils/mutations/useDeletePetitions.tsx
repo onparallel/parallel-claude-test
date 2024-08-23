@@ -14,7 +14,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
 import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
@@ -243,7 +243,7 @@ function ConfirmDeletePetitionsDialog({
                       },
                     )
                   : null,
-              ].filter(isDefined),
+              ].filter(isNonNullish),
             ),
           }}
         />

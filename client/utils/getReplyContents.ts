@@ -4,7 +4,7 @@ import {
   getReplyContents_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { IntlShape } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { FORMATS, prettifyTimezone } from "./dates";
 import { formatNumberWithPrefix } from "./formatNumberWithPrefix";
 import { isFileTypeField } from "./isFileTypeField";
@@ -38,7 +38,7 @@ export function getReplyContents({
     ];
   } else if (type === "CHECKBOX") {
     assertType<FieldOptions["CHECKBOX"]>(options);
-    if (isDefined(options.labels)) {
+    if (isNonNullish(options.labels)) {
       return (reply.content.value as string[]).map((value) => {
         const index = options.values.indexOf(value);
         return [index >= 0 ? options.labels![index] : value];
@@ -48,7 +48,7 @@ export function getReplyContents({
     }
   } else if (type === "SELECT") {
     assertType<FieldOptions["SELECT"]>(options);
-    if (isDefined(options.labels)) {
+    if (isNonNullish(options.labels)) {
       const index = options.values.indexOf(reply.content.value);
       const label = options.labels[index];
       return [index >= 0 ? label : reply.content.value];

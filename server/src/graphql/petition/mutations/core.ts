@@ -18,7 +18,8 @@ import { DatabaseError } from "pg";
 import {
   filter,
   groupBy,
-  isDefined,
+  isNonNullish,
+  isNullish,
   map,
   omit,
   partition,
@@ -409,7 +410,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     let petitionIds = args.ids ?? [];
-    if (isDefined(args.folders)) {
+    if (isNonNullish(args.folders)) {
       const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
       const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
         folderIds,
@@ -673,8 +674,8 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
       (await ctx.petitions.loadPetition(petitionId))!;
 
     if (
-      isDefined(passwordHash) &&
-      (!isDefined(password) || passwordHash !== (await hash(password, passwordSalt!)))
+      isNonNullish(passwordHash) &&
+      (isNullish(password) || passwordHash !== (await hash(password, passwordSalt!)))
     ) {
       throw new ApolloError(
         "The petition is restricted with a password.",
@@ -684,11 +685,11 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
 
     let data: Partial<CreatePetition>;
     if (isRestricted) {
-      const salt = isDefined(password) ? random(10) : null;
+      const salt = isNonNullish(password) ? random(10) : null;
       data = {
         restricted_by_user_id: ctx.user!.id,
         restricted_at: new Date(),
-        restricted_password_hash: isDefined(password) ? await hash(password, salt!) : null,
+        restricted_password_hash: isNonNullish(password) ? await hash(password, salt!) : null,
         restricted_password_salt: salt,
       };
     } else {
@@ -916,7 +917,7 @@ export const updatePetition = mutationField("updatePetition", {
     if (name !== undefined) {
       data.name = name?.trim() || null;
     }
-    if (isDefined(locale)) {
+    if (isNonNullish(locale)) {
       data.recipient_locale = locale;
     }
     if (deadline !== undefined) {
@@ -934,22 +935,22 @@ export const updatePetition = mutationField("updatePetition", {
     if (remindersConfig !== undefined) {
       data.reminders_config = remindersConfig;
     }
-    if (isDefined(skipForwardSecurity)) {
+    if (isNonNullish(skipForwardSecurity)) {
       data.skip_forward_security = skipForwardSecurity;
     }
-    if (isDefined(isRecipientViewContentsHidden)) {
+    if (isNonNullish(isRecipientViewContentsHidden)) {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
-    if (isDefined(isDelegateAccessEnabled)) {
+    if (isNonNullish(isDelegateAccessEnabled)) {
       data.enable_delegate_access = isDelegateAccessEnabled;
     }
-    if (isDefined(isInteractionWithRecipientsEnabled)) {
+    if (isNonNullish(isInteractionWithRecipientsEnabled)) {
       data.enable_interaction_with_recipients = isInteractionWithRecipientsEnabled;
     }
-    if (isDefined(isReviewFlowEnabled)) {
+    if (isNonNullish(isReviewFlowEnabled)) {
       data.enable_review_flow = isReviewFlowEnabled;
     }
-    if (isDefined(isDocumentGenerationEnabled)) {
+    if (isNonNullish(isDocumentGenerationEnabled)) {
       data.enable_document_generation = isDocumentGenerationEnabled;
     }
     if (signatureConfig !== undefined) {
@@ -959,7 +960,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.template_description = description === null ? null : JSON.stringify(description);
     }
 
-    if (isDefined(isCompletingMessageEnabled)) {
+    if (isNonNullish(isCompletingMessageEnabled)) {
       data.is_completing_message_enabled = isCompletingMessageEnabled;
     }
 
@@ -1134,7 +1135,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
         (f) => f.parent_petition_field_id === field.parent_petition_field_id && f.position === 1,
       );
       // when deleting first child of a FIELD_GROUP, make sure 2nd field does not have visibility conditions, as it will end up in 1st position
-      if (isDefined(secondChild?.visibility)) {
+      if (isNonNullish(secondChild?.visibility)) {
         throw new ApolloError(
           "First child cannot have visibility conditions",
           "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR",
@@ -1286,27 +1287,27 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (description !== undefined) {
       data.description = description?.trim() || null;
     }
-    if (isDefined(optional)) {
+    if (isNonNullish(optional)) {
       data.optional = optional;
     }
-    if (isDefined(multiple)) {
+    if (isNonNullish(multiple)) {
       data.multiple = multiple;
     }
-    if (isDefined(requireApproval)) {
+    if (isNonNullish(requireApproval)) {
       data.require_approval = requireApproval;
     }
 
-    if (isDefined(showInPdf)) {
+    if (isNonNullish(showInPdf)) {
       data.show_in_pdf = showInPdf;
     }
 
-    if (isDefined(isInternal)) {
+    if (isNonNullish(isInternal)) {
       data.is_internal = isInternal;
       data.require_approval = !isInternal;
       data.show_in_pdf = !isInternal;
     }
 
-    if (isDefined(showActivityInPdf)) {
+    if (isNonNullish(showActivityInPdf)) {
       data.show_activity_in_pdf = showActivityInPdf;
     }
 
@@ -1314,7 +1315,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       data.alias = alias?.trim() || null;
     }
 
-    if (isDefined(options)) {
+    if (isNonNullish(options)) {
       try {
         if ("autoSearchConfig" in options && options.autoSearchConfig !== null) {
           throw new ApolloError(
@@ -1330,7 +1331,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           ...(field.type === "FILE_UPLOAD"
             ? omit(options, ["maxFileSize"]) // ignore maxFileSize so user can't change it
             : options),
-          ...(isDefined(options.documentProcessing) // hardcode maxFileSize and accepts options when setting documentProcessing
+          ...(isNonNullish(options.documentProcessing) // hardcode maxFileSize and accepts options when setting documentProcessing
             ? {
                 maxFileSize: toBytes(10, "MB"), // 10MB is a limit for the Bankflip request. We should review this when implementing a second provider
                 accepts: ["PDF", "IMAGE"],
@@ -1343,24 +1344,24 @@ export const updatePetitionField = mutationField("updatePetitionField", {
             labels?: string[] | null;
             values?: string[] | null;
           };
-          if (!isDefined(values) && isDefined(labels)) {
+          if (isNullish(values) && isNonNullish(labels)) {
             throw new Error("Values are required when labels are defined");
           }
           // make sure every or none of the values have a label
-          if (isDefined(values) && isDefined(labels) && values.length !== labels.length) {
+          if (isNonNullish(values) && isNonNullish(labels) && values.length !== labels.length) {
             throw new Error("The number of values and labels should match");
           }
-          if (isDefined(labels) && labels.some((l) => l.trim() === "")) {
+          if (isNonNullish(labels) && labels.some((l) => l.trim() === "")) {
             throw new Error("Labels cannot be empty");
           }
-          if (isDefined(options.values) && !isDefined(options.labels)) {
+          if (isNonNullish(options.values) && isNullish(options.labels)) {
             data.options.labels = null;
           }
         }
 
         if (
           field.type === "SHORT_TEXT" &&
-          isDefined(data.options.format) &&
+          isNonNullish(data.options.format) &&
           field.options.format !== data.options.format
         ) {
           const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
@@ -1406,7 +1407,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         })) ?? null;
     }
 
-    if (isDefined(hasCommentsEnabled)) {
+    if (isNonNullish(hasCommentsEnabled)) {
       data.has_comments_enabled = hasCommentsEnabled;
     }
 
@@ -1436,7 +1437,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           );
         }
 
-        if (isDefined(data.optional) && field.type === "FIELD_GROUP") {
+        if (isNonNullish(data.optional) && field.type === "FIELD_GROUP") {
           if (field.optional) {
             // if updating FIELD_GROUP to optional, remove every empty field group reply
             await ctx.petitions.deleteEmptyFieldGroupReplies(field.id, `User:${ctx.user!.id}`);
@@ -1452,7 +1453,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
       }
 
-      if (isDefined(data.is_internal) && field.type === "FIELD_GROUP") {
+      if (isNonNullish(data.is_internal) && field.type === "FIELD_GROUP") {
         const fieldChildren = await ctx.petitions.loadPetitionFieldChildren(field.id);
         if (fieldChildren.length > 0) {
           if (field.is_internal) {
@@ -1510,25 +1511,25 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
       ifArgDefined("config", async (_, args, ctx) => {
         const field = await ctx.petitions.loadField(args.fieldId);
         const nameFields = await ctx.petitions.loadField(args.config!.name);
-        const dateField = isDefined(args.config!.date)
+        const dateField = isNonNullish(args.config!.date)
           ? await ctx.petitions.loadField(args.config!.date)
           : null;
         return (
           nameFields.length > 0 &&
           nameFields.every(
             (f) =>
-              isDefined(f) &&
+              isNonNullish(f) &&
               f.petition_id === args.petitionId && // fields must belong all to the same petition
               f.type === "SHORT_TEXT" && // must be of type SHORT_TEXT
               !f.multiple && // must be "single reply"
-              (!isDefined(f.parent_petition_field_id) || // must not be a child of another field (children are multiple by default)
+              (isNullish(f.parent_petition_field_id) || // must not be a child of another field (children are multiple by default)
                 f.parent_petition_field_id === field!.parent_petition_field_id), // can be a sibling of the BACKGROUND_CHECK field
           ) &&
-          (!isDefined(dateField) ||
+          (isNullish(dateField) ||
             (dateField.petition_id === args.petitionId &&
               dateField.type === "DATE" &&
               !dateField.multiple &&
-              (!isDefined(dateField.parent_petition_field_id) ||
+              (isNullish(dateField.parent_petition_field_id) ||
                 dateField.parent_petition_field_id === field!.parent_petition_field_id)))
         );
       }),
@@ -1783,7 +1784,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
 
       if (isFileTypeField(reply!.type)) {
-        if (!isDefined(reply?.content["file_upload_id"])) {
+        if (isNullish(reply?.content["file_upload_id"])) {
           throw new ApolloError("File not found", "FILE_NOT_FOUND");
         }
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
@@ -1805,7 +1806,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
             args.preview ? "inline" : "attachment",
           ),
         };
-      } else if (reply!.type === "BACKGROUND_CHECK" && isDefined(reply?.content?.entity)) {
+      } else if (reply!.type === "BACKGROUND_CHECK" && isNonNullish(reply?.content?.entity)) {
         const { binary_stream: stream, mime_type: contentType } =
           await ctx.backgroundCheck.entityProfileDetailsPdf(ctx.user!.id, reply!.content);
         const key = random(16);
@@ -2043,7 +2044,7 @@ export const sendPetition = mutationField("sendPetition", {
       );
 
       if (
-        isDefined(args.bulkSendSigningMode) &&
+        isNonNullish(args.bulkSendSigningMode) &&
         args.bulkSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
       ) {
         await ctx.petitions.updatePetition(
@@ -2072,7 +2073,7 @@ export const sendPetition = mutationField("sendPetition", {
         );
       }
 
-      const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
+      const sender = isNonNullish(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
 
       // we chunk petitions in chunks of less than 100 contactIds
       // this way we can schedule the PetitionMessages in batches of 100 emails per 5 minutes
@@ -2291,7 +2292,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
       `User:${ctx.user!.id}`,
       ctx.user!.id,
     );
-    return (await ctx.petitions.loadAccess(args.accessIds)).filter(isDefined);
+    return (await ctx.petitions.loadAccess(args.accessIds)).filter(isNonNullish);
   },
 });
 
@@ -2310,7 +2311,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
   },
   resolve: async (_, args, ctx) => {
     await ctx.petitions.reactivateAccesses(args.petitionId, args.accessIds, ctx.user!);
-    return (await ctx.petitions.loadAccess(args.accessIds)).filter(isDefined);
+    return (await ctx.petitions.loadAccess(args.accessIds)).filter(isNonNullish);
   },
 });
 
@@ -2379,7 +2380,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     if (!args.force) {
       const field = await ctx.petitions.loadField(args.fieldId);
       const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
-      if (isDefined(field) && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
+      if (isNonNullish(field) && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
         throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
       }
     }
@@ -2437,7 +2438,9 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
 
     const accesses = await ctx.petitions.loadAccessesForPetition(args.petitionId);
 
-    const activeAccesses = accesses.filter((a) => a.status === "ACTIVE" && isDefined(a.contact_id));
+    const activeAccesses = accesses.filter(
+      (a) => a.status === "ACTIVE" && isNonNullish(a.contact_id),
+    );
 
     const events = await ctx.petitions.createEvent(
       activeAccesses.map((access) => ({
@@ -2551,7 +2554,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     const ownerPermissions = args.permissions.filter((p) => p.permissionType === "OWNER");
     if (
       ownerPermissions.length > 1 || // 0 or 1 OWNER defined in the array
-      (ownerPermissions.length === 1 && !isDefined(ownerPermissions[0].userId)) // if there is an owner, userId must be defined
+      (ownerPermissions.length === 1 && isNullish(ownerPermissions[0].userId)) // if there is an owner, userId must be defined
     ) {
       throw new ArgValidationError(info, "permissions", "Invalid permissions array");
     }
@@ -2655,16 +2658,16 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
   ),
   resolve: async (_, args, ctx) => {
     const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
-    if (isDefined(args.title)) {
+    if (isNonNullish(args.title)) {
       publicPetitionLinkData.title = args.title;
     }
-    if (isDefined(args.description)) {
+    if (isNonNullish(args.description)) {
       publicPetitionLinkData.description = args.description;
     }
-    if (isDefined(args.isActive)) {
+    if (isNonNullish(args.isActive)) {
       publicPetitionLinkData.is_active = args.isActive;
     }
-    if (isDefined(args.slug)) {
+    if (isNonNullish(args.slug)) {
       publicPetitionLinkData.slug = args.slug;
     }
 
@@ -2672,7 +2675,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
       publicPetitionLinkData.prefill_secret = args.prefillSecret;
     }
 
-    if (isDefined(args.allowMultiplePetitions)) {
+    if (isNonNullish(args.allowMultiplePetitions)) {
       publicPetitionLinkData.allow_multiple_petitions = args.allowMultiplePetitions;
     }
 
@@ -2717,7 +2720,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
 
     if (
       Object.keys(petition.custom_properties).length >= 20 &&
-      !isDefined(petition.custom_properties[key])
+      isNullish(petition.custom_properties[key])
     ) {
       throw new ApolloError("Max limit of properties reached", "CUSTOM_PROPERTIES_LIMIT_ERROR");
     }
@@ -2758,7 +2761,7 @@ export const completePetition = mutationField("completePetition", {
       // run an automated background search for each field that has autoSearchConfig and the "name" field replied
       // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
       for (const data of backgroundCheckAutoSearchQueries) {
-        if (isDefined(data.petitionFieldReplyId)) {
+        if (isNonNullish(data.petitionFieldReplyId)) {
           await ctx.petitions.updatePetitionFieldRepliesContent(
             args.petitionId,
             [
@@ -3294,7 +3297,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         (f) => f.id === args.petitionFieldId,
       );
 
-      if (!isDefined(fieldGroup)) {
+      if (isNullish(fieldGroup)) {
         // trying to archive a FIELD_GROUP reply that is not visible with the current field visibility
         throw new ForbiddenError(
           "provided field is not visible due to current visibility conditions",
@@ -3305,7 +3308,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       const groupReplies =
         fieldGroup.replies
           .find((r) => r.id === args.parentReplyId)!
-          .children?.filter((c) => isDefined(c.field.profile_type_field_id)) ?? [];
+          .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? [];
 
       // load profile and get its values and files
       const [profile, profileTypeFields, profileFieldValues, profileFieldFiles] = await Promise.all(
@@ -3338,10 +3341,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       const fileUploadIds = unique([
         ...groupReplies.flatMap((r) =>
           r.field.type === "FILE_UPLOAD"
-            ? r.replies.map((r) => r.content.file_upload_id as number).filter(isDefined)
+            ? r.replies.map((r) => r.content.file_upload_id as number).filter(isNonNullish)
             : [],
         ),
-        ...profileFieldFiles.map((pff) => pff.file_upload_id).filter(isDefined),
+        ...profileFieldFiles.map((pff) => pff.file_upload_id).filter(isNonNullish),
       ]);
 
       const fileUploads = await ctx.files.loadFileUpload(fileUploadIds);
@@ -3379,21 +3382,21 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         );
 
         // if already exists a value on the profile, there could be a conflict with reply so we need to check
-        if (isDefined(profileFieldValue)) {
+        if (isNonNullish(profileFieldValue)) {
           // we need to do something only if the reply value is different than current value (or no reply on the field)
-          if (!isDefined(reply) || !contentsAreEqual(profileFieldValue, reply)) {
+          if (isNullish(reply) || !contentsAreEqual(profileFieldValue, reply)) {
             // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
             if (
-              isDefined(reply) &&
+              isNonNullish(reply) &&
               profileTypeField.is_expirable &&
               !profileTypeField.options.useReplyAsExpiryDate &&
-              !isDefined(expiration) &&
-              (!isDefined(resolution) || resolution.action !== "IGNORE") // if resolution is IGNORE, value will not be updated so we don't want to update the expiryDate
+              isNullish(expiration) &&
+              (isNullish(resolution) || resolution.action !== "IGNORE") // if resolution is IGNORE, value will not be updated so we don't want to update the expiryDate
             ) {
               missingExpirations.push(field.profile_type_field_id!);
             }
             // resolution is required
-            if (!isDefined(resolution)) {
+            if (isNullish(resolution)) {
               missingConflictResolutions.push(field.profile_type_field_id!);
             } else if (resolution.action === "OVERWRITE") {
               /**
@@ -3414,13 +3417,13 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               });
             }
           }
-        } else if (isDefined(reply)) {
+        } else if (isNonNullish(reply)) {
           // profile field value is not present in profile, there will be no conflicts
           // if the field is expirable, we require it to be present on expirations array
           if (
             profileTypeField.is_expirable &&
             !profileTypeField.options.useReplyAsExpiryDate &&
-            !isDefined(expiration)
+            isNullish(expiration)
           ) {
             // expiration is required
             missingExpirations.push(field.profile_type_field_id!);
@@ -3465,7 +3468,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         if (profileFieldFileValues.length > 0) {
           if (replies.length === 0) {
             // no replies on field, IGNORE or OVERWRITE?
-            if (!isDefined(resolution)) {
+            if (isNullish(resolution)) {
               // resolution is required
               missingConflictResolutions.push(field.profile_type_field_id!);
             }
@@ -3480,7 +3483,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             }
           } else {
             const replyFileUploads = replies
-              .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+              .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
               .map((r) => r.content.file_upload_id as number)
               .map((id) => fileUploads.find((fu) => fu?.id === id));
 
@@ -3501,23 +3504,23 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
             // expiration is required if the field is expirable and the reply has files (meaning profile value will not be removed)
             if (
-              (!isDefined(resolution) || resolution.action !== "IGNORE") && // don't ask for expiryDate if ignoring this reply
+              (isNullish(resolution) || resolution.action !== "IGNORE") && // don't ask for expiryDate if ignoring this reply
               profileTypeField.is_expirable &&
-              !isDefined(expiration) &&
+              isNullish(expiration) &&
               (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0) // if there is no difference between reply and profile value, no need to update expiryDate
             ) {
               missingExpirations.push(field.profile_type_field_id!);
             }
 
             if (
-              !isDefined(resolution) &&
+              isNullish(resolution) &&
               (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0)
             ) {
               // resolution is required only if there is any difference between files on reply and profile
               missingConflictResolutions.push(field.profile_type_field_id!);
             } else if (resolution?.action === "APPEND" || resolution?.action === "OVERWRITE") {
               createProfileFieldFiles.push(
-                ...newFileUploads.filter(isDefined).map((r) => ({
+                ...newFileUploads.filter(isNonNullish).map((r) => ({
                   profileTypeFieldId: field.profile_type_field_id!,
                   fileUploadId: r.id!,
                   expiryDate: expiration?.expiryDate,
@@ -3526,7 +3529,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               if (resolution?.action === "OVERWRITE") {
                 deleteProfileFieldFileIds.push(
                   ...currentProfileFieldFileUploads
-                    .filter(isDefined)
+                    .filter(isNonNullish)
                     .map((fu) => profileFieldFiles.find((pf) => pf.file_upload_id === fu?.id)!.id),
                 );
               }
@@ -3536,14 +3539,14 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           // no files on the profile. we can add the files on replies without checking for conflicts
 
           // if the field is expirable, we require it to be present on expirations array
-          if (profileTypeField.is_expirable && !isDefined(expiration)) {
+          if (profileTypeField.is_expirable && isNullish(expiration)) {
             // expiration is required
             missingExpirations.push(field.profile_type_field_id!);
           }
 
           createProfileFieldFiles.push(
             ...replies
-              .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+              .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
               .map((r) => ({
                 profileTypeFieldId: field.profile_type_field_id!,
                 fileUploadId: r.content.file_upload_id as number,
@@ -3727,7 +3730,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           .flat()
           .filter(
             (r) =>
-              isDefined(r.associated_profile_id) &&
+              isNonNullish(r.associated_profile_id) &&
               r.associated_profile_id !== args.profileId &&
               r.id !== args.parentReplyId,
           );
@@ -3979,7 +3982,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     }
 
     const fieldGroups = (await ctx.petitions.loadFieldsForPetition(petition.id)).filter(
-      (f) => f!.type === "FIELD_GROUP" && isDefined(f.profile_type_id),
+      (f) => f!.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
     );
     const children = await ctx.petitions.loadPetitionFieldChildren(fieldGroups.map((f) => f.id));
     const groupsWithChildren = zip(fieldGroups, children);
@@ -3994,7 +3997,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
 
       for (const profileId of input.profileIds) {
         let groupReply = emptyGroupReplies.shift();
-        if (!isDefined(groupReply)) {
+        if (isNullish(groupReply)) {
           [groupReply] = await ctx.petitions.createEmptyFieldGroupReply([parent.id], ctx.user!);
         }
 
@@ -4007,7 +4010,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
         const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(profileId);
 
-        const linkedChildren = children.filter((c) => isDefined(c.profile_type_field_id));
+        const linkedChildren = children.filter((c) => isNonNullish(c.profile_type_field_id));
 
         const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
           linkedChildren.map((child) => ({
@@ -4027,11 +4030,11 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
             (f) => f.profile_type_field_id === child.profile_type_field_id,
           );
 
-          const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isDefined);
+          const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isNonNullish);
           const clonedFileUploads =
             fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
 
-          if (isDefined(profileValue)) {
+          if (isNonNullish(profileValue)) {
             replies.push({
               petition_field_id: child.id,
               parent_petition_field_reply_id: groupReply.id,
@@ -4090,7 +4093,7 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
   resolve: async (_, args, ctx) => {
     const profileLinkedChildren = (
       await ctx.petitions.loadPetitionFieldChildren(args.petitionFieldId)
-    ).filter((f) => isDefined(f.profile_type_field_id));
+    ).filter((f) => isNonNullish(f.profile_type_field_id));
 
     const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
       profileLinkedChildren.map((child) => ({
@@ -4115,11 +4118,11 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
         (f) => f.profile_type_field_id === child.profile_type_field_id,
       );
 
-      const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isDefined);
+      const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isNonNullish);
       const clonedFileUploads =
         fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
 
-      if (isDefined(profileValue)) {
+      if (isNonNullish(profileValue)) {
         replies.push({
           petition_field_id: child.id,
           parent_petition_field_reply_id: args.parentReplyId,
@@ -4154,7 +4157,7 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
       `User:${ctx.user!.id}`,
     );
 
-    if (isDefined(parentReply?.associated_profile_id)) {
+    if (isNonNullish(parentReply?.associated_profile_id)) {
       // call safeRemove AFTER updating associated_profile_id on reply, so old profile_id can be safe removed
       // (calling this function before updating will result in no disassociation as there is still a reference to the profile on the parentReply)
       const disassociated = await ctx.petitions.safeRemovePetitionProfileAssociation(

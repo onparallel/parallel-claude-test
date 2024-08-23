@@ -6,7 +6,7 @@ import { LocalizableUserText } from "@parallel/components/common/LocalizableUser
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface CreateOrUpdateProfileTypeDialogProps {
   name?: LocalizableUserText;
@@ -50,7 +50,7 @@ function CreateOrUpdateProfileTypeDialog({
         }),
       }}
       header={
-        isDefined(name) && isEditing ? (
+        isNonNullish(name) && isEditing ? (
           <FormattedMessage
             id="component.create-profile-type-dialog.edit-profile-type-name"
             defaultMessage="Edit profile type name"

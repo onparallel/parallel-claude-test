@@ -30,7 +30,7 @@ import { isReplyContentCompatible, mapReplyContents } from "@parallel/utils/peti
 import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { groupBy, isDefined, pick } from "remeda";
+import { groupBy, isNonNullish, isNullish, pick } from "remeda";
 
 export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ petitionId: string }>) {
   const {
@@ -93,7 +93,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         .map((f) => ({
           ...f,
           replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
-            ? f.replies.filter((r) => !isDefined(r.content.error))
+            ? f.replies.filter((r) => isNullish(r.content.error))
             : f.replies,
         })),
     [selectedPetitionData?.petition?.fields],
@@ -109,7 +109,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       .map((f) => ({
         ...f,
         replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
-          ? f.replies.filter((r) => !isDefined(r.content.error))
+          ? f.replies.filter((r) => isNullish(r.content.error))
           : f.replies,
       }));
 
@@ -130,26 +130,26 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         replyIsApproved;
       if (!isFieldReplied) {
         const matchingField =
-          (isDefined(field.alias) &&
+          (isNonNullish(field.alias) &&
             filteredSourceFields.find((f) => {
               return (
                 field.alias === f.alias &&
                 isReplyContentCompatible(field, f) &&
-                isDefined(field.parent) === isDefined(f.parent)
+                isNonNullish(field.parent) === isNonNullish(f.parent)
               );
             })) ||
-          (isDefined(field.fromPetitionFieldId) &&
+          (isNonNullish(field.fromPetitionFieldId) &&
             filteredSourceFields.find((f) => {
               return (
                 field.fromPetitionFieldId === f.fromPetitionFieldId &&
                 isReplyContentCompatible(field, f) &&
-                isDefined(field.parent) === isDefined(f.parent)
+                isNonNullish(field.parent) === isNonNullish(f.parent)
               );
             })) ||
           null;
-        if (isDefined(matchingField)) {
+        if (isNonNullish(matchingField)) {
           mapping[field.id] = matchingField.id;
-          if (isDefined(field.parent) && isDefined(matchingField.parent)) {
+          if (isNonNullish(field.parent) && isNonNullish(matchingField.parent)) {
             mapping[field.parent.id] = matchingField.parent.id;
           }
         }
@@ -364,7 +364,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         )
       }
       alternative={
-        (isDefined(errors.mapping) || invalidGroups) && currentStep === 1 ? (
+        (isNonNullish(errors.mapping) || invalidGroups) && currentStep === 1 ? (
           <Text color="red.600" aria-live="polite">
             {invalidGroups ? (
               <FormattedMessage

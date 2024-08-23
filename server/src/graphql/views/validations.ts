@@ -1,9 +1,9 @@
 import { ArgsValue } from "nexus/dist/core";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
+import { NexusGenInputs } from "../__types";
 import { ArgValidationError } from "../helpers/errors";
 import { validateAnd } from "../helpers/validateArgs";
 import { validPetitionSharedWithFilter, validPetitionTagFilter } from "../petition/types/filters";
-import { NexusGenInputs } from "../__types";
 
 export function validPetitionListViewData<TypeName extends string, FieldName extends string>(
   prop: (
@@ -16,7 +16,7 @@ export function validPetitionListViewData<TypeName extends string, FieldName ext
     validPetitionTagFilter((args) => prop(args)?.tagsFilters, `${name}.tagsFilters`),
     async (_, args, ctx, info) => {
       const fromTemplateId = prop(args)?.fromTemplateId;
-      if (isDefined(fromTemplateId)) {
+      if (isNonNullish(fromTemplateId)) {
         const hasAccess = await ctx.petitions.userHasAccessToPetitions(
           ctx.user!.id,
           fromTemplateId,

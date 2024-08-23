@@ -31,6 +31,10 @@ import {
   BackgroundCheckService,
 } from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
+import {
+  DOCUMENT_PROCESSING_SERVICE,
+  IDocumentProcessingService,
+} from "./services/DocumentProcessingService";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService } from "./services/EncryptionService";
 import {
@@ -71,10 +75,6 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
-import {
-  DOCUMENT_PROCESSING_SERVICE,
-  IDocumentProcessingService,
-} from "./services/DocumentProcessingService";
 
 @injectable()
 export class ApiContext {

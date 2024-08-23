@@ -7,6 +7,7 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -18,7 +19,6 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
-import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import {
   OrganizationGroups_UserGroupFragment,
   OrganizationGroups_cloneUserGroupsDocument,

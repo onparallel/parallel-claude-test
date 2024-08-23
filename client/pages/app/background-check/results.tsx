@@ -30,7 +30,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 type BackgroundCheckFieldSearchResults_Selection =
   | ({
       type: "Person";
@@ -107,7 +107,7 @@ function BackgroundCheckFieldSearchResults({
   );
 
   const showGenericErrorToast = useGenericErrorToast();
-  if (isDefined(error)) {
+  if (isNonNullish(error)) {
     showGenericErrorToast();
   }
 
@@ -301,7 +301,9 @@ function BackgroundCheckFieldSearchResults({
                   />
                   {": "}
                 </Text>
-                <Text as="span">{[entityTypeLabel, name, date].filter(isDefined).join(" | ")}</Text>
+                <Text as="span">
+                  {[entityTypeLabel, name, date].filter(isNonNullish).join(" | ")}
+                </Text>
               </Box>
 
               <HStack>

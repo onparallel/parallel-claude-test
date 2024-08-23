@@ -1,7 +1,16 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import pMap from "p-map";
-import { filter, flatten, groupBy, indexBy, isDefined, mapValues, pipe } from "remeda";
+import {
+  filter,
+  flatten,
+  groupBy,
+  indexBy,
+  isNonNullish,
+  isNullish,
+  mapValues,
+  pipe,
+} from "remeda";
 import { UserLocale } from "../db/__types";
 import { PetitionFieldOptions, selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { ContactRepository } from "../db/repositories/ContactRepository";
@@ -86,7 +95,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
     );
 
     const originalMessage =
-      isDefined(args.petitionAccessId) && isDefined(args.petitionId) && options?.publicContext
+      isNonNullish(args.petitionAccessId) && isNonNullish(args.petitionId) && options?.publicContext
         ? await this.petitions.loadOriginalMessageByPetitionAccess(
             args.petitionAccessId,
             args.petitionId,
@@ -98,7 +107,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
         const id = fromGlobalId(key, "PetitionField").id;
         const field = fieldsById[id];
         const reply = repliesByFieldId[id];
-        if (!isDefined(reply)) {
+        if (isNullish(reply)) {
           return "";
         } else {
           switch (reply.type) {
@@ -110,7 +119,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
                 (reply.content.value as string[]).map((value) => {
                   const index = values.indexOf(value);
                   return index >= 0
-                    ? isDefined(labels)
+                    ? isNonNullish(labels)
                       ? labels[index]
                       : values[index]
                     : reply.content.value;
@@ -121,7 +130,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
               const { values, labels } = valuesAndLabelsByFieldId[field.id];
               const index = values.indexOf(reply.content.value);
               return index >= 0
-                ? isDefined(labels)
+                ? isNonNullish(labels)
                   ? labels[index]
                   : values[index]
                 : reply.content.value;

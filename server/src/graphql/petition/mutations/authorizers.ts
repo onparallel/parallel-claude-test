@@ -1,15 +1,15 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition } from "remeda";
+import { isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../../../util/fieldLogic";
+import { toGlobalId } from "../../../util/globalId";
 import { Maybe, MaybeArray } from "../../../util/types";
+import { NexusGenInputs } from "../../__types";
 import { Arg } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
-import { NexusGenInputs } from "../../__types";
-import { PetitionFieldMath, PetitionFieldVisibility } from "../../../util/fieldLogic";
-import { toGlobalId } from "../../../util/globalId";
 
 async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
   try {
@@ -18,7 +18,7 @@ async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
     }
     // ids of users in my same organization
     return (await ctx.users.loadUser(userIds)).every(
-      (u) => isDefined(u) && u.org_id === ctx.user!.org_id,
+      (u) => isNonNullish(u) && u.org_id === ctx.user!.org_id,
     );
   } catch {}
   return false;
@@ -30,7 +30,7 @@ export function userHasAccessToUsers<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    if (!isDefined(args[argName])) {
+    if (isNullish(args[argName])) {
       return true;
     }
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -51,15 +51,15 @@ export function userHasAccessToUserAndUserGroups<
   return async (_, args, ctx) => {
     try {
       const permissions = args[argName] as unknown as UserOrUserGroup[] | null | undefined;
-      if (!isDefined(permissions)) {
+      if (isNullish(permissions)) {
         return true;
       }
       for (const p of permissions) {
-        if (Number(isDefined(p.userId)) + Number(isDefined(p.userGroupId)) !== 1) {
+        if (Number(isNonNullish(p.userId)) + Number(isNonNullish(p.userGroupId)) !== 1) {
           return false;
         }
       }
-      const [uPermissions, ugPermissions] = partition(permissions, (p) => isDefined(p.userId));
+      const [uPermissions, ugPermissions] = partition(permissions, (p) => isNonNullish(p.userId));
 
       const [hasAccessToUsers, hasAccessToUserGroups] = await Promise.all([
         contextUserHasAccessToUsers(
@@ -89,7 +89,9 @@ export function argUserHasStatus<
         return true;
       }
 
-      return (await ctx.users.loadUser(userIds)).every((u) => isDefined(u) && u.status === status);
+      return (await ctx.users.loadUser(userIds)).every(
+        (u) => isNonNullish(u) && u.status === status,
+      );
     } catch {}
     return false;
   };
@@ -108,7 +110,7 @@ export function userHasAccessToPublicPetitionLink<
       const publicPetitionLinkIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       const publicPetitionLinks = (
         await ctx.petitions.loadPublicPetitionLink(publicPetitionLinkIds)
-      ).filter(isDefined);
+      ).filter(isNonNullish);
 
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
@@ -127,7 +129,7 @@ export function userCanSendAs<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const senderId = args[argName] as unknown as Maybe<number>;
-    if (!isDefined(senderId) || senderId === ctx.user!.id) {
+    if (isNullish(senderId) || senderId === ctx.user!.id) {
       return true;
     }
     try {
@@ -272,7 +274,7 @@ export function fieldIsNotBeingUsedInMathOperation<
 
     const referencingFields = petitionFields.filter(
       (f) =>
-        isDefined(f.math) &&
+        isNonNullish(f.math) &&
         (f.math as PetitionFieldMath[]).some((m) =>
           m.operations.some((op) => op.operand.type === "FIELD" && op.operand.fieldId === fieldId),
         ),
@@ -318,7 +320,7 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
           petitionFields.some(
             (f) =>
               f.type === "BACKGROUND_CHECK" &&
-              isDefined(f.options.autoSearchConfig) &&
+              isNonNullish(f.options.autoSearchConfig) &&
               ((f.options.autoSearchConfig.name as number[]).includes(field.id) ||
                 (f.options.autoSearchConfig.date as number | null) === field.id),
           )

@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserReference_UserFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export const UserReference = Object.assign(
   chakraForwardRef<
@@ -16,7 +16,7 @@ export const UserReference = Object.assign(
   >(function UserReference({ user, useYou, ...props }, ref) {
     const intl = useIntl();
 
-    return isDefined(user) ? (
+    return isNonNullish(user) ? (
       user.status === "INACTIVE" ? (
         <Tooltip
           label={intl.formatMessage({

@@ -24,9 +24,9 @@ import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { NotificationsButton } from "./NotificationsButton";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
-import { NotificationsButton } from "./NotificationsButton";
 
 const NOTIFICATIONS_LIMIT = 16;
 const POLL_INTERVAL = 30_000;

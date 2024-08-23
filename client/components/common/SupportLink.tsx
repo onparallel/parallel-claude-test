@@ -1,5 +1,5 @@
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { NormalLink } from "./Link";
 
 interface SupportLink {
@@ -16,7 +16,7 @@ export const SupportLink = chakraForwardRef<"a", SupportLink>(function SupportLi
       href={`mailto:support@onparallel.com?body=${encodeURIComponent(message)}`}
       {...props}
       onClick={(event) => {
-        if (isDefined(window.Intercom)) {
+        if (isNonNullish(window.Intercom)) {
           event.preventDefault();
           window.Intercom("showNewMessage", message);
         }

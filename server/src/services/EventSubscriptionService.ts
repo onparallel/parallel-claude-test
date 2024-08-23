@@ -1,13 +1,13 @@
 import { sign } from "crypto";
+import stringify from "fast-safe-stringify";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
+import { CONFIG, Config } from "../config";
 import { EventSubscription, EventSubscriptionSignatureKey } from "../db/__types";
 import { SubscriptionRepository } from "../db/repositories/SubscriptionRepository";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "../services/EncryptionService";
-import { FETCH_SERVICE, IFetchService } from "./FetchService";
-import stringify from "fast-safe-stringify";
-import { CONFIG, Config } from "../config";
 import { EMAILS, IEmailsService } from "./EmailsService";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const EVENT_SUBSCRIPTION_SERVICE = Symbol.for("EVENT_SUBSCRIPTION_SERVICE");
 

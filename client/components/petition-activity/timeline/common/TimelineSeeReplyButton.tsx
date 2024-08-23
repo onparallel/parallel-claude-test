@@ -4,7 +4,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { TimelineSeeReplyButton_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface TimelineSeeReplyButton extends ButtonOptions, ThemingProps<"Button"> {
   field?: TimelineSeeReplyButton_PetitionFieldFragment | null;
@@ -15,7 +15,7 @@ export function TimelineSeeReplyButton({ field, replyId, ...props }: TimelineSee
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const reply = field?.replies.find((r) => r.id === replyId);
 
-  return isDefined(field) ? (
+  return isNonNullish(field) ? (
     reply !== undefined ? (
       <NakedLink
         href={

@@ -14,13 +14,15 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { ComponentType, PropsWithChildren, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { PetitionComposeBackgroundCheckSettings } from "./fields/PetitionComposeBackgroundCheckSettings";
 import { PetitionComposeCheckboxSettings } from "./fields/PetitionComposeCheckboxSettings";
 import { PetitionComposeDynamicSelectFieldSettings } from "./fields/PetitionComposeDynamicSelectFieldSettings";
 import { PetitionComposeFieldGroupSettings } from "./fields/PetitionComposeFieldGroupSettings";
+import { PetitionComposeFileUploadSettings } from "./fields/PetitionComposeFileUploadSettings";
 import { PetitionComposeHeadingSettings } from "./fields/PetitionComposeHeadingSettings";
+import { PetitionComposeIdVerificationSettings } from "./fields/PetitionComposeIdVerificationSettings";
 import { PetitionComposeNumberSettings } from "./fields/PetitionComposeNumberSettings";
 import { PetitionComposeSelectSettings } from "./fields/PetitionComposeSelectSettings";
 import { PetitionComposeShortTextSettings } from "./fields/PetitionComposeShortTextSettings";
@@ -34,8 +36,6 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
-import { PetitionComposeIdVerificationSettings } from "./fields/PetitionComposeIdVerificationSettings";
-import { PetitionComposeFileUploadSettings } from "./fields/PetitionComposeFileUploadSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petition: PetitionComposeFieldSettings_PetitionBaseFragment;
@@ -90,7 +90,7 @@ export const PetitionComposeFieldSettings = Object.assign(
     ) {
       const showErrorDialog = useErrorDialog();
 
-      const isFieldGroupChild = isDefined(field.parent);
+      const isFieldGroupChild = isNonNullish(field.parent);
 
       const showInPdf = isFieldGroupChild ? field.parent!.showInPdf : field.showInPdf;
 

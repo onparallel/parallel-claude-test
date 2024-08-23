@@ -1,11 +1,11 @@
-import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-import { ArgValidationError } from "../errors";
+import { fromStream } from "file-type";
 import { FileUpload } from "graphql-upload/Upload.js";
 import match from "mime-match";
-import { fromStream } from "file-type";
-import { MaybeArray } from "../../../util/types";
+import { core } from "nexus";
 import { unMaybeArray } from "../../../util/arrays";
+import { MaybeArray } from "../../../util/types";
+import { ArgValidationError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function contentType<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,

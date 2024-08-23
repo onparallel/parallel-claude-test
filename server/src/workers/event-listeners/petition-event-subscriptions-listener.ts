@@ -1,5 +1,5 @@
 import { DatabaseError } from "pg";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PetitionEventTypeValues } from "../../db/__types";
 import { mapPetitionEvent } from "../../util/eventMapper";
 import { pFilter } from "../../util/promises/pFilter";
@@ -50,19 +50,19 @@ export const petitionEventSubscriptionsListener = listener(
         if (s.from_template_id !== null && s.from_template_id !== petition.from_template_id) {
           return false;
         }
-        if (isDefined(s.from_template_field_ids) && "petition_field_id" in event.data) {
+        if (isNonNullish(s.from_template_field_ids) && "petition_field_id" in event.data) {
           if (event.data.petition_field_id === null) {
             // subscription is for a field event, but this event is not a field event
             // (general comments on petition)
             return false;
           }
           const field = await ctx.petitions.loadField(event.data.petition_field_id);
-          if (!isDefined(field?.from_petition_field_id)) {
+          if (isNullish(field?.from_petition_field_id)) {
             // field does not come from a template
             return false;
           }
           const templateField = await ctx.petitions.loadField(field.from_petition_field_id);
-          if (!isDefined(templateField) || !s.from_template_field_ids.includes(templateField.id)) {
+          if (isNullish(templateField) || !s.from_template_field_ids.includes(templateField.id)) {
             return false;
           }
         }

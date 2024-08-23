@@ -5,7 +5,7 @@ import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@pa
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
@@ -160,7 +160,7 @@ export function CurrentSignatureRequestRow({
                   <MenuItem
                     icon={<DocumentIcon boxSize={5} />}
                     onClick={() => onDownload(signatureRequest.id, true)}
-                    isDisabled={!isDefined(signatureRequest.auditTrailFilename)}
+                    isDisabled={isNullish(signatureRequest.auditTrailFilename)}
                   >
                     <FormattedMessage
                       id="component.petition-signatures-card.audit-trail"
@@ -171,7 +171,7 @@ export function CurrentSignatureRequestRow({
               }
             />
           </HStack>
-        ) : status === "CANCELLED" && isDefined(signatureRequest.errorMessage) ? (
+        ) : status === "CANCELLED" && isNonNullish(signatureRequest.errorMessage) ? (
           <Button size="sm" onClick={() => handleSeeRequestErrorMessageClick(signatureRequest)}>
             <FormattedMessage
               id="component.petition-signatures-card.more-info-button"

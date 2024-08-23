@@ -9,14 +9,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
-import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
-import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
+import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 
 type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 

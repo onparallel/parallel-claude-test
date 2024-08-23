@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { PetitionEvent } from "../../db/__types";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { listener } from "../helpers/EventProcessor";
@@ -83,7 +83,7 @@ export const petitionActivityListener = listener(
       const comment = await ctx.petitions.loadPetitionFieldComment(
         event.data.petition_field_comment_id,
       );
-      if (isDefined(comment?.petition_access_id)) {
+      if (isNonNullish(comment?.petition_access_id)) {
         lastRecipientActivityAt = event.created_at;
       }
     }
@@ -92,7 +92,7 @@ export const petitionActivityListener = listener(
       lastRecipientActivityAt = event.created_at;
     }
 
-    if (isDefined(lastActivityAt ?? lastRecipientActivityAt)) {
+    if (isNonNullish(lastActivityAt ?? lastRecipientActivityAt)) {
       await ctx.petitions.updatePetitionLastActivityDates(
         (event as PetitionEvent).petition_id,
         removeNotDefined({

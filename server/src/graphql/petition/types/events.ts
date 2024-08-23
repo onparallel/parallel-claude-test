@@ -1,5 +1,5 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PetitionEventTypeValues } from "../../../db/__types";
 import { mapPetitionEventPayload } from "../../../util/eventMapper";
 import { userOrPetitionAccessResolver } from "../../helpers/userOrPetitionAccessResolver";
@@ -186,7 +186,7 @@ export const AccessDeactivatedEvent = createPetitionEvent("AccessDeactivatedEven
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      return isDefined(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
+      return isNonNullish(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
     },
   });
   t.string("reason", {
@@ -237,7 +237,7 @@ export const MessagesCancelledEvent = createPetitionEvent("MessageCancelledEvent
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      return isDefined(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
+      return isNonNullish(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
     },
   });
   t.string("reason", {
@@ -318,7 +318,7 @@ export const CommentPublishedEvent = createPetitionEvent("CommentPublishedEvent"
   t.nullable.field("field", {
     type: "PetitionField",
     resolve: async (root, _, ctx) => {
-      if (isDefined(root.data.petition_field_id)) {
+      if (isNonNullish(root.data.petition_field_id)) {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       }
       return null;
@@ -334,7 +334,7 @@ export const CommentPublishedEvent = createPetitionEvent("CommentPublishedEvent"
     resolve: (root) => root.data.is_internal ?? false,
   });
   t.boolean("isGeneral", {
-    resolve: (root) => !isDefined(root.data.petition_field_id),
+    resolve: (root) => isNullish(root.data.petition_field_id),
   });
 });
 
@@ -342,7 +342,7 @@ export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t
   t.nullable.field("field", {
     type: "PetitionField",
     resolve: async (root, _, ctx) => {
-      if (isDefined(root.data.petition_field_id)) {
+      if (isNonNullish(root.data.petition_field_id)) {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       }
       return null;
@@ -356,7 +356,7 @@ export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t
     resolve: (root) => root.data.is_internal ?? false,
   });
   t.boolean("isGeneral", {
-    resolve: (root) => !isDefined(root.data.petition_field_id),
+    resolve: (root) => isNullish(root.data.petition_field_id),
   });
 });
 
@@ -602,7 +602,7 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
         return { __type: "User", ...(await ctx.users.loadUser(data.cancel_data.user_id))! };
       } else {
         if (data.cancel_reason === "REQUEST_RESTARTED") {
-          const isAccess = isDefined(data.cancel_data.petition_access_id);
+          const isAccess = isNonNullish(data.cancel_data.petition_access_id);
           if (isAccess) {
             return {
               __type: "PetitionAccess",
@@ -644,7 +644,7 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
     resolve: ({ data }) => {
       // expose error message only for specific errors
       return data.cancel_reason === "REQUEST_ERROR" &&
-        isDefined(data.cancel_data.error_code) &&
+        isNonNullish(data.cancel_data.error_code) &&
         ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
           data.cancel_data.error_code,
         ) &&
@@ -785,7 +785,7 @@ export const ProfileDisassociatedEvent = createPetitionEvent("ProfileDisassociat
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
-      if (isDefined(root.data.user_id)) {
+      if (isNonNullish(root.data.user_id)) {
         return await ctx.users.loadUser(root.data.user_id);
       }
       return null;

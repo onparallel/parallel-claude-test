@@ -23,7 +23,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { Fragment, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
@@ -104,7 +104,7 @@ export function PetitionRepliesFieldReply({
     "message",
     async (e) => {
       const browserTab = browserTabRef.current;
-      if (!isDefined(browserTab) || e.source !== browserTab) {
+      if (isNullish(browserTab) || e.source !== browserTab) {
         return;
       }
       if (e.data.event === "update-info") {
@@ -116,7 +116,7 @@ export function PetitionRepliesFieldReply({
         browserTab.postMessage(
           {
             event: "info-updated",
-            entityIds: [reply.content?.entity?.id].filter(isDefined),
+            entityIds: [reply.content?.entity?.id].filter(isNonNullish),
           },
           browserTab.origin,
         );
@@ -194,7 +194,7 @@ export function PetitionRepliesFieldReply({
                       />
                     ) : (
                       [content.request.model.type, content.request.model.year]
-                        .filter(isDefined)
+                        .filter(isNonNullish)
                         .join("_")
                     )}
                   </Text>
@@ -266,7 +266,7 @@ export function PetitionRepliesFieldReply({
                           </VisuallyHidden>
                           <Text as="span">
                             {[entityTypeLabel, content?.query?.name, content?.query?.date]
-                              .filter(isDefined)
+                              .filter(isNonNullish)
                               .join(" | ")}
                           </Text>
                           <Text as="span" color="gray.500" fontSize="sm">
@@ -317,7 +317,7 @@ export function PetitionRepliesFieldReply({
                       </Text>
                     </Flex>
                     {type === "FILE_UPLOAD" &&
-                    isDefined(reply.metadata) &&
+                    isNonNullish(reply.metadata) &&
                     reply.metadata.type === "PAYSLIP" ? (
                       <PetitionRepliesFieldFileUploadPayslipReply
                         metadata={reply.metadata as any}
@@ -327,7 +327,7 @@ export function PetitionRepliesFieldReply({
                 ) : (
                   <HStack>
                     {["SELECT", "CHECKBOX"].includes(type) &&
-                    isDefined(
+                    isNonNullish(
                       (reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]).labels,
                     ) ? (
                       <Text as="span">

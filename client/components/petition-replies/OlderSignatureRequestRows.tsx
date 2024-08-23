@@ -2,18 +2,18 @@ import { gql } from "@apollo/client";
 import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
+import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { Divider } from "../common/Divider";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
+import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
-import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
-import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 
 export function OlderSignatureRequestRows({
   signatures,
@@ -112,7 +112,7 @@ export function OlderSignatureRequestRows({
                       <MenuItem
                         icon={<DocumentIcon boxSize={5} />}
                         onClick={() => onDownload(signature.id, true)}
-                        isDisabled={!isDefined(signature.auditTrailFilename)}
+                        isDisabled={isNullish(signature.auditTrailFilename)}
                       >
                         <FormattedMessage
                           id="component.petition-signatures-card.audit-trail"
@@ -123,7 +123,7 @@ export function OlderSignatureRequestRows({
                   }
                 />
               </HStack>
-            ) : signature.status === "CANCELLED" && isDefined(signature.errorMessage) ? (
+            ) : signature.status === "CANCELLED" && isNonNullish(signature.errorMessage) ? (
               <Button size="sm" onClick={() => handleSeeRequestErrorMessageClick(signature)}>
                 <FormattedMessage
                   id="component.petition-signatures-card.more-info-button"

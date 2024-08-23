@@ -26,7 +26,7 @@ import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { useRecipientViewIdVerificationStartAgainDialog } from "../dialogs/RecipientViewIdVerificationStartAgainDialog";
 import {
   RecipientViewPetitionFieldLayout,
@@ -78,7 +78,7 @@ export function RecipientViewPetitionFieldIdVerification({
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
-        if (isDefined(popupRef.current) && popupRef.current.closed && !sessionReady) {
+        if (isNonNullish(popupRef.current) && popupRef.current.closed && !sessionReady) {
           setState("IDLE");
           done();
         } else {
@@ -104,7 +104,7 @@ export function RecipientViewPetitionFieldIdVerification({
     "message",
     (e) => {
       const popup = popupRef.current;
-      if (isDefined(popup) && e.source === popup) {
+      if (isNonNullish(popup) && e.source === popup) {
         if (e.data.name === "session_completed") {
           setSessionReady(true);
         }
@@ -154,7 +154,7 @@ export function RecipientViewPetitionFieldIdVerification({
 
   const showStartAgainDialog = useRecipientViewIdVerificationStartAgainDialog();
   const hasError = field.replies.some(
-    (r) => isDefined(r.content.error) && r.content.error.length > 0,
+    (r) => isNonNullish(r.content.error) && r.content.error.length > 0,
   );
 
   const handleStartAgain = async () => {
@@ -216,7 +216,8 @@ export function RecipientViewPetitionFieldIdVerification({
                 {field.replies.map((reply) => {
                   const contentType = reply.content?.contentType ?? "";
                   const isVideo = contentType.includes("video");
-                  const hasError = isDefined(reply.content.error) && reply.content.error.length > 0;
+                  const hasError =
+                    isNonNullish(reply.content.error) && reply.content.error.length > 0;
 
                   return (
                     <HStack

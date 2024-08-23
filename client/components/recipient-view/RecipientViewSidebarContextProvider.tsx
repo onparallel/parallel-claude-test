@@ -3,7 +3,7 @@ import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 interface RecipientViewSidebarContextProps {
   children: ReactNode;
@@ -28,10 +28,12 @@ export function RecipientViewSidebarContextProvider({
     { base: "CLOSED", lg: "CONTENTS" },
     { fallback: deviceType === null ? "lg" : "md" },
   )!;
-  const [state, setState] = useState<SidebarState>(isDefined(fieldId) ? "COMMENTS" : initialState);
+  const [state, setState] = useState<SidebarState>(
+    isNonNullish(fieldId) ? "COMMENTS" : initialState,
+  );
 
   useEffectSkipFirst(() => {
-    if (isDefined(fieldId) && state !== "COMMENTS") {
+    if (isNonNullish(fieldId) && state !== "COMMENTS") {
       setState("COMMENTS");
     }
   }, [fieldId]);
@@ -40,7 +42,7 @@ export function RecipientViewSidebarContextProvider({
     // Close the sidebar if it is open and the same state is clicked or open with the new state
     setState(state === value ? "CLOSED" : value);
     // Reset the fieldId when change the sidebar state
-    if (isDefined(fieldId)) {
+    if (isNonNullish(fieldId)) {
       setFieldId(null);
     }
   };

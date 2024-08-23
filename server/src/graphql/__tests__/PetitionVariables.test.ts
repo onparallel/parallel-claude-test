@@ -1,10 +1,10 @@
+import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { Organization, Petition, User } from "../../db/__types";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { TestClient, initServer } from "./server";
 import { KNEX } from "../../db/knex";
-import { gql } from "graphql-request";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
+import { TestClient, initServer } from "./server";
 
 describe("Petition Variables", () => {
   let testClient: TestClient;

@@ -1,5 +1,5 @@
 import { Router, urlencoded } from "express";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { sign, verify } from "../util/jwt";
 
 type AppSumoPayload =
@@ -72,7 +72,7 @@ export const appsumo = Router()
           return res.status(401).json({ message: "invalid action" });
         }
 
-        return isDefined(req.context.organization) ||
+        return isNonNullish(req.context.organization) ||
           ["activate", "refund"].includes(payload.action)
           ? next()
           : res.status(401).json({
@@ -90,10 +90,10 @@ export const appsumo = Router()
       const org = req.context.organization;
 
       if (payload.action === "activate") {
-        if (isDefined(org)) {
+        if (isNonNullish(org)) {
           // first we need to make sure this organization was not created previously with another AppSumo purchase UNLESS the last action was a refund
           // "Sumo-lings SHOULD NOT be able to activate multiple AppSumo licenses with the same email."
-          if (isDefined(org.appsumo_license) && org.appsumo_license.action !== "refund") {
+          if (isNonNullish(org.appsumo_license) && org.appsumo_license.action !== "refund") {
             return res.status(401).json({
               message: "The email is already registered in Parallel with an active license",
             });
@@ -140,7 +140,7 @@ export const appsumo = Router()
         }
       } else if (payload.action === "refund") {
         // if doing a refund and the organization does not exist, do nothing and return success
-        if (isDefined(org)) {
+        if (isNonNullish(org)) {
           await req.context.organizations.updateAppSumoLicense(
             org.id,
             payload,

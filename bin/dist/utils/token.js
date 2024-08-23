@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.token = exports.encode = void 0;
+exports.encode = encode;
+exports.token = token;
 const crypto_1 = require("crypto");
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 function encode(buffer) {
@@ -40,9 +41,7 @@ function encode(buffer) {
         .map((d) => ALPHABET[d])
         .join("");
 }
-exports.encode = encode;
 function token(length) {
     const buffer = (0, crypto_1.randomBytes)(length);
     return encode(buffer);
 }
-exports.token = token;

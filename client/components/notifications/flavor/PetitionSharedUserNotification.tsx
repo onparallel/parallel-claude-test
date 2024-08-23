@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
+import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
 import { PetitionSharedUserNotification_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
-import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 
 export interface PetitionSharedUserNotificationProps {
   isFirst?: boolean;

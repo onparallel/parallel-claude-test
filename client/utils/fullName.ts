@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { Maybe } from "./types";
 
 export function fullName(
@@ -6,5 +6,5 @@ export function fullName(
   lastName: Maybe<string> | undefined,
 ) {
   const parts = [firstName, lastName];
-  return parts.filter(isDefined).join(" ");
+  return parts.filter(isNonNullish).join(" ");
 }

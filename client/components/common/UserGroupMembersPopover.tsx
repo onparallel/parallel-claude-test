@@ -21,9 +21,9 @@ import {
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
-import { UserGroupReference } from "./UserGroupReference";
+import { isNonNullish } from "remeda";
 import { UserAvatar } from "./UserAvatar";
+import { UserGroupReference } from "./UserGroupReference";
 
 export interface UserGroupMembersPopoverProps {
   userGroupId: string;
@@ -41,7 +41,7 @@ export function UserGroupMembersPopover({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
-  const group = isDefined(data)
+  const group = isNonNullish(data)
     ? (data.getUsersOrGroups[0] as UserGroupMembersPopover_UserGroupFragment)
     : null;
   return (
@@ -50,7 +50,7 @@ export function UserGroupMembersPopover({
       <Portal>
         <PopoverContent width="fit-content" maxWidth="320px">
           <PopoverArrow />
-          {isDefined(group) ? (
+          {isNonNullish(group) ? (
             <PopoverHeader borderBottom="none" fontWeight="normal" paddingBottom={0} fontSize="sm">
               <FormattedMessage
                 id="component.user-group-members-popover.members-of"
@@ -62,7 +62,7 @@ export function UserGroupMembersPopover({
             </PopoverHeader>
           ) : null}
           <PopoverBody paddingX={0} paddingY={2} overflow="auto" maxHeight="300px" minWidth="200px">
-            {isDefined(group) ? (
+            {isNonNullish(group) ? (
               group.members.length > 0 ? (
                 <Stack as={List}>
                   {group.members.map(({ user }) => (

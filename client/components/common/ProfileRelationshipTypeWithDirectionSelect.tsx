@@ -13,7 +13,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
@@ -229,7 +229,7 @@ function IndicatorsContainer({
 }: SingleValueProps<ProfileRelationshipTypeWithDirectionSelectSelection, false, never>) {
   const intl = useIntl();
   const value = props.getValue()?.[0];
-  const reverse = isDefined(value)
+  const reverse = isNonNullish(value)
     ? props.selectProps.options.find(
         (ptwd) =>
           ptwd.profileRelationshipType.id === value.profileRelationshipType.id &&
@@ -240,7 +240,7 @@ function IndicatorsContainer({
   return (
     <components.IndicatorsContainer {...props}>
       <>
-        {isDefined(reverse) ? (
+        {isNonNullish(reverse) ? (
           <IconButton
             icon={<RelationshipIcon fontSize="md" />}
             variant="ghost"

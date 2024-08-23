@@ -89,7 +89,7 @@ import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { waitForElement } from "@parallel/utils/waitForElement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqueBy, zip } from "remeda";
+import { isNonNullish, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -127,7 +127,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
       return [
         [field, fieldIndex],
-        ...(isDefined(field.children) ? zip(field.children, childrenFieldIndices!) : []),
+        ...(isNonNullish(field.children) ? zip(field.children, childrenFieldIndices!) : []),
       ] as unknown as [
         FieldSelection | UnwrapArray<Exclude<FieldSelection["children"], null | undefined>>,
         string,
@@ -136,7 +136,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [fieldsWithIndices]);
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
   const activeFieldWithIndex = useMemo(() => {
-    return isDefined(activeFieldId)
+    return isNonNullish(activeFieldId)
       ? (allFieldsWithIndices.find(([field]) => field.id === activeFieldId) ?? null)
       : null;
   }, [allFieldsWithIndices, activeFieldId]);
@@ -150,7 +150,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [addFieldAfterId, setAddFieldAfterId] =
     useState<Maybe<[afterFieldId: string | undefined, inParentFieldId: string | undefined]>>(null);
-  const isAddFieldDrawerOpen = isDefined(addFieldAfterId);
+  const isAddFieldDrawerOpen = isNonNullish(addFieldAfterId);
   const [afterFieldId, inParentFieldId] = addFieldAfterId ?? [];
 
   const handleCloseFieldDrawer = useCallback(() => setAddFieldAfterId(null), []);
@@ -344,7 +344,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               operations,
             };
           })
-          .filter(isDefined);
+          .filter(isNonNullish);
 
         await _handleFieldEdit(field.id, {
           math: newMath.length > 0 ? newMath : null,
@@ -423,7 +423,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           await deletePetitionField({
             variables: { petitionId, fieldId, force },
             update: (cache, { data }) => {
-              if (isTemplate && isDefined(field.parent) && isDefined(data)) {
+              if (isTemplate && isNonNullish(field.parent) && isNonNullish(data)) {
                 updatePreviewFieldReplies(cache, field.parent.id, (replies) => {
                   return replies.map((r) => {
                     const children = [...r.children!].filter(({ field }) => field.id !== fieldId);
@@ -528,9 +528,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
       const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)?.[0];
       if (
-        isDefined(data.isInternal) &&
+        isNonNullish(data.isInternal) &&
         data.isInternal === false &&
-        isDefined(field) &&
+        isNonNullish(field) &&
         field.type === "FIELD_GROUP" &&
         (field.children ?? []).length > 0 &&
         (field.children![0].type === "DOW_JONES_KYC" ||
@@ -604,7 +604,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     conditions,
                   };
                 })
-                .filter(isDefined);
+                .filter(isNonNullish);
 
               await _handleFieldEdit(field.id, {
                 math: newMath.length > 0 ? newMath : null,
@@ -641,7 +641,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 fragmentName: "PetitionCompose_updatePetitionField",
                 id: fieldId,
               });
-              if (isDefined(cached)) {
+              if (isNonNullish(cached)) {
                 return {
                   updatePetitionField: {
                     ...cached,
@@ -758,7 +758,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     operations,
                   };
                 })
-                .filter(isDefined);
+                .filter(isNonNullish);
 
               await _handleFieldEdit(field.id, {
                 math: newMath.length > 0 ? newMath : null,
@@ -790,7 +790,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const { allFieldsWithIndices } = fieldsRef.current!;
     const field = allFieldsWithIndices.find(([f]) => f.id === inParentFieldId)![0];
     const childrenLength = field.children?.length ?? 0;
-    let _position = isDefined(position) && childrenLength > position ? position + 1 : 0;
+    let _position = isNonNullish(position) && childrenLength > position ? position + 1 : 0;
     if (
       (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
       childrenLength === 0 &&
@@ -831,7 +831,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const { fieldsWithIndices } = fieldsRef.current!;
 
       let position = undefined as number | undefined;
-      if (isDefined(parentFieldId)) {
+      if (isNonNullish(parentFieldId)) {
         const parentField = fieldsWithIndices.find(([f]) => f.id === parentFieldId)![0];
         const childIndex = parentField.children?.findIndex((f) => f.id === afterFieldId);
         try {
@@ -860,7 +860,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             position,
           },
           update: (cache, { data }) => {
-            if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
+            if (isTemplate && isNonNullish(parentFieldId) && isNonNullish(data)) {
               // updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
               //   return replies.map((r) => {
               //     const children = [...r.children!];
@@ -884,7 +884,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         const { data } = await createPetitionField({
           variables: { petitionId, type, position, parentFieldId },
           update: (cache, { data }) => {
-            if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
+            if (isTemplate && isNonNullish(parentFieldId) && isNonNullish(data)) {
               updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
                 return replies.map((r) => {
                   const children = [...r.children!];
@@ -988,7 +988,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             force,
           },
           update: (cache, { data }) => {
-            if (isTemplate && isDefined(data)) {
+            if (isTemplate && isNonNullish(data)) {
               for (const fieldId of childrenFieldIds) {
                 updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
                   return replies.map((r) => {
@@ -1087,7 +1087,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             force,
           },
           update: (cache, { data }) => {
-            if (isTemplate && isDefined(data))
+            if (isTemplate && isNonNullish(data))
               for (const fieldId of childrenFieldIds) {
                 updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
                   return replies.map((r) => {

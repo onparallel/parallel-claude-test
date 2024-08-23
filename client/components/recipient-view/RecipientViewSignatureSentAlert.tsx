@@ -18,7 +18,7 @@ import {
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
@@ -44,7 +44,7 @@ export function RecipientViewSignatureSentAlert({
   }
 
   const isPendingStart =
-    petition.signatureConfig?.review === true && !isDefined(petition.latestSignatureRequest);
+    petition.signatureConfig?.review === true && isNullish(petition.latestSignatureRequest);
   return (
     <Alert status={isPendingStart ? "warning" : "success"} zIndex={2} paddingX={6}>
       <Flex

@@ -12,7 +12,7 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import { DatabaseError } from "pg";
-import { isDefined } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
@@ -24,6 +24,7 @@ import {
   interpolatePlaceholdersInSlate,
   renderTextWithPlaceholders,
 } from "../../util/slate/placeholders";
+import { fromPlainText } from "../../util/slate/utils";
 import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -51,7 +52,6 @@ import {
   validPublicPetitionLinkPrefillDataKeycode,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
-import { fromPlainText } from "../../util/slate/utils";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -88,7 +88,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
   },
   resolve: async (_, args, ctx) => {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-    if (petition.skip_forward_security && isDefined(ctx.access!.contact_id)) {
+    if (petition.skip_forward_security && isNonNullish(ctx.access!.contact_id)) {
       await ctx.petitions.createEvent({
         type: "ACCESS_OPENED",
         petition_id: ctx.access!.petition_id,
@@ -103,7 +103,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       userAgent: args.userAgent ?? null,
     };
 
-    if (!isDefined(ctx.access!.contact_id)) {
+    if (isNullish(ctx.access!.contact_id)) {
       const owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
       const data = (await ctx.users.loadUserData(owner.user_data_id))!;
 
@@ -179,11 +179,11 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
   },
   resolve: async (_, args, ctx) => {
     return await stallFor(async function () {
-      const isContactless = !isDefined(ctx.access!.contact_id);
+      const isContactless = isNullish(ctx.access!.contact_id);
       const { firstName, lastName, email } = args;
 
       if (isContactless) {
-        if (!isDefined(firstName) || !isDefined(lastName) || !isDefined(email)) {
+        if (isNullish(firstName) || isNullish(lastName) || isNullish(email)) {
           throw new ApolloError(
             "The information to create a contact is not valid",
             "INVALID_CONTACT_FORM",
@@ -254,7 +254,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
         );
 
         // if is a contactless petition access
-        if (result.success && !isDefined(ctx.access!.contact_id)) {
+        if (result.success && isNullish(ctx.access!.contact_id)) {
           const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
           const petition = await ctx.petitions.loadPetition(access!.petition_id);
 
@@ -318,8 +318,8 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           // if there is an email in the authentication request it is coming from a non-contact link,
           // if it is not the same contact it throws an error to force 2FA.
           if (
-            isDefined(ctx.contact) &&
-            isDefined(result.data?.contact_email) &&
+            isNonNullish(ctx.contact) &&
+            isNonNullish(result.data?.contact_email) &&
             ctx.contact.email.toLowerCase() !== result.data!.contact_email!.toLowerCase()
           ) {
             throw new ApolloError(
@@ -402,7 +402,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       // run an automated background search for each field that has autoSearchConfig and the "name" field replied
       // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
       for (const data of backgroundCheckAutoSearchQueries) {
-        if (isDefined(data.petitionFieldReplyId)) {
+        if (isNonNullish(data.petitionFieldReplyId)) {
           await ctx.petitions.updatePetitionFieldRepliesContent(
             ctx.access!.petition_id,
             [
@@ -463,7 +463,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       }
 
       if (
-        !isDefined(petition.signature_config) || // signature is not configured, process has finished
+        isNullish(petition.signature_config) || // signature is not configured, process has finished
         petition.signature_config.review === true // signature needs to be manually started, send email to user
       ) {
         await ctx.emails.sendPetitionCompletedEmail(
@@ -633,7 +633,7 @@ export const publicDeletePetitionComment = mutationField("publicDeletePetitionCo
       ctx.access!,
     );
 
-    if (isDefined(comment?.petition_field_id)) {
+    if (isNonNullish(comment?.petition_field_id)) {
       const publicPetitionField = await ctx.petitions.loadField(comment.petition_field_id);
       if (!publicPetitionField) {
         throw new ApolloError("PublicPetitionField not found", "PUBLIC_PETITION_FIELD_NOT_FOUND");
@@ -902,7 +902,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
     validateArgs: validateAnd(
       validEmail((args) => args.contactEmail, "contactEmail"),
       validXor(
-        (args) => [isDefined(args.prefill), isDefined(args.prefillDataKey)],
+        (args) => [isNonNullish(args.prefill), isNonNullish(args.prefillDataKey)],
         "prefill,prefillDataKey",
       ),
     ),
@@ -926,7 +926,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       }
 
       const owner = await ctx.petitions.loadTemplateDefaultOwner(link.template_id);
-      if (!isDefined(owner)) {
+      if (isNullish(owner)) {
         throw new Error(`Can't find owner of PublicPetitionLink:${link.id}`);
       }
 
@@ -956,12 +956,12 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         );
 
         // prefill before creating message subject and body so replies are available on PetitionMessageContext
-        if (isDefined(args.prefill)) {
+        if (isNonNullish(args.prefill)) {
           const payload = decode(args.prefill) as JwtPayload;
           if ("replies" in payload && typeof payload.replies === "object") {
             await ctx.petitions.prefillPetition(petition.id, payload.replies, owner.user);
           }
-        } else if (isDefined(args.prefillDataKey)) {
+        } else if (isNonNullish(args.prefillDataKey)) {
           const prefillData = (await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
             args.prefillDataKey,
           ))!;
@@ -1171,7 +1171,7 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
   resolve: async (_, args, ctx) => {
     const task = (await ctx.tasks.loadTask(args.taskId)) as Task<"PRINT_PDF">;
 
-    const file = isDefined(task.output)
+    const file = isNonNullish(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
       : null;
     if (

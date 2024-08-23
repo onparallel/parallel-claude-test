@@ -21,12 +21,12 @@ import {
   useCounter,
 } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { OverflownText } from "@parallel/components/common/OverflownText";
-import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
+import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   CreatePetitionFromProfilePrefillInput,
@@ -43,7 +43,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ForwardedRef, forwardRef, useEffect, useMemo, useRef } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqueBy } from "remeda";
+import { isNonNullish, isNullish, uniqueBy } from "remeda";
 
 type PetitionFieldSelection = UnwrapArray<
   Assert<useAssociateNewPetitionToProfileDialog_PetitionBaseFragment["fields"]>
@@ -93,7 +93,7 @@ function AssociateNewPetitionToProfileDialog({
 
     const allFieldGroups =
       template.fields.filter(
-        (f) => isDefined(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
+        (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
       ) ?? [];
 
     // Filter the groups of fields compatible with the profile to suggest in step 2.
@@ -115,7 +115,7 @@ function AssociateNewPetitionToProfileDialog({
 
     const fieldsWithCompatibleProfiles =
       profile.relationships.length === 0
-        ? isDefined(selectedGroup)
+        ? isNonNullish(selectedGroup)
           ? ([[selectedGroup, [profile]]] as [
               PetitionFieldSelection,
               useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
@@ -171,7 +171,7 @@ function AssociateNewPetitionToProfileDialog({
 
               return filteredProfiles.length > 0 ? [f, filteredProfiles] : null;
             })
-            .filter(isDefined) as [
+            .filter(isNonNullish) as [
             PetitionFieldSelection,
             useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
           ][]);
@@ -248,7 +248,7 @@ function AssociateNewPetitionToProfileDialog({
         {
           as: "form",
           onSubmit: handleSubmit(async (data) => {
-            if (!isDefined(data.templateId)) return;
+            if (isNullish(data.templateId)) return;
 
             const groupId = data.groupId ?? compatibleFieldGroupsIds[0];
 
@@ -267,7 +267,7 @@ function AssociateNewPetitionToProfileDialog({
                 },
               });
 
-              if (isDefined(res?.data)) {
+              if (isNonNullish(res?.data)) {
                 goToPetition(res.data.createPetitionFromProfile.id, "preview");
               } else {
                 throw new Error("No data in createPetitionFromProfile mutation response");
@@ -301,11 +301,11 @@ function AssociateNewPetitionToProfileDialog({
       }
       body={
         <FormProvider {...form}>
-          {currentStep === 0 || !isDefined(template) ? (
+          {currentStep === 0 || isNullish(template) ? (
             <AssociateNewPetitionToProfileStep1
               key="step1"
               ref={selectRef}
-              showCheckbox={isDefined(template) && (!omitStep2 || !omitStep3)}
+              showCheckbox={isNonNullish(template) && (!omitStep2 || !omitStep3)}
             />
           ) : currentStep === 1 ? (
             omitStep2 ? (
@@ -617,7 +617,7 @@ function AssociateNewPetitionToProfileStep3({
               const isRadioButton = !field.multiple;
               const [_, fieldIndex] = fieldsWithIndices.find(([f]) => f.id === field.id)!;
 
-              if (!isDefined(field) || !isDefined(profiles)) return null;
+              if (isNullish(field) || isNullish(profiles)) return null;
 
               return (
                 <Tr key={item.id}>

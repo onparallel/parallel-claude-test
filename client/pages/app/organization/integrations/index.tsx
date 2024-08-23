@@ -39,7 +39,7 @@ import { compose } from "@parallel/utils/compose";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, noop } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
 
@@ -393,13 +393,13 @@ function OrganizationIntegrations() {
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => {
           if (
-            isDefined((integration as IntegrationSwitchCardProps).onChange) ||
-            isDefined((integration as IntegrationSwitchCardProps).switchButton)
+            isNonNullish((integration as IntegrationSwitchCardProps).onChange) ||
+            isNonNullish((integration as IntegrationSwitchCardProps).switchButton)
           ) {
             return <IntegrationSwitchCard key={index} {...integration} />;
           }
 
-          if (isDefined((integration as IntegrationLinkCardProps).href)) {
+          if (isNonNullish((integration as IntegrationLinkCardProps).href)) {
             return (
               <IntegrationLinkCard key={index} {...(integration as IntegrationLinkCardProps)} />
             );

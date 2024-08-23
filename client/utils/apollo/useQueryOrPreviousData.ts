@@ -2,7 +2,7 @@ import { DocumentNode, OperationVariables, TypedDocumentNode } from "@apollo/cli
 import { QueryHookOptions, QueryResult, useQuery } from "@apollo/client/react";
 import { assignRef } from "@chakra-ui/hooks";
 import { useRef } from "react";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function useQueryOrPreviousData<
   TData = any,
@@ -21,7 +21,7 @@ export function useQueryOrPreviousData<
   }>({ data: undefined, options: undefined });
   const { data, ...rest } = useQuery(query, options);
   const previous = previousRef.current;
-  if (isDefined(data)) {
+  if (isNonNullish(data)) {
     assignRef(previousRef, { data, options });
     return { data, ...rest };
   } else {

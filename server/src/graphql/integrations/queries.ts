@@ -1,5 +1,5 @@
 import { idArg, nonNull, nullable, queryField, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { InvalidCredentialsError } from "../../integrations/helpers/GenericIntegration";
 import {
   EntityDetailsResponse,
@@ -214,12 +214,12 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       const reply = fieldReplies.find(
         (r) =>
           r.type === "BACKGROUND_CHECK" &&
-          isDefined(r.content.search) &&
+          isNonNullish(r.content.search) &&
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
 
       if (
-        isDefined(reply) &&
+        isNonNullish(reply) &&
         reply.content.query.name === query.name &&
         reply.content.query.date === query.date &&
         reply.content.query.type === query.type
@@ -244,7 +244,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         );
       }
 
-      if (isDefined(reply)) {
+      if (isNonNullish(reply)) {
         const updateCheck = await ctx.petitions.repliesCanBeUpdated([reply.id]);
         if (updateCheck === "REPLY_ALREADY_APPROVED") {
           throw new ApolloError(
@@ -257,7 +257,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       }
 
       const search = await ctx.backgroundCheck.entitySearch(query);
-      if (isDefined(reply)) {
+      if (isNonNullish(reply)) {
         // reply is defined but search criteria doesn't match, update it
         await ctx.petitions.updatePetitionFieldRepliesContent(
           params.petitionId,
@@ -311,11 +311,11 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         (v) =>
           v.profile_type_field_id === params.profileTypeFieldId &&
           v.type === "BACKGROUND_CHECK" &&
-          isDefined(v.content.search),
+          isNonNullish(v.content.search),
       );
 
       if (
-        isDefined(profileFieldValue) &&
+        isNonNullish(profileFieldValue) &&
         profileFieldValue.content.query.name === query.name &&
         profileFieldValue.content.query.date === query.date &&
         profileFieldValue.content.query.type === query.type
@@ -439,7 +439,7 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
 
-      if (isDefined(reply)) {
+      if (isNonNullish(reply)) {
         // i found a reply and it matches the entity, return it
         return reply.content.entity as EntityDetailsResponse;
       }
@@ -463,7 +463,7 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
           v.content.entity?.id === entityId,
       );
 
-      if (isDefined(profileFieldValue)) {
+      if (isNonNullish(profileFieldValue)) {
         // i found a pfv and it matches the entity, return it
         return profileFieldValue.content.entity as EntityDetailsResponse;
       }

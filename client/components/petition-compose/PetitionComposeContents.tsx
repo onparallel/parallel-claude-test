@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Center, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { ProfilesIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeContents_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -18,7 +19,6 @@ import {
   AddAliasToFieldDialog,
   useAddAliasToFieldDialog,
 } from "../petition-common/dialogs/AddAliasToFieldDialog";
-import { ProfilesIcon } from "@parallel/chakra/icons";
 
 export interface PetitionComposeContentsProps<
   T extends PetitionComposeContents_PetitionFieldFragment,

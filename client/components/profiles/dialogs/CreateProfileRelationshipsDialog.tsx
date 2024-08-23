@@ -29,7 +29,7 @@ import {
 } from "@parallel/graphql/__types";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { groupBy, isDefined, unique } from "remeda";
+import { groupBy, isNonNullish, unique } from "remeda";
 
 interface CreateProfileRelationshipsDialogProps {
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
@@ -87,7 +87,7 @@ function CreateProfileRelationshipsDialog({
   const relationships = watch("relationships");
 
   const setRelationships = relationships.filter(
-    (v) => isDefined(v.profile) && isDefined(v.profileRelationshipTypeWithDirection),
+    (v) => isNonNullish(v.profile) && isNonNullish(v.profileRelationshipTypeWithDirection),
   );
 
   return (
@@ -347,7 +347,7 @@ function ProfileRelationshipRow({
     `relationships.${index}.profileRelationshipTypeWithDirection`,
   );
 
-  const compatibleProfileTypeIds = isDefined(selectedProfileRelationshipTypeWithDirection)
+  const compatibleProfileTypeIds = isNonNullish(selectedProfileRelationshipTypeWithDirection)
     ? selectedProfileRelationshipTypeWithDirection.profileRelationshipType[
         selectedProfileRelationshipTypeWithDirection.direction === "LEFT_RIGHT"
           ? "allowedLeftRightProfileTypeIds"
@@ -363,7 +363,7 @@ function ProfileRelationshipRow({
         }) ?? [],
       );
 
-  const options = isDefined(selectedProfile)
+  const options = isNonNullish(selectedProfile)
     ? profileRelationshipTypesWithDirection.filter((prtwd) =>
         prtwd.profileRelationshipType[
           prtwd.direction === "LEFT_RIGHT"
@@ -374,12 +374,12 @@ function ProfileRelationshipRow({
     : profileRelationshipTypesWithDirection;
 
   const hasProfileError =
-    isDefined(errors.relationships?.[index]?.type) ||
-    isDefined(errors.relationships?.[index]?.profile);
+    isNonNullish(errors.relationships?.[index]?.type) ||
+    isNonNullish(errors.relationships?.[index]?.profile);
 
   const hasRelationsShipError =
-    isDefined(errors.relationships?.[index]?.type) ||
-    isDefined(errors.relationships?.[index]?.profileRelationshipTypeWithDirection);
+    isNonNullish(errors.relationships?.[index]?.type) ||
+    isNonNullish(errors.relationships?.[index]?.profileRelationshipTypeWithDirection);
 
   return (
     <FormControl as={NoElement} isInvalid={true}>
@@ -444,7 +444,7 @@ function ProfileRelationshipRow({
           isDisabled={!canRemove}
         />
       )}
-      {isDefined(errors.relationships?.[index]?.type) ? (
+      {isNonNullish(errors.relationships?.[index]?.type) ? (
         <FormErrorMessage gridColumn={"1 / -1"} margin={0}>
           {errors.relationships?.[index]?.type === "duplicated" ? (
             <FormattedMessage

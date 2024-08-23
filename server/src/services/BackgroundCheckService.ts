@@ -1,5 +1,5 @@
 import { Container, inject, injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isNullish } from "remeda";
 import { Readable } from "stream";
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
 import { IPrinter, PRINTER } from "./Printer";
@@ -48,7 +48,7 @@ export class BackgroundCheckService implements IBackgroundCheckService {
   }
 
   async entityProfileDetails(entityId: string, userId?: number): Promise<EntityDetailsResponse> {
-    if (!isDefined(userId)) {
+    if (isNullish(userId)) {
       return await this.getClient().entityProfileDetails(entityId);
     }
 

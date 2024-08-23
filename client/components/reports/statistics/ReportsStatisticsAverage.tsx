@@ -24,7 +24,7 @@ import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isNonNullish } from "remeda";
 import { TimeSpan } from "../common/TimeSpan";
 
 export function ReportsStatisticsAverage({
@@ -213,7 +213,7 @@ export function ReportsStatisticsAverage({
           >
             <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
               <Text whiteSpace="nowrap">
-                {isDefined(times.pending_to_complete) ? (
+                {isNonNullish(times.pending_to_complete) ? (
                   <TimeSpan duration={pendingToComplete} />
                 ) : (
                   "-"
@@ -235,7 +235,11 @@ export function ReportsStatisticsAverage({
             </GridItem>
             <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
               <Text whiteSpace="nowrap">
-                {isDefined(times.complete_to_close) ? <TimeSpan duration={completeToClose} /> : "-"}
+                {isNonNullish(times.complete_to_close) ? (
+                  <TimeSpan duration={completeToClose} />
+                ) : (
+                  "-"
+                )}
               </Text>
             </GridItem>
             <GridItem colSpan={4}>
@@ -297,7 +301,7 @@ export function ReportsStatisticsAverage({
               <>
                 <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
                   <Text whiteSpace="nowrap">
-                    {isDefined(times.pending_to_complete) ? (
+                    {isNonNullish(times.pending_to_complete) ? (
                       <TimeSpan duration={timeToComplete} />
                     ) : (
                       "-"
@@ -369,7 +373,7 @@ function useDownloadAverageReportExcel() {
         },
         {
           templateId,
-          range: isDefined(range)
+          range: isNonNullish(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
         },
@@ -495,13 +499,15 @@ function useDownloadAverageReportExcel() {
           signed: status.signed,
           closed: status.closed,
           total_time: ((times.pending_to_complete ?? 0) + (times.complete_to_close ?? 0)) / 3600,
-          time_to_complete: isDefined(times.pending_to_complete)
+          time_to_complete: isNonNullish(times.pending_to_complete)
             ? times.pending_to_complete / 3600
             : "-",
-          time_to_sign: isDefined(times.signature_completed)
+          time_to_sign: isNonNullish(times.signature_completed)
             ? times.signature_completed / 3600
             : "-",
-          time_to_close: isDefined(times.complete_to_close) ? times.complete_to_close / 3600 : "-",
+          time_to_close: isNonNullish(times.complete_to_close)
+            ? times.complete_to_close / 3600
+            : "-",
         });
       },
     );

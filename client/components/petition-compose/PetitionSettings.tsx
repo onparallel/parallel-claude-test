@@ -55,7 +55,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isNonNullish, noop } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
@@ -933,7 +933,7 @@ function _PetitionSettings({
             />
           }
           controlId="auto-anonymize"
-          isActive={isDefined(petition.anonymizeAfterMonths)}
+          isActive={isNonNullish(petition.anonymizeAfterMonths)}
           onAdd={() => handleConfigCompliancePeriod(true)}
           onConfig={() => handleConfigCompliancePeriod(true)}
           onRemove={() => handleConfigCompliancePeriod(false)}
