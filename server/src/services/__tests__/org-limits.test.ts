@@ -1,4 +1,4 @@
-import { subMonths } from "date-fns";
+import { Duration, subMonths } from "date-fns";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
