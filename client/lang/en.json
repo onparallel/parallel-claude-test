@@ -5221,23 +5221,23 @@
   },
   {
     "term": "component.petition-compose-id-verification-settings.all",
-    "definition": "All",
-    "context": "All"
+    "definition": "Any document type",
+    "context": "Any document type"
   },
   {
     "term": "component.petition-compose-id-verification-settings.allowed-documents",
-    "definition": "Allowed documents",
-    "context": "Allowed documents"
+    "definition": "Identify with",
+    "context": "Identify with"
+  },
+  {
+    "term": "component.petition-compose-id-verification-settings.n-documents-selected",
+    "definition": "{count} selected",
+    "context": "{count} selected"
   },
   {
     "term": "component.petition-compose-id-verification-settings.type-of-verification",
     "definition": "Type of verification",
     "context": "Type of verification"
-  },
-  {
-    "term": "component.petition-compose-id-verification-settings.x-documents-selected",
-    "definition": "{count} selected",
-    "context": "{count} selected"
   },
   {
     "term": "component.petition-compose-new-field-drawer.category-files",
@@ -9210,19 +9210,9 @@
     "context": "Select folder"
   },
   {
-    "term": "component.select-type-of-documents-dialog.description",
-    "definition": "Select the documents you want to allow in the validation.",
-    "context": "Select the documents you want to allow in the validation."
-  },
-  {
     "term": "component.select-type-of-documents-dialog.driver-license",
     "definition": "Driver's license",
     "context": "Driver's license"
-  },
-  {
-    "term": "component.select-type-of-documents-dialog.error-message",
-    "definition": "Please, select at least one document type.",
-    "context": "Please, select at least one document type."
   },
   {
     "term": "component.select-type-of-documents-dialog.extended",
@@ -9236,8 +9226,8 @@
   },
   {
     "term": "component.select-type-of-documents-dialog.id-card",
-    "definition": "National identity card",
-    "context": "National identity card"
+    "definition": "National ID card",
+    "context": "National ID card"
   },
   {
     "term": "component.select-type-of-documents-dialog.passport",
@@ -9258,11 +9248,6 @@
     "term": "component.select-type-of-documents-dialog.simple-description",
     "definition": "Identity document only",
     "context": "Identity document only"
-  },
-  {
-    "term": "component.select-type-of-documents-dialog.title",
-    "definition": "Types of documents",
-    "context": "Types of documents"
   },
   {
     "term": "component.send-button.schedule",

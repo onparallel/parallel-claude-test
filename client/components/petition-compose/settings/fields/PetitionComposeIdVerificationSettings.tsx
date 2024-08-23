@@ -1,33 +1,13 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  CheckboxGroup,
-  FormControl,
-  FormErrorMessage,
-  Link,
-  ListItem,
-  Stack,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
-import {
-  SimpleOption,
-  SimpleSelect,
-  SimpleSelectProps,
-} from "@parallel/components/common/SimpleSelect";
-import { SmallPopover } from "@parallel/components/common/SmallPopover";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Box, Stack, Text } from "@chakra-ui/react";
+import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { UnwrapArray } from "@parallel/utils/types";
+import { Children, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { OptionProps, components } from "react-select";
+import { OptionProps, ValueContainerProps, components } from "react-select";
+import { omit } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
-import { SettingsRowConfigButton } from "../rows/SettingsRowConfigButton";
-
-export type TypeOfVerificationValue = "SIMPLE" | "EXTENDED";
 
 export function PetitionComposeIdVerificationSettings({
   petition,
@@ -35,45 +15,8 @@ export function PetitionComposeIdVerificationSettings({
   onFieldEdit,
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
-  const allowedDocuments = field.options.config.allowedDocuments;
-
-  const showSelectTypeOfDocumentsDialog = useSelectTypeOfDocumentsDialog();
-  const handleAllowedDocumentsChange = async () => {
-    try {
-      const { documents } = await showSelectTypeOfDocumentsDialog({
-        allowedDocuments,
-      });
-      onFieldEdit(field.id, {
-        options: {
-          ...field.options,
-          config: {
-            ...field.options.config,
-            allowedDocuments: documents,
-          },
-        },
-      });
-    } catch {}
-  };
-
-  const handleTypeOfVerificationChange = (value: TypeOfVerificationValue | null) => {
-    if (!value) return;
-
-    onFieldEdit(field.id, {
-      options: {
-        ...field.options,
-        config: {
-          ...field.options.config,
-          type: value,
-        },
-      },
-    });
-  };
-
-  const documents = useTypeOfDocuments();
+  const documents = useTypesOfDocuments();
   const typesOfVerification = useTypesOfVerification();
-  const selectedTypeOfVerification = typesOfVerification.find(
-    ({ value }) => value === field.options.config.type,
-  );
 
   return (
     <>
@@ -86,153 +29,108 @@ export function PetitionComposeIdVerificationSettings({
             defaultMessage="Type of verification"
           />
         }
+        isDisabled={isReadOnly}
       >
         <Box flex="1">
-          <TypesOfVerificationSelect
-            value={selectedTypeOfVerification?.value ?? "SIMPLE"}
-            onChange={handleTypeOfVerificationChange}
-            isDisabled={isReadOnly}
+          <SimpleSelect
+            isSearchable={false}
+            isClearable={false}
+            size="sm"
+            options={typesOfVerification}
+            value={field.options.config.type}
+            components={{ Option }}
+            onChange={(value) =>
+              onFieldEdit(field.id, {
+                options: {
+                  config: {
+                    ...field.options.config,
+                    type: value,
+                  },
+                },
+              })
+            }
           />
         </Box>
       </SettingsRow>
-      <SettingsRowConfigButton
+      <SettingsRow
         isDisabled={isReadOnly}
         data-section="allowed-documents"
         label={
           <Text as="span">
             <FormattedMessage
               id="component.petition-compose-id-verification-settings.allowed-documents"
-              defaultMessage="Allowed documents"
+              defaultMessage="Identify with"
             />
           </Text>
         }
-        onConfig={() => handleAllowedDocumentsChange()}
         controlId="allowed-documents"
       >
-        <SmallPopover
-          content={
-            <UnorderedList>
-              {documents
-                .filter(({ value }) => allowedDocuments.includes(value))
-                .map(({ label }) => (
-                  <ListItem key={label}>{label}</ListItem>
-                ))}
-            </UnorderedList>
-          }
-          width="auto"
-        >
-          <Text as={Link} fontSize="sm">
-            {documents.length === allowedDocuments.length ? (
-              <FormattedMessage
-                id="component.petition-compose-id-verification-settings.all"
-                defaultMessage="All"
-              />
-            ) : (
-              <FormattedMessage
-                id="component.petition-compose-id-verification-settings.x-documents-selected"
-                defaultMessage="{count} selected"
-                values={{ count: allowedDocuments.length }}
-              />
-            )}
-          </Text>
-        </SmallPopover>
-      </SettingsRowConfigButton>
+        <Box flex={1}>
+          <MultiCheckboxSimpleSelect
+            size="sm"
+            options={documents}
+            value={field.options.config.allowedDocuments}
+            isClearable={false}
+            isSearchable={false}
+            onChange={(values) => {
+              if (values.length === 0) {
+                return;
+              }
+              onFieldEdit(field.id, {
+                options: {
+                  config: {
+                    ...field.options.config,
+                    allowedDocuments: values,
+                  },
+                },
+              });
+            }}
+            components={{ ValueContainer }}
+            styles={{
+              valueContainer: (styles) => {
+                return omit(styles, ["flexWrap"]);
+              },
+            }}
+          />
+        </Box>
+      </SettingsRow>
     </>
   );
 }
 
-interface SelectTypeOfDocumentsDialogProps {
-  allowedDocuments?: string[];
-}
-interface SelectTypeOfDocumentsDialogData {
-  documents: string[];
-}
-
-function SelectTypeOfDocumentsDialog({
-  allowedDocuments,
+function ValueContainer({
+  innerProps,
+  children,
   ...props
-}: DialogProps<SelectTypeOfDocumentsDialogProps, SelectTypeOfDocumentsDialogData>) {
-  const {
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm<SelectTypeOfDocumentsDialogData>({
-    mode: "onSubmit",
-    defaultValues: {
-      documents: allowedDocuments ?? [],
-    },
-  });
-
-  const documents = useTypeOfDocuments();
+}: ValueContainerProps<UnwrapArray<ReturnType<typeof useTypesOfDocuments>>>) {
   return (
-    <ConfirmDialog
-      size="xl"
-      hasCloseButton
-      content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => props.onResolve(data)),
-      }}
-      header={
-        <Text>
-          <FormattedMessage
-            id="component.select-type-of-documents-dialog.title"
-            defaultMessage="Types of documents"
-          />
-        </Text>
-      }
-      body={
-        <Stack>
-          <Text>
+    <components.ValueContainer innerProps={{ ...innerProps } as any} {...props}>
+      {props.getValue().length === 1 ? (
+        <Box as="span" noOfLines={1}>
+          {props.getValue()[0].label}
+        </Box>
+      ) : (
+        <Box as="span" fontStyle="italic">
+          {props.getValue().length === props.selectProps.options.length ? (
             <FormattedMessage
-              id="component.select-type-of-documents-dialog.description"
-              defaultMessage="Select the documents you want to allow in the validation."
+              id="component.petition-compose-id-verification-settings.all"
+              defaultMessage="Any document type"
             />
-          </Text>
-          <Controller
-            name={"documents"}
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { onChange, value } }) => {
-              return (
-                <CheckboxGroup onChange={onChange} value={value}>
-                  <Stack>
-                    {documents.map(({ value, label }) => {
-                      return (
-                        <Checkbox key={value} value={value}>
-                          {label}
-                        </Checkbox>
-                      );
-                    })}
-                  </Stack>
-                </CheckboxGroup>
-              );
-            }}
-          />
-          <FormControl isInvalid={!!errors.documents}>
-            <FormErrorMessage>
-              <FormattedMessage
-                id="component.select-type-of-documents-dialog.error-message"
-                defaultMessage="Please, select at least one document type."
-              />
-            </FormErrorMessage>
-          </FormControl>
-        </Stack>
-      }
-      confirm={
-        <Button colorScheme="primary" variant="solid" type="submit">
-          <FormattedMessage id="generic.save" defaultMessage="Save" />
-        </Button>
-      }
-      {...props}
-    />
+          ) : (
+            <FormattedMessage
+              id="component.petition-compose-id-verification-settings.n-documents-selected"
+              defaultMessage="{count} selected"
+              values={{ count: props.getValue().length }}
+            />
+          )}
+        </Box>
+      )}
+      {Children.toArray(children).at(-1)}
+    </components.ValueContainer>
   );
 }
 
-function useSelectTypeOfDocumentsDialog() {
-  return useDialog(SelectTypeOfDocumentsDialog);
-}
-
-function useTypeOfDocuments() {
+function useTypesOfDocuments() {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -240,7 +138,7 @@ function useTypeOfDocuments() {
         value: "ID_CARD",
         label: intl.formatMessage({
           id: "component.select-type-of-documents-dialog.id-card",
-          defaultMessage: "National identity card",
+          defaultMessage: "National ID card",
         }),
       },
       {
@@ -269,6 +167,7 @@ function useTypeOfDocuments() {
   );
 }
 
+type TypeOfVerificationValue = "SIMPLE" | "EXTENDED";
 interface TypesOfVerificationSelectOption extends SimpleOption<TypeOfVerificationValue> {
   description: string;
 }
@@ -304,37 +203,14 @@ function useTypesOfVerification() {
   );
 }
 
-export function TypesOfVerificationSelect({
-  value,
-
-  ...props
-}: Omit<
-  SimpleSelectProps<TypeOfVerificationValue, false, TypesOfVerificationSelectOption>,
-  "options"
->) {
-  const options = useTypesOfVerification();
-
-  return (
-    <SimpleSelect
-      isSearchable={false}
-      isClearable={false}
-      size="sm"
-      options={options}
-      value={value}
-      components={{ Option }}
-      {...props}
-    />
-  );
-}
-
 function Option(props: OptionProps<TypesOfVerificationSelectOption>) {
   return (
     <components.Option {...props}>
-      <Stack spacing={0} fontSize="md">
-        <Text>{props.data.label}</Text>
-        <Text fontSize="sm" color={props.isSelected ? "white" : "gray.600"}>
+      <Stack spacing={0}>
+        <Box>{props.data.label}</Box>
+        <Box fontSize="xs" opacity={0.6}>
           {props.data.description}
-        </Text>
+        </Box>
       </Stack>
     </components.Option>
   );
