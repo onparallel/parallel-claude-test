@@ -145,6 +145,9 @@ class MockStorageImpl implements IStorageImpl {
   async downloadFile() {
     return {} as any;
   }
+  async downloadFileBase64() {
+    return "";
+  }
   async getFileMetadata() {
     return {} as any;
   }

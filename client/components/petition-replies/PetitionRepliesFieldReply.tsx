@@ -35,6 +35,7 @@ import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRisk
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -198,10 +199,7 @@ export function PetitionRepliesFieldReply({
                     )}
                   </Text>
                 ) : type === "ID_VERIFICATION" ? (
-                  <PetitionRepliesFieldIdVerificationReply
-                    reply={reply}
-                    editReplyIconButton={editReplyIconButton()}
-                  />
+                  <PetitionRepliesFieldIdVerificationReply reply={reply} />
                 ) : type === "DOW_JONES_KYC" ? (
                   <Stack spacing={1}>
                     <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
@@ -291,32 +289,41 @@ export function PetitionRepliesFieldReply({
                     </Flex>
                   </Stack>
                 ) : isFileTypeField(type) ? (
-                  <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                    <VisuallyHidden>
-                      {intl.formatMessage({
-                        id: "generic.file-name",
-                        defaultMessage: "File name",
-                      })}
-                    </VisuallyHidden>
-                    <Text as="span" wordBreak="break-all">
-                      {content.filename}
-                      {" - "}
-                      <Text
-                        as="span"
-                        aria-label={intl.formatMessage({
-                          id: "generic.file-size",
-                          defaultMessage: "File size",
+                  <Stack flex="1">
+                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                      <VisuallyHidden>
+                        {intl.formatMessage({
+                          id: "generic.file-name",
+                          defaultMessage: "File name",
                         })}
-                        fontSize="sm"
-                        color="gray.500"
-                      >
-                        <FileSize value={content.size} />
+                      </VisuallyHidden>
+                      <Text as="span" wordBreak="break-all">
+                        {content.filename}
+                        {" - "}
+                        <Text
+                          as="span"
+                          aria-label={intl.formatMessage({
+                            id: "generic.file-size",
+                            defaultMessage: "File size",
+                          })}
+                          fontSize="sm"
+                          color="gray.500"
+                        >
+                          <FileSize value={content.size} />
+                        </Text>
+                        <Box display="inline-block" marginStart={2}>
+                          {editReplyIconButton()}
+                        </Box>
                       </Text>
-                      <Box display="inline-block" marginStart={2}>
-                        {editReplyIconButton()}
-                      </Box>
-                    </Text>
-                  </Flex>
+                    </Flex>
+                    {type === "FILE_UPLOAD" &&
+                    isDefined(reply.metadata) &&
+                    reply.metadata.type === "PAYSLIP" ? (
+                      <PetitionRepliesFieldFileUploadPayslipReply
+                        metadata={reply.metadata as any}
+                      />
+                    ) : null}
+                  </Stack>
                 ) : (
                   <HStack>
                     {["SELECT", "CHECKBOX"].includes(type) &&

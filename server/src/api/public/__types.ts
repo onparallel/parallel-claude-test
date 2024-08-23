@@ -406,6 +406,8 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"]["output"];
 };
 
+export type DocumentProcessingType = "PAYSLIP";
+
 export type DowJonesKycEntityDate = {
   day: Maybe<Scalars["Int"]["output"]>;
   month: Maybe<Scalars["Int"]["output"]>;
@@ -690,6 +692,7 @@ export type InputFeatureFlagNameValue = {
 /** The types of integrations available. */
 export type IntegrationType =
   | "AI_COMPLETION"
+  | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
   | "ID_VERIFICATION"
   | "SIGNATURE"
@@ -841,6 +844,8 @@ export type Mutation = {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  /** Creates a new Bankflip Document Processing integration on the provided organization */
+  createBankflipDocumentProcessingIntegration: SupportMethodResponse;
   /** Creates a new Bankflip ID Verification integration on the provided organization */
   createBankflipIdVerificationIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
@@ -872,6 +877,7 @@ export type Mutation = {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -1424,6 +1430,13 @@ export type MutationcreateBackgroundCheckProfilePdfTaskArgs = {
   token: Scalars["String"]["input"];
 };
 
+export type MutationcreateBankflipDocumentProcessingIntegrationArgs = {
+  apiKey: Scalars["String"]["input"];
+  host: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+  webhookSecret: Scalars["String"]["input"];
+};
+
 export type MutationcreateBankflipIdVerificationIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   host: Scalars["String"]["input"];
@@ -1486,6 +1499,14 @@ export type MutationcreateExportExcelTaskArgs = {
 export type MutationcreateExportRepliesTaskArgs = {
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateFieldGroupReplyFromProfileArgs = {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateFileUploadReplyArgs = {

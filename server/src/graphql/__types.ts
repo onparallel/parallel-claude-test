@@ -476,6 +476,7 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "LIMIT_EXCEEDED"
     | "SUCCESS";
+  DocumentProcessingType: db.DocumentProcessingType;
   DowJonesKycEntityType: "Entity" | "Person";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
@@ -1910,6 +1911,7 @@ export interface NexusGenFieldTypes {
     createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
+    createBankflipDocumentProcessingIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBankflipIdVerificationIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -4482,6 +4484,7 @@ export interface NexusGenFieldTypeNames {
     createAddPetitionPermissionTask: "Task";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
+    createBankflipDocumentProcessingIntegration: "SupportMethodResponse";
     createBankflipIdVerificationIntegration: "SupportMethodResponse";
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
@@ -6701,6 +6704,13 @@ export interface NexusGenArgTypes {
       // args
       entityId: string; // String!
       token: string; // String!
+    };
+    createBankflipDocumentProcessingIntegration: {
+      // args
+      apiKey: string; // String!
+      host: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
+      webhookSecret: string; // String!
     };
     createBankflipIdVerificationIntegration: {
       // args

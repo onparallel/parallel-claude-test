@@ -4,7 +4,13 @@ import { isDefined, unique } from "remeda";
 import { SignaturitBrandingIdKey } from "../../integrations/signature/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
-import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
+import {
+  CreateDocumentProcessingLog,
+  CreateOrgIntegration,
+  IntegrationType,
+  OrgIntegration,
+  User,
+} from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 
@@ -13,6 +19,47 @@ interface IntegrationProviders {
   DOW_JONES_KYC: "DOW_JONES_KYC";
   AI_COMPLETION: "AZURE_OPEN_AI";
   ID_VERIFICATION: "BANKFLIP";
+  DOCUMENT_PROCESSING: "BANKFLIP";
+}
+
+type SignaturitSettings = {
+  CREDENTIALS: { API_KEY: string };
+  ENVIRONMENT: "production" | "sandbox";
+  IS_PARALLEL_MANAGED: boolean;
+  SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
+} & { [key in SignaturitBrandingIdKey]?: string };
+
+interface DocusignSettings {
+  CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
+  ENVIRONMENT: "production" | "sandbox";
+}
+
+interface BankflipSettings {
+  CREDENTIALS: { API_KEY: string; HOST: string; WEBHOOK_SECRET: string };
+}
+
+interface SsoSettings {
+  EMAIL_DOMAINS: string[];
+  COGNITO_PROVIDER: string;
+}
+
+interface UserProvisioningSettings {
+  AUTH_KEY: string;
+}
+
+interface DowJonesKycSettings {
+  CREDENTIALS: {
+    ACCESS_TOKEN: string;
+    REFRESH_TOKEN: string;
+    CLIENT_ID: string;
+    USERNAME: string;
+    PASSWORD: string;
+  };
+}
+
+interface AzureAiCompletionSettings {
+  CREDENTIALS: { API_KEY: string };
+  ENDPOINT: string;
 }
 
 export type IntegrationProvider<TType extends IntegrationType> =
@@ -21,51 +68,30 @@ export type IntegrationProvider<TType extends IntegrationType> =
 export type IntegrationSettings<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-> = TType extends "SIGNATURE"
-  ? TProvider extends "SIGNATURIT"
+> = {
+  SSO: SsoSettings;
+  DOW_JONES_KYC: DowJonesKycSettings;
+  USER_PROVISIONING: UserProvisioningSettings;
+  SIGNATURE: TProvider extends IntegrationProviders["SIGNATURE"]
     ? {
-        CREDENTIALS: { API_KEY: string };
-        ENVIRONMENT: "production" | "sandbox";
-        IS_PARALLEL_MANAGED: boolean;
-        SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
-      } & { [key in SignaturitBrandingIdKey]?: string }
-    : TProvider extends "DOCUSIGN"
-      ? {
-          CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
-          ENVIRONMENT: "production" | "sandbox";
-        }
-      : never
-  : TType extends "SSO"
+        SIGNATURIT: SignaturitSettings;
+        DOCUSIGN: DocusignSettings;
+      }[TProvider]
+    : never;
+  AI_COMPLETION: TProvider extends IntegrationProviders["AI_COMPLETION"]
+    ? { AZURE_OPEN_AI: AzureAiCompletionSettings }[TProvider]
+    : never;
+  ID_VERIFICATION: TProvider extends IntegrationProviders["ID_VERIFICATION"]
     ? {
-        EMAIL_DOMAINS: string[];
-        COGNITO_PROVIDER: string;
-      }
-    : TType extends "USER_PROVISIONING"
-      ? {
-          AUTH_KEY: string;
-        }
-      : TType extends "DOW_JONES_KYC"
-        ? {
-            CREDENTIALS: {
-              ACCESS_TOKEN: string;
-              REFRESH_TOKEN: string;
-              CLIENT_ID: string;
-              USERNAME: string;
-              PASSWORD: string;
-            };
-          }
-        : TType extends "AI_COMPLETION"
-          ? TProvider extends "AZURE_OPEN_AI"
-            ? {
-                CREDENTIALS: { API_KEY: string };
-                ENDPOINT: string;
-              }
-            : never
-          : TType extends "ID_VERIFICATION"
-            ? TProvider extends "BANKFLIP"
-              ? { CREDENTIALS: { API_KEY: string; HOST: string; WEBHOOK_SECRET: string } }
-              : never
-            : never;
+        BANKFLIP: BankflipSettings;
+      }[TProvider]
+    : never;
+  DOCUMENT_PROCESSING: TProvider extends IntegrationProviders["DOCUMENT_PROCESSING"]
+    ? {
+        BANKFLIP: BankflipSettings;
+      }[TProvider]
+    : never;
+}[TType];
 
 export type IntegrationCredentials<
   TType extends IntegrationType,
@@ -342,5 +368,57 @@ export class IntegrationRepository extends BaseRepository {
     await this.from("org_integration")
       .where({ id, deleted_at: null })
       .update({ deleted_at: this.now(), deleted_by: deletedBy });
+  }
+
+  readonly loadDocumentProcessingLogByExternalId = this.buildLoadBy(
+    "document_processing_log",
+    "external_id",
+  );
+
+  async createDocumentProcessingLog(data: CreateDocumentProcessingLog, createdBy: string) {
+    const [log] = await this.insert("document_processing_log", {
+      ...data,
+      created_by: createdBy,
+    }).returning("*");
+
+    return log;
+  }
+
+  async updateDocumentProcessingLog(
+    id: number,
+    data: Partial<CreateDocumentProcessingLog>,
+    updatedBy: string,
+  ) {
+    const [log] = await this.from("document_processing_log")
+      .where("id", id)
+      .update(
+        {
+          ...data,
+          updated_by: updatedBy,
+          updated_at: this.now(),
+        },
+        "*",
+      );
+
+    return log;
+  }
+
+  async updateDocumentProcessingLogByExternalId(
+    externalId: string,
+    data: Partial<CreateDocumentProcessingLog>,
+    updatedBy: string,
+  ) {
+    const [log] = await this.from("document_processing_log")
+      .where("external_id", externalId)
+      .update(
+        {
+          ...data,
+          updated_by: updatedBy,
+          updated_at: this.now(),
+        },
+        "*",
+      );
+
+    return log;
   }
 }

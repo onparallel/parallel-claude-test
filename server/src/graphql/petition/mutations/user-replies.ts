@@ -210,6 +210,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
           },
         ],
         ctx.user!,
+        true,
       ),
     ]);
 

@@ -2,6 +2,11 @@ import { ContainerModule } from "inversify";
 import { AI_COMPLETION_CLIENT, IAiCompletionClient } from "./ai-completion/AiCompletionClient";
 import { AzureOpenAiClient } from "./ai-completion/AzureOpenAIClient";
 import { AzureOpenAiIntegration } from "./ai-completion/AzureOpenAiIntegration";
+import { IDocumentProcessingIntegration } from "./document-processing/DocumentProcessingIntegration";
+import {
+  BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION,
+  BankflipDocumentProcessingIntegration,
+} from "./document-processing/bankflip/BankflipDocumentProcessingIntegration";
 import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./dow-jones/DowJonesClient";
 import { DowJonesIntegration } from "./dow-jones/DowJonesIntegration";
 import { IIdVerificationIntegration } from "./id-verification/IdVerificationIntegration";
@@ -31,5 +36,9 @@ export const integrationsModule = new ContainerModule((bind) => {
 
   bind<IIdVerificationIntegration>(BANKFLIP_ID_VERIFICATION_INTEGRATION).to(
     BankflipIdVerificationIntegration,
+  );
+
+  bind<IDocumentProcessingIntegration>(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION).to(
+    BankflipDocumentProcessingIntegration,
   );
 });

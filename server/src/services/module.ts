@@ -17,6 +17,11 @@ import {
   IBackgroundCheckService,
 } from "./BackgroundCheckService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
+import {
+  DOCUMENT_PROCESSING_SERVICE,
+  DocumentProcessingService,
+  IDocumentProcessingService,
+} from "./DocumentProcessingService";
 import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService, IEncryptionService } from "./EncryptionService";
 import {
@@ -105,4 +110,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
   bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
   bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
+  bind<IDocumentProcessingService>(DOCUMENT_PROCESSING_SERVICE).to(DocumentProcessingService);
 });

@@ -1,5 +1,5 @@
 import { enumType, interfaceType, objectType } from "nexus";
-import { IntegrationTypeValues } from "../../db/__types";
+import { DocumentProcessingTypeValues, IntegrationTypeValues } from "../../db/__types";
 
 export const IntegrationType = enumType({
   name: "IntegrationType",
@@ -376,4 +376,9 @@ export const DowJonesKycEntityProfileResultEntity = objectType({
     t.implements("DowJonesKycEntityProfileResult");
     t.nullable.field("dateOfRegistration", { type: "DowJonesKycEntityDate" });
   },
+});
+
+export const DocumentProcessingType = enumType({
+  name: "DocumentProcessingType",
+  members: DocumentProcessingTypeValues,
 });

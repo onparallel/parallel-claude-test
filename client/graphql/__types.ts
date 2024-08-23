@@ -437,6 +437,8 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"]["output"];
 }
 
+export type DocumentProcessingType = "PAYSLIP";
+
 export interface DowJonesKycEntityDate {
   __typename?: "DowJonesKycEntityDate";
   day?: Maybe<Scalars["Int"]["output"]>;
@@ -741,6 +743,7 @@ export interface InputFeatureFlagNameValue {
 /** The types of integrations available. */
 export type IntegrationType =
   | "AI_COMPLETION"
+  | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
   | "ID_VERIFICATION"
   | "SIGNATURE"
@@ -901,6 +904,8 @@ export interface Mutation {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  /** Creates a new Bankflip Document Processing integration on the provided organization */
+  createBankflipDocumentProcessingIntegration: SupportMethodResponse;
   /** Creates a new Bankflip ID Verification integration on the provided organization */
   createBankflipIdVerificationIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
@@ -1483,6 +1488,13 @@ export interface MutationcreateAzureOpenAiIntegrationArgs {
 export interface MutationcreateBackgroundCheckProfilePdfTaskArgs {
   entityId: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
+}
+
+export interface MutationcreateBankflipDocumentProcessingIntegrationArgs {
+  apiKey: Scalars["String"]["input"];
+  host: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+  webhookSecret: Scalars["String"]["input"];
 }
 
 export interface MutationcreateBankflipIdVerificationIntegrationArgs {
@@ -17438,6 +17450,7 @@ export type PetitionComposeFieldSettings_UserFragment = {
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
+  organization: { __typename?: "Organization"; hasDocumentProcessingIntegration: boolean };
 };
 
 export type PetitionComposeFieldSettings_PetitionBase_Petition_Fragment = {
@@ -17556,6 +17569,11 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
     result: Result;
     url?: string | null;
   };
+};
+
+export type PetitionComposeFileUploadSettings_UserFragment = {
+  __typename?: "User";
+  organization: { __typename?: "Organization"; hasDocumentProcessingIntegration: boolean };
 };
 
 export type ImportOptionsSettingsRow_PetitionFieldFragment = {
@@ -36194,6 +36212,7 @@ export type PetitionCompose_QueryFragment = {
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
       iconUrl92?: string | null;
+      hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -38329,6 +38348,7 @@ export type PetitionCompose_userQuery = {
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
       iconUrl92?: string | null;
+      hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -59299,11 +59319,20 @@ export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
   }
   ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionFieldTypeSelect_UserFragment, unknown>;
+export const PetitionComposeFileUploadSettings_UserFragmentDoc = gql`
+  fragment PetitionComposeFileUploadSettings_User on User {
+    organization {
+      hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
+    }
+  }
+` as unknown as DocumentNode<PetitionComposeFileUploadSettings_UserFragment, unknown>;
 export const PetitionComposeFieldSettings_UserFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_User on User {
     ...PetitionFieldTypeSelect_User
+    ...PetitionComposeFileUploadSettings_User
   }
   ${PetitionFieldTypeSelect_UserFragmentDoc}
+  ${PetitionComposeFileUploadSettings_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_UserFragment, unknown>;
 export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
   fragment PetitionComposeNewFieldDrawer_User on User {

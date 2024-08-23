@@ -453,6 +453,10 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+enum DocumentProcessingType {
+  PAYSLIP
+}
+
 type DowJonesKycEntityDate {
   day: Int
   month: Int
@@ -787,6 +791,7 @@ The types of integrations available.
 """
 enum IntegrationType {
   AI_COMPLETION
+  DOCUMENT_PROCESSING
   DOW_JONES_KYC
   ID_VERIFICATION
   SIGNATURE
@@ -1081,6 +1086,31 @@ type Mutation {
     orgId: GID!
   ): SupportMethodResponse!
   createBackgroundCheckProfilePdfTask(entityId: String!, token: String!): Task!
+
+  """
+  Creates a new Bankflip Document Processing integration on the provided organization
+  """
+  createBankflipDocumentProcessingIntegration(
+    """
+    Bankflip Account API KEY
+    """
+    apiKey: String!
+
+    """
+    e.g. https://core.bankflip.io
+    """
+    host: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+
+    """
+    Secret for webhook verification
+    """
+    webhookSecret: String!
+  ): SupportMethodResponse!
 
   """
   Creates a new Bankflip ID Verification integration on the provided organization

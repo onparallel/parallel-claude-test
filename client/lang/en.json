@@ -5200,6 +5200,21 @@
     "context": "Allowed formats"
   },
   {
+    "term": "component.petition-compose-file-upload-settings.document-type",
+    "definition": "Document type",
+    "context": "Document type"
+  },
+  {
+    "term": "component.petition-compose-file-upload-settings.document-type-description",
+    "definition": "When uploading the selected document type, the information will be extracted for quicker review.",
+    "context": "When uploading the selected document type, the information will be extracted for quicker review."
+  },
+  {
+    "term": "component.petition-compose-file-upload-settings.document-type-payslip",
+    "definition": "Payslip",
+    "context": "Payslip"
+  },
+  {
     "term": "component.petition-compose-group-children.add-field",
     "definition": "Add...",
     "context": "Add..."
@@ -5388,6 +5403,11 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Unlimited",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-file-upload-payslip-reply.error-reading-document",
+    "definition": "We have not been able to read this document. Please check it to make sure it is the correct type of document.",
+    "context": "We have not been able to read this document. Please check it to make sure it is the correct type of document."
   },
   {
     "term": "component.petition-field-logic-add-condition-button.add-condition",
@@ -6160,6 +6180,41 @@
     "context": "<b>Preview only</b> - Comments are disabled."
   },
   {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.employee-id",
+    "definition": "Employee ID",
+    "context": "Employee ID"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.employee-name",
+    "definition": "Employee name",
+    "context": "Employee name"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.employer-name",
+    "definition": "Employer name",
+    "context": "Employer name"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.net-salary",
+    "definition": "Net salary",
+    "context": "Net salary"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.period",
+    "definition": "Period",
+    "context": "Period"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.total-accrued",
+    "definition": "Total accrued",
+    "context": "Total accrued"
+  },
+  {
+    "term": "component.petition-replies-field-file-upload-payslip-reply.total-deduction",
+    "definition": "Total deduction",
+    "context": "Total deduction"
+  },
+  {
     "term": "component.petition-replies-field-id-verification-reply.birth-place",
     "definition": "Birth place",
     "context": "Birth place"
@@ -6188,6 +6243,11 @@
     "term": "component.petition-replies-field-id-verification-reply.driver-license-number",
     "definition": "Driver license",
     "context": "Driver license"
+  },
+  {
+    "term": "component.petition-replies-field-id-verification-reply.employer-id",
+    "definition": "Employer ID",
+    "context": "Employer ID"
   },
   {
     "term": "component.petition-replies-field-id-verification-reply.expired-document-poppover",
@@ -11303,6 +11363,11 @@
     "term": "generic.all-event-types",
     "definition": "All events",
     "context": "All events"
+  },
+  {
+    "term": "generic.all-types",
+    "definition": "All",
+    "context": "All"
   },
   {
     "term": "generic.apply",

@@ -53,7 +53,10 @@ const COMPONENTS: Partial<
   Record<
     PetitionFieldType,
     ComponentType<
-      Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">
+      Pick<
+        PetitionComposeFieldSettingsProps,
+        "petition" | "field" | "onFieldEdit" | "isReadOnly" | "user"
+      >
     >
   >
 > = {
@@ -191,6 +194,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                 field={field}
                 onFieldEdit={onFieldEdit}
                 isReadOnly={isReadOnly}
+                user={user}
               />
               {canChangeMultiple ? (
                 field.type === "FILE_UPLOAD" ? (
@@ -313,8 +317,10 @@ export const PetitionComposeFieldSettings = Object.assign(
       User: gql`
         fragment PetitionComposeFieldSettings_User on User {
           ...PetitionFieldTypeSelect_User
+          ...PetitionComposeFileUploadSettings_User
         }
         ${PetitionFieldTypeSelect.fragments.User}
+        ${PetitionComposeFileUploadSettings.fragments.User}
       `,
       PetitionBase: gql`
         fragment PetitionComposeFieldSettings_PetitionBase on PetitionBase {

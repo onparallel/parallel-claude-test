@@ -1,18 +1,24 @@
 import { gql } from "@apollo/client";
-import { HStack, IconProps, Stack, Text } from "@chakra-ui/react";
-import { AlertCircleFilledIcon, CameraIcon, CircleCheckFilledIcon } from "@parallel/chakra/icons";
+import { HStack, Stack, Text } from "@chakra-ui/react";
+import { CameraIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { ReactNode, forwardRef, useMemo } from "react";
-import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
+import { useMemo } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import {
+  InvalidIcon,
+  PetitionRepliesMetadataDate,
+  PetitionRepliesMetadataScore,
+  PetitionRepliesMetadataScoreIcon,
+  PetitionRepliesMetadataText,
+  ValidIcon,
+} from "./PetitionRepliesMetadata";
 
 interface PetitionRepliesFieldIdVerificationReplyProps {
   reply: PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment;
-  editReplyIconButton: ReactNode;
 }
 
 interface MetadataLiveness {
@@ -52,14 +58,13 @@ interface InferredDataIDCard {
 
 export function PetitionRepliesFieldIdVerificationReply({
   reply,
-  editReplyIconButton,
 }: PetitionRepliesFieldIdVerificationReplyProps) {
   if (isDefined(reply.content.error) && reply.content.error.length > 0) {
     return <ErrorMessageContent />;
   }
 
   if (isDefined(reply.metadata.inferred_type)) {
-    return <IDCardView reply={reply} editReplyIconButton={editReplyIconButton} />;
+    return <IDCardView reply={reply} />;
   }
 
   return <LivenessView reply={reply} />;
@@ -78,10 +83,8 @@ PetitionRepliesFieldIdVerificationReply.fragments = {
 
 function IDCardView({
   reply,
-  editReplyIconButton,
 }: {
   reply: PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment;
-  editReplyIconButton: ReactNode;
 }) {
   const intl = useIntl();
 
@@ -108,21 +111,21 @@ function IDCardView({
           {hasName ? <CopyToClipboardButton size="xs" fontSize="md" text={fullName} /> : null}
         </HStack>
 
-        <IdVerificatioText
+        <PetitionRepliesMetadataText
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.nationality",
             defaultMessage: "Nationality",
           })}
           content={nationality ? (getCountryName(nationality) ?? nationality) : null}
         />
-        <IdVerificationDate
+        <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.date-of-birth",
             defaultMessage: "Date of birth",
           })}
           date={metadata.inferred_data.birthDate}
         />
-        <IdVerificatioText
+        <PetitionRepliesMetadataText
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.birth-place",
             defaultMessage: "Birth place",
@@ -165,7 +168,11 @@ function IDCardView({
                   return (
                     <HStack key={index} justify="space-between">
                       <Text as="span">{label}</Text>
-                      <ScoreWithIcon score={score} threshold={50} maxScore={100} />
+                      <PetitionRepliesMetadataScoreIcon
+                        score={score}
+                        threshold={50}
+                        maxScore={100}
+                      />
                     </HStack>
                   );
                 })}
@@ -182,21 +189,21 @@ function IDCardView({
             <CopyToClipboardButton size="xs" fontSize="md" text={idNumber} />
           ) : null}
         </HStack>
-        <IdVerificatioText
+        <PetitionRepliesMetadataText
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.issuing-country",
             defaultMessage: "Issuing country",
           })}
           content={issuingCountry ? (getCountryName(issuingCountry) ?? issuingCountry) : null}
         />
-        <IdVerificationDate
+        <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.date-of-issue",
             defaultMessage: "Date of issue",
           })}
           date={metadata.inferred_data.issueDate}
         />
-        <IdVerificationDate
+        <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.expiry-date",
             defaultMessage: "Expiry date",
@@ -256,7 +263,7 @@ function LivenessView({
             />
           </Text>
         </HStack>
-        <IdVerificationScore
+        <PetitionRepliesMetadataScore
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.liveness",
             defaultMessage: "Liveness",
@@ -265,7 +272,7 @@ function LivenessView({
           maxScore={100}
           threshold={50}
         />
-        <IdVerificationScore
+        <PetitionRepliesMetadataScore
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.only-one-face",
             defaultMessage: "Only one face",
@@ -275,91 +282,6 @@ function LivenessView({
           threshold={50}
         />
       </Stack>
-    </HStack>
-  );
-}
-
-function ScoreWithIcon({
-  score,
-  threshold,
-  maxScore,
-}: {
-  score: number | null;
-  threshold: number;
-  maxScore: number;
-}) {
-  if (!isDefined(score)) return <Text>{"-"}</Text>;
-
-  return score >= threshold ? (
-    <HStack spacing={1}>
-      <ValidIcon />
-      <Text as="span" color="green.500">
-        {Math.trunc(score)}/{maxScore}
-      </Text>
-    </HStack>
-  ) : (
-    <HStack spacing={1}>
-      <InvalidIcon />
-      <Text as="span">
-        {Math.trunc(score)}/{maxScore}
-      </Text>
-    </HStack>
-  );
-}
-
-function IdVerificationScore({
-  label,
-  score,
-  threshold,
-  maxScore,
-}: {
-  label: string;
-  score: number | null;
-  threshold: number;
-  maxScore: number;
-}) {
-  return (
-    <HStack alignItems="flex-end">
-      <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
-        {label}:
-      </Text>
-      <ScoreWithIcon score={score} threshold={threshold} maxScore={maxScore} />
-    </HStack>
-  );
-}
-
-function IdVerificationDate({
-  label,
-  date,
-  rightIcon,
-}: {
-  label: string;
-  date: string | null;
-  rightIcon?: ReactNode;
-}) {
-  const intl = useIntl();
-  return (
-    <HStack alignItems="flex-end">
-      <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
-        {label}:
-      </Text>
-      <Text as="span">{isDefined(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}</Text>
-      {rightIcon}
-      {isDefined(date) ? (
-        <CopyToClipboardButton size="xs" fontSize="md" text={intl.formatDate(date, FORMATS.L)} />
-      ) : null}
-    </HStack>
-  );
-}
-
-function IdVerificatioText({ label, content }: { label: string; content: string | null }) {
-  return (
-    <HStack alignItems="flex-end">
-      <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
-        {label}:
-      </Text>
-      <Text as="span">{isDefined(content) ? content : "-"}</Text>
-      {isDefined(content) ? <CopyToClipboardButton size="xs" fontSize="md" text={content} /> : null}
     </HStack>
   );
 }
@@ -435,11 +357,3 @@ function useMetadataScores(
 
   return metadataScores;
 }
-
-const InvalidIcon = forwardRef<SVGSVGElement, IconProps>(function InvalidIcon({ ...props }, ref) {
-  return <AlertCircleFilledIcon ref={ref} {...props} color="yellow.500" />;
-});
-
-const ValidIcon = forwardRef<SVGSVGElement, IconProps>(function ValidIcon({ ...props }, ref) {
-  return <CircleCheckFilledIcon ref={ref} {...props} color="green.500" />;
-});

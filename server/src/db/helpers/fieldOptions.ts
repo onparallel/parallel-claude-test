@@ -5,7 +5,13 @@ import { join } from "path";
 import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
-import { ContactLocale, CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
+import {
+  ContactLocale,
+  CreatePetitionField,
+  DocumentProcessingTypeValues,
+  PetitionField,
+  PetitionFieldType,
+} from "../__types";
 
 const SCHEMAS = {
   NUMBER: {
@@ -107,6 +113,20 @@ const SCHEMAS = {
         items: {
           type: "string",
           enum: ["PDF", "IMAGE"],
+        },
+      },
+      documentProcessing: {
+        type: ["object", "null"],
+        required: ["integrationId", "processDocumentAs"],
+        additionalProperties: false,
+        properties: {
+          integrationId: {
+            type: ["number", "null"],
+          },
+          processDocumentAs: {
+            type: "string",
+            enum: DocumentProcessingTypeValues,
+          },
         },
       },
       attachToPdf: {

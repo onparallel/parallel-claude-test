@@ -6,7 +6,17 @@ import yargs from "yargs";
 import { writeJson } from "./utils/json";
 import { run } from "./utils/run";
 
-let CURRENCIES: Set<string> | null = null;
+let CURRENCIES: Map<
+  string,
+  {
+    state: string;
+    name: string;
+    symbol: string;
+    code: string;
+    fractionalUnitName: string;
+    fractionalUnit: number;
+  }
+> | null = null;
 async function getCurrencies() {
   if (CURRENCIES) {
     return CURRENCIES;
@@ -15,12 +25,28 @@ async function getCurrencies() {
       await fetch("https://www.wikitable2json.com/api/List_of_circulating_currencies?table=0")
     ).json();
     const data = tables[0];
-    assert(data[0][3].startsWith("ISO code"));
-    return (CURRENCIES = new Set(
+    // if any of these asserts fails make sure the table still has the same structure and correct code accordingly
+    assert(data[0][0] === "State / Territory[1]");
+    assert(data[0][1] === "Currency[1][2]");
+    assert(data[0][2] === "Symbol[upper-alpha 4] orAbbrev.[3]");
+    assert(data[0][3] === "ISO code[2]");
+    assert(data[0][4] === "Fractionalunit");
+    assert(data[0][5] === "Numberto basic");
+    return (CURRENCIES = new Map(
       data
         .slice(1)
-        .filter((row) => row[3] !== "(none)")
-        .map((row) => row[3]),
+        .filter((row) => row[3] !== "(none)" && row.length > 0)
+        .map((row) => [
+          row[3],
+          {
+            state: row[0],
+            name: row[1],
+            symbol: row[2],
+            code: row[3],
+            fractionalUnitName: row[4],
+            fractionalUnit: row[5] === "(none)" ? 1 : parseInt(row[5]),
+          },
+        ]),
     ));
   }
 }
@@ -40,13 +66,13 @@ async function main() {
     })
     .option("dataset", {
       required: true,
-      choices: ["country-names", "currency-names"] as const,
+      choices: ["country-names", "currency-names", "currency-basic-unit"] as const,
       description: "The dataset to extract.",
     }).argv;
 
   async function getData(type: typeof dataset, locale: string) {
     switch (type) {
-      case "country-names":
+      case "country-names": {
         const countries = new Set(ccl.all().map((x) => x.countryCode));
         return pipe(
           cldr.extractTerritoryDisplayNames(locale) as Record<string, string>,
@@ -56,7 +82,8 @@ async function main() {
           sort(([, a], [, b]) => a.localeCompare(b)),
           Object.fromEntries,
         );
-      case "currency-names":
+      }
+      case "currency-names": {
         const currencies = await getCurrencies();
         return pipe(
           cldr.extractCurrencyInfoById(locale),
@@ -67,6 +94,11 @@ async function main() {
           map(([code, data]) => [code, [data.displayName, data.symbol]]),
           Object.fromEntries,
         );
+      }
+      case "currency-basic-unit": {
+        const currencies = await getCurrencies();
+        return Object.fromEntries([...currencies.values()].map((x) => [x.code, x.fractionalUnit]));
+      }
     }
   }
 

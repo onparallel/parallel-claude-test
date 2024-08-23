@@ -7,6 +7,10 @@ import {
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { AzureOpenAiIntegration } from "../integrations/ai-completion/AzureOpenAiIntegration";
+import {
+  BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION,
+  BankflipDocumentProcessingIntegration,
+} from "../integrations/document-processing/bankflip/BankflipDocumentProcessingIntegration";
 import { DowJonesIntegration } from "../integrations/dow-jones/DowJonesIntegration";
 import {
   BANKFLIP_ID_VERIFICATION_INTEGRATION,
@@ -51,6 +55,13 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"ID_VERIFICATION", "BANKFLIP">>;
+  createBankflipDocumentProcessingIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"DOCUMENT_PROCESSING", "BANKFLIP">>;
 }
 
 @injectable()
@@ -62,6 +73,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
     @inject(BANKFLIP_ID_VERIFICATION_INTEGRATION)
     private bankflipIdVerificationIntegration: BankflipIdVerificationIntegration,
+    @inject(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
+    private bankflipDocumentProcessingIntegration: BankflipDocumentProcessingIntegration,
   ) {}
 
   private async authenticateSignaturitApiKey(apiKey: string) {
@@ -147,5 +160,19 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     t?: Knex.Transaction<any, any[]> | undefined,
   ): Promise<EnhancedOrgIntegration<"ID_VERIFICATION", "BANKFLIP">> {
     return await this.bankflipIdVerificationIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async createBankflipDocumentProcessingIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"DOCUMENT_PROCESSING", "BANKFLIP">> {
+    return await this.bankflipDocumentProcessingIntegration.createOrgIntegration(
+      data,
+      createdBy,
+      t,
+    );
   }
 }

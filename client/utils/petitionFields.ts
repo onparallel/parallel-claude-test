@@ -1,5 +1,9 @@
 import { useTheme } from "@chakra-ui/react";
-import { BackgroundCheckEntitySearchType, PetitionFieldType } from "@parallel/graphql/__types";
+import {
+  BackgroundCheckEntitySearchType,
+  DocumentProcessingType,
+  PetitionFieldType,
+} from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { Maybe } from "./types";
@@ -23,6 +27,10 @@ export interface FieldOptions {
     accepts: Maybe<FileUploadAccepts[]>;
     attachToPdf: boolean;
     maxFileSize?: Maybe<number>;
+    documentProcessing?: Maybe<{
+      integrationId: Maybe<string>;
+      processDocumentAs: DocumentProcessingType;
+    }>;
   };
   SHORT_TEXT: {
     placeholder?: Maybe<string>;

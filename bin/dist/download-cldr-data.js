@@ -18,11 +18,27 @@ async function getCurrencies() {
     else {
         const tables = await (await fetch("https://www.wikitable2json.com/api/List_of_circulating_currencies?table=0")).json();
         const data = tables[0];
-        (0, ts_essentials_1.assert)(data[0][3].startsWith("ISO code"));
-        return (CURRENCIES = new Set(data
+        // if any of these asserts fails make sure the table still has the same structure and correct code accordingly
+        (0, ts_essentials_1.assert)(data[0][0] === "State / Territory[1]");
+        (0, ts_essentials_1.assert)(data[0][1] === "Currency[1][2]");
+        (0, ts_essentials_1.assert)(data[0][2] === "Symbol[upper-alpha 4] orAbbrev.[3]");
+        (0, ts_essentials_1.assert)(data[0][3] === "ISO code[2]");
+        (0, ts_essentials_1.assert)(data[0][4] === "Fractionalunit");
+        (0, ts_essentials_1.assert)(data[0][5] === "Numberto basic");
+        return (CURRENCIES = new Map(data
             .slice(1)
-            .filter((row) => row[3] !== "(none)")
-            .map((row) => row[3])));
+            .filter((row) => row[3] !== "(none)" && row.length > 0)
+            .map((row) => [
+            row[3],
+            {
+                state: row[0],
+                name: row[1],
+                symbol: row[2],
+                code: row[3],
+                fractionalUnitName: row[4],
+                fractionalUnit: row[5] === "(none)" ? 1 : parseInt(row[5]),
+            },
+        ])));
     }
 }
 async function main() {
@@ -40,17 +56,23 @@ async function main() {
     })
         .option("dataset", {
         required: true,
-        choices: ["country-names", "currency-names"],
+        choices: ["country-names", "currency-names", "currency-basic-unit"],
         description: "The dataset to extract.",
     }).argv;
     async function getData(type, locale) {
         switch (type) {
-            case "country-names":
+            case "country-names": {
                 const countries = new Set(country_codes_list_1.default.all().map((x) => x.countryCode));
                 return (0, remeda_1.pipe)(cldr_1.default.extractTerritoryDisplayNames(locale), Object.entries, (0, remeda_1.filter)(([code]) => countries.has(code)), (0, remeda_1.forEach)(([, name]) => (0, ts_essentials_1.assert)(typeof name === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.localeCompare(b)), Object.fromEntries);
-            case "currency-names":
+            }
+            case "currency-names": {
                 const currencies = await getCurrencies();
                 return (0, remeda_1.pipe)(cldr_1.default.extractCurrencyInfoById(locale), Object.entries, (0, remeda_1.filter)(([code]) => currencies.has(code)), (0, remeda_1.forEach)(([, data]) => (0, ts_essentials_1.assert)(typeof data.displayName === "string")), (0, remeda_1.sort)(([, a], [, b]) => a.displayName.localeCompare(b.displayName)), (0, remeda_1.map)(([code, data]) => [code, [data.displayName, data.symbol]]), Object.fromEntries);
+            }
+            case "currency-basic-unit": {
+                const currencies = await getCurrencies();
+                return Object.fromEntries([...currencies.values()].map((x) => [x.code, x.fractionalUnit]));
+            }
         }
     }
     for (const locale of locales) {

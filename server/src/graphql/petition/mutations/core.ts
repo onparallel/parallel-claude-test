@@ -58,6 +58,7 @@ import {
   mapFieldLogicCondition,
   mapFieldMathOperation,
 } from "../../../util/fieldLogic";
+import { toBytes } from "../../../util/fileSize";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
@@ -1329,6 +1330,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           ...(field.type === "FILE_UPLOAD"
             ? omit(options, ["maxFileSize"]) // ignore maxFileSize so user can't change it
             : options),
+          ...(isDefined(options.documentProcessing) // hardcode maxFileSize and accepts options when setting documentProcessing
+            ? {
+                maxFileSize: toBytes(10, "MB"), // 10MB is a limit for the Bankflip request. We should review this when implementing a second provider
+                accepts: ["PDF", "IMAGE"],
+              }
+            : {}),
         };
 
         if (["SELECT", "CHECKBOX"].includes(field.type)) {
@@ -4049,12 +4056,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
 
     if (replies.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
-      await ctx.petitions.createPetitionFieldReply(
-        petition.id,
-        replies,
-        `User:${ctx.user!.id}`,
-        false,
-      );
+      await ctx.petitions.createPetitionFieldReply(petition.id, replies, `User:${ctx.user!.id}`);
     }
 
     return petition;
@@ -4230,7 +4232,6 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
         args.petitionId,
         replies,
         `User:${ctx.user!.id}`,
-        false,
       );
     }
 

@@ -2191,7 +2191,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {
-                    values: expect.toBeArrayOfSize(154),
+                    values: expect.toBeArrayOfSize(155),
                     standardList: "CURRENCIES",
                   },
                   position: 6,

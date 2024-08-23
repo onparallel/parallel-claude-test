@@ -1,11 +1,14 @@
-import { Box, Stack } from "@chakra-ui/react";
+import { gql } from "@apollo/client";
+import { Box } from "@chakra-ui/react";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
+import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { DocumentProcessingType } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 import { Children, useMemo } from "react";
-import { FormattedList, FormattedMessage } from "react-intl";
+import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { ValueContainerProps, components } from "react-select";
 import { difference, intersectionWith } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
@@ -15,30 +18,88 @@ export function PetitionComposeFileUploadSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+  user,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly" | "user">) {
+  const intl = useIntl();
+
   const options = field.options as FieldOptions["FILE_UPLOAD"];
+
+  const documentTypes = useSimpleSelectOptions<DocumentProcessingType>(
+    (intl) => [
+      {
+        label: intl.formatMessage({
+          id: "component.petition-compose-file-upload-settings.document-type-payslip",
+          defaultMessage: "Payslip",
+        }),
+        value: "PAYSLIP",
+      },
+    ],
+    [],
+  );
   return (
     <>
-      <Stack spacing={1}>
+      {user.organization.hasDocumentProcessingIntegration ? (
         <SettingsRow
-          controlId="allowed-format"
+          controlId="document-type"
           textStyle={isReadOnly ? "muted" : undefined}
           label={
             <FormattedMessage
-              id="component.petition-compose-file-upload-settings.allowed-formats"
-              defaultMessage="Allowed formats"
+              id="component.petition-compose-file-upload-settings.document-type"
+              defaultMessage="Document type"
             />
           }
           isReadOnly={isReadOnly}
+          description={
+            <FormattedMessage
+              id="component.petition-compose-file-upload-settings.document-type-description"
+              defaultMessage="When uploading the selected document type, the information will be extracted for quicker review."
+            />
+          }
         >
           <Box flex={1}>
-            <AllowedFormatsSelect
-              value={options.accepts}
-              onChange={(accepts) => onFieldEdit(field.id, { options: { accepts } })}
+            <SimpleSelect
+              data-testid="petition-compose-file-upload-type-select"
+              size="sm"
+              isClearable
+              isDisabled={isReadOnly}
+              options={documentTypes}
+              value={options.documentProcessing?.processDocumentAs ?? null}
+              onChange={(processDocumentAs) => {
+                onFieldEdit(field.id, {
+                  options: {
+                    ...field.options,
+                    documentProcessing: processDocumentAs
+                      ? { integrationId: null, processDocumentAs }
+                      : null,
+                  },
+                });
+              }}
+              placeholder={intl.formatMessage({
+                id: "generic.all-types",
+                defaultMessage: "All",
+              })}
             />
           </Box>
         </SettingsRow>
-      </Stack>
+      ) : null}
+      <SettingsRow
+        controlId="allowed-format"
+        textStyle={isReadOnly ? "muted" : undefined}
+        label={
+          <FormattedMessage
+            id="component.petition-compose-file-upload-settings.allowed-formats"
+            defaultMessage="Allowed formats"
+          />
+        }
+        isReadOnly={isReadOnly}
+      >
+        <Box flex={1}>
+          <AllowedFormatsSelect
+            value={options.accepts}
+            onChange={(accepts) => onFieldEdit(field.id, { options: { accepts } })}
+          />
+        </Box>
+      </SettingsRow>
     </>
   );
 }
@@ -113,3 +174,13 @@ function ValueContainer({
     </components.ValueContainer>
   );
 }
+
+PetitionComposeFileUploadSettings.fragments = {
+  User: gql`
+    fragment PetitionComposeFileUploadSettings_User on User {
+      organization {
+        hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
+      }
+    }
+  `,
+};

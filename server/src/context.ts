@@ -71,6 +71,10 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
+import {
+  DOCUMENT_PROCESSING_SERVICE,
+  IDocumentProcessingService,
+} from "./services/DocumentProcessingService";
 
 @injectable()
 export class ApiContext {
@@ -170,6 +174,8 @@ export class WorkerContext {
     @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
+    @inject(DOCUMENT_PROCESSING_SERVICE)
+    public readonly documentProcessing: IDocumentProcessingService,
 
     // Repositories
     public readonly contacts: ContactRepository,

@@ -10,6 +10,7 @@ import {
   groupBy,
   indexBy,
   isDefined,
+  isNonNullish,
   map,
   mapValues,
   minBy,
@@ -2358,11 +2359,38 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
+  private async createReplyCreatedOrUpdatedEvents(
+    petitionId: number,
+    replies: PetitionFieldReply[],
+    eventType: "REPLY_CREATED" | "REPLY_UPDATED",
+    t?: Knex.Transaction,
+  ) {
+    const events: CreatePetitionEvent[] = replies.map((reply) => ({
+      type: eventType,
+      petition_id: petitionId,
+      data: {
+        ...(isNonNullish(reply.user_id)
+          ? { user_id: reply.user_id }
+          : { petition_access_id: reply.petition_access_id! }),
+        petition_field_id: reply.petition_field_id,
+        petition_field_reply_id: reply.id,
+      },
+    }));
+
+    // delay event processing only in the case the user is creating a single text reply
+    // for massive reply creation (import from profile, prefill) we don't want to delay
+    const delayEvents = replies.length === 1 && !isFileTypeField(replies[0].type);
+    if (delayEvents) {
+      await this.createEventWithDelay(events, this.REPLY_EVENTS_DELAY_SECONDS, t);
+    } else {
+      await this.createEvent(events, t);
+    }
+  }
+
   async createPetitionFieldReply(
     petitionId: number,
     data: MaybeArray<CreatePetitionFieldReply>,
     createdBy: string,
-    delayEvents: boolean = true,
   ) {
     const dataArray = unMaybeArray(data);
     if (dataArray.length === 0) {
@@ -2403,23 +2431,7 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition.dataloader.clear(petitionId);
     }
 
-    const events: CreatePetitionEvent[] = replies.map((reply) => ({
-      type: "REPLY_CREATED",
-      petition_id: petitionId,
-      data: {
-        ...(createdBy.startsWith("User")
-          ? { user_id: reply.user_id! }
-          : { petition_access_id: reply.petition_access_id! }),
-        petition_field_id: reply.petition_field_id,
-        petition_field_reply_id: reply.id,
-      },
-    }));
-
-    if (delayEvents) {
-      await this.createEventWithDelay(events, this.REPLY_EVENTS_DELAY_SECONDS);
-    } else {
-      await this.createEvent(events);
-    }
+    await this.createReplyCreatedOrUpdatedEvents(petitionId, replies, "REPLY_CREATED");
 
     return replies;
   }
@@ -2428,6 +2440,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     data: { id: number; content: any; metadata?: any }[],
     updater: User | PetitionAccess,
+    skipEventCreation?: boolean,
     t?: Knex.Transaction,
   ) {
     const replyIds = unique(data.map((d) => d.id));
@@ -2491,6 +2504,10 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition.dataloader.clear(petitionId);
     }
 
+    if (skipEventCreation) {
+      return replies;
+    }
+
     const petitionAccessIdOrUserId = isContact
       ? { petition_access_id: updater.id }
       : { user_id: updater.id };
@@ -2531,10 +2548,13 @@ export class PetitionRepository extends BaseRepository {
     replyId: number,
     data: Partial<PetitionFieldReply>,
     updatedBy: string,
+    skipFieldCheck?: boolean,
   ) {
-    const field = await this.loadFieldForReply(replyId);
-    if (!field) {
-      throw new Error("Petition field not found");
+    if (!skipFieldCheck) {
+      const field = await this.loadFieldForReply(replyId);
+      if (!field) {
+        throw new Error("Petition field not found");
+      }
     }
     const [reply] = await this.from("petition_field_reply")
       .where("id", replyId)
@@ -3917,7 +3937,7 @@ export class PetitionRepository extends BaseRepository {
 
   private async createOrUpdateReplyEvents(
     petitionId: number,
-    replies: Pick<PetitionFieldReply, "id" | "petition_field_id">[],
+    replies: PetitionFieldReply[],
     updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">,
     t?: Knex.Transaction,
   ) {
@@ -3929,28 +3949,20 @@ export class PetitionRepository extends BaseRepository {
       ((isDefined(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
         (isDefined(updater.petition_access_id) &&
           latestEvent.data.petition_access_id === updater.petition_access_id)) &&
-      differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS
+      differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS &&
+      // if all replies are file uploads, we will create a new REPLY_UPDATED event instead of updating the REPLY_CREATED
+      // this will allow document-processor to trigger requests for the new files
+      !replies.every((r) => isFileTypeField(r.type))
     ) {
+      const delayEvents = replies.length === 1 && !isFileTypeField(replies[0].type);
       await this.updateEvent(
         latestEvent.id,
         { created_at: new Date() },
-        this.REPLY_EVENTS_DELAY_SECONDS,
+        delayEvents ? this.REPLY_EVENTS_DELAY_SECONDS : undefined,
         t,
       );
     } else {
-      await this.createEventWithDelay(
-        replies.map((r) => ({
-          type: "REPLY_UPDATED",
-          petition_id: petitionId,
-          data: {
-            petition_field_id: r.petition_field_id,
-            petition_field_reply_id: r.id,
-            ...updater,
-          },
-        })),
-        this.REPLY_EVENTS_DELAY_SECONDS,
-        t,
-      );
+      await this.createReplyCreatedOrUpdatedEvents(petitionId, replies, "REPLY_UPDATED", t);
     }
   }
 

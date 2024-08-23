@@ -33,6 +33,7 @@ export interface IStorageImpl {
     cdType: "attachment" | "inline",
   ): Promise<string>;
   downloadFile(key: string): Promise<Readable>;
+  downloadFileBase64(key: string): Promise<string>;
   getFileMetadata(key: string): Promise<HeadObjectOutput>;
   deleteFile(key: MaybeArray<string>): Promise<void>;
   uploadFile(key: string, contentType: string, body: Buffer | Readable): Promise<HeadObjectOutput>;
@@ -75,6 +76,14 @@ class StorageImpl implements IStorageImpl {
       new GetObjectCommand({ Bucket: this.bucketName, Key: key }),
     );
     return Readable.from(await buffer(response.Body! as Readable));
+  }
+
+  async downloadFileBase64(key: string) {
+    const response = await this.s3.send(
+      new GetObjectCommand({ Bucket: this.bucketName, Key: key }),
+    );
+
+    return await response.Body!.transformToString("base64");
   }
 
   async getFileMetadata(key: string) {

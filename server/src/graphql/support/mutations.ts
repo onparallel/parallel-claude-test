@@ -741,3 +741,49 @@ export const createBankflipIdVerificationIntegration = mutationField(
     },
   },
 );
+
+export const createBankflipDocumentProcessingIntegration = mutationField(
+  "createBankflipDocumentProcessingIntegration",
+  {
+    description:
+      "Creates a new Bankflip Document Processing integration on the provided organization",
+    type: "SupportMethodResponse",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(
+        globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
+      ),
+      apiKey: nonNull(stringArg({ description: "Bankflip Account API KEY" })),
+      host: nonNull(stringArg({ description: "e.g. https://core.bankflip.io" })),
+      webhookSecret: nonNull(stringArg({ description: "Secret for webhook verification" })),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const data = await ctx.integrationsSetup.createBankflipDocumentProcessingIntegration(
+          {
+            org_id: ctx.user!.org_id,
+            name: "Document Processing",
+            settings: {
+              CREDENTIALS: {
+                API_KEY: args.apiKey,
+                HOST: args.host,
+                WEBHOOK_SECRET: args.webhookSecret,
+              },
+            },
+          },
+          `User:${ctx.user!.id}`,
+        );
+
+        return {
+          result: "SUCCESS",
+          message: `Integration:${data.id} created successfully`,
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
+    },
+  },
+);

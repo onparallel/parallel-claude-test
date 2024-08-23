@@ -1,4 +1,5 @@
 import { analyticsEventListener } from "./event-listeners/analytics-event-listener";
+import { documentProcessingListener } from "./event-listeners/document-processing-listener";
 import { petitionActivityListener } from "./event-listeners/petition-activity-listener";
 import { petitionEventSubscriptionsListener } from "./event-listeners/petition-event-subscriptions-listener";
 import { profileEventSubscriptionsListener } from "./event-listeners/profile-event-subscriptions-listener";
@@ -14,6 +15,7 @@ createQueueWorker(
     .register(profileEventSubscriptionsListener)
     .register(analyticsEventListener)
     .register(petitionActivityListener)
+    .register(documentProcessingListener)
     .listen(),
   { batchSize: 10 },
 );

@@ -25,6 +25,10 @@ export type ContactLocale = "en" | "es" | "ca" | "it" | "pt";
 
 export const ContactLocaleValues = ["en", "es", "ca", "it", "pt"] as ContactLocale[];
 
+export type DocumentProcessingType = "PAYSLIP";
+
+export const DocumentProcessingTypeValues = ["PAYSLIP"] as DocumentProcessingType[];
+
 export type EventSubscriptionType = "PETITION" | "PROFILE";
 
 export const EventSubscriptionTypeValues = ["PETITION", "PROFILE"] as EventSubscriptionType[];
@@ -100,7 +104,8 @@ export type IntegrationType =
   | "USER_PROVISIONING"
   | "DOW_JONES_KYC"
   | "AI_COMPLETION"
-  | "ID_VERIFICATION";
+  | "ID_VERIFICATION"
+  | "DOCUMENT_PROCESSING";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
@@ -109,6 +114,7 @@ export const IntegrationTypeValues = [
   "DOW_JONES_KYC",
   "AI_COMPLETION",
   "ID_VERIFICATION",
+  "DOCUMENT_PROCESSING",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -601,6 +607,7 @@ export interface TableTypes {
   contact: Contact;
   contact_authentication: ContactAuthentication;
   contact_authentication_request: ContactAuthenticationRequest;
+  document_processing_log: DocumentProcessingLog;
   email_attachment: EmailAttachment;
   email_event: EmailEvent;
   email_log: EmailLog;
@@ -667,6 +674,7 @@ export interface TableCreateTypes {
   contact: CreateContact;
   contact_authentication: CreateContactAuthentication;
   contact_authentication_request: CreateContactAuthenticationRequest;
+  document_processing_log: CreateDocumentProcessingLog;
   email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
@@ -733,6 +741,7 @@ export interface TablePrimaryKeys {
   contact: "id";
   contact_authentication: "id";
   contact_authentication_request: "id";
+  document_processing_log: "id";
   email_attachment: "id";
   email_event: "id";
   email_log: "id";
@@ -895,6 +904,33 @@ export type CreateContactAuthenticationRequest = PartialProps<
   | "contact_first_name"
   | "contact_last_name"
   | "contact_email"
+>;
+
+export interface DocumentProcessingLog {
+  id: number; // int4
+  external_id: Maybe<string>; // varchar
+  integration_id: number; // int4
+  file_upload_id: number; // int4
+  document_type: DocumentProcessingType; // document_processing_type
+  raw_result: Maybe<any>; // jsonb
+  error: Maybe<any>; // jsonb
+  metadata: any; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateDocumentProcessingLog = PartialProps<
+  Omit<DocumentProcessingLog, "id">,
+  | "external_id"
+  | "raw_result"
+  | "error"
+  | "metadata"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
 >;
 
 export interface EmailAttachment {
