@@ -297,6 +297,15 @@ export class BankflipDocumentProcessingIntegration
     const timestamp = req.headers["x-signature-timestamp"] as string;
     const requestSignature = req.headers["x-signature-v1"] as string;
 
+    const numericTimestamp = parseInt(timestamp, 10);
+    const diff = new Date().getTime() - numericTimestamp;
+    if (isNaN(diff) || diff > 5 * 60 * 1_000) {
+      // if received timestamp is older than 5 minutes, reject the request as it could be a replay attack
+      // any error response in the webhook will cause Bankflip to retry the request after an exponential backoff, up to 60 times, or ~6 days
+      // 5 minutes check should allow Bankflip to retry the request a few times before it's rejected
+      throw new Error("HMAC verification error: Invalid timestamp");
+    }
+
     const hash = createHmac("sha256", Buffer.from(webhookSecret, "base64"))
       .update(Buffer.from(requestMethod + requestUri + requestBody + timestamp))
       .digest();
