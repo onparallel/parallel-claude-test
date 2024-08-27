@@ -10,7 +10,7 @@ import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 import { Children, useMemo } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { ValueContainerProps, components } from "react-select";
-import { difference, intersectionWith } from "remeda";
+import { difference, intersectionWith, isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
 
@@ -91,7 +91,7 @@ export function PetitionComposeFileUploadSettings({
             defaultMessage="Allowed formats"
           />
         }
-        isReadOnly={isReadOnly}
+        isReadOnly={isReadOnly || isNonNullish(field.options.documentProcessing)}
       >
         <Box flex={1}>
           <AllowedFormatsSelect

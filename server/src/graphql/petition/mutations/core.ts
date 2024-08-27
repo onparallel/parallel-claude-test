@@ -1220,6 +1220,23 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       (args) => args.data.multiple,
       not(fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"])),
     ),
+    ifArgDefined(
+      (args) =>
+        (args.data.options?.accepts !== undefined ? true : undefined) ??
+        (args.data.options?.maxFileSize !== undefined ? true : undefined),
+      async (_, args, ctx) => {
+        const field = await ctx.petitions.loadField(args.fieldId);
+        if (
+          isNonNullish(field?.options.documentProcessing) &&
+          args.data.options?.documentProcessing !== null
+        ) {
+          throw new ForbiddenError(
+            "Can't set accepts or maxFileSize on a document processing field",
+          );
+        }
+        return true;
+      },
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
