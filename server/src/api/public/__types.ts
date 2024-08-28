@@ -6226,7 +6226,7 @@ export type PetitionFragment = {
   createdAt: string;
   customProperties: { [key: string]: any };
   fromTemplate: { id: string } | null;
-  recipients: Array<{
+  recipients?: Array<{
     recipientUrl: string | null;
     id: string;
     status: PetitionAccessStatus;
@@ -6293,7 +6293,7 @@ export type PetitionFragment = {
       multiple: boolean;
     }> | null;
   }>;
-  replies: Array<{
+  replies?: Array<{
     id: string;
     alias: string | null;
     type: PetitionFieldType;
@@ -6320,7 +6320,7 @@ export type PetitionFragment = {
     internal: { approved: number; replied: number; optional: number; total: number };
   };
   variablesResult?: Array<{ name: string; value: number | null }>;
-  signatures: Array<{
+  signatures?: Array<{
     id: string;
     status: PetitionSignatureRequestStatus;
     environment: SignatureOrgIntegrationEnvironment;
@@ -6726,7 +6726,7 @@ export type GetPetitions_petitionsQuery = {
           createdAt: string;
           customProperties: { [key: string]: any };
           fromTemplate: { id: string } | null;
-          recipients: Array<{
+          recipients?: Array<{
             recipientUrl: string | null;
             id: string;
             status: PetitionAccessStatus;
@@ -6793,7 +6793,7 @@ export type GetPetitions_petitionsQuery = {
               multiple: boolean;
             }> | null;
           }>;
-          replies: Array<{
+          replies?: Array<{
             id: string;
             alias: string | null;
             type: PetitionFieldType;
@@ -6820,7 +6820,7 @@ export type GetPetitions_petitionsQuery = {
             internal: { approved: number; replied: number; optional: number; total: number };
           };
           variablesResult?: Array<{ name: string; value: number | null }>;
-          signatures: Array<{
+          signatures?: Array<{
             id: string;
             status: PetitionSignatureRequestStatus;
             environment: SignatureOrgIntegrationEnvironment;
@@ -6869,7 +6869,7 @@ export type CreatePetition_petitionMutation = {
         createdAt: string;
         customProperties: { [key: string]: any };
         fromTemplate: { id: string } | null;
-        recipients: Array<{
+        recipients?: Array<{
           recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
@@ -6936,7 +6936,7 @@ export type CreatePetition_petitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies: Array<{
+        replies?: Array<{
           id: string;
           alias: string | null;
           type: PetitionFieldType;
@@ -6963,7 +6963,7 @@ export type CreatePetition_petitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures: Array<{
+        signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
           environment: SignatureOrgIntegrationEnvironment;
@@ -7009,7 +7009,7 @@ export type GetPetition_petitionQuery = {
         createdAt: string;
         customProperties: { [key: string]: any };
         fromTemplate: { id: string } | null;
-        recipients: Array<{
+        recipients?: Array<{
           recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
@@ -7076,7 +7076,7 @@ export type GetPetition_petitionQuery = {
             multiple: boolean;
           }> | null;
         }>;
-        replies: Array<{
+        replies?: Array<{
           id: string;
           alias: string | null;
           type: PetitionFieldType;
@@ -7103,7 +7103,7 @@ export type GetPetition_petitionQuery = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures: Array<{
+        signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
           environment: SignatureOrgIntegrationEnvironment;
@@ -7184,7 +7184,7 @@ export type UpdatePetition_updatePetitionMutation = {
         createdAt: string;
         customProperties: { [key: string]: any };
         fromTemplate: { id: string } | null;
-        recipients: Array<{
+        recipients?: Array<{
           recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
@@ -7251,7 +7251,7 @@ export type UpdatePetition_updatePetitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies: Array<{
+        replies?: Array<{
           id: string;
           alias: string | null;
           type: PetitionFieldType;
@@ -7278,7 +7278,7 @@ export type UpdatePetition_updatePetitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures: Array<{
+        signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
           environment: SignatureOrgIntegrationEnvironment;
@@ -7330,7 +7330,7 @@ export type ClosePetition_closePetitionMutation = {
     createdAt: string;
     customProperties: { [key: string]: any };
     fromTemplate: { id: string } | null;
-    recipients: Array<{
+    recipients?: Array<{
       recipientUrl: string | null;
       id: string;
       status: PetitionAccessStatus;
@@ -7397,7 +7397,7 @@ export type ClosePetition_closePetitionMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies: Array<{
+    replies?: Array<{
       id: string;
       alias: string | null;
       type: PetitionFieldType;
@@ -7424,7 +7424,7 @@ export type ClosePetition_closePetitionMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures: Array<{
+    signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;
       environment: SignatureOrgIntegrationEnvironment;
@@ -7468,7 +7468,7 @@ export type ReopenPetition_reopenPetitionMutation = {
     createdAt: string;
     customProperties: { [key: string]: any };
     fromTemplate: { id: string } | null;
-    recipients: Array<{
+    recipients?: Array<{
       recipientUrl: string | null;
       id: string;
       status: PetitionAccessStatus;
@@ -7535,7 +7535,7 @@ export type ReopenPetition_reopenPetitionMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies: Array<{
+    replies?: Array<{
       id: string;
       alias: string | null;
       type: PetitionFieldType;
@@ -7562,7 +7562,7 @@ export type ReopenPetition_reopenPetitionMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures: Array<{
+    signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;
       environment: SignatureOrgIntegrationEnvironment;
@@ -7623,7 +7623,7 @@ export type TagPetition_tagPetitionMutation = {
         createdAt: string;
         customProperties: { [key: string]: any };
         fromTemplate: { id: string } | null;
-        recipients: Array<{
+        recipients?: Array<{
           recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
@@ -7690,7 +7690,7 @@ export type TagPetition_tagPetitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies: Array<{
+        replies?: Array<{
           id: string;
           alias: string | null;
           type: PetitionFieldType;
@@ -7717,7 +7717,7 @@ export type TagPetition_tagPetitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures: Array<{
+        signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
           environment: SignatureOrgIntegrationEnvironment;
@@ -7832,7 +7832,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       createdAt: string;
       customProperties: { [key: string]: any };
       fromTemplate: { id: string } | null;
-      recipients: Array<{
+      recipients?: Array<{
         recipientUrl: string | null;
         id: string;
         status: PetitionAccessStatus;
@@ -7899,7 +7899,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           multiple: boolean;
         }> | null;
       }>;
-      replies: Array<{
+      replies?: Array<{
         id: string;
         alias: string | null;
         type: PetitionFieldType;
@@ -7926,7 +7926,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         internal: { approved: number; replied: number; optional: number; total: number };
       };
       variablesResult?: Array<{ name: string; value: number | null }>;
-      signatures: Array<{
+      signatures?: Array<{
         id: string;
         status: PetitionSignatureRequestStatus;
         environment: SignatureOrgIntegrationEnvironment;
@@ -8223,6 +8223,17 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
   };
 };
 
+export type GetPetitionFieldComments_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type GetPetitionFieldComments_petitionQuery = {
+  petition:
+    | { fields: Array<{ id: string; fromPetitionFieldId: string | null }> }
+    | { fields: Array<{ id: string; fromPetitionFieldId: string | null }> }
+    | null;
+};
+
 export type GetPetitionFieldComments_petitionFieldCommentsQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
@@ -8258,6 +8269,17 @@ export type GetPetitionFieldComments_petitionFieldCommentsQuery = {
       >;
     }>;
   };
+};
+
+export type SendPetitionFieldComment_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type SendPetitionFieldComment_petitionQuery = {
+  petition:
+    | { fields: Array<{ id: string; fromPetitionFieldId: string | null }> }
+    | { fields: Array<{ id: string; fromPetitionFieldId: string | null }> }
+    | null;
 };
 
 export type SendPetitionFieldComment_usersByEmailQueryVariables = Exact<{
@@ -10571,7 +10593,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     createdAt: string;
     customProperties: { [key: string]: any };
     fromTemplate: { id: string } | null;
-    recipients: Array<{
+    recipients?: Array<{
       recipientUrl: string | null;
       id: string;
       status: PetitionAccessStatus;
@@ -10638,7 +10660,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies: Array<{
+    replies?: Array<{
       id: string;
       alias: string | null;
       type: PetitionFieldType;
@@ -10665,7 +10687,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures: Array<{
+    signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;
       environment: SignatureOrgIntegrationEnvironment;
@@ -11715,6 +11737,19 @@ export const UpdatePetitionField_updatePetitionFieldDocument = gql`
   UpdatePetitionField_updatePetitionFieldMutation,
   UpdatePetitionField_updatePetitionFieldMutationVariables
 >;
+export const GetPetitionFieldComments_petitionDocument = gql`
+  query GetPetitionFieldComments_petition($id: GID!) {
+    petition(id: $id) {
+      fields {
+        id
+        fromPetitionFieldId
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  GetPetitionFieldComments_petitionQuery,
+  GetPetitionFieldComments_petitionQueryVariables
+>;
 export const GetPetitionFieldComments_petitionFieldCommentsDocument = gql`
   query GetPetitionFieldComments_petitionFieldComments($petitionId: GID!, $fieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
@@ -11727,6 +11762,19 @@ export const GetPetitionFieldComments_petitionFieldCommentsDocument = gql`
 ` as unknown as DocumentNode<
   GetPetitionFieldComments_petitionFieldCommentsQuery,
   GetPetitionFieldComments_petitionFieldCommentsQueryVariables
+>;
+export const SendPetitionFieldComment_petitionDocument = gql`
+  query SendPetitionFieldComment_petition($id: GID!) {
+    petition(id: $id) {
+      fields {
+        id
+        fromPetitionFieldId
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  SendPetitionFieldComment_petitionQuery,
+  SendPetitionFieldComment_petitionQueryVariables
 >;
 export const SendPetitionFieldComment_usersByEmailDocument = gql`
   query SendPetitionFieldComment_usersByEmail($search: String!) {

@@ -76,6 +76,7 @@ import {
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
   GetPetitionEvents_PetitionEventsDocument,
+  GetPetitionFieldComments_petitionDocument,
   GetPetitionFieldComments_petitionFieldCommentsDocument,
   GetPetitionProfiles_petitionDocument,
   GetPetitionRecipients_petitionAccessesDocument,
@@ -106,6 +107,7 @@ import {
   ReopenPetition_reopenPetitionDocument,
   SendPetitionFieldComment_createPetitionCommentDocument,
   SendPetitionFieldComment_getUsersOrGroupsDocument,
+  SendPetitionFieldComment_petitionDocument,
   SendPetitionFieldComment_userGroupsDocument,
   SendPetitionFieldComment_usersByEmailDocument,
   SharePetition_createAddPetitionPermissionTaskDocument,
@@ -1833,7 +1835,14 @@ export function publicApi(container: Container) {
   for (const type of ["comment", "note"] as const) {
     api
       .path(`/petitions/:petitionId/fields/:fieldId/${type}s`, {
-        params: { petitionId, fieldId },
+        params: {
+          petitionId,
+          fieldId: idParam({
+            type: "PetitionField",
+            description:
+              "The ID of the parallel field. You can also provide the ID of the related template field",
+          }),
+        },
       })
       .get(
         {
@@ -1847,6 +1856,14 @@ export function publicApi(container: Container) {
         },
         async ({ client, params }) => {
           const _query = gql`
+            query GetPetitionFieldComments_petition($id: GID!) {
+              petition(id: $id) {
+                fields {
+                  id
+                  fromPetitionFieldId
+                }
+              }
+            }
             query GetPetitionFieldComments_petitionFieldComments(
               $petitionId: GID!
               $fieldId: GID!
@@ -1860,11 +1877,24 @@ export function publicApi(container: Container) {
             ${PetitionFieldCommentFragment}
           `;
 
+          // the provided fieldId can be a field of the petition, or a field of the template from where the petition was created
+          // if the field is from the template, we need to get the fieldId from the petition to execute the mutation
+          const { petition } = await client.request(GetPetitionFieldComments_petitionDocument, {
+            id: params.petitionId,
+          });
+          const field = petition!.fields.find(
+            (field) => field.id === params.fieldId || field.fromPetitionFieldId === params.fieldId,
+          );
+
+          if (!field) {
+            throw new BadRequestError("Field not found");
+          }
+
           const response = await client.request(
             GetPetitionFieldComments_petitionFieldCommentsDocument,
             {
               petitionId: params.petitionId,
-              fieldId: params.fieldId,
+              fieldId: field.id,
             },
           );
 
@@ -1890,6 +1920,14 @@ export function publicApi(container: Container) {
         },
         async ({ client, params, body }) => {
           const _queries = gql`
+            query SendPetitionFieldComment_petition($id: GID!) {
+              petition(id: $id) {
+                fields {
+                  id
+                  fromPetitionFieldId
+                }
+              }
+            }
             query SendPetitionFieldComment_usersByEmail($search: String!) {
               me {
                 organization {
@@ -1949,6 +1987,19 @@ export function publicApi(container: Container) {
             }
             ${PetitionFieldCommentFragment}
           `;
+
+          // the provided fieldId can be a field of the petition, or a field of the template from where the petition was created
+          // if the field is from the template, we need to get the fieldId from the petition to execute the mutation
+          const { petition } = await client.request(SendPetitionFieldComment_petitionDocument, {
+            id: params.petitionId,
+          });
+          const field = petition!.fields.find(
+            (field) => field.id === params.fieldId || field.fromPetitionFieldId === params.fieldId,
+          );
+
+          if (!field) {
+            throw new BadRequestError("Field not found");
+          }
 
           const slateComment = await fromPlainTextWithMentions(body.content, async (mention) => {
             try {
@@ -2030,7 +2081,7 @@ export function publicApi(container: Container) {
             SendPetitionFieldComment_createPetitionCommentDocument,
             {
               petitionId: params.petitionId,
-              petitionFieldId: params.fieldId,
+              petitionFieldId: field.id,
               isInternal: type === "note",
               content: slateComment,
               sharePetition: body.sharePermission !== undefined,
