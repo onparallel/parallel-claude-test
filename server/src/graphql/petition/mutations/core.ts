@@ -2054,7 +2054,7 @@ export const sendPetition = mutationField("sendPetition", {
               credits_used: 1,
               email_subject: args.subject, // pass email subject so field placeholders are correctly replaced on the cloned petition
             },
-            { cloneReplies: true }, // also clone the petition replies
+            { cloneReplies: true, createEmptyFieldGroups: false }, // also clone the petition replies
             `User:${ctx.user!.id}`,
           ),
         { concurrency: 5 },

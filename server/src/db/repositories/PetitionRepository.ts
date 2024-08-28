@@ -2988,7 +2988,12 @@ export class PetitionRepository extends BaseRepository {
     owner: User,
     // never expose document_organization_theme_id as this must be fetched from the owner's organization
     data: Partial<Omit<TableTypes["petition"], "document_organization_theme_id">> = {},
-    options?: { insertPermissions?: boolean; cloneReplies?: boolean },
+    options?: {
+      insertPermissions?: boolean;
+      cloneReplies?: boolean;
+      /** @default true */
+      createEmptyFieldGroups?: boolean;
+    },
     createdBy = `User:${owner.id}`,
     t?: Knex.Transaction,
   ) {
@@ -3223,7 +3228,7 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
 
-      if (!cloned.is_template) {
+      if (!cloned.is_template && (options?.createEmptyFieldGroups ?? true)) {
         // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
         await this.createEmptyFieldGroupReply(
           clonedFields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
