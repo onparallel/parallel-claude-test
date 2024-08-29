@@ -715,7 +715,7 @@ export const createBankflipIdVerificationIntegration = mutationField(
       try {
         const data = await ctx.integrationsSetup.createBankflipIdVerificationIntegration(
           {
-            org_id: ctx.user!.org_id,
+            org_id: args.orgId,
             name: "ID Verification",
             settings: {
               CREDENTIALS: {
@@ -761,7 +761,7 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
       try {
         const data = await ctx.integrationsSetup.createBankflipDocumentProcessingIntegration(
           {
-            org_id: ctx.user!.org_id,
+            org_id: args.orgId,
             name: "Document Processing",
             settings: {
               CREDENTIALS: {
