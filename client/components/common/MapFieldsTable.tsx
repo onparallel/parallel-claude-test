@@ -4,7 +4,6 @@ import {
   HStack,
   Stack,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Text,
@@ -36,6 +35,7 @@ import { ReplyNotAvailable } from "../petition-replies/PetitionRepliesFieldReply
 import { AlertPopover } from "./AlertPopover";
 import { FileSize } from "./FileSize";
 import { OverflownText } from "./OverflownText";
+import { ScrollShadows } from "./ScrollShadows";
 import { SmallPopover } from "./SmallPopover";
 
 export interface MapFieldsTableProps {
@@ -106,48 +106,10 @@ export const MapFieldsTable = Object.assign(
     }, [overwriteExisting]);
 
     return (
-      <TableContainer
-        ref={_ref}
-        overflowY="auto"
-        border="1px solid"
-        borderColor="gray.200"
-        {...props}
-      >
-        <Table
-          variant="unstyled"
-          sx={{
-            tableLayout: "fixed",
-            borderCollapse: "separate",
-            borderSpacing: 0,
-            "& th": {
-              padding: 2,
-              fontWeight: 400,
-              fontSize: "sm",
-              borderBottom: "1px solid",
-              borderColor: "gray.200",
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-              background: "gray.50",
-              opacity: isDisabled ? 0.5 : 1,
-            },
-            "& th:first-of-type": {
-              paddingStart: 4,
-            },
-            "& th:last-of-type": {
-              paddingEnd: 4,
-            },
-            "& td": {
-              borderBottom: "1px solid",
-              borderColor: "gray.200",
-            },
-            "& tr:last-of-type td": {
-              borderBottom: "none",
-            },
-          }}
-        >
+      <ScrollShadows shadowTop={false} ref={_ref} overflow="auto" {...props}>
+        <Table variant="parallel" layout="fixed">
           <Thead>
-            <Tr>
+            <Tr position="sticky" top={0} zIndex={1}>
               <Th width="33%">
                 <FormattedMessage
                   id="component.map-fields-table.petition-field-header"
@@ -217,7 +179,7 @@ export const MapFieldsTable = Object.assign(
               })}
           </Tbody>
         </Table>
-      </TableContainer>
+      </ScrollShadows>
     );
   }),
   {
@@ -371,10 +333,7 @@ function TableRow({
   const isFieldDisabled =
     (field.replies.length > 0 && !allowOverwrite && !field.multiple && !targetFieldIsChild) ||
     replyIsApproved ||
-    !hasFields ||
-    isDisabled;
-
-  const opacity = isDisabled ? 0.5 : 1;
+    !hasFields;
 
   const alertOrArrow =
     allowOverwrite && field.replies.length > 0 && !field.multiple ? (
@@ -411,7 +370,7 @@ function TableRow({
 
   return (
     <Tr>
-      <Td padding={2} paddingStart={4} minWidth={0} opacity={opacity}>
+      <Td>
         <HStack paddingStart={targetFieldIsChild ? 3 : 0}>
           <PetitionFieldTypeIndicator
             as="span"
@@ -428,7 +387,7 @@ function TableRow({
           )}
         </HStack>
       </Td>
-      <Td padding={2} textAlign="center" opacity={opacity}>
+      <Td textAlign="center">
         {isFieldDisabled ? (
           <SmallPopover
             content={
@@ -459,7 +418,7 @@ function TableRow({
           alertOrArrow
         ) : null}
       </Td>
-      <Td padding={2} minWidth="240px">
+      <Td minWidth="240px">
         <PetitionFieldSelect
           value={selectedField ?? null}
           petition={sourcePetition}
@@ -471,7 +430,7 @@ function TableRow({
             id: "component.map-fields-table.no-import-field",
             defaultMessage: "Don't import",
           })}
-          isDisabled={isFieldDisabled}
+          isDisabled={isDisabled || isFieldDisabled}
           isInvalid={isFieldDisabled ? false : isInvalid}
           isClearable
           captureMenuScroll
@@ -481,7 +440,7 @@ function TableRow({
           expandFieldGroups
         />
       </Td>
-      <Td padding={2} paddingEnd={4} minWidth={0} maxWidth="200px" opacity={opacity}>
+      <Td padding={2} paddingEnd={4} minWidth={0} maxWidth="200px">
         <HStack>
           {selectedField ? (
             <Stack minWidth={0} flex="1" spacing={2}>

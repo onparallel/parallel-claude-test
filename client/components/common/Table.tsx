@@ -5,6 +5,7 @@ import {
   Button,
   ButtonProps,
   Center,
+  Table as ChakraTable,
   Checkbox,
   Collapse,
   Heading,
@@ -17,13 +18,17 @@ import {
   ModalHeader,
   ModalOverlay,
   Portal,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
+  Tr,
   useBreakpointValue,
   useDisclosure,
   useOutsideClick,
   usePopper,
 } from "@chakra-ui/react";
-import { getColor } from "@chakra-ui/theme-tools";
 import {
   ArrowUpDownIcon,
   ChevronDownIcon,
@@ -155,7 +160,6 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 }: TableProps<TRow, TContext, TImpl>) {
   const { selection, allSelected, anySelected, selectedCount, toggle, toggleAll } =
     useSelectionState(rows ?? [], rowKeyProp);
-  const colors = useTableColors();
 
   useEffect(() => {
     onSelectionChange?.(
@@ -196,8 +200,8 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               ...pick(columns[0], ["key", "CellContent", "cellProps"]),
               label: "",
               Header: ({ context }) => (
-                <Box as="th" colSpan={columns.length} fontWeight="normal">
-                  <HStack height="38px" paddingX={3} position="relative" top="1px">
+                <Th colSpan={columns.length} paddingY="0" textTransform="none">
+                  <HStack>
                     <Box fontSize="sm">
                       <FormattedMessage
                         id="component.table-page.n-selected"
@@ -224,7 +228,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                       }
                     })}
                   </HStack>
-                </Box>
+                </Th>
               ),
             },
             ...columns.slice(1).map((column) => ({
@@ -237,9 +241,9 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       updated.unshift({
         key: "expand-toggle",
         label: "",
-        Header: () => <Box as="th" width="1px" />,
+        Header: () => <Th width="1px" />,
         cellProps: {
-          paddingY: 0,
+          paddingY: "0",
           paddingEnd: 1,
           _first: {
             paddingStart: 2,
@@ -289,43 +293,18 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         key: "selection-checkbox",
         label: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
-          <Box
-            as="th"
-            width="40px"
-            padding={0}
-            userSelect="none"
-            position="relative"
-            _after={{
-              position: "absolute",
-              insetEnd: 0,
-              top: 0,
-              content: "''",
-              display: "block",
-              width: "1px",
-              height: "41px",
-              backgroundColor: colors.border,
-            }}
-          >
-            <Center
-              as="label"
-              boxSize="40px"
-              cursor="pointer"
-              position="relative"
-              top="1px"
-              onClick={onToggleAll}
-            >
+          <Th width="40px" padding="0 !important">
+            <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleAll}>
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
                 onChange={noop}
               />
             </Center>
-          </Box>
+          </Th>
         ),
         cellProps: {
-          paddingY: 0,
-          paddingEnd: 0,
-          _first: { paddingStart: 0 },
+          padding: "0 !important",
         },
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
@@ -350,25 +329,14 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   );
 
   return (
-    <Box
-      as="table"
-      borderBottom="1px solid"
-      borderBottomColor={colors.border}
+    <ChakraTable
+      variant="parallel"
+      borderInline="none"
       {...props}
       sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
     >
-      <Box as="thead" position="sticky" top="0" zIndex="10">
-        <Box
-          as="tr"
-          backgroundColor={colors.header}
-          height="41px"
-          sx={{
-            boxShadow: (theme) => {
-              const color = getColor(theme, colors.border);
-              return `0 1px 0 ${color}, inset 0 1px 0 ${color}`;
-            },
-          }}
-        >
+      <Thead position="sticky" top="0" zIndex="10">
+        <Tr height="42px">
           {_columns.map((column) => {
             if (column.Header) {
               return (
@@ -407,9 +375,9 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               );
             }
           })}
-        </Box>
-      </Box>
-      <Box as="tbody">
+        </Tr>
+      </Thead>
+      <Tbody>
         {(rows ?? []).map((row) => {
           const key = getKey(row, rowKeyProp);
           const isSelected = selection[key] ?? false;
@@ -431,24 +399,12 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             />
           );
         })}
-      </Box>
-    </Box>
+      </Tbody>
+    </ChakraTable>
   );
 }
 
 export const Table: typeof _Table = memo(_Table) as any;
-
-export function useTableColors() {
-  return useMemo(() => {
-    return {
-      border: "gray.200",
-      header: "gray.50",
-      row: "white",
-      rowHover: "gray.50",
-      rowSelected: "primary.50",
-    };
-  }, []);
-}
 
 function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   row,
@@ -474,7 +430,6 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   TableProps<TRow, TContext, TImpl>,
   "columns" | "isExpandable" | "isHighlightable" | "onRowClick"
 >) {
-  const colors = useTableColors();
   const handleToggleSelection = useCallback(onToggleSelection.bind(null, rowKey), [
     onToggleSelection,
     rowKey,
@@ -485,24 +440,15 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   ]);
   return (
     <>
-      <Box
-        as="tr"
-        backgroundColor={isSelected ? colors.rowSelected : colors.row}
-        _hover={{
-          backgroundColor: isSelected
-            ? colors.rowSelected
-            : isHighlightable
-              ? colors.rowHover
-              : colors.row,
-        }}
+      <Tr
+        data-highlightable={isHighlightable ? true : undefined}
+        data-selected={isSelected ? true : undefined}
         cursor={onRowClick ? "pointer" : "default"}
-        borderTop="1px solid"
-        borderTopColor={colors.border}
         {...(isExpandable
           ? {}
           : {
               borderTop: "1px solid",
-              borderTopColor: colors.border,
+              borderTopColor: "gray.200",
             })}
         onClick={onRowClick?.bind(null, row)}
       >
@@ -521,15 +467,15 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             />
           );
         })}
-      </Box>
+      </Tr>
       {isExpandable ? (
-        <Box as="tr" borderTop="1px solid" borderTopColor={colors.border}>
-          <Box as="td" padding={0} colSpan={columns.length}>
+        <Tr>
+          <Td padding={0} colSpan={columns.length}>
             <Collapse in={isExpanded}>
-              <Box borderTop="1px solid" borderTopColor={colors.border} />
+              <FormattedMessage id="generic.expand" defaultMessage="Expand" />
             </Collapse>
-          </Box>
-        </Box>
+          </Td>
+        </Tr>
       ) : null}
     </>
   );
@@ -542,17 +488,9 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
       ? column.cellProps(props.row, props.context)
       : (column.cellProps ?? {});
   return (
-    <Box
-      as="td"
-      padding={2}
-      _last={{ paddingEnd: 5 }}
-      _first={{ paddingStart: 5 }}
-      userSelect="contain"
-      textAlign={column.align ?? "left"}
-      {...cellProps}
-    >
+    <Td userSelect="contain" textAlign={column.align ?? "left"} {...cellProps}>
       <column.CellContent column={column} {...props} />
-    </Box>
+    </Td>
   );
 }
 const Cell: typeof _Cell = memo(_Cell) as any;
@@ -626,20 +564,9 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
 
   const _ref = useMergedRef(ref, popperRef);
   return (
-    <Box
+    <Th
       ref={referenceRef}
       key={column.key}
-      as="th"
-      paddingX={2}
-      paddingY={1}
-      _last={{ paddingEnd: 5 }}
-      _first={{ paddingStart: 5 }}
-      height="38px"
-      fontSize="sm"
-      fontWeight="normal"
-      textTransform="uppercase"
-      userSelect="none"
-      whiteSpace="nowrap"
       className={sort?.field === column.key ? "sort-active" : undefined}
       aria-sort={
         column.isSortable
@@ -771,7 +698,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
           </Portal>
         )
       ) : null}
-    </Box>
+    </Th>
   );
 }
 

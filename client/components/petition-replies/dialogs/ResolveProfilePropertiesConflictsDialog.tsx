@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import {
+  Box,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -9,7 +10,6 @@ import {
   Radio,
   Stack,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Text,
@@ -144,44 +144,8 @@ function ResolveProfilePropertiesConflictsDialog({
               defaultMessage="Select the value you want to keep:"
             />
           </Text>
-          <TableContainer
-            maxHeight="100%"
-            overflowY="auto"
-            border="1px solid"
-            borderColor="gray.200"
-          >
-            <Table
-              variant="unstyled"
-              sx={{
-                tableLayout: "fixed",
-                borderCollapse: "separate",
-                borderSpacing: 0,
-                "& th": {
-                  padding: 2,
-                  fontWeight: 400,
-                  fontSize: "sm",
-                  borderBottom: "1px solid",
-                  borderColor: "gray.200",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 1,
-                  background: "gray.50",
-                },
-                "& th:first-of-type": {
-                  paddingStart: 4,
-                },
-                "& th:last-of-type": {
-                  paddingEnd: 4,
-                },
-                "& td": {
-                  borderBottom: "1px solid",
-                  borderColor: "gray.200",
-                },
-                "& tr:last-of-type td": {
-                  borderBottom: "none",
-                },
-              }}
-            >
+          <Box maxHeight="100%" overflow="auto">
+            <Table variant="parallel">
               <Thead>
                 <Tr>
                   <Th width="33%">
@@ -222,7 +186,7 @@ function ResolveProfilePropertiesConflictsDialog({
                 </FormProvider>
               </Tbody>
             </Table>
-          </TableContainer>
+          </Box>
         </Stack>
       }
       cancel={
@@ -291,7 +255,7 @@ function TableRow({
 
   return (
     <FormControl as={Tr} isInvalid={!!errors.conflicts?.[index]?.action}>
-      <Td paddingY={2} paddingEnd={2} paddingStart={4}>
+      <Td>
         <ProfileTypeFieldTypeName type={field.type} name={field.name} />
       </Td>
       <Controller
@@ -312,7 +276,7 @@ function TableRow({
                   onChange={handleCheckBoxChange}
                   defaultValue={checkedItems}
                 >
-                  <Td paddingX={2} paddingY={3} verticalAlign="top">
+                  <Td verticalAlign="middle">
                     <HStack alignItems="flex-start">
                       <Checkbox value="IGNORE" marginTop={1.5} />
                       <Flex flex="1" gap={2} flexWrap="wrap" minWidth={0}>
@@ -338,7 +302,7 @@ function TableRow({
                       </Flex>
                     </HStack>
                   </Td>
-                  <Td paddingX={2} paddingY={3} verticalAlign="top">
+                  <Td verticalAlign="middle">
                     <HStack alignItems="flex-start">
                       <Checkbox value="OVERWRITE" marginTop={1.5} />
                       <Flex gap={2} flexWrap="wrap" minWidth={0}>
@@ -456,7 +420,7 @@ function TextValueRadioGroup({
 
   return (
     <>
-      <Td paddingX={2} paddingY={3} verticalAlign="top">
+      <Td verticalAlign="middle">
         <HStack>
           <Radio {...getRadioProps({ value: "IGNORE" })} />
           <Flex minWidth={0}>
@@ -465,7 +429,7 @@ function TextValueRadioGroup({
           </Flex>
         </HStack>
       </Td>
-      <Td paddingX={2} paddingY={3} verticalAlign="top">
+      <Td verticalAlign="middle">
         <HStack>
           <Radio {...getRadioProps({ value: "OVERWRITE" })} />
           <Flex minWidth={0}>

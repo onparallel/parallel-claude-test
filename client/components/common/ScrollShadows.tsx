@@ -4,10 +4,28 @@ import useMergedRef from "@react-hook/merged-ref";
 import useResizeObserver from "@react-hook/resize-observer";
 import { useRef } from "react";
 
-export const ScrollShadows = chakraForwardRef<
-  "div",
-  { size?: number; direction?: "horizontal" | "vertical" }
->(function ScrollShadows({ children, direction = "vertical", size = 40, ...props }, ref) {
+interface ScrollShadowsProps {
+  size?: number;
+  direction?: "horizontal" | "vertical";
+  shadowTop?: boolean;
+  shadowBottom?: boolean;
+  shadowStart?: boolean;
+  shadowEnd?: boolean;
+}
+
+export const ScrollShadows = chakraForwardRef<"div", ScrollShadowsProps>(function ScrollShadows(
+  {
+    children,
+    direction = "vertical",
+    size = 40,
+    shadowTop = true,
+    shadowBottom = true,
+    shadowStart = true,
+    shadowEnd = true,
+    ...props
+  },
+  ref,
+) {
   const innerRef = useRef<HTMLDivElement>(null);
   const _ref = useMergedRef(ref, innerRef);
   const scrollRef = useRef<[boolean | null, boolean | null]>([null, null]);
@@ -36,11 +54,15 @@ export const ScrollShadows = chakraForwardRef<
     const isTop = element.scrollTop === 0;
     const isBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
     if (prevTop !== isTop) {
-      element.setAttribute("data-scroll-top", `${isTop}`);
+      if (shadowTop) {
+        element.setAttribute("data-scroll-top", `${isTop}`);
+      }
       scrollRef.current[0] = isTop;
     }
     if (prevBottom !== isBottom) {
-      element.setAttribute("data-scroll-bottom", `${isBottom}`);
+      if (shadowBottom) {
+        element.setAttribute("data-scroll-bottom", `${isBottom}`);
+      }
       scrollRef.current[1] = isBottom;
     }
   }
@@ -52,11 +74,15 @@ export const ScrollShadows = chakraForwardRef<
     const isEnd = element.scrollLeft + element.clientWidth >= element.scrollWidth;
 
     if (prevStart !== isStart) {
-      element.setAttribute("data-scroll-start", `${isStart}`);
+      if (shadowStart) {
+        element.setAttribute("data-scroll-start", `${isStart}`);
+      }
       scrollRef.current[0] = isStart;
     }
     if (prevEnd !== isEnd) {
-      element.setAttribute("data-scroll-end", `${isEnd}`);
+      if (shadowEnd) {
+        element.setAttribute("data-scroll-end", `${isEnd}`);
+      }
       scrollRef.current[1] = isEnd;
     }
   }

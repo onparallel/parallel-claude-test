@@ -3,7 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
+import { Table, TableProps } from "@parallel/components/common/Table";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNullish } from "remeda";
@@ -57,7 +57,6 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   color,
   ...props
 }: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
-  const colors = useTableColors();
   const intl = useIntl();
 
   useEffect(() => {
@@ -209,7 +208,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           <Flex
             flexDirection="column"
             borderTop="1px solid"
-            borderTopColor={colors.border}
+            borderTopColor="gray.200"
             flex="1 1 300px"
           >
             {body}
@@ -224,7 +223,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         paddingX={3}
         borderTop="1px solid"
         alignItems="center"
-        borderTopColor={colors.border}
+        borderTopColor="gray.200"
       >
         {Footer ? <Footer {...(context as any)}>{bottom}</Footer> : <>{bottom}</>}
       </Stack>

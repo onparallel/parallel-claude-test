@@ -11,7 +11,6 @@ import {
   RadioGroup,
   Stack,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Text,
@@ -27,6 +26,7 @@ import { LocalizableUserTextRender } from "@parallel/components/common/Localizab
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
+import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   CreatePetitionFromProfilePrefillInput,
@@ -556,48 +556,17 @@ function AssociateNewPetitionToProfileStep3({
           }}
         />
       </Text>
-      <TableContainer overflowY="auto" border="1px solid" borderColor="gray.200" maxHeight="350px">
-        <Table
-          variant="unstyled"
-          sx={{
-            tableLayout: "fixed",
-            borderCollapse: "separate",
-            borderSpacing: 0,
-            "& th": {
-              padding: 2,
-              fontWeight: 400,
-              fontSize: "sm",
-              borderBottom: "1px solid",
-              borderColor: "gray.200",
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-              background: "gray.50",
-            },
-            "& th:first-of-type, & td:first-of-type": {
-              paddingStart: 4,
-            },
-            "& th:last-of-type, & td:last-of-type": {
-              paddingEnd: 4,
-            },
-            "& td": {
-              borderBottom: "1px solid",
-              borderColor: "gray.200",
-            },
-            "& tr:last-of-type td": {
-              borderBottom: "none",
-            },
-          }}
-        >
+      <ScrollShadows shadowTop={false} overflow="auto" maxHeight="350px">
+        <Table variant="parallel">
           <Thead>
-            <Tr>
-              <Th width="50%">
+            <Tr position="sticky" top={0} zIndex={1}>
+              <Th>
                 <FormattedMessage
                   id="component.associate-new-petition-to-profile-dialog.table-header-group"
                   defaultMessage="Group"
                 />
               </Th>
-              <Th width="50%">
+              <Th>
                 <FormattedMessage
                   id="component.associate-new-petition-to-profile-dialog.table-header-profile"
                   defaultMessage="Profile"
@@ -621,7 +590,7 @@ function AssociateNewPetitionToProfileStep3({
 
               return (
                 <Tr key={item.id}>
-                  <Td padding={2}>
+                  <Td>
                     <HStack>
                       <PetitionFieldTypeIndicator
                         as="span"
@@ -635,7 +604,7 @@ function AssociateNewPetitionToProfileStep3({
                       </OverflownText>
                     </HStack>
                   </Td>
-                  <Td padding={2}>
+                  <Td>
                     <Controller
                       name={`prefill.${index}.profileIds` as const}
                       control={control}
@@ -695,7 +664,7 @@ function AssociateNewPetitionToProfileStep3({
             })}
           </Tbody>
         </Table>
-      </TableContainer>
+      </ScrollShadows>
     </Stack>
   );
 }
