@@ -55,6 +55,11 @@
     "context": "a moment ago"
   },
   {
+    "term": "component.delegate-access-dialog.default-message-body",
+    "definition": "Ciao,\n\nMi hanno chiesto queste informazioni su {organization} tramite Parallel. Potresti aiutarmi a completarle, per favore?\n\nGrazie,\n{contact}",
+    "context": "Hello,\n\nI have been asked for this information from {organization} through Parallel. Could you please help me complete it?\n\nThanks,\n{contact}"
+  },
+  {
     "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
     "definition": "{tone, select, INFORMAL{Invita} other{Inviti}} un collaboratore a completare o rivedere le informazioni mancanti.",
     "context": "Invite a collaborator to complete or review the missing information."
@@ -755,81 +760,6 @@
     "context": "Check status"
   },
   {
-    "term": "component.rich-text-editor.add-link-header",
-    "definition": "Aggiungi link",
-    "context": "Add link"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-required-url",
-    "definition": "È richiesto un link URL valido",
-    "context": "A valid link is required"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-text-to-show",
-    "definition": "Testo da mostrare (opzionale)",
-    "context": "Text to show (optional)"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-url",
-    "definition": "Link URL",
-    "context": "URL link"
-  },
-  {
-    "term": "component.rich-text-editor.bold",
-    "definition": "Grassetto",
-    "context": "Bold"
-  },
-  {
-    "term": "component.rich-text-editor.font-size",
-    "definition": "Dimensione testo",
-    "context": "Font size"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-body",
-    "definition": "Paragrafo",
-    "context": "Body"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-heading",
-    "definition": "Intestazione",
-    "context": "Heading"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-subheading",
-    "definition": "Sottotitolo",
-    "context": "Subheading"
-  },
-  {
-    "term": "component.rich-text-editor.italic",
-    "definition": "Corsivo",
-    "context": "Italic"
-  },
-  {
-    "term": "component.rich-text-editor.link",
-    "definition": "Collegamento",
-    "context": "Link"
-  },
-  {
-    "term": "component.rich-text-editor.list",
-    "definition": "Elenco puntato",
-    "context": "Bullet list"
-  },
-  {
-    "term": "component.rich-text-editor.ordered-list",
-    "definition": "Elenco numerato",
-    "context": "Numbered list"
-  },
-  {
-    "term": "component.rich-text-editor.personalize",
-    "definition": "Personalizza",
-    "context": "Personalize"
-  },
-  {
-    "term": "component.rich-text-editor.underline",
-    "definition": "Sottolineato",
-    "context": "Underline"
-  },
-  {
     "term": "component.search-input.placeholder",
     "definition": "Cerca...",
     "context": "Search..."
@@ -1000,11 +930,6 @@
     "context": "Delete"
   },
   {
-    "term": "generic.deleted-field",
-    "definition": "Campo eliminato",
-    "context": "Deleted field"
-  },
-  {
     "term": "generic.deleted-user",
     "definition": "Utente eliminato",
     "context": "Deleted user"
@@ -1013,11 +938,6 @@
     "term": "generic.document-not-available",
     "definition": "Documento non disponibile",
     "context": "Document not available"
-  },
-  {
-    "term": "generic.done",
-    "definition": "Fatto",
-    "context": "Done"
   },
   {
     "term": "generic.download-file",
@@ -1598,16 +1518,6 @@
     "term": "petition.signature-successful.title",
     "definition": "Documento firmato con successo",
     "context": "Document signed successfully"
-  },
-  {
-    "term": "placeholder-plugin.deleted-field",
-    "definition": "Questo campo è stato eliminato. Non verrà mostrato nulla qui.",
-    "context": "This field has been deleted. Nothing will show here."
-  },
-  {
-    "term": "placeholder-plugin.field-without-replies",
-    "definition": "Questo campo non ha risposte. Non verrà mostrato nulla qui.",
-    "context": "This field has no replies. Nothing will show here."
   },
   {
     "term": "public-petition-email-exists.body",

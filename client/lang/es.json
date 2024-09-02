@@ -2395,6 +2395,11 @@
     "context": "Deactivate integration"
   },
   {
+    "term": "component.delegate-access-dialog.default-message-body",
+    "definition": "Hola,\n\nMe han pedido esta información de {organization} a través de Parallel. ¿Podrías ayudarme por favor a completarla?\n\nGracias,\n{contact}",
+    "context": "Hello,\n\nI have been asked for this information from {organization} through Parallel. Could you please help me complete it?\n\nThanks,\n{contact}"
+  },
+  {
     "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
     "definition": "{tone, select, INFORMAL{Invita} other{Invite}} a un colaborador a completar o revisar la información que falta.",
     "context": "Invite a collaborator to complete or review the missing information."

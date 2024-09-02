@@ -66,6 +66,7 @@ async function extractTerms(cwd: string, glob: string | string[], excludePragma?
     throws: true,
     extractSourceLocation: true,
     additionalFunctionNames: ["getLocalizableUserText"],
+    preserveWhitespace: true,
   });
   return JSON.parse(result);
 }

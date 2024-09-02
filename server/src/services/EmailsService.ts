@@ -59,7 +59,7 @@ export interface IEmailsService {
     petitionId: number,
     originalAccessId: number,
     newAccessId: number,
-    messageBody: any,
+    messageBody: string,
   ): Promise<void>;
   sendDeveloperWebhookFailedEmail(
     eventSubscriptionId: number,
@@ -247,7 +247,7 @@ export class EmailsService implements IEmailsService {
     petitionId: number,
     originalAccessId: number,
     newAccessId: number,
-    messageBody: any,
+    messageBody: string,
   ) {
     return await this.enqueueEmail("petition-access-delegated", {
       id: this.buildQueueId("PetitionAccessDelegated", [originalAccessId, newAccessId]),

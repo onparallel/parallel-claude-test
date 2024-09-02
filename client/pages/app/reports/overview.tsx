@@ -252,7 +252,7 @@ export function Overview() {
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.total-parallels-description"
-                        defaultMessage="This is the total number of parallels created in the organization. "
+                        defaultMessage="This is the total number of parallels created in the organization."
                       />
                     </Text>
                     <Text>

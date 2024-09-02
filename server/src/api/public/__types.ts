@@ -2033,7 +2033,7 @@ export type MutationpublicDelegateAccessToContactArgs = {
   firstName: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   lastName: Scalars["String"]["input"];
-  messageBody: Scalars["JSON"]["input"];
+  messageBody: Scalars["String"]["input"];
 };
 
 export type MutationpublicDeletePetitionCommentArgs = {

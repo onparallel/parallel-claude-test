@@ -12,66 +12,20 @@ import {
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
-import { PetitionLocale, Tone } from "@parallel/graphql/__types";
+import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { Tone } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
-import { plainTextToRTEValue } from "@parallel/utils/slate/RichTextEditor/plainTextToRTEValue";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import outdent from "outdent";
 import { useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface DelegateAccessDialogData {
   email: string;
   firstName: string;
   lastName: string;
-  messageBody: any;
+  messageBody: string;
 }
-
-const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
-  ca: (organization, contactName) => outdent`
-    Hola,
-  
-    M'han demanat aquesta informació de ${organization} a través de Parallel. Podries ajudar-me, si us plau, a completar-la?
-    
-    Gràcies,
-    ${contactName}.
-  `,
-  en: (organization, contactName) => outdent`
-    Hello,
-
-    I have been asked for this information from ${organization} through Parallel. Could you please help me complete it?
-
-    Thanks,
-    ${contactName}.
-  `,
-  es: (organization, contactName) => outdent`
-    Hola,
-
-    Me han pedido esta información de ${organization} a través de Parallel. ¿Podrías ayudarme por favor a completarla?
-    
-    Gracias,
-    ${contactName}.
-  `,
-  it: (organization, contactName) => outdent`
-    Ciao,
-
-    Mi hanno chiesto queste informazioni su ${organization} tramite Parallel. Potresti aiutarmi a completarle, per favore?
-    
-    Grazie,
-    ${contactName}.
-  `,
-  pt: (organization, contactName) => outdent`
-    Olá,
-  
-    Foi-me solicitada esta informação sobre a ${organization} através da Parallel. Poderia ajudar-me a completá-la, por favor?
-  
-    Obrigado,
-    ${contactName}.
-  `,
-};
 
 function DelegateAccessDialog({
   keycode,
@@ -91,7 +45,6 @@ function DelegateAccessDialog({
   const intl = useIntl();
 
   const {
-    control,
     handleSubmit,
     register,
     formState: { errors },
@@ -101,8 +54,14 @@ function DelegateAccessDialog({
       email: "",
       firstName: "",
       lastName: "",
-      messageBody: plainTextToRTEValue(
-        (messages[intl.locale as PetitionLocale] ?? messages["en"])(organizationName, contactName),
+      messageBody: intl.formatMessage(
+        {
+          id: "component.delegate-access-dialog.default-message-body",
+          defaultMessage:
+            // eslint-disable-next-line formatjs/no-multiple-whitespaces
+            "Hello,\n\nI have been asked for this information from {organization} through Parallel. Could you please help me complete it?\n\nThanks,\n{contact}",
+        },
+        { organization: organizationName, contact: contactName },
       ),
     },
     shouldFocusError: true,
@@ -194,22 +153,19 @@ function DelegateAccessDialog({
             )}
           </FormControl>
           <FormControl isInvalid={!!errors.messageBody} id="delegate-access-message">
-            <Controller
-              name="messageBody"
-              control={control}
-              rules={{
-                validate: { required: (value) => !isEmptyRTEValue(value) },
-              }}
-              render={({ field: { value, onChange } }) => (
-                <RichTextEditor
-                  value={value}
-                  onChange={onChange}
-                  placeholder={intl.formatMessage({
-                    id: "generic.email-message-placeholder",
-                    defaultMessage: "Write a message to include in the email",
-                  })}
-                />
-              )}
+            <GrowingTextarea
+              {...register("messageBody", {
+                required: true,
+              })}
+              aria-label={intl.formatMessage({
+                id: "generic.email-message-placeholder",
+                defaultMessage: "Write a message to include in the email",
+              })}
+              placeholder={intl.formatMessage({
+                id: "generic.email-message-placeholder",
+                defaultMessage: "Write a message to include in the email",
+              })}
+              maxLength={1_000}
             />
             <FormErrorMessage>
               <FormattedMessage

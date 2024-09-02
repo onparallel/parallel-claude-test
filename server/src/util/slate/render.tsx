@@ -1,7 +1,6 @@
 import { Fragment, ReactNode, createElement } from "react";
-import { isNonNullish } from "remeda";
-
 import { renderToString } from "react-dom/server";
+import { isNonNullish } from "remeda";
 import { paragraphIsEmpty } from "./utils";
 
 export interface SlateNode {
@@ -49,6 +48,18 @@ export function renderWhiteSpace(text: string) {
       )}
     </Fragment>
   ));
+}
+
+export function renderTextToHtml(text: string) {
+  return renderHtml(
+    <>
+      {text.split("\n").map((line, i) => (
+        <p key={i} style={{ margin: 0 }}>
+          {line === "" ? <br /> : line}
+        </p>
+      ))}
+    </>,
+  );
 }
 
 export function renderSlateToReactNodes(
@@ -128,19 +139,24 @@ export function renderSlateToReactNodes(
   return null;
 }
 
+function renderHtml(node: ReactNode) {
+  return renderToString(node).replace(/<!-- --> <!-- -->(\u00A0<!-- -->)+/g, function (match) {
+    const extra = (match.length - 17) / 9;
+    return " " + "&nbsp;".repeat(extra);
+  });
+}
+
 export function renderSlateToHtml(nodes: SlateNode[], options?: Partial<RenderSlateToHtmlOptions>) {
   const opts: RenderSlateToHtmlOptions = {
     startingHeadingLevel: 1,
     override: {},
     ...options,
   };
-  return renderToString(<>{renderSlateToReactNodes(nodes, opts)}</>).replace(
-    /<!-- --> <!-- -->(\u00A0<!-- -->)+/g,
-    function (match) {
-      const extra = (match.length - 17) / 9;
-      return " " + "&nbsp;".repeat(extra);
-    },
-  );
+  return renderHtml(renderSlateToReactNodes(nodes, opts));
+}
+
+export function textToSlateNodes(value: string): SlateNode[] {
+  return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
 }
 
 export function renderSlateToText(nodes: SlateNode[], options?: Partial<RenderSlateOptions>) {

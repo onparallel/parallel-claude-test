@@ -65,7 +65,7 @@ const _mutations = [
       $email: String!
       $firstName: String!
       $lastName: String!
-      $messageBody: JSON!
+      $messageBody: String!
     ) {
       publicDelegateAccessToContact(
         keycode: $keycode

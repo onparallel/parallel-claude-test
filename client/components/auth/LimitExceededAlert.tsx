@@ -17,7 +17,7 @@ export function LimitExceededAlert(props: CloseableAlertProps) {
           <Text>
             <FormattedMessage
               id="component.limit-exceeded-alert.body"
-              defaultMessage=" Attempt limit exceeded, please try after some time."
+              defaultMessage="Attempt limit exceeded, please try after some time."
             />
           </Text>
         </AlertDescription>

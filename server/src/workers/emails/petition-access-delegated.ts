@@ -3,14 +3,14 @@ import { buildEmail } from "../../emails/buildEmail";
 import AccessDelegatedEmail from "../../emails/emails/recipient/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
+import { renderTextToHtml } from "../../util/slate/render";
 
 export async function petitionAccessDelegated(
   payload: {
     petition_id: number;
     new_access_id: number;
     original_access_id: number;
-    message_body: any;
+    message_body: string;
   },
   context: WorkerContext,
 ) {
@@ -68,8 +68,8 @@ export async function petitionAccessDelegated(
       petitionOwnerFullName: fullName(petitionOwnerData.first_name, petitionOwnerData.last_name)!,
       petitionOwnerEmail: petitionOwnerData.email,
       deadline: petition.deadline,
-      bodyHtml: renderSlateToHtml(payload.message_body),
-      bodyPlainText: renderSlateToText(payload.message_body),
+      bodyHtml: renderTextToHtml(payload.message_body),
+      bodyPlainText: payload.message_body,
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,

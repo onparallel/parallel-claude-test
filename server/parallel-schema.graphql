@@ -1999,7 +1999,7 @@ type Mutation {
     firstName: String!
     keycode: ID!
     lastName: String!
-    messageBody: JSON!
+    messageBody: String!
   ): PublicPetitionAccess!
 
   """

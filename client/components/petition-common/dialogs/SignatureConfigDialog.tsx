@@ -431,7 +431,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
                 ) : (
                   <FormattedMessage
                     id="component.signature-config-dialog.review-before-send-option-no-explainer"
-                    defaultMessage=" The signature process will start when all the information has been completed."
+                    defaultMessage="The signature process will start when all the information has been completed."
                   />
                 )}
               </Text>

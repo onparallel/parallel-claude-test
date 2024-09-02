@@ -426,7 +426,7 @@ export function ProfileFieldBackgroundCheck({
                     (
                     <FormattedMessage
                       id="generic.x-results"
-                      defaultMessage="{count, plural, =0 {No results}  =1 {1 result} other {# results}}"
+                      defaultMessage="{count, plural, =0 {No results} =1 {1 result} other {# results}}"
                       values={{
                         count: search?.totalCount ?? 0,
                       }}

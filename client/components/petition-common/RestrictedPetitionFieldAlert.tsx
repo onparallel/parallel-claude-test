@@ -22,7 +22,7 @@ export const RestrictedPetitionFieldAlert = chakraForwardRef<
         <Box flex="1">
           <FormattedMessage
             id="component.petition-compose-field.update-plan-to-use-field"
-            defaultMessage="Update your plan to use this field. "
+            defaultMessage="Update your plan to use this field."
           />
         </Box>
         <SupportButton

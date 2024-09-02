@@ -7309,7 +7309,7 @@ export interface NexusGenArgTypes {
       firstName: string; // String!
       keycode: string; // ID!
       lastName: string; // String!
-      messageBody: NexusGenScalars["JSON"]; // JSON!
+      messageBody: string; // String!
     };
     publicDeletePetitionComment: {
       // args

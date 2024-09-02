@@ -918,6 +918,7 @@ export const schemaTypes: IntrospectionType[] = [
     name: "SupportMethodResponse",
     description: "Return type for all support methods",
     specifiedByURL: null,
+    isOneOf: null,
     fields: [
       {
         name: "message",
@@ -958,6 +959,7 @@ export const schemaTypes: IntrospectionType[] = [
     name: "Result",
     description: "Represents the result of an operation.",
     specifiedByURL: null,
+    isOneOf: null,
     fields: null,
     inputFields: null,
     interfaces: null,
@@ -972,6 +974,7 @@ export const schemaTypes: IntrospectionType[] = [
     name: "UserLocale",
     description: "The preferred locale for the user",
     specifiedByURL: null,
+    isOneOf: null,
     fields: null,
     inputFields: null,
     interfaces: null,
@@ -986,6 +989,7 @@ export const schemaTypes: IntrospectionType[] = [
     name: "FeatureFlag",
     description: null,
     specifiedByURL: null,
+    isOneOf: null,
     fields: null,
     inputFields: null,
     interfaces: null,

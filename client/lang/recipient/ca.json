@@ -55,6 +55,11 @@
     "context": "a moment ago"
   },
   {
+    "term": "component.delegate-access-dialog.default-message-body",
+    "definition": "Hola,\n\nM'han demanat aquesta informació de {organization} a través de Parallel. Podries ajudar-me, si us plau, a completar-la?\n\nGràcies,\n{contact}",
+    "context": "Hello,\n\nI have been asked for this information from {organization} through Parallel. Could you please help me complete it?\n\nThanks,\n{contact}"
+  },
+  {
     "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
     "definition": "{tone, select, INFORMAL{Convida} other{Convidi}} un col·laborador a completar o revisar la informació que falta.",
     "context": "Invite a collaborator to complete or review the missing information."
@@ -755,81 +760,6 @@
     "context": "Check status"
   },
   {
-    "term": "component.rich-text-editor.add-link-header",
-    "definition": "Afegir enllaç",
-    "context": "Add link"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-required-url",
-    "definition": "Es requereix un enllaç URL vàlid",
-    "context": "A valid link is required"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-text-to-show",
-    "definition": "Text a mostrar (opcional)",
-    "context": "Text to show (optional)"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-url",
-    "definition": "Enllaç URL",
-    "context": "URL link"
-  },
-  {
-    "term": "component.rich-text-editor.bold",
-    "definition": "Negreta",
-    "context": "Bold"
-  },
-  {
-    "term": "component.rich-text-editor.font-size",
-    "definition": "Mida de text",
-    "context": "Font size"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-body",
-    "definition": "Paràgraf",
-    "context": "Body"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-heading",
-    "definition": "Títol",
-    "context": "Heading"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-subheading",
-    "definition": "Subtítol",
-    "context": "Subheading"
-  },
-  {
-    "term": "component.rich-text-editor.italic",
-    "definition": "Cursiva",
-    "context": "Italic"
-  },
-  {
-    "term": "component.rich-text-editor.link",
-    "definition": "Enllaç",
-    "context": "Link"
-  },
-  {
-    "term": "component.rich-text-editor.list",
-    "definition": "Llista",
-    "context": "Bullet list"
-  },
-  {
-    "term": "component.rich-text-editor.ordered-list",
-    "definition": "Llista numerada",
-    "context": "Numbered list"
-  },
-  {
-    "term": "component.rich-text-editor.personalize",
-    "definition": "Personalitzar",
-    "context": "Personalize"
-  },
-  {
-    "term": "component.rich-text-editor.underline",
-    "definition": "Subratllat",
-    "context": "Underline"
-  },
-  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."
@@ -1000,11 +930,6 @@
     "context": "Delete"
   },
   {
-    "term": "generic.deleted-field",
-    "definition": "Camp eliminat",
-    "context": "Deleted field"
-  },
-  {
     "term": "generic.deleted-user",
     "definition": "Usuari eliminat",
     "context": "Deleted user"
@@ -1013,11 +938,6 @@
     "term": "generic.document-not-available",
     "definition": "Document no disponible",
     "context": "Document not available"
-  },
-  {
-    "term": "generic.done",
-    "definition": "Fet",
-    "context": "Done"
   },
   {
     "term": "generic.download-file",
@@ -1598,16 +1518,6 @@
     "term": "petition.signature-successful.title",
     "definition": "Document signat correctament",
     "context": "Document signed successfully"
-  },
-  {
-    "term": "placeholder-plugin.deleted-field",
-    "definition": "Aquest camp ha estat eliminat. No es mostrarà res aquí.",
-    "context": "This field has been deleted. Nothing will show here."
-  },
-  {
-    "term": "placeholder-plugin.field-without-replies",
-    "definition": "Aquest camp no té respostes. No es mostrarà res aquí.",
-    "context": "This field has no replies. Nothing will show here."
   },
   {
     "term": "public-petition-email-exists.body",

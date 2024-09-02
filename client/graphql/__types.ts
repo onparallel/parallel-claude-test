@@ -2093,7 +2093,7 @@ export interface MutationpublicDelegateAccessToContactArgs {
   firstName: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   lastName: Scalars["String"]["input"];
-  messageBody: Scalars["JSON"]["input"];
+  messageBody: Scalars["String"]["input"];
 }
 
 export interface MutationpublicDeletePetitionCommentArgs {
@@ -28418,7 +28418,7 @@ export type useDelegateAccess_publicDelegateAccessToContactMutationVariables = E
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
   lastName: Scalars["String"]["input"];
-  messageBody: Scalars["JSON"]["input"];
+  messageBody: Scalars["String"]["input"];
 }>;
 
 export type useDelegateAccess_publicDelegateAccessToContactMutation = {
@@ -65703,7 +65703,7 @@ export const useDelegateAccess_publicDelegateAccessToContactDocument = gql`
     $email: String!
     $firstName: String!
     $lastName: String!
-    $messageBody: JSON!
+    $messageBody: String!
   ) {
     publicDelegateAccessToContact(
       keycode: $keycode

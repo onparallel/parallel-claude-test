@@ -55,6 +55,11 @@
     "context": "a moment ago"
   },
   {
+    "term": "component.delegate-access-dialog.default-message-body",
+    "definition": "",
+    "context": "Hello,\n\nI have been asked for this information from {organization} through Parallel. Could you please help me complete it?\n\nThanks,\n{contact}"
+  },
+  {
     "term": "component.delegate-access-dialog.invite-collaborator-subtitle",
     "definition": "",
     "context": "Invite a collaborator to complete or review the missing information."
@@ -755,81 +760,6 @@
     "context": "Check status"
   },
   {
-    "term": "component.rich-text-editor.add-link-header",
-    "definition": "",
-    "context": "Add link"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-required-url",
-    "definition": "",
-    "context": "A valid link is required"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-text-to-show",
-    "definition": "",
-    "context": "Text to show (optional)"
-  },
-  {
-    "term": "component.rich-text-editor.add-link-url",
-    "definition": "",
-    "context": "URL link"
-  },
-  {
-    "term": "component.rich-text-editor.bold",
-    "definition": "",
-    "context": "Bold"
-  },
-  {
-    "term": "component.rich-text-editor.font-size",
-    "definition": "",
-    "context": "Font size"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-body",
-    "definition": "",
-    "context": "Body"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-heading",
-    "definition": "",
-    "context": "Heading"
-  },
-  {
-    "term": "component.rich-text-editor.font-size-subheading",
-    "definition": "",
-    "context": "Subheading"
-  },
-  {
-    "term": "component.rich-text-editor.italic",
-    "definition": "",
-    "context": "Italic"
-  },
-  {
-    "term": "component.rich-text-editor.link",
-    "definition": "",
-    "context": "Link"
-  },
-  {
-    "term": "component.rich-text-editor.list",
-    "definition": "",
-    "context": "Bullet list"
-  },
-  {
-    "term": "component.rich-text-editor.ordered-list",
-    "definition": "",
-    "context": "Numbered list"
-  },
-  {
-    "term": "component.rich-text-editor.personalize",
-    "definition": "",
-    "context": "Personalize"
-  },
-  {
-    "term": "component.rich-text-editor.underline",
-    "definition": "",
-    "context": "Underline"
-  },
-  {
     "term": "component.search-input.placeholder",
     "definition": "",
     "context": "Search..."
@@ -1000,11 +930,6 @@
     "context": "Delete"
   },
   {
-    "term": "generic.deleted-field",
-    "definition": "",
-    "context": "Deleted field"
-  },
-  {
     "term": "generic.deleted-user",
     "definition": "",
     "context": "Deleted user"
@@ -1013,11 +938,6 @@
     "term": "generic.document-not-available",
     "definition": "",
     "context": "Document not available"
-  },
-  {
-    "term": "generic.done",
-    "definition": "",
-    "context": "Done"
   },
   {
     "term": "generic.download-file",
@@ -1598,16 +1518,6 @@
     "term": "petition.signature-successful.title",
     "definition": "",
     "context": "Document signed successfully"
-  },
-  {
-    "term": "placeholder-plugin.deleted-field",
-    "definition": "",
-    "context": "This field has been deleted. Nothing will show here."
-  },
-  {
-    "term": "placeholder-plugin.field-without-replies",
-    "definition": "",
-    "context": "This field has no replies. Nothing will show here."
   },
   {
     "term": "public-petition-email-exists.body",

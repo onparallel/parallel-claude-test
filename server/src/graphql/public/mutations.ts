@@ -29,11 +29,10 @@ import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helper
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
-import { jsonArg } from "../helpers/scalars/JSON";
 import { validateAnd } from "../helpers/validateArgs";
+import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validXor } from "../helpers/validators/validXor";
 import {
   fieldAttachmentBelongsToField,
@@ -704,10 +703,10 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     email: nonNull(stringArg()),
     firstName: nonNull(stringArg()),
     lastName: nonNull(stringArg()),
-    messageBody: nonNull(jsonArg()),
+    messageBody: nonNull(stringArg()),
   },
   authorize: authenticatePublicAccess("keycode"),
-  validateArgs: validRichTextContent((args) => args.messageBody, undefined, "messageBody"),
+  validateArgs: maxLength((args) => args.messageBody, "messageBody", 1000),
   resolve: async (_, args, ctx) => {
     const access = ctx.access!;
     const recipient = ctx.contact!;
