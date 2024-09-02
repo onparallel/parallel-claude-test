@@ -5,16 +5,19 @@ import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
 import { isNonNullish } from "remeda";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldDateProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldDateProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-export function ProfileFieldDate({
+export function ProfileFormFieldDate({
   index,
   field,
   expiryDate,
@@ -24,7 +27,7 @@ export function ProfileFieldDate({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldDateProps) {
+}: ProfileFormFieldDateProps) {
   const { browserName } = useMetadata();
 
   const alertIsActive =
@@ -35,7 +38,7 @@ export function ProfileFieldDate({
   const { useReplyAsExpiryDate } = field.options as ProfileTypeFieldOptions<"DATE">;
 
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -69,6 +72,6 @@ export function ProfileFieldDate({
           </Center>
         )}
       </Flex>
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }

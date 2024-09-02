@@ -17,9 +17,9 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
 import {
-  ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
-  ProfileFieldBackgroundCheck_updateProfileFieldValueDocument,
-  ProfileField_PetitionFieldFragment,
+  ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
+  ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
+  ProfileFormField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -38,20 +38,23 @@ import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { useConfirmRemoveEntityDialog } from "../dialogs/ConfirmRemoveEntityDialog";
 import { useConfirmUpdateEntityDialog } from "../dialogs/ConfirmUpdateEntityDialog";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldBackgroundCheckProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldBackgroundCheckProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
   onRefreshField: () => void;
   profileId: string;
-  fieldsWithIndices: [ProfileField_PetitionFieldFragment, PetitionFieldIndex][];
+  fieldsWithIndices: [ProfileFormField_PetitionFieldFragment, PetitionFieldIndex][];
   petitionId?: string;
 }
 
-export function ProfileFieldBackgroundCheck({
+export function ProfileFormFieldBackgroundCheck({
   index,
   field,
   expiryDate,
@@ -64,7 +67,7 @@ export function ProfileFieldBackgroundCheck({
   petitionId,
   properties,
   ...props
-}: ProfileFieldBackgroundCheckProps) {
+}: ProfileFormFieldBackgroundCheckProps) {
   const intl = useIntl();
   const router = useRouter();
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
@@ -192,7 +195,7 @@ export function ProfileFieldBackgroundCheck({
 
   const showConfirmRemoveEntityDialog = useConfirmRemoveEntityDialog();
   const [updateProfileFieldValue] = useMutation(
-    ProfileFieldBackgroundCheck_updateProfileFieldValueDocument,
+    ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
   );
   const handleRemove = async () => {
     try {
@@ -295,7 +298,7 @@ export function ProfileFieldBackgroundCheck({
   };
 
   const [copyBackgroundCheckReplyToProfileFieldValue] = useMutation(
-    ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
+    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
   );
   const showConfirmUpdateEntityDialog = useConfirmUpdateEntityDialog();
   const handleSuggestionClick = async (replyId: string) => {
@@ -383,7 +386,7 @@ export function ProfileFieldBackgroundCheck({
   });
 
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -585,13 +588,13 @@ export function ProfileFieldBackgroundCheck({
           </HStack>
         ) : null}
       </Stack>
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }
 
 const _mutations = [
   gql`
-    mutation ProfileFieldBackgroundCheck_updateProfileFieldValue(
+    mutation ProfileFormFieldBackgroundCheck_updateProfileFieldValue(
       $profileId: GID!
       $fields: [UpdateProfileFieldValueInput!]!
     ) {
@@ -601,7 +604,7 @@ const _mutations = [
     }
   `,
   gql`
-    mutation ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
+    mutation ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
       $profileId: GID!
       $profileTypeFieldId: GID!
       $petitionId: GID!

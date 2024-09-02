@@ -1,16 +1,19 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { Controller } from "react-hook-form";
 import { isNonNullish } from "remeda";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldPhoneProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldPhoneProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-export function ProfileFieldPhone({
+export function ProfileFormFieldPhone({
   index,
   field,
   control,
@@ -22,9 +25,9 @@ export function ProfileFieldPhone({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldPhoneProps) {
+}: ProfileFormFieldPhoneProps) {
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -58,6 +61,6 @@ export function ProfileFieldPhone({
           />
         )}
       />
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }

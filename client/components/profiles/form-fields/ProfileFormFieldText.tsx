@@ -1,14 +1,17 @@
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldTextProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldTextProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-export function ProfileFieldText({
+export function ProfileFormFieldText({
   index,
   field,
   register,
@@ -18,9 +21,9 @@ export function ProfileFieldText({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldTextProps) {
+}: ProfileFormFieldTextProps) {
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -39,6 +42,6 @@ export function ProfileFieldText({
         }}
         isDisabled={isDisabled}
       />
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }

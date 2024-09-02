@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { ProfileField_ProfileTypeFieldFragment, UserLocale } from "@parallel/graphql/__types";
+import { ProfileFormField_ProfileTypeFieldFragment, UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -16,18 +16,21 @@ import Select, {
   components,
 } from "react-select";
 import { sortBy } from "remeda";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldSelectProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldSelectProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
-export function ProfileFieldSelect({
+export function ProfileFormFieldSelect({
   index,
   field,
   register,
@@ -38,9 +41,9 @@ export function ProfileFieldSelect({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldSelectProps) {
+}: ProfileFormFieldSelectProps) {
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -54,7 +57,7 @@ export function ProfileFieldSelect({
           control={control}
           render={({ field: { value, onChange, onBlur } }) => {
             return (
-              <ProfileFieldSelectInner
+              <ProfileFormFieldSelectInner
                 isDisabled={isDisabled}
                 field={field}
                 value={value}
@@ -85,20 +88,20 @@ export function ProfileFieldSelect({
           }}
         />
       </Box>
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }
 
-interface ProfileFieldSelectInnerProps
+interface ProfileFormFieldSelectInnerProps
   extends UseReactSelectProps<SelectOptionValue, false, never>,
     Omit<SelectProps<SelectOptionValue, false, never>, "value" | "onChange">,
     ValueProps<string> {
-  field: ProfileField_ProfileTypeFieldFragment;
+  field: ProfileFormField_ProfileTypeFieldFragment;
 }
 
-export const ProfileFieldSelectInner = forwardRef<
+export const ProfileFormFieldSelectInner = forwardRef<
   SelectInstance<SelectOptionValue, false, never>,
-  ProfileFieldSelectInnerProps
+  ProfileFormFieldSelectInnerProps
 >(function ProfileFieldSelectInner({ field, value, onChange, ...props }, ref) {
   const intl = useIntl();
 
@@ -165,11 +168,11 @@ function SingleValue({
 }: SingleValueProps<SelectOptionValue, false, never> & { selectProps: ReactSelectExtraProps }) {
   return (
     <components.SingleValue {...props}>
-      <ProfileFieldSelectOptionItem
+      <ProfileFormFieldSelectOptionItem
         color={props.selectProps.showOptionsWithColors ? props.data.color : undefined}
       >
         {children}
-      </ProfileFieldSelectOptionItem>
+      </ProfileFormFieldSelectOptionItem>
     </components.SingleValue>
   );
 }
@@ -180,16 +183,16 @@ function Option({
 }: OptionProps<SelectOptionValue, false, never> & { selectProps: ReactSelectExtraProps }) {
   return (
     <components.Option {...props}>
-      <ProfileFieldSelectOptionItem
+      <ProfileFormFieldSelectOptionItem
         color={props.selectProps.showOptionsWithColors ? props.data.color : undefined}
       >
         {children}
-      </ProfileFieldSelectOptionItem>
+      </ProfileFormFieldSelectOptionItem>
     </components.Option>
   );
 }
 
-export function ProfileFieldSelectOptionItem({
+export function ProfileFormFieldSelectOptionItem({
   color,
   children,
 }: PropsWithChildren<{ color?: string | undefined }>) {

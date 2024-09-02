@@ -3,16 +3,19 @@ import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldShortTextProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldShortTextProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-export function ProfileFieldShortText({
+export function ProfileFormFieldShortText({
   index,
   field,
   control,
@@ -22,7 +25,7 @@ export function ProfileFieldShortText({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldShortTextProps) {
+}: ProfileFormFieldShortTextProps) {
   const intl = useIntl();
   const formats = useShortTextFormats();
   const format = isNonNullish(field.options.format)
@@ -30,7 +33,7 @@ export function ProfileFieldShortText({
     : null;
 
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -83,6 +86,6 @@ export function ProfileFieldShortText({
       />
 
       {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }

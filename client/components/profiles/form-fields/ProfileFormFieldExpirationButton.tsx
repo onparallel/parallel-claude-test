@@ -9,7 +9,7 @@ import { Duration } from "date-fns";
 import { useIntl } from "react-intl";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
 
-interface ProfileFieldExpirationButtonProps
+interface ProfileFormFieldExpirationButtonProps
   extends Omit<IconButtonWithTooltipProps, "onChange" | "label"> {
   isDisabled: boolean;
   onChange: (expiryDate: string | null) => void;
@@ -18,14 +18,14 @@ interface ProfileFieldExpirationButtonProps
   expiryAlertAheadTime?: Duration | null;
 }
 
-export function ProfileFieldExpirationButton({
+export function ProfileFormFieldExpirationButton({
   onChange,
   isDisabled,
   fieldName,
   expiryDate,
   expiryAlertAheadTime,
   ...props
-}: ProfileFieldExpirationButtonProps) {
+}: ProfileFormFieldExpirationButtonProps) {
   const intl = useIntl();
 
   const showUpdateExpiration = useUpdateProfileFieldExpirationDialog();

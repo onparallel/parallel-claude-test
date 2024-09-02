@@ -3,7 +3,7 @@ import { AssignIcon } from "@parallel/chakra/icons";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { ProfileFieldSelectOptionItem } from "@parallel/components/profiles/fields/ProfileFieldSelect";
+import { ProfileFormFieldSelectOptionItem } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
 import {
   UpdateProfileTypeFieldSelectOptionsSubstitution,
   UserLocale,
@@ -156,11 +156,11 @@ export function useConfirmRemovedSelectOptionsReplacementDialog() {
 function SingleValue(props: SingleValueProps<SelectOptionValue>) {
   return (
     <components.SingleValue {...props}>
-      <ProfileFieldSelectOptionItem
+      <ProfileFormFieldSelectOptionItem
         color={(props.selectProps as any).showOptionsWithColors ? props.data.color : undefined}
       >
         <LocalizableUserTextRender value={props.data.label} default={<></>} />
-      </ProfileFieldSelectOptionItem>
+      </ProfileFormFieldSelectOptionItem>
     </components.SingleValue>
   );
 }
@@ -168,11 +168,11 @@ function SingleValue(props: SingleValueProps<SelectOptionValue>) {
 function Option({ children, ...props }: OptionProps<SelectOptionValue>) {
   return (
     <components.Option {...props}>
-      <ProfileFieldSelectOptionItem
+      <ProfileFormFieldSelectOptionItem
         color={(props.selectProps as any).showOptionsWithColors ? props.data.color : undefined}
       >
         <LocalizableUserTextRender value={props.data.label} default={<></>} />
-      </ProfileFieldSelectOptionItem>
+      </ProfileFormFieldSelectOptionItem>
     </components.Option>
   );
 }

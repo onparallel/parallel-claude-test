@@ -20,8 +20,8 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organization/dialogs/ConfirmDiscardChangesDialog";
-import { ProfileField } from "@parallel/components/profiles/fields/ProfileField";
-import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
+import { ProfileFormField } from "@parallel/components/profiles/form-fields/ProfileFormField";
+import { ProfileFormFieldFileAction } from "@parallel/components/profiles/form-fields/ProfileFormFieldFileUpload";
 import {
   PetitionFieldType,
   ProfileForm_PetitionBaseFragment,
@@ -256,7 +256,7 @@ export const ProfileForm = Object.assign(
                 const prop = profile.properties?.find(
                   (prop) => prop.field.id === profileTypeFieldId,
                 );
-                const events = content!.value as ProfileFieldFileAction[];
+                const events = content!.value as ProfileFormFieldFileAction[];
                 const deleteFiles = events.filter(discriminator("type", "DELETE"));
                 const addFiles = events.filter(discriminator("type", "ADD"));
                 const updateExpiresAt = events.filter(discriminator("type", "UPDATE"));
@@ -478,7 +478,7 @@ export const ProfileForm = Object.assign(
             {propertiesWithSuggestedFields.map(([{ field, value, files }, suggestedFields]) => {
               const fieldIndex = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
               return (
-                <ProfileField
+                <ProfileFormField
                   key={field.id}
                   profileId={profileId}
                   field={field}
@@ -553,18 +553,18 @@ export const ProfileForm = Object.assign(
             type
             myPermission
             alias
-            ...ProfileField_ProfileTypeField
+            ...ProfileFormField_ProfileTypeField
           }
-          ${ProfileField.fragments.ProfileTypeField}
+          ${ProfileFormField.fragments.ProfileTypeField}
         `;
       },
       get ProfileFieldFile() {
         return gql`
           fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
             id
-            ...ProfileField_ProfileFieldFile
+            ...ProfileFormField_ProfileFieldFile
           }
-          ${ProfileField.fragments.ProfileFieldFile}
+          ${ProfileFormField.fragments.ProfileFieldFile}
         `;
       },
       get ProfileFieldValue() {
@@ -574,9 +574,9 @@ export const ProfileForm = Object.assign(
             content
             createdAt
             expiryDate
-            ...ProfileField_ProfileFieldValue
+            ...ProfileFormField_ProfileFieldValue
           }
-          ${ProfileField.fragments.ProfileFieldValue}
+          ${ProfileFormField.fragments.ProfileFieldValue}
         `;
       },
       get ProfileFieldProperty() {
@@ -591,12 +591,12 @@ export const ProfileForm = Object.assign(
             value {
               ...ProfileForm_ProfileFieldValue
             }
-            ...ProfileField_ProfileFieldProperty
+            ...ProfileFormField_ProfileFieldProperty
           }
           ${this.ProfileTypeField}
           ${this.ProfileFieldFile}
           ${this.ProfileFieldValue}
-          ${ProfileField.fragments.ProfileFieldProperty}
+          ${ProfileFormField.fragments.ProfileFieldProperty}
         `;
       },
       get Profile() {
@@ -630,17 +630,17 @@ export const ProfileForm = Object.assign(
             fields {
               id
               alias
-              ...ProfileField_PetitionField
+              ...ProfileFormField_PetitionField
               children {
                 id
                 alias
-                ...ProfileField_PetitionField
+                ...ProfileFormField_PetitionField
               }
             }
             ...useAllFieldsWithIndices_PetitionBase
           }
           ${useAllFieldsWithIndices.fragments.PetitionBase}
-          ${ProfileField.fragments.PetitionField}
+          ${ProfileFormField.fragments.PetitionField}
         `;
       },
     },

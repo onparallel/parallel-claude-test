@@ -18,7 +18,7 @@ import { useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { ProfileFieldSelectInner } from "../fields/ProfileFieldSelect";
+import { ProfileFormFieldSelectInner } from "../form-fields/ProfileFormFieldSelect";
 
 interface CreateProfileDialogResult {
   profile: useCreateProfileDialog_ProfileFragment;
@@ -242,7 +242,7 @@ function CreateProfileDialog({
                     control={control}
                     render={({ field: { ...props } }) => {
                       return (
-                        <ProfileFieldSelectInner
+                        <ProfileFormFieldSelectInner
                           field={profileTypeField}
                           {...props}
                           isDisabled={profileTypeField.myPermission !== "WRITE"}

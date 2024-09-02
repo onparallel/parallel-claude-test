@@ -4,24 +4,24 @@ import { EditIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
-import { ProfileFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
+import { ProfileFormFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { Duration, isPast, sub } from "date-fns";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export interface ProfileFieldInputGroupProps {
+export interface ProfileFormFieldInputGroupProps {
   showSuggestionsButton: boolean;
   areSuggestionsVisible: boolean;
   onToggleSuggestions: () => void;
-  field: ProfileFieldInputGroup_ProfileTypeFieldFragment;
+  field: ProfileFormFieldInputGroup_ProfileTypeFieldFragment;
   children?: ReactNode;
   expiryDate?: string | null;
   isDisabled?: boolean;
 }
 
-export function ProfileFieldInputGroup({
+export function ProfileFormFieldInputGroup({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
@@ -29,7 +29,7 @@ export function ProfileFieldInputGroup({
   expiryDate,
   children,
   isDisabled,
-}: ProfileFieldInputGroupProps) {
+}: ProfileFormFieldInputGroupProps) {
   const { browserName } = useMetadata();
 
   return (
@@ -129,10 +129,10 @@ export const ProfileFieldExpiresAtIcon = chakraForwardRef<"div", ProfileFieldExp
   },
 );
 
-ProfileFieldInputGroup.fragments = {
+ProfileFormFieldInputGroup.fragments = {
   get ProfileTypeField() {
     return gql`
-      fragment ProfileFieldInputGroup_ProfileTypeField on ProfileTypeField {
+      fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
         id
         type
         isExpirable

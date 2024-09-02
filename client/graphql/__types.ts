@@ -1,5 +1,5 @@
-import type { Duration } from "date-fns";
 import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import type { Duration } from "date-fns";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null;
@@ -26161,7 +26161,7 @@ export type useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragme
   name: { [locale in UserLocale]?: string };
 };
 
-export type ProfileField_ProfileFieldPropertyFragment = {
+export type ProfileFormField_ProfileFieldPropertyFragment = {
   __typename?: "ProfileFieldProperty";
   field: {
     __typename?: "ProfileTypeField";
@@ -26191,7 +26191,7 @@ export type ProfileField_ProfileFieldPropertyFragment = {
   } | null;
 };
 
-export type ProfileField_ProfileTypeFieldFragment = {
+export type ProfileFormField_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   name: { [locale in UserLocale]?: string };
@@ -26201,13 +26201,13 @@ export type ProfileField_ProfileTypeFieldFragment = {
   options: { [key: string]: any };
 };
 
-export type ProfileField_ProfileFieldValueFragment = {
+export type ProfileFormField_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   id: string;
   content?: { [key: string]: any } | null;
 };
 
-export type ProfileField_ProfileFieldFileFragment = {
+export type ProfileFormField_ProfileFieldFileFragment = {
   __typename?: "ProfileFieldFile";
   id: string;
   expiryDate?: string | null;
@@ -26220,7 +26220,7 @@ export type ProfileField_ProfileFieldFileFragment = {
   } | null;
 };
 
-export type ProfileField_PetitionFieldFragment = {
+export type ProfileFormField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   options: { [key: string]: any };
@@ -26234,16 +26234,16 @@ export type ProfileField_PetitionFieldFragment = {
   }>;
 };
 
-export type ProfileFieldBackgroundCheck_updateProfileFieldValueMutationVariables = Exact<{
+export type ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
 }>;
 
-export type ProfileFieldBackgroundCheck_updateProfileFieldValueMutation = {
+export type ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutation = {
   updateProfileFieldValue: { __typename?: "Profile"; id: string };
 };
 
-export type ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables =
+export type ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables =
   Exact<{
     profileId: Scalars["GID"]["input"];
     profileTypeFieldId: Scalars["GID"]["input"];
@@ -26252,7 +26252,7 @@ export type ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldVa
     expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   }>;
 
-export type ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation = {
+export type ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation = {
   copyBackgroundCheckReplyToProfileFieldValue: { __typename?: "ProfileFieldValue"; id: string };
 };
 
@@ -26269,7 +26269,7 @@ export type ProfileFieldFileUpload_ProfileFieldFileFragment = {
   } | null;
 };
 
-export type ProfileFieldInputGroup_ProfileTypeFieldFragment = {
+export type ProfileFormFieldInputGroup_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   type: ProfileTypeFieldType;
@@ -61259,8 +61259,8 @@ export const ProfileFieldSuggestion_PetitionFieldFragmentDoc = gql`
     type
   }
 ` as unknown as DocumentNode<ProfileFieldSuggestion_PetitionFieldFragment, unknown>;
-export const ProfileField_PetitionFieldFragmentDoc = gql`
-  fragment ProfileField_PetitionField on PetitionField {
+export const ProfileFormField_PetitionFieldFragmentDoc = gql`
+  fragment ProfileFormField_PetitionField on PetitionField {
     id
     options
     replies {
@@ -61271,22 +61271,22 @@ export const ProfileField_PetitionFieldFragmentDoc = gql`
     ...ProfileFieldSuggestion_PetitionField
   }
   ${ProfileFieldSuggestion_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileField_PetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormField_PetitionFieldFragment, unknown>;
 export const ProfileForm_PetitionBaseFragmentDoc = gql`
   fragment ProfileForm_PetitionBase on PetitionBase {
     fields {
       id
       alias
-      ...ProfileField_PetitionField
+      ...ProfileFormField_PetitionField
       children {
         id
         alias
-        ...ProfileField_PetitionField
+        ...ProfileFormField_PetitionField
       }
     }
     ...useAllFieldsWithIndices_PetitionBase
   }
-  ${ProfileField_PetitionFieldFragmentDoc}
+  ${ProfileFormField_PetitionFieldFragmentDoc}
   ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_PetitionBaseFragment, unknown>;
 export const ProfileDrawer_PetitionBaseFragmentDoc = gql`
@@ -61697,26 +61697,26 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
-export const ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFieldInputGroup_ProfileTypeField on ProfileTypeField {
+export const ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
     id
     type
     isExpirable
     expiryAlertAheadTime
   }
-` as unknown as DocumentNode<ProfileFieldInputGroup_ProfileTypeFieldFragment, unknown>;
-export const ProfileField_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileField_ProfileTypeField on ProfileTypeField {
+` as unknown as DocumentNode<ProfileFormFieldInputGroup_ProfileTypeFieldFragment, unknown>;
+export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
     id
     name
     type
     isExpirable
     expiryAlertAheadTime
     options
-    ...ProfileFieldInputGroup_ProfileTypeField
+    ...ProfileFormFieldInputGroup_ProfileTypeField
   }
-  ${ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileField_ProfileTypeFieldFragment, unknown>;
+  ${ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_ProfileTypeFieldFragment, unknown>;
 export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileForm_ProfileTypeField on ProfileTypeField {
     id
@@ -61725,9 +61725,9 @@ export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
     type
     myPermission
     alias
-    ...ProfileField_ProfileTypeField
+    ...ProfileFormField_ProfileTypeField
   }
-  ${ProfileField_ProfileTypeFieldFragmentDoc}
+  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileTypeFieldFragment, unknown>;
 export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
   fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
@@ -61741,51 +61741,51 @@ export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ProfileFieldFileUpload_ProfileFieldFileFragment, unknown>;
-export const ProfileField_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileField_ProfileFieldFile on ProfileFieldFile {
+export const ProfileFormField_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
     ...ProfileFieldFileUpload_ProfileFieldFile
   }
   ${ProfileFieldFileUpload_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<ProfileField_ProfileFieldFileFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldFileFragment, unknown>;
 export const ProfileForm_ProfileFieldFileFragmentDoc = gql`
   fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
     id
-    ...ProfileField_ProfileFieldFile
+    ...ProfileFormField_ProfileFieldFile
   }
-  ${ProfileField_ProfileFieldFileFragmentDoc}
+  ${ProfileFormField_ProfileFieldFileFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFieldFileFragment, unknown>;
-export const ProfileField_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfileField_ProfileFieldValue on ProfileFieldValue {
+export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
     id
     content
   }
-` as unknown as DocumentNode<ProfileField_ProfileFieldValueFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
 export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
   fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
     id
     content
     createdAt
     expiryDate
-    ...ProfileField_ProfileFieldValue
+    ...ProfileFormField_ProfileFieldValue
   }
-  ${ProfileField_ProfileFieldValueFragmentDoc}
+  ${ProfileFormField_ProfileFieldValueFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
-export const ProfileField_ProfileFieldPropertyFragmentDoc = gql`
-  fragment ProfileField_ProfileFieldProperty on ProfileFieldProperty {
+export const ProfileFormField_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
     field {
-      ...ProfileField_ProfileTypeField
+      ...ProfileFormField_ProfileTypeField
     }
     files {
-      ...ProfileField_ProfileFieldFile
+      ...ProfileFormField_ProfileFieldFile
     }
     value {
-      ...ProfileField_ProfileFieldValue
+      ...ProfileFormField_ProfileFieldValue
     }
   }
-  ${ProfileField_ProfileTypeFieldFragmentDoc}
-  ${ProfileField_ProfileFieldFileFragmentDoc}
-  ${ProfileField_ProfileFieldValueFragmentDoc}
-` as unknown as DocumentNode<ProfileField_ProfileFieldPropertyFragment, unknown>;
+  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
+  ${ProfileFormField_ProfileFieldFileFragmentDoc}
+  ${ProfileFormField_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldPropertyFragment, unknown>;
 export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
   fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -61797,12 +61797,12 @@ export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
     value {
       ...ProfileForm_ProfileFieldValue
     }
-    ...ProfileField_ProfileFieldProperty
+    ...ProfileFormField_ProfileFieldProperty
   }
   ${ProfileForm_ProfileTypeFieldFragmentDoc}
   ${ProfileForm_ProfileFieldFileFragmentDoc}
   ${ProfileForm_ProfileFieldValueFragmentDoc}
-  ${ProfileField_ProfileFieldPropertyFragmentDoc}
+  ${ProfileFormField_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
 export const ProfileForm_ProfileFragmentDoc = gql`
   fragment ProfileForm_Profile on Profile {
@@ -65625,8 +65625,8 @@ export const useProfileSubscribersDialog_unsubscribeFromProfileDocument = gql`
   useProfileSubscribersDialog_unsubscribeFromProfileMutation,
   useProfileSubscribersDialog_unsubscribeFromProfileMutationVariables
 >;
-export const ProfileFieldBackgroundCheck_updateProfileFieldValueDocument = gql`
-  mutation ProfileFieldBackgroundCheck_updateProfileFieldValue(
+export const ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument = gql`
+  mutation ProfileFormFieldBackgroundCheck_updateProfileFieldValue(
     $profileId: GID!
     $fields: [UpdateProfileFieldValueInput!]!
   ) {
@@ -65635,31 +65635,32 @@ export const ProfileFieldBackgroundCheck_updateProfileFieldValueDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  ProfileFieldBackgroundCheck_updateProfileFieldValueMutation,
-  ProfileFieldBackgroundCheck_updateProfileFieldValueMutationVariables
+  ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutation,
+  ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutationVariables
 >;
-export const ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument = gql`
-  mutation ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
-    $profileId: GID!
-    $profileTypeFieldId: GID!
-    $petitionId: GID!
-    $replyId: GID!
-    $expiryDate: Date
-  ) {
-    copyBackgroundCheckReplyToProfileFieldValue(
-      profileId: $profileId
-      profileTypeFieldId: $profileTypeFieldId
-      petitionId: $petitionId
-      replyId: $replyId
-      expiryDate: $expiryDate
+export const ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument =
+  gql`
+    mutation ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $petitionId: GID!
+      $replyId: GID!
+      $expiryDate: Date
     ) {
-      id
+      copyBackgroundCheckReplyToProfileFieldValue(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        petitionId: $petitionId
+        replyId: $replyId
+        expiryDate: $expiryDate
+      ) {
+        id
+      }
     }
-  }
-` as unknown as DocumentNode<
-  ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation,
-  ProfileFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables
->;
+  ` as unknown as DocumentNode<
+    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation,
+    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables
+  >;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)

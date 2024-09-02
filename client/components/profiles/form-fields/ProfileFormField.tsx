@@ -7,11 +7,11 @@ import {
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import {
-  ProfileField_PetitionFieldFragment,
-  ProfileField_ProfileFieldFileFragment,
-  ProfileField_ProfileFieldPropertyFragment,
-  ProfileField_ProfileFieldValueFragment,
-  ProfileField_ProfileTypeFieldFragment,
+  ProfileFormField_PetitionFieldFragment,
+  ProfileFormField_ProfileFieldFileFragment,
+  ProfileFormField_ProfileFieldPropertyFragment,
+  ProfileFormField_ProfileFieldValueFragment,
+  ProfileFormField_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
@@ -39,18 +39,21 @@ import { isNonNullish, isNullish, noop } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
-import { ProfileFieldBackgroundCheck } from "./ProfileFieldBackgroundCheck";
-import { ProfileFieldDate } from "./ProfileFieldDate";
-import { ProfileFieldExpirationButton } from "./ProfileFieldExpirationButton";
-import { ProfileFieldFileAction, ProfileFieldFileUpload } from "./ProfileFieldFileUpload";
-import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
-import { ProfileFieldNumber } from "./ProfileFieldNumber";
-import { ProfileFieldPhone } from "./ProfileFieldPhone";
-import { ProfileFieldSelect } from "./ProfileFieldSelect";
-import { ProfileFieldShortText } from "./ProfileFieldShortText";
-import { ProfileFieldText } from "./ProfileFieldText";
+import { ProfileFormFieldBackgroundCheck } from "./ProfileFormFieldBackgroundCheck";
+import { ProfileFormFieldDate } from "./ProfileFormFieldDate";
+import { ProfileFormFieldExpirationButton } from "./ProfileFormFieldExpirationButton";
+import {
+  ProfileFormFieldFileAction,
+  ProfileFormFieldFileUpload,
+} from "./ProfileFormFieldFileUpload";
+import { ProfileFormFieldInputGroup } from "./ProfileFormFieldInputGroup";
+import { ProfileFormFieldNumber } from "./ProfileFormFieldNumber";
+import { ProfileFormFieldPhone } from "./ProfileFormFieldPhone";
+import { ProfileFormFieldSelect } from "./ProfileFormFieldSelect";
+import { ProfileFormFieldShortText } from "./ProfileFormFieldShortText";
+import { ProfileFormFieldText } from "./ProfileFormFieldText";
 
-export interface ProfileFieldProps {
+export interface ProfileFormFieldProps {
   index: number;
   control: Control<ProfileFormData, any>;
   register: UseFormRegister<ProfileFormData>;
@@ -59,16 +62,16 @@ export interface ProfileFieldProps {
   setError: UseFormSetError<ProfileFormData>;
   onRefetch: () => void;
   profileId: string;
-  field: ProfileField_ProfileTypeFieldFragment;
-  value?: ProfileField_ProfileFieldValueFragment | null;
-  files?: ProfileField_ProfileFieldFileFragment[] | null;
-  fieldsWithIndices: [ProfileField_PetitionFieldFragment, PetitionFieldIndex][];
+  field: ProfileFormField_ProfileTypeFieldFragment;
+  value?: ProfileFormField_ProfileFieldValueFragment | null;
+  files?: ProfileFormField_ProfileFieldFileFragment[] | null;
+  fieldsWithIndices: [ProfileFormField_PetitionFieldFragment, PetitionFieldIndex][];
   isDisabled?: boolean;
   petitionId?: string;
-  properties: ProfileField_ProfileFieldPropertyFragment[];
+  properties: ProfileFormField_ProfileFieldPropertyFragment[];
 }
 
-export function ProfileField(props: ProfileFieldProps) {
+export function ProfileFormField(props: ProfileFormFieldProps) {
   const intl = useIntl();
   const { index, field, files, control, setValue, fieldsWithIndices } = props;
   const { dirtyFields, errors } = useFormState({ control });
@@ -93,7 +96,7 @@ export function ProfileField(props: ProfileFieldProps) {
     if (
       field.type === "FILE" &&
       content?.value &&
-      !(content.value as ProfileFieldFileAction[]).some(discriminator("type", "UPDATE"))
+      !(content.value as ProfileFormFieldFileAction[]).some(discriminator("type", "UPDATE"))
     ) {
       setValue(`fields.${index}.content.value`, [
         ...content.value,
@@ -172,7 +175,7 @@ export function ProfileField(props: ProfileFieldProps) {
         if (isFileTypeField(petitionField.type)) {
           if (
             content?.value.some(
-              (event: ProfileFieldFileAction) => event.type === "COPY" && event.id === reply.id,
+              (event: ProfileFormFieldFileAction) => event.type === "COPY" && event.id === reply.id,
             ) ||
             files?.some(({ file }) => file?.filename === reply.content.filename)
           ) {
@@ -357,7 +360,7 @@ export function ProfileField(props: ProfileFieldProps) {
             </Badge>
           ) : null}
           {needsExpirationDialog ? (
-            <ProfileFieldExpirationButton
+            <ProfileFormFieldExpirationButton
               isDisabled={fieldIsEmpty || props.isDisabled === true}
               expiryDate={expiryDate}
               fieldName={field.name}
@@ -367,21 +370,21 @@ export function ProfileField(props: ProfileFieldProps) {
           ) : null}
         </HStack>
         {field.type === "FILE" ? (
-          <ProfileFieldFileUpload {...commonProps} />
+          <ProfileFormFieldFileUpload {...commonProps} />
         ) : field.type === "DATE" ? (
-          <ProfileFieldDate {...commonProps} />
+          <ProfileFormFieldDate {...commonProps} />
         ) : field.type === "NUMBER" ? (
-          <ProfileFieldNumber {...commonProps} />
+          <ProfileFormFieldNumber {...commonProps} />
         ) : field.type === "PHONE" ? (
-          <ProfileFieldPhone {...commonProps} />
+          <ProfileFormFieldPhone {...commonProps} />
         ) : field.type === "TEXT" ? (
-          <ProfileFieldText {...commonProps} />
+          <ProfileFormFieldText {...commonProps} />
         ) : field.type === "SHORT_TEXT" ? (
-          <ProfileFieldShortText {...commonProps} />
+          <ProfileFormFieldShortText {...commonProps} />
         ) : field.type === "SELECT" ? (
-          <ProfileFieldSelect {...commonProps} control={control} />
+          <ProfileFormFieldSelect {...commonProps} control={control} />
         ) : field.type === "BACKGROUND_CHECK" ? (
-          <ProfileFieldBackgroundCheck
+          <ProfileFormFieldBackgroundCheck
             {...commonProps}
             profileId={props.profileId}
             onRefreshField={props.onRefetch}
@@ -417,18 +420,18 @@ export function ProfileField(props: ProfileFieldProps) {
   );
 }
 
-ProfileField.fragments = {
+ProfileFormField.fragments = {
   get ProfileFieldProperty() {
     return gql`
-      fragment ProfileField_ProfileFieldProperty on ProfileFieldProperty {
+      fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
         field {
-          ...ProfileField_ProfileTypeField
+          ...ProfileFormField_ProfileTypeField
         }
         files {
-          ...ProfileField_ProfileFieldFile
+          ...ProfileFormField_ProfileFieldFile
         }
         value {
-          ...ProfileField_ProfileFieldValue
+          ...ProfileFormField_ProfileFieldValue
         }
       }
       ${this.ProfileTypeField}
@@ -438,21 +441,21 @@ ProfileField.fragments = {
   },
   get ProfileTypeField() {
     return gql`
-      fragment ProfileField_ProfileTypeField on ProfileTypeField {
+      fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
         id
         name
         type
         isExpirable
         expiryAlertAheadTime
         options
-        ...ProfileFieldInputGroup_ProfileTypeField
+        ...ProfileFormFieldInputGroup_ProfileTypeField
       }
-      ${ProfileFieldInputGroup.fragments.ProfileTypeField}
+      ${ProfileFormFieldInputGroup.fragments.ProfileTypeField}
     `;
   },
   get ProfileFieldValue() {
     return gql`
-      fragment ProfileField_ProfileFieldValue on ProfileFieldValue {
+      fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
         id
         content
       }
@@ -460,15 +463,15 @@ ProfileField.fragments = {
   },
   get ProfileFieldFile() {
     return gql`
-      fragment ProfileField_ProfileFieldFile on ProfileFieldFile {
+      fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
         ...ProfileFieldFileUpload_ProfileFieldFile
       }
-      ${ProfileFieldFileUpload.fragments.ProfileFieldFile}
+      ${ProfileFormFieldFileUpload.fragments.ProfileFieldFile}
     `;
   },
   get PetitionField() {
     return gql`
-      fragment ProfileField_PetitionField on PetitionField {
+      fragment ProfileFormField_PetitionField on PetitionField {
         id
         options
         replies {

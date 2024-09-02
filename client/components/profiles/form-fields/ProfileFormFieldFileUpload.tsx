@@ -17,10 +17,10 @@ import { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isNullish, noop, sumBy } from "remeda";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldFileUploadProps extends ProfileFieldProps {
+interface ProfileFormFieldFileUploadProps extends ProfileFormFieldProps {
   showSuggestionsButton: boolean;
   areSuggestionsVisible: boolean;
   onToggleSuggestions: () => void;
@@ -28,13 +28,13 @@ interface ProfileFieldFileUploadProps extends ProfileFieldProps {
   expiryDate?: string | null;
 }
 
-export type ProfileFieldFileAction =
+export type ProfileFormFieldFileAction =
   | { type: "ADD"; file: File; id: string }
   | { type: "COPY"; file: { name: string; type: string; size: number }; id: string }
   | { type: "DELETE"; id: string }
   | { type: "UPDATE" };
 
-export function ProfileFieldFileUpload({
+export function ProfileFormFieldFileUpload({
   profileId,
   field,
   files,
@@ -46,7 +46,7 @@ export function ProfileFieldFileUpload({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldFileUploadProps) {
+}: ProfileFormFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
 
@@ -93,7 +93,7 @@ export function ProfileFieldFileUpload({
       name={`fields.${index}.content.value`}
       control={control}
       render={({ field: { onChange, value, ...rest } }) => {
-        const actions = (value as ProfileFieldFileAction[]) ?? [];
+        const actions = (value as ProfileFormFieldFileAction[]) ?? [];
         return (
           <Stack>
             <HStack align="start">
@@ -322,7 +322,7 @@ function ProfileFile({ name, type, size, onRemove, onPreview, isDisabled }: Prof
   );
 }
 
-ProfileFieldFileUpload.fragments = {
+ProfileFormFieldFileUpload.fragments = {
   get ProfileFieldFile() {
     return gql`
       fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {

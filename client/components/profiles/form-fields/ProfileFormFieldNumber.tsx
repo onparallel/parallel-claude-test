@@ -1,15 +1,18 @@
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { Controller } from "react-hook-form";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
+import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  ProfileFormFieldInputGroup,
+  ProfileFormFieldInputGroupProps,
+} from "./ProfileFormFieldInputGroup";
 
-interface ProfileFieldNumberProps
-  extends ProfileFieldProps,
-    Omit<ProfileFieldInputGroupProps, "field"> {
+interface ProfileFormFieldNumberProps
+  extends ProfileFormFieldProps,
+    Omit<ProfileFormFieldInputGroupProps, "field"> {
   showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
-export function ProfileFieldNumber({
+export function ProfileFormFieldNumber({
   index,
   field,
   control,
@@ -19,9 +22,9 @@ export function ProfileFieldNumber({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
-}: ProfileFieldNumberProps) {
+}: ProfileFormFieldNumberProps) {
   return (
-    <ProfileFieldInputGroup
+    <ProfileFormFieldInputGroup
       field={field}
       expiryDate={expiryDate}
       isDisabled={isDisabled}
@@ -49,6 +52,6 @@ export function ProfileFieldNumber({
           );
         }}
       />
-    </ProfileFieldInputGroup>
+    </ProfileFormFieldInputGroup>
   );
 }
