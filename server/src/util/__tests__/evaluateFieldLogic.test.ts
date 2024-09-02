@@ -338,12 +338,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: {},
           currentVariables: {},
           finalVariables: {},
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: {},
           currentVariables: {},
           finalVariables: {},
+          headerNumber: null,
         },
       ]);
     });
@@ -1033,12 +1035,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 0, price: 50 },
           currentVariables: { score: 0, price: 50 },
           finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { score: 0, price: 50 },
           currentVariables: { score: 0, price: 50 },
           finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1089,12 +1093,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 100 },
           currentVariables: { score: 100 },
           finalVariables: { score: 100 },
+          headerNumber: null,
         },
         {
           isVisible: false,
           previousVariables: { score: 100 },
           currentVariables: { score: 100 },
           finalVariables: { score: 100 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1222,6 +1228,625 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("automatic heading enumeration - NUMBERS", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "score",
+                  operator: "EQUAL",
+                  value: 100,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 2,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 3,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "price",
+                  operator: "GREATER_THAN_OR_EQUAL",
+                  value: 10,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 4,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 5,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 6,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 7,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 8,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 9,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 10,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { name: "score", default_value: 0 },
+          { name: "price", default_value: 50 },
+        ],
+        custom_lists: [],
+        automatic_numbering_config: { numbering_type: "NUMBERS" },
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: false,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "1",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "2",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "3",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "4",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "5",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "6",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "7",
+        },
+      ]);
+    });
+
+    it("automatic heading enumeration - LETTERS", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "score",
+                  operator: "EQUAL",
+                  value: 100,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 2,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 3,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "price",
+                  operator: "GREATER_THAN_OR_EQUAL",
+                  value: 10,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 4,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 5,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 6,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 7,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 8,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 9,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 10,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { name: "score", default_value: 0 },
+          { name: "price", default_value: 50 },
+        ],
+        custom_lists: [],
+        automatic_numbering_config: { numbering_type: "LETTERS" },
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: false,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "A",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "B",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "C",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "D",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "E",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "F",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "G",
+        },
+      ]);
+    });
+
+    it("automatic heading enumeration - ROMAN NUMERALS", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "score",
+                  operator: "EQUAL",
+                  value: 100,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 2,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 3,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "price",
+                  operator: "GREATER_THAN_OR_EQUAL",
+                  value: 10,
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+          {
+            id: 4,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 5,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 6,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 7,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 8,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 9,
+            type: "HEADING",
+            options: {
+              showNumbering: false,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+          {
+            id: 10,
+            type: "HEADING",
+            options: {
+              showNumbering: true,
+            },
+            visibility: null,
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { name: "score", default_value: 0 },
+          { name: "price", default_value: 50 },
+        ],
+        custom_lists: [],
+        automatic_numbering_config: { numbering_type: "ROMAN_NUMERALS" },
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: false,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "I",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "II",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "III",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "IV",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "V",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "VI",
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { score: 0, price: 50 },
+          currentVariables: { score: 0, price: 50 },
+          finalVariables: { score: 0, price: 50 },
+          headerNumber: "VII",
         },
       ]);
     });
@@ -1280,12 +1905,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { total: 0 },
           currentVariables: { total: 0 },
           finalVariables: { total: 50 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { total: 0 },
           currentVariables: { total: 50 },
           finalVariables: { total: 50 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1342,12 +1969,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { total: 0 },
           currentVariables: { total: 0 },
           finalVariables: { total: 123 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { total: 0 },
           currentVariables: { total: 123 },
           finalVariables: { total: 123 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1399,6 +2028,7 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { total: 10, score: 100 },
           currentVariables: { total: 0.1, score: 100 },
           finalVariables: { total: 0.1, score: 100 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1485,12 +2115,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { price: 0 },
           currentVariables: { price: 15 },
           finalVariables: { price: 15 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { price: 15 },
           currentVariables: { price: 15 },
           finalVariables: { price: 15 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1555,12 +2187,14 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 0, price: 1.5 },
           currentVariables: { score: 0, price: 1.5 },
           finalVariables: { score: 0, price: 1.5 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { score: 0, price: 1.5 },
           currentVariables: { score: 0, price: 1.5 },
           finalVariables: { score: 0, price: 1.5 },
+          headerNumber: null,
         },
       ]);
     });
@@ -1606,6 +2240,7 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 0 },
           currentVariables: { score: NaN },
           finalVariables: { score: NaN },
+          headerNumber: null,
         },
       ]);
     });
@@ -1668,18 +2303,21 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 0 },
           currentVariables: { score: 0 },
           finalVariables: { score: NaN },
+          headerNumber: null,
         },
         {
           isVisible: false,
           previousVariables: { score: 0 },
           currentVariables: { score: 0 },
           finalVariables: { score: NaN },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { score: 0 },
           currentVariables: { score: NaN },
           finalVariables: { score: NaN },
+          headerNumber: null,
         },
       ]);
     });
@@ -1816,6 +2454,7 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { total: 0, score: 1 },
           currentVariables: { total: -100, score: 100 },
           finalVariables: { total: -100, score: 0.25 },
+          headerNumber: null,
         },
         {
           isVisible: false,
@@ -1832,18 +2471,21 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { total: -100, score: 100 },
           currentVariables: { total: -100, score: 0.25 },
           finalVariables: { total: -100, score: 0.25 },
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { total: -100, score: 0.25 },
           currentVariables: { total: -100, score: 0.25 },
           finalVariables: { total: -100, score: 0.25 },
+          headerNumber: null,
         },
       ]);
     });
@@ -2190,6 +2832,7 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
         },
       ]);
     });
@@ -2324,6 +2967,7 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
         },
         {
           isVisible: true,
@@ -2340,6 +2984,7 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
         },
       ]);
     });
@@ -2472,12 +3117,14 @@ describe("evaluateFieldLogic", () => {
               },
             ],
           ],
+          headerNumber: null,
         },
         {
           isVisible: true,
           previousVariables: { score: 0 },
           currentVariables: { score: 5000 },
           finalVariables: { score: 5000 },
+          headerNumber: null,
         },
       ]);
     });

@@ -34,6 +34,7 @@ import { IncludeApprovalSettingsRow } from "./rows/IncludeApprovalSettingsRow";
 import { InternalFieldSettingsRow } from "./rows/InternalFieldSettingsRow";
 import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
+import { SettingsRowSwitch } from "./rows/SettingsRowSwitch";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
 
@@ -305,6 +306,44 @@ export const PetitionComposeFieldSettings = Object.assign(
                     onChange={handleFieldEdit}
                   />
                 ) : null}
+                {field.type === "HEADING" && petition.automaticNumberingConfig ? (
+                  <>
+                    <SettingsRowSwitch
+                      isDisabled={isReadOnly}
+                      isChecked={field.options.showNumbering ?? false}
+                      onChange={(value) =>
+                        onFieldEdit(field.id, {
+                          options: {
+                            ...field.options,
+                            showNumbering: value,
+                          },
+                        })
+                      }
+                      label={
+                        <FormattedMessage
+                          id="component.petition-compose-field-settings.show-numbering-label"
+                          defaultMessage="Show numbering"
+                        />
+                      }
+                      description={
+                        <Text fontSize="sm">
+                          <FormattedMessage
+                            id="component.petition-compose-field-settings.how-numbering-description"
+                            defaultMessage="Enable this setting to include the text block in automatic numbering."
+                          />
+                        </Text>
+                      }
+                      controlId="heading-show-numbering"
+                    />
+                    {field.options.showNumbering ? (
+                      <SettingsRowAlias
+                        field={field}
+                        onFieldEdit={onFieldEdit}
+                        isReadOnly={isReadOnly}
+                      />
+                    ) : null}
+                  </>
+                ) : null}
               </SettingsRowGroup>
             )}
           </Stack>
@@ -336,6 +375,9 @@ export const PetitionComposeFieldSettings = Object.assign(
             rightSidePetitionField {
               id
             }
+          }
+          automaticNumberingConfig {
+            numberingType
           }
         }
       `,

@@ -1278,6 +1278,7 @@ export interface Petition {
   enable_interaction_with_recipients: boolean; // bool
   enable_review_flow: boolean; // bool
   enable_document_generation: boolean; // bool
+  automatic_numbering_config: Maybe<any>; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -1334,6 +1335,7 @@ export type CreatePetition = PartialProps<
   | "enable_interaction_with_recipients"
   | "enable_review_flow"
   | "enable_document_generation"
+  | "automatic_numbering_config"
 >;
 
 export interface PetitionAccess {

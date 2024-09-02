@@ -1005,6 +1005,46 @@
     "context": "Type of search"
   },
   {
+    "term": "component.configure-automatic-numbering-dialog.body",
+    "definition": "Automatically numbers each block of text.",
+    "context": "Automatically numbers each block of text."
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.header-add",
+    "definition": "Add automatic numbering",
+    "context": "Add automatic numbering"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.header-configure",
+    "definition": "Configure automatic numbering",
+    "context": "Configure automatic numbering"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.letters",
+    "definition": "Letters (A, B, C, D, etc.)",
+    "context": "Letters (A, B, C, D, etc.)"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.numbers",
+    "definition": "Numbers (1, 2, 3, 4, etc.)",
+    "context": "Numbers (1, 2, 3, 4, etc.)"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.roman-numerals",
+    "definition": "Roman numerals (I, II, III, IV, etc.)",
+    "context": "Roman numerals (I, II, III, IV, etc.)"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.type-of-numbering-label",
+    "definition": "Type of numbering",
+    "context": "Type of numbering"
+  },
+  {
+    "term": "component.configure-automatic-numbering-dialog.update-existing-fields",
+    "definition": "Activate in existing text blocks",
+    "context": "Activate in existing text blocks"
+  },
+  {
     "term": "component.configure-expirations-date-dialog.body",
     "definition": "Adds the expiration date of the following <b>{profileName}</b> properties:",
     "context": "Adds the expiration date of the following <b>{profileName}</b> properties:"
@@ -4465,6 +4505,16 @@
     "context": "Unread"
   },
   {
+    "term": "component.numbering-badge.popover",
+    "definition": "This field will be automatically numbered.",
+    "context": "This field will be automatically numbered."
+  },
+  {
+    "term": "component.numbering-badge.text",
+    "definition": "Num",
+    "context": "Num"
+  },
+  {
     "term": "component.organization-memebers-list-table-header.change-limit",
     "definition": "Change limit",
     "context": "Change limit"
@@ -4950,6 +5000,16 @@
     "context": "The first field of a group cannot be internal if the group is not."
   },
   {
+    "term": "component.settings-row-alias.heading-alias-description",
+    "definition": "Use this reference in a field description to display the automatic numbering assigned to this field.",
+    "context": "Use this reference in a field description to display the automatic numbering assigned to this field."
+  },
+  {
+    "term": "component.petition-compose-field-settings.how-numbering-description",
+    "definition": "Enable this setting to include the text block in automatic numbering.",
+    "context": "Enable this setting to include the text block in automatic numbering."
+  },
+  {
     "term": "component.petition-compose-field-settings.include-approval",
     "definition": "Include approval",
     "context": "Include approval"
@@ -5013,6 +5073,11 @@
     "term": "component.petition-compose-field-settings.show-in-pdf-description",
     "definition": "Enabling this option will make the content appear in the exported PDF and the document to be signed.",
     "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-numbering-label",
+    "definition": "Show numbering",
+    "context": "Show numbering"
   },
   {
     "term": "component.petition-compose-field.add-attachment",
@@ -6480,6 +6545,16 @@
     "context": "Type to search among the existing templates"
   },
   {
+    "term": "component.petition-settings.automatic-numbering-description",
+    "definition": "The number will dynamically change to match the order in which it appears on the form.",
+    "context": "The number will dynamically change to match the order in which it appears on the form."
+  },
+  {
+    "term": "component.petition-settings.automatic-numbering-description1",
+    "definition": "Adds numbering to text blocks with numbering enabled.",
+    "context": "Adds numbering to text blocks with numbering enabled."
+  },
+  {
     "term": "component.petition-settings.automatic-reminders",
     "definition": "Automatic reminders",
     "context": "Automatic reminders"
@@ -6598,6 +6673,11 @@
     "term": "component.petition-settings.locale-label",
     "definition": "Communications language",
     "context": "Communications language"
+  },
+  {
+    "term": "component.petition-settings.petition-automatic-numbering",
+    "definition": "Automatic numbering",
+    "context": "Automatic numbering"
   },
   {
     "term": "component.petition-settings.petition-signature-enable",

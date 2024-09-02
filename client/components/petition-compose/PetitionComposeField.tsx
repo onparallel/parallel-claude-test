@@ -38,8 +38,9 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { letters } from "@parallel/utils/autoIncremental";
 import { generateCssStripe } from "@parallel/utils/css";
-import { PetitionFieldIndex, letters } from "@parallel/utils/fieldIndices";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -92,6 +93,7 @@ import { NativeTypes } from "react-dnd-html5-backend";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
+import { NumberingBadge } from "../common/NumberingBadge";
 import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
@@ -775,6 +777,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           onClick={onTypeIndicatorClick}
         />
         {field.isInternal ? <InternalFieldBadge /> : null}
+        {field.options.showNumbering ? <NumberingBadge /> : null}
         {"isLinkedToProfileTypeField" in field &&
         field.isLinkedToProfileTypeField &&
         "profileTypeField" in field &&

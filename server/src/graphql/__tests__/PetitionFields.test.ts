@@ -215,6 +215,7 @@ describe("GraphQL/Petition Fields", () => {
               requireApproval: false,
               options: {
                 hasPageBreak: false,
+                showNumbering: false,
               },
               isReadOnly: true,
               replies: [],
@@ -554,6 +555,43 @@ describe("GraphQL/Petition Fields", () => {
       expect(data?.createPetitionField).toEqual({
         type: "TEXT",
         isInternal: true,
+      });
+    });
+
+    it("creates a HEADING with enabled automatic numbering if petition is configured", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        automatic_numbering_config: { numbering_type: "NUMBERS" },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $type: PetitionFieldType!) {
+            createPetitionField(petitionId: $petitionId, type: $type) {
+              type
+              options
+              petition {
+                automaticNumberingConfig {
+                  numberingType
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          type: "HEADING",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionField).toEqual({
+        type: "HEADING",
+        options: { hasPageBreak: false, showNumbering: true },
+        petition: {
+          automaticNumberingConfig: {
+            numberingType: "NUMBERS",
+          },
+        },
       });
     });
   });
@@ -4355,6 +4393,7 @@ describe("GraphQL/Petition Fields", () => {
         hasCommentsEnabled: false,
         options: {
           hasPageBreak: false,
+          showNumbering: false,
         },
       });
     });

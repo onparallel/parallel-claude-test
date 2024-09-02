@@ -8,6 +8,7 @@ import { PropsWithChildren, createContext, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { PetitionFieldIndex, useFieldsWithIndices } from "../fieldIndices";
+import { useFieldLogic } from "../fieldLogic/useFieldLogic";
 import { isFileTypeField } from "../isFileTypeField";
 import { ArrayUnionToUnion, UnwrapArray } from "../types";
 import { DateLiquidValue, DateTimeLiquidValue, WithLabelLiquidValue } from "./LiquidValue";
@@ -24,9 +25,13 @@ export function LiquidScopeProvider({
 }>) {
   const intl = useIntl();
   const fieldsWithIndices = useFieldsWithIndices(petition);
+  const fieldLogic = useFieldLogic(petition, usePreviewReplies);
   const scope = useMemo(() => {
     const scope: Record<string, any> = { petitionId: petition.id, _: {} };
-    for (const [field, fieldIndex, childrenFieldIndices] of fieldsWithIndices) {
+    for (const [[field, fieldIndex, childrenFieldIndices], logic] of zip(
+      fieldsWithIndices,
+      fieldLogic,
+    )) {
       const replies =
         field.__typename === "PetitionField" && usePreviewReplies
           ? field.previewReplies
@@ -63,6 +68,12 @@ export function LiquidScopeProvider({
         if (isNonNullish(field.alias)) {
           scope[field.alias] = value;
         }
+      }
+      if (field.type === "HEADING") {
+        scope._[fieldIndex] = logic.headerNumber;
+      }
+      if (isNonNullish(field.alias)) {
+        scope[field.alias] = logic.headerNumber;
       }
     }
     return scope;
@@ -132,6 +143,7 @@ LiquidScopeProvider.fragments = {
         }
       }
       ...useFieldsWithIndices_PetitionBase
+      ...useFieldLogic_PetitionBase
     }
 
     fragment LiquidScopeProvider_PetitionField on PetitionField {
@@ -143,6 +155,7 @@ LiquidScopeProvider.fragments = {
     }
 
     ${useFieldsWithIndices.fragments.PetitionBase}
+    ${useFieldLogic.fragments.PetitionBase}
   `,
   PublicPetition: gql`
     fragment LiquidScopeProvider_PublicPetition on PublicPetition {
@@ -162,6 +175,7 @@ LiquidScopeProvider.fragments = {
         }
       }
       ...useFieldsWithIndices_PublicPetition
+      ...useFieldLogic_PublicPetition
     }
 
     fragment LiquidScopeProvider_PublicPetitionField on PublicPetitionField {
@@ -173,5 +187,6 @@ LiquidScopeProvider.fragments = {
     }
 
     ${useFieldsWithIndices.fragments.PublicPetition}
+    ${useFieldLogic.fragments.PublicPetition}
   `,
 };

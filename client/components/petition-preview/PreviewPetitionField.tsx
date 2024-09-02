@@ -289,6 +289,7 @@ export function PreviewPetitionField({
     return (
       <RecipientViewPetitionFieldHeading
         field={field}
+        headerNumber={fieldLogic.headerNumber}
         onDownloadAttachment={handleDownloadAttachment(field.id)}
         onCommentsButtonClick={onCommentsButtonClick}
       />

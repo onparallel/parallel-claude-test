@@ -112,6 +112,29 @@ type AsyncFieldCompletionResponse {
   url: String!
 }
 
+"""
+The automatic numbering settings of a petition
+"""
+type AutomaticNumberingConfig {
+  numberingType: AutomaticNumberingType!
+}
+
+"""
+The automatic numbering settings of a petition
+"""
+input AutomaticNumberingConfigInput {
+  numberingType: AutomaticNumberingType!
+}
+
+"""
+The type of a automatic numbering
+"""
+enum AutomaticNumberingType {
+  LETTERS
+  NUMBERS
+  ROMAN_NUMERALS
+}
+
 interface BackgroundCheckEntityDetails {
   createdAt: DateTime
   id: String!
@@ -1735,6 +1758,11 @@ type Mutation {
   dynamicSelectFieldFileDownloadLink(fieldId: GID!, petitionId: GID!): FileUploadDownloadLinkResult!
 
   """
+  sets automatic numbering on all petition HEADINGs
+  """
+  enableAutomaticNumberingOnPetitionFields(petitionId: GID!): PetitionBase!
+
+  """
   Generates a download link for a file reply.
   """
   fileUploadReplyDownloadLink(
@@ -3257,6 +3285,11 @@ type Petition implements PetitionBase {
   attachmentsList: PetitionAttachmentsList!
 
   """
+  The automatic numbering settings of the petition.
+  """
+  automaticNumberingConfig: AutomaticNumberingConfig
+
+  """
   Time when the petition was closed.
   """
   closedAt: DateTime
@@ -3648,6 +3681,11 @@ interface PetitionBase {
   The attachments linked to this petition
   """
   attachmentsList: PetitionAttachmentsList!
+
+  """
+  The automatic numbering settings of the petition.
+  """
+  automaticNumberingConfig: AutomaticNumberingConfig
 
   """
   The closing email body of the petition.
@@ -5072,6 +5110,11 @@ type PetitionTemplate implements PetitionBase {
   The attachments linked to this petition
   """
   attachmentsList: PetitionAttachmentsList!
+
+  """
+  The automatic numbering settings of the petition.
+  """
+  automaticNumberingConfig: AutomaticNumberingConfig
   backgroundColor: String
   categories: [String!]
 
@@ -5973,6 +6016,11 @@ type PublicOrganization {
 A public view of the petition
 """
 type PublicPetition implements Timestamps {
+  """
+  The automatic numbering settings of the petition.
+  """
+  automaticNumberingConfig: AutomaticNumberingConfig
+
   """
   The body of the optional completing message to be show to recipients.
   """
@@ -7632,6 +7680,7 @@ input UpdatePetitionFieldReplyInput {
 input UpdatePetitionInput {
   anonymizeAfterMonths: Int
   anonymizePurpose: String
+  automaticNumberingConfig: AutomaticNumberingConfigInput
   closingEmailBody: JSON
   completingMessageBody: JSON
   completingMessageSubject: String

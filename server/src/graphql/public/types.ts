@@ -330,6 +330,13 @@ export const PublicPetition = objectType({
           petitionId: root.id,
         }),
     });
+    t.nullable.field("automaticNumberingConfig", {
+      type: "AutomaticNumberingConfig",
+      description: "The automatic numbering settings of the petition.",
+      resolve: async (root) => {
+        return root.automatic_numbering_config;
+      },
+    });
   },
 });
 

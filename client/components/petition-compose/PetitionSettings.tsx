@@ -22,6 +22,7 @@ import {
   DocumentIcon,
   EmailIcon,
   FieldDateIcon,
+  FieldNumberIcon,
   FolderIcon,
   LinkIcon,
   ListIcon,
@@ -39,6 +40,7 @@ import {
   PetitionSettings_UserFragment,
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionSettings_createPublicPetitionLinkDocument,
+  PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
@@ -90,6 +92,7 @@ import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionD
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
+import { useConfigureAutomaticNumberingDialog } from "./dialogs/ConfigureAutomaticNumberingDialog";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -414,6 +417,34 @@ function _PetitionSettings({
       await onUpdatePetition({ defaultPath: path });
     } catch {}
   }
+
+  const showConfigureAutomaticNumberingDialog = useConfigureAutomaticNumberingDialog();
+  const handleAutomaticNumberingChange = async (value: boolean) => {
+    if (value) {
+      handleConfigureAutomaticNumberingClick();
+    } else {
+      await onUpdatePetition({ automaticNumberingConfig: null });
+    }
+  };
+
+  const [enableAutomaticNumberingOnPetitionFields] = useMutation(
+    PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
+  );
+  const handleConfigureAutomaticNumberingClick = async () => {
+    try {
+      const { numberingType, updateExistingFields } = await showConfigureAutomaticNumberingDialog({
+        numberingType: petition.automaticNumberingConfig?.numberingType,
+      });
+      await onUpdatePetition({
+        automaticNumberingConfig: {
+          numberingType,
+        },
+      });
+      if (updateExistingFields) {
+        await enableAutomaticNumberingOnPetitionFields({ variables: { petitionId: petition.id } });
+      }
+    } catch {}
+  };
 
   return (
     <Stack padding={4} spacing={2}>
@@ -866,6 +897,41 @@ function _PetitionSettings({
               controlId="enable-esignature"
             />
           ) : null}
+
+          <SettingsRowButton
+            data-section="auto-enumeration-settings"
+            isDisabled={settingIsDisabled}
+            icon={<FieldNumberIcon />}
+            label={
+              <HStack>
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.petition-settings.petition-automatic-numbering"
+                    defaultMessage="Automatic numbering"
+                  />
+                </Text>
+                <HelpPopover popoverWidth="2xs">
+                  <Text marginBottom={2}>
+                    <FormattedMessage
+                      id="component.petition-settings.automatic-numbering-description1"
+                      defaultMessage="Adds numbering to text blocks with numbering enabled."
+                    />
+                  </Text>
+                  <Text>
+                    <FormattedMessage
+                      id="component.petition-settings.automatic-numbering-description"
+                      defaultMessage="The number will dynamically change to match the order in which it appears on the form."
+                    />
+                  </Text>
+                </HelpPopover>
+              </HStack>
+            }
+            isActive={Boolean(petition.automaticNumberingConfig)}
+            onAdd={() => handleAutomaticNumberingChange(true)}
+            onRemove={() => handleAutomaticNumberingChange(false)}
+            onConfig={() => handleConfigureAutomaticNumberingClick()}
+            controlId="enable-auto-enumeration"
+          />
         </>
       ) : null}
       {petition.__typename === "Petition" || user.hasAutoAnonymize ? (
@@ -1014,6 +1080,9 @@ const fragments = {
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword
+      automaticNumberingConfig {
+        numberingType
+      }
       selectedDocumentTheme {
         id
         name
@@ -1172,6 +1241,17 @@ const mutations = [
       }
     }
     ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
+  `,
+  gql`
+    mutation PetitionSettings_enableAutomaticNumberingOnPetitionFields($petitionId: GID!) {
+      enableAutomaticNumberingOnPetitionFields(petitionId: $petitionId) {
+        id
+        fields {
+          id
+          options
+        }
+      }
+    }
   `,
 ];
 

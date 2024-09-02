@@ -126,6 +126,10 @@ export interface NexusGenInputs {
     expiryDate?: NexusGenScalars["Date"] | null; // Date
     profileTypeFieldId: NexusGenScalars["GID"]; // GID!
   };
+  AutomaticNumberingConfigInput: {
+    // input type
+    numberingType: NexusGenEnums["AutomaticNumberingType"]; // AutomaticNumberingType!
+  };
   CreateContactInput: {
     // input type
     email: string; // String!
@@ -388,6 +392,7 @@ export interface NexusGenInputs {
     // input type
     anonymizeAfterMonths?: number | null; // Int
     anonymizePurpose?: string | null; // String
+    automaticNumberingConfig?: NexusGenInputs["AutomaticNumberingConfigInput"] | null; // AutomaticNumberingConfigInput
     closingEmailBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject?: string | null; // String
@@ -469,6 +474,7 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   AiCompletionLogStatus: db.AiCompletionLogStatus;
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction: "APPEND" | "IGNORE" | "OVERWRITE";
+  AutomaticNumberingType: "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
   BackgroundCheckEntitySearchType: "COMPANY" | "PERSON";
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult:
@@ -647,6 +653,9 @@ export interface NexusGenObjects {
     // root type
     type: string; // String!
     url: string; // String!
+  };
+  AutomaticNumberingConfig: {
+    numbering_type: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS";
   };
   BackgroundCheckEntityDetailsCompany: {
     // root type
@@ -1468,6 +1477,10 @@ export interface NexusGenFieldTypes {
     type: string; // String!
     url: string; // String!
   };
+  AutomaticNumberingConfig: {
+    // field return type
+    numberingType: NexusGenEnums["AutomaticNumberingType"]; // AutomaticNumberingType!
+  };
   BackgroundCheckEntityDetailsCompany: {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -1987,6 +2000,7 @@ export interface NexusGenFieldTypes {
     disassociatePetitionFromProfile: NexusGenEnums["Success"]; // Success!
     disassociateProfileFromPetition: NexusGenEnums["Success"]; // Success!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    enableAutomaticNumberingOnPetitionFields: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
@@ -2217,6 +2231,7 @@ export interface NexusGenFieldTypes {
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2757,6 +2772,7 @@ export interface NexusGenFieldTypes {
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -3176,6 +3192,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetition: {
     // field return type
+    automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     completingMessageBody: string | null; // String
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3863,6 +3880,7 @@ export interface NexusGenFieldTypes {
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
@@ -4040,6 +4058,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     type: "String";
     url: "String";
+  };
+  AutomaticNumberingConfig: {
+    // field return type name
+    numberingType: "AutomaticNumberingType";
   };
   BackgroundCheckEntityDetailsCompany: {
     // field return type name
@@ -4560,6 +4582,7 @@ export interface NexusGenFieldTypeNames {
     disassociatePetitionFromProfile: "Success";
     disassociateProfileFromPetition: "Success";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
+    enableAutomaticNumberingOnPetitionFields: "PetitionBase";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
@@ -4790,6 +4813,7 @@ export interface NexusGenFieldTypeNames {
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
     attachmentsList: "PetitionAttachmentsList";
+    automaticNumberingConfig: "AutomaticNumberingConfig";
     closedAt: "DateTime";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
@@ -5330,6 +5354,7 @@ export interface NexusGenFieldTypeNames {
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
     attachmentsList: "PetitionAttachmentsList";
+    automaticNumberingConfig: "AutomaticNumberingConfig";
     backgroundColor: "String";
     categories: "String";
     closingEmailBody: "JSON";
@@ -5749,6 +5774,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetition: {
     // field return type name
+    automaticNumberingConfig: "AutomaticNumberingConfig";
     completingMessageBody: "String";
     completingMessageSubject: "String";
     createdAt: "DateTime";
@@ -6436,6 +6462,7 @@ export interface NexusGenFieldTypeNames {
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
     attachmentsList: "PetitionAttachmentsList";
+    automaticNumberingConfig: "AutomaticNumberingConfig";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
@@ -7137,6 +7164,10 @@ export interface NexusGenArgTypes {
     dynamicSelectFieldFileDownloadLink: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    enableAutomaticNumberingOnPetitionFields: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     fileUploadReplyDownloadLink: {

@@ -138,6 +138,26 @@ export const PetitionBaseOrFolder = unionType({
   `,
 });
 
+export const AutomaticNumberingType = enumType({
+  name: "AutomaticNumberingType",
+  description: "The type of a automatic numbering",
+  members: ["NUMBERS", "LETTERS", "ROMAN_NUMERALS"],
+});
+
+export const AutomaticNumberingConfig = objectType({
+  name: "AutomaticNumberingConfig",
+  description: "The automatic numbering settings of a petition",
+  definition(t) {
+    t.field("numberingType", {
+      type: "AutomaticNumberingType",
+      resolve: (o) => o.numbering_type,
+    });
+  },
+  sourceType: /* ts */ `{
+    numbering_type: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS"
+  }`,
+});
+
 export const PetitionBase = interfaceType({
   name: "PetitionBase",
   definition(t) {
@@ -374,6 +394,13 @@ export const PetitionBase = interfaceType({
       type: "PetitionFieldGroupRelationship",
       resolve: async (o, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(o.id);
+      },
+    });
+    t.nullable.field("automaticNumberingConfig", {
+      type: "AutomaticNumberingConfig",
+      description: "The automatic numbering settings of the petition.",
+      resolve: async (o) => {
+        return o.automatic_numbering_config;
       },
     });
   },

@@ -22,6 +22,7 @@ export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionF
 export interface FieldOptions {
   HEADING: {
     hasPageBreak: boolean;
+    showNumbering?: boolean;
   };
   FILE_UPLOAD: {
     accepts: Maybe<FileUploadAccepts[]>;

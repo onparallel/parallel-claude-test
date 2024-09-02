@@ -6,7 +6,12 @@
 import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionField, PetitionFieldReply } from "../db/__types";
-import type { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
+import type {
+  AutomaticNumberingConfig,
+  PetitionCustomList,
+  PetitionVariable,
+} from "../db/repositories/PetitionRepository";
+import { letters, numbers, romanNumerals } from "./autoIncremental";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { fromGlobalId, toGlobalId } from "./globalId";
 import { Maybe, UnwrapArray } from "./types";
@@ -95,6 +100,7 @@ export interface PetitionFieldLogic<TID extends number | string = number> {
 
 interface FieldLogic {
   isVisible: boolean;
+  headerNumber?: string | null;
   previousVariables: Record<string, number>;
   currentVariables: Record<string, number>;
   finalVariables: Record<string, number>;
@@ -132,6 +138,7 @@ interface FieldLogicPetitionInput<TID = number | string> {
   variables: PetitionVariable[];
   fields: FieldLogicPetitionFieldInput<TID>[];
   custom_lists: PetitionCustomList[];
+  automatic_numbering_config?: AutomaticNumberingConfig | null;
 }
 
 /** maps fieldIds inside logic condition from globalId to number and vice-versa */
@@ -201,6 +208,15 @@ export function applyFieldVisibility<T extends FieldLogicPetitionInput>(petition
 export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
   petition: T,
 ): FieldLogicResult[] {
+  const headerNumbers =
+    petition.automatic_numbering_config?.numbering_type === "NUMBERS"
+      ? numbers()
+      : petition.automatic_numbering_config?.numbering_type === "LETTERS"
+        ? letters()
+        : petition.automatic_numbering_config?.numbering_type === "ROMAN_NUMERALS"
+          ? romanNumerals()
+          : null;
+
   return Array.from(
     (function* () {
       const fields = petition.fields;
@@ -263,6 +279,18 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
         } else {
           return currentVariables[operand.name];
         }
+      }
+
+      function getNextEnumeration(field: Pick<PetitionField, "type" | "options">) {
+        if (
+          isNonNullish(headerNumbers) &&
+          field.type === "HEADING" &&
+          field.options.showNumbering
+        ) {
+          return `${headerNumbers.next().value}`;
+        }
+
+        return null;
       }
 
       for (const field of fields) {
@@ -402,6 +430,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
             previousVariables,
             finalVariables: currentVariables,
             groupChildrenLogic,
+            headerNumber: null,
           };
         } else {
           yield {
@@ -409,6 +438,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
             currentVariables: { ...currentVariables },
             previousVariables,
             finalVariables: currentVariables,
+            headerNumber: visibilitiesById[field.id] ? getNextEnumeration(field) : null,
           };
         }
       }

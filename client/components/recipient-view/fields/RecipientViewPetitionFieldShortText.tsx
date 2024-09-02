@@ -150,8 +150,8 @@ export function RecipientViewPetitionFieldShortText({
       setIsSaving(true);
       try {
         const replyId = await onCreateReply({ value });
-        if (replyId) {
-          const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
+        if (replyId && newReplyRef.current) {
+          const selection = pick(newReplyRef.current, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
             await waitFor(1);

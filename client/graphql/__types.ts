@@ -143,6 +143,20 @@ export interface AsyncFieldCompletionResponse {
   url: Scalars["String"]["output"];
 }
 
+/** The automatic numbering settings of a petition */
+export interface AutomaticNumberingConfig {
+  __typename?: "AutomaticNumberingConfig";
+  numberingType: AutomaticNumberingType;
+}
+
+/** The automatic numbering settings of a petition */
+export interface AutomaticNumberingConfigInput {
+  numberingType: AutomaticNumberingType;
+}
+
+/** The type of a automatic numbering */
+export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
+
 export interface BackgroundCheckEntityDetails {
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["String"]["output"];
@@ -1068,6 +1082,8 @@ export interface Mutation {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
+  /** sets automatic numbering on all petition HEADINGs */
+  enableAutomaticNumberingOnPetitionFields: PetitionBase;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Forces an update of the branding of every signature integration of the selected organization. */
@@ -1921,6 +1937,10 @@ export interface MutationdisassociateProfileFromPetitionArgs {
 
 export interface MutationdynamicSelectFieldFileDownloadLinkArgs {
   fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationenableAutomaticNumberingOnPetitionFieldsArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
@@ -2989,6 +3009,8 @@ export interface Petition extends PetitionBase {
   anonymizePurpose?: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig?: Maybe<AutomaticNumberingConfig>;
   /** Time when the petition was closed. */
   closedAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The closing email body of the petition. */
@@ -3201,6 +3223,8 @@ export interface PetitionBase {
   anonymizePurpose?: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig?: Maybe<AutomaticNumberingConfig>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]["output"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -4124,6 +4148,8 @@ export interface PetitionTemplate extends PetitionBase {
   anonymizePurpose?: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig?: Maybe<AutomaticNumberingConfig>;
   backgroundColor?: Maybe<Scalars["String"]["output"]>;
   categories?: Maybe<Array<Scalars["String"]["output"]>>;
   /** The closing email body of the petition. */
@@ -4823,6 +4849,8 @@ export interface PublicOrganizationlogoUrlArgs {
 /** A public view of the petition */
 export interface PublicPetition extends Timestamps {
   __typename?: "PublicPetition";
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig?: Maybe<AutomaticNumberingConfig>;
   /** The body of the optional completing message to be show to recipients. */
   completingMessageBody?: Maybe<Scalars["String"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
@@ -6000,6 +6028,7 @@ export interface UpdatePetitionFieldReplyInput {
 export interface UpdatePetitionInput {
   anonymizeAfterMonths?: InputMaybe<Scalars["Int"]["input"]>;
   anonymizePurpose?: InputMaybe<Scalars["String"]["input"]>;
+  automaticNumberingConfig?: InputMaybe<AutomaticNumberingConfigInput>;
   closingEmailBody?: InputMaybe<Scalars["JSON"]["input"]>;
   completingMessageBody?: InputMaybe<Scalars["JSON"]["input"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]["input"]>;
@@ -7298,6 +7327,10 @@ export type RecipientSelectGroups_PetitionFragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -11022,6 +11055,10 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -11216,6 +11253,10 @@ export type AddPetitionAccessDialog_petitionQuery = {
             } | null>;
           };
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -11421,6 +11462,10 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
           } | null>;
         };
       }>;
+      automaticNumberingConfig?: {
+        __typename?: "AutomaticNumberingConfig";
+        numberingType: AutomaticNumberingType;
+      } | null;
       variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
       customLists: Array<{
         __typename?: "PetitionCustomList";
@@ -12608,6 +12653,10 @@ export type SuggestedSigners_PublicPetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -12732,6 +12781,10 @@ export type SuggestedSigners_PetitionBase_Petition_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -12824,6 +12877,10 @@ export type SuggestedSigners_PetitionBase_PetitionTemplate_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -13036,6 +13093,10 @@ export type ConfirmPetitionSignersDialog_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -13720,6 +13781,10 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -13840,6 +13905,10 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -16014,6 +16083,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     };
   } | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -16199,6 +16272,10 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
     | { __typename?: "TemplateDefaultUserPermission"; id: string }
   >;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -16484,6 +16561,32 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
         }
     >;
   };
+};
+
+export type PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutation = {
+  enableAutomaticNumberingOnPetitionFields:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          options: { [key: string]: any };
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          options: { [key: string]: any };
+        }>;
+      };
 };
 
 export type CompliancePeriodDialog_PetitionBase_Petition_Fragment = {
@@ -17465,6 +17568,10 @@ export type PetitionComposeFieldSettings_PetitionBase_Petition_Fragment = {
     leftSidePetitionField: { __typename?: "PetitionField"; id: string };
     rightSidePetitionField: { __typename?: "PetitionField"; id: string };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
 };
 
 export type PetitionComposeFieldSettings_PetitionBase_PetitionTemplate_Fragment = {
@@ -17479,6 +17586,10 @@ export type PetitionComposeFieldSettings_PetitionBase_PetitionTemplate_Fragment 
     leftSidePetitionField: { __typename?: "PetitionField"; id: string };
     rightSidePetitionField: { __typename?: "PetitionField"; id: string };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
 };
 
 export type PetitionComposeFieldSettings_PetitionBaseFragment =
@@ -18532,6 +18643,10 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -18679,6 +18794,10 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -18811,6 +18930,10 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -19881,6 +20004,10 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -20013,6 +20140,10 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -20594,6 +20725,10 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment =
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -20678,6 +20813,10 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_PetitionTemplate_Fr
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -20915,6 +21054,10 @@ export type NewSignatureRequestRow_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -22053,6 +22196,10 @@ export type PetitionSignaturesCard_PetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -22322,6 +22469,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             }>;
           }> | null;
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -22631,6 +22782,10 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         }>;
       }> | null;
     }>;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -22900,6 +23055,10 @@ export type PetitionSignaturesCard_petitionQuery = {
             }>;
           }> | null;
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -23868,6 +24027,10 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
       expiryAlertAheadTime?: Duration | null;
     } | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -24165,6 +24328,10 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
             expiryAlertAheadTime?: Duration | null;
           } | null;
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -26501,6 +26668,10 @@ export type RecipientViewContents_PublicPetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -26589,6 +26760,10 @@ export type RecipientViewContents_PetitionBase_Petition_Fragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -26677,6 +26852,10 @@ export type RecipientViewContents_PetitionBase_PetitionTemplate_Fragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -26955,6 +27134,10 @@ export type RecipientViewProgressBar_PetitionFragment = {
     }>;
   }>;
   signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -27122,6 +27305,10 @@ export type RecipientViewProgressBar_PublicPetitionFragment = {
     }> | null;
   }>;
   signatureConfig?: { __typename?: "PublicSignatureConfig"; review: boolean } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -27247,6 +27434,10 @@ export type RecipientViewSidebar_PublicPetitionAccessFragment = {
       firstName: string;
       email: string;
     }>;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -27412,6 +27603,10 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment 
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -27500,6 +27695,10 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFra
         }>;
       }> | null;
     }>;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -27589,6 +27788,10 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
         }>;
       }> | null;
     }>;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -28180,6 +28383,10 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -32581,6 +32788,10 @@ export type PetitionActivity_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -33845,6 +34056,10 @@ export type PetitionActivity_updatePetitionMutation = {
             } | null>;
           };
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -35189,6 +35404,10 @@ export type PetitionActivity_petitionQuery = {
             } | null>;
           };
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -35552,6 +35771,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     };
   } | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
@@ -35859,6 +36082,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
     | { __typename?: "TemplateDefaultUserPermission"; id: string }
   >;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
@@ -36321,6 +36548,10 @@ export type PetitionCompose_updatePetitionMutation = {
           };
         } | null;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -36560,6 +36791,10 @@ export type PetitionCompose_updatePetitionMutation = {
           | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
           | { __typename?: "TemplateDefaultUserPermission"; id: string }
         >;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -38695,6 +38930,10 @@ export type PetitionCompose_petitionQuery = {
           };
         } | null;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
@@ -39024,6 +39263,10 @@ export type PetitionCompose_petitionQuery = {
           | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
           | { __typename?: "TemplateDefaultUserPermission"; id: string }
         >;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
@@ -40341,6 +40584,10 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
         }
     >;
   } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -40737,6 +40984,10 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       lastName?: string | null;
       isPreset: boolean;
     } | null>;
+  } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
   } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -41294,6 +41545,10 @@ export type PetitionPreview_updatePetitionMutation = {
               }
           >;
         } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -41697,6 +41952,10 @@ export type PetitionPreview_updatePetitionMutation = {
             lastName?: string | null;
             isPreset: boolean;
           } | null>;
+        } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
@@ -42199,6 +42458,10 @@ export type PetitionPreview_completePetitionMutation = {
             } | null;
           }
       >;
+    } | null;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -42703,6 +42966,10 @@ export type PetitionPreview_petitionQuery = {
               }
           >;
         } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -43106,6 +43373,10 @@ export type PetitionPreview_petitionQuery = {
             lastName?: string | null;
             isPreset: boolean;
           } | null>;
+        } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
@@ -43828,6 +44099,10 @@ export type PetitionReplies_PetitionFragment = {
       isDefault: boolean;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
+  } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
   } | null;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
@@ -44801,6 +45076,10 @@ export type PetitionReplies_closePetitionMutation = {
         environment: SignatureOrgIntegrationEnvironment;
       } | null;
     } | null;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
     latestSummaryRequest?: {
@@ -45545,6 +45824,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         isDefault: boolean;
         environment: SignatureOrgIntegrationEnvironment;
       } | null;
+    } | null;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
     } | null;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
@@ -46450,6 +46733,10 @@ export type PetitionReplies_petitionQuery = {
             isDefault: boolean;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
+        } | null;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
         } | null;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -49064,6 +49351,10 @@ export type RecipientView_PublicPetitionAccessFragment = {
         signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
       }>;
     } | null;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -49252,6 +49543,10 @@ export type RecipientView_PublicPetitionFragment = {
       signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
     }>;
   } | null;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -49435,6 +49730,10 @@ export type RecipientView_publicCompletePetitionMutation = {
         status: string;
         signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
       }>;
+    } | null;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
@@ -49642,6 +49941,10 @@ export type RecipientView_accessQuery = {
           status: string;
           signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
         }>;
+      } | null;
+      automaticNumberingConfig?: {
+        __typename?: "AutomaticNumberingConfig";
+        numberingType: AutomaticNumberingType;
       } | null;
       variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
       customLists: Array<{
@@ -50438,6 +50741,10 @@ export type useAllFieldsWithIndices_PetitionBaseFragment =
 
 export type useFieldLogic_PublicPetitionFragment = {
   __typename?: "PublicPetition";
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
@@ -50542,6 +50849,10 @@ export type useFieldLogic_PublicPetitionFieldInnerFragment = {
 
 export type useFieldLogic_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
@@ -50620,6 +50931,10 @@ export type useFieldLogic_PetitionBase_Petition_Fragment = {
 
 export type useFieldLogic_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
@@ -50902,40 +51217,83 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
     multiple: boolean;
     alias?: string | null;
     options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           alias?: string | null;
-          options: { [key: string]: any };
+          parent?: { __typename?: "PetitionField"; id: string } | null;
         };
-        replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
       }> | null;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           alias?: string | null;
-          options: { [key: string]: any };
         };
-        replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
       }> | null;
     }>;
-    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
@@ -50948,40 +51306,83 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
     multiple: boolean;
     alias?: string | null;
     options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           alias?: string | null;
-          options: { [key: string]: any };
+          parent?: { __typename?: "PetitionField"; id: string } | null;
         };
-        replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
       }> | null;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           alias?: string | null;
-          options: { [key: string]: any };
         };
-        replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
       }> | null;
     }>;
-    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type LiquidScopeProvider_PetitionBaseFragment =
@@ -51007,27 +51408,53 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
     multiple: boolean;
     alias?: string | null;
     options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       content: { [key: string]: any };
+      id: string;
+      isAnonymized: boolean;
       children?: Array<{
         __typename?: "PublicPetitionFieldGroupChildReply";
         field: {
           __typename?: "PublicPetitionField";
           id: string;
           type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           alias?: string | null;
-          options: { [key: string]: any };
         };
         replies: Array<{
           __typename?: "PublicPetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
+          isAnonymized: boolean;
         }>;
       }> | null;
     }>;
-    children?: Array<{ __typename?: "PublicPetitionField"; id: string }> | null;
+    children?: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PublicPetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type LiquidScopeProvider_PublicPetitionFieldFragment = {
@@ -52274,6 +52701,10 @@ export type useGetPetitionPages_PublicPetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -52354,6 +52785,10 @@ export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -52434,6 +52869,10 @@ export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
       }> | null;
     }>;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -52598,6 +53037,10 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -52723,6 +53166,10 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -52805,6 +53252,10 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
       }>;
     }> | null;
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -53311,6 +53762,10 @@ export type useStartSignatureRequest_PetitionFragment = {
       } | null>;
     };
   }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
@@ -53509,6 +53964,10 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
             } | null>;
           };
         }>;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -53712,6 +54171,10 @@ export type useStartSignatureRequest_completePetitionMutation = {
         } | null>;
       };
     }>;
+    automaticNumberingConfig?: {
+      __typename?: "AutomaticNumberingConfig";
+      numberingType: AutomaticNumberingType;
+    } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
@@ -57144,6 +57607,9 @@ export const useFieldLogic_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<useFieldLogic_PetitionFieldFragment, unknown>;
 export const useFieldLogic_PetitionBaseFragmentDoc = gql`
   fragment useFieldLogic_PetitionBase on PetitionBase {
+    automaticNumberingConfig {
+      numberingType
+    }
     variables {
       name
       defaultValue
@@ -58971,6 +59437,9 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRecipientViewContentsHidden
     isRestricted
     isRestrictedWithPassword
+    automaticNumberingConfig {
+      numberingType
+    }
     selectedDocumentTheme {
       id
       name
@@ -59121,6 +59590,9 @@ export const PetitionComposeFieldSettings_PetitionBaseFragmentDoc = gql`
       rightSidePetitionField {
         id
       }
+    }
+    automaticNumberingConfig {
+      numberingType
     }
   }
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_PetitionBaseFragment, unknown>;
@@ -59921,9 +60393,11 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
       }
     }
     ...useFieldsWithIndices_PetitionBase
+    ...useFieldLogic_PetitionBase
   }
   ${LiquidScopeProvider_PetitionFieldFragmentDoc}
   ${useFieldsWithIndices_PetitionBaseFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<LiquidScopeProvider_PetitionBaseFragment, unknown>;
 export const PreviewPetitionFieldBackgroundCheck_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldBackgroundCheck_PetitionField on PetitionField {
@@ -61835,6 +62309,9 @@ export const useFieldLogic_PublicPetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<useFieldLogic_PublicPetitionFieldFragment, unknown>;
 export const useFieldLogic_PublicPetitionFragmentDoc = gql`
   fragment useFieldLogic_PublicPetition on PublicPetition {
+    automaticNumberingConfig {
+      numberingType
+    }
     variables {
       name
       defaultValue
@@ -61978,9 +62455,11 @@ export const LiquidScopeProvider_PublicPetitionFragmentDoc = gql`
       }
     }
     ...useFieldsWithIndices_PublicPetition
+    ...useFieldLogic_PublicPetition
   }
   ${LiquidScopeProvider_PublicPetitionFieldFragmentDoc}
   ${useFieldsWithIndices_PublicPetitionFragmentDoc}
+  ${useFieldLogic_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<LiquidScopeProvider_PublicPetitionFragment, unknown>;
 export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
   fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
@@ -64077,6 +64556,20 @@ export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
 ` as unknown as DocumentNode<
   PetitionSettings_updateTemplateDefaultPermissionsMutation,
   PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
+>;
+export const PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument = gql`
+  mutation PetitionSettings_enableAutomaticNumberingOnPetitionFields($petitionId: GID!) {
+    enableAutomaticNumberingOnPetitionFields(petitionId: $petitionId) {
+      id
+      fields {
+        id
+        options
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutation,
+  PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutationVariables
 >;
 export const ConfigureAutomateSearchDialog_petitionDocument = gql`
   query ConfigureAutomateSearchDialog_petition($id: GID!) {

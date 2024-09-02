@@ -1,38 +1,56 @@
 import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
 import { isNonNullish, zip } from "remeda";
-import { PetitionField } from "../db/__types";
+import { PetitionField, PetitionFieldReply } from "../db/__types";
+import type {
+  AutomaticNumberingConfig,
+  PetitionCustomList,
+  PetitionVariable,
+} from "../db/repositories/PetitionRepository";
 import {
   DateLiquidValue,
   DateTimeLiquidValue,
   WithLabelLiquidValue,
 } from "../pdf/utils/liquid/LiquidValue";
 import { getFieldsWithIndices } from "./fieldIndices";
-import { FieldLogicResult } from "./fieldLogic";
+import { evaluateFieldLogic, FieldLogicResult } from "./fieldLogic";
 import { isFileTypeField } from "./isFileTypeField";
+import { Maybe } from "./types";
 
 interface InnerPetitionFieldLiquidScope
-  extends Pick<PetitionField, "type" | "multiple" | "alias" | "options"> {
+  extends Pick<PetitionField, "type" | "multiple" | "alias" | "options" | "visibility" | "math"> {
   id: string;
 }
 
+interface InnerPetitionFieldReplyLiquidScope
+  extends Pick<PetitionFieldReply, "content" | "anonymized_at"> {}
+
 interface PetitionFieldLiquidScope extends InnerPetitionFieldLiquidScope {
-  replies: {
-    content: any;
-    children:
-      | {
-          field: InnerPetitionFieldLiquidScope;
-          replies: {
-            content: any;
-          }[];
-        }[]
-      | null;
-  }[];
+  children?: Maybe<
+    (InnerPetitionFieldLiquidScope & {
+      parent?: Maybe<Pick<InnerPetitionFieldLiquidScope, "id">>;
+      replies: InnerPetitionFieldReplyLiquidScope[];
+    })[]
+  >;
+  replies: (InnerPetitionFieldReplyLiquidScope & {
+    children?: Maybe<
+      {
+        field: Pick<
+          InnerPetitionFieldLiquidScope,
+          "id" | "type" | "multiple" | "alias" | "options"
+        >;
+        replies: InnerPetitionFieldReplyLiquidScope[];
+      }[]
+    >;
+  })[];
 }
 
 interface PetitionLiquidScope {
   id: string;
   fields: PetitionFieldLiquidScope[];
+  variables: PetitionVariable[];
+  custom_lists: PetitionCustomList[];
+  automatic_numbering_config: AutomaticNumberingConfig | null;
 }
 
 function getReplyValue(
@@ -74,9 +92,13 @@ function getReplyValue(
 
 export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, intl: IntlShape) {
   const fieldsWithIndices = getFieldsWithIndices(petition.fields);
+  const fieldLogic = evaluateFieldLogic(petition);
   const scope: Record<string, any> = { petitionId: petition.id, _: {} };
 
-  for (const [field, fieldIndex, childrenFieldIndices] of fieldsWithIndices) {
+  for (const [[field, fieldIndex, childrenFieldIndices], logic] of zip(
+    fieldsWithIndices,
+    fieldLogic,
+  )) {
     const replies = field.replies;
     let values: any[];
     if (field.type === "FIELD_GROUP") {
@@ -110,6 +132,13 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
       if (isNonNullish(field.alias)) {
         scope[field.alias] = value;
       }
+    }
+
+    if (field.type === "HEADING") {
+      scope._[fieldIndex] = logic.headerNumber;
+    }
+    if (isNonNullish(field.alias)) {
+      scope[field.alias] = logic.headerNumber;
     }
   }
   return scope;

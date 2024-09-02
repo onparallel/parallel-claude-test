@@ -16,6 +16,7 @@ import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
 import {
+  AutomaticNumberingConfig,
   PetitionCustomList,
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
@@ -38,6 +39,7 @@ export interface TableTypes
           summary_config: PetitionSummaryConfig | null;
           variables: PetitionVariable[];
           custom_lists: PetitionCustomList[] | null;
+          automatic_numbering_config: AutomaticNumberingConfig | null;
         }
       >;
       petition_signature_request: Replace<
@@ -67,6 +69,7 @@ export interface TableCreateTypes
           signature_config?: PetitionSignatureConfig | null;
           summary_config?: PetitionSummaryConfig | null;
           variables?: PetitionVariable[] | null;
+          automatic_numbering_config?: AutomaticNumberingConfig | null;
         }
       >;
       petition_signature_request: Replace<

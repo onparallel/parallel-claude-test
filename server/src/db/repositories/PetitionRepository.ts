@@ -28,7 +28,7 @@ import { validateReferencingFieldsPositions } from "../../graphql/helpers/valida
 import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
-import { average, unMaybeArray, zipX } from "../../util/arrays";
+import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {
   PetitionFieldMath,
@@ -240,6 +240,10 @@ export interface PetitionSummaryConfig {
   integration_id: number;
   prompt: AiCompletionPrompt[];
   model: string;
+}
+
+export interface AutomaticNumberingConfig {
+  numbering_type: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS";
 }
 
 type TemplateDefaultPermissionInput = {
@@ -2835,6 +2839,24 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => fieldsByPetition[id] ?? []);
   }
 
+  async getComposedPetitionProperties(petitionIds: number[]) {
+    const properties = await this.from("petition")
+      .whereIn("id", petitionIds)
+      .whereNull("deleted_at")
+      .select(["id", "variables", "custom_lists", "automatic_numbering_config"]);
+
+    const propertiesByPetitionId = indexBy(properties, (p) => p.id);
+
+    return petitionIds.map((id) => {
+      const petitionProperties = propertiesByPetitionId[id];
+      return {
+        variables: petitionProperties?.variables ?? [],
+        custom_lists: petitionProperties?.custom_lists ?? [],
+        automatic_numbering_config: petitionProperties?.automatic_numbering_config ?? null,
+      };
+    });
+  }
+
   async getPetitionVariables(petitionIds: number[]) {
     const petitionVariables = await this.from("petition")
       .whereIn("id", petitionIds)
@@ -2844,17 +2866,6 @@ export class PetitionRepository extends BaseRepository {
     const variablesByPetitionId = indexBy(petitionVariables, (v) => v.id);
 
     return petitionIds.map((id) => variablesByPetitionId[id]?.variables ?? []);
-  }
-
-  async getPetitionCustomLists(petitionIds: number[]) {
-    const petitionCustomLists = await this.from("petition")
-      .whereIn("id", petitionIds)
-      .whereNull("deleted_at")
-      .select(["id", "custom_lists"]);
-
-    const customListsByPetitionId = indexBy(petitionCustomLists, (v) => v.id);
-
-    return petitionIds.map((id) => customListsByPetitionId[id]?.custom_lists ?? []);
   }
 
   async getLastPetitionReplyStatusChangeEvents(petitionIds: number[]) {
@@ -2874,15 +2885,13 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getComposedPetitionFieldsAndVariables(petitionIds: number[]) {
-    const [fieldsWithRepliesByPetition, variablesByPetition, customListsByPetition] =
-      await Promise.all([
-        this.getPetitionFieldsWithReplies(petitionIds),
-        this.getPetitionVariables(petitionIds),
-        this.getPetitionCustomLists(petitionIds),
-      ]);
+    const [fieldsWithRepliesByPetition, propertiesByPetition] = await Promise.all([
+      this.getPetitionFieldsWithReplies(petitionIds),
+      this.getComposedPetitionProperties(petitionIds),
+    ]);
 
-    return zipX(fieldsWithRepliesByPetition, variablesByPetition, customListsByPetition).map(
-      ([fieldsWithReplies, variables, customLists]) => {
+    return zip(fieldsWithRepliesByPetition, propertiesByPetition).map(
+      ([fieldsWithReplies, petition]) => {
         const [fields, children] = partition(
           fieldsWithReplies,
           (f) => f.parent_petition_field_id === null,
@@ -2922,8 +2931,9 @@ export class PetitionRepository extends BaseRepository {
               replies: fieldReplies,
             };
           }),
-          variables,
-          custom_lists: customLists,
+          variables: petition.variables,
+          custom_lists: petition.custom_lists,
+          automatic_numbering_config: petition.automatic_numbering_config,
         };
       },
     );
@@ -5116,7 +5126,10 @@ export class PetitionRepository extends BaseRepository {
         this.loadFieldsForPetition.dataloader.clear(petitionId);
       }
 
-      const props = defaultFieldProperties(type, field);
+      const [petition] = await this.from("petition", t)
+        .where({ id: petitionId, deleted_at: null })
+        .select("automatic_numbering_config");
+      const props = defaultFieldProperties(type, field, petition);
       if (type === "ID_VERIFICATION") {
         const integrations = await this.from("org_integration", t)
           .where("org_id", user.org_id)
@@ -8755,5 +8768,26 @@ export class PetitionRepository extends BaseRepository {
         ],
       );
     }
+  }
+
+  async setAutomaticNumberingOnPetitionFields(
+    petitionId: number,
+    showNumbering: boolean,
+    updatedBy: string,
+  ) {
+    await this.from("petition_field")
+      .where({
+        petition_id: petitionId,
+        type: "HEADING",
+        deleted_at: null,
+      })
+      .update({
+        options: this.knex.raw(
+          /* sql */ `options || jsonb_build_object('showNumbering', ?::boolean)`,
+          [showNumbering],
+        ),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
   }
 }

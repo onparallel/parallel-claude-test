@@ -10,6 +10,7 @@ import { RecipientViewPetitionFieldLayout_PetitionFieldSelection } from "./Recip
 
 export interface RecipientViewPetitionFieldHeadingProps {
   field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  headerNumber?: string | null;
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick?: () => void;
 }
@@ -18,10 +19,13 @@ export const RecipientViewPetitionFieldHeading = chakraForwardRef<
   "div",
   RecipientViewPetitionFieldHeadingProps
 >(function RecipientViewPetitionFieldHeading(
-  { field, onDownloadAttachment, onCommentsButtonClick, ...props },
+  { field, headerNumber, onDownloadAttachment, onCommentsButtonClick, ...props },
   ref,
 ) {
   const [commentsFieldId] = useFieldCommentsQueryState();
+
+  const number = headerNumber ? `${headerNumber}. ` : "";
+  const title = field.title ? field.title : "";
 
   return (
     <Stack as="header" id={`field-${field.id}`} spacing={1} padding={2} {...props} ref={ref}>
@@ -29,7 +33,7 @@ export const RecipientViewPetitionFieldHeading = chakraForwardRef<
         <Box flex="1">
           <Heading size="md">
             {field.isInternal ? <InternalFieldBadge marginEnd={2.5} marginBottom={0.5} /> : null}
-            {field.title ? field.title : null}
+            {`${number}${title}`}
           </Heading>
         </Box>
         {(field.hasCommentsEnabled || field.__typename === "PetitionField") &&

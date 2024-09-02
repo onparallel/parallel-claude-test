@@ -133,6 +133,19 @@ export type AsyncFieldCompletionResponse = {
   url: Scalars["String"]["output"];
 };
 
+/** The automatic numbering settings of a petition */
+export type AutomaticNumberingConfig = {
+  numberingType: AutomaticNumberingType;
+};
+
+/** The automatic numbering settings of a petition */
+export type AutomaticNumberingConfigInput = {
+  numberingType: AutomaticNumberingType;
+};
+
+/** The type of a automatic numbering */
+export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
+
 export type BackgroundCheckEntityDetails = {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["String"]["output"];
@@ -1008,6 +1021,8 @@ export type Mutation = {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
+  /** sets automatic numbering on all petition HEADINGs */
+  enableAutomaticNumberingOnPetitionFields: PetitionBase;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Forces an update of the branding of every signature integration of the selected organization. */
@@ -1861,6 +1876,10 @@ export type MutationdisassociateProfileFromPetitionArgs = {
 
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationenableAutomaticNumberingOnPetitionFieldsArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -2919,6 +2938,8 @@ export type Petition = PetitionBase & {
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig: Maybe<AutomaticNumberingConfig>;
   /** Time when the petition was closed. */
   closedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The closing email body of the petition. */
@@ -3123,6 +3144,8 @@ export type PetitionBase = {
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig: Maybe<AutomaticNumberingConfig>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -3997,6 +4020,8 @@ export type PetitionTemplate = PetitionBase & {
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig: Maybe<AutomaticNumberingConfig>;
   backgroundColor: Maybe<Scalars["String"]["output"]>;
   categories: Maybe<Array<Scalars["String"]["output"]>>;
   /** The closing email body of the petition. */
@@ -4655,6 +4680,8 @@ export type PublicOrganizationlogoUrlArgs = {
 
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
+  /** The automatic numbering settings of the petition. */
+  automaticNumberingConfig: Maybe<AutomaticNumberingConfig>;
   /** The body of the optional completing message to be show to recipients. */
   completingMessageBody: Maybe<Scalars["String"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
@@ -5788,6 +5815,7 @@ export type UpdatePetitionFieldReplyInput = {
 export type UpdatePetitionInput = {
   anonymizeAfterMonths?: InputMaybe<Scalars["Int"]["input"]>;
   anonymizePurpose?: InputMaybe<Scalars["String"]["input"]>;
+  automaticNumberingConfig?: InputMaybe<AutomaticNumberingConfigInput>;
   closingEmailBody?: InputMaybe<Scalars["JSON"]["input"]>;
   completingMessageBody?: InputMaybe<Scalars["JSON"]["input"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]["input"]>;

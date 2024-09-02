@@ -125,6 +125,11 @@ export const PetitionRepliesField = Object.assign(
       </NakedLink>
     );
 
+    const headerNumber = fieldLogic.headerNumber ? `${fieldLogic.headerNumber}. ` : "";
+    const fieldTitle =
+      field.title ||
+      intl.formatMessage({ id: "generic.empty-heading", defaultMessage: "Untitled heading" });
+
     return field.type === "HEADING" ? (
       <Grid
         ref={ref as any}
@@ -170,9 +175,7 @@ export const PetitionRepliesField = Object.assign(
             {field.isInternal ? (
               <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
             ) : null}
-            {field.title || (
-              <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
-            )}
+            {`${headerNumber}${fieldTitle}`}
           </Heading>
           {goToComposeButton}
         </HStack>

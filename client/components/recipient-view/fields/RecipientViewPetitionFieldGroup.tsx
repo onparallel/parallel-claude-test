@@ -15,7 +15,6 @@ import { RecipientViewPetitionFieldDate } from "@parallel/components/recipient-v
 import { RecipientViewPetitionFieldDateTime } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDateTime";
 import { RecipientViewPetitionFieldDynamicSelect } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldFileUpload";
-import { RecipientViewPetitionFieldHeading } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldNumber } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldSelect";
@@ -215,13 +214,7 @@ function RecipientViewPetitionFieldGroupField(props: {
 
   return (
     <Box id={`field-${field.id}-${parentReplyId}`}>
-      {field.type === "HEADING" ? (
-        <RecipientViewPetitionFieldHeading
-          field={field}
-          onDownloadAttachment={props.onDownloadAttachment}
-          padding={0}
-        />
-      ) : field.type === "TEXT" ? (
+      {field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText {...commonProps} />
       ) : field.type === "SHORT_TEXT" ? (
         <RecipientViewPetitionFieldShortText {...commonProps} />

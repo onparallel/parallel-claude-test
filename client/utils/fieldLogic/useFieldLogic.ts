@@ -13,6 +13,7 @@ import {
 import { useMemo } from "react";
 import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
+import { letters, numbers, romanNumerals } from "../autoIncremental";
 import { completedFieldReplies } from "../completedFieldReplies";
 import { UnwrapArray } from "../types";
 import {
@@ -34,6 +35,7 @@ type PetitionFieldSelection =
 
 export interface FieldLogic {
   isVisible: boolean;
+  headerNumber?: string | null;
   previousVariables: Record<string, number>;
   currentVariables: Record<string, number>;
   finalVariables: Record<string, number>;
@@ -55,6 +57,15 @@ export function useFieldLogic(
   petition: PetitionSelection,
   usePreviewReplies = false,
 ): FieldLogicResult[] {
+  const headerNumbers =
+    petition.automaticNumberingConfig?.numberingType === "NUMBERS"
+      ? numbers()
+      : petition.automaticNumberingConfig?.numberingType === "LETTERS"
+        ? letters()
+        : petition.automaticNumberingConfig?.numberingType === "ROMAN_NUMERALS"
+          ? romanNumerals()
+          : null;
+
   return useMemo(
     () =>
       Array.from(
@@ -122,6 +133,18 @@ export function useFieldLogic(
             } else {
               return currentVariables[operand.name];
             }
+          }
+
+          function getNextEnumeration(field: Pick<PetitionFieldSelection, "type" | "options">) {
+            if (
+              isNonNullish(headerNumbers) &&
+              field.type === "HEADING" &&
+              field.options.showNumbering
+            ) {
+              return `${headerNumbers.next().value}`;
+            }
+
+            return null;
           }
 
           for (const field of fields) {
@@ -272,6 +295,7 @@ export function useFieldLogic(
                 previousVariables,
                 finalVariables: currentVariables,
                 groupChildrenLogic,
+                headerNumber: null,
               };
             } else {
               yield {
@@ -279,6 +303,7 @@ export function useFieldLogic(
                 currentVariables: { ...currentVariables },
                 previousVariables,
                 finalVariables: currentVariables,
+                headerNumber: visibilitiesById[field.id] ? getNextEnumeration(field) : null,
               };
             }
           }
@@ -460,6 +485,9 @@ function applyMathOperation(
 useFieldLogic.fragments = {
   PublicPetition: gql`
     fragment useFieldLogic_PublicPetition on PublicPetition {
+      automaticNumberingConfig {
+        numberingType
+      }
       variables {
         name
         defaultValue
@@ -510,6 +538,9 @@ useFieldLogic.fragments = {
   `,
   PetitionBase: gql`
     fragment useFieldLogic_PetitionBase on PetitionBase {
+      automaticNumberingConfig {
+        numberingType
+      }
       variables {
         name
         defaultValue

@@ -70,12 +70,13 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
   };
 
   const showAliasButtons =
-    field.type === "HEADING" ||
     field.type === "DYNAMIC_SELECT" ||
     isFileTypeField(field.type) ||
     field.type === "BACKGROUND_CHECK"
       ? false
       : true;
+
+  const hideLiquidReferenceButtons = field.type === "HEADING";
 
   return (
     <Stack>
@@ -90,13 +91,22 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
         }
         description={
           <Text fontSize="sm">
-            <FormattedMessage
-              id="component.settings-row-alias.alias-description"
-              defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
-            />
-            <HelpCenterLink marginStart={1} articleId={6323096}>
-              <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
-            </HelpCenterLink>
+            {field.type === "HEADING" ? (
+              <FormattedMessage
+                id="component.settings-row-alias.heading-alias-description"
+                defaultMessage="Use this reference in a field description to display the automatic numbering assigned to this field."
+              />
+            ) : (
+              <>
+                <FormattedMessage
+                  id="component.settings-row-alias.alias-description"
+                  defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
+                />
+                <HelpCenterLink marginStart={1} articleId={6323096}>
+                  <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+                </HelpCenterLink>
+              </>
+            )}
           </Text>
         }
         controlId="alias-field"
@@ -121,13 +131,15 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
                   size="sm"
                   variant="outline"
                 />
-                <MoreLiquidReferencesButton
-                  field={field}
-                  size="sm"
-                  boxShadow="none"
-                  variant="outline"
-                  isDisabled={!alias || Boolean(aliasError)}
-                />
+                {hideLiquidReferenceButtons ? null : (
+                  <MoreLiquidReferencesButton
+                    field={field}
+                    size="sm"
+                    boxShadow="none"
+                    variant="outline"
+                    isDisabled={!alias || Boolean(aliasError)}
+                  />
+                )}
               </>
             ) : null}
           </HStack>

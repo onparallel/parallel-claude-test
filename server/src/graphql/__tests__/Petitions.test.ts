@@ -21,6 +21,7 @@ import {
   UserGroupPermissionName,
 } from "../../db/__types";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
+import { defaultFieldProperties } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { AUTH, IAuth } from "../../services/AuthService";
@@ -3085,6 +3086,54 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("removes automatic numbering on HEADINGs when removing numbering config on the petition", async () => {
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ automatic_numbering_config: { numbering_type: "LETTERS" } }),
+      );
+
+      const headings = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
+        type: "HEADING",
+        ...defaultFieldProperties("HEADING", undefined, {
+          automatic_numbering_config: { numbering_type: "LETTERS" },
+        }),
+      }));
+
+      expect(headings.every((h) => h.options.showNumbering === true)).toBeTrue();
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              automaticNumberingConfig {
+                numberingType
+              }
+              fields {
+                type
+                options
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: { automaticNumberingConfig: null },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetition).toEqual({
+        automaticNumberingConfig: null,
+        fields: [
+          { type: "HEADING", options: { hasPageBreak: false, showNumbering: false } },
+          { type: "HEADING", options: { hasPageBreak: false, showNumbering: false } },
+          { type: "HEADING", options: { hasPageBreak: false, showNumbering: false } },
+        ],
+      });
     });
   });
 

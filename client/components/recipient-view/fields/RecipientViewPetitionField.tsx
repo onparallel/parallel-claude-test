@@ -263,6 +263,7 @@ export function RecipientViewPetitionField({
     return (
       <RecipientViewPetitionFieldHeading
         field={props.field}
+        headerNumber={fieldLogic?.headerNumber}
         onDownloadAttachment={handleDownloadAttachment(props.field.id)}
         onCommentsButtonClick={handleCommentsButtonClick}
       />

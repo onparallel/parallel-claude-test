@@ -12,6 +12,7 @@ import {
   PetitionField,
   PetitionFieldType,
 } from "../__types";
+import { TableTypes } from "./BaseRepository";
 
 const SCHEMAS = {
   NUMBER: {
@@ -140,6 +141,9 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {
       hasPageBreak: {
+        type: "boolean",
+      },
+      showNumbering: {
         type: "boolean",
       },
     },
@@ -393,6 +397,7 @@ export function validateFieldOptions(type: PetitionFieldType, options: any) {
 export function defaultFieldProperties(
   type: PetitionFieldType,
   field?: PetitionField,
+  petition?: Pick<TableTypes["petition"], "automatic_numbering_config">,
 ): Partial<CreatePetitionField> {
   // Always inherit optional
   const optional = field?.optional ?? false;
@@ -421,6 +426,7 @@ export function defaultFieldProperties(
       case "HEADING": {
         return {
           hasPageBreak: false,
+          showNumbering: isNonNullish(petition?.automatic_numbering_config),
         };
       }
       case "TEXT": {

@@ -126,22 +126,39 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
         fields: composedPetition.fields
           .filter((f) => f.type !== "BACKGROUND_CHECK")
           .map((f) => ({
-            ...f,
+            ...pick(f, ["type", "multiple", "alias", "options", "visibility", "math"]),
             id: toGlobalId("PetitionField", f.id),
+            children:
+              f.children
+                ?.filter((c) => c.type !== "BACKGROUND_CHECK")
+                .map((c) => ({
+                  ...pick(c, ["type", "multiple", "alias", "options", "visibility", "math"]),
+                  id: toGlobalId("PetitionField", c.id),
+                  parent: { id: toGlobalId("PetitionField", f.id) },
+                  replies: c.replies.map((r) => ({
+                    content: r.content,
+                    anonymized_at: r.anonymized_at,
+                  })),
+                })) ?? undefined,
             replies: f.replies.map((r) => ({
-              ...r,
-              children:
-                r.children
-                  ?.filter((c) => c.field.type !== "BACKGROUND_CHECK")
-                  .map((c) => ({
-                    ...c,
-                    field: {
-                      ...c.field,
-                      id: toGlobalId("PetitionField", c.field.id),
-                    },
-                  })) ?? null,
+              content: r.content,
+              anonymized_at: r.anonymized_at,
+              children: r.children
+                ? r.children
+                    .filter((c) => c.field.type !== "BACKGROUND_CHECK")
+                    .map((c) => ({
+                      field: {
+                        id: toGlobalId("PetitionField", c.field.id),
+                        ...pick(c.field, ["type", "multiple", "alias", "options"]),
+                      },
+                      replies: c.replies,
+                    }))
+                : null,
             })),
           })),
+        variables: composedPetition.variables,
+        custom_lists: composedPetition.custom_lists,
+        automatic_numbering_config: composedPetition.automatic_numbering_config,
       },
       intl,
     );

@@ -30,6 +30,7 @@ import {
   zip,
   zipWith,
 } from "remeda";
+import { assert } from "ts-essentials";
 import {
   CreatePetition,
   CreatePetitionField,
@@ -583,6 +584,16 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
 });
 
+export const AutomaticNumberingConfigInput = inputObjectType({
+  name: "AutomaticNumberingConfigInput",
+  description: "The automatic numbering settings of a petition",
+  definition(t) {
+    t.nonNull.field("numberingType", {
+      type: "AutomaticNumberingType",
+    });
+  },
+});
+
 export const RemindersConfigInput = inputObjectType({
   name: "RemindersConfigInput",
   description: "The reminders settings for the petition",
@@ -772,6 +783,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.anonymizePurpose,
         args.data.defaultPath,
         args.data.defaultOnBehalfId,
+        args.data.automaticNumberingConfig,
       ],
       petitionsAreEditable("petitionId"),
     ),
@@ -797,6 +809,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.anonymizePurpose,
         args.data.defaultPath,
         args.data.defaultOnBehalfId,
+        args.data.automaticNumberingConfig,
       ],
       petitionIsNotAnonymized("petitionId"),
     ),
@@ -848,6 +861,9 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.int("anonymizeAfterMonths");
           t.nullable.string("defaultPath");
           t.nullable.globalId("defaultOnBehalfId", { prefixName: "User" });
+          t.nullable.field("automaticNumberingConfig", {
+            type: "AutomaticNumberingConfigInput",
+          });
         },
       }).asArg(),
     ),
@@ -912,6 +928,7 @@ export const updatePetition = mutationField("updatePetition", {
       anonymizePurpose,
       defaultPath,
       defaultOnBehalfId,
+      automaticNumberingConfig,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -987,6 +1004,22 @@ export const updatePetition = mutationField("updatePetition", {
       data.send_on_behalf_user_id = defaultOnBehalfId ? Number(defaultOnBehalfId) : null;
     }
 
+    if (automaticNumberingConfig !== undefined) {
+      data.automatic_numbering_config =
+        automaticNumberingConfig !== null
+          ? {
+              numbering_type: automaticNumberingConfig.numberingType,
+            }
+          : null;
+      if (automaticNumberingConfig === null) {
+        await ctx.petitions.setAutomaticNumberingOnPetitionFields(
+          args.petitionId,
+          false,
+          `User:${ctx.user!.id}`,
+        );
+      }
+    }
+
     const [petition] = await ctx.petitions.updatePetition(
       args.petitionId,
       data,
@@ -1045,10 +1078,12 @@ export const createPetitionField = mutationField("createPetitionField", {
   },
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    assert(petition, "Petition not found");
     ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
 
-    async function defaultProperties(type: PetitionFieldType) {
-      const props = defaultFieldProperties(type);
+    async function defaultProperties(type: PetitionFieldType, petition: Petition) {
+      const props = defaultFieldProperties(type, undefined, petition);
       if (type === "ID_VERIFICATION") {
         const integrations = await ctx.integrations.loadIntegrationsByOrgId(
           ctx.user!.org_id,
@@ -1066,7 +1101,7 @@ export const createPetitionField = mutationField("createPetitionField", {
       args.petitionId,
       {
         type: args.type,
-        ...(await defaultProperties(args.type)),
+        ...(await defaultProperties(args.type, petition)),
       },
       args.parentFieldId ?? null,
       args.position ?? -1,
@@ -4258,3 +4293,29 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
     return updatedReply;
   },
 });
+
+export const enableAutomaticNumberingOnPetitionFields = mutationField(
+  "enableAutomaticNumberingOnPetitionFields",
+  {
+    description: "sets automatic numbering on all petition HEADINGs",
+    type: "PetitionBase",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionIsNotAnonymized("petitionId"),
+      petitionsAreEditable("petitionId"),
+      petitionsAreNotPublicTemplates("petitionId"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+    },
+    resolve: async (_, { petitionId }, ctx) => {
+      await ctx.petitions.setAutomaticNumberingOnPetitionFields(
+        petitionId,
+        true,
+        `User:${ctx.user!.id}`,
+      );
+
+      return (await ctx.petitions.loadPetition(petitionId))!;
+    },
+  },
+);

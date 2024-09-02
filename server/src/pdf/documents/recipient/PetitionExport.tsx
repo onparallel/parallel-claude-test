@@ -138,10 +138,16 @@ export default function PetitionExport({
     (r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS,
   )?.metadata.EXTERNAL_ID_CUATRECASAS as string | undefined;
 
-  function notEmptyHeading(
-    field: Pick<PetitionExport_PetitionFieldFragment, "type" | "title" | "description">,
-  ) {
-    return !(field.type === "HEADING" && !field.title && !field.description);
+  function notEmptyHeading(x: {
+    field: Pick<PetitionExport_PetitionFieldFragment, "type" | "title" | "description">;
+    logic: FieldLogicResult;
+  }) {
+    return !(
+      x.field.type === "HEADING" &&
+      !x.field.title &&
+      !x.field.description &&
+      !x.logic.headerNumber
+    );
   }
 
   return (
@@ -173,22 +179,20 @@ export default function PetitionExport({
                   </View>
                 ) : null}
                 <View style={styles.content}>
-                  {page
-                    .filter((x) => notEmptyHeading(x.field))
-                    .map(({ field, logic }) => {
-                      return (
-                        <LiquidPetitionVariableProvider key={field.id} logic={logic}>
-                          <PetitionExportField
-                            field={field}
-                            replies={field.replies}
-                            theme={petition.selectedDocumentTheme.data as PdfDocumentTheme}
-                            isPetition={petition.__typename === "Petition"}
-                            includeNetDocumentsLinks={includeNetDocumentsLinks}
-                            fieldLogic={logic}
-                          />
-                        </LiquidPetitionVariableProvider>
-                      );
-                    })}
+                  {page.filter(notEmptyHeading).map(({ field, logic }) => {
+                    return (
+                      <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                        <PetitionExportField
+                          field={field}
+                          replies={field.replies}
+                          theme={petition.selectedDocumentTheme.data as PdfDocumentTheme}
+                          isPetition={petition.__typename === "Petition"}
+                          includeNetDocumentsLinks={includeNetDocumentsLinks}
+                          fieldLogic={logic}
+                        />
+                      </LiquidPetitionVariableProvider>
+                    );
+                  })}
                 </View>
                 {i === pages.length - 1 &&
                 showSignatureBoxes &&
@@ -321,7 +325,7 @@ function PetitionExportField({
     <View>
       {field.type === "HEADING" ? (
         <View>
-          {field.title ? (
+          {field.title || fieldLogic?.headerNumber ? (
             <Text
               style={[
                 styles.headerTitle,
@@ -329,7 +333,8 @@ function PetitionExportField({
                 ...(field.description ? [{ marginBottom: "2mm" }] : []),
               ]}
             >
-              {cleanupText(field.title)}
+              {fieldLogic?.headerNumber ? `${fieldLogic.headerNumber}. ` : ""}
+              {field.title ? cleanupText(field.title) : ""}
             </Text>
           ) : null}
           {field.description ? (
@@ -559,6 +564,9 @@ function groupFieldsByPages<T extends PetitionExport_PetitionBaseFragment>(
       default_value: v.defaultValue,
     })),
     custom_lists: petition.customLists,
+    automatic_numbering_config: petition.automaticNumberingConfig
+      ? { numbering_type: petition.automaticNumberingConfig.numberingType }
+      : null,
   });
 
   const pages: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] = [];
@@ -640,6 +648,9 @@ PetitionExport.fragments = {
         customLists {
           name
           values
+        }
+        automaticNumberingConfig {
+          numberingType
         }
         __typename
       }
