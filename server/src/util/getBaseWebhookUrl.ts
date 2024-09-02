@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
-import fetch from "node-fetch";
 import { resolve } from "path";
+import { waitFor } from "./promises/waitFor";
 
 export async function getBaseWebhookUrl(defaultURL: string) {
   return process.env.NODE_ENV === "production" ? defaultURL : await tunnelUrl();
@@ -13,14 +13,18 @@ async function tunnelUrl() {
     });
 
     // ping the api to make sure tunnel is active.
-    const { status } = await fetch(`${tunnelUrl}/ping`, {
-      timeout: 5000, //5 seconds
-    });
-    if (status !== 200) {
-      throw new Error(
-        `Tunnel at ${tunnelUrl} seems to be down with code ${status}. Run 'yarn localtunnel' on a separate terminal and try again.`,
-      );
-    }
+    await Promise.race([
+      fetch(`${tunnelUrl}/ping`).then((res) => {
+        if (!res.ok) {
+          Promise.reject(
+            new Error(
+              `Tunnel at ${tunnelUrl} seems to be down with code ${status}. Run 'yarn localtunnel' on a separate terminal and try again.`,
+            ),
+          );
+        }
+      }),
+      waitFor(5_000).then(() => Promise.reject(new Error("TIMEOUT"))),
+    ]);
     return tunnelUrl;
   } catch (e: any) {
     if (e.code === "ENOENT") {

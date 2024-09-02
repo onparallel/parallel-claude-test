@@ -4,11 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const cli_progress_1 = require("cli-progress");
-const promises_1 = require("fs/promises");
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const p_map_1 = __importDefault(require("p-map"));
 const path_1 = __importDefault(require("path"));
 const yargs_1 = __importDefault(require("yargs"));
+const fetchToFile_1 = require("./utils/fetchToFile");
 const run_1 = require("./utils/run");
 async function main() {
     const { output } = await yargs_1.default.option("output", {
@@ -16,7 +15,7 @@ async function main() {
         type: "string",
         description: "Directory to place the images",
     }).argv;
-    const res = await (0, node_fetch_1.default)("https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/data/openmoji.json");
+    const res = await fetch("https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/data/openmoji.json");
     const data = await res.json();
     const flags = data.filter((element) => element.group === "flags" && element.subgroups === "country-flag");
     const bar = new cli_progress_1.SingleBar({}, cli_progress_1.Presets.shades_classic);
@@ -25,8 +24,8 @@ async function main() {
         const match = element.tags.match(/^([A-Z]{2}),/);
         if (match === null || match === void 0 ? void 0 : match[1]) {
             const code = match === null || match === void 0 ? void 0 : match[1];
-            const file = await (0, node_fetch_1.default)(`https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/${element.hexcode}.png`);
-            await (0, promises_1.writeFile)(path_1.default.join(output, `${code.toLowerCase()}.png`), await file.buffer(), "binary");
+            const url = `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/${element.hexcode}.png`;
+            await (0, fetchToFile_1.fetchToFile)(url, path_1.default.join(output, `${code.toLowerCase()}.png`));
             bar.increment(1);
         }
     }, { concurrency: 20 });

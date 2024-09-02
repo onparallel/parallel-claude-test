@@ -31,7 +31,6 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
-import fetch from "node-fetch";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";

@@ -3,7 +3,6 @@ import { json, Request, Router } from "express";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { extension } from "mime-types";
-import { RequestInit } from "node-fetch";
 import { join } from "path";
 import { isNullish, omit } from "remeda";
 import { Config, CONFIG } from "../../../config";

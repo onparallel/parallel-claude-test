@@ -139,7 +139,7 @@
     "@types/intercom-web": "^2.8.26",
     "@types/js-cookie": "^3.0.6",
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.14.8",
+    "@types/node": "^22.5.0",
     "@types/node-fetch": "^2.6.4",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18.3.4",

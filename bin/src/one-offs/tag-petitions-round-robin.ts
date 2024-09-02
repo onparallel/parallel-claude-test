@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;

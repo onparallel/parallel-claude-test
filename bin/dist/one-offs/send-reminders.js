@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("fs/promises");
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const remeda_1 = require("remeda");
 const run_1 = require("../utils/run");
 const wait_1 = require("../utils/wait");
@@ -14,7 +10,7 @@ const wait_1 = require("../utils/wait");
 const API_KEY = process.env.API_KEY;
 const TEMPLATE_ID = process.env.TEMPLATE_ID;
 async function request(path, { query, method = "GET", body, }) {
-    const res = await (0, node_fetch_1.default)(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
+    const res = await fetch(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
         method,
         body: body ? JSON.stringify(body) : undefined,
         headers: {

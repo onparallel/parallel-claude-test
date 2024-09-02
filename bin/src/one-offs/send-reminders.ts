@@ -1,5 +1,4 @@
 import { writeFile } from "fs/promises";
-import fetch from "node-fetch";
 import { chunk } from "remeda";
 import { run } from "../utils/run";
 import { wait } from "../utils/wait";

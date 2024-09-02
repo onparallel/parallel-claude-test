@@ -2,7 +2,6 @@ import { untranslated } from "@parallel/utils/untranslated";
 import { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import Script from "next/script";
-import { default as nodeFetch } from "node-fetch";
 import { useEffect, useRef } from "react";
 
 function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -56,7 +55,7 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
 }
 
 export async function getServerSideProps() {
-  const res = await nodeFetch("http://localhost/api/docs");
+  const res = await fetch("http://localhost/api/docs");
   return {
     props: {
       spec: await res.json(),

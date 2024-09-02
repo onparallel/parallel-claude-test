@@ -1,9 +1,8 @@
-import { createWriteStream } from "fs";
 import { mkdir, rm } from "fs/promises";
-import fetch from "node-fetch";
 import pMap from "p-map";
 import { join } from "path";
 import yargs from "yargs";
+import { fetchToFile } from "./utils/fetchToFile";
 import { writeJson } from "./utils/json";
 import { run } from "./utils/run";
 
@@ -76,11 +75,8 @@ async function main() {
             });
           }
         }
-        const res = await fetch(url);
         const dest = join(familyDir, `${descriptor}.ttf`);
-        await new Promise((resolve, reject) =>
-          res.body.pipe(createWriteStream(dest)).on("error", reject).on("close", resolve),
-        );
+        await fetchToFile(url, dest);
       }
     },
     { concurrency: 1 },

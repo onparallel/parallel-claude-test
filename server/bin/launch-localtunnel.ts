@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
 import { writeFileSync } from "fs";
-import fetch from "node-fetch";
 import { resolve } from "path";
 import { waitFor } from "../src/util/promises/waitFor";
 

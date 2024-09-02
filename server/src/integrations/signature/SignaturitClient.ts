@@ -1,9 +1,8 @@
 import stringify from "fast-safe-stringify";
-import FormData from "form-data";
-import { createReadStream, PathLike } from "fs";
+import { openAsBlob, PathLike } from "fs";
 import { inject, injectable } from "inversify";
-import { BodyInit } from "node-fetch";
 import pMap from "p-map";
+import { basename } from "path";
 import { flatten } from "q-flat";
 import { isNonNullish, isNullish, omit } from "remeda";
 import { URLSearchParams } from "url";
@@ -683,7 +682,9 @@ class SignaturitSDK {
       });
 
       if (response.ok) {
-        const responseData = binary ? await response.buffer() : await response.json();
+        const responseData = binary
+          ? Buffer.from(await response.arrayBuffer())
+          : await response.json();
         return responseData as T;
       } else {
         throw await response.json();
@@ -727,10 +728,10 @@ class SignaturitSDK {
   async createSignature(params: SignaturitSignatureParams) {
     const form = new FormData();
 
-    params.files?.forEach(function (filePath, i) {
-      form.append("files[" + i + "]", createReadStream(filePath));
-    });
-
+    let i = 0;
+    for (const file of params.files ?? []) {
+      form.append(`files[${i++}]`, await openAsBlob(file), basename(file.toString()));
+    }
     this.fillFormData(form, omit(params, ["files"]));
 
     return await this.apiRequest<SignaturitSignatureResponse>("POST", "/v3/signatures.json", form);

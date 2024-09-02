@@ -1,5 +1,4 @@
 import { inject, injectable } from "inversify";
-import { RequestInit } from "node-fetch";
 import { isNonNullish, isNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
@@ -192,8 +191,11 @@ export class BankflipService implements IBankflipService {
       },
       ...init,
     });
-
-    return await response[type]();
+    if (type === "json") {
+      return await response.json();
+    } else {
+      return Buffer.from(await response.arrayBuffer()) as T;
+    }
   }
 
   async createSession(metadata: SessionMetadata) {

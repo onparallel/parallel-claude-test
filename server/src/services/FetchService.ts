@@ -1,5 +1,4 @@
 import { injectable } from "inversify";
-import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import { isNonNullish } from "remeda";
 import { RetryOptions, StopRetryError, retry } from "../util/retry";
 

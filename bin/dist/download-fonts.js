@@ -3,12 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const p_map_1 = __importDefault(require("p-map"));
 const path_1 = require("path");
 const yargs_1 = __importDefault(require("yargs"));
+const fetchToFile_1 = require("./utils/fetchToFile");
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
 async function main() {
@@ -30,7 +29,7 @@ async function main() {
         array: true,
         description: "where to put the manifest json file",
     }).argv;
-    const res = await (0, node_fetch_1.default)(`https://webfonts.googleapis.com/v1/webfonts?${new URLSearchParams({
+    const res = await fetch(`https://webfonts.googleapis.com/v1/webfonts?${new URLSearchParams({
         fields: ["items.files", "items.family"].join(","),
         key: "AIzaSyBpQsEEScqktyrQeEGfm5R0UIMivXAlhw8",
     })}`);
@@ -73,9 +72,8 @@ async function main() {
                     });
                 }
             }
-            const res = await (0, node_fetch_1.default)(url);
             const dest = (0, path_1.join)(familyDir, `${descriptor}.ttf`);
-            await new Promise((resolve, reject) => res.body.pipe((0, fs_1.createWriteStream)(dest)).on("error", reject).on("close", resolve));
+            await (0, fetchToFile_1.fetchToFile)(url, dest);
         }
     }, { concurrency: 1 });
     for (const path of outputManifest) {

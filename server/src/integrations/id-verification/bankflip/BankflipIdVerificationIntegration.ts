@@ -1,7 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { Request, Response, Router, json } from "express";
 import { inject, injectable } from "inversify";
-import { RequestInit } from "node-fetch";
 import { isNonNullish, omit, pick } from "remeda";
 import { CONFIG, Config } from "../../../config";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
@@ -352,7 +351,11 @@ export class BankflipIdVerificationIntegration
       throw new Error(`${response.status} ${response.statusText}`);
     }
 
-    return await response[type]();
+    if (type === "json") {
+      return await response.json();
+    } else {
+      return Buffer.from(await response.arrayBuffer()) as T;
+    }
   }
 
   private async buildBankflipCustomization(orgId: number) {

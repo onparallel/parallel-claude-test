@@ -1,8 +1,3 @@
-jest.mock("node-fetch");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fetch = require("node-fetch");
-const { Response } = jest.requireActual("node-fetch");
-import { RequestInfo, RequestInit } from "node-fetch";
 import { waitFor } from "../../util/promises/waitFor";
 import { FetchService, IFetchService, TimeoutError } from "../FetchService";
 
@@ -12,21 +7,26 @@ function flushPromises() {
 
 describe("FetchService", () => {
   let fetchService: IFetchService;
+  const _fetch = fetch;
+  const fetchMock = jest.fn<Promise<Response>, Parameters<typeof fetch>>();
+
   beforeAll(async () => {
     fetchService = new FetchService();
   });
 
   beforeEach(() => {
+    global.fetch = fetchMock as any;
+    fetchMock.mockReset();
     jest.useFakeTimers();
   });
 
   afterEach(() => {
+    global.fetch = _fetch;
     jest.useRealTimers();
-    fetch.mockClear();
   });
 
   it("does a simple fetch", async () => {
-    fetch.mockImplementation(async () => {
+    fetchMock.mockImplementation(async () => {
       return Promise.resolve(new Response(JSON.stringify({ mocked: 1 }), { status: 200 }));
     });
 
@@ -36,7 +36,7 @@ describe("FetchService", () => {
   });
 
   it("fails if setting timeout and fetch can't resolve", async () => {
-    fetch.mockImplementation(async (url: RequestInfo, init?: RequestInit) => {
+    fetchMock.mockImplementation(async (url, init) => {
       await waitFor(10_000, { signal: (init?.signal ?? undefined) as any });
       return new Response("OK", { status: 200 });
     });
@@ -48,7 +48,7 @@ describe("FetchService", () => {
 
   it("retries once if fetch does not succed", async () => {
     let calls = 0;
-    fetch.mockImplementation(async () => {
+    fetchMock.mockImplementation(async () => {
       if (calls++ === 0) {
         return Promise.resolve(new Response("", { status: 502, statusText: "Bad Gateway" }));
       }
@@ -58,11 +58,11 @@ describe("FetchService", () => {
 
     const response = await fetchService.fetch("https://www.example.com", { maxRetries: 1 });
     expect(response).toMatchObject({ ok: true, status: 200, statusText: "OK" });
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("stops retrying if aborted from outside", async () => {
-    fetch.mockImplementation(async (url: RequestInfo, init?: RequestInit) => {
+    fetchMock.mockImplementation(async (url, init) => {
       await waitFor(1_000, { signal: (init?.signal ?? undefined) as any });
       return new Response("Bad Gateway", { status: 502 });
     });
@@ -73,16 +73,16 @@ describe("FetchService", () => {
       maxRetries: 3,
     });
     waitFor(2_500).then(() => controller.abort());
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     jest.advanceTimersByTime(1_000);
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     jest.advanceTimersByTime(1_000);
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     jest.advanceTimersByTime(600);
     await expect(promise).rejects.toThrow();
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 });

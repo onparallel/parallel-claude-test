@@ -2,7 +2,6 @@ import { faker } from "@faker-js/faker/locale/af_ZA";
 import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
-import { Response } from "node-fetch";
 import { Readable } from "stream";
 import { User } from "../src/db/__types";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";

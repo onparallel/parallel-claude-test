@@ -1,6 +1,5 @@
 import { Request } from "express";
 import { inject, injectable } from "inversify";
-import { RequestInit, Response } from "node-fetch";
 import { omit } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { FeatureFlagName, OrgIntegration } from "../../db/__types";

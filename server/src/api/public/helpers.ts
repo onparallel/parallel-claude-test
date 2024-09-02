@@ -1,11 +1,8 @@
-import FormData from "form-data";
-import { createReadStream } from "fs";
+import { openAsBlob } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
-import fetch from "node-fetch";
 import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } from "remeda";
-import { promisify } from "util";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -436,14 +433,12 @@ export async function uploadFile(
     formData.append(key, presignedPostData.fields[key]);
   });
   formData.append("Content-Type", file.mimetype);
-  formData.append("file", createReadStream(file.path));
-
-  const contentLength = await promisify(formData.getLength.bind(formData))();
+  const blob = await openAsBlob(file.path);
+  formData.append("file", blob, file.filename);
 
   return await fetch(presignedPostData.url, {
     method: "POST",
     body: formData,
-    headers: { ...formData.getHeaders(), "Content-Length": contentLength.toString() },
   });
 }
 

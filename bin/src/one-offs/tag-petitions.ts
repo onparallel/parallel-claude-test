@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { difference } from "remeda";
 import { run } from "../utils/run";
 
