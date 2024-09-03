@@ -1,4 +1,5 @@
-import { assignRef, Box, Tooltip } from "@chakra-ui/react";
+import { assignRef, Box } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import useMergedRef from "@react-hook/merged-ref";
 import useResizeObserver from "@react-hook/resize-observer";

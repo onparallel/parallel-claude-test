@@ -1,4 +1,5 @@
-import { IconButton, IconButtonProps, PlacementWithLogical, Tooltip } from "@chakra-ui/react";
+import { IconButton, IconButtonProps, PlacementWithLogical } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 
 export interface IconButtonWithTooltipProps extends Omit<IconButtonProps, "aria-label"> {

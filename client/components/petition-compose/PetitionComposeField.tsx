@@ -11,7 +11,6 @@ import {
   Stack,
   Switch,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import {
   CalculatorIcon,
@@ -82,6 +81,7 @@ import {
   HStack,
   Heading,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { ChevronFilledIcon } from "@parallel/chakra/icons";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";

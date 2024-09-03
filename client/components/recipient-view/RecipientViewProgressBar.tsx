@@ -4,7 +4,6 @@ import {
   Flex,
   HStack,
   Heading,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
@@ -12,6 +11,7 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   RecipientViewProgressBar_PetitionFieldFragment,

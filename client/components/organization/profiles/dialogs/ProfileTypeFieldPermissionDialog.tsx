@@ -9,7 +9,6 @@ import {
   Flex,
   FormControl,
   HStack,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -17,6 +16,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";

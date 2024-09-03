@@ -1,4 +1,5 @@
-import { Button, FormControl, FormLabel, Select, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Text } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { OrganizationStatus } from "@parallel/graphql/__types";

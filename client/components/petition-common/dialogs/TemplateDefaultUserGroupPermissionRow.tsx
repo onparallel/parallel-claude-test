@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Flex,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -12,6 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";

@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";

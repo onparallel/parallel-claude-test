@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  List,
-  Progress,
-  Stack,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   BusinessIcon,
   CheckIcon,

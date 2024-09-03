@@ -4,11 +4,11 @@ import {
   Input,
   NumberInput,
   NumberInputField,
-  Select,
   Switch,
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
   IntrospectionEnumType,

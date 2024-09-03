@@ -4,7 +4,6 @@ import {
   FormControl,
   FormLabel,
   HStack,
-  Select,
   Stack,
   Switch,
   Tab,
@@ -14,6 +13,7 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { Card } from "@parallel/components/common/Card";
 import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";

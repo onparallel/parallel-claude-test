@@ -21,18 +21,8 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 
 import { useMutation } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  HStack,
-  List,
-  ListItem,
-  Switch,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Badge, Box, Button, Center, HStack, List, ListItem, Switch, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";

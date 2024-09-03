@@ -9,8 +9,8 @@ import {
   Progress,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { CheckIcon, CloseIcon, DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";

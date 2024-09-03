@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Text, Tooltip, VisuallyHidden } from "@chakra-ui/react";
+import { Flex, HStack, IconButton, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { BellSettingsIcon, FolderIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { CheckboxTableFilter } from "@parallel/components/common/CheckboxTableFilter";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";

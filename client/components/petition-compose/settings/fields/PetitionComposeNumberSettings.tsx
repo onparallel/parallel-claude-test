@@ -11,10 +11,10 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Select,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { FieldOptions } from "@parallel/utils/petitionFields";

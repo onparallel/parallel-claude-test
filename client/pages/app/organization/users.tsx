@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Heading, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Heading, Stack, Text, useToast } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleFilledIcon,
   ArrowUpRightIcon,

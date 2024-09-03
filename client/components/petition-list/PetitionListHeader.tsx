@@ -5,20 +5,18 @@ import {
   Circle,
   HStack,
   Heading,
-  Menu,
   MenuItem,
   MenuList,
-  Popover,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
   Stack,
-  Tooltip,
   chakra,
   useBreakpointValue,
   useMenuButton,
 } from "@chakra-ui/react";
+import { Menu, Popover, Tooltip } from "@parallel/chakra/components";
 import {
   ChevronDownIcon,
   CloseIcon,

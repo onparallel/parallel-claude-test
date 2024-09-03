@@ -4,7 +4,6 @@ import {
   Button,
   Flex,
   HStack,
-  Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
@@ -13,6 +12,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import {
   ArchiveIcon,
   BellIcon,

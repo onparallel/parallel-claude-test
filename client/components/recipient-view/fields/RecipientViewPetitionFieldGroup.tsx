@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, Heading, Stack, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon, DeleteIcon, EditSimpleIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { ConfimationPopover } from "@parallel/components/common/ConfirmationPopover";

@@ -18,8 +18,8 @@ import {
   StackProps,
   Text,
   ThemingProps,
-  Tooltip,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   ArrowForwardIcon,
   CommentIcon,

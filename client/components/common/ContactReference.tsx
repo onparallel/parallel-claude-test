@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { SystemStyleObject, Text, Tooltip } from "@chakra-ui/react";
+import { SystemStyleObject, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";

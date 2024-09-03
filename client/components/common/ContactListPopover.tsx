@@ -3,13 +3,13 @@ import {
   Box,
   List,
   ListItem,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import {
   ContactListPopover_ContactFragment,
   ContactListPopover_PetitionSignerFragment,

@@ -1,14 +1,5 @@
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  Progress,
-  Stack,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, Progress, Stack, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
   CheckIcon,

@@ -4,10 +4,10 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Select,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";

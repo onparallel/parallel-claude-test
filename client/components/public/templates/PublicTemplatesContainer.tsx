@@ -1,14 +1,5 @@
-import {
-  Box,
-  Button,
-  Grid,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Button, Grid, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";

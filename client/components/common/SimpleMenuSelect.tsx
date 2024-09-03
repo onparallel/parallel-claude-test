@@ -1,13 +1,13 @@
 import {
   Button,
   ButtonProps,
-  Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Portal,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { SimpleOption } from "./SimpleSelect";

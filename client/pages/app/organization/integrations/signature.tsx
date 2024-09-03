@@ -9,9 +9,9 @@ import {
   Spacer,
   Stack,
   Text,
-  Tooltip,
   useToast,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";

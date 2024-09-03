@@ -1,12 +1,5 @@
-import {
-  IconButton,
-  IconButtonProps,
-  Menu,
-  MenuButton,
-  MenuProps,
-  Portal,
-  Tooltip,
-} from "@chakra-ui/react";
+import { IconButton, IconButtonProps, MenuButton, MenuProps, Portal } from "@chakra-ui/react";
+import { Menu, Tooltip } from "@parallel/chakra/components";
 import { MoreVerticalIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";

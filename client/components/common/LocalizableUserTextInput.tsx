@@ -7,7 +7,6 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
-  Menu,
   MenuButton,
   MenuItem,
   MenuList,
@@ -17,6 +16,7 @@ import {
   useFormControl,
   useTheme,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserLocale } from "@parallel/graphql/__types";

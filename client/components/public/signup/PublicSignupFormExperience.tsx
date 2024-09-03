@@ -6,10 +6,10 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Select,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { useMemo } from "react";
 import ReCaptcha from "react-google-recaptcha";
 import { Controller, useForm } from "react-hook-form";

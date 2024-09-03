@@ -11,8 +11,8 @@ import {
   Stack,
   Text,
   ThemingProps,
-  Tooltip,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { DeleteIcon, EditIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";

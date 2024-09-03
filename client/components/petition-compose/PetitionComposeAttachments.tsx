@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   HStack,
-  Menu,
   MenuButton,
   MenuItem,
   MenuList,
@@ -14,6 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
   BackCoverIcon,

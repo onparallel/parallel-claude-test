@@ -4,9 +4,9 @@ import {
   IconButtonProps,
   IconProps,
   Placement,
-  Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { cloneElement, isValidElement } from "react";
 

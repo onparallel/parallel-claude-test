@@ -6,7 +6,6 @@ import {
   Flex,
   HStack,
   Heading,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -15,6 +14,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
   BracesIcon,

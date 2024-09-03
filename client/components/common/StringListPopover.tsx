@@ -1,13 +1,13 @@
 import {
   List,
   ListItem,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { ReactNode } from "react";
 
 export function StringListPopover({ items, children }: { items: string[]; children: ReactNode }) {

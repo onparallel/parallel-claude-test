@@ -7,9 +7,9 @@ import {
   List,
   ListItem,
   Stack,
-  Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   AddIcon,
   HelpOutlineIcon,

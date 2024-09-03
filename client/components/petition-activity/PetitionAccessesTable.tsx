@@ -6,15 +6,14 @@ import {
   Center,
   Flex,
   HStack,
-  Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Portal,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
+import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   BellIcon,
   BellOffIcon,

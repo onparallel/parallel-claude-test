@@ -4,7 +4,6 @@ import {
   Button,
   HStack,
   Img,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
@@ -12,6 +11,7 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";

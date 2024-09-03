@@ -11,11 +11,11 @@ import {
   InputGroup,
   InputRightAddon,
   InputRightElement,
-  Select,
   Stack,
   Text,
   useToast,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import {
   ArrowShortRightIcon,
   BellSettingsIcon,

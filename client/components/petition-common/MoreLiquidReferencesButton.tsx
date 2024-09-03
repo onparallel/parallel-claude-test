@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Heading,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -10,6 +9,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {

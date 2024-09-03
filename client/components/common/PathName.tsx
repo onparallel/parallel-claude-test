@@ -1,4 +1,5 @@
-import { Box, PlacementWithLogical, Tooltip } from "@chakra-ui/react";
+import { Box, PlacementWithLogical } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { createElement, ReactElement } from "react";

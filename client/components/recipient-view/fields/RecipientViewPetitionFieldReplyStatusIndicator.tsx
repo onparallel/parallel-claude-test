@@ -1,4 +1,5 @@
-import { Spinner, Tooltip } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { CheckIcon, CloseIcon, CloudOkIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";

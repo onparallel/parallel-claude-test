@@ -1,4 +1,5 @@
-import { Box, Menu, MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
+import { Box, MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { CheckIcon, FontSizeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";

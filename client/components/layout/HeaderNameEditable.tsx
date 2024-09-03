@@ -5,9 +5,9 @@ import {
   EditablePreview,
   Flex,
   Text,
-  Tooltip,
   UseEditableProps,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { CloudErrorIcon, CloudOkIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";

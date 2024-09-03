@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Flex,
-  Menu,
   MenuButton,
   MenuItem,
   MenuItemOption,
@@ -13,6 +12,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
   ChevronDownIcon,

@@ -13,12 +13,12 @@ import {
   Image,
   Radio,
   RadioGroup,
-  Select,
   Spinner,
   Stack,
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { Card } from "@parallel/components/common/Card";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ColorInput } from "@parallel/components/common/ColorInput";

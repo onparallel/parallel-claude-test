@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Avatar, Box, Flex, Tooltip, useMultiStyleConfig } from "@chakra-ui/react";
+import { Avatar, Box, Flex, useMultiStyleConfig } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {

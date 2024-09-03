@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Menu, MenuButton, Portal, ThemingProps } from "@chakra-ui/react";
+import { MenuButton, Portal, ThemingProps } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType, PetitionFieldTypeSelect_UserFragment } from "@parallel/graphql/__types";
 import { SelectLikeButton } from "../common/SelectLikeButton";

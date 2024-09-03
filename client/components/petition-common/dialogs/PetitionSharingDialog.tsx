@@ -13,7 +13,6 @@ import {
   Flex,
   FormControl,
   ListItem,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -24,6 +23,7 @@ import {
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";

@@ -5,7 +5,6 @@ import {
   Circle,
   HStack,
   IconButton,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -13,9 +12,9 @@ import {
   Portal,
   Stack,
   Text,
-  Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   DownloadIcon,
   HelpOutlineIcon,

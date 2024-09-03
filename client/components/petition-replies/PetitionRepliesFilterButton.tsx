@@ -1,4 +1,5 @@
-import { Button, Menu, MenuButton, MenuList, Portal } from "@chakra-ui/react";
+import { Button, MenuButton, MenuList, Portal } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { FilterIcon } from "@parallel/chakra/icons";
 import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenuItemOptionProps";
 import {

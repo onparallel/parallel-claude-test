@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   HStack,
-  Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -12,10 +11,10 @@ import {
   Portal,
   Stack,
   Text,
-  Tooltip,
   useBreakpointValue,
   UsePopperProps,
 } from "@chakra-ui/react";
+import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   ArrowBackIcon,
   BellIcon,

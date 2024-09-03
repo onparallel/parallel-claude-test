@@ -1,4 +1,5 @@
-import { Button, Select, Stack, StackProps } from "@chakra-ui/react";
+import { Button, Stack, StackProps } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { ArrowShortRightIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useSupportedUserLocales } from "@parallel/utils/locales";

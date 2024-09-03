@@ -1,4 +1,5 @@
-import { Box, Button, HStack, Select, Stack } from "@chakra-ui/react";
+import { Box, Button, HStack, Stack } from "@chakra-ui/react";
+import { Select } from "@parallel/chakra/components";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
 import { ValueProps } from "@parallel/utils/ValueProps";

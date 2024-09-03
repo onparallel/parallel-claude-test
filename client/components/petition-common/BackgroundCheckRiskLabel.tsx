@@ -1,4 +1,5 @@
-import { Badge, HStack, Text, Tooltip } from "@chakra-ui/react";
+import { Badge, HStack, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isNullish } from "remeda";

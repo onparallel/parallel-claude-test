@@ -1,4 +1,5 @@
-import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";

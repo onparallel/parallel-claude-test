@@ -1,4 +1,5 @@
-import { Flex, PlacementWithLogical, Text, Tooltip } from "@chakra-ui/react";
+import { Flex, PlacementWithLogical, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   SignatureCancelledIcon,
   SignatureCompletedIcon,

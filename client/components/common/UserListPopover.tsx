@@ -4,7 +4,6 @@ import {
   Flex,
   List,
   ListItem,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
@@ -13,6 +12,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserListPopover_UserFragment,

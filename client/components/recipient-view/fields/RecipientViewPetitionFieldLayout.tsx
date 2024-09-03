@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon } from "@parallel/chakra/icons";
 import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";

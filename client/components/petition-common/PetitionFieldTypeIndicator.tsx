@@ -1,4 +1,5 @@
-import { Button, Text, Tooltip } from "@chakra-ui/react";
+import { Button, Text } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";

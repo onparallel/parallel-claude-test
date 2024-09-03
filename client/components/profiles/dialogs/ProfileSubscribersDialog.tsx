@@ -4,13 +4,13 @@ import {
   Button,
   Flex,
   FormControl,
-  Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import {

@@ -1,6 +1,5 @@
-import { extendTheme, keyframes, Menu, Popover, Select, Tooltip } from "@chakra-ui/react";
+import { extendTheme, keyframes } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
-import { ChevronDownIcon } from "./icons";
 import { styles } from "./styles";
 
 import { tableAnatomy } from "@chakra-ui/anatomy";
@@ -276,26 +275,3 @@ export const theme = extendTheme({
 });
 
 export type Theme = typeof theme;
-
-Tooltip.defaultProps = {
-  hasArrow: true,
-  openDelay: 250,
-  closeDelay: 150,
-  arrowSize: 8,
-  borderRadius: 4,
-} as any;
-
-Menu.defaultProps = {
-  isLazy: true,
-  strategy: "fixed",
-} as any;
-
-(Popover as any).defaultProps = {
-  openDelay: 250,
-  isLazy: true,
-  strategy: "fixed",
-} as any;
-
-Select.defaultProps = {
-  icon: <ChevronDownIcon fontSize="16px" />,
-};

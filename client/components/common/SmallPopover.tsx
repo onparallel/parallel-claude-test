@@ -1,6 +1,5 @@
 import {
   BoxProps,
-  Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
@@ -9,6 +8,7 @@ import {
   Portal,
   useId,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { ReactNode, cloneElement } from "react";
 
 export function SmallPopover({

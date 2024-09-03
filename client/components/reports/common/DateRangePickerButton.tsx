@@ -10,7 +10,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Popover,
   PopoverBody,
   PopoverContent,
   PopoverFooter,
@@ -22,6 +21,7 @@ import {
   useDisclosure,
   useOutsideClick,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import { CloseIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
 import { ValueProps } from "@parallel/utils/ValueProps";
