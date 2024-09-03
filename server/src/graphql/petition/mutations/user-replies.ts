@@ -5,6 +5,7 @@ import {
   list,
   mutationField,
   nonNull,
+  nullable,
   objectType,
   stringArg,
 } from "nexus";
@@ -73,6 +74,9 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldId: nonNull(globalIdArg("PetitionField")),
     file: nonNull("FileUploadInput"),
     parentReplyId: globalIdArg("PetitionFieldReply"),
+    password: nullable(
+      stringArg({ description: "provide the password if the file is password-protected" }),
+    ),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
@@ -100,6 +104,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
           size: size.toString(),
           content_type: contentType,
           upload_complete: false,
+          password: args.password ? ctx.encryption.encrypt(args.password, "hex") : null,
         },
         `User:${ctx.user!.id}`,
       );
@@ -165,6 +170,9 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     file: nonNull("FileUploadInput"),
+    password: nullable(
+      stringArg({ description: "provide the password if the file is password-protected" }),
+    ),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
@@ -192,6 +200,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
         size: size.toString(),
         content_type: contentType,
         upload_complete: false,
+        password: args.password ? ctx.encryption.encrypt(args.password, "hex") : null,
       },
       `User:${ctx.user!.id}`,
     );

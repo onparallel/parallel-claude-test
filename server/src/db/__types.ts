@@ -1075,6 +1075,7 @@ export interface FileUpload {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   file_deleted_at: Maybe<Date>; // timestamptz
+  password: Maybe<string>; // varchar
 }
 
 export type CreateFileUpload = PartialProps<
@@ -1087,6 +1088,7 @@ export type CreateFileUpload = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "file_deleted_at"
+  | "password"
 >;
 
 export interface LicenseCode {

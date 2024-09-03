@@ -1589,6 +1589,7 @@ export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 }
 
@@ -2085,6 +2086,7 @@ export interface MutationpublicCreateFileUploadReplyArgs {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export interface MutationpublicCreatePetitionCommentArgs {
@@ -2450,6 +2452,7 @@ export interface MutationupdateFieldPositionsArgs {
 
 export interface MutationupdateFileUploadReplyArgs {
   file: FileUploadInput;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
 }
@@ -19648,6 +19651,7 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type PreviewPetitionFieldMutations_createFileUploadReplyMutation = {
@@ -28538,6 +28542,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
     fieldId: Scalars["GID"]["input"];
     data: FileUploadInput;
     parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+    password?: InputMaybe<Scalars["String"]["input"]>;
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation = {
@@ -64975,12 +64980,14 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
     $fieldId: GID!
     $file: FileUploadInput!
     $parentReplyId: GID
+    $password: String
   ) {
     createFileUploadReply(
       petitionId: $petitionId
       fieldId: $fieldId
       file: $file
       parentReplyId: $parentReplyId
+      password: $password
     ) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
@@ -66106,12 +66113,14 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
     $fieldId: GID!
     $data: FileUploadInput!
     $parentReplyId: GID
+    $password: String
   ) {
     publicCreateFileUploadReply(
       keycode: $keycode
       fieldId: $fieldId
       data: $data
       parentReplyId: $parentReplyId
+      password: $password
     ) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData

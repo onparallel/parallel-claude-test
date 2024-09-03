@@ -26,6 +26,7 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
 import { MaybePromise } from "@parallel/utils/types";
+import { useCheckIfFileIsPasswordProtected } from "@parallel/utils/useCheckIfFileIsPasswordProtected";
 import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
@@ -46,7 +47,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onCreateReply: (content: File[]) => void;
+  onCreateReply: (content: { file: File; password?: string }[]) => void;
   onDownloadReply: (replyId: string) => void;
   onError: (error: any) => void;
   isInvalid?: boolean;
@@ -343,7 +344,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
 interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
   field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
-  onCreateReply: (files: File[]) => MaybePromise<void>;
+  onCreateReply: (content: { file: File; password?: string }[]) => MaybePromise<void>;
   onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
@@ -381,13 +382,23 @@ function PetitionFieldFileUploadDropzone({
   const MAX_FILE_SIZE = maxFileSize ?? 300 * 1024 * 1024;
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
+  const checkIfPdfIsPasswordProtected = useCheckIfFileIsPasswordProtected();
   async function handleFileDrop(files: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);
     } else {
       try {
         setFileDropError(null);
-        await onCreateReply(files);
+        const finalFiles: { file: File; password?: string }[] = [];
+        for (const file of files) {
+          const result = await checkIfPdfIsPasswordProtected(file);
+          if (result.message === "PASSWORD_ENTERED") {
+            finalFiles.push({ file, password: result.password });
+          } else if (result.message !== "PASSWORD_NOT_ENTERED") {
+            finalFiles.push({ file });
+          }
+        }
+        await onCreateReply(finalFiles);
       } catch (e) {
         onError(e);
       }

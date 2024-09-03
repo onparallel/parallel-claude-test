@@ -63,7 +63,11 @@ export interface PreviewPetitionFieldGroupProps
   onUpdateReply: (replyId: string, content: any) => Promise<void>;
   onRefreshField: () => void;
   onDownloadFileUploadReply: (replyId: string) => void;
-  onCreateFileReply: (content: File[], fieldId: string, parentReplyId: string) => void;
+  onCreateFileReply: (
+    content: { file: File; password?: string }[],
+    fieldId: string,
+    parentReplyId: string,
+  ) => void;
   onStartAsyncFieldCompletion: (
     fieldId: string,
     parentReplyId: string,
@@ -345,7 +349,11 @@ function PreviewPetitionFieldGroupField(props: {
     parentReplyId: string,
   ) => Promise<string | undefined>;
   onDownloadFileUploadReply: (replyId: string) => void;
-  onCreateFileReply: (content: File[], fieldId: string, parentReplyId: string) => void;
+  onCreateFileReply: (
+    content: { file: File; password?: string }[],
+    fieldId: string,
+    parentReplyId: string,
+  ) => void;
   onStartAsyncFieldCompletion: (
     fieldId: string,
     parentReplyId: string,
@@ -409,7 +417,7 @@ function PreviewPetitionFieldGroupField(props: {
         <RecipientViewPetitionFieldFileUpload
           {...commonProps}
           onDownloadReply={onDownloadFileUploadReply}
-          onCreateReply={async (content: File[]) => {
+          onCreateReply={async (content: { file: File; password?: string }[]) => {
             await onCreateFileReply(content, field.id, parentReplyId);
           }}
           isCacheOnly={isCacheOnly}

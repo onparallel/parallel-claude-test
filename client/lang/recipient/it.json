@@ -65,6 +65,16 @@
     "context": "Invite a collaborator to complete or review the missing information."
   },
   {
+    "term": "component.enter-file-password-dialog.header",
+    "definition": "File protetto da password",
+    "context": "File is password protected"
+  },
+  {
+    "term": "component.enter-file-password-dialog.password-label",
+    "definition": "Per favore, inserisci la password per il file {name}",
+    "context": "Please, enter password for file {name}"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Errore",
     "context": "Error"
@@ -1080,6 +1090,16 @@
     "context": "Help"
   },
   {
+    "term": "generic.hide",
+    "definition": "Nascondere",
+    "context": "Hide"
+  },
+  {
+    "term": "generic.incorrect-password",
+    "definition": "La password è incorretta",
+    "context": "The password is incorrect"
+  },
+  {
     "term": "generic.invalid-first-name-error",
     "definition": "Per favore, inserisci il nome",
     "context": "Please, enter the first name"
@@ -1263,6 +1283,11 @@
     "term": "generic.share",
     "definition": "Condividi",
     "context": "Share"
+  },
+  {
+    "term": "generic.show",
+    "definition": "Mostra",
+    "context": "Show"
   },
   {
     "term": "generic.show-more-less",

@@ -1537,6 +1537,10 @@ export const SubmitFileReply = schema({
   required: ["reply"],
   properties: {
     reply: _FileUploadReplySubmitContent,
+    password: {
+      type: "string",
+      description: "Provide password when uploading a password-protected PDF file",
+    } as const,
     status: _PetitionFieldReplyStatus,
     parentReplyId: _PetitionFieldReplyParentReplyId,
   },
@@ -1549,6 +1553,10 @@ export const UpdateFileReply = schema({
   required: ["reply"],
   properties: {
     reply: _FileUploadReplySubmitContent,
+    password: {
+      type: "string",
+      description: "Provide password when uploading a password-protected PDF file",
+    },
   },
 } as const);
 

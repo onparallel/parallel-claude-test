@@ -22,12 +22,14 @@ gql`
     $fieldId: GID!
     $parentReplyId: GID
     $file: FileUploadInput!
+    $password: String
   ) {
     createFileUploadReply(
       petitionId: $petitionId
       fieldId: $fieldId
       parentReplyId: $parentReplyId
       file: $file
+      password: $password
     ) {
       presignedPostData {
         ...AWSPresignedPostData
@@ -90,8 +92,14 @@ gql`
     $petitionId: GID!
     $replyId: GID!
     $file: FileUploadInput!
+    $password: String
   ) {
-    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+    updateFileUploadReply(
+      petitionId: $petitionId
+      replyId: $replyId
+      file: $file
+      password: $password
+    ) {
       presignedPostData {
         ...AWSPresignedPostData
       }

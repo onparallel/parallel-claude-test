@@ -1,4 +1,13 @@
-import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
+import {
+  booleanArg,
+  idArg,
+  list,
+  mutationField,
+  nonNull,
+  nullable,
+  objectType,
+  stringArg,
+} from "nexus";
 import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
@@ -246,6 +255,9 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     fieldId: nonNull(globalIdArg("PetitionField")),
     data: nonNull("FileUploadInput"),
     parentReplyId: globalIdArg("PetitionFieldReply"),
+    password: nullable(
+      stringArg({ description: "provide the password if the file is password-protected" }),
+    ),
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
@@ -267,6 +279,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
         filename,
         size: size.toString(),
         content_type: contentType,
+        password: args.password ? ctx.encryption.encrypt(args.password, "hex") : null,
       },
       `Contact:${ctx.contact!.id}`,
     );

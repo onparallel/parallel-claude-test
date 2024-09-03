@@ -5,6 +5,7 @@ import {
   CheckIcon,
   CloseIcon,
   EditSimpleIcon,
+  LockClosedIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
 import {
@@ -35,6 +36,7 @@ import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRisk
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionRepliesFieldFilePassword";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 
@@ -290,7 +292,8 @@ export function PetitionRepliesFieldReply({
                   </Stack>
                 ) : isFileTypeField(type) ? (
                   <Stack flex="1">
-                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                    <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>
+                      {isNonNullish(content.password) ? <LockClosedIcon /> : null}
                       <VisuallyHidden>
                         {intl.formatMessage({
                           id: "generic.file-name",
@@ -316,6 +319,9 @@ export function PetitionRepliesFieldReply({
                         </Box>
                       </Text>
                     </Flex>
+                    {isNonNullish(content.password) ? (
+                      <PetitionRepliesFieldFilePassword password={content.password} />
+                    ) : null}
                     {type === "FILE_UPLOAD" &&
                     isNonNullish(reply.metadata) &&
                     reply.metadata.type === "PAYSLIP" ? (

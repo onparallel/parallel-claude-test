@@ -1528,6 +1528,7 @@ export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -2024,6 +2025,7 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationpublicCreatePetitionCommentArgs = {
@@ -2389,6 +2391,7 @@ export type MutationupdateFieldPositionsArgs = {
 
 export type MutationupdateFileUploadReplyArgs = {
   file: FileUploadInput;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
 };

@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import stringify from "fast-safe-stringify";
+import { createReadStream } from "fs";
 import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
 import { Container } from "inversify";
@@ -12,6 +13,7 @@ import { ILogger, LOGGER } from "../../services/Logger";
 import { IRedis, REDIS } from "../../services/Redis";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { removePasswordFromPdf } from "../../util/pdf";
 import { fromPlainTextWithMentions } from "../../util/slate/utils";
 import { titleize } from "../../util/strings";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
@@ -2158,9 +2160,31 @@ export function publicApi(container: Container) {
 
           if (isNonNullish(fieldType) && isFileTypeField(fieldType)) {
             const file = body.reply as FormDataFile;
+
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
+
+            if (file.mimetype === "application/pdf") {
+              // if uploading a PDF , check if it can be decrypted
+              try {
+                await removePasswordFromPdf(
+                  createReadStream(file.path),
+                  (body as any).password ?? "",
+                );
+              } catch {
+                if (!("password" in body)) {
+                  throw new BadRequestError("Please, provide a password for the file");
+                }
+                throw new BadRequestError("The provided password is incorrect");
+              }
+            }
+
+            const isPasswordRestrictedPdf =
+              "password" in body &&
+              isNonNullish(body.password) &&
+              file.mimetype === "application/pdf";
+
             const {
               createFileUploadReply: { presignedPostData, reply },
             } = await client.request(SubmitReply_createFileUploadReplyDocument, {
@@ -2168,6 +2192,7 @@ export function publicApi(container: Container) {
               fieldId: params.fieldId,
               parentReplyId: body.parentReplyId,
               file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+              password: isPasswordRestrictedPdf ? body.password || undefined : undefined,
             });
 
             const uploadResponse = await uploadFile(file, presignedPostData);
@@ -2289,12 +2314,34 @@ export function publicApi(container: Container) {
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
+
+            if (file.mimetype === "application/pdf") {
+              // if uploading a PDF , check if it can be decrypted
+              try {
+                await removePasswordFromPdf(
+                  createReadStream(file.path),
+                  (body as any).password ?? "",
+                );
+              } catch {
+                if (!("password" in body)) {
+                  throw new BadRequestError("Please, provide a password for the file");
+                }
+                throw new BadRequestError("The provided password is incorrect");
+              }
+            }
+
+            const isPasswordRestrictedPdf =
+              "password" in body &&
+              isNonNullish(body.password) &&
+              file.mimetype === "application/pdf";
+
             const {
               updateFileUploadReply: { presignedPostData, reply },
             } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
               petitionId: params.petitionId,
               replyId: params.replyId,
               file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
+              password: isPasswordRestrictedPdf ? body.password || undefined : undefined,
             });
 
             const uploadResponse = await uploadFile(file, presignedPostData);

@@ -1250,6 +1250,11 @@ type Mutation {
     fieldId: GID!
     file: FileUploadInput!
     parentReplyId: GID
+
+    """
+    provide the password if the file is password-protected
+    """
+    password: String
     petitionId: GID!
   ): FileUploadReplyResponse!
 
@@ -1986,6 +1991,11 @@ type Mutation {
     fieldId: GID!
     keycode: ID!
     parentReplyId: GID
+
+    """
+    provide the password if the file is password-protected
+    """
+    password: String
   ): PublicCreateFileUploadReply!
 
   """
@@ -2480,6 +2490,11 @@ type Mutation {
   """
   updateFileUploadReply(
     file: FileUploadInput!
+
+    """
+    provide the password if the file is password-protected
+    """
+    password: String
     petitionId: GID!
     replyId: GID!
   ): FileUploadReplyResponse!

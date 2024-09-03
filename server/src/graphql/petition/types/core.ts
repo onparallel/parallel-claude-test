@@ -1197,6 +1197,9 @@ export const PetitionFieldReply = objectType({
           const file = isNonNullish(root.content.file_upload_id)
             ? await ctx.files.loadFileUpload(root.content.file_upload_id)
             : null;
+          const decrypted = isNonNullish(file?.password)
+            ? await ctx.encryption.decrypt(Buffer.from(file.password, "hex"), "utf8")
+            : null;
           return file
             ? {
                 id: toGlobalId("FileUpload", file.id),
@@ -1205,6 +1208,9 @@ export const PetitionFieldReply = objectType({
                 contentType: file.content_type,
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
+                ...(root.type === "FILE_UPLOAD" && isNonNullish(decrypted)
+                  ? { password: decrypted }
+                  : {}),
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
                 ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
                   ? { warning: root.content.warning }

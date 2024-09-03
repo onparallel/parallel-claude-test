@@ -1,4 +1,4 @@
-import { PathLike } from "fs";
+import { createReadStream, PathLike } from "fs";
 import { mkdir, rm, stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
@@ -17,11 +17,13 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { applyFieldVisibility } from "../util/fieldLogic";
 import { isFileTypeField } from "../util/isFileTypeField";
+import { removePasswordFromPdf } from "../util/pdf";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { retry } from "../util/retry";
-import { ChildProcessNonSuccessError, spawn as _spawn } from "../util/spawn";
+import { spawn as _spawn, ChildProcessNonSuccessError } from "../util/spawn";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
+import { ENCRYPTION_SERVICE, IEncryptionService } from "./EncryptionService";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
@@ -49,6 +51,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
     @inject(PRINTER) private printer: IPrinter,
     @inject(LOGGER) private logger: ILogger,
@@ -450,10 +453,15 @@ export class PetitionBinder implements IPetitionBinder {
               "pdf",
             );
           } else if (file.content_type === "application/pdf") {
-            return await this.writeTemporaryFile(
-              await this.storage.fileUploads.downloadFile(file.path),
-              "pdf",
-            );
+            let readable = await this.storage.fileUploads.downloadFile(file.path);
+            if (file.password) {
+              const decryptedFilePath = await removePasswordFromPdf(
+                readable,
+                this.encryption.decrypt(Buffer.from(file.password, "hex"), "utf8"),
+              );
+              readable = createReadStream(decryptedFilePath);
+            }
+            return await this.writeTemporaryFile(readable, "pdf");
           } else {
             this.logger.warn(
               `Cannot annex ${file.content_type} FileUpload:${file.id} to pdf binder. Skipping...`,

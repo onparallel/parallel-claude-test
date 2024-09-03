@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { json, Request, Router } from "express";
+import { readFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { extension } from "mime-types";
@@ -19,6 +20,7 @@ import { FETCH_SERVICE, IFetchService } from "../../../services/FetchService";
 import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { never } from "../../../util/never";
+import { removePasswordFromPdf } from "../../../util/pdf";
 import { Maybe } from "../../../util/types";
 import { InvalidCredentialsError, InvalidRequestError } from "../../helpers/GenericIntegration";
 import { WebhookIntegration } from "../../helpers/WebhookIntegration";
@@ -238,6 +240,20 @@ export class BankflipDocumentProcessingIntegration
     );
   }
 
+  // returns a bse64-encoded decrypted version of the file
+  private async resolveFileUploadContents(file: FileUpload): Promise<string> {
+    if (file.content_type === "application/pdf" && file.password) {
+      const readable = await this.storage.fileUploads.downloadFile(file.path);
+      const decryptedFilePath = await removePasswordFromPdf(
+        readable,
+        this.encryption.decrypt(Buffer.from(file.password, "hex"), "utf8"),
+      );
+      return await readFile(decryptedFilePath, { encoding: "base64" });
+    } else {
+      return await this.storage.fileUploads.downloadFileBase64(file.path);
+    }
+  }
+
   private async createPayslipExtractionRequest(integrationId: number, file: FileUpload) {
     return await this.withCredentials(integrationId, async (credentials) => {
       const response = await this.apiRequest<{ id: string }>(
@@ -248,7 +264,7 @@ export class BankflipDocumentProcessingIntegration
           body: JSON.stringify({
             documents: [
               {
-                content: await this.storage.fileUploads.downloadFileBase64(file.path),
+                content: await this.resolveFileUploadContents(file),
                 contentType: file.content_type,
                 name: file.filename,
                 extension: extension(file.content_type),

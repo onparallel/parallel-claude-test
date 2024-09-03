@@ -2870,6 +2870,16 @@
     "context": "The folder is empty"
   },
   {
+    "term": "component.enter-file-password-dialog.header",
+    "definition": "Archivo protegido con contraseña",
+    "context": "File is password protected"
+  },
+  {
+    "term": "component.enter-file-password-dialog.password-label",
+    "definition": "Por favor, ingrese la contraseña para {name}",
+    "context": "Please, enter password for file {name}"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error"
@@ -5000,11 +5010,6 @@
     "context": "The first field of a group cannot be internal if the group is not."
   },
   {
-    "term": "component.settings-row-alias.heading-alias-description",
-    "definition": "Utiliza la referencia en la descripción de un campo para mostrar la numeración automática que corresponde a este campo.",
-    "context": "Use this reference in a field description to display the automatic numbering assigned to this field."
-  },
-  {
     "term": "component.petition-compose-field-settings.how-numbering-description",
     "definition": "Activa esta opción para incluir el bloque de texto en la numeración automática.",
     "context": "Enable this setting to include the text block in automatic numbering."
@@ -5473,6 +5478,11 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Ilimitado",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-file-password.password",
+    "definition": "Contraseña: {password}",
+    "context": "Password: {password}"
   },
   {
     "term": "component.petition-field-file-upload-payslip-reply.error-reading-document",
@@ -9568,6 +9578,11 @@
     "term": "component.settings-row-alias.alias-label",
     "definition": "Referencias",
     "context": "References"
+  },
+  {
+    "term": "component.settings-row-alias.heading-alias-description",
+    "definition": "Utiliza la referencia en la descripción de un campo para mostrar la numeración automática que corresponde a este campo.",
+    "context": "Use this reference in a field description to display the automatic numbering assigned to this field."
   },
   {
     "term": "component.settings-row-alias.reference-exists-error",

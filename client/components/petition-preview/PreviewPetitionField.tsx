@@ -169,7 +169,11 @@ export function PreviewPetitionField({
 
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
-    async (content: File[], _fieldId?: string, parentReplyId?: string) => {
+    async (
+      content: { file: File; password?: string }[],
+      _fieldId?: string,
+      parentReplyId?: string,
+    ) => {
       await createFileUploadReply({
         petitionId,
         fieldId: _fieldId ?? fieldId,

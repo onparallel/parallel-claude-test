@@ -65,6 +65,16 @@
     "context": "Invite a collaborator to complete or review the missing information."
   },
   {
+    "term": "component.enter-file-password-dialog.header",
+    "definition": "Arxiu protegit amb contrasenya",
+    "context": "File is password protected"
+  },
+  {
+    "term": "component.enter-file-password-dialog.password-label",
+    "definition": "Si us plau, introdueix la contrasenya per a l'arxiu {name}",
+    "context": "Please, enter password for file {name}"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error"
@@ -1080,6 +1090,16 @@
     "context": "Help"
   },
   {
+    "term": "generic.hide",
+    "definition": "Amagar",
+    "context": "Hide"
+  },
+  {
+    "term": "generic.incorrect-password",
+    "definition": "La contrasenya és incorrecta",
+    "context": "The password is incorrect"
+  },
+  {
     "term": "generic.invalid-first-name-error",
     "definition": "Si us plau, introdueix el nom",
     "context": "Please, enter the first name"
@@ -1263,6 +1283,11 @@
     "term": "generic.share",
     "definition": "Compartir",
     "context": "Share"
+  },
+  {
+    "term": "generic.show",
+    "definition": "Mostrar",
+    "context": "Show"
   },
   {
     "term": "generic.show-more-less",

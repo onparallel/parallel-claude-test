@@ -162,7 +162,11 @@ export function RecipientViewPetitionField({
 
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
-    async (content: File[], _fieldId?: string, parentReplyId?: string) => {
+    async (
+      content: { file: File; password?: string }[],
+      _fieldId?: string,
+      parentReplyId?: string,
+    ) => {
       try {
         await createFileUploadReply({
           keycode: props.keycode,

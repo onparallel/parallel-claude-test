@@ -17,12 +17,14 @@ const _publicCreateFileUploadReply = gql`
     $fieldId: GID!
     $data: FileUploadInput!
     $parentReplyId: GID
+    $password: String
   ) {
     publicCreateFileUploadReply(
       keycode: $keycode
       fieldId: $fieldId
       data: $data
       parentReplyId: $parentReplyId
+      password: $password
     ) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
@@ -117,7 +119,7 @@ export function useCreateFileUploadReply() {
     }: {
       keycode: string;
       fieldId: string;
-      content: File[];
+      content: { file: File; password?: string }[];
       uploads: MutableRefObject<Record<string, AbortController>>;
       parentReplyId?: string;
     }) {
@@ -125,7 +127,7 @@ export function useCreateFileUploadReply() {
         // create file upload replies without concurrency, upload concurrently
         await pMap(
           content,
-          async (file) => {
+          async ({ file, password }) => {
             const { data } = await createFileUploadReply({
               variables: {
                 keycode,
@@ -136,6 +138,7 @@ export function useCreateFileUploadReply() {
                   contentType: file.type,
                 },
                 parentReplyId,
+                password,
               },
               update(cache, { data }) {
                 const reply = data!.publicCreateFileUploadReply.reply;

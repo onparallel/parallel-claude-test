@@ -59,8 +59,8 @@ export class FileRepository extends BaseRepository {
       with ids as (
         select * from (?) as t(id_index, id_value)
       )
-      insert into file_upload(path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by)
-      select path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by
+      insert into file_upload(path, filename, size, content_type, upload_complete, password, created_at, created_by, updated_at, updated_by)
+      select path, filename, size, content_type, upload_complete, password, created_at, created_by, updated_at, updated_by
       from file_upload join ids on ids.id_value = id
       where id in ?
       order by ids.id_index asc

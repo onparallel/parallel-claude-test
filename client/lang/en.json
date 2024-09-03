@@ -2870,6 +2870,16 @@
     "context": "The folder is empty"
   },
   {
+    "term": "component.enter-file-password-dialog.header",
+    "definition": "File is password protected",
+    "context": "File is password protected"
+  },
+  {
+    "term": "component.enter-file-password-dialog.password-label",
+    "definition": "Please, enter password for file {name}",
+    "context": "Please, enter password for file {name}"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error"
@@ -5000,11 +5010,6 @@
     "context": "The first field of a group cannot be internal if the group is not."
   },
   {
-    "term": "component.settings-row-alias.heading-alias-description",
-    "definition": "Use this reference in a field description to display the automatic numbering assigned to this field.",
-    "context": "Use this reference in a field description to display the automatic numbering assigned to this field."
-  },
-  {
     "term": "component.petition-compose-field-settings.how-numbering-description",
     "definition": "Enable this setting to include the text block in automatic numbering.",
     "context": "Enable this setting to include the text block in automatic numbering."
@@ -5473,6 +5478,11 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Unlimited",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-file-password.password",
+    "definition": "Password: {password}",
+    "context": "Password: {password}"
   },
   {
     "term": "component.petition-field-file-upload-payslip-reply.error-reading-document",
@@ -9568,6 +9578,11 @@
     "term": "component.settings-row-alias.alias-label",
     "definition": "References",
     "context": "References"
+  },
+  {
+    "term": "component.settings-row-alias.heading-alias-description",
+    "definition": "Use this reference in a field description to display the automatic numbering assigned to this field.",
+    "context": "Use this reference in a field description to display the automatic numbering assigned to this field."
   },
   {
     "term": "component.settings-row-alias.reference-exists-error",

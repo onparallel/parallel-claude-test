@@ -6816,6 +6816,7 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       parentReplyId?: NexusGenScalars["GID"] | null; // GID
+      password?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     createFileUploadReplyComplete: {
@@ -7312,6 +7313,7 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
       parentReplyId?: NexusGenScalars["GID"] | null; // GID
+      password?: string | null; // String
     };
     publicCreatePetitionComment: {
       // args
@@ -7677,6 +7679,7 @@ export interface NexusGenArgTypes {
     updateFileUploadReply: {
       // args
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
+      password?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
     };

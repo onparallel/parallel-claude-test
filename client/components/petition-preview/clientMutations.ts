@@ -365,12 +365,14 @@ const _createFileUploadReply = gql`
     $fieldId: GID!
     $file: FileUploadInput!
     $parentReplyId: GID
+    $password: String
   ) {
     createFileUploadReply(
       petitionId: $petitionId
       fieldId: $fieldId
       file: $file
       parentReplyId: $parentReplyId
+      password: $password
     ) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
@@ -441,13 +443,13 @@ export function useCreateFileUploadReply() {
     }: {
       petitionId: string;
       fieldId: string;
-      content: File[];
+      content: { file: File; password?: string }[];
       uploads: MutableRefObject<Record<string, AbortController>>;
       parentReplyId?: string;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        for (const file of content) {
+        for (const { file } of content) {
           const id = `${fieldId}-${getRandomId()}`;
           updatePreviewFieldReplies(apollo, fieldId, (replies) => [
             ...(replies ?? []),
@@ -504,7 +506,7 @@ export function useCreateFileUploadReply() {
       } else {
         await pMap(
           content,
-          async (file) => {
+          async ({ file, password }) => {
             const { data } = await createFileUploadReply({
               variables: {
                 petitionId,
@@ -515,6 +517,7 @@ export function useCreateFileUploadReply() {
                   contentType: file.type,
                 },
                 parentReplyId,
+                password,
               },
               update(cache, { data }) {
                 const reply = data!.createFileUploadReply.reply;
@@ -876,8 +879,8 @@ export function useCreateFieldGroupReplyFromProfile() {
               fieldId: linkedField.id,
               content: (property!.files?.map((f) => {
                 const { filename, size, contentType } = f.file ?? {};
-                return { name: filename, size, type: contentType };
-              }) ?? []) as File[],
+                return { file: { name: filename, size, type: contentType } };
+              }) ?? []) as { file: File }[],
               uploads: { current: {} },
               parentReplyId,
               isCacheOnly,

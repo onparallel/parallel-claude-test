@@ -1528,6 +1528,7 @@ export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -2024,6 +2025,7 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationpublicCreatePetitionCommentArgs = {
@@ -2389,6 +2391,7 @@ export type MutationupdateFieldPositionsArgs = {
 
 export type MutationupdateFileUploadReplyArgs = {
   file: FileUploadInput;
+  password?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
 };
@@ -10423,6 +10426,7 @@ export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
   fieldId: Scalars["GID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   file: FileUploadInput;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type SubmitReply_createFileUploadReplyMutation = {
@@ -10541,6 +10545,7 @@ export type UpdateReply_updateFileUploadReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
   file: FileUploadInput;
+  password?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type UpdateReply_updateFileUploadReplyMutation = {
@@ -12825,12 +12830,14 @@ export const SubmitReply_createFileUploadReplyDocument = gql`
     $fieldId: GID!
     $parentReplyId: GID
     $file: FileUploadInput!
+    $password: String
   ) {
     createFileUploadReply(
       petitionId: $petitionId
       fieldId: $fieldId
       parentReplyId: $parentReplyId
       file: $file
+      password: $password
     ) {
       presignedPostData {
         ...AWSPresignedPostData
@@ -12905,8 +12912,14 @@ export const UpdateReply_updateFileUploadReplyDocument = gql`
     $petitionId: GID!
     $replyId: GID!
     $file: FileUploadInput!
+    $password: String
   ) {
-    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+    updateFileUploadReply(
+      petitionId: $petitionId
+      replyId: $replyId
+      file: $file
+      password: $password
+    ) {
       presignedPostData {
         ...AWSPresignedPostData
       }
