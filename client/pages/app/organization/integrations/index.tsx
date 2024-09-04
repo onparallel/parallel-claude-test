@@ -298,7 +298,7 @@ function OrganizationIntegrations() {
       body: intl.formatMessage({
         id: "page.organization-integrations.id-verification-description",
         defaultMessage:
-          "Allows verification of the identity of individuals through their identity documents.",
+          "Allows the verification of a person's identity using official identity documents.",
       }),
       onChange: noop,
       isChecked: hasIdVerification,

@@ -13991,8 +13991,8 @@
   },
   {
     "term": "page.organization-integrations.id-verification-description",
-    "definition": "Allows verification of the identity of individuals through their identity documents.",
-    "context": "Allows verification of the identity of individuals through their identity documents."
+    "definition": "Allows the verification of a person's identity using official identity documents.",
+    "context": "Allows the verification of a person's identity using official identity documents."
   },
   {
     "term": "page.organization-integrations.open-sanctions-contact-message",

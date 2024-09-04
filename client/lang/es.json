@@ -13991,8 +13991,8 @@
   },
   {
     "term": "page.organization-integrations.id-verification-description",
-    "definition": "Permite verificar la identidad de personas físicas a través de su documento de identidad.",
-    "context": "Allows verification of the identity of individuals through their identity documents."
+    "definition": "Permite verificar la identidad de personas a través de sus documentos de identidad.",
+    "context": "Allows the verification of a person's identity using official identity documents."
   },
   {
     "term": "page.organization-integrations.open-sanctions-contact-message",
