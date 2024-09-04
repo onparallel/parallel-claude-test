@@ -73,30 +73,28 @@ async function main() {
     throw new Error(`No running instances for environment ${env} and release ${commit}.`);
   }
 
-  if (env === "production") {
-    const addresses = await ec2
-      .send(new DescribeAddressesCommand({ Filters: [{ Name: "tag:Environment", Values: [env] }] }))
-      .then((r) => r.Addresses!);
+  const addresses = await ec2
+    .send(new DescribeAddressesCommand({ Filters: [{ Name: "tag:Environment", Values: [env] }] }))
+    .then((r) => r.Addresses!);
 
-    const availableAddresses = addresses.filter(
-      (a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId),
-    );
+  const availableAddresses = addresses.filter(
+    (a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId),
+  );
 
-    if (availableAddresses.length < newInstances.length) {
-      throw new Error("Not enough available elastic IPs");
-    }
-
-    await pMap(zip(newInstances, availableAddresses), async ([instance, address]) => {
-      const addressName = address.Tags!.find((t) => t.Key === "Name")!.Value!;
-      console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
-      await ec2.send(
-        new AssociateAddressCommand({
-          InstanceId: instance.InstanceId,
-          AllocationId: address.AllocationId,
-        }),
-      );
-    });
+  if (availableAddresses.length < newInstances.length) {
+    throw new Error("Not enough available elastic IPs");
   }
+
+  await pMap(zip(newInstances, availableAddresses), async ([instance, address]) => {
+    const addressName = address.Tags!.find((t) => t.Key === "Name")!.Value!;
+    console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
+    await ec2.send(
+      new AssociateAddressCommand({
+        InstanceId: instance.InstanceId,
+        AllocationId: address.AllocationId,
+      }),
+    );
+  });
 
   await pMap(newInstances, async (instance) => {
     const ipAddress = instance.PrivateIpAddress!;
