@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 
-interface DialogCallbacks<TResult = void> {
+export interface DialogCallbacks<TResult = void> {
   onResolve: (value?: TResult) => void;
   onReject: (reason?: string) => void;
 }

@@ -761,6 +761,11 @@ interface IOrgIntegration {
   isDefault: Boolean!
 
   """
+  URL of the integration logo
+  """
+  logoUrl(options: ImageOptions): String
+
+  """
   Custom name of this integration, provided by the user
   """
   name: String!
@@ -817,6 +822,7 @@ enum IntegrationType {
   DOCUMENT_PROCESSING
   DOW_JONES_KYC
   ID_VERIFICATION
+  PROFILE_EXTERNAL_SOURCE
   SIGNATURE
   SSO
   USER_PROVISIONING
@@ -1061,6 +1067,12 @@ type Mutation {
     message: String
     petitionId: GID!
   ): Petition!
+  completeProfileFromExternalSource(
+    conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+    profileExternalSourceEntityId: GID!
+    profileId: GID
+    profileTypeId: GID!
+  ): Profile!
   copyBackgroundCheckReplyToProfileFieldValue(
     expiryDate: Date
     petitionId: GID!
@@ -1209,6 +1221,24 @@ type Mutation {
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
   """
   createDowJonesProfileDownloadTask(profileId: ID!): Task!
+
+  """
+  Creates a new eInforma Profile External Source integration on the provided organization
+  """
+  createEInformaProfileExternalSourceIntegration(
+    clientId: String!
+    clientSecret: String!
+
+    """
+    Paid subscription will allow to access real data for entity details
+    """
+    isPaidSubscription: Boolean!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
 
   "\n    Edits permissions to users and groups on given petitions.\n    If the total amount of permissions to edit exceeds 100, a task will be created for async completion.\n  "
   createEditPetitionPermissionTask(
@@ -1928,6 +1958,19 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
+  profileExternalSourceDetails(
+    externalId: ID!
+    integrationId: GID!
+    profileId: GID
+    profileTypeId: GID!
+  ): ProfileExternalSourceSearchSingleResult!
+  profileExternalSourceSearch(
+    integrationId: GID!
+    locale: UserLocale!
+    profileId: GID
+    profileTypeId: GID!
+    search: JSONObject!
+  ): ProfileExternalSourceSearchResults!
 
   """
   Generates a download link for a profile field file
@@ -2951,6 +2994,11 @@ type OrgIntegration implements IOrgIntegration {
   Wether this integration is the default to be used if the user has more than one of the same type
   """
   isDefault: Boolean!
+
+  """
+  URL of the integration logo
+  """
+  logoUrl(options: ImageOptions): String
 
   """
   Custom name of this integration, provided by the user
@@ -5561,6 +5609,107 @@ enum ProfileEventType {
   PROFILE_UPDATED
 }
 
+input ProfileExternalSourceConflictResolution {
+  action: ProfileExternalSourceConflictResolutionAction!
+  profileTypeFieldId: GID!
+}
+
+enum ProfileExternalSourceConflictResolutionAction {
+  IGNORE
+  OVERWRITE
+}
+
+type ProfileExternalSourceOrgIntegration implements IOrgIntegration {
+  id: GID!
+  invalidCredentials: Boolean!
+
+  """
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  URL of the integration logo
+  """
+  logoUrl(options: ImageOptions): String
+
+  """
+  Custom name of this integration, provided by the user
+  """
+  name: String!
+
+  """
+  Returns a list with search parameters structure required to do a search on this external source provider
+  """
+  searchParams(
+    locale: UserLocale!
+    profileId: GID
+    profileTypeId: GID!
+  ): [ProfileExternalSourceSearchParam!]!
+
+  """
+  Returns a list with profile types that can be used to perform searches on this external source provider
+  """
+  searchableProfileTypes: [ProfileType!]!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
+}
+
+type ProfileExternalSourceSearchMultipleResults {
+  results: ProfileExternalSourceSearchMultipleResultsDetail!
+  totalCount: Int!
+}
+
+type ProfileExternalSourceSearchMultipleResultsColumn {
+  key: String!
+  label: String!
+}
+
+type ProfileExternalSourceSearchMultipleResultsDetail {
+  columns: [ProfileExternalSourceSearchMultipleResultsColumn!]!
+  key: String!
+  rows: [JSONObject!]!
+}
+
+type ProfileExternalSourceSearchParam {
+  defaultValue: String
+  key: String!
+  label: String!
+  minLength: Int
+  options: [ProfileExternalSourceSearchParamOption!]
+  placeholder: String
+  required: Boolean!
+  type: ProfileExternalSourceSearchParamType!
+}
+
+type ProfileExternalSourceSearchParamOption {
+  label: String!
+  value: String!
+}
+
+enum ProfileExternalSourceSearchParamType {
+  SELECT
+  TEXT
+}
+
+union ProfileExternalSourceSearchResults =
+  | ProfileExternalSourceSearchMultipleResults
+  | ProfileExternalSourceSearchSingleResult
+
+type ProfileExternalSourceSearchSingleResult {
+  data: [ProfileExternalSourceSearchSingleResultData!]!
+  id: GID!
+  profile: Profile
+}
+
+type ProfileExternalSourceSearchSingleResultData {
+  content: JSONObject
+  profileTypeField: ProfileTypeField!
+}
+
 type ProfileFieldExpiryUpdatedEvent implements ProfileEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -5864,6 +6013,7 @@ type ProfileType implements Timestamps {
   name: LocalizableUserText!
   profileNamePattern: String!
   profileNamePatternFields: [GID!]!
+  standardType: ProfileTypeStandardType
 
   """
   Time when the resource was last updated.
@@ -7418,6 +7568,11 @@ type SignatureOrgIntegration implements IOrgIntegration {
   Wether this integration is the default to be used if the user has more than one of the same type
   """
   isDefault: Boolean!
+
+  """
+  URL of the integration logo
+  """
+  logoUrl(options: ImageOptions): String
 
   """
   Custom name of this integration, provided by the user

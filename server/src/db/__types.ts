@@ -105,7 +105,8 @@ export type IntegrationType =
   | "DOW_JONES_KYC"
   | "AI_COMPLETION"
   | "ID_VERIFICATION"
-  | "DOCUMENT_PROCESSING";
+  | "DOCUMENT_PROCESSING"
+  | "PROFILE_EXTERNAL_SOURCE";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
@@ -115,6 +116,7 @@ export const IntegrationTypeValues = [
   "AI_COMPLETION",
   "ID_VERIFICATION",
   "DOCUMENT_PROCESSING",
+  "PROFILE_EXTERNAL_SOURCE",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -641,6 +643,7 @@ export interface TableTypes {
   petition_user_notification: PetitionUserNotification;
   profile: Profile;
   profile_event: ProfileEvent;
+  profile_external_source_entity: ProfileExternalSourceEntity;
   profile_field_file: ProfileFieldFile;
   profile_field_value: ProfileFieldValue;
   profile_relationship: ProfileRelationship;
@@ -708,6 +711,7 @@ export interface TableCreateTypes {
   petition_user_notification: CreatePetitionUserNotification;
   profile: CreateProfile;
   profile_event: CreateProfileEvent;
+  profile_external_source_entity: CreateProfileExternalSourceEntity;
   profile_field_file: CreateProfileFieldFile;
   profile_field_value: CreateProfileFieldValue;
   profile_relationship: CreateProfileRelationship;
@@ -775,6 +779,7 @@ export interface TablePrimaryKeys {
   petition_user_notification: "id";
   profile: "id";
   profile_event: "id";
+  profile_external_source_entity: "id";
   profile_field_file: "id";
   profile_field_value: "id";
   profile_relationship: "id";
@@ -1828,6 +1833,22 @@ export type CreateProfileEvent = PartialProps<
   "data" | "created_at" | "processed_at" | "processed_by"
 >;
 
+export interface ProfileExternalSourceEntity {
+  id: number; // int4
+  integration_id: number; // int4
+  data: any; // jsonb
+  standard_type: ProfileTypeStandardType; // profile_type_standard_type
+  parsed_data: any; // jsonb
+  created_by_user_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileExternalSourceEntity = PartialProps<
+  Omit<ProfileExternalSourceEntity, "id">,
+  "parsed_data" | "created_at" | "created_by"
+>;
+
 export interface ProfileFieldFile {
   id: number; // int4
   profile_id: number; // int4
@@ -1870,6 +1891,7 @@ export interface ProfileFieldValue {
   anonymized_at: Maybe<Date>; // timestamptz
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  external_source_integration_id: Maybe<number>; // int4
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -1883,6 +1905,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "anonymized_at"
   | "deleted_at"
   | "deleted_by"
+  | "external_source_integration_id"
 >;
 
 export interface ProfileRelationship {

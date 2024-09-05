@@ -1,5 +1,5 @@
-import { AzureKeyCredential, OpenAIClient } from "@azure/openai";
 import { inject, injectable } from "inversify";
+import { AzureOpenAI } from "openai";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
@@ -45,13 +45,15 @@ export class AzureOpenAiIntegration extends GenericIntegration<
 
   public async withAzureOpenAiClient<TResult>(
     orgIntegrationId: number,
-    handler: (client: OpenAIClient, context: AzureOpenAiIntegrationContext) => Promise<TResult>,
+    apiVersion: string,
+    handler: (client: AzureOpenAI, context: AzureOpenAiIntegrationContext) => Promise<TResult>,
   ): Promise<TResult> {
     return await this.withCredentials(orgIntegrationId, async (credentials, context) => {
-      const client = new OpenAIClient(
-        context.endpoint,
-        new AzureKeyCredential(credentials.API_KEY),
-      );
+      const client = new AzureOpenAI({
+        endpoint: context.endpoint,
+        apiKey: credentials.API_KEY,
+        apiVersion,
+      });
       try {
         return await handler(client, context);
       } catch (error) {

@@ -12,8 +12,9 @@ import {
   Spinner,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon, EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
+import { ExternalLinkIcon, EyeOffIcon, LockClosedIcon, SearchIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -50,9 +51,13 @@ import { useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, partition } from "remeda";
+import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link } from "../common/Link";
 import { ProfileReference } from "../common/ProfileReference";
+import { Spacer } from "../common/Spacer";
+import { useImportFromExternalSourceDialog } from "./dialogs/ImportFromExternalSourceDialog";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -191,6 +196,34 @@ export const ProfileForm = Object.assign(
         ),
       [properties, fieldsWithIndices],
     );
+
+    const showSelectProfileExternalSourceDialog = useImportFromExternalSourceDialog();
+    const toast = useToast();
+    async function handleCheckExternalSourcesClick() {
+      try {
+        await showSelectProfileExternalSourceDialog({
+          profileType: profile.profileType,
+          profileId: profile.id,
+        });
+        toast({
+          title: intl.formatMessage({
+            id: "component.profile-form.success-toast-header",
+            defaultMessage: "Information imported successfully",
+          }),
+          description: intl.formatMessage({
+            id: "component.profile-form.success-toast-description",
+            defaultMessage:
+              "The profile has been updated with the information from the external source",
+          }),
+          status: "success",
+          isClosable: true,
+        });
+      } catch (e) {
+        if (!isDialogError(e)) {
+          throw e;
+        }
+      }
+    }
 
     return (
       <Flex
@@ -408,7 +441,7 @@ export const ProfileForm = Object.assign(
                 />
               </Badge>
             ) : profile.status === "DELETION_SCHEDULED" ? (
-              <Badge colorScheme={"red"}>
+              <Badge colorScheme="red">
                 <FormattedMessage
                   id="component.profile-form.deleted-status"
                   defaultMessage="Deleted"
@@ -419,6 +452,20 @@ export const ProfileForm = Object.assign(
               <Link href={`/app/profiles/${profile.id}`} display="flex">
                 <ExternalLinkIcon fontSize="lg" />
               </Link>
+            ) : null}
+            <Spacer />
+            {profile.profileType.standardType === "INDIVIDUAL" ||
+            profile.profileType.standardType === "LEGAL_ENTITY" ? (
+              <IconButtonWithTooltip
+                isDisabled={profile.status !== "OPEN"}
+                onClick={handleCheckExternalSourcesClick}
+                icon={<SearchIcon />}
+                size="sm"
+                label={intl.formatMessage({
+                  id: "component.profile-form.check-external-sources-tooltip",
+                  defaultMessage: "Check external data sources",
+                })}
+              />
             ) : null}
           </HStack>
           <HStack
@@ -436,7 +483,6 @@ export const ProfileForm = Object.assign(
                 })}
               />
             </OverflownText>
-
             <Box whiteSpace="nowrap">
               <FormattedMessage
                 id="component.profile-form.associated-profiles-count"
@@ -608,6 +654,8 @@ export const ProfileForm = Object.assign(
             profileType {
               id
               name
+              standardType
+              ...useImportFromExternalSourceDialog_ProfileType
             }
             properties {
               ...ProfileForm_ProfileFieldProperty
@@ -622,6 +670,7 @@ export const ProfileForm = Object.assign(
           }
           ${ProfileReference.fragments.Profile}
           ${this.ProfileFieldProperty}
+          ${useImportFromExternalSourceDialog.fragments.ProfileType}
         `;
       },
       get PetitionBase() {

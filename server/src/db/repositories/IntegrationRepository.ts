@@ -20,6 +20,7 @@ interface IntegrationProviders {
   AI_COMPLETION: "AZURE_OPEN_AI";
   ID_VERIFICATION: "BANKFLIP";
   DOCUMENT_PROCESSING: "BANKFLIP";
+  PROFILE_EXTERNAL_SOURCE: "EINFORMA";
 }
 
 type SignaturitSettings = {
@@ -62,6 +63,14 @@ interface AzureAiCompletionSettings {
   ENDPOINT: string;
 }
 
+interface EInformaProfileExternalSourceSettings {
+  CREDENTIALS: {
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+  };
+  ENVIRONMENT: "production" | "test";
+}
+
 export type IntegrationProvider<TType extends IntegrationType> =
   TType extends keyof IntegrationProviders ? IntegrationProviders[TType] : string;
 
@@ -89,6 +98,11 @@ export type IntegrationSettings<
   DOCUMENT_PROCESSING: TProvider extends IntegrationProviders["DOCUMENT_PROCESSING"]
     ? {
         BANKFLIP: BankflipSettings;
+      }[TProvider]
+    : never;
+  PROFILE_EXTERNAL_SOURCE: TProvider extends IntegrationProviders["PROFILE_EXTERNAL_SOURCE"]
+    ? {
+        EINFORMA: EInformaProfileExternalSourceSettings;
       }[TProvider]
     : never;
 }[TType];
@@ -302,6 +316,7 @@ export class IntegrationRepository extends BaseRepository {
     ids: number[],
     user: User,
     integrationTypes?: IntegrationType[],
+    onlyEnabled?: boolean,
   ) {
     const [{ count }] = await this.from("org_integration")
       .whereIn("id", ids)
@@ -309,6 +324,9 @@ export class IntegrationRepository extends BaseRepository {
       .mmodify((q) => {
         if ((integrationTypes ?? []).length > 0) {
           q.whereIn("type", integrationTypes!);
+        }
+        if (onlyEnabled) {
+          q.where("is_enabled", true);
         }
       })
       .select<{ count: number }[]>(this.knex.raw(`count(distinct(id))::int as "count"`));

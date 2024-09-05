@@ -10,7 +10,8 @@ import {
   UserLocaleValues,
 } from "../../../db/__types";
 import { toGlobalId } from "../../../util/globalId";
-import { JsonSchema, JsonSchemaFor, schema } from "../../rest/schemas";
+
+import { JsonSchema, JsonSchemaFor, schema } from "../../../util/jsonSchema";
 import { UserLocale } from "../__types";
 import { PetitionEvent, ProfileEvent } from "./events";
 

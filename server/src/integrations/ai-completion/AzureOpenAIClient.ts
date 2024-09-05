@@ -10,6 +10,7 @@ import { AzureOpenAiIntegration, AzureOpenAiModel } from "./AzureOpenAiIntegrati
 interface AzureOpenAiClientParams {
   model: AzureOpenAiModel;
   prompt: AiCompletionPrompt[];
+  apiVersion: string;
 }
 
 @injectable()
@@ -36,59 +37,67 @@ export class AzureOpenAiClient
     },
   };
 
-  buildRequestParams(model: AzureOpenAiModel, prompt: AiCompletionPrompt[]) {
+  buildRequestParams(model: AzureOpenAiModel, apiVersion: string, prompt: AiCompletionPrompt[]) {
     return {
       prompt,
       model,
+      apiVersion,
     };
   }
 
   async getCompletion(params: AzureOpenAiClientParams, options?: AiCompletionOptions) {
-    return await this.openAi.withAzureOpenAiClient(this.integrationId, async (client, context) => {
-      if (options?.stream) {
-        throw new Error("Stream not supported");
-      }
-      const response = await retry(
-        async (i) => {
-          try {
-            const model = i === 0 ? params.model : context.defaultModel;
-            const { result: completion, time } = await withStopwatch(
-              async () =>
-                await client.getChatCompletions(model, params.prompt, {
-                  n: 1, // ensure there is only 1 choice in response
-                }),
-            );
+    return await this.openAi.withAzureOpenAiClient(
+      this.integrationId,
+      params.apiVersion,
+      async (client, context) => {
+        if (options?.stream) {
+          throw new Error("Stream not supported");
+        }
+        const response = await retry(
+          async (i) => {
+            try {
+              const model = i === 0 ? params.model : context.defaultModel;
+              const { result: completion, time } = await withStopwatch(
+                async () =>
+                  await client.chat.completions.create({
+                    model,
+                    messages: params.prompt,
+                    n: 1, // ensure there is only 1 choice in response,
+                  }),
+              );
 
-            return { completion, model, time };
-          } catch (e) {
-            if (this.isModelNotFoundError(e)) {
-              throw new InvalidRequestError(e.code, e.message);
-            } else {
-              throw new StopRetryError(e);
+              return { completion, model, time };
+            } catch (e) {
+              if (this.isModelNotFoundError(e)) {
+                throw new InvalidRequestError(e.code, e.message);
+              } else {
+                throw new StopRetryError(e);
+              }
             }
-          }
-        },
-        { maxRetries: 1 },
-      );
+          },
+          { maxRetries: 1 },
+        );
 
-      const requestTokens = response.completion.usage?.promptTokens ?? 0;
-      const requestCost = this.PRICE_PER_TOKEN[response.model].input.multipliedBy(requestTokens);
+        const requestTokens = response.completion.usage?.prompt_tokens ?? 0;
+        const requestCost = this.PRICE_PER_TOKEN[response.model].input.multipliedBy(requestTokens);
 
-      const responseTokens = response.completion.usage?.completionTokens ?? 0;
-      const responseCost = this.PRICE_PER_TOKEN[response.model].output.multipliedBy(responseTokens);
+        const responseTokens = response.completion.usage?.completion_tokens ?? 0;
+        const responseCost =
+          this.PRICE_PER_TOKEN[response.model].output.multipliedBy(responseTokens);
 
-      const totalCost = requestCost.plus(responseCost).toString();
+        const totalCost = requestCost.plus(responseCost).toString();
 
-      return {
-        requestParams: JSON.stringify({ ...params, model: response.model }),
-        rawResponse: JSON.stringify(response.completion),
-        completion: response.completion.choices[0].message?.content ?? "",
-        requestTokens,
-        responseTokens,
-        totalCost,
-        requestDurationMs: response.time,
-      };
-    });
+        return {
+          requestParams: JSON.stringify({ ...params, model: response.model }),
+          rawResponse: JSON.stringify(response.completion),
+          completion: response.completion.choices[0].message?.content ?? "",
+          requestTokens,
+          responseTokens,
+          totalCost,
+          requestDurationMs: response.time,
+        };
+      },
+    );
   }
 
   private isModelNotFoundError(e: unknown): e is { code: string; message: string } {

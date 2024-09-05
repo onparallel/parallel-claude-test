@@ -1,5 +1,8 @@
 import { createContainer } from "../src/container";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/integrations/dow-jones/DowJonesClient";
+import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
+import { IProfileExternalSourceIntegration } from "../src/integrations/profile-external-source/ProfileExternalSourceIntegration";
+import { AI_ASSISTANT_SERVICE, IAiAssistantService } from "../src/services/AiAssistantService";
 import { ANALYTICS, IAnalyticsService } from "../src/services/AnalyticsService";
 import { AUTH, IAuth } from "../src/services/AuthService";
 import {
@@ -13,10 +16,12 @@ import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
 import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
 import {
+  MockAiAssistantService,
   MockAnalyticsService,
   MockAuth,
   MockBackgroundCheckService,
   MockDowJonesClient,
+  MockEInformaProfileExternalSourceIntegration,
   MockEmailsService,
   MockFetchService,
   MockQueuesService,
@@ -39,5 +44,14 @@ export function createTestContainer() {
     .rebind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
     .to(MockBackgroundCheckService)
     .inSingletonScope();
+  container
+    .rebind<IAiAssistantService>(AI_ASSISTANT_SERVICE)
+    .to(MockAiAssistantService)
+    .inSingletonScope();
+  container
+    .rebind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    .to(MockEInformaProfileExternalSourceIntegration)
+    .inSingletonScope();
+
   return container;
 }

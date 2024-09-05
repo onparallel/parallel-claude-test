@@ -239,8 +239,8 @@ export const theme = extendTheme({
               borderColor: "gray.200",
             },
             th: {
-              paddingX: 2,
-              paddingY: 2,
+              paddingX: 2.5,
+              paddingY: 2.5,
               letterSpacing: "normal",
               fontWeight: 400,
               fontSize: "sm",

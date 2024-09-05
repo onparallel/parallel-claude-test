@@ -11,6 +11,7 @@ export function buildProfileUpdatedEventsData(
   currentValues: ProfileFieldValue[],
   previousValues: ProfileFieldValue[],
   user: User,
+  externalSourceIntegrationId?: number | null,
 ) {
   const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
   const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
@@ -34,6 +35,7 @@ export function buildProfileUpdatedEventsData(
                 current_profile_field_value_id: current?.id ?? null,
                 previous_profile_field_value_id: previous?.id ?? null,
                 alias: f.alias ?? null,
+                external_source_integration_id: externalSourceIntegrationId ?? null,
               },
             } satisfies ProfileFieldValueUpdatedEvent<true>,
           ]

@@ -8,6 +8,7 @@ import {
 } from "../../db/repositories/IntegrationRepository";
 import { Tone } from "../../emails/utils/types";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../../services/EncryptionService";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { GenericIntegration } from "../helpers/GenericIntegration";
 
 export type SignaturitBrandingIdKey = `${Uppercase<ContactLocale>}_${Tone}_BRANDING_ID`;
@@ -38,9 +39,32 @@ export class SignaturitIntegration extends GenericIntegration<
 
   constructor(
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
+    @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
   ) {
     super(encryption, integrations);
+  }
+
+  async authenticateApiKey(apiKey: string) {
+    return await Promise.any(
+      Object.entries({
+        sandbox: "https://api.sandbox.signaturit.com",
+        production: "https://api.signaturit.com",
+      }).map(([environment, url]) =>
+        this.fetch
+          .fetch(`${url}/v3/team/users.json`, {
+            headers: { authorization: `Bearer ${apiKey}` },
+            timeout: 5_000,
+          })
+          .then(({ status }) => {
+            if (status === 200) {
+              return { environment: environment as SignaturitEnvironment };
+            } else {
+              throw new Error();
+            }
+          }),
+      ),
+    );
   }
 
   public async withApiKey<TResult>(

@@ -14,6 +14,11 @@ import {
   BANKFLIP_ID_VERIFICATION_INTEGRATION,
   BankflipIdVerificationIntegration,
 } from "./id-verification/bankflip/BankflipIdVerificationIntegration";
+import { IProfileExternalSourceIntegration } from "./profile-external-source/ProfileExternalSourceIntegration";
+import {
+  EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+  EInformaProfileExternalSourceIntegration,
+} from "./profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { DocusignClient } from "./signature/DocusignClient";
 import { DocusignIntegration } from "./signature/DocusignIntegration";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature/SignatureClient";
@@ -40,5 +45,9 @@ export const integrationsModule = new ContainerModule((bind) => {
 
   bind<IDocumentProcessingIntegration>(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION).to(
     BankflipDocumentProcessingIntegration,
+  );
+
+  bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
+    EInformaProfileExternalSourceIntegration,
   );
 });

@@ -26,6 +26,7 @@ interface AiCompletionConfig {
   type: AiCompletionLogType;
   model: string;
   prompt: AiCompletionPrompt[];
+  apiVersion: string;
 }
 
 export interface IAiCompletionService {
@@ -53,7 +54,7 @@ export class AiCompletionService implements IAiCompletionService {
     const integration = (await this.integrations.loadIntegration(config.integration_id))!;
     const provider = integration.provider as IntegrationProvider<"AI_COMPLETION">;
     const client = this.getClient({ id: integration.id, provider });
-    const params = client.buildRequestParams(config.model, config.prompt);
+    const params = client.buildRequestParams(config.model, config.apiVersion, config.prompt);
 
     const aiCompletionLog = await this.petitions.createAiCompletionLog(
       {

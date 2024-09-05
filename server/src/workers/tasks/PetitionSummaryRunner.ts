@@ -67,6 +67,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       {
         type: "PETITION_SUMMARY",
         integration_id: summaryConfig.integration_id,
+        apiVersion: summaryConfig.api_version,
         model: summaryConfig.model,
         prompt: summaryConfig.prompt.map((message) => ({
           role: message.role,

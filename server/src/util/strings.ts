@@ -16,6 +16,6 @@ export function pascalCase(text: string) {
     .join("");
 }
 
-function capitalize(text: string) {
+export function capitalize(text: string) {
   return text.charAt(0).toUpperCase().concat(text.slice(1).toLowerCase());
 }

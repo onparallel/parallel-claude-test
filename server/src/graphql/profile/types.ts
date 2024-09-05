@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
+import { format as formatPhoneNumber } from "libphonenumber-js";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
 import { isNonNullish, isNullish, pick, sortBy, unique } from "remeda";
 import {
@@ -58,6 +59,10 @@ export const ProfileType = objectType({
     });
     t.nonNull.boolean("isStandard", {
       resolve: (o) => o.standard_type !== null,
+    });
+    t.nullable.field("standardType", {
+      type: "ProfileTypeStandardType",
+      resolve: (o) => o.standard_type,
     });
   },
 });
@@ -424,8 +429,14 @@ export const ProfileFieldValue = objectType({
                 }
               : null,
           };
+        } else if (root.type === "PHONE") {
+          return {
+            ...root.content,
+            pretty: formatPhoneNumber(root.content.value as string, "INTERNATIONAL"),
+          };
+        } else {
+          return root.content;
         }
-        return root.content;
       },
     });
   },

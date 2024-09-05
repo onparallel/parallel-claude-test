@@ -354,6 +354,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         Profile: {
           fields: {
             petitions: { merge: false },
+            properties: { merge: mergeArraysBy(["field", "id"]) },
           },
         },
       },

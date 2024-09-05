@@ -1,15 +1,27 @@
 export type MaybePromise<T> = T | Promise<T>;
+
 export type MaybeArray<T> = T | Array<T>;
-export type MaybeFunction<T> = T | (() => T);
+export function unMaybeArray<T>(maybeArray: MaybeArray<T>) {
+  return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
+}
+
+export type MaybeFunction<TResult, TArgs extends any[] = []> =
+  | TResult
+  | ((...args: TArgs) => TResult);
+export function unMaybeFunction<TResult, TArgs extends any[] = []>(
+  maybeFunction: MaybeFunction<TResult, TArgs>,
+  ...args: TArgs
+) {
+  return typeof maybeFunction === "function"
+    ? (maybeFunction as (...args: TArgs) => TResult)(...args)
+    : (maybeFunction as TResult);
+}
+
 export type UnwrapArray<T> = T extends Array<infer U> ? U : never;
 export type UnwrapPromise<T> = T extends Promise<infer U> ? U : never;
 export type Maybe<T> = T | null;
 export type Assert<T> = Exclude<T, null | undefined>;
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
-
-export function unMaybeArray<T>(items: MaybeArray<T>) {
-  return Array.isArray(items) ? items : [items];
-}
 
 export type If<Condition, Then, Else = never> = Condition extends false | undefined ? Else : Then;
 

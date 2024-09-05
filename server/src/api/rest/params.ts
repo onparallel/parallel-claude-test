@@ -1,9 +1,9 @@
 import Ajv from "ajv";
 import { OpenAPIV3 } from "openapi-types";
 import { isNonNullish } from "remeda";
+import { JsonSchema } from "../../util/jsonSchema";
 import { If, MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
-import { JsonSchema } from "./schemas";
 
 export class ParseError extends Error {
   constructor(

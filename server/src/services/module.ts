@@ -5,6 +5,11 @@ import {
   IAccountSetupService,
 } from "./AccountSetupService";
 import {
+  AI_ASSISTANT_SERVICE,
+  AiAssistantService,
+  IAiAssistantService,
+} from "./AiAssistantService";
+import {
   AI_COMPLETION_SERVICE,
   AiCompletionService,
   IAiCompletionService,
@@ -67,6 +72,11 @@ import {
 } from "./PetitionMessageContextService";
 import { IPrinter, PRINTER, Printer } from "./Printer";
 import {
+  IProfileExternalSourcesService,
+  PROFILE_EXTERNAL_SOURCE_SERVICE,
+  ProfileExternalSourcesService,
+} from "./ProfileExternalSourcesService";
+import {
   IProfilesSetupService,
   PROFILES_SETUP_SERVICE,
   ProfilesSetupService,
@@ -111,4 +121,8 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
   bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
   bind<IDocumentProcessingService>(DOCUMENT_PROCESSING_SERVICE).to(DocumentProcessingService);
+  bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE).to(
+    ProfileExternalSourcesService,
+  );
+  bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
 });

@@ -17,16 +17,17 @@ interface ImageOptions {
 
 export interface IImageService {
   getImageUrl(path: string, options?: ImageOptions): Promise<string>;
+  getAssetImageUrl(path: string, options?: ImageOptions): Promise<string>;
 }
 
 @injectable()
 export class ImageService implements ImageService {
   constructor(@inject(CONFIG) private config: Config) {}
 
-  async getImageUrl(key: string, options: ImageOptions = {}) {
+  private async _getImageUrl(bucketName: string, key: string, options: ImageOptions = {}) {
     const request = Buffer.from(
       JSON.stringify({
-        bucket: this.config.s3.publicFilesBucketName,
+        bucket: bucketName,
         key,
         edits: options,
       }),
@@ -35,5 +36,13 @@ export class ImageService implements ImageService {
       .update(`/${request}`)
       .digest("hex");
     return `${this.config.misc.imagesUrl}/${request}?${new URLSearchParams({ signature })}`;
+  }
+
+  async getImageUrl(key: string, options: ImageOptions = {}) {
+    return await this._getImageUrl(this.config.s3.publicFilesBucketName, key, options);
+  }
+
+  async getAssetImageUrl(key: string, options: ImageOptions = {}) {
+    return await this._getImageUrl(this.config.s3.assetsBucketName, key, options);
   }
 }

@@ -722,10 +722,16 @@ export interface IOrgIntegration {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl?: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
+}
+
+export interface IOrgIntegrationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
 }
 
 export interface IOrgIntegrationPagination {
@@ -760,6 +766,7 @@ export type IntegrationType =
   | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
   | "ID_VERIFICATION"
+  | "PROFILE_EXTERNAL_SOURCE"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -905,6 +912,7 @@ export interface Mutation {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
+  completeProfileFromExternalSource: Profile;
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
@@ -938,6 +946,8 @@ export interface Mutation {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
+  /** Creates a new eInforma Profile External Source integration on the provided organization */
+  createEInformaProfileExternalSourceIntegration: SupportMethodResponse;
   /**
    *
    *     Edits permissions to users and groups on given petitions.
@@ -1118,6 +1128,8 @@ export interface Mutation {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
+  profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
   profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
@@ -1468,6 +1480,13 @@ export interface MutationcompletePetitionArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
+export interface MutationcompleteProfileFromExternalSourceArgs {
+  conflictResolutions: Array<ProfileExternalSourceConflictResolution>;
+  profileExternalSourceEntityId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+}
+
 export interface MutationcopyBackgroundCheckReplyToProfileFieldValueArgs {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1555,6 +1574,13 @@ export interface MutationcreateDowJonesKycReplyArgs {
 
 export interface MutationcreateDowJonesProfileDownloadTaskArgs {
   profileId: Scalars["ID"]["input"];
+}
+
+export interface MutationcreateEInformaProfileExternalSourceIntegrationArgs {
+  clientId: Scalars["String"]["input"];
+  clientSecret: Scalars["String"]["input"];
+  isPaidSubscription: Scalars["Boolean"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateEditPetitionPermissionTaskArgs {
@@ -2044,6 +2070,21 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
   attachmentId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationprofileExternalSourceDetailsArgs {
+  externalId: Scalars["ID"]["input"];
+  integrationId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationprofileExternalSourceSearchArgs {
+  integrationId: Scalars["GID"]["input"];
+  locale: UserLocale;
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  search: Scalars["JSONObject"]["input"];
 }
 
 export interface MutationprofileFieldFileDownloadLinkArgs {
@@ -2757,10 +2798,16 @@ export interface OrgIntegration extends IOrgIntegration {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl?: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
+}
+
+export interface OrgIntegrationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
 }
 
 /** An object describing the license of an organization */
@@ -4458,6 +4505,97 @@ export type ProfileEventType =
   | "PROFILE_SCHEDULED_FOR_DELETION"
   | "PROFILE_UPDATED";
 
+export interface ProfileExternalSourceConflictResolution {
+  action: ProfileExternalSourceConflictResolutionAction;
+  profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export type ProfileExternalSourceConflictResolutionAction = "IGNORE" | "OVERWRITE";
+
+export interface ProfileExternalSourceOrgIntegration extends IOrgIntegration {
+  __typename?: "ProfileExternalSourceOrgIntegration";
+  id: Scalars["GID"]["output"];
+  invalidCredentials: Scalars["Boolean"]["output"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl?: Maybe<Scalars["String"]["output"]>;
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"]["output"];
+  /** Returns a list with search parameters structure required to do a search on this external source provider */
+  searchParams: Array<ProfileExternalSourceSearchParam>;
+  /** Returns a list with profile types that can be used to perform searches on this external source provider */
+  searchableProfileTypes: Array<ProfileType>;
+  /** The type of the integration. */
+  type: IntegrationType;
+}
+
+export interface ProfileExternalSourceOrgIntegrationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
+}
+
+export interface ProfileExternalSourceOrgIntegrationsearchParamsArgs {
+  locale: UserLocale;
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface ProfileExternalSourceSearchMultipleResults {
+  __typename?: "ProfileExternalSourceSearchMultipleResults";
+  results: ProfileExternalSourceSearchMultipleResultsDetail;
+  totalCount: Scalars["Int"]["output"];
+}
+
+export interface ProfileExternalSourceSearchMultipleResultsColumn {
+  __typename?: "ProfileExternalSourceSearchMultipleResultsColumn";
+  key: Scalars["String"]["output"];
+  label: Scalars["String"]["output"];
+}
+
+export interface ProfileExternalSourceSearchMultipleResultsDetail {
+  __typename?: "ProfileExternalSourceSearchMultipleResultsDetail";
+  columns: Array<ProfileExternalSourceSearchMultipleResultsColumn>;
+  key: Scalars["String"]["output"];
+  rows: Array<Scalars["JSONObject"]["output"]>;
+}
+
+export interface ProfileExternalSourceSearchParam {
+  __typename?: "ProfileExternalSourceSearchParam";
+  defaultValue?: Maybe<Scalars["String"]["output"]>;
+  key: Scalars["String"]["output"];
+  label: Scalars["String"]["output"];
+  minLength?: Maybe<Scalars["Int"]["output"]>;
+  options?: Maybe<Array<ProfileExternalSourceSearchParamOption>>;
+  placeholder?: Maybe<Scalars["String"]["output"]>;
+  required: Scalars["Boolean"]["output"];
+  type: ProfileExternalSourceSearchParamType;
+}
+
+export interface ProfileExternalSourceSearchParamOption {
+  __typename?: "ProfileExternalSourceSearchParamOption";
+  label: Scalars["String"]["output"];
+  value: Scalars["String"]["output"];
+}
+
+export type ProfileExternalSourceSearchParamType = "SELECT" | "TEXT";
+
+export type ProfileExternalSourceSearchResults =
+  | ProfileExternalSourceSearchMultipleResults
+  | ProfileExternalSourceSearchSingleResult;
+
+export interface ProfileExternalSourceSearchSingleResult {
+  __typename?: "ProfileExternalSourceSearchSingleResult";
+  data: Array<ProfileExternalSourceSearchSingleResultData>;
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+}
+
+export interface ProfileExternalSourceSearchSingleResultData {
+  __typename?: "ProfileExternalSourceSearchSingleResultData";
+  content?: Maybe<Scalars["JSONObject"]["output"]>;
+  profileTypeField: ProfileTypeField;
+}
+
 export interface ProfileFieldExpiryUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldExpiryUpdatedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -4722,6 +4860,7 @@ export interface ProfileType extends Timestamps {
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   profileNamePatternFields: Array<Scalars["GID"]["output"]>;
+  standardType?: Maybe<ProfileTypeStandardType>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 }
@@ -5831,11 +5970,17 @@ export interface SignatureOrgIntegration extends IOrgIntegration {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl?: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   provider: SignatureOrgIntegrationProvider;
   /** The type of the integration. */
   type: IntegrationType;
+}
+
+export interface SignatureOrgIntegrationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
 }
 
 export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
@@ -7079,6 +7224,13 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
         id: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
+};
+
+export type ProfileFieldValueContent_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
 };
 
 export type ProfileReference_ProfileFragment = {
@@ -16273,6 +16425,7 @@ export type PetitionSettings_UserFragment = {
       __typename?: "IOrgIntegrationPagination";
       items: Array<
         | { __typename?: "OrgIntegration" }
+        | { __typename?: "ProfileExternalSourceOrgIntegration" }
         | {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -22102,6 +22255,7 @@ export type PetitionSignaturesCard_UserFragment = {
       __typename?: "IOrgIntegrationPagination";
       items: Array<
         | { __typename?: "OrgIntegration" }
+        | { __typename?: "ProfileExternalSourceOrgIntegration" }
         | {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -23357,6 +23511,7 @@ export type ProfileDrawer_profileQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -25016,6 +25171,7 @@ export type ProfileForm_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    standardType?: ProfileTypeStandardType | null;
   };
   properties: Array<{
     __typename?: "ProfileFieldProperty";
@@ -25162,6 +25318,7 @@ export type ProfileForm_updateProfileFieldValueMutation = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -26255,6 +26412,250 @@ export type useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDire
       rightLeftName: { [locale in UserLocale]?: string };
     };
   }>;
+};
+
+export type ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment = {
+  __typename?: "ProfileExternalSourceSearchSingleResult";
+  id: string;
+  profile?: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: { __typename?: "ProfileTypeField"; id: string };
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+      } | null;
+    }>;
+  } | null;
+  data: Array<{
+    __typename?: "ProfileExternalSourceSearchSingleResultData";
+    content?: { [key: string]: any } | null;
+    profileTypeField: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      myPermission: ProfileTypeFieldPermissionType;
+      type: ProfileTypeFieldType;
+      options: { [key: string]: any };
+    };
+  }>;
+};
+
+export type ImportFromExternalSourceDialog_integrationsQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  locale: UserLocale;
+}>;
+
+export type ImportFromExternalSourceDialog_integrationsQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      integrations: {
+        __typename?: "IOrgIntegrationPagination";
+        items: Array<
+          | { __typename?: "OrgIntegration" }
+          | {
+              __typename?: "ProfileExternalSourceOrgIntegration";
+              id: string;
+              name: string;
+              logoUrl?: string | null;
+              searchParams: Array<{
+                __typename?: "ProfileExternalSourceSearchParam";
+                type: ProfileExternalSourceSearchParamType;
+                key: string;
+                required: boolean;
+                label: string;
+                placeholder?: string | null;
+                defaultValue?: string | null;
+                minLength?: number | null;
+                options?: Array<{
+                  __typename?: "ProfileExternalSourceSearchParamOption";
+                  value: string;
+                  label: string;
+                }> | null;
+              }>;
+              searchableProfileTypes: Array<{ __typename?: "ProfileType"; id: string }>;
+            }
+          | { __typename?: "SignatureOrgIntegration" }
+        >;
+      };
+    };
+  };
+};
+
+export type ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment = {
+  __typename?: "ProfileExternalSourceOrgIntegration";
+  id: string;
+  name: string;
+  logoUrl?: string | null;
+  searchParams: Array<{
+    __typename?: "ProfileExternalSourceSearchParam";
+    type: ProfileExternalSourceSearchParamType;
+    key: string;
+    required: boolean;
+    label: string;
+    placeholder?: string | null;
+    defaultValue?: string | null;
+    minLength?: number | null;
+    options?: Array<{
+      __typename?: "ProfileExternalSourceSearchParamOption";
+      value: string;
+      label: string;
+    }> | null;
+  }>;
+  searchableProfileTypes: Array<{ __typename?: "ProfileType"; id: string }>;
+};
+
+export type ImportFromExternalSourceDialog_profileExternalSourceSearchMutationVariables = Exact<{
+  integrationId: Scalars["GID"]["input"];
+  locale: UserLocale;
+  search: Scalars["JSONObject"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type ImportFromExternalSourceDialog_profileExternalSourceSearchMutation = {
+  profileExternalSourceSearch:
+    | {
+        __typename?: "ProfileExternalSourceSearchMultipleResults";
+        results: {
+          __typename?: "ProfileExternalSourceSearchMultipleResultsDetail";
+          key: string;
+          rows: Array<{ [key: string]: any }>;
+          columns: Array<{
+            __typename?: "ProfileExternalSourceSearchMultipleResultsColumn";
+            key: string;
+            label: string;
+          }>;
+        };
+      }
+    | {
+        __typename?: "ProfileExternalSourceSearchSingleResult";
+        id: string;
+        profile?: {
+          __typename?: "Profile";
+          id: string;
+          localizableName: { [locale in UserLocale]?: string };
+          status: ProfileStatus;
+          properties: Array<{
+            __typename?: "ProfileFieldProperty";
+            field: { __typename?: "ProfileTypeField"; id: string };
+            value?: {
+              __typename?: "ProfileFieldValue";
+              id: string;
+              content?: { [key: string]: any } | null;
+            } | null;
+          }>;
+        } | null;
+        data: Array<{
+          __typename?: "ProfileExternalSourceSearchSingleResultData";
+          content?: { [key: string]: any } | null;
+          profileTypeField: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            name: { [locale in UserLocale]?: string };
+            myPermission: ProfileTypeFieldPermissionType;
+            type: ProfileTypeFieldType;
+            options: { [key: string]: any };
+          };
+        }>;
+      };
+};
+
+export type ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment =
+  {
+    __typename?: "ProfileExternalSourceSearchMultipleResultsDetail";
+    key: string;
+    rows: Array<{ [key: string]: any }>;
+    columns: Array<{
+      __typename?: "ProfileExternalSourceSearchMultipleResultsColumn";
+      key: string;
+      label: string;
+    }>;
+  };
+
+export type ImportFromExternalSourceDialog_profileExternalSourceDetailsMutationVariables = Exact<{
+  externalId: Scalars["ID"]["input"];
+  integrationId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type ImportFromExternalSourceDialog_profileExternalSourceDetailsMutation = {
+  profileExternalSourceDetails: {
+    __typename?: "ProfileExternalSourceSearchSingleResult";
+    id: string;
+    profile?: {
+      __typename?: "Profile";
+      id: string;
+      localizableName: { [locale in UserLocale]?: string };
+      status: ProfileStatus;
+      properties: Array<{
+        __typename?: "ProfileFieldProperty";
+        field: { __typename?: "ProfileTypeField"; id: string };
+        value?: {
+          __typename?: "ProfileFieldValue";
+          id: string;
+          content?: { [key: string]: any } | null;
+        } | null;
+      }>;
+    } | null;
+    data: Array<{
+      __typename?: "ProfileExternalSourceSearchSingleResultData";
+      content?: { [key: string]: any } | null;
+      profileTypeField: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        myPermission: ProfileTypeFieldPermissionType;
+        type: ProfileTypeFieldType;
+        options: { [key: string]: any };
+      };
+    }>;
+  };
+};
+
+export type ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutationVariables =
+  Exact<{
+    profileExternalSourceEntityId: Scalars["GID"]["input"];
+    profileTypeId: Scalars["GID"]["input"];
+    profileId?: InputMaybe<Scalars["GID"]["input"]>;
+    conflictResolutions:
+      | Array<ProfileExternalSourceConflictResolution>
+      | ProfileExternalSourceConflictResolution;
+  }>;
+
+export type ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutation = {
+  completeProfileFromExternalSource: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: { __typename?: "ProfileTypeField"; id: string };
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+      } | null;
+    }>;
+  };
+};
+
+export type useImportFromExternalSourceDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
 };
 
 export type useProfileSubscribersDialog_UserFragment = {
@@ -31628,6 +32029,7 @@ export type OrganizationIntegrations_userQuery = {
       name: string;
       hasIdVerification: boolean;
       hasDowJones: boolean;
+      hasEInforma: boolean;
       hasDocuSign: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
@@ -31636,6 +32038,11 @@ export type OrganizationIntegrations_userQuery = {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
           | { __typename?: "OrgIntegration"; id: string; invalidCredentials: boolean }
+          | {
+              __typename?: "ProfileExternalSourceOrgIntegration";
+              id: string;
+              invalidCredentials: boolean;
+            }
           | { __typename?: "SignatureOrgIntegration"; id: string; invalidCredentials: boolean }
         >;
       };
@@ -31644,6 +32051,7 @@ export type OrganizationIntegrations_userQuery = {
         totalCount: number;
         items: Array<
           | { __typename?: "OrgIntegration" }
+          | { __typename?: "ProfileExternalSourceOrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -31693,6 +32101,7 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVaria
 export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
   markSignatureIntegrationAsDefault:
     | { __typename?: "OrgIntegration" }
+    | { __typename?: "ProfileExternalSourceOrgIntegration" }
     | {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -31750,6 +32159,7 @@ export type IntegrationsSignature_userQuery = {
         totalCount: number;
         items: Array<
           | { __typename?: "OrgIntegration" }
+          | { __typename?: "ProfileExternalSourceOrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -36549,6 +36959,7 @@ export type PetitionCompose_QueryFragment = {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
           | { __typename?: "OrgIntegration" }
+          | { __typename?: "ProfileExternalSourceOrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -38691,6 +39102,7 @@ export type PetitionCompose_userQuery = {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
           | { __typename?: "OrgIntegration" }
+          | { __typename?: "ProfileExternalSourceOrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -46038,6 +46450,7 @@ export type PetitionReplies_userQuery = {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
           | { __typename?: "OrgIntegration" }
+          | { __typename?: "ProfileExternalSourceOrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -47837,6 +48250,7 @@ export type ProfileDetail_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    standardType?: ProfileTypeStandardType | null;
   };
   properties: Array<{
     __typename?: "ProfileFieldProperty";
@@ -47953,6 +48367,7 @@ export type ProfileDetail_profileQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -48022,6 +48437,7 @@ export type ProfileDetail_subscribeToProfileMutation = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -48091,6 +48507,7 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -56379,6 +56796,86 @@ export const useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDire
     useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment,
     unknown
   >;
+export const ProfileFieldValueContent_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldValueContent_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<ProfileFieldValueContent_ProfileTypeFieldFragment, unknown>;
+export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragmentDoc =
+  gql`
+    fragment ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult on ProfileExternalSourceSearchSingleResult {
+      id
+      profile {
+        id
+        ...ProfileReference_Profile
+        properties {
+          field {
+            id
+          }
+          value {
+            id
+            content
+          }
+        }
+      }
+      data {
+        profileTypeField {
+          id
+          name
+          myPermission
+          ...ProfileFieldValueContent_ProfileTypeField
+        }
+        content
+      }
+    }
+    ${ProfileReference_ProfileFragmentDoc}
+    ${ProfileFieldValueContent_ProfileTypeFieldFragmentDoc}
+  ` as unknown as DocumentNode<
+    ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment,
+    unknown
+  >;
+export const ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragmentDoc = gql`
+  fragment ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegration on ProfileExternalSourceOrgIntegration {
+    id
+    name
+    logoUrl(options: { resize: { width: 300, height: 60, fit: inside } })
+    searchParams(profileTypeId: $profileTypeId, profileId: $profileId, locale: $locale) {
+      type
+      key
+      required
+      label
+      placeholder
+      defaultValue
+      minLength
+      options {
+        value
+        label
+      }
+    }
+    searchableProfileTypes {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment,
+  unknown
+>;
+export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragmentDoc =
+  gql`
+    fragment ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetail on ProfileExternalSourceSearchMultipleResultsDetail {
+      key
+      rows
+      columns {
+        key
+        label
+      }
+    }
+  ` as unknown as DocumentNode<
+    ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment,
+    unknown
+  >;
 export const useProfileSubscribersDialog_UserFragmentDoc = gql`
   fragment useProfileSubscribersDialog_User on User {
     id
@@ -61546,6 +62043,12 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const useImportFromExternalSourceDialog_ProfileTypeFragmentDoc = gql`
+  fragment useImportFromExternalSourceDialog_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useImportFromExternalSourceDialog_ProfileTypeFragment, unknown>;
 export const ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
     id
@@ -61661,6 +62164,8 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     profileType {
       id
       name
+      standardType
+      ...useImportFromExternalSourceDialog_ProfileType
     }
     properties {
       ...ProfileForm_ProfileFieldProperty
@@ -61674,6 +62179,7 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     permanentDeletionAt
   }
   ${ProfileReference_ProfileFragmentDoc}
+  ${useImportFromExternalSourceDialog_ProfileTypeFragmentDoc}
   ${ProfileForm_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
 export const ProfileSubscribers_UserFragmentDoc = gql`
@@ -65462,6 +65968,114 @@ export const useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDir
     useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDirectionQuery,
     useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDirectionQueryVariables
   >;
+export const ImportFromExternalSourceDialog_integrationsDocument = gql`
+  query ImportFromExternalSourceDialog_integrations(
+    $profileTypeId: GID!
+    $profileId: GID
+    $locale: UserLocale!
+  ) {
+    me {
+      id
+      organization {
+        id
+        integrations(type: PROFILE_EXTERNAL_SOURCE, limit: 100) {
+          items {
+            ... on ProfileExternalSourceOrgIntegration {
+              ...ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegration
+            }
+          }
+        }
+      }
+    }
+  }
+  ${ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragmentDoc}
+` as unknown as DocumentNode<
+  ImportFromExternalSourceDialog_integrationsQuery,
+  ImportFromExternalSourceDialog_integrationsQueryVariables
+>;
+export const ImportFromExternalSourceDialog_profileExternalSourceSearchDocument = gql`
+  mutation ImportFromExternalSourceDialog_profileExternalSourceSearch(
+    $integrationId: GID!
+    $locale: UserLocale!
+    $search: JSONObject!
+    $profileTypeId: GID!
+    $profileId: GID
+  ) {
+    profileExternalSourceSearch(
+      integrationId: $integrationId
+      locale: $locale
+      search: $search
+      profileTypeId: $profileTypeId
+      profileId: $profileId
+    ) {
+      ... on ProfileExternalSourceSearchSingleResult {
+        ...ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult
+      }
+      ... on ProfileExternalSourceSearchMultipleResults {
+        results {
+          ...ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetail
+        }
+      }
+    }
+  }
+  ${ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragmentDoc}
+  ${ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragmentDoc}
+` as unknown as DocumentNode<
+  ImportFromExternalSourceDialog_profileExternalSourceSearchMutation,
+  ImportFromExternalSourceDialog_profileExternalSourceSearchMutationVariables
+>;
+export const ImportFromExternalSourceDialog_profileExternalSourceDetailsDocument = gql`
+  mutation ImportFromExternalSourceDialog_profileExternalSourceDetails(
+    $externalId: ID!
+    $integrationId: GID!
+    $profileTypeId: GID!
+    $profileId: GID
+  ) {
+    profileExternalSourceDetails(
+      externalId: $externalId
+      integrationId: $integrationId
+      profileTypeId: $profileTypeId
+      profileId: $profileId
+    ) {
+      ...ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult
+    }
+  }
+  ${ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragmentDoc}
+` as unknown as DocumentNode<
+  ImportFromExternalSourceDialog_profileExternalSourceDetailsMutation,
+  ImportFromExternalSourceDialog_profileExternalSourceDetailsMutationVariables
+>;
+export const ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument = gql`
+  mutation ImportFromExternalSourceDialog_completeProfileFromExternalSource(
+    $profileExternalSourceEntityId: GID!
+    $profileTypeId: GID!
+    $profileId: GID
+    $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+  ) {
+    completeProfileFromExternalSource(
+      profileExternalSourceEntityId: $profileExternalSourceEntityId
+      profileTypeId: $profileTypeId
+      profileId: $profileId
+      conflictResolutions: $conflictResolutions
+    ) {
+      id
+      name
+      properties {
+        field {
+          id
+        }
+        value {
+          id
+          content
+          createdAt
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutation,
+  ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutationVariables
+>;
 export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
   mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
     subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
@@ -66857,6 +67471,7 @@ export const OrganizationIntegrations_userDocument = gql`
         id
         hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+        hasEInforma: hasIntegration(integration: PROFILE_EXTERNAL_SOURCE, provider: "EINFORMA")
         hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
         integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
           items {

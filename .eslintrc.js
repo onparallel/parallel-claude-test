@@ -43,7 +43,6 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/ban-types": ["error", { types: { "{}": false } }],
-    "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
     eqeqeq: ["error", "always"],
     "react/react-in-jsx-scope": "off",
     "react/display-name": "off",

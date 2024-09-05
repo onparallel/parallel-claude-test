@@ -6,11 +6,11 @@ import { Readable } from "stream";
 import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
 import { unMaybeArray } from "../../util/arrays";
+import { JsonSchemaFor } from "../../util/jsonSchema";
 import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError } from "./errors";
 import { ParseError } from "./params";
 import { Text } from "./responses";
-import { JsonSchemaFor } from "./schemas";
 
 /*
  * We wrap multer files in a class with a custom .toString so that unflatten doesn't rebuild the object.

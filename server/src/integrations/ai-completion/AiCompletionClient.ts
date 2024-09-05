@@ -25,5 +25,5 @@ export interface AiCompletionPrompt {
 
 export interface IAiCompletionClient<TParams> extends BaseClient {
   getCompletion: (params: TParams, options?: AiCompletionOptions) => Promise<AiCompletionResponse>;
-  buildRequestParams(model: string, prompt: AiCompletionPrompt[]): TParams;
+  buildRequestParams(model: string, apiVersion: string, prompt: AiCompletionPrompt[]): TParams;
 }

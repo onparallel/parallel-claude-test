@@ -46,6 +46,7 @@ export function buildConfig() {
       region: process.env.AWS_REGION!,
     },
     s3: {
+      assetsBucketName: process.env.S3_ASSETS_BUCKET_NAME!,
       fileUploadsBucketName: process.env.S3_FILE_UPLOADS_BUCKET_NAME!,
       temporaryFilesBucketName: process.env.S3_TEMPORARY_FILES_BUCKET_NAME!,
       publicFilesBucketName: process.env.S3_PUBLIC_FILES_BUCKET_NAME!,
@@ -205,6 +206,11 @@ export function buildConfig() {
       yenteUrl: process.env.OPEN_SANCTIONS_YENTE_URL!,
       yenteUsername: process.env.OPEN_SANCTIONS_YENTE_USERNAME!,
       yentePassword: process.env.OPEN_SANCTIONS_YENTE_PASSWORD!,
+    },
+    aiAssistant: {
+      apiKey: process.env.OPENAI_ASSISTANT_API_KEY!,
+      endpoint: process.env.OPENAI_ASSISTANT_ENDPOINT!,
+      apiVersion: process.env.OPENAI_ASSISTANT_API_VERSION!,
     },
   });
 }

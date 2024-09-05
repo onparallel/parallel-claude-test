@@ -16,7 +16,11 @@ interface SelectionState {
  * This hook encapsulates the logic for handling the selection of rows on a
  * table.
  */
-export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
+export function useSelectionState<T>(
+  items: T[],
+  keyProp: KeyProp<T>,
+  { single }: { single?: boolean } = {},
+) {
   const [{ selection }, setState] = useState<SelectionState>({
     selection: Object.fromEntries(
       items.map((r) => {
@@ -57,7 +61,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
       const toggle = debounce((key: string, shiftKey: boolean) => {
         setState((previous) => {
           const keys = [key];
-          if (previous.lastSelected && shiftKey) {
+          if (!single && previous.lastSelected && shiftKey) {
             // range selection
             const lastIndex = items.findIndex(
               (r) => getKey(r, keyPropRef.current) === previous.lastSelected,
@@ -73,12 +77,15 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
               }
             }
           }
+          const selection = Object.fromEntries(keys.map((k) => [k, !previous.selection[key]]));
           return {
             lastSelected: key,
-            selection: {
-              ...previous.selection,
-              ...Object.fromEntries(keys.map((k) => [k, !previous.selection[key]])),
-            },
+            selection: single
+              ? selection
+              : {
+                  ...previous.selection,
+                  ...selection,
+                },
           };
         });
       });
@@ -109,7 +116,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
           });
         },
       };
-    }, [items, keyProp]),
+    }, [items, keyProp, single]),
   };
 }
 

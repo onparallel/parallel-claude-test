@@ -280,6 +280,11 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  ProfileExternalSourceConflictResolution: {
+    // input type
+    action: NexusGenEnums["ProfileExternalSourceConflictResolutionAction"]; // ProfileExternalSourceConflictResolutionAction!
+    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+  };
   ProfileFieldPropertyFilter: {
     // input type
     alias?: string | null; // String
@@ -557,6 +562,8 @@ export interface NexusGenEnums {
   PetitionTagFilterLogicalOperator: "AND" | "OR";
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   ProfileEventType: db.ProfileEventType;
+  ProfileExternalSourceConflictResolutionAction: "IGNORE" | "OVERWRITE";
+  ProfileExternalSourceSearchParamType: "SELECT" | "TEXT";
   ProfileFieldValuesFilterOperator:
     | "CONTAIN"
     | "END_WITH"
@@ -1126,6 +1133,48 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   ProfileEventSubscription: db.EventSubscription;
+  ProfileExternalSourceOrgIntegration: db.OrgIntegration;
+  ProfileExternalSourceSearchMultipleResults: {
+    // root type
+    results: NexusGenRootTypes["ProfileExternalSourceSearchMultipleResultsDetail"]; // ProfileExternalSourceSearchMultipleResultsDetail!
+    totalCount: number; // Int!
+  };
+  ProfileExternalSourceSearchMultipleResultsColumn: {
+    // root type
+    key: string; // String!
+    label: string; // String!
+  };
+  ProfileExternalSourceSearchMultipleResultsDetail: {
+    // root type
+    columns: NexusGenRootTypes["ProfileExternalSourceSearchMultipleResultsColumn"][]; // [ProfileExternalSourceSearchMultipleResultsColumn!]!
+    key: string; // String!
+    rows: NexusGenScalars["JSONObject"][]; // [JSONObject!]!
+  };
+  ProfileExternalSourceSearchParam: {
+    // root type
+    defaultValue?: string | null; // String
+    key: string; // String!
+    label: string; // String!
+    minLength?: number | null; // Int
+    options?: NexusGenRootTypes["ProfileExternalSourceSearchParamOption"][] | null; // [ProfileExternalSourceSearchParamOption!]
+    placeholder?: string | null; // String
+    required: boolean; // Boolean!
+    type: NexusGenEnums["ProfileExternalSourceSearchParamType"]; // ProfileExternalSourceSearchParamType!
+  };
+  ProfileExternalSourceSearchParamOption: {
+    // root type
+    label: string; // String!
+    value: string; // String!
+  };
+  ProfileExternalSourceSearchSingleResult: {
+    id: number;
+    profileId: number | null;
+    data: { profileTypeFieldId: number; content: any }[];
+  };
+  ProfileExternalSourceSearchSingleResultData: {
+    // root type
+    content?: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
   ProfileFieldExpiryUpdatedEvent: profileEvents.ProfileFieldExpiryUpdatedEvent;
   ProfileFieldFile: db.ProfileFieldFile;
   ProfileFieldFileAddedEvent: profileEvents.ProfileFieldFileAddedEvent;
@@ -1359,6 +1408,7 @@ export interface NexusGenInterfaces {
   EventSubscription: db.EventSubscription;
   IOrgIntegration:
     | NexusGenRootTypes["OrgIntegration"]
+    | NexusGenRootTypes["ProfileExternalSourceOrgIntegration"]
     | NexusGenRootTypes["SignatureOrgIntegration"];
   PetitionBase: db.Petition;
   PetitionEvent: petitionEvents.PetitionEvent;
@@ -1383,6 +1433,11 @@ export interface NexusGenUnions {
   PetitionFieldOrPetition:
     | ({ __type: "PetitionField" } & NexusGenRootTypes["PetitionField"])
     | ({ __type: "Petition" } & NexusGenRootTypes["Petition"]);
+  ProfileExternalSourceSearchResults:
+    | ({ type: "FOUND" } & NexusGenRootTypes["ProfileExternalSourceSearchSingleResult"])
+    | ({
+        type: "MULTIPLE_RESULTS";
+      } & NexusGenRootTypes["ProfileExternalSourceSearchMultipleResults"]);
   PublicPetitionFieldOrPublicPetition:
     | ({ __type: "PublicPetitionField" } & NexusGenRootTypes["PublicPetitionField"])
     | ({ __type: "PublicPetition" } & NexusGenRootTypes["PublicPetition"]);
@@ -1919,6 +1974,7 @@ export interface NexusGenFieldTypes {
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
+    completeProfileFromExternalSource: NexusGenRootTypes["Profile"]; // Profile!
     copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
@@ -1933,6 +1989,7 @@ export interface NexusGenFieldTypes {
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
+    createEInformaProfileExternalSourceIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createEditPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
@@ -2019,6 +2076,8 @@ export interface NexusGenFieldTypes {
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    profileExternalSourceDetails: NexusGenRootTypes["ProfileExternalSourceSearchSingleResult"]; // ProfileExternalSourceSearchSingleResult!
+    profileExternalSourceSearch: NexusGenRootTypes["ProfileExternalSourceSearchResults"]; // ProfileExternalSourceSearchResults!
     profileFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     profileFieldFileUploadComplete: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -2145,6 +2204,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
+    logoUrl: string | null; // String
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
@@ -2945,6 +3005,60 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     signatureKeys: NexusGenRootTypes["EventSubscriptionSignatureKey"][]; // [EventSubscriptionSignatureKey!]!
   };
+  ProfileExternalSourceOrgIntegration: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    invalidCredentials: boolean; // Boolean!
+    isDefault: boolean; // Boolean!
+    logoUrl: string | null; // String
+    name: string; // String!
+    searchParams: NexusGenRootTypes["ProfileExternalSourceSearchParam"][]; // [ProfileExternalSourceSearchParam!]!
+    searchableProfileTypes: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
+  ProfileExternalSourceSearchMultipleResults: {
+    // field return type
+    results: NexusGenRootTypes["ProfileExternalSourceSearchMultipleResultsDetail"]; // ProfileExternalSourceSearchMultipleResultsDetail!
+    totalCount: number; // Int!
+  };
+  ProfileExternalSourceSearchMultipleResultsColumn: {
+    // field return type
+    key: string; // String!
+    label: string; // String!
+  };
+  ProfileExternalSourceSearchMultipleResultsDetail: {
+    // field return type
+    columns: NexusGenRootTypes["ProfileExternalSourceSearchMultipleResultsColumn"][]; // [ProfileExternalSourceSearchMultipleResultsColumn!]!
+    key: string; // String!
+    rows: NexusGenScalars["JSONObject"][]; // [JSONObject!]!
+  };
+  ProfileExternalSourceSearchParam: {
+    // field return type
+    defaultValue: string | null; // String
+    key: string; // String!
+    label: string; // String!
+    minLength: number | null; // Int
+    options: NexusGenRootTypes["ProfileExternalSourceSearchParamOption"][] | null; // [ProfileExternalSourceSearchParamOption!]
+    placeholder: string | null; // String
+    required: boolean; // Boolean!
+    type: NexusGenEnums["ProfileExternalSourceSearchParamType"]; // ProfileExternalSourceSearchParamType!
+  };
+  ProfileExternalSourceSearchParamOption: {
+    // field return type
+    label: string; // String!
+    value: string; // String!
+  };
+  ProfileExternalSourceSearchSingleResult: {
+    // field return type
+    data: NexusGenRootTypes["ProfileExternalSourceSearchSingleResultData"][]; // [ProfileExternalSourceSearchSingleResultData!]!
+    id: NexusGenScalars["GID"]; // GID!
+    profile: NexusGenRootTypes["Profile"] | null; // Profile
+  };
+  ProfileExternalSourceSearchSingleResultData: {
+    // field return type
+    content: NexusGenScalars["JSONObject"] | null; // JSONObject
+    profileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+  };
   ProfileFieldExpiryUpdatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3112,6 +3226,7 @@ export interface NexusGenFieldTypes {
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     profileNamePattern: string; // String!
     profileNamePatternFields: NexusGenScalars["GID"][]; // [GID!]!
+    standardType: NexusGenEnums["ProfileTypeStandardType"] | null; // ProfileTypeStandardType
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   ProfileTypeField: {
@@ -3615,6 +3730,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
+    logoUrl: string | null; // String
     name: string; // String!
     provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
@@ -3872,6 +3988,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
+    logoUrl: string | null; // String
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
@@ -4501,6 +4618,7 @@ export interface NexusGenFieldTypeNames {
     closePetition: "Petition";
     closeProfile: "Profile";
     completePetition: "Petition";
+    completeProfileFromExternalSource: "Profile";
     copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createAddPetitionPermissionTask: "Task";
@@ -4515,6 +4633,7 @@ export interface NexusGenFieldTypeNames {
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
+    createEInformaProfileExternalSourceIntegration: "SupportMethodResponse";
     createEditPetitionPermissionTask: "Task";
     createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
@@ -4601,6 +4720,8 @@ export interface NexusGenFieldTypeNames {
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
+    profileExternalSourceDetails: "ProfileExternalSourceSearchSingleResult";
+    profileExternalSourceSearch: "ProfileExternalSourceSearchResults";
     profileFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     profileFieldFileUploadComplete: "ProfileFieldFile";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -4727,6 +4848,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     invalidCredentials: "Boolean";
     isDefault: "Boolean";
+    logoUrl: "String";
     name: "String";
     type: "IntegrationType";
   };
@@ -5527,6 +5649,60 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     signatureKeys: "EventSubscriptionSignatureKey";
   };
+  ProfileExternalSourceOrgIntegration: {
+    // field return type name
+    id: "GID";
+    invalidCredentials: "Boolean";
+    isDefault: "Boolean";
+    logoUrl: "String";
+    name: "String";
+    searchParams: "ProfileExternalSourceSearchParam";
+    searchableProfileTypes: "ProfileType";
+    type: "IntegrationType";
+  };
+  ProfileExternalSourceSearchMultipleResults: {
+    // field return type name
+    results: "ProfileExternalSourceSearchMultipleResultsDetail";
+    totalCount: "Int";
+  };
+  ProfileExternalSourceSearchMultipleResultsColumn: {
+    // field return type name
+    key: "String";
+    label: "String";
+  };
+  ProfileExternalSourceSearchMultipleResultsDetail: {
+    // field return type name
+    columns: "ProfileExternalSourceSearchMultipleResultsColumn";
+    key: "String";
+    rows: "JSONObject";
+  };
+  ProfileExternalSourceSearchParam: {
+    // field return type name
+    defaultValue: "String";
+    key: "String";
+    label: "String";
+    minLength: "Int";
+    options: "ProfileExternalSourceSearchParamOption";
+    placeholder: "String";
+    required: "Boolean";
+    type: "ProfileExternalSourceSearchParamType";
+  };
+  ProfileExternalSourceSearchParamOption: {
+    // field return type name
+    label: "String";
+    value: "String";
+  };
+  ProfileExternalSourceSearchSingleResult: {
+    // field return type name
+    data: "ProfileExternalSourceSearchSingleResultData";
+    id: "GID";
+    profile: "Profile";
+  };
+  ProfileExternalSourceSearchSingleResultData: {
+    // field return type name
+    content: "JSONObject";
+    profileTypeField: "ProfileTypeField";
+  };
   ProfileFieldExpiryUpdatedEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -5694,6 +5870,7 @@ export interface NexusGenFieldTypeNames {
     name: "LocalizableUserText";
     profileNamePattern: "String";
     profileNamePatternFields: "GID";
+    standardType: "ProfileTypeStandardType";
     updatedAt: "DateTime";
   };
   ProfileTypeField: {
@@ -6197,6 +6374,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     invalidCredentials: "Boolean";
     isDefault: "Boolean";
+    logoUrl: "String";
     name: "String";
     provider: "SignatureOrgIntegrationProvider";
     type: "IntegrationType";
@@ -6454,6 +6632,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     invalidCredentials: "Boolean";
     isDefault: "Boolean";
+    logoUrl: "String";
     name: "String";
     type: "IntegrationType";
   };
@@ -6694,6 +6873,13 @@ export interface NexusGenArgTypes {
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    completeProfileFromExternalSource: {
+      // args
+      conflictResolutions: NexusGenInputs["ProfileExternalSourceConflictResolution"][]; // [ProfileExternalSourceConflictResolution!]!
+      profileExternalSourceEntityId: NexusGenScalars["GID"]; // GID!
+      profileId?: NexusGenScalars["GID"] | null; // GID
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
     copyBackgroundCheckReplyToProfileFieldValue: {
       // args
       expiryDate?: NexusGenScalars["Date"] | null; // Date
@@ -6782,6 +6968,13 @@ export interface NexusGenArgTypes {
     createDowJonesProfileDownloadTask: {
       // args
       profileId: string; // ID!
+    };
+    createEInformaProfileExternalSourceIntegration: {
+      // args
+      clientId: string; // String!
+      clientSecret: string; // String!
+      isPaidSubscription: boolean; // Boolean!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     createEditPetitionPermissionTask: {
       // args
@@ -7271,6 +7464,21 @@ export interface NexusGenArgTypes {
       attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    profileExternalSourceDetails: {
+      // args
+      externalId: string; // ID!
+      integrationId: NexusGenScalars["GID"]; // GID!
+      profileId?: NexusGenScalars["GID"] | null; // GID
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    profileExternalSourceSearch: {
+      // args
+      integrationId: NexusGenScalars["GID"]; // GID!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      profileId?: NexusGenScalars["GID"] | null; // GID
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+      search: NexusGenScalars["JSONObject"]; // JSONObject!
     };
     profileFieldFileDownloadLink: {
       // args
@@ -7978,6 +8186,12 @@ export interface NexusGenArgTypes {
       userAgent?: string | null; // String
     };
   };
+  OrgIntegration: {
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+  };
   Organization: {
     currentUsagePeriod: {
       // args
@@ -8064,6 +8278,18 @@ export interface NexusGenArgTypes {
     relationships: {
       // args
       filter?: NexusGenInputs["ProfileRelationshipFilter"][] | null; // [ProfileRelationshipFilter!]
+    };
+  };
+  ProfileExternalSourceOrgIntegration: {
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+    searchParams: {
+      // args
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      profileId?: NexusGenScalars["GID"] | null; // GID
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
   };
   PublicOrganization: {
@@ -8352,6 +8578,12 @@ export interface NexusGenArgTypes {
       type?: NexusGenEnums["UserGroupType"][] | null; // [UserGroupType!]
     };
   };
+  SignatureOrgIntegration: {
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+  };
   User: {
     avatarUrl: {
       // args
@@ -8368,6 +8600,12 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
     };
   };
+  IOrgIntegration: {
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+  };
 }
 
 export interface NexusGenAbstractTypeMembers {
@@ -8376,6 +8614,9 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionFieldCommentUserGroupMention"
     | "PetitionFieldCommentUserMention";
   PetitionFieldOrPetition: "Petition" | "PetitionField";
+  ProfileExternalSourceSearchResults:
+    | "ProfileExternalSourceSearchMultipleResults"
+    | "ProfileExternalSourceSearchSingleResult";
   PublicPetitionFieldOrPublicPetition: "PublicPetition" | "PublicPetitionField";
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
@@ -8398,7 +8639,10 @@ export interface NexusGenAbstractTypeMembers {
     | "DowJonesKycEntitySearchResultEntity"
     | "DowJonesKycEntitySearchResultPerson";
   EventSubscription: "PetitionEventSubscription" | "ProfileEventSubscription";
-  IOrgIntegration: "OrgIntegration" | "SignatureOrgIntegration";
+  IOrgIntegration:
+    | "OrgIntegration"
+    | "ProfileExternalSourceOrgIntegration"
+    | "SignatureOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -8559,6 +8803,7 @@ export interface NexusGenTypeInterfaces {
   ProfileCreatedEvent: "ProfileEvent";
   ProfileDisassociatedEvent: "PetitionEvent";
   ProfileEventSubscription: "EventSubscription";
+  ProfileExternalSourceOrgIntegration: "IOrgIntegration";
   ProfileFieldExpiryUpdatedEvent: "ProfileEvent";
   ProfileFieldFile: "ProfileFieldResponse";
   ProfileFieldFileAddedEvent: "ProfileEvent";
@@ -8634,6 +8879,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PetitionPermission"
   | "PetitionUserNotification"
   | "ProfileEvent"
+  | "ProfileExternalSourceSearchResults"
   | "ProfileFieldResponse"
   | "PublicPetitionFieldOrPublicPetition"
   | "PublicUserOrContact"

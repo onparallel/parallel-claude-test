@@ -11,6 +11,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     current_profile_field_value_id: number | null;
     previous_profile_field_value_id: number | null;
     alias: string | null;
+    external_source_integration_id?: number | null;
   };
   PROFILE_FIELD_FILE_ADDED: {
     user_id: number;

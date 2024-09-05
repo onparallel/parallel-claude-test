@@ -1,6 +1,7 @@
 import {
   Button,
   Flex,
+  HTMLChakraProps,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -9,6 +10,7 @@ import {
   ModalHeader,
   Stack,
 } from "@chakra-ui/react";
+import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -23,11 +25,13 @@ export interface ConfirmDialogProps<TResult> extends Omit<BaseDialogProps<TResul
   alternative?: ReactNode;
   content?: ModalContentProps;
   hasCloseButton?: boolean;
+  bodyProps?: MaybeFunction<HTMLChakraProps<"div">>;
 }
 
 export function ConfirmDialog<TResult = void>({
   header,
   body,
+  bodyProps,
   confirm,
   cancel,
   alternative,
@@ -62,7 +66,10 @@ export function ConfirmDialog<TResult = void>({
           />
         ) : null}
         <ModalHeader>{header}</ModalHeader>
-        <ModalBody as={props.scrollBehavior === "inside" ? ScrollShadows : undefined}>
+        <ModalBody
+          as={props.scrollBehavior === "inside" ? ScrollShadows : undefined}
+          {...unMaybeFunction(bodyProps)}
+        >
           {body}
         </ModalBody>
         <ModalFooter

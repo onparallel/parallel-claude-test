@@ -69,6 +69,10 @@ import {
   PetitionMessageContextService,
 } from "./services/PetitionMessageContextService";
 import { IPrinter, PRINTER } from "./services/Printer";
+import {
+  IProfileExternalSourcesService,
+  PROFILE_EXTERNAL_SOURCE_SERVICE,
+} from "./services/ProfileExternalSourcesService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
@@ -121,6 +125,8 @@ export class ApiContext {
     @inject(PROFILES_SETUP_SERVICE)
     public readonly profilesSetup: IProfilesSetupService,
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
+    @inject(PROFILE_EXTERNAL_SOURCE_SERVICE)
+    public readonly profileExternalSources: IProfileExternalSourcesService,
 
     // Repositories
     public readonly contacts: ContactRepository,

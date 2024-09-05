@@ -787,3 +787,64 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
     },
   },
 );
+
+export const createEInformaProfileExternalSourceIntegration = mutationField(
+  "createEInformaProfileExternalSourceIntegration",
+  {
+    description:
+      "Creates a new eInforma Profile External Source integration on the provided organization",
+    type: "SupportMethodResponse",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(
+        globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
+      ),
+      clientId: nonNull(stringArg()),
+      clientSecret: nonNull(stringArg()),
+      isPaidSubscription: nonNull(
+        booleanArg({
+          description: "Paid subscription will allow to access real data for entity details",
+        }),
+      ),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "PROFILE_EXTERNAL_SOURCE",
+          "EINFORMA",
+        );
+        if (integrations.length > 0) {
+          throw new Error(
+            `Organization already has an eInforma Profile External Source integration`,
+          );
+        }
+
+        const data = await ctx.integrationsSetup.createEInformaProfileExternalSourceIntegration(
+          {
+            org_id: args.orgId,
+            name: "eInforma",
+            settings: {
+              CREDENTIALS: {
+                CLIENT_ID: args.clientId,
+                CLIENT_SECRET: args.clientSecret,
+              },
+              ENVIRONMENT: args.isPaidSubscription ? "production" : "test",
+            },
+          },
+          `User:${ctx.user!.id}`,
+        );
+
+        return {
+          result: "SUCCESS",
+          message: `Integration:${data.id} created successfully`,
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
+    },
+  },
+);

@@ -1,6 +1,6 @@
 import { Response } from "express";
+import { JsonSchemaFor } from "../../util/jsonSchema";
 import { ResponseWrapper, RestResponse } from "./core";
-import { JsonSchemaFor } from "./schemas";
 
 export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   __type?: T;

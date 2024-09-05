@@ -240,6 +240,7 @@ export interface PetitionSummaryConfig {
   integration_id: number;
   prompt: AiCompletionPrompt[];
   model: string;
+  api_version: string;
 }
 
 export interface AutomaticNumberingConfig {

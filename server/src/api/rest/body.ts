@@ -1,3 +1,5 @@
+import Ajv, { ValidateFunction } from "ajv";
+import addFormats from "ajv-formats";
 import { Request } from "express";
 import { unflatten } from "flat";
 import { OpenAPIV3 } from "openapi-types";
@@ -5,13 +7,35 @@ import { outdent } from "outdent";
 import { isNonNullish, isNullish } from "remeda";
 import typeIs from "type-is";
 import { unMaybeArray } from "../../util/arrays";
+import { JsonSchema, JsonSchemaFor } from "../../util/jsonSchema";
+import { isValidTime, isValidTimezone } from "../../util/time";
 import { FormDataFile, RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
-import { JsonSchemaFor, buildValidateSchema } from "./schemas";
 
 export interface BodyOptions {
   description?: string;
   required?: boolean;
+}
+
+export function buildValidateSchema<T>(schema: JsonSchemaFor<T>): ValidateFunction<T>;
+export function buildValidateSchema<T = any>(schema: JsonSchema): ValidateFunction<T>;
+export function buildValidateSchema<T = any>(schema: JsonSchema) {
+  const ajv = new Ajv({ strict: false });
+  addFormats(ajv, ["date-time", "date", "email", "uri", "binary"]);
+  ajv.addFormat("time-zone", isValidTimezone);
+  ajv.addFormat("time", isValidTime);
+  ajv.addKeyword({
+    keyword: "isFile",
+    type: "object",
+    schemaType: "boolean",
+    validate(isFile: boolean, value: any) {
+      if (isFile && !(value instanceof FormDataFile)) {
+        return false;
+      }
+      return true;
+    },
+  });
+  return ajv.compile<T>(schema);
 }
 
 export function JsonBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyContent<T> {

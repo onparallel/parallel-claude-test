@@ -510,6 +510,36 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
+    "term": "integration.einforma-search-params-company-search.individual-label",
+    "definition": "Name or tax ID",
+    "context": "Name or tax ID"
+  },
+  {
+    "term": "integration.einforma-search-params-company-search.legal-entity-label",
+    "definition": "Company name or tax ID",
+    "context": "Company name or tax ID"
+  },
+  {
+    "term": "integration.einforma-search-params-province.label",
+    "definition": "Province",
+    "context": "Province"
+  },
+  {
+    "term": "integration.einforma-search-results-name-or-company-name.label",
+    "definition": "Name or company name",
+    "context": "Name or company name"
+  },
+  {
+    "term": "integration.einforma-search-results-province.label",
+    "definition": "Province",
+    "context": "Province"
+  },
+  {
+    "term": "integration.einforma.search-params-province.placeholder",
+    "definition": "Select a spanish province",
+    "context": "Select a spanish province"
+  },
+  {
     "term": "invitation.access-parallel",
     "definition": "Log in",
     "context": "Log in"

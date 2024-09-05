@@ -214,7 +214,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               />
               <Text textAlign="center" paddingX={4}>
                 <FormattedMessage
-                  id="component.petition-compose-new-field.empty-search-text"
+                  id="generic.search-no-results"
                   defaultMessage="No matches found for your search."
                 />
               </Text>

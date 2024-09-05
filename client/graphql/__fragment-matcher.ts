@@ -28,7 +28,11 @@ const result: PossibleTypesResultData = {
       "DowJonesKycEntitySearchResultPerson",
     ],
     EventSubscription: ["PetitionEventSubscription", "ProfileEventSubscription"],
-    IOrgIntegration: ["OrgIntegration", "SignatureOrgIntegration"],
+    IOrgIntegration: [
+      "OrgIntegration",
+      "ProfileExternalSourceOrgIntegration",
+      "SignatureOrgIntegration",
+    ],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseOrFolder: ["Petition", "PetitionFolder", "PetitionTemplate"],
     PetitionEvent: [
@@ -111,6 +115,10 @@ const result: PossibleTypesResultData = {
       "ProfileReopenedEvent",
       "ProfileScheduledForDeletionEvent",
       "ProfileUpdatedEvent",
+    ],
+    ProfileExternalSourceSearchResults: [
+      "ProfileExternalSourceSearchMultipleResults",
+      "ProfileExternalSourceSearchSingleResult",
     ],
     ProfileFieldResponse: ["ProfileFieldFile", "ProfileFieldValue"],
     PublicPetitionFieldOrPublicPetition: ["PublicPetition", "PublicPetitionField"],

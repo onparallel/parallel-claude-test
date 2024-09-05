@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { groupBy, indexBy, isNonNullish, isNullish, pick, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, pick, unique, zip } from "remeda";
 import {
   Profile,
   ProfileStatus,
@@ -75,6 +75,10 @@ export const profileIsNotAnonymized = createProfileAuthorizer((p) => isNullish(p
 
 export const profileTypeIsNotStandard = createProfileTypeAuthorizer(
   (p) => p.standard_type === null,
+);
+
+export const profileTypeIsStandard = createProfileTypeAuthorizer((p) =>
+  isNonNullish(p.standard_type),
 );
 
 export const profileTypeFieldIsNotStandard = createProfileTypeFieldAuthorizer(
@@ -576,5 +580,116 @@ export function profileTypeFieldsAreExpirable<TypeName extends string, FieldName
 
     const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
     return profileTypeFields.every((ptf) => isNonNullish(ptf) && ptf.is_expirable);
+  };
+}
+
+export function userHasAccessToExternalSourceEntity<
+  TypeName extends string,
+  FieldName extends string,
+  TEntityIdArg extends Arg<TypeName, FieldName, number>,
+>(entityIdArg: TEntityIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const entityId = args[entityIdArg] as unknown as number;
+
+    const entity = await ctx.profiles.loadProfileExternalSourceEntity(entityId);
+    return isNonNullish(entity) && entity.created_by_user_id === ctx.user!.id;
+  };
+}
+
+export function externalSourceEntityMatchesProfileTypeStandardType<
+  TypeName extends string,
+  FieldName extends string,
+  TEntityIdArg extends Arg<TypeName, FieldName, number>,
+  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  entityIdArg: TEntityIdArg,
+  profileTypeIdArg: TProfileTypeIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const entityId = args[entityIdArg] as unknown as number;
+    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+
+    const entity = await ctx.profiles.loadProfileExternalSourceEntity(entityId);
+    const profileType = await ctx.profiles.loadProfileType(profileTypeId);
+
+    const matches =
+      isNonNullish(entity) &&
+      isNonNullish(profileType) &&
+      entity.standard_type === profileType.standard_type;
+
+    if (!matches) {
+      throw new ForbiddenError("Entity does not match profile type standard type");
+    }
+
+    return true;
+  };
+}
+
+export function profileMatchesProfileType<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  profileIdArg: TProfileIdArg,
+  profileTypeIdArg: TProfileTypeIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
+    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+
+    const profile = await ctx.profiles.loadProfile(profileId);
+
+    const matches = isNonNullish(profile) && profile.profile_type_id === profileTypeId;
+
+    if (!matches) {
+      throw new ForbiddenError("Profile does not match profile type");
+    }
+
+    return true;
+  };
+}
+
+export function userCanOverwriteProfileFields<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
+  TConflictResolutionsArg extends Arg<
+    TypeName,
+    FieldName,
+    NexusGenInputs["ProfileExternalSourceConflictResolution"][]
+  >,
+>(
+  profileTypeIdArg: TProfileTypeIdArg,
+  conflictResolutionsArg: TConflictResolutionsArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const conflictResolutions = args[
+      conflictResolutionsArg
+    ] as unknown as NexusGenInputs["ProfileExternalSourceConflictResolution"][];
+
+    const profileTypeFields =
+      await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+    const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+      profileTypeFields.map((ptf) => ({
+        profileTypeFieldId: ptf.id,
+        userId: ctx.user!.id,
+      })),
+    );
+
+    const zipped = zip(profileTypeFields, effectivePermissions);
+
+    // check that for every OVERWRITE on the resolutions, user has WRITE permission on the property
+    for (const resolution of conflictResolutions) {
+      if (resolution.action === "OVERWRITE") {
+        const found = zipped.find(([ptf]) => ptf.id === resolution.profileTypeFieldId);
+        if (!found || !isAtLeast(found[1], "WRITE")) {
+          throw new ForbiddenError("User does not have permission to overwrite profile field");
+        }
+      }
+    }
+
+    return true;
   };
 }

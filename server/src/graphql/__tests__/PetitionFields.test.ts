@@ -8223,7 +8223,7 @@ describe("GraphQL/Petition Fields", () => {
                 files: null,
                 value: {
                   id: expect.any(String),
-                  content: { value: "+123456789" },
+                  content: { value: "+123456789", pretty: "+1 23456789" },
                 },
               },
               {
@@ -8234,7 +8234,7 @@ describe("GraphQL/Petition Fields", () => {
                 files: null,
                 value: {
                   id: expect.any(String),
-                  content: { value: "+987654321" },
+                  content: { value: "+987654321", pretty: "+98 7654321" },
                 },
               },
               {
@@ -9899,6 +9899,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+123456789",
+                    pretty: "+1 23456789",
                   },
                 },
                 files: null,
@@ -9911,6 +9912,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+987654321",
+                    pretty: "+98 7654321",
                   },
                 },
                 files: null,
@@ -10291,6 +10293,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+123456789",
+                    pretty: "+1 23456789",
                   },
                 },
                 files: null,
@@ -10303,6 +10306,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+987654321",
+                    pretty: "+98 7654321",
                   },
                 },
                 files: null,
@@ -10689,6 +10693,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+123456789",
+                    pretty: "+1 23456789",
                   },
                 },
                 files: null,
@@ -10701,6 +10706,7 @@ describe("GraphQL/Petition Fields", () => {
                 value: {
                   content: {
                     value: "+987654321",
+                    pretty: "+98 7654321",
                   },
                 },
                 files: null,
@@ -12581,7 +12587,7 @@ describe("GraphQL/Petition Fields", () => {
                 files: null,
                 value: {
                   id: expect.any(String),
-                  content: { value: "+123456789" },
+                  content: { value: "+123456789", pretty: "+1 23456789" },
                 },
               },
               {
@@ -12592,7 +12598,7 @@ describe("GraphQL/Petition Fields", () => {
                 files: null,
                 value: {
                   id: expect.any(String),
-                  content: { value: "+987654321" },
+                  content: { value: "+987654321", pretty: "+98 7654321" },
                 },
               },
               {

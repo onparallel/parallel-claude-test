@@ -5,8 +5,8 @@ import {
   ProfileEventType,
 } from "../../../db/__types";
 import { toGlobalId } from "../../../util/globalId";
+import { JsonSchema, JsonSchemaFor } from "../../../util/jsonSchema";
 import { pascalCase } from "../../../util/strings";
-import { JsonSchema, JsonSchemaFor } from "../../rest/schemas";
 import { _PetitionSigner } from "./core";
 
 const PetitionEventSchemas = {

@@ -216,6 +216,71 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createEInformaProfileExternalSourceIntegration",
+      description:
+        "Creates a new eInforma Profile External Source integration on the provided organization",
+      args: [
+        {
+          name: "clientId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "clientSecret",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "isPaidSubscription",
+          description: "Paid subscription will allow to access real data for entity details",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "e.g. yw7RQt2cQ4XDHdrbtL3",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "deleteAzureOpenAiIntegration",
       description: "Removes the Azure OpenAI integration of the user's organization",
       args: [

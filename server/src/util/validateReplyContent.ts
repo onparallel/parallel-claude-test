@@ -111,7 +111,7 @@ export async function validateReplyContent(
         );
       }
       if (isNonNullish(field.options.format)) {
-        if (!(await validateShortTextFormat(content.value, field.options.format))) {
+        if (!validateShortTextFormat(content.value, field.options.format)) {
           throw new ValidateReplyContentError(
             "INVALID_FORMAT",
             `Reply is not valid according to format ${field.options.format}.`,

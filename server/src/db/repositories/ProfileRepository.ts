@@ -31,6 +31,7 @@ import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
+  CreateProfileExternalSourceEntity,
   CreateProfileRelationship,
   CreateProfileRelationshipType,
   CreateProfileRelationshipTypeAllowedProfileType,
@@ -51,6 +52,7 @@ import {
   ProfileTypeFieldPermission,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
+  ProfileTypeStandardType,
   User,
   UserLocale,
 } from "../__types";
@@ -1072,6 +1074,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
     }[],
     userId: number | null,
+    externalSourceIntegrationId?: number,
   ) {
     //ignore fields that have no content and no expiry date
     const fields = _fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
@@ -1114,6 +1117,7 @@ export class ProfileRepository extends BaseRepository {
                 ...(f.expiryDate !== undefined
                   ? { expiry_date: f.expiryDate }
                   : { expiry_date: previousByPtfId[f.profileTypeFieldId]?.expiry_date ?? null }),
+                external_source_integration_id: externalSourceIntegrationId,
               })),
               t,
             )
@@ -2574,5 +2578,36 @@ export class ProfileRepository extends BaseRepository {
       [updatedBy, fromUserId, toUserId, updatedBy],
       t,
     );
+  }
+
+  async getProfileTypesByStandardType(orgId: number, standardTypes: ProfileTypeStandardType[]) {
+    return await this.from("profile_type")
+      .where("org_id", orgId)
+      .whereNull("deleted_at")
+      .whereNull("archived_at")
+      .whereNotNull("standard_type")
+      .whereIn("standard_type", standardTypes)
+      .orderBy("created_at", "desc")
+      .select("*");
+  }
+
+  readonly loadProfileExternalSourceEntity = this.buildLoadBy(
+    "profile_external_source_entity",
+    "id",
+  );
+
+  async createProfileExternalSourceEntity(
+    data: CreateProfileExternalSourceEntity,
+    createdBy: string,
+  ) {
+    const [row] = await this.from("profile_external_source_entity").insert(
+      {
+        ...data,
+        created_by: createdBy,
+      },
+      "*",
+    );
+
+    return row;
   }
 }

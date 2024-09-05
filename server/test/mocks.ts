@@ -3,7 +3,12 @@ import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Readable } from "stream";
-import { User } from "../src/db/__types";
+import {
+  ProfileExternalSourceEntity,
+  ProfileTypeStandardType,
+  User,
+  UserLocale,
+} from "../src/db/__types";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
@@ -12,7 +17,17 @@ import {
   RiskEntityProfilePdfResult,
   RiskEntityProfileResult,
 } from "../src/integrations/dow-jones/DowJonesClient";
+import {
+  IProfileExternalSourceIntegration,
+  ProfileExternalSourceRequestError,
+  ProfileExternalSourceSearchSingleResult,
+} from "../src/integrations/profile-external-source/ProfileExternalSourceIntegration";
+import {
+  EInformaProfileExternalSourceIntegration,
+  EInformaSearchParams,
+} from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
+import { IAiAssistantService } from "../src/services/AiAssistantService";
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
 import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
@@ -283,5 +298,143 @@ export class MockBackgroundCheckService implements IBackgroundCheckService {
       mime_type: "application/pdf",
       binary_stream: Readable.from(""),
     };
+  }
+}
+
+@injectable()
+export class MockAiAssistantService implements IAiAssistantService {
+  async getJsonCompletion() {
+    return null;
+  }
+}
+
+@injectable()
+export class MockEInformaProfileExternalSourceIntegration
+  extends EInformaProfileExternalSourceIntegration
+  implements IProfileExternalSourceIntegration
+{
+  protected override async entitySearchByName(
+    integrationId: number,
+    standardType: ProfileTypeStandardType,
+    locale: UserLocale,
+    search: EInformaSearchParams,
+  ): Promise<any> {
+    if (!this.STANDARD_TYPES.includes(standardType)) {
+      throw new ProfileExternalSourceRequestError(400, "BAD_REQUEST");
+    }
+
+    if (standardType === "INDIVIDUAL" && search.companySearch === "Mike Ross") {
+      return {
+        type: "MULTIPLE_RESULTS",
+        totalCount: 3,
+        results: {
+          key: "id",
+          columns: [
+            {
+              key: "denominacion",
+              label: "Name or company name",
+            },
+            {
+              key: "provincia",
+              label: "Province",
+            },
+          ],
+          rows: [
+            { id: "1", denominacion: "Mike Ross (1)", provincia: "Barcelona" },
+            { id: "2", denominacion: "Mike Ross (2)", provincia: "Barcelona" },
+            { id: "3", denominacion: "Mike Ross (3)", provincia: "Barcelona" },
+          ],
+        },
+      };
+    } else if (standardType === "LEGAL_ENTITY" && search.companySearch === "Parallel") {
+      return {
+        type: "MULTIPLE_RESULTS",
+        totalCount: 2,
+        results: {
+          key: "id",
+          columns: [
+            {
+              key: "denominacion",
+              label: "Name or company name",
+            },
+            {
+              key: "provincia",
+              label: "Province",
+            },
+          ],
+          rows: [
+            { id: "4", denominacion: "Parallel Solutions S.L. (1)", provincia: "Barcelona" },
+            { id: "5", denominacion: "Parallel Solutions S.L. (2)", provincia: "Barcelona" },
+          ],
+        },
+      };
+    } else {
+      return {
+        type: "MULTIPLE_RESULTS",
+        totalCount: 0,
+        results: {
+          key: "id",
+          columns: [],
+          rows: [],
+        },
+      };
+    }
+  }
+
+  public override async entityDetails(
+    integrationId: number,
+    standardType: ProfileTypeStandardType,
+    externalId: string,
+    onStoreEntity: (entity: any) => Promise<ProfileExternalSourceEntity>,
+  ): Promise<ProfileExternalSourceSearchSingleResult> {
+    if (!this.STANDARD_TYPES.includes(standardType)) {
+      throw new ProfileExternalSourceRequestError(400, "BAD_REQUEST");
+    }
+
+    if (externalId === "Y1234567A") {
+      return {
+        type: "FOUND",
+        entity: {
+          id: 1,
+          integration_id: integrationId,
+          data: {},
+          parsed_data: {
+            p_first_name: { value: "Mike" },
+            p_last_name: { value: "Ross" },
+            p_email: { value: "mike@onparallel.com" },
+            p_address: { value: "Fake St. 123" },
+            p_city: { value: "Barcelona" },
+            p_tax_id: { value: "Y1234567A" },
+            p_occupation: { value: "Lawyer" },
+          },
+          created_at: new Date(),
+          standard_type: "INDIVIDUAL",
+          created_by_user_id: 1,
+          created_by: "User:1",
+        },
+      };
+    } else if (externalId === "B67505586") {
+      return {
+        type: "FOUND",
+        entity: {
+          id: 2,
+          integration_id: integrationId,
+          data: {},
+          parsed_data: {
+            p_entity_name: { value: "Parallel Solutions SL" },
+            p_trade_name: { value: "Parallel" },
+            p_tax_id: { value: "B67505586" },
+            p_city: { value: "Barcelona" },
+            p_date_of_incorporation: { value: "2020-01-01" },
+          },
+          created_at: new Date(),
+          standard_type: "LEGAL_ENTITY",
+          created_by_user_id: 1,
+          created_by: "User:1",
+        },
+      };
+    } else {
+      throw new ProfileExternalSourceRequestError(404, "NOT_FOUND");
+    }
   }
 }

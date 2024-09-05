@@ -1,11 +1,11 @@
 import { Modal, ModalOverlay, ModalProps } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
+import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from "react";
 import { DialogProps } from "./DialogProvider";
 
-export interface BaseDialogProps<TResult>
-  extends Omit<ModalProps, "children" | "isOpen" | "onClose">,
-    DialogProps<{}, TResult> {
+type BaseModalProps = Omit<ModalProps, "children" | "isOpen" | "onClose">;
+
+export interface BaseDialogProps<TResult> extends BaseModalProps, DialogProps<{}, TResult> {
   closeOnNavigation?: boolean;
   children: ReactNode;
 }
@@ -25,9 +25,21 @@ export function BaseDialog<TResult = void>({
       return () => router.events.off("routeChangeStart", routeChangeStartHandler);
     }
   }, [closeOnNavigation]);
+  const contextProps = useContext(BaseDialogPropsContext);
   return (
-    <Modal isOpen={true} onClose={() => onReject("CLOSE")} {...props}>
+    <Modal isOpen={true} onClose={() => onReject("CLOSE")} {...contextProps} {...props}>
       <ModalOverlay>{children}</ModalOverlay>
     </Modal>
+  );
+}
+
+const BaseDialogPropsContext = createContext<BaseModalProps>({});
+
+export function BaseDialogPropsProvider({
+  children,
+  value,
+}: PropsWithChildren<{ value: BaseModalProps }>) {
+  return (
+    <BaseDialogPropsContext.Provider value={value}>{children}</BaseDialogPropsContext.Provider>
   );
 }

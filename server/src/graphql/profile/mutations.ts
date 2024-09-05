@@ -2,6 +2,8 @@ import { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import {
   arg,
   booleanArg,
+  enumType,
+  idArg,
   inputObjectType,
   list,
   mutationField,
@@ -29,6 +31,7 @@ import {
   Profile,
   ProfileFieldFile,
   ProfileFieldValue,
+  ProfileTypeField,
 } from "../../db/__types";
 import {
   ProfileFieldExpiryUpdatedEvent,
@@ -43,10 +46,13 @@ import {
   profileTypeFieldSelectValues,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
+import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
+import { validateProfileFieldValue } from "../../util/validateProfileFieldValue";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
 import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
@@ -62,6 +68,7 @@ import { validFileUploadInput } from "../helpers/validators/validFileUploadInput
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
 import { validateRegex } from "../helpers/validators/validateRegex";
+import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
   petitionIsNotAnonymized,
   petitionsAreNotPublicTemplates,
@@ -74,20 +81,25 @@ import { userHasAccessToUserAndUserGroups } from "../petition/mutations/authoriz
 import { contextUserHasPermission } from "../users/authorizers";
 import {
   contextUserCanSubscribeUsersToProfile,
+  externalSourceEntityMatchesProfileTypeStandardType,
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
   profileHasStatus,
   profileIsAssociatedToPetition,
   profileIsNotAnonymized,
+  profileMatchesProfileType,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsNotStandard,
   profileTypeFieldIsNotUsedInMonitoringRules,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
   profileTypeIsNotStandard,
+  profileTypeIsStandard,
   profilesCanBeAssociated,
   relationshipBelongsToProfile,
+  userCanOverwriteProfileFields,
+  userHasAccessToExternalSourceEntity,
   userHasAccessToProfile,
   userHasAccessToProfileRelationshipsInput,
   userHasAccessToProfileType,
@@ -97,7 +109,6 @@ import {
   validProfileNamePattern,
   validProfileTypeFieldOptions,
   validProfileTypeFieldSubstitution,
-  validateProfileFieldValue,
 } from "./validators";
 
 export const createProfileType = mutationField("createProfileType", {
@@ -2096,3 +2107,346 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
     return RESULT.SUCCESS;
   },
 });
+
+export const profileExternalSourceSearch = mutationField("profileExternalSourceSearch", {
+  type: nonNull("ProfileExternalSourceSearchResults"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToIntegrations("integrationId", ["PROFILE_EXTERNAL_SOURCE"], true),
+    userHasAccessToProfileType("profileTypeId"),
+    not(profileTypeIsArchived("profileTypeId")),
+    profileTypeIsStandard("profileTypeId"),
+    ifArgDefined(
+      "profileId",
+      and(
+        userHasAccessToProfile("profileId" as never),
+        profileHasStatus("profileId" as never, "OPEN"),
+        profileIsNotAnonymized("profileId" as never),
+        profileMatchesProfileType("profileId" as never, "profileTypeId"),
+      ),
+    ),
+  ),
+  args: {
+    integrationId: nonNull(globalIdArg("OrgIntegration")),
+    locale: nonNull("UserLocale"),
+    search: nonNull("JSONObject"),
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    profileId: nullable(globalIdArg("Profile")),
+  },
+  resolve: async (_, args, ctx, info) => {
+    try {
+      const data = await ctx.profileExternalSources.entitySearch(
+        args.integrationId,
+        args.profileTypeId,
+        args.locale,
+        args.search,
+        ctx.user!,
+      );
+
+      if (data.type === "FOUND") {
+        const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+          args.profileTypeId,
+        );
+        const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+          profileTypeFields.map((ptf) => ({ profileTypeFieldId: ptf.id, userId: ctx.user!.id })),
+        );
+        const profileFieldsAndPermissions = zip(profileTypeFields, effectivePermissions);
+        return {
+          type: "FOUND",
+          id: data.entity.id,
+          profileId: args.profileId ?? null,
+          data: Object.entries(data.entity.parsed_data)
+            .map(([alias, content]) => {
+              const [profileTypeField, permission] = profileFieldsAndPermissions.find(
+                ([ptf]) => ptf.alias === alias,
+              )!;
+              return {
+                profileTypeFieldId: profileTypeField.id,
+                content: isAtLeast(permission, "READ") ? content : null,
+              };
+            })
+            .sort((a, b) => {
+              const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeFieldId)!;
+              const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeFieldId)!;
+              return ptfA.position - ptfB.position;
+            }),
+        };
+      } else {
+        return {
+          type: "MULTIPLE_RESULTS",
+          totalCount: data.totalCount,
+          results: data.results,
+        };
+      }
+    } catch (error) {
+      if (error instanceof ProfileExternalSourceRequestError) {
+        if (error.status === 400) {
+          throw new ApolloError(error.message, "BAD_REQUEST");
+        }
+        if (error.status === 402) {
+          // Payment required: trying to search entity by id on a FREE eInforma plan
+          throw new ApolloError(error.message, "PAYMENT_REQUIRED");
+        }
+        if (error.status === 404) {
+          return {
+            type: "MULTIPLE_RESULTS",
+            totalCount: 0,
+            results: { key: "id", columns: [], rows: [] },
+          };
+        }
+      }
+      throw error;
+    }
+  },
+});
+
+export const profileExternalSourceDetails = mutationField("profileExternalSourceDetails", {
+  type: nonNull("ProfileExternalSourceSearchSingleResult"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToIntegrations("integrationId", ["PROFILE_EXTERNAL_SOURCE"], true),
+    userHasAccessToProfileType("profileTypeId"),
+    not(profileTypeIsArchived("profileTypeId")),
+    profileTypeIsStandard("profileTypeId"),
+    ifArgDefined(
+      "profileId",
+      and(
+        userHasAccessToProfile("profileId" as never),
+        profileHasStatus("profileId" as never, "OPEN"),
+        profileIsNotAnonymized("profileId" as never),
+        profileMatchesProfileType("profileId" as never, "profileTypeId"),
+      ),
+    ),
+  ),
+  args: {
+    externalId: nonNull(idArg()),
+    integrationId: nonNull(globalIdArg("OrgIntegration")),
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    profileId: nullable(globalIdArg("Profile")),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const data = await ctx.profileExternalSources.entityDetails(
+        args.integrationId,
+        args.profileTypeId,
+        args.externalId,
+        ctx.user!,
+      );
+
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        args.profileTypeId,
+      );
+      const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+        profileTypeFields.map((ptf) => ({ profileTypeFieldId: ptf.id, userId: ctx.user!.id })),
+      );
+      const profileFieldsAndPermissions = zip(profileTypeFields, effectivePermissions);
+      return {
+        type: "FOUND",
+        id: data.entity.id,
+        profileId: args.profileId ?? null,
+        data: Object.entries(data.entity.parsed_data)
+          .map(([alias, content]) => {
+            const [profileTypeField, permission] = profileFieldsAndPermissions.find(
+              ([ptf]) => ptf.alias === alias,
+            )!;
+            return {
+              profileTypeFieldId: profileTypeField.id,
+              content: isAtLeast(permission, "READ") ? content : null,
+            };
+          })
+          .sort((a, b) => {
+            const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeFieldId)!;
+            const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeFieldId)!;
+            return ptfA.position - ptfB.position;
+          }),
+      };
+    } catch (error) {
+      if (error instanceof ProfileExternalSourceRequestError) {
+        if (error.status === 400) {
+          throw new ApolloError(error.message, "BAD_REQUEST");
+        }
+        if (error.status === 402) {
+          // Payment required: trying to search entity by id on a FREE eInforma plan
+          throw new ApolloError(error.message, "PAYMENT_REQUIRED");
+        }
+        if (error.status === 404) {
+          throw new ApolloError(error.message, "ENTITY_NOT_FOUND");
+        }
+      }
+      throw error;
+    }
+  },
+});
+
+export const completeProfileFromExternalSource = mutationField(
+  "completeProfileFromExternalSource",
+  {
+    type: nonNull("Profile"),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      ifArgDefined(
+        "profileId",
+        and(
+          userHasAccessToProfile("profileId" as never),
+          profileHasStatus("profileId" as never, "OPEN"),
+          profileIsNotAnonymized("profileId" as never),
+          profileMatchesProfileType("profileId" as never, "profileTypeId"),
+        ),
+        contextUserHasPermission("PROFILES:CREATE_PROFILES"),
+      ),
+      userHasAccessToProfileType("profileTypeId"),
+      not(profileTypeIsArchived("profileTypeId")),
+      profileTypeIsStandard("profileTypeId"),
+      userHasAccessToExternalSourceEntity("profileExternalSourceEntityId"),
+      externalSourceEntityMatchesProfileTypeStandardType(
+        "profileExternalSourceEntityId",
+        "profileTypeId",
+      ),
+      userCanOverwriteProfileFields("profileTypeId", "conflictResolutions"),
+    ),
+    args: {
+      profileExternalSourceEntityId: nonNull(globalIdArg("ProfileExternalSourceEntity")),
+      profileTypeId: nonNull(globalIdArg("ProfileType")),
+      profileId: nullable(globalIdArg("Profile")),
+      conflictResolutions: nonNull(
+        list(
+          nonNull(
+            inputObjectType({
+              name: "ProfileExternalSourceConflictResolution",
+              definition: (t) => {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nonNull.field("action", {
+                  type: enumType({
+                    name: "ProfileExternalSourceConflictResolutionAction",
+                    members: ["IGNORE", "OVERWRITE"],
+                  }),
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+    },
+    resolve: async (_, args, ctx) => {
+      const entity = await ctx.profiles.loadProfileExternalSourceEntity(
+        args.profileExternalSourceEntityId,
+      );
+      assert(entity, "ProfileExternalSourceEntity not found");
+
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        args.profileTypeId,
+      );
+
+      const missingResolutions: number[] = [];
+      const fields: { content: any; profileTypeField: ProfileTypeField }[] = Object.entries(
+        entity.parsed_data,
+      )
+        .map(([alias, content]) => {
+          const profileTypeField = profileTypeFields.find((ptf) => ptf.alias === alias);
+          assert(profileTypeField, `ProfileTypeField with alias ${alias} not found`);
+
+          // check conflict resolution (no matter if the current value is the same as the external source)
+          // in this flow there is no need to check if current value exists or is different from incoming
+          // every field defined in entity.parsed_data will need a conflict resolution
+          const resolution = args.conflictResolutions.find(
+            (r) => r.profileTypeFieldId === profileTypeField.id,
+          );
+          if (!resolution) {
+            missingResolutions.push(profileTypeField.id);
+          } else if (resolution.action === "OVERWRITE") {
+            return { content, profileTypeField };
+          }
+
+          // resolution.action === "IGNORE"
+          // keep current value
+          return null;
+        })
+        .filter(isNonNullish)
+        .sort((a, b) => {
+          const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeField.id)!;
+          const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeField.id)!;
+          return ptfA.position - ptfB.position;
+        });
+
+      if (missingResolutions.length > 0) {
+        throw new ApolloError(
+          "Missing conflict resolutions for profileTypeFieldIds",
+          "MISSING_CONFLICT_RESOLUTIONS",
+          {
+            missingResolutions: missingResolutions.map((id) => toGlobalId("ProfileTypeField", id)),
+          },
+        );
+      }
+
+      const aggregatedErrors: { profileTypeFieldId: string; error: string; content: any }[] = [];
+      for (const field of fields) {
+        try {
+          // fields should already be validated as entity.parsed_data is validated before storing it on DB
+          // just in case, validate again
+          await validateProfileFieldValue(field.profileTypeField, field.content);
+        } catch (error) {
+          aggregatedErrors.push({
+            profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeField.id),
+            error: error instanceof Error ? error.message : "UNKNOWN",
+            content: field.content,
+          });
+        }
+      }
+      if (aggregatedErrors.length > 0) {
+        throw new ApolloError("Validation errors on profile field values", "VALIDATION_ERRORS", {
+          errors: aggregatedErrors,
+        });
+      }
+
+      const profile = args.profileId
+        ? await ctx.profiles.loadProfile(args.profileId)
+        : await ctx.profiles.createProfile(
+            {
+              name: "",
+              localizable_name: { en: "", es: "" },
+              org_id: ctx.user!.org_id,
+              profile_type_id: args.profileTypeId,
+            },
+            ctx.user!.id,
+          );
+      assert(profile, "Profile not found");
+
+      if (fields.length > 0) {
+        const _fields = fields.map((f) => ({
+          profileTypeFieldId: f.profileTypeField.id,
+          type: f.profileTypeField.type,
+          content: f.content,
+          alias: f.profileTypeField.alias,
+        }));
+
+        const {
+          currentValues,
+          previousValues,
+          profile: updatedProfile,
+        } = await ctx.profiles.updateProfileFieldValue(
+          profile.id,
+          _fields,
+          ctx.user!.id,
+          entity.integration_id,
+        );
+
+        await ctx.profiles.createProfileUpdatedEvents(
+          profile.id,
+          buildProfileUpdatedEventsData(
+            profile.id,
+            _fields,
+            currentValues,
+            previousValues,
+            ctx.user!,
+            entity.integration_id,
+          ),
+          ctx.user!,
+        );
+
+        return updatedProfile!;
+      }
+
+      return profile;
+    },
+  },
+);

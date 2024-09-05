@@ -671,10 +671,16 @@ export type IOrgIntegration = {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
+};
+
+export type IOrgIntegrationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 export type IOrgIntegrationPagination = {
@@ -708,6 +714,7 @@ export type IntegrationType =
   | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
   | "ID_VERIFICATION"
+  | "PROFILE_EXTERNAL_SOURCE"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -844,6 +851,7 @@ export type Mutation = {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
+  completeProfileFromExternalSource: Profile;
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
@@ -877,6 +885,8 @@ export type Mutation = {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
+  /** Creates a new eInforma Profile External Source integration on the provided organization */
+  createEInformaProfileExternalSourceIntegration: SupportMethodResponse;
   /**
    *
    *     Edits permissions to users and groups on given petitions.
@@ -1057,6 +1067,8 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
+  profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
   profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
@@ -1407,6 +1419,13 @@ export type MutationcompletePetitionArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationcompleteProfileFromExternalSourceArgs = {
+  conflictResolutions: Array<ProfileExternalSourceConflictResolution>;
+  profileExternalSourceEntityId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+};
+
 export type MutationcopyBackgroundCheckReplyToProfileFieldValueArgs = {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1494,6 +1513,13 @@ export type MutationcreateDowJonesKycReplyArgs = {
 
 export type MutationcreateDowJonesProfileDownloadTaskArgs = {
   profileId: Scalars["ID"]["input"];
+};
+
+export type MutationcreateEInformaProfileExternalSourceIntegrationArgs = {
+  clientId: Scalars["String"]["input"];
+  clientSecret: Scalars["String"]["input"];
+  isPaidSubscription: Scalars["Boolean"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateEditPetitionPermissionTaskArgs = {
@@ -1983,6 +2009,21 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   attachmentId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationprofileExternalSourceDetailsArgs = {
+  externalId: Scalars["ID"]["input"];
+  integrationId: Scalars["GID"]["input"];
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationprofileExternalSourceSearchArgs = {
+  integrationId: Scalars["GID"]["input"];
+  locale: UserLocale;
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  search: Scalars["JSONObject"]["input"];
 };
 
 export type MutationprofileFieldFileDownloadLinkArgs = {
@@ -2695,10 +2736,16 @@ export type OrgIntegration = IOrgIntegration & {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
+};
+
+export type OrgIntegrationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** An object describing the license of an organization */
@@ -4319,6 +4366,89 @@ export type ProfileEventType =
   | "PROFILE_SCHEDULED_FOR_DELETION"
   | "PROFILE_UPDATED";
 
+export type ProfileExternalSourceConflictResolution = {
+  action: ProfileExternalSourceConflictResolutionAction;
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type ProfileExternalSourceConflictResolutionAction = "IGNORE" | "OVERWRITE";
+
+export type ProfileExternalSourceOrgIntegration = IOrgIntegration & {
+  id: Scalars["GID"]["output"];
+  invalidCredentials: Scalars["Boolean"]["output"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl: Maybe<Scalars["String"]["output"]>;
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"]["output"];
+  /** Returns a list with search parameters structure required to do a search on this external source provider */
+  searchParams: Array<ProfileExternalSourceSearchParam>;
+  /** Returns a list with profile types that can be used to perform searches on this external source provider */
+  searchableProfileTypes: Array<ProfileType>;
+  /** The type of the integration. */
+  type: IntegrationType;
+};
+
+export type ProfileExternalSourceOrgIntegrationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
+};
+
+export type ProfileExternalSourceOrgIntegrationsearchParamsArgs = {
+  locale: UserLocale;
+  profileId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+};
+
+export type ProfileExternalSourceSearchMultipleResults = {
+  results: ProfileExternalSourceSearchMultipleResultsDetail;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type ProfileExternalSourceSearchMultipleResultsColumn = {
+  key: Scalars["String"]["output"];
+  label: Scalars["String"]["output"];
+};
+
+export type ProfileExternalSourceSearchMultipleResultsDetail = {
+  columns: Array<ProfileExternalSourceSearchMultipleResultsColumn>;
+  key: Scalars["String"]["output"];
+  rows: Array<Scalars["JSONObject"]["output"]>;
+};
+
+export type ProfileExternalSourceSearchParam = {
+  defaultValue: Maybe<Scalars["String"]["output"]>;
+  key: Scalars["String"]["output"];
+  label: Scalars["String"]["output"];
+  minLength: Maybe<Scalars["Int"]["output"]>;
+  options: Maybe<Array<ProfileExternalSourceSearchParamOption>>;
+  placeholder: Maybe<Scalars["String"]["output"]>;
+  required: Scalars["Boolean"]["output"];
+  type: ProfileExternalSourceSearchParamType;
+};
+
+export type ProfileExternalSourceSearchParamOption = {
+  label: Scalars["String"]["output"];
+  value: Scalars["String"]["output"];
+};
+
+export type ProfileExternalSourceSearchParamType = "SELECT" | "TEXT";
+
+export type ProfileExternalSourceSearchResults =
+  | ProfileExternalSourceSearchMultipleResults
+  | ProfileExternalSourceSearchSingleResult;
+
+export type ProfileExternalSourceSearchSingleResult = {
+  data: Array<ProfileExternalSourceSearchSingleResultData>;
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+};
+
+export type ProfileExternalSourceSearchSingleResultData = {
+  content: Maybe<Scalars["JSONObject"]["output"]>;
+  profileTypeField: ProfileTypeField;
+};
+
 export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -4563,6 +4693,7 @@ export type ProfileType = Timestamps & {
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   profileNamePatternFields: Array<Scalars["GID"]["output"]>;
+  standardType: Maybe<ProfileTypeStandardType>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 };
@@ -5626,11 +5757,17 @@ export type SignatureOrgIntegration = IOrgIntegration & {
   invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"]["output"];
+  /** URL of the integration logo */
+  logoUrl: Maybe<Scalars["String"]["output"]>;
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"]["output"];
   provider: SignatureOrgIntegrationProvider;
   /** The type of the integration. */
   type: IntegrationType;
+};
+
+export type SignatureOrgIntegrationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";

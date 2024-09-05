@@ -510,6 +510,36 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
+    "term": "integration.einforma-search-params-company-search.individual-label",
+    "definition": "Nombre o NIF",
+    "context": "Name or tax ID"
+  },
+  {
+    "term": "integration.einforma-search-params-company-search.legal-entity-label",
+    "definition": "Denominación social o NIF",
+    "context": "Company name or tax ID"
+  },
+  {
+    "term": "integration.einforma-search-params-province.label",
+    "definition": "Provincia",
+    "context": "Province"
+  },
+  {
+    "term": "integration.einforma-search-results-name-or-company-name.label",
+    "definition": "Nombre o denominación social",
+    "context": "Name or company name"
+  },
+  {
+    "term": "integration.einforma-search-results-province.label",
+    "definition": "Provincia",
+    "context": "Province"
+  },
+  {
+    "term": "integration.einforma.search-params-province.placeholder",
+    "definition": "Introduce una provincia española",
+    "context": "Select a spanish province"
+  },
+  {
     "term": "invitation.access-parallel",
     "definition": "Acceder",
     "context": "Log in"

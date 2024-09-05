@@ -7,7 +7,7 @@ import { useIntl } from "react-intl";
 
 export interface ProfileTypeFieldTypeIndicatorProps {
   type: ProfileTypeFieldType;
-  fieldIndex: number;
+  fieldIndex?: number;
   isTooltipDisabled?: boolean;
   hideIcon?: boolean;
 }
@@ -29,7 +29,7 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
         backgroundColor={color}
         color="white"
         alignItems="center"
-        minWidth={8}
+        minWidth={fieldIndex ? 8 : undefined}
         borderRadius="sm"
         paddingX={1}
         spacing={0.5}
@@ -38,9 +38,11 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
         {...props}
       >
         {hideIcon ? null : <Icon as={icon} boxSize="16px" role="presentation" />}
-        <Text width={5} as="span" fontSize="xs" marginStart={hideIcon ? 0 : 0.5} textAlign="center">
-          {fieldIndex}
-        </Text>
+        {fieldIndex ? (
+          <Text width={5} as="span" fontSize="xs" textAlign="center">
+            {fieldIndex}
+          </Text>
+        ) : null}
       </HStack>
     </Tooltip>
   );

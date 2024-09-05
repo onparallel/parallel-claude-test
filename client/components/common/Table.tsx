@@ -37,6 +37,7 @@ import {
   FilterIcon,
 } from "@parallel/chakra/icons";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
+import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import useMergedRef from "@react-hook/merged-ref";
@@ -84,6 +85,8 @@ export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   isExpandable?: boolean;
   isHighlightable?: boolean;
   actions?: ((ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode }) | ReactElement)[];
+  headProps?: MaybeFunction<HTMLChakraProps<"thead">, [context: TContext]>;
+  rowProps?: MaybeFunction<HTMLChakraProps<"tr">, [row: TRow, context: TContext]>;
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TImpl, event: MouseEvent) => void;
   onSortChange?: (sort: TableSorting<any>) => void;
@@ -103,18 +106,20 @@ export interface TableHeaderProps<TRow, TContext = unknown, TFilter = unknown>
   onToggleAll: () => void;
 }
 
-export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
+export interface TableRowProps<TRow, TContext = unknown> {
   row: TRow;
   context: TContext;
   rowKey: string;
-  column: TableColumn<TRow, TContext, TFilter>;
   isSelected?: boolean;
   isExpanded?: boolean;
   onToggleSelection?: (event: any) => void;
   onToggleExpand?: (expanded: boolean) => void;
 }
 
-type MaybeFunction<TResult, TArgs extends any[] = []> = TResult | ((...args: TArgs) => TResult);
+export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown>
+  extends TableRowProps<TRow, TContext> {
+  column: TableColumn<TRow, TContext, TFilter>;
+}
 
 export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   key: string;
@@ -152,6 +157,8 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   sort,
   filter,
   actions,
+  headProps,
+  rowProps,
   onSelectionChange,
   onRowClick,
   onSortChange,
@@ -335,7 +342,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       {...props}
       sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
     >
-      <Thead>
+      <Thead {...unMaybeFunction(headProps, context as TContext)}>
         <Tr height="42px">
           {_columns.map((column) => {
             if (column.Header) {
@@ -354,10 +361,6 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                 />
               );
             } else {
-                const headerProps =
-                  typeof column.headerProps === "function"
-                    ? column.headerProps(_context!)
-                    : (column.headerProps ?? {});
               return (
                 <DefaultHeader
                   key={column.key}
@@ -370,7 +373,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                   allSelected={allSelected}
                   anySelected={anySelected}
                   onToggleAll={toggleAll}
-                    {...headerProps}
+                  {...unMaybeFunction(column.headerProps, _context!)}
                 />
               );
             }
@@ -393,6 +396,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               isExpanded={isExpanded}
               isExpandable={isExpandable}
               isHighlightable={isHighlightable}
+              rowProps={rowProps}
               onRowClick={handleRowClick}
               onToggleExpand={handleToggleExpand}
               onToggleSelection={toggle}
@@ -415,6 +419,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   isExpanded,
   isExpandable,
   isHighlightable,
+  rowProps,
   onRowClick,
   onToggleSelection,
   onToggleExpand,
@@ -428,7 +433,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   onToggleExpand: (key: string, value: boolean) => void;
 } & Pick<
   TableProps<TRow, TContext, TImpl>,
-  "columns" | "isExpandable" | "isHighlightable" | "onRowClick"
+  "columns" | "isExpandable" | "isHighlightable" | "onRowClick" | "rowProps"
 >) {
   const handleToggleSelection = useCallback(onToggleSelection.bind(null, rowKey), [
     onToggleSelection,
@@ -451,6 +456,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               borderTopColor: "gray.200",
             })}
         onClick={onRowClick?.bind(null, row)}
+        {...unMaybeFunction(rowProps, row, context)}
       >
         {columns.map((column) => {
           return (
@@ -483,12 +489,12 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 const Row: typeof _Row = memo(_Row) as any;
 
 function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TContext>) {
-  const cellProps =
-    typeof column.cellProps === "function"
-      ? column.cellProps(props.row, props.context)
-      : (column.cellProps ?? {});
   return (
-    <Td userSelect="contain" textAlign={column.align ?? "left"} {...cellProps}>
+    <Td
+      userSelect="contain"
+      textAlign={column.align ?? "left"}
+      {...unMaybeFunction(column.cellProps, props.row, props.context)}
+    >
       <column.CellContent column={column} {...props} />
     </Td>
   );

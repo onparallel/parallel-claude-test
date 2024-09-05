@@ -1,5 +1,18 @@
-import { enumType, interfaceType, objectType } from "nexus";
+import { arg, enumType, interfaceType, nonNull, nullable, objectType, unionType } from "nexus";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { DocumentProcessingTypeValues, IntegrationTypeValues } from "../../db/__types";
+import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasFeatureFlag } from "../petition/authorizers";
+import {
+  profileIsNotAnonymized,
+  profileMatchesProfileType,
+  profileTypeIsArchived,
+  profileTypeIsStandard,
+  userHasAccessToProfile,
+  userHasAccessToProfileType,
+} from "../profile/authorizers";
 
 export const IntegrationType = enumType({
   name: "IntegrationType",
@@ -26,8 +39,29 @@ export const IOrgIntegration = interfaceType({
     t.boolean("invalidCredentials", {
       resolve: (o) => o.invalid_credentials,
     });
+    t.nullable.string("logoUrl", {
+      description: "URL of the integration logo",
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        const asset = {
+          DOCUSIGN: "docusign.png",
+          SIGNATURIT: "signaturit.png",
+          EINFORMA: "einforma.png",
+        }[root.provider];
+        return isNonNullish(asset)
+          ? await ctx.images.getAssetImageUrl(`static/logos/${asset}`, args.options as any)
+          : null;
+      },
+    });
   },
-  resolveType: (o) => (o.type === "SIGNATURE" ? "SignatureOrgIntegration" : "OrgIntegration"),
+  resolveType: (o) =>
+    o.type === "SIGNATURE"
+      ? "SignatureOrgIntegration"
+      : o.type === "PROFILE_EXTERNAL_SOURCE"
+        ? "ProfileExternalSourceOrgIntegration"
+        : "OrgIntegration",
 });
 
 export const SignatureOrgIntegration = objectType({
@@ -381,4 +415,161 @@ export const DowJonesKycEntityProfileResultEntity = objectType({
 export const DocumentProcessingType = enumType({
   name: "DocumentProcessingType",
   members: DocumentProcessingTypeValues,
+});
+
+export const ProfileExternalSourceSearchParam = objectType({
+  name: "ProfileExternalSourceSearchParam",
+  definition(t) {
+    t.nonNull.field("type", {
+      type: enumType({
+        name: "ProfileExternalSourceSearchParamType",
+        members: ["TEXT", "SELECT"],
+      }),
+    });
+    t.nonNull.string("key");
+    t.nonNull.boolean("required");
+    t.nonNull.string("label");
+    t.nullable.string("placeholder");
+    t.nullable.string("defaultValue");
+    t.nullable.list.nonNull.field("options", {
+      type: objectType({
+        name: "ProfileExternalSourceSearchParamOption",
+        definition(t) {
+          t.nonNull.string("value");
+          t.nonNull.string("label");
+        },
+      }),
+    });
+    t.nullable.int("minLength");
+  },
+});
+
+export const ProfileExternalSourceSearchResults = unionType({
+  name: "ProfileExternalSourceSearchResults",
+  definition(t) {
+    t.members(
+      "ProfileExternalSourceSearchSingleResult",
+      "ProfileExternalSourceSearchMultipleResults",
+    );
+  },
+  resolveType: (o) => {
+    if (o.type === "FOUND") {
+      return "ProfileExternalSourceSearchSingleResult";
+    } else if (o.type === "MULTIPLE_RESULTS") {
+      return "ProfileExternalSourceSearchMultipleResults";
+    }
+    throw new Error(`Unknown type`);
+  },
+  sourceType: /* ts */ `
+    | ({ type: "FOUND" } & NexusGenRootTypes["ProfileExternalSourceSearchSingleResult"])
+    | ({ type: "MULTIPLE_RESULTS" } & NexusGenRootTypes["ProfileExternalSourceSearchMultipleResults"])
+  `,
+});
+
+export const ProfileExternalSourceSearchSingleResult = objectType({
+  name: "ProfileExternalSourceSearchSingleResult",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "ProfileExternalSourceEntity" });
+    t.nullable.field("profile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) =>
+        o.profileId ? await ctx.profiles.loadProfile(o.profileId) : null,
+    });
+    t.nonNull.list.nonNull.field("data", {
+      type: objectType({
+        name: "ProfileExternalSourceSearchSingleResultData",
+        definition(t) {
+          t.nonNull.field("profileTypeField", {
+            type: "ProfileTypeField",
+            resolve: async (o, _, ctx) => {
+              const ptf = await ctx.profiles.loadProfileTypeField(o.profileTypeFieldId);
+              assert(isNonNullish(ptf), `Unknown profile type field ${o.profileTypeFieldId}`);
+              return ptf;
+            },
+          });
+          t.nullable.jsonObject("content");
+        },
+      }),
+    });
+  },
+  sourceType: /* ts */ `{
+    id: number;
+    profileId: number | null;
+    data: { profileTypeFieldId: number, content: any }[];
+  }`,
+});
+
+export const ProfileExternalSourceSearchMultipleResults = objectType({
+  name: "ProfileExternalSourceSearchMultipleResults",
+  definition(t) {
+    t.nonNull.int("totalCount");
+    t.nonNull.field("results", {
+      type: objectType({
+        name: "ProfileExternalSourceSearchMultipleResultsDetail",
+        definition(t) {
+          t.nonNull.string("key");
+          t.nonNull.list.nonNull.jsonObject("rows");
+          t.nonNull.list.nonNull.field("columns", {
+            type: objectType({
+              name: "ProfileExternalSourceSearchMultipleResultsColumn",
+              definition(t) {
+                t.nonNull.string("key");
+                t.nonNull.string("label");
+              },
+            }),
+          });
+        },
+      }),
+    });
+  },
+});
+
+export const ProfileExternalSourceOrgIntegration = objectType({
+  name: "ProfileExternalSourceOrgIntegration",
+  definition(t) {
+    t.implements("IOrgIntegration");
+    t.nonNull.list.nonNull.field("searchParams", {
+      description:
+        "Returns a list with search parameters structure required to do a search on this external source provider",
+      type: "ProfileExternalSourceSearchParam",
+      authorize: authenticateAnd(
+        userHasFeatureFlag("PROFILES"),
+        userHasAccessToProfileType("profileTypeId"),
+        not(profileTypeIsArchived("profileTypeId")),
+        profileTypeIsStandard("profileTypeId"),
+        ifArgDefined(
+          "profileId",
+          and(
+            userHasAccessToProfile("profileId" as never),
+            profileIsNotAnonymized("profileId" as never),
+            profileMatchesProfileType("profileId" as never, "profileTypeId"),
+          ),
+        ),
+      ),
+      args: {
+        profileTypeId: nonNull(globalIdArg("ProfileType")),
+        locale: nonNull("UserLocale"),
+        profileId: nullable(globalIdArg("Profile")),
+      },
+      resolve: async (o, args, ctx) => {
+        return await ctx.profileExternalSources.getSearchParamsDefinition(
+          o.id,
+          args.profileTypeId,
+          ctx.user!.id,
+          args.locale,
+          args.profileId,
+        );
+      },
+    });
+    t.nonNull.list.nonNull.field("searchableProfileTypes", {
+      description:
+        "Returns a list with profile types that can be used to perform searches on this external source provider",
+      type: "ProfileType",
+      authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+      resolve: async (o, _, ctx) => {
+        return await ctx.profileExternalSources.getAvailableProfileTypesByIntegrationId(o.id);
+      },
+    });
+  },
+  sourceType: "db.OrgIntegration",
 });

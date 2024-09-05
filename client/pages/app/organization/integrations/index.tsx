@@ -55,6 +55,7 @@ function OrganizationIntegrations() {
 
   const hasDownJones = me.organization.hasDowJones;
   const hasIdVerification = me.organization.hasIdVerification;
+  const hasEInforma = me.organization.hasEInforma;
 
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
@@ -199,7 +200,7 @@ function OrganizationIntegrations() {
       disabledMessage: (
         <Text>
           <FormattedMessage
-            id="page.organization-integrations.dow-jones-disabled-message"
+            id="page.organization-integrations.disabled-message"
             defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
             values={{
               a: (chunks: any) => (
@@ -264,7 +265,48 @@ function OrganizationIntegrations() {
       disabledMessage: (
         <Text>
           <FormattedMessage
-            id="page.organization-integrations.dow-jones-disabled-message"
+            id="page.organization-integrations.disabled-message"
+            defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
+            values={{
+              a: (chunks: any) => (
+                <SupportButton
+                  variant="link"
+                  fontSize="sm"
+                  message={intl.formatMessage({
+                    id: "component.import-from-external-source-dialog.missing-integration-message",
+                    defaultMessage:
+                      "Hi, I would like more information about checking external data sources.",
+                  })}
+                >
+                  {chunks}
+                </SupportButton>
+              ),
+            }}
+          />
+        </Text>
+      ),
+      logo: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/einforma.png`}
+          alt={untranslated("eInforma")}
+          maxWidth="124px"
+        />
+      ),
+      title: untranslated("eInforma"),
+      body: intl.formatMessage({
+        id: "page.organization-integrations.einforma-description",
+        defaultMessage: "Check official information on companies and freelancers in Spain.",
+      }),
+      onChange: noop,
+      isChecked: hasEInforma,
+    },
+    {
+      isDisabled: true,
+
+      disabledMessage: (
+        <Text>
+          <FormattedMessage
+            id="page.organization-integrations.disabled-message"
             defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
             values={{
               a: (chunks: any) => (
@@ -424,6 +466,7 @@ OrganizationIntegrations.queries = [
           id
           hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+          hasEInforma: hasIntegration(integration: PROFILE_EXTERNAL_SOURCE, provider: "EINFORMA")
           hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
           integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
             items {

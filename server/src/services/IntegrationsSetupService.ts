@@ -17,6 +17,10 @@ import {
   BankflipIdVerificationIntegration,
 } from "../integrations/id-verification/bankflip/BankflipIdVerificationIntegration";
 import {
+  EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+  EInformaProfileExternalSourceIntegration,
+} from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
+import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/signature/SignaturitIntegration";
@@ -62,6 +66,13 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOCUMENT_PROCESSING", "BANKFLIP">>;
+  createEInformaProfileExternalSourceIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">>;
 }
 
 @injectable()
@@ -75,29 +86,9 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     private bankflipIdVerificationIntegration: BankflipIdVerificationIntegration,
     @inject(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
     private bankflipDocumentProcessingIntegration: BankflipDocumentProcessingIntegration,
+    @inject(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    private eInformaProfileExternalSourceIntegration: EInformaProfileExternalSourceIntegration,
   ) {}
-
-  private async authenticateSignaturitApiKey(apiKey: string) {
-    return await Promise.any(
-      Object.entries({
-        sandbox: "https://api.sandbox.signaturit.com",
-        production: "https://api.signaturit.com",
-      }).map(([environment, url]) =>
-        this.fetch
-          .fetch(`${url}/v3/team/users.json`, {
-            headers: { authorization: `Bearer ${apiKey}` },
-            timeout: 5_000,
-          })
-          .then(({ status }) => {
-            if (status === 200) {
-              return { environment: environment as SignaturitEnvironment };
-            } else {
-              throw new Error();
-            }
-          }),
-      ),
-    );
-  }
 
   async createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
@@ -109,7 +100,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
   ) {
     let environment = env;
     if (!environment) {
-      ({ environment } = await this.authenticateSignaturitApiKey(apiKey));
+      ({ environment } = await this.signaturitIntegration.authenticateApiKey(apiKey));
     }
     return await this.signaturitIntegration.createOrgIntegration(
       {
@@ -170,6 +161,23 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOCUMENT_PROCESSING", "BANKFLIP">> {
     return await this.bankflipDocumentProcessingIntegration.createOrgIntegration(
+      data,
+      createdBy,
+      t,
+    );
+  }
+
+  async createEInformaProfileExternalSourceIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">> {
+    // verify that credentials are valid
+    await this.eInformaProfileExternalSourceIntegration.fetchAccessToken(data.settings.CREDENTIALS);
+
+    return await this.eInformaProfileExternalSourceIntegration.createOrgIntegration(
       data,
       createdBy,
       t,

@@ -3590,6 +3590,126 @@
     "context": "Field not visible"
   },
   {
+    "term": "component.import-from-external-source-dialog.change-search-button",
+    "definition": "Cambiar búsqueda",
+    "context": "Change search params"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.create-profile-button",
+    "definition": "Crear perfil",
+    "context": "Create profile"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.create-profile-description",
+    "definition": "Se creará un nuevo perfil con las siguientes propiedades.",
+    "context": "A new profile will be created with the following properties."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.current-value",
+    "definition": "Valor actual",
+    "context": "Current value"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.fields-without-read",
+    "definition": "No tienes permiso para ver algunas de las propiedades para las cuales {providerName} está reportando información:",
+    "context": "You don't have read permission on some of the fields for which {providerName} is reporting information:"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.fields-without-write",
+    "definition": "No tienes permiso para editar algunas de las propiedades para las cuales {providerName} está reportando información:",
+    "context": "You don't have write permission on some of the fields for which {providerName} is reporting information:"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header",
+    "definition": "Selecciona una fuente externa",
+    "context": "Select an external data source"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header-create-profile",
+    "definition": "Nuevo perfil",
+    "context": "New profile"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header-search",
+    "definition": "Buscar {profileTypeName}",
+    "context": "Search {profileTypeName}"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header-search-results",
+    "definition": "Resultados de la búsqueda",
+    "context": "Search results"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header-select-source",
+    "definition": "Selecciona una fuente externa",
+    "context": "Select an external data source"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.header-update-profile",
+    "definition": "Actualizar perfil",
+    "context": "Update profile"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.missing-integration-alert-description",
+    "definition": "Actualiza tu plan para acceder a esta funcionalidad.",
+    "context": "Upgrade your plan to access this feature."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.missing-integration-message",
+    "definition": "Hola, me gustaría obtener más información para realizar búsquedas con fuentes externas.",
+    "context": "Hi, I would like more information about checking external data sources."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.no-read-permission",
+    "definition": "No tienes permiso para ver esta propiedad",
+    "context": "You don't have permission to view this field"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.no-write-permission",
+    "definition": "No tienes permiso para editar esta propiedad",
+    "context": "You don't have permission to edit this field"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.searching-by",
+    "definition": "Buscando por",
+    "context": "Searching by"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.update-profile-button",
+    "definition": "Actualizar perfil",
+    "context": "Update profile"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.update-profile-description",
+    "definition": "Las siguientes propiedades del perfil de {profileName} se actualizarán con la información del resultado seleccionado.",
+    "context": "The following properties of profile {profileName} will be updated with the selected results."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.update-profile-description-2",
+    "definition": "Selecciona el valor que quieras conservar:",
+    "context": "Select the value you want to keep:"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.value",
+    "definition": "Valor",
+    "context": "Value"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.value-differs-external-source",
+    "definition": "El valor actual difiere del de {providerName}.",
+    "context": "The current value differs from the one in {providerName}."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.value-from",
+    "definition": "De {integrationName}",
+    "context": "From {integrationName}"
+  },
+  {
+    "term": "component.import-from-external-source-dialog.value-matches-external-source",
+    "definition": "El valor actual coincide con el de {providerName}.",
+    "context": "The current value matches with the one in {providerName}."
+  },
+  {
     "term": "component.import-options-settings-row.default-file-name",
     "definition": "opciones",
     "context": "options"
@@ -5358,11 +5478,6 @@
     "term": "component.petition-compose-new-field-placeholder.select-field-group-children",
     "definition": "Selecciona el campo que necesites o arrastra campos {isTemplate, select, true {de la plantilla} other {del parallel}}",
     "context": "Select the field that you need or drag and drop fields from the {isTemplate, select, true {template} other {petition}}"
-  },
-  {
-    "term": "component.petition-compose-new-field.empty-search-text",
-    "definition": "No se han encontrado coincidencias con tu búsqueda.",
-    "context": "No matches found for your search."
   },
   {
     "term": "component.petition-compose-new-field.link-to-profile",
@@ -7445,6 +7560,11 @@
     "context": "Suggested reply from:"
   },
   {
+    "term": "component.profile-field-value-content.no-value",
+    "definition": "Sin valor",
+    "context": "No value"
+  },
+  {
     "term": "component.profile-field.expiration-date",
     "definition": "Vencimiento: {date}",
     "context": "Expires at: {date}"
@@ -7470,6 +7590,11 @@
     "context": "{count, plural, =1 {# association} other {# associations}}"
   },
   {
+    "term": "component.profile-form.check-external-sources-tooltip",
+    "definition": "Lanzar búsqueda externa",
+    "context": "Check external data sources"
+  },
+  {
     "term": "component.profile-form.closed-status",
     "definition": "Cerrado",
     "context": "Closed"
@@ -7493,6 +7618,16 @@
     "term": "component.profile-form.recover-profile-alert",
     "definition": "Este perfil se eliminará permanentemente el {date}.",
     "context": "This profile will be permanently deleted on {date}."
+  },
+  {
+    "term": "component.profile-form.success-toast-description",
+    "definition": "El perfil se ha actualizado con la información de la fuente externa",
+    "context": "The profile has been updated with the information from the external source"
+  },
+  {
+    "term": "component.profile-form.success-toast-header",
+    "definition": "Información importada correctamente",
+    "context": "Information imported successfully"
   },
   {
     "term": "component.profile-petitions-table.add-petition",
@@ -12260,6 +12395,11 @@
     "context": "Male"
   },
   {
+    "term": "generic.min-length-error",
+    "definition": "El campo debe tener al menos {count} caracteres",
+    "context": "The field should be at least {count} characters long"
+  },
+  {
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
@@ -12600,6 +12740,11 @@
     "context": "Previous page"
   },
   {
+    "term": "generic.profile-property",
+    "definition": "Propiedad",
+    "context": "Property"
+  },
+  {
     "term": "generic.profile-type-field-type-background-check",
     "definition": "Búsqueda en listados",
     "context": "Background check"
@@ -12718,6 +12863,11 @@
     "term": "generic.search",
     "definition": "Búsqueda",
     "context": "Search"
+  },
+  {
+    "term": "generic.search-no-results",
+    "definition": "No se han encontrado coincidencias con tu búsqueda.",
+    "context": "No matches found for your search."
   },
   {
     "term": "generic.see-message",
@@ -13950,6 +14100,11 @@
     "context": "Can't find the integration you need?"
   },
   {
+    "term": "page.organization-integrations.disabled-message",
+    "definition": "Esta es una funcionalidad enterprise. <a>Contacta</a> con nuestro equipo de soporte para más información.",
+    "context": "This is an Enterprise feature. <a>Contact</a> with our support team for more information."
+  },
+  {
     "term": "page.organization-integrations.docusign-description",
     "definition": "Añade firma digital a tus parallels.",
     "context": "Add digital signature to your parallels."
@@ -13965,11 +14120,6 @@
     "context": "Run a background check of individuals and legal entities using its database."
   },
   {
-    "term": "page.organization-integrations.dow-jones-disabled-message",
-    "definition": "Esta es una funcionalidad enterprise. <a>Contacta</a> con nuestro equipo de soporte para más información.",
-    "context": "This is an Enterprise feature. <a>Contact</a> with our support team for more information."
-  },
-  {
     "term": "page.organization-integrations.dow-jones-error",
     "definition": "La integración no está funcionando correctamente. Por favor, vuelve a conectar con tu cuenta.",
     "context": "The integration is not working properly. Please reconnect to your account."
@@ -13978,6 +14128,11 @@
     "term": "page.organization-integrations.dow-jones-title",
     "definition": "Dow Jones RiskCenter",
     "context": "Dow Jones RiskCenter"
+  },
+  {
+    "term": "page.organization-integrations.einforma-description",
+    "definition": "Consulta información oficial sobre empresas y autónomos en España.",
+    "context": "Check official information on companies and freelancers in Spain."
   },
   {
     "term": "page.organization-integrations.id-verification-contact-message",
