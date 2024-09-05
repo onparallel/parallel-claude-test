@@ -836,8 +836,8 @@
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export-title",
-    "definition": "Título del PDF adjunto",
-    "context": "PDF export title"
+    "definition": "Título del documento",
+    "context": "Title of the document"
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export-title-help",

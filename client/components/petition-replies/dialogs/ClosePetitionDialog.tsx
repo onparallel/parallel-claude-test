@@ -154,7 +154,7 @@ export function ClosePetitionDialog({
                         <FormLabel display="flex" alignItems="center">
                           <FormattedMessage
                             id="component.close-petition-dialog.attach-pdf-export-title"
-                            defaultMessage="PDF export title"
+                            defaultMessage="Title of the document"
                           />
                           <HelpPopover placement="auto">
                             <FormattedMessage
@@ -166,7 +166,6 @@ export function ClosePetitionDialog({
                         <Input
                           ref={pdfExportTitleRef}
                           value={pdfExportTitle ?? ""}
-                          isInvalid={attachPdfExport && !pdfExportTitle}
                           onChange={(e) => setPdfExportTitle(e.target.value)}
                         />
                       </FormControl>
@@ -183,14 +182,8 @@ export function ClosePetitionDialog({
           leftIcon={sendMessage ? <PaperPlaneIcon /> : undefined}
           colorScheme="primary"
           onClick={() => {
-            if (
-              sendMessage &&
-              (isEmptyRTEValue(message) ||
-                (attachPdfExport && !hasSignedDocument && !pdfExportTitle))
-            ) {
-              if (isEmptyRTEValue(message)) {
-                setIsInvalid(true);
-              }
+            if (sendMessage && isEmptyRTEValue(message)) {
+              setIsInvalid(true);
             } else {
               props.onResolve({
                 message: sendMessage ? message : null,

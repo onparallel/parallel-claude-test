@@ -836,8 +836,8 @@
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export-title",
-    "definition": "PDF export title",
-    "context": "PDF export title"
+    "definition": "Title of the document",
+    "context": "Title of the document"
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export-title-help",
