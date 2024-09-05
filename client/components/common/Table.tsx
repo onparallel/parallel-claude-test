@@ -60,6 +60,7 @@ import { identity, isNonNullish, noop, pick } from "remeda";
 import { Card } from "./Card";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
+import { ScrollTableContainer } from "./ScrollTableContainer";
 
 export type TableSortingDirection = "ASC" | "DESC";
 
@@ -329,78 +330,80 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   );
 
   return (
-    <ChakraTable
-      variant="parallel"
-      borderInline="none"
-      {...props}
-      sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
-    >
-      <Thead position="sticky" top="0" zIndex="10">
-        <Tr height="42px">
-          {_columns.map((column) => {
-            if (column.Header) {
-              return (
-                <column.Header
-                  key={column.key}
-                  column={column}
-                  context={_context}
-                  sort={sort}
-                  filter={filter?.[column.key]}
-                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                  onSortByClick={handleOnSortByClick}
-                  allSelected={allSelected}
-                  anySelected={anySelected}
-                  onToggleAll={toggleAll}
-                />
-              );
-            } else {
-              const headerProps =
-                typeof column.headerProps === "function"
-                  ? column.headerProps(_context!)
-                  : (column.headerProps ?? {});
-              return (
-                <DefaultHeader
-                  key={column.key}
-                  column={column}
-                  context={_context}
-                  sort={sort}
-                  filter={filter?.[column.key]}
-                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                  onSortByClick={handleOnSortByClick}
-                  allSelected={allSelected}
-                  anySelected={anySelected}
-                  onToggleAll={toggleAll}
-                  {...headerProps}
-                />
-              );
-            }
+    <ScrollTableContainer>
+      <ChakraTable
+        variant="parallel"
+        borderInline="none"
+        {...props}
+        sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
+      >
+        <Thead>
+          <Tr height="42px">
+            {_columns.map((column) => {
+              if (column.Header) {
+                return (
+                  <column.Header
+                    key={column.key}
+                    column={column}
+                    context={_context}
+                    sort={sort}
+                    filter={filter?.[column.key]}
+                    onFilterChange={(value) => onFilterChange?.(column.key, value)}
+                    onSortByClick={handleOnSortByClick}
+                    allSelected={allSelected}
+                    anySelected={anySelected}
+                    onToggleAll={toggleAll}
+                  />
+                );
+              } else {
+                const headerProps =
+                  typeof column.headerProps === "function"
+                    ? column.headerProps(_context!)
+                    : (column.headerProps ?? {});
+                return (
+                  <DefaultHeader
+                    key={column.key}
+                    column={column}
+                    context={_context}
+                    sort={sort}
+                    filter={filter?.[column.key]}
+                    onFilterChange={(value) => onFilterChange?.(column.key, value)}
+                    onSortByClick={handleOnSortByClick}
+                    allSelected={allSelected}
+                    anySelected={anySelected}
+                    onToggleAll={toggleAll}
+                    {...headerProps}
+                  />
+                );
+              }
+            })}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(rows ?? []).map((row) => {
+            const key = getKey(row, rowKeyProp);
+            const isSelected = selection[key] ?? false;
+            const isExpanded = key === expanded;
+            return (
+              <Row
+                key={key}
+                row={row}
+                context={_context}
+                rowKey={key}
+                columns={_columns}
+                isSelected={isSelected}
+                isExpanded={isExpanded}
+                isExpandable={isExpandable}
+                isHighlightable={isHighlightable}
+                onRowClick={handleRowClick}
+                onToggleExpand={handleToggleExpand}
+                onToggleSelection={toggle}
+              />
+            );
           })}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {(rows ?? []).map((row) => {
-          const key = getKey(row, rowKeyProp);
-          const isSelected = selection[key] ?? false;
-          const isExpanded = key === expanded;
-          return (
-            <Row
-              key={key}
-              row={row}
-              context={_context}
-              rowKey={key}
-              columns={_columns}
-              isSelected={isSelected}
-              isExpanded={isExpanded}
-              isExpandable={isExpandable}
-              isHighlightable={isHighlightable}
-              onRowClick={handleRowClick}
-              onToggleExpand={handleToggleExpand}
-              onToggleSelection={toggle}
-            />
-          );
-        })}
-      </Tbody>
-    </ChakraTable>
+        </Tbody>
+      </ChakraTable>
+    </ScrollTableContainer>
   );
 }
 
