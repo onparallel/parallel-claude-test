@@ -235,7 +235,8 @@ export function AddPetitionAccessDialog({
         user,
         signatureConfig: signatureConfig,
         isUpdate: true,
-        petition,
+        petitionId: petition.id,
+        isInteractionWithRecipientsEnabled: petition.isInteractionWithRecipientsEnabled,
       });
 
       updateSignatureConfig({
@@ -632,6 +633,7 @@ AddPetitionAccessDialog.fragments = {
       id
       emailSubject
       emailBody
+      isInteractionWithRecipientsEnabled
       myEffectivePermission {
         permissionType
       }
@@ -641,7 +643,6 @@ AddPetitionAccessDialog.fragments = {
           id
         }
       }
-      ...ConfirmPetitionSignersDialog_Petition
       signatureConfig {
         timezone
         ...AddPetitionAccessDialog_SignatureConfig
@@ -667,8 +668,6 @@ AddPetitionAccessDialog.fragments = {
       ...MessageEmailSubjectFormControl_PetitionBase
       ...RecipientSelectGroups_Petition
     }
-
-    ${ConfirmPetitionSignersDialog.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${PetitionRemindersConfig.fragments.RemindersConfig}
     ${MessageEmailSubjectFormControl.fragments.PetitionBase}

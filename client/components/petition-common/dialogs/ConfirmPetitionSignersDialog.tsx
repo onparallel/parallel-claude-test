@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -34,11 +34,11 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  ConfirmPetitionSignersDialog_PetitionFragment,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
   ConfirmPetitionSignersDialog_UserFragment,
   ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument,
+  ConfirmPetitionSignersDialog_petitionDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -61,7 +61,8 @@ interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
   signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
   isUpdate?: boolean;
-  petition: ConfirmPetitionSignersDialog_PetitionFragment;
+  petitionId: string;
+  isInteractionWithRecipientsEnabled: boolean;
 }
 
 export interface ConfirmPetitionSignersDialogResult {
@@ -88,6 +89,13 @@ export function ConfirmPetitionSignersDialog(
     (s) => s.isPreset,
   );
 
+  const petitionId = props.petitionId;
+  const { data } = useQuery(ConfirmPetitionSignersDialog_petitionDocument, {
+    variables: { id: petitionId },
+  });
+
+  const petition = data?.petition;
+
   const isSequential = signingMode === "SEQUENTIAL";
 
   const {
@@ -102,7 +110,7 @@ export function ConfirmPetitionSignersDialog(
     defaultValues: {
       signers: otherSigners,
       message: null,
-      allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
+      allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
         ? props.signatureConfig.allowAdditionalSigners
         : false,
       customDocumentTemporaryFileId: null,
@@ -192,7 +200,7 @@ export function ConfirmPetitionSignersDialog(
         setCustomDocument(file);
         const { data } = await createCustomSignatureDocumentUploadLink({
           variables: {
-            petitionId: props.petition.id,
+            petitionId,
             file: {
               contentType: file.type,
               filename: file.name,
@@ -261,7 +269,7 @@ export function ConfirmPetitionSignersDialog(
                   isPreset: true,
                 })),
               ],
-              allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
+              allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
                 ? !isMaxSignersReached && allowAdditionalSigners
                 : false,
             });
@@ -542,13 +550,15 @@ export function ConfirmPetitionSignersDialog(
                         </AlertDescription>
                       </Alert>
                     ) : null}
-                    <SuggestedSigners
-                      currentSigners={allSigners}
-                      isDisabled={isMaxSignersReached}
-                      petition={props.petition}
-                      user={props.user}
-                      onAddSigner={(s) => onChange([...signers, s])}
-                    />
+                    {isNonNullish(petition) ? (
+                      <SuggestedSigners
+                        currentSigners={allSigners}
+                        isDisabled={isMaxSignersReached}
+                        petition={petition}
+                        user={props.user}
+                        onAddSigner={(s) => onChange([...signers, s])}
+                      />
+                    ) : null}
                   </Stack>
                 </>
               )}
@@ -556,7 +566,7 @@ export function ConfirmPetitionSignersDialog(
           </FormControl>
           {props.isUpdate ? (
             !isMaxSignersReached &&
-            props.petition.isInteractionWithRecipientsEnabled && (
+            props.isInteractionWithRecipientsEnabled && (
               <Checkbox marginTop={4} {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage
@@ -693,36 +703,13 @@ ConfirmPetitionSignersDialog.fragments = {
       }
     `;
   },
-  get Petition() {
+  get PetitionBase() {
     return gql`
-      fragment ConfirmPetitionSignersDialog_Petition on Petition {
+      fragment ConfirmPetitionSignersDialog_PetitionBase on PetitionBase {
         id
-        isInteractionWithRecipientsEnabled
-        fields {
-          ...ConfirmPetitionSignersDialog_PetitionField
-        }
-        accesses {
-          id
-          status
-          contact {
-            id
-            email
-            firstName
-            lastName
-          }
-        }
-        signatureRequests {
-          signatureConfig {
-            signers {
-              ...ConfirmPetitionSignersDialog_PetitionSigner
-            }
-          }
-        }
         ...SuggestedSigners_PetitionBase
       }
       ${SuggestedSigners.fragments.PetitionBase}
-      ${this.PetitionField}
-      ${this.PetitionSigner}
     `;
   },
 };
@@ -735,6 +722,17 @@ const _mutations = [
     ) {
       createCustomSignatureDocumentUploadLink(petitionId: $petitionId, file: $file)
     }
+  `,
+];
+
+const _queries = [
+  gql`
+    query ConfirmPetitionSignersDialog_petition($id: GID!) {
+      petition(id: $id) {
+        ...ConfirmPetitionSignersDialog_PetitionBase
+      }
+    }
+    ${ConfirmPetitionSignersDialog.fragments.PetitionBase}
   `,
 ];
 

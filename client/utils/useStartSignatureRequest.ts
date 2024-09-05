@@ -103,7 +103,8 @@ export function useStartSignatureRequest({
           user,
           signatureConfig: petition.signatureConfig!,
           isUpdate: !startSignature && !canFinalize,
-          petition,
+          petitionId: petition.id,
+          isInteractionWithRecipientsEnabled: petition.isInteractionWithRecipientsEnabled,
         });
 
         await updateSignatureConfig({
@@ -183,8 +184,8 @@ useStartSignatureRequest.fragments = {
   Petition: gql`
     fragment useStartSignatureRequest_Petition on Petition {
       id
-      ...ConfirmPetitionSignersDialog_Petition
       status
+      isInteractionWithRecipientsEnabled
       signatureConfig {
         timezone
         integration {
@@ -198,7 +199,6 @@ useStartSignatureRequest.fragments = {
       }
       ...usePetitionCanFinalize_PetitionBase
     }
-    ${ConfirmPetitionSignersDialog.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${usePetitionCanFinalize.fragments.PetitionBase}
   `,

@@ -361,7 +361,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
               user: me,
               signatureConfig: petition.signatureConfig,
-              petition,
+              petitionId: petition.id,
+              isInteractionWithRecipientsEnabled: petition.isInteractionWithRecipientsEnabled,
             });
           }
 
@@ -974,7 +975,6 @@ const _fragments = {
       }
       ... on Petition {
         ...PetitionPreviewStartSignatureButton_Petition
-        ...ConfirmPetitionSignersDialog_Petition
         unreadGeneralCommentCount
         accesses {
           id
@@ -1042,7 +1042,6 @@ const _fragments = {
     ${focusPetitionField.fragments.PetitionField}
     ${RecipientViewContents.fragments.PetitionBase}
     ${PetitionPreviewStartSignatureButton.fragments.Petition}
-    ${ConfirmPetitionSignersDialog.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${RecipientViewProgressBar.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
