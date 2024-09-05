@@ -189,7 +189,10 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             />
           </Flex>
         ) : null}
-        <ScrollTableContainer minHeight={rows?.length ? "80px" : "unset"}>
+        <ScrollTableContainer
+          minHeight={rows?.length ? "80px" : "unset"}
+          flex={rows?.length ? "1" : "unset"}
+        >
           <Table
             columns={columns}
             rows={rows}
