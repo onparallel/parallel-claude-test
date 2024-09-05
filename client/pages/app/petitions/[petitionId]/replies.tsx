@@ -183,6 +183,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     }
   }, []);
 
+  useEffect(() => {
+    if (isNonNullish(activeFieldId)) {
+      const field = document.getElementById(`field-${activeFieldId}`);
+      if (field) {
+        scrollIntoView(field, { block: "center", behavior: "smooth" });
+      }
+    }
+  }, [activeFieldId]);
+
   useTempQueryParam("field", (fieldId) => {
     setTimeout(() => handlePetitionContentsFieldClick(fieldId));
   });
