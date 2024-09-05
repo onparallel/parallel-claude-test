@@ -300,11 +300,6 @@
     "context": "Contacts"
   },
   {
-    "term": "component.app-layout-navbar.home-link",
-    "definition": "Home",
-    "context": "Home"
-  },
-  {
     "term": "component.app-layout-navbar.parallels-link.limit-reached-warning",
     "definition": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>",
     "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"

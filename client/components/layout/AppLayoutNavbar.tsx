@@ -84,8 +84,8 @@ export const AppLayoutNavbar = Object.assign(
             isActive:
               pathname.startsWith("/app/petitions") && !pathname.startsWith("/app/petitions/new"),
             text: intl.formatMessage({
-              id: "component.app-layout-navbar.home-link",
-              defaultMessage: "Home",
+              id: "generic.root-petitions",
+              defaultMessage: "Parallels",
             }),
             warning: me.organization.isPetitionUsageLimitReached
               ? intl.formatMessage(
