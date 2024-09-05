@@ -7,6 +7,7 @@ import { Table, TableProps } from "@parallel/components/common/Table";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNullish } from "remeda";
+import { ScrollTableContainer } from "./ScrollTableContainer";
 import { SimpleMenuSelect } from "./SimpleMenuSelect";
 import { useSimpleSelectOptions } from "./SimpleSelect";
 
@@ -188,29 +189,26 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             />
           </Flex>
         ) : null}
-        <Table
-          columns={columns}
-          rows={rows}
-          context={context}
-          rowKeyProp={rowKeyProp}
-          isExpandable={isExpandable}
-          isSelectable={isSelectable}
-          isHighlightable={isHighlightable}
-          sort={sort}
-          filter={filter}
-          actions={actions}
-          onFilterChange={onFilterChange}
-          onSelectionChange={onSelectionChange}
-          onRowClick={onRowClick}
-          onSortChange={onSortChange}
-        />
+        <ScrollTableContainer minHeight={rows?.length ? "80px" : "unset"}>
+          <Table
+            columns={columns}
+            rows={rows}
+            context={context}
+            rowKeyProp={rowKeyProp}
+            isExpandable={isExpandable}
+            isSelectable={isSelectable}
+            isHighlightable={isHighlightable}
+            sort={sort}
+            filter={filter}
+            actions={actions}
+            onFilterChange={onFilterChange}
+            onSelectionChange={onSelectionChange}
+            onRowClick={onRowClick}
+            onSortChange={onSortChange}
+          />
+        </ScrollTableContainer>
         {body ? (
-          <Flex
-            flexDirection="column"
-            borderTop="1px solid"
-            borderTopColor="gray.200"
-            flex="1 1 300px"
-          >
+          <Flex flexDirection="column" flex="1 1 300px">
             {body}
           </Flex>
         ) : null}
