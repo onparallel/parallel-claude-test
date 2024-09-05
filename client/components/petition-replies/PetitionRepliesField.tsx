@@ -385,6 +385,13 @@ export const PetitionRepliesField = Object.assign(
                                     ? { overflowWrap: "anywhere", fontWeight: 500 }
                                     : { textStyle: "hint", whiteSpace: "nowrap" })}
                                 >
+                                  {x.field.isInternal ? (
+                                    <InternalFieldBadge
+                                      marginEnd={1.5}
+                                      position="relative"
+                                      top="-2px"
+                                    />
+                                  ) : null}
                                   {x.field.title || (
                                     <FormattedMessage
                                       id="generic.untitled-field"
