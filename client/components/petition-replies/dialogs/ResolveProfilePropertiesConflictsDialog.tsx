@@ -1,6 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
 import {
-  Box,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -21,6 +20,7 @@ import {
 import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { ScrollTableContainer } from "@parallel/components/common/ScrollTableContainer";
 import { SimpleFileButton } from "@parallel/components/common/SimpleFileButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -144,8 +144,8 @@ function ResolveProfilePropertiesConflictsDialog({
               defaultMessage="Select the value you want to keep:"
             />
           </Text>
-          <Box maxHeight="100%" overflow="auto">
-            <Table variant="parallel">
+          <ScrollTableContainer>
+            <Table variant="parallel" layout="fixed">
               <Thead>
                 <Tr>
                   <Th width="33%">
@@ -154,13 +154,13 @@ function ResolveProfilePropertiesConflictsDialog({
                       defaultMessage="Property"
                     />
                   </Th>
-                  <Th width="auto">
+                  <Th width="33%">
                     <FormattedMessage
                       id="component.use-profile-properties-columns.current-value"
                       defaultMessage="Value in profile"
                     />
                   </Th>
-                  <Th width="auto">
+                  <Th width="33%">
                     <FormattedMessage
                       id="component.use-profile-properties-columns.new-value"
                       defaultMessage="Value in parallel"
@@ -186,7 +186,7 @@ function ResolveProfilePropertiesConflictsDialog({
                 </FormProvider>
               </Tbody>
             </Table>
-          </Box>
+          </ScrollTableContainer>
         </Stack>
       }
       cancel={
@@ -417,6 +417,8 @@ function TextValueRadioGroup({
     defaultValue: "OVERWRITE",
     onChange,
   });
+
+  //TODO: fix overflown text
 
   return (
     <>

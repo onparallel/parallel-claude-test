@@ -35,7 +35,7 @@ import { ReplyNotAvailable } from "../petition-replies/PetitionRepliesFieldReply
 import { AlertPopover } from "./AlertPopover";
 import { FileSize } from "./FileSize";
 import { OverflownText } from "./OverflownText";
-import { ScrollShadows } from "./ScrollShadows";
+import { ScrollTableContainer } from "./ScrollTableContainer";
 import { SmallPopover } from "./SmallPopover";
 
 export interface MapFieldsTableProps {
@@ -106,7 +106,7 @@ export const MapFieldsTable = Object.assign(
     }, [overwriteExisting]);
 
     return (
-      <ScrollShadows shadowTop={false} ref={_ref} overflow="auto" {...props}>
+      <ScrollTableContainer {...props}>
         <Table variant="parallel" layout="fixed">
           <Thead>
             <Tr position="sticky" top={0} zIndex={1}>
@@ -179,7 +179,7 @@ export const MapFieldsTable = Object.assign(
               })}
           </Tbody>
         </Table>
-      </ScrollShadows>
+      </ScrollTableContainer>
     );
   }),
   {

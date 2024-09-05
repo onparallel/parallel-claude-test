@@ -26,7 +26,7 @@ import { LocalizableUserTextRender } from "@parallel/components/common/Localizab
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
-import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
+import { ScrollTableContainer } from "@parallel/components/common/ScrollTableContainer";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   CreatePetitionFromProfilePrefillInput,
@@ -556,7 +556,7 @@ function AssociateNewPetitionToProfileStep3({
           }}
         />
       </Text>
-      <ScrollShadows shadowTop={false} overflow="auto" maxHeight="350px">
+      <ScrollTableContainer maxHeight="350px">
         <Table variant="parallel">
           <Thead>
             <Tr position="sticky" top={0} zIndex={1}>
@@ -664,7 +664,7 @@ function AssociateNewPetitionToProfileStep3({
             })}
           </Tbody>
         </Table>
-      </ScrollShadows>
+      </ScrollTableContainer>
     </Stack>
   );
 }
