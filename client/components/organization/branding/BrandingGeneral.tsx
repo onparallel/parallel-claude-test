@@ -270,8 +270,8 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               />
             </HStack>
             {isLight ? (
-              <CloseableAlert status="warning" backgroundColor="orange.100" marginTop={4}>
-                <AlertIcon color="yellow.500" />
+              <CloseableAlert status="warning" marginTop={4}>
+                <AlertIcon />
                 <AlertDescription>
                   <FormattedMessage
                     id="component.branding-general.primary-color-warning"

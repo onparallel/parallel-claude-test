@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Button,
   Divider,
@@ -91,12 +92,14 @@ function Security() {
             <FormattedMessage id="page.security.password-header" defaultMessage="Change password" />
           </Heading>
           {me.isSsoUser ? (
-            <Alert borderRadius="md">
+            <Alert status="info" rounded="md">
               <AlertIcon />
-              <FormattedMessage
-                id="page.security.sso-user-explanation"
-                defaultMessage="SSO users are not able to change passwords"
-              />
+              <AlertDescription>
+                <FormattedMessage
+                  id="page.security.sso-user-explanation"
+                  defaultMessage="SSO users are not able to change passwords"
+                />
+              </AlertDescription>
             </Alert>
           ) : null}
           <Stack as="form" onSubmit={handleSubmit(onChangePassword)} spacing={4}>

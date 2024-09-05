@@ -716,8 +716,8 @@ function SignatureConfigDialogBodyStep3({
             </ListElement>
             <Stack marginTop={2}>
               {!isPetition && signers.length > 0 ? (
-                <CloseableAlert status="info" borderRadius="base">
-                  <AlertIcon color="blue.500" />
+                <CloseableAlert status="info" rounded="md">
+                  <AlertIcon />
                   <AlertDescription>
                     <FormattedMessage
                       id="component.signature-config-dialog.template-alert"

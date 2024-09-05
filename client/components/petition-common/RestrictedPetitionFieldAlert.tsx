@@ -1,5 +1,5 @@
 /** no-recipient */
-import { Alert, AlertIcon, AlertProps, Box, HStack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertProps, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
@@ -16,15 +16,15 @@ export const RestrictedPetitionFieldAlert = chakraForwardRef<
 >(function RestrictedPetitionFieldAlert({ fieldType, ...props }, ref) {
   const intl = useIntl();
   return (
-    <Alert status="warning" rounded="md" paddingX={4} paddingY={2} ref={ref} {...props}>
-      <AlertIcon color="yellow.500" />
-      <HStack spacing={4} width="100%">
-        <Box flex="1">
+    <Alert status="warning" rounded="md" paddingY={2} ref={ref} {...props}>
+      <AlertIcon />
+      <HStack flex={1}>
+        <AlertDescription flex="1">
           <FormattedMessage
             id="component.petition-compose-field.update-plan-to-use-field"
             defaultMessage="Update your plan to use this field."
           />
-        </Box>
+        </AlertDescription>
         <SupportButton
           size="sm"
           fontSize="md"

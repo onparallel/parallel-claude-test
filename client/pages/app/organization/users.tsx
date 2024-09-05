@@ -522,7 +522,7 @@ function OrganizationUsers() {
         </Heading>
       }
     >
-      <Flex direction="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>
+      <Stack flex="1" minHeight={0} padding={4} paddingBottom={24}>
         {isUserLimitReached ? <UserLimitReachedAlert /> : null}
         <TablePage
           flex="0 1 auto"
@@ -642,7 +642,7 @@ function OrganizationUsers() {
           }
           Footer={CustomFooter}
         />
-      </Flex>
+      </Stack>
     </OrganizationSettingsLayout>
   );
 }

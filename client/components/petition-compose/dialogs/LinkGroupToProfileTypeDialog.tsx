@@ -103,8 +103,8 @@ function LinkGroupToProfileTypeDialog({
               )}
             />
             {hasLinkedFields ? (
-              <Alert status="warning" marginTop={4} borderRadius="md">
-                <AlertIcon color="yellow.500" />
+              <Alert status="warning" marginTop={4} rounded="md">
+                <AlertIcon />
                 <AlertDescription>
                   <FormattedMessage
                     id="component.link-group-to-profile-type-dialog.delete-profile-fields"

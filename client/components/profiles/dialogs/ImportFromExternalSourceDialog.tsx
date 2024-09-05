@@ -375,7 +375,7 @@ function ImportFromExternalSourceDialogSearch({
             </FormControl>
           ))}
           {noResults ? (
-            <CloseableAlert status="warning" variant="subtle" rounded="md">
+            <CloseableAlert status="warning" rounded="md">
               <AlertIcon />
               <AlertDescription flex="1">
                 <FormattedMessage

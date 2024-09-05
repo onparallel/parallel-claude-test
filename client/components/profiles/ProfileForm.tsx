@@ -6,6 +6,7 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Flex,
   HStack,
   Heading,
@@ -707,20 +708,10 @@ function ProfileDeletedAlert({
 
   const userCanRecoverProfile = useHasPermission("PROFILES:CLOSE_PROFILES");
   return (
-    <Alert overflow="visible" status="error">
+    <Alert status="error">
       <AlertIcon />
-      <AlertDescription
-        flex="1"
-        fontSize="sm"
-        display="flex"
-        position="sticky"
-        top={0}
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-        gap={2}
-      >
-        <Text>
+      <HStack>
+        <AlertDescription fontSize="sm">
           <FormattedMessage
             id="component.profile-form.recover-profile-alert"
             defaultMessage="This profile will be permanently deleted on {date}."
@@ -728,18 +719,18 @@ function ProfileDeletedAlert({
               date: intl.formatDate(permanentDeletionAt, FORMATS.LL),
             }}
           />
-        </Text>
+        </AlertDescription>
         {userCanRecoverProfile ? (
-          <Box>
+          <Center>
             <Button backgroundColor="white" onClick={onRecoverClick} fontWeight={500}>
               <FormattedMessage
                 id="component.profile-form.recover-button"
                 defaultMessage="Recover"
               />
             </Button>
-          </Box>
+          </Center>
         ) : null}
-      </AlertDescription>
+      </HStack>
     </Alert>
   );
 }
@@ -756,47 +747,41 @@ function EditedFieldsAlert({
   onCancel: () => void;
 }) {
   return (
-    <Alert overflow="visible">
-      <AlertDescription
-        flex="1"
-        fontSize="sm"
-        display="flex"
-        position="sticky"
-        top={0}
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
+    <Alert>
+      <HStack flex={1}>
         {isSubmitting ? (
-          <HStack>
-            <Spinner
-              thickness="3px"
-              speed="0.65s"
-              emptyColor="transparent"
-              color="blue.500"
-              width={4}
-              height={4}
-            />
-            <Text>
-              <FormattedMessage
-                id="page.profile-details.saving-changes"
-                defaultMessage="Saving {count, plural, =1 {# change} other{# changes}}..."
-                values={{
-                  count: editedFieldsCount,
-                }}
+          <AlertDescription flex={1} fontSize="sm">
+            <HStack>
+              <Spinner
+                thickness="3px"
+                speed="0.65s"
+                emptyColor="transparent"
+                color="blue.500"
+                width={4}
+                height={4}
               />
-            </Text>
-          </HStack>
+              <Box flex={1}>
+                <FormattedMessage
+                  id="page.profile-details.saving-changes"
+                  defaultMessage="Saving {count, plural, =1 {# change} other{# changes}}..."
+                  values={{
+                    count: editedFieldsCount,
+                  }}
+                />
+              </Box>
+            </HStack>
+          </AlertDescription>
         ) : (
-          <FormattedMessage
-            id="page.profile-details.n-fields-edited"
-            defaultMessage="{count, plural, =1 {# property} other{# properties}} changed"
-            values={{
-              count: editedFieldsCount,
-            }}
-          />
+          <AlertDescription flex={1} fontSize="sm">
+            <FormattedMessage
+              id="page.profile-details.n-fields-edited"
+              defaultMessage="{count, plural, =1 {# property} other{# properties}} changed"
+              values={{
+                count: editedFieldsCount,
+              }}
+            />
+          </AlertDescription>
         )}
-
         <HStack>
           {isSubmitting ? null : (
             <Button size="sm" bgColor="white" onClick={onCancel}>
@@ -812,7 +797,7 @@ function EditedFieldsAlert({
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           </Button>
         </HStack>
-      </AlertDescription>
+      </HStack>
     </Alert>
   );
 }

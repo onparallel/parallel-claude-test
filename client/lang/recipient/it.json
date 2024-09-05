@@ -1635,22 +1635,22 @@
     "context": "Home"
   },
   {
-    "term": "public.public-petition-link-unavailable.description",
+    "term": "page.public-petition-link.link-unavailable-description",
     "definition": "Contatta {fullName} <{email}> per poter continuare.",
     "context": "Contact with {fullName} <{email}> to continue."
   },
   {
-    "term": "public.public-petition-link-unavailable.title",
+    "term": "page.public-petition-link.link-unavailable-title",
     "definition": "Questo processo è chiuso",
     "context": "This process is closed"
   },
   {
-    "term": "public.public-petition.error--reminder-description",
+    "term": "page.public-petition-link.error-reminder-description",
     "definition": "Puoi inviare un promemoria solo ogni 24 ore",
     "context": "You can only send one reminder each 24 hours"
   },
   {
-    "term": "public.public-petition.error-reminder-title",
+    "term": "page.public-petition-link.error-reminder-title",
     "definition": "Promemoria già inviato",
     "context": "Reminder already sent"
   },

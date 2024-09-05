@@ -350,7 +350,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                         />
                       )
                     ) : null}
-
                     {showRefreshRepliesAlert ? (
                       <RecipientViewRefreshRepliesAlert
                         tone={tone}

@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Box,
   Center,
@@ -217,14 +218,14 @@ export function PetitionRepliesFieldComments({
       </HStack>
 
       {isTemplate ? (
-        <Alert status="info" paddingY={0}>
+        <Alert status="info">
           <AlertIcon />
-          <Text flex={1} paddingY={3}>
+          <AlertDescription>
             <FormattedMessage
               id="component.petition-replies-field-comments.template-read-only-alert"
               defaultMessage="<b>Preview only</b> - Comments are disabled."
             />
-          </Text>
+          </AlertDescription>
         </Alert>
       ) : null}
       <Box overflow="auto" flex={1} ref={commentsRef}>

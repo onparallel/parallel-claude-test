@@ -160,7 +160,7 @@ function ConfirmDeleteProfileTypeDialog({
       body={
         <Stack>
           <Alert status="warning">
-            <AlertIcon color="yellow.500" />
+            <AlertIcon />
             <AlertDescription>
               <FormattedMessage
                 id="component.use-delete-profile-type.profiles-in-use"

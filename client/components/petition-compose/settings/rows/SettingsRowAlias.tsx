@@ -167,8 +167,8 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
       </SettingsRow>
       {isFileTypeField(field.type) && showDocumentReferenceAlert ? (
         <CloseableAlert status="warning" rounded="md">
-          <AlertIcon color="yellow.500" />
-          <AlertDescription width="100%">
+          <AlertIcon />
+          <AlertDescription>
             <FormattedMessage
               id="component.petition-compose-field-settings.alias-warning"
               defaultMessage="<b>Note:</b> Document fields cannot be used to replace content in descriptions."

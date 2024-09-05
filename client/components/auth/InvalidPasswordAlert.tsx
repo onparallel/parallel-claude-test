@@ -4,7 +4,7 @@ import { CloseableAlert, CloseableAlertProps } from "../common/CloseableAlert";
 
 export function InvalidPasswordAlert(props: CloseableAlertProps) {
   return (
-    <CloseableAlert status="error" variant="subtle" rounded="md" {...props}>
+    <CloseableAlert status="error" rounded="md" {...props}>
       <AlertIcon />
       <Stack>
         <AlertTitle>

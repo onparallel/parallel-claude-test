@@ -57,9 +57,9 @@ export function ConfigureRemindersDialog({
       body={
         <Stack spacing={4}>
           {optedOut.length ? (
-            <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
+            <Alert status="warning" rounded="md">
               <Flex alignItems="center" justifyContent="flex-start">
-                <AlertIcon color="yellow.500" />
+                <AlertIcon />
                 <AlertDescription>
                   <Text>
                     <FormattedMessage

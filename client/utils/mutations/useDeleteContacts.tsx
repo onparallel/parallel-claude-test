@@ -1,5 +1,14 @@
 import { gql, useMutation } from "@apollo/client";
-import { Alert, AlertIcon, Box, Button, Stack, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import {
   useDeleteContacts_ContactFragment,
@@ -61,68 +70,72 @@ function useConfirmDeleteContactsDialog() {
         size: "lg",
         header: (
           <FormattedMessage
-            id="component.use-delete-contact.confirm-delete-header"
+            id="util.use-delete-contact.confirm-delete-header"
             defaultMessage="Delete {count, plural, =1{{email}} other {# contacts}}"
             values={{ email: contacts[0].email, count: contacts.length }}
           />
         ),
         description: (
           <Stack>
-            <Alert status="warning" borderRadius="md">
-              <AlertIcon color="yellow.500" />
-              {contacts.length === 1 ? (
-                <Box>
+            <Alert status="warning" rounded="md">
+              <AlertIcon />
+              <AlertDescription>
+                {contacts.length === 1 ? (
+                  <>
+                    <Text>
+                      <FormattedMessage
+                        id="util.use-delete-contact.confirm-delete-alert-single-text"
+                        defaultMessage="This contact has access to:"
+                      />
+                    </Text>
+                    <UnorderedList paddingStart={4}>
+                      {extra.PENDING > 0 ? (
+                        <ListItem>
+                          <FormattedMessage
+                            id="util.use-delete-contact.confirm-delete-pending-parallels"
+                            defaultMessage="{count} pending {count, plural, =1{parallel} other{parallels}}"
+                            values={{ count: extra.PENDING }}
+                          />
+                        </ListItem>
+                      ) : null}
+                      {extra.COMPLETED > 0 ? (
+                        <ListItem>
+                          <FormattedMessage
+                            id="util.use-delete-contact.confirm-delete-completed-parallels"
+                            defaultMessage="{count} completed {count, plural, =1{parallel} other{parallels}}"
+                            values={{ count: extra.COMPLETED }}
+                          />
+                        </ListItem>
+                      ) : null}
+                      {extra.CLOSED > 0 ? (
+                        <ListItem>
+                          <FormattedMessage
+                            id="util.use-delete-contact.confirm-delete-closed-parallels"
+                            defaultMessage="{count} closed {count, plural, =1{parallel} other{parallels}}"
+                            values={{ count: extra.CLOSED }}
+                          />
+                        </ListItem>
+                      ) : null}
+                    </UnorderedList>
+                  </>
+                ) : (
                   <FormattedMessage
-                    id="component.use-delete-contact.confirm-delete-alert-single-text"
-                    defaultMessage="This contact has access to:"
+                    id="util.use-delete-contact.confirm-delete-alert-multiple-text"
+                    defaultMessage="We have found parallels sent to some of these contacts."
                   />
-                  <Stack as="ul" paddingStart={8} spacing={0}>
-                    {extra.PENDING > 0 ? (
-                      <Text as="li">
-                        <FormattedMessage
-                          id="component.use-delete-contact.confirm-delete-alert.pending-parallels"
-                          defaultMessage="{count} pending {count, plural, =1{parallel} other{parallels}}"
-                          values={{ count: extra.PENDING }}
-                        />
-                      </Text>
-                    ) : null}
-                    {extra.COMPLETED > 0 ? (
-                      <Text as="li">
-                        <FormattedMessage
-                          id="component.use-delete-contact.confirm-delete-alert.completed-parallels"
-                          defaultMessage="{count} completed {count, plural, =1{parallel} other{parallels}}"
-                          values={{ count: extra.COMPLETED }}
-                        />
-                      </Text>
-                    ) : null}
-                    {extra.CLOSED > 0 ? (
-                      <Text as="li">
-                        <FormattedMessage
-                          id="component.use-delete-contact.confirm-delete-alert.closed-parallels"
-                          defaultMessage="{count} closed {count, plural, =1{parallel} other{parallels}}"
-                          values={{ count: extra.CLOSED }}
-                        />
-                      </Text>
-                    ) : null}
-                  </Stack>
-                </Box>
-              ) : (
-                <FormattedMessage
-                  id="component.use-delete-contact.confirm-delete-alert-multiple-text"
-                  defaultMessage="We have found parallels sent to some of these contacts."
-                />
-              )}
+                )}
+              </AlertDescription>
             </Alert>
             <Text>
               <FormattedMessage
-                id="component.use-delete-contact.confirm-delete-body.1"
+                id="util.use-delete-contact.confirm-delete-body.1"
                 defaultMessage="If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
                 values={{ count: contacts.length }}
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="component.use-delete-contact.confirm-delete-body.2"
+                id="util.use-delete-contact.confirm-delete-body.2"
                 defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
                 values={{
                   count: contacts.length,
@@ -136,7 +149,7 @@ function useConfirmDeleteContactsDialog() {
         confirm: (
           <Button colorScheme="red" type="submit">
             <FormattedMessage
-              id="component.use-delete-contact.confirm-delete-button"
+              id="util.use-delete-contact.confirm-delete-button"
               defaultMessage="Yes, delete {count, plural, =1{contact} other {contacts}}"
               values={{ count: contacts.length }}
             />

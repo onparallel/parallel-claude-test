@@ -1,6 +1,6 @@
 import { keyframes, SystemStyleObject } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
-import { Theme } from "@parallel/chakra/theme";
+import type { Theme } from "@parallel/chakra/theme/theme";
 
 /**
  * Generates a background image of diagonal lines

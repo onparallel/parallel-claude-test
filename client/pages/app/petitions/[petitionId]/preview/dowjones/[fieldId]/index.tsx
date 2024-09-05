@@ -73,7 +73,7 @@ function DowJonesFieldSearch() {
       <Center minHeight="100vh" backgroundColor="gray.50" padding={4}>
         <Stack>
           {isDisabled ? (
-            <Alert status="warning" borderRadius="md" maxWidth="500px">
+            <Alert status="warning" rounded="md" maxWidth="500px">
               <AlertIcon />
               <Stack>
                 <AlertTitle>

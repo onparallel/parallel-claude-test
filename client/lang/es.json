@@ -11065,47 +11065,47 @@
     "context": "Do you still want to create the contact?"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert-multiple-text",
+    "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",
     "definition": "Hemos encontrado parallels enviados a algunos de estos contactos.",
     "context": "We have found parallels sent to some of these contacts."
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert-single-text",
+    "term": "util.use-delete-contact.confirm-delete-alert-single-text",
     "definition": "Este contacto tiene acceso a:",
     "context": "This contact has access to:"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.closed-parallels",
+    "term": "util.use-delete-contact.confirm-delete-closed-parallels",
     "definition": "{count, plural, =1{# parallel cerrado} other{# parallels cerrados}}",
     "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.completed-parallels",
+    "term": "util.use-delete-contact.confirm-delete-completed-parallels",
     "definition": "{count, plural, =1{# parallel completado} other{# parallels completados}}",
     "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.pending-parallels",
+    "term": "util.use-delete-contact.confirm-delete-pending-parallels",
     "definition": "{count, plural, =1{# parallel pendiente} other{# parallels pendientes}}",
     "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-body.1",
+    "term": "util.use-delete-contact.confirm-delete-body.1",
     "definition": "Si continúas, {count, plural, =1{el contacto ya no podrá} other{los contactos ya no podrán}} acceder a sus respuestas.",
     "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-body.2",
+    "term": "util.use-delete-contact.confirm-delete-body.2",
     "definition": "¿Estás seguro de que quieres eliminar a {count, plural, =1{<b>{fullName} <{email}></b>} other {estos contactos}}?",
     "context": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-button",
+    "term": "util.use-delete-contact.confirm-delete-button",
     "definition": "Si, eliminar {count, plural, =1{contacto} other {contactos}}",
     "context": "Yes, delete {count, plural, =1{contact} other {contacts}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-header",
+    "term": "util.use-delete-contact.confirm-delete-header",
     "definition": "Eliminar {count, plural, =1{{email}} other {# contactos}}",
     "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
   },
@@ -16365,22 +16365,22 @@
     "context": "Preview"
   },
   {
-    "term": "public.public-petition-link-unavailable.description",
+    "term": "page.public-petition-link.link-unavailable-description",
     "definition": "Contacta con {fullName} <{email}> para poder continuar.",
     "context": "Contact with {fullName} <{email}> to continue."
   },
   {
-    "term": "public.public-petition-link-unavailable.title",
+    "term": "page.public-petition-link.link-unavailable-title",
     "definition": "Este proceso está cerrado",
     "context": "This process is closed"
   },
   {
-    "term": "public.public-petition.error--reminder-description",
+    "term": "page.public-petition-link.error-reminder-description",
     "definition": "Solamente puedes enviar un recordatorio cada 24 horas",
     "context": "You can only send one reminder each 24 hours"
   },
   {
-    "term": "public.public-petition.error-reminder-title",
+    "term": "page.public-petition-link.error-reminder-title",
     "definition": "Recordatorio ya enviado",
     "context": "Reminder already sent"
   },

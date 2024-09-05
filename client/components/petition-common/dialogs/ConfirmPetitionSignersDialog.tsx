@@ -538,12 +538,7 @@ export function ConfirmPetitionSignersDialog(
                       </Text>
                     ) : null}
                     {instructions ? (
-                      <Alert
-                        variant="subtle"
-                        status="info"
-                        borderRadius="md"
-                        backgroundColor="gray.100"
-                      >
+                      <Alert status="info" rounded="md" backgroundColor="gray.100">
                         <AlertIcon />
                         <AlertDescription>
                           <BreakLines>{instructions}</BreakLines>

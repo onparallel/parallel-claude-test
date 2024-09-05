@@ -228,7 +228,7 @@ const _mutations = [
 function ErrorAlert() {
   const intl = useIntl();
   return (
-    <CloseableAlert status="error" borderRadius="md">
+    <CloseableAlert status="error" rounded="md">
       <AlertIcon />
       <AlertDescription>
         <FormattedMessage

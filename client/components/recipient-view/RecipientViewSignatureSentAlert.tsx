@@ -56,7 +56,7 @@ export function RecipientViewSignatureSentAlert({
         gap={{ base: 2, md: 6 }}
       >
         <Flex alignItems={{ base: "start", md: "center" }}>
-          <AlertIcon color={isPendingStart ? "yellow.400" : undefined} />
+          <AlertIcon />
           <AlertDescription>
             {isPendingStart ? (
               <Text>

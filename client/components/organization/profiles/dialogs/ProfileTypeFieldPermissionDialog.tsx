@@ -187,7 +187,7 @@ export function ProfileTypeFieldPermissionDialog({
       body={
         <Stack>
           {isUsedInProfileName ? (
-            <Alert status="info" marginBottom={2} borderRadius="md">
+            <Alert status="info" marginBottom={2} rounded="md">
               <AlertIcon />
               <AlertDescription>
                 <FormattedMessage

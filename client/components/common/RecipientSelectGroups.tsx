@@ -529,14 +529,16 @@ export function RecipientSelectGroups({
       {recipientGroups.length === 1 &&
       validRecipients(0).length >= 2 &&
       invalidRecipients(0).length === 0 ? (
-        <CloseableAlert status="info" marginTop={2} borderRadius="base">
+        <CloseableAlert status="info" marginTop={2} rounded="md">
           <AlertIcon />
-          <Text display="block">
-            <FormattedMessage
-              id="component.recipient-select-groups.same-petition-warning"
-              defaultMessage="Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
-            />
-          </Text>
+          <AlertDescription>
+            <Text>
+              <FormattedMessage
+                id="component.recipient-select-groups.same-petition-warning"
+                defaultMessage="Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
+              />
+            </Text>
+          </AlertDescription>
         </CloseableAlert>
       ) : null}
       {!hasLinkedFieldGroupReplied && canAddRecipientGroups ? (
@@ -570,7 +572,7 @@ export function RecipientSelectGroups({
           borderRadius="base"
           marginTop={2}
         >
-          <AlertIcon color="yellow.500" />
+          <AlertIcon />
           <AlertDescription>
             <Text>
               <FormattedMessage

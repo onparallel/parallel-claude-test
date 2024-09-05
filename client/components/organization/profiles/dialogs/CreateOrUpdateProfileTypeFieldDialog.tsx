@@ -776,20 +776,18 @@ const PropertyReferencedAlert = chakraForwardRef<"div", PropertyReferencedAlertP
   function PropertyReferencedAlert({ propertyNames, ...props }, ref) {
     const intl = useIntl();
     return (
-      <Alert status="warning" rounded="md" paddingX={4} paddingY={2} ref={ref} {...props}>
-        <AlertIcon color="yellow.500" />
-        <HStack spacing={4} width="100%">
-          <Box flex="1">
-            <FormattedMessage
-              id="component.property-referenced-alert.referenced-in"
-              defaultMessage="This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
-              values={{
-                properties: intl.formatList(propertyNames.map((name, i) => <b key={i}>{name}</b>)),
-                count: propertyNames.length,
-              }}
-            />
-          </Box>
-        </HStack>
+      <Alert status="warning" rounded="md" ref={ref} {...props}>
+        <AlertIcon />
+        <AlertDescription>
+          <FormattedMessage
+            id="component.property-referenced-alert.referenced-in"
+            defaultMessage="This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
+            values={{
+              properties: intl.formatList(propertyNames.map((name, i) => <b key={i}>{name}</b>)),
+              count: propertyNames.length,
+            }}
+          />
+        </AlertDescription>
       </Alert>
     );
   },

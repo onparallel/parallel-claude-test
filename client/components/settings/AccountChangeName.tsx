@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Button,
   FormControl,
@@ -44,12 +45,14 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
         <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
       </Heading>
       {user.isSsoUser ? (
-        <Alert borderRadius="md">
+        <Alert rounded="md">
           <AlertIcon />
-          <FormattedMessage
-            id="settings.account.sso-user-explanation"
-            defaultMessage="SSO users are not able to change their name"
-          />
+          <AlertDescription>
+            <FormattedMessage
+              id="settings.account.sso-user-explanation"
+              defaultMessage="SSO users are not able to change their name"
+            />
+          </AlertDescription>
         </Alert>
       ) : null}
       <Stack

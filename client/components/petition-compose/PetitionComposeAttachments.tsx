@@ -445,30 +445,26 @@ export const PetitionComposeAttachments = Object.assign(
           {totalMaxFilesSizeExceeded || hasDocumentFieldsWithAttachments ? (
             <Box>
               {totalMaxFilesSizeExceeded ? (
-                <CloseableAlert status="warning" variant="subtle" rounded="md" marginTop={4}>
-                  <AlertIcon color="yellow.500" />
-                  <AlertDescription flex="1">
-                    <Text>
-                      <FormattedMessage
-                        id="component.petition-compose-attachments.large-files-alert"
-                        defaultMessage="<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
-                        values={{ size: <FileSize value={TOTAL_MAX_FILES_SIZE} /> }}
-                      />
-                    </Text>
+                <CloseableAlert status="warning" rounded="md" marginTop={4}>
+                  <AlertIcon />
+                  <AlertDescription>
+                    <FormattedMessage
+                      id="component.petition-compose-attachments.large-files-alert"
+                      defaultMessage="<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
+                      values={{ size: <FileSize value={TOTAL_MAX_FILES_SIZE} /> }}
+                    />
                   </AlertDescription>
                 </CloseableAlert>
               ) : null}
               {hasDocumentFieldsWithAttachments ? (
-                <CloseableAlert status="info" variant="subtle" rounded="md" marginTop={4}>
+                <CloseableAlert status="info" rounded="md" marginTop={4}>
                   <AlertIcon />
-                  <AlertDescription flex="1">
-                    <Text>
-                      <FormattedMessage
-                        id="component.petition-compose-attachments.petition-with-document-fields-alert"
-                        defaultMessage="{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
-                        values={{ type: isTemplate ? "TEMPLATE" : "PETITION" }}
-                      />
-                    </Text>
+                  <AlertDescription>
+                    <FormattedMessage
+                      id="component.petition-compose-attachments.petition-with-document-fields-alert"
+                      defaultMessage="{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
+                      values={{ type: isTemplate ? "TEMPLATE" : "PETITION" }}
+                    />
                   </AlertDescription>
                 </CloseableAlert>
               ) : null}

@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Box, HStack, ThemingProps } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, HStack, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ReactNode } from "react";
@@ -15,7 +15,7 @@ export const ContactSupportAlert = chakraForwardRef<"div", ContactSupportAlertPr
       <Alert status="info" rounded="md" {...props} ref={ref}>
         <AlertIcon />
         <HStack spacing={4} width="100%">
-          <Box flex="1">{body}</Box>
+          <AlertDescription flex="1">{body}</AlertDescription>
           <SupportButton
             variant="outline"
             colorScheme="blue"

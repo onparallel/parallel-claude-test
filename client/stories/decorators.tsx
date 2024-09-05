@@ -1,6 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
-import { theme } from "@parallel/chakra/theme";
+import { theme } from "@parallel/chakra/theme/theme";
 import { LiquidProvider } from "@parallel/utils/liquid/LiquidContext";
 import { DecoratorFunction } from "@storybook/csf";
 import { useMemo } from "react";

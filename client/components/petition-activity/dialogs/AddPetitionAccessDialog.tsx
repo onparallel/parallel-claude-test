@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Button,
   Center,
@@ -321,9 +322,9 @@ export function AddPetitionAccessDialog({
           (
             <Stack spacing={4}>
               {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (
-                <Alert status="warning" borderRadius="md">
-                  <AlertIcon color="yellow.500" />
-                  <Text>
+                <Alert status="warning" rounded="md">
+                  <AlertIcon />
+                  <AlertDescription>
                     {!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit ? (
                       <FormattedMessage
                         id="component.add-petition-access-dialog.petition-limit-reached"
@@ -336,7 +337,7 @@ export function AddPetitionAccessDialog({
                         values={{ left: petitionsPeriod.limit - petitionsPeriod.used }}
                       />
                     )}
-                  </Text>
+                  </AlertDescription>
                 </Alert>
               ) : null}
               {signatureConfig && !signatureConfig.review ? (
@@ -348,10 +349,10 @@ export function AddPetitionAccessDialog({
                       validate: () => !isMissingSigners,
                     }}
                     render={({ field: { value, onChange }, fieldState: { error } }) => (
-                      <Alert status="info" borderRadius="md">
+                      <Alert status="info" rounded="md">
                         <AlertIcon />
                         <HStack justifyContent="space-between" width="100%">
-                          <Text>
+                          <AlertDescription>
                             {!isMissingSigners ? (
                               <FormattedMessage
                                 id="component.add-petition-access-dialog.add-signers-text-optional"
@@ -363,7 +364,7 @@ export function AddPetitionAccessDialog({
                                 defaultMessage="Before sending, <b>include the signers.</b>"
                               />
                             )}
-                          </Text>
+                          </AlertDescription>
                           <Center>
                             <Button
                               variant="outline"

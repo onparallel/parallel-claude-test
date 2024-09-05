@@ -150,11 +150,11 @@ function PublicPetitionLink({
       if (isApolloError(error, "REMINDER_ALREADY_SENT_ERROR")) {
         toast({
           title: intl.formatMessage({
-            id: "public.public-petition.error-reminder-title",
+            id: "page.public-petition-link.error-reminder-title",
             defaultMessage: "Reminder already sent",
           }),
           description: intl.formatMessage({
-            id: "public.public-petition.error--reminder-description",
+            id: "page.public-petition-link.error-reminder-description",
             defaultMessage: "You can only send one reminder each 24 hours",
           }),
           status: "error",
@@ -205,17 +205,17 @@ function PublicPetitionLink({
           >
             {!publicPetitionLink.isAvailable ? (
               <Alert status="warning">
-                <AlertIcon color="yellow.500" />
+                <AlertIcon />
                 <AlertTitle>
                   <FormattedMessage
-                    id="public.public-petition-link-unavailable.title"
+                    id="page.public-petition-link.link-unavailable-title"
                     defaultMessage="This process is closed"
                   />
                 </AlertTitle>
                 <AlertDescription>
                   -{" "}
                   <FormattedMessage
-                    id="public.public-petition-link-unavailable.description"
+                    id="page.public-petition-link.link-unavailable-description"
                     defaultMessage="Contact with {fullName} <{email}> to continue."
                     values={{
                       fullName: publicPetitionLink.owner.fullName!,

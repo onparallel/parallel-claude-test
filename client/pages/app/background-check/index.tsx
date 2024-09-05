@@ -93,8 +93,8 @@ function BackgroundCheckFieldSearch({
       <Center minHeight="100vh" backgroundColor="gray.50" padding={4}>
         <Stack width="100%" maxWidth="500px">
           {isDisabled ? (
-            <Alert status="warning" borderRadius="md">
-              <AlertIcon color="yellow.500" />
+            <Alert status="warning" rounded="md">
+              <AlertIcon />
               <Stack>
                 <AlertTitle>
                   <FormattedMessage

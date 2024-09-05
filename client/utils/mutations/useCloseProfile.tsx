@@ -61,7 +61,7 @@ function CloseProfileDialog({
       }
       body={
         <Stack>
-          <Alert status="info" borderRadius="md">
+          <Alert status="info" rounded="md">
             <AlertIcon />
             <AlertDescription>
               <FormattedMessage

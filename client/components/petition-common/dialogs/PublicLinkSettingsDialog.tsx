@@ -1,6 +1,7 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Button,
   Checkbox,
@@ -214,16 +215,18 @@ export function PublicLinkSettingsDialog({
         <Stack spacing={4}>
           {publicLink && dirtyFields.slug === true ? (
             <Alert status="warning" rounded="md">
-              <AlertIcon color="yellow.500" />
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="component.settings-public-link-dialog.link-edited-alert"
-                    defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
-                  />
-                </Text>
-                <Text as="b">{publicLink.url}</Text>
-              </Stack>
+              <AlertIcon />
+              <AlertDescription>
+                <Stack>
+                  <Text>
+                    <FormattedMessage
+                      id="component.settings-public-link-dialog.link-edited-alert"
+                      defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
+                    />
+                  </Text>
+                  <Text as="b">{publicLink.url}</Text>
+                </Stack>
+              </AlertDescription>
             </Alert>
           ) : null}
           <Stack spacing={2}>

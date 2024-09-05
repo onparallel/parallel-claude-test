@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 export function PetitionCompletedAlert(props: AlertProps) {
   return (
     <Alert status="warning" {...props}>
-      <AlertIcon color="yellow.500" />
+      <AlertIcon />
       <AlertDescription>
         <FormattedMessage
           id="component.petition-completed-alert.description"

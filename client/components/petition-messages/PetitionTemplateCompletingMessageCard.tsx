@@ -133,7 +133,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
             </Text>
             <PaddedCollapse in={isEnabled}>
               {petition.signatureConfig ? (
-                <CloseableAlert status="info" mb={2} alignItems="start">
+                <CloseableAlert status="info" rounded="md" marginBottom={2}>
                   <AlertIcon />
                   <AlertDescription>
                     <FormattedMessage

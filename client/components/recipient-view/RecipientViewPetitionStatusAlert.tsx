@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AlertDescription, AlertIcon, Flex, Text } from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, Text } from "@chakra-ui/react";
 import {
   RecipientViewPetitionStatusAlert_PublicPetitionFragment,
   RecipientViewPetitionStatusAlert_PublicUserFragment,
@@ -34,41 +34,39 @@ export function RecipientViewPetitionStatusAlert({
   );
 
   return (
-    <CloseableAlert status="success" variant="subtle" zIndex={2} paddingX={6}>
-      <Flex alignItems="center" justifyContent="flex-start" marginX="auto" width="100%">
-        <AlertIcon />
-        <AlertDescription>
-          {petition.status === "COMPLETED" ? (
-            <>
-              <Text>
-                <FormattedMessage
-                  id="component.recipient-view-petition-status-alert.petition-completed-alert-1"
-                  defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
-                  values={{
-                    name,
-                    tone,
-                  }}
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="component.recipient-view-petition-status-alert.petition-completed-alert-2"
-                  defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-                  values={{ tone }}
-                />
-              </Text>
-            </>
-          ) : (
-            <FormattedMessage
-              id="component.recipient-view-petition-status-alert.petition-closed-alert"
-              defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
-              values={{
-                name,
-              }}
-            />
-          )}
-        </AlertDescription>
-      </Flex>
+    <CloseableAlert status="success" zIndex={2} paddingX={6}>
+      <AlertIcon />
+      <AlertDescription flex="1">
+        {petition.status === "COMPLETED" ? (
+          <>
+            <Text>
+              <FormattedMessage
+                id="component.recipient-view-petition-status-alert.petition-completed-alert-1"
+                defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
+                values={{
+                  name,
+                  tone,
+                }}
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="component.recipient-view-petition-status-alert.petition-completed-alert-2"
+                defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+                values={{ tone }}
+              />
+            </Text>
+          </>
+        ) : (
+          <FormattedMessage
+            id="component.recipient-view-petition-status-alert.petition-closed-alert"
+            defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
+            values={{
+              name,
+            }}
+          />
+        )}
+      </AlertDescription>
     </CloseableAlert>
   );
 }

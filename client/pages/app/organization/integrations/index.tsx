@@ -386,52 +386,50 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
-      <Box>
-        <Alert status="info" paddingX={6}>
-          <AlertIcon />
-          <Stack
-            direction={{ base: "column", md: "row" }}
-            flex="1"
-            justifyContent="space-between"
-            spacing={4}
-          >
-            <Box>
-              <AlertTitle>
-                <FormattedMessage
-                  id="page.organization-integrations.alert-title"
-                  defaultMessage="Can't find the integration you need?"
-                />
-              </AlertTitle>
-              <AlertDescription>
-                <FormattedMessage
-                  id="page.organization-integrations.alert-description"
-                  defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
-                />
-              </AlertDescription>
-            </Box>
-            <Center>
-              <Button
-                variant="outline"
-                colorScheme="blue"
-                backgroundColor="white"
-                as="a"
-                target="_blank"
-                rel="noopener"
-                href="https://roadmap.onparallel.com/feature-requests?category=integrations&selectedCategory=integrations"
-                aria-label={intl.formatMessage({
-                  id: "page.organization-integrations.alert-button",
-                  defaultMessage: "Suggest integration",
-                })}
-              >
-                <FormattedMessage
-                  id="page.organization-integrations.alert-button"
-                  defaultMessage="Suggest integration"
-                />
-              </Button>
-            </Center>
-          </Stack>
-        </Alert>
-      </Box>
+      <Alert status="info">
+        <AlertIcon />
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          flex="1"
+          justifyContent="space-between"
+          spacing={4}
+        >
+          <Box flex={1}>
+            <AlertTitle>
+              <FormattedMessage
+                id="page.organization-integrations.alert-title"
+                defaultMessage="Can't find the integration you need?"
+              />
+            </AlertTitle>
+            <AlertDescription>
+              <FormattedMessage
+                id="page.organization-integrations.alert-description"
+                defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+              />
+            </AlertDescription>
+          </Box>
+          <Center>
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              backgroundColor="white"
+              as="a"
+              target="_blank"
+              rel="noopener"
+              href="https://roadmap.onparallel.com/feature-requests?category=integrations&selectedCategory=integrations"
+              aria-label={intl.formatMessage({
+                id: "page.organization-integrations.alert-button",
+                defaultMessage: "Suggest integration",
+              })}
+            >
+              <FormattedMessage
+                id="page.organization-integrations.alert-button"
+                defaultMessage="Suggest integration"
+              />
+            </Button>
+          </Center>
+        </Stack>
+      </Alert>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => {
           if (

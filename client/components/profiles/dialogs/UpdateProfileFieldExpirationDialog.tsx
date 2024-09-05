@@ -164,8 +164,8 @@ function UpdateProfileFieldExpirationDialog({
             )}
           </Text>
           {isPastDate ? (
-            <Alert status="warning" borderRadius="base">
-              <AlertIcon color="yellow.500" />
+            <Alert status="warning" rounded="md">
+              <AlertIcon />
               <AlertDescription flex="1">
                 <FormattedMessage
                   id="component.update-profile-field-expiration-dialog.date-expired-alert"

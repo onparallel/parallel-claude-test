@@ -1,19 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Badge,
   Box,
   Button,
   Center,
   Flex,
+  HStack,
   Stack,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
@@ -738,35 +739,37 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           )}
           <Box>
             {!isPetition ? (
-              <Alert status="info" paddingY={0}>
+              <Alert status="info">
                 <AlertIcon />
-                <Text flex={1} paddingY={3}>
-                  <FormattedMessage
-                    id="page.preview.template-only-cache-alert"
-                    defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
-                    values={{
-                      button: (
-                        <FormattedMessage
-                          id="generic.create-petition"
-                          defaultMessage="Create parallel"
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-                {showGeneratePrefilledPublicLinkButton ? (
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    marginStart={2}
-                    onClick={() => handleGeneratePrefilledPublicLinkClick()}
-                  >
+                <HStack>
+                  <AlertDescription flex={1}>
                     <FormattedMessage
-                      id="page.preview.generate-prefilled-link"
-                      defaultMessage="Generate prefilled link"
+                      id="page.preview.template-only-cache-alert"
+                      defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
+                      values={{
+                        button: (
+                          <FormattedMessage
+                            id="generic.create-petition"
+                            defaultMessage="Create parallel"
+                          />
+                        ),
+                      }}
                     />
-                  </Button>
-                ) : null}
+                  </AlertDescription>
+                  {showGeneratePrefilledPublicLinkButton ? (
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      marginStart={2}
+                      onClick={() => handleGeneratePrefilledPublicLinkClick()}
+                    >
+                      <FormattedMessage
+                        id="page.preview.generate-prefilled-link"
+                        defaultMessage="Generate prefilled link"
+                      />
+                    </Button>
+                  ) : null}
+                </HStack>
               </Alert>
             ) : null}
             {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (

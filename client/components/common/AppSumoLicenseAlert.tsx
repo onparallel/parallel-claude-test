@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertIcon, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { AppSumoLicenseAlert_OrgLicenseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "./SupportButton";
@@ -20,28 +20,30 @@ export function AppSumoLicenseAlert({ license }: AppSumoLicenseAlertProps) {
     <Alert status="info" rounded="md">
       <AlertIcon />
       <HStack spacing={4} width="100%">
-        <Stack flex="1">
-          <Text fontWeight="bold">
-            <FormattedMessage
-              id="component.appsumo-license-alert.current-plan"
-              defaultMessage="Your current plan is {plan}"
-              values={{ plan: planName }}
-            />
-          </Text>
-          <Text>
-            {license.name === "APPSUMO4" ? (
+        <AlertDescription>
+          <Stack flex="1">
+            <Text fontWeight="bold">
               <FormattedMessage
-                id="component.appsumo-license-alert.contact-text-max-license"
-                defaultMessage="Contact with us to increase your user and parallel limits."
+                id="component.appsumo-license-alert.current-plan"
+                defaultMessage="Your current plan is {plan}"
+                values={{ plan: planName }}
               />
-            ) : (
-              <FormattedMessage
-                id="component.appsumo-license-alert.upgrade-text"
-                defaultMessage="Upgrade your plan to increase your user and parallel limits."
-              />
-            )}
-          </Text>
-        </Stack>
+            </Text>
+            <Text>
+              {license.name === "APPSUMO4" ? (
+                <FormattedMessage
+                  id="component.appsumo-license-alert.contact-text-max-license"
+                  defaultMessage="Contact with us to increase your user and parallel limits."
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.appsumo-license-alert.upgrade-text"
+                  defaultMessage="Upgrade your plan to increase your user and parallel limits."
+                />
+              )}
+            </Text>
+          </Stack>
+        </AlertDescription>
         {license.name === "APPSUMO4" ? (
           <SupportButton
             variant="outline"

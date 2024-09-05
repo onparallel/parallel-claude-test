@@ -1,4 +1,4 @@
-import { Alert, Button, HStack, Input, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, Button, HStack, Input, Text } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { FieldOptions } from "@parallel/utils/petitionFields";
@@ -55,24 +55,26 @@ export function PetitionComposeFieldGroupSettings({
     <>
       {field.isLinkedToProfileType ? (
         <>
-          <Alert status="info" borderRadius="md" as={HStack} paddingY={2} paddingX={4}>
-            <ProfilesIcon color="blue.700" />
-            <Text as="span">
-              <FormattedMessage
-                id="component.petition-compose-field-group-settings.group-name-linked"
-                defaultMessage="Group linked to <b>{profileTypeName}</b>"
-                values={{
-                  profileTypeName: localizableUserTextRender({
-                    intl,
-                    value: field.profileType!.name,
-                    default: intl.formatMessage({
-                      id: "generic.unnamed-profile-type",
-                      defaultMessage: "Unnamed profile type",
+          <Alert status="info" rounded="md" paddingY={2}>
+            <HStack>
+              <ProfilesIcon color="blue.700" />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.petition-compose-field-group-settings.group-name-linked"
+                  defaultMessage="Group linked to <b>{profileTypeName}</b>"
+                  values={{
+                    profileTypeName: localizableUserTextRender({
+                      intl,
+                      value: field.profileType!.name,
+                      default: intl.formatMessage({
+                        id: "generic.unnamed-profile-type",
+                        defaultMessage: "Unnamed profile type",
+                      }),
                     }),
-                  }),
-                }}
-              />
-            </Text>
+                  }}
+                />
+              </AlertDescription>
+            </HStack>
           </Alert>
         </>
       ) : null}

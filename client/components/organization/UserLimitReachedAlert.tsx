@@ -1,13 +1,14 @@
-import { Alert, AlertDescription, AlertIcon, AlertProps } from "@chakra-ui/react";
+import { AlertDescription, AlertIcon } from "@chakra-ui/react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { CloseableAlert } from "../common/CloseableAlert";
 import { SupportLink } from "../common/SupportLink";
 
-export function UserLimitReachedAlert(props: AlertProps) {
+export function UserLimitReachedAlert() {
   const intl = useIntl();
   return (
-    <Alert status="warning" borderRadius="md" mb={4}>
-      <AlertIcon color="yellow.500" />
-      <AlertDescription>
+    <CloseableAlert status="warning" rounded="md">
+      <AlertIcon />
+      <AlertDescription flex={1}>
         <FormattedMessage
           id="component.user-limit-reached-alert.max-limit-reached"
           defaultMessage="You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
@@ -26,6 +27,6 @@ export function UserLimitReachedAlert(props: AlertProps) {
           }}
         />
       </AlertDescription>
-    </Alert>
+    </CloseableAlert>
   );
 }

@@ -11065,47 +11065,47 @@
     "context": "Do you still want to create the contact?"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert-multiple-text",
+    "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",
     "definition": "We have found parallels sent to some of these contacts.",
     "context": "We have found parallels sent to some of these contacts."
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert-single-text",
+    "term": "util.use-delete-contact.confirm-delete-alert-single-text",
     "definition": "This contact has access to:",
     "context": "This contact has access to:"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.closed-parallels",
+    "term": "util.use-delete-contact.confirm-delete-closed-parallels",
     "definition": "{count} closed {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.completed-parallels",
+    "term": "util.use-delete-contact.confirm-delete-completed-parallels",
     "definition": "{count} completed {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-alert.pending-parallels",
+    "term": "util.use-delete-contact.confirm-delete-pending-parallels",
     "definition": "{count} pending {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-body.1",
+    "term": "util.use-delete-contact.confirm-delete-body.1",
     "definition": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore.",
     "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-body.2",
+    "term": "util.use-delete-contact.confirm-delete-body.2",
     "definition": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?",
     "context": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-button",
+    "term": "util.use-delete-contact.confirm-delete-button",
     "definition": "Yes, delete {count, plural, =1{contact} other {contacts}}",
     "context": "Yes, delete {count, plural, =1{contact} other {contacts}}"
   },
   {
-    "term": "component.use-delete-contact.confirm-delete-header",
+    "term": "util.use-delete-contact.confirm-delete-header",
     "definition": "Delete {count, plural, =1{{email}} other {# contacts}}",
     "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
   },
@@ -16365,22 +16365,22 @@
     "context": "Preview"
   },
   {
-    "term": "public.public-petition-link-unavailable.description",
+    "term": "page.public-petition-link.link-unavailable-description",
     "definition": "Contact with {fullName} <{email}> to continue.",
     "context": "Contact with {fullName} <{email}> to continue."
   },
   {
-    "term": "public.public-petition-link-unavailable.title",
+    "term": "page.public-petition-link.link-unavailable-title",
     "definition": "This process is closed",
     "context": "This process is closed"
   },
   {
-    "term": "public.public-petition.error--reminder-description",
+    "term": "page.public-petition-link.error-reminder-description",
     "definition": "You can only send one reminder each 24 hours",
     "context": "You can only send one reminder each 24 hours"
   },
   {
-    "term": "public.public-petition.error-reminder-title",
+    "term": "page.public-petition-link.error-reminder-title",
     "definition": "Reminder already sent",
     "context": "Reminder already sent"
   },

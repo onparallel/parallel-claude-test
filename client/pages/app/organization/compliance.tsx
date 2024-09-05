@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Box,
   Button,
@@ -122,13 +123,13 @@ function OrganizationCompliance() {
           {me.hasAutoAnonymize ? null : (
             <Alert status="info" rounded="md">
               <AlertIcon />
-              <HStack spacing={8}>
-                <Text flex="1">
+              <HStack>
+                <AlertDescription flex="1">
                   <FormattedMessage
                     id="page.compliance.upgrade-plan-alert"
                     defaultMessage="Upgrade your plan to access Compliance functionalities."
                   />
-                </Text>
+                </AlertDescription>
                 <Center>
                   <Button
                     as={SupportLink}

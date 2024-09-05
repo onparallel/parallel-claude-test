@@ -57,7 +57,6 @@ export function EmailVerificationRequiredAlert({
       isOpen={isOpen}
       onClose={onClose}
       status="error"
-      variant="subtle"
       rounded="md"
       zIndex={2}
       marginBottom={10}

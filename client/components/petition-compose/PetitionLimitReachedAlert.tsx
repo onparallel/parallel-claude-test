@@ -10,7 +10,7 @@ export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReac
   const intl = useIntl();
   return (
     <Alert status="warning" {...props}>
-      <AlertIcon color="yellow.500" />
+      <AlertIcon />
       <AlertDescription>
         <FormattedMessage
           id="component.petition-limit-reached-alert.title"

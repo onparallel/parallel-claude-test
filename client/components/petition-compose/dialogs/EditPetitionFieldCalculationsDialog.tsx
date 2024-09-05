@@ -85,25 +85,26 @@ function EditPetitionFieldCalculationsDialog({
       body={
         <Stack>
           {petition.variables.length === 0 ? (
-            <Alert status="warning" borderRadius="md">
-              <AlertDescription flex="1">
-                <FormattedMessage
-                  id="component.edit-petition-field-calculations-dialog.variables-warning"
-                  defaultMessage="You need to add at least one variable to be able to perform calculations."
-                />
-              </AlertDescription>
-              <Button
-                variant="outline"
-                backgroundColor="white"
-                size="sm"
-                marginStart={2}
-                onClick={() => withError(handleAddNewVariable)}
-              >
-                <FormattedMessage
-                  id="component.edit-petition-field-calculations-dialog.create-variable-button"
-                  defaultMessage="Create variable"
-                />
-              </Button>
+            <Alert status="warning" rounded="md">
+              <HStack>
+                <AlertDescription flex="1">
+                  <FormattedMessage
+                    id="component.edit-petition-field-calculations-dialog.variables-warning"
+                    defaultMessage="You need to add at least one variable to be able to perform calculations."
+                  />
+                </AlertDescription>
+                <Button
+                  variant="outline"
+                  backgroundColor="white"
+                  size="sm"
+                  onClick={() => withError(handleAddNewVariable)}
+                >
+                  <FormattedMessage
+                    id="component.edit-petition-field-calculations-dialog.create-variable-button"
+                    defaultMessage="Create variable"
+                  />
+                </Button>
+              </HStack>
             </Alert>
           ) : null}
           <Text>
