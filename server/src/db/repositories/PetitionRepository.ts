@@ -23,6 +23,7 @@ import {
   unique,
   zip,
 } from "remeda";
+import { assert } from "ts-essentials";
 import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
@@ -7766,11 +7767,20 @@ export class PetitionRepository extends BaseRepository {
         (r) => r.petition_field_id,
       );
 
-      // prioritize using empty replies over creating new ones
-      const replies = await pMap(
+      const emptyGroupReplies = await pMap(
         fieldGroupReplies,
         async (reply) => {
-          const emptyReply = emptyFieldGroupRepliesByFieldId[reply.fieldId]?.pop();
+          const field = fields.find((f) => f.id === reply.fieldId);
+          assert(field, "Field not found for reply");
+          if (!field.multiple) {
+            // on non-multiple fields, we can only have one reply, so we need to delete the existing one
+            await this.deletePetitionFieldReplies([{ id: field.id }], `User:${owner.id}`);
+          }
+
+          // prioritize using empty replies over creating new ones
+          const emptyReply = field.multiple
+            ? emptyFieldGroupRepliesByFieldId[reply.fieldId]?.pop()
+            : undefined;
 
           if (isNonNullish(emptyReply)) {
             return emptyReply;
@@ -7792,7 +7802,7 @@ export class PetitionRepository extends BaseRepository {
       );
 
       // create "children" replies for each FIELD_GROUP reply
-      for (const [parentReply, { childrenReplies }] of zip(replies, fieldGroupReplies)) {
+      for (const [parentReply, { childrenReplies }] of zip(emptyGroupReplies, fieldGroupReplies)) {
         if (isNonNullish(childrenReplies) && childrenReplies.length > 0) {
           await this.createPetitionFieldReply(
             petitionId,

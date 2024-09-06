@@ -4159,6 +4159,103 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("replaces current FIELD_GROUP reply if the field is non-multiple", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        multiple: false,
+        type: "FIELD_GROUP",
+        alias: "field_group",
+      }));
+      const children = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroup.id,
+        type: "TEXT",
+        alias: `child_${i}`,
+      }));
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      const [child0Reply] = await mocks.createRandomTextReply(children[0].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: groupReply.id,
+        user_id: user.id,
+      }));
+      const [child1Reply] = await mocks.createRandomTextReply(children[1].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: groupReply.id,
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replies: JSONObject!) {
+            bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+              id
+              fields {
+                alias
+                replies {
+                  id
+                  children {
+                    field {
+                      alias
+                    }
+                    replies {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replies: {
+            field_group: {
+              child_0: "Hello",
+              child_1: "World",
+            },
+          },
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.bulkCreatePetitionReplies).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        fields: [
+          {
+            alias: "field_group",
+            replies: [
+              {
+                id: expect.not.toEqualCaseInsensitive(
+                  toGlobalId("PetitionFieldReply", groupReply.id),
+                ),
+                children: [
+                  {
+                    field: { alias: "child_0" },
+                    replies: [{ content: { value: "Hello" } }],
+                  },
+                  {
+                    field: { alias: "child_1" },
+                    replies: [{ content: { value: "World" } }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      // make sure replies are deleted in DB
+      const dbReplies = await mocks.knex
+        .from("petition_field_reply")
+        .whereIn("id", [groupReply.id, child0Reply.id, child1Reply.id])
+        .select("deleted_at");
+
+      expect(dbReplies).toEqual([
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+      ]);
+    });
   });
 
   describe("createPetitionFieldReplies", () => {
