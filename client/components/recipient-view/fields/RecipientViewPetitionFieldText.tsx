@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -107,11 +107,13 @@ export function RecipientViewPetitionFieldText({
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
           const element = replyRefs[prevId].current!;
-          if (element.type === "text") {
-            // selectionStart does not work on inputs that are not type="text" (e.g. email)
-            element.selectionStart = element.value.length;
+          if (isNonNullish(element)) {
+            if (element.type === "text") {
+              // selectionStart does not work on inputs that are not type="text" (e.g. email)
+              element.selectionStart = element.value.length;
+            }
+            element.focus();
           }
-          element.focus();
         }
       }
       await onDeleteReply(replyId);
@@ -130,22 +132,33 @@ export function RecipientViewPetitionFieldText({
       if (!value) {
         return;
       }
+      let selection: { selectionStart: number; selectionEnd: number } | undefined;
       setIsSaving(true);
       try {
+        if (isNonNullish(newReplyRef.current)) {
+          // save selection to restore it after creating the reply,
+          // need to do it before createReply because it will remove the textarea from the DOM
+          // and the ref will be null
+          selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
+        }
         const replyId = await onCreateReply({ value });
+
         if (replyId) {
-          const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
             await waitFor(1);
             const newReplyElement = replyRefs[replyId].current!;
             if (newReplyElement) {
-              Object.assign(newReplyElement, selection);
+              newReplyElement.selectionStart =
+                selection?.selectionStart ?? newReplyElement.value.length;
+              newReplyElement.selectionEnd =
+                selection?.selectionEnd ?? newReplyElement.value.length;
+
               newReplyElement.focus();
               newReplyElement.setSelectionRange(
-                newReplyElement.value.length,
-                newReplyElement.value.length,
+                selection?.selectionStart ?? newReplyElement.value.length,
+                selection?.selectionEnd ?? newReplyElement.value.length,
               );
             }
           }
