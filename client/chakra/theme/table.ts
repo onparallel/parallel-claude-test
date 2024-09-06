@@ -18,6 +18,7 @@ export const tableTheme = defineMultiStyleConfig({
         th: {
           paddingX: 2.5,
           paddingY: 2.5,
+          height: "40px",
           letterSpacing: "normal",
           fontWeight: 400,
           fontSize: "sm",

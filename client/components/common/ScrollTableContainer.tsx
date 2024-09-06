@@ -8,7 +8,7 @@ export const ScrollTableContainer = chakraForwardRef<"div", {}>((props, ref) => 
       shadowTop={false}
       overflow="auto"
       flex={1}
-      minHeight="80px"
+      minHeight="82px"
       {...props}
       sx={{
         "thead > tr": {

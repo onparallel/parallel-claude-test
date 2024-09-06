@@ -301,7 +301,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         label: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
           <Th width="40px" padding="0 !important">
-            <Center as="label" height="36px" cursor="pointer" onClick={onToggleAll}>
+            <Center as="label" height="38px" cursor="pointer" onClick={onToggleAll}>
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
@@ -575,7 +575,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
       key={column.key}
       className={sort?.field === column.key ? "sort-active" : undefined}
       paddingY={0}
-      height="38px"
+      height="40px"
       aria-sort={
         column.isSortable
           ? sort?.field === column.key
