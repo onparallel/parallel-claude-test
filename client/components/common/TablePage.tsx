@@ -202,7 +202,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           <Flex flexDirection="column" flex="1 1 300px">
             {body}
           </Flex>
-        ) : loading ? (
+        ) : loading && (rows?.length ?? 0) === 0 ? (
           <Center flex="1 1 300px">
             <Spinner
               thickness="4px"
