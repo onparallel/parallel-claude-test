@@ -330,12 +330,14 @@ export function RecipientViewPetitionFieldGroupLayout({
             </Heading>
           </Box>
           {(field.hasCommentsEnabled || isPetitionField) && isNonNullish(onCommentsButtonClick) ? (
-            <CommentsButton
-              commentCount={field.commentCount}
-              hasUnreadComments={field.unreadCommentCount > 0}
-              onClick={onCommentsButtonClick}
-              backgroundColor={commentsFieldId === field.id ? "gray.300" : undefined}
-            />
+            <Flex paddingEnd={2}>
+              <CommentsButton
+                commentCount={field.commentCount}
+                hasUnreadComments={field.unreadCommentCount > 0}
+                onClick={onCommentsButtonClick}
+                backgroundColor={commentsFieldId === field.id ? "gray.300" : undefined}
+              />
+            </Flex>
           ) : null}
         </Flex>
         {field.description ? (
