@@ -24,8 +24,8 @@ import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { ArrayUnionToUnion, Maybe } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
-import { zip } from "remeda";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish, zip } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
@@ -50,6 +50,7 @@ export const RecipientViewContents = Object.assign(
     { currentPage, petition, usePreviewReplies, isPreview, closeOnNavigate, onClose, ...props },
     ref,
   ) {
+    const intl = useIntl();
     const router = useRouter();
     const { query } = router;
     const { pages, fields, fieldLogic } = useGetPagesAndFields(
@@ -61,12 +62,12 @@ export const RecipientViewContents = Object.assign(
     const filteredFields = zip(fields as PetitionFieldSelection[], fieldLogic)
       .filter(([field, fieldLogic]) =>
         (field.__typename === "PublicPetitionField" && field.isInternal) ||
-        (field.type === "HEADING" && !field.title)
+        (field.type === "HEADING" && !field.title && !fieldLogic.headerNumber)
           ? false
           : true,
       )
-      // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
-      .slice(fields[0].title ? 1 : 0);
+      // skip first one as long it has a title or headerNumber otherwise skip nothing as it's been filtered our before
+      .slice(fields[0].title || isNonNullish(fieldLogic[0].headerNumber) ? 1 : 0);
 
     const showCommentsCount = (field: PetitionFieldSelection) => {
       return (
@@ -128,6 +129,13 @@ export const RecipientViewContents = Object.assign(
                 ? unreadCommentCount
                 : currentFieldUnreadCommentCount;
 
+              const pageTitle =
+                title ??
+                intl.formatMessage({
+                  id: "generic.empty-heading",
+                  defaultMessage: "Untitled heading",
+                });
+
               return (
                 <ListItem key={index}>
                   <Text as="h2">
@@ -158,12 +166,7 @@ export const RecipientViewContents = Object.assign(
                           whiteSpace="nowrap"
                           {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
                         >
-                          {title || (
-                            <FormattedMessage
-                              id="generic.empty-heading"
-                              defaultMessage="Untitled heading"
-                            />
-                          )}
+                          {pageTitle}
                         </Box>
 
                         {showCommentsNumber ? (
@@ -196,6 +199,17 @@ export const RecipientViewContents = Object.assign(
                           usePreviewReplies && field.__typename === "PetitionField"
                             ? field.previewReplies
                             : field.replies;
+
+                        const fieldTitle = fieldLogic?.headerNumber
+                          ? `${fieldLogic?.headerNumber}. ${field.title ?? ""}`
+                          : (field.title ??
+                            intl.formatMessage({
+                              id: "generic.untitled-field",
+                              defaultMessage: "Untitled field",
+                            }));
+
+                        const hasTitle =
+                          isNonNullish(field.title) || isNonNullish(fieldLogic?.headerNumber);
                         return (
                           <ListItem key={field.id} position="relative">
                             <Text
@@ -222,7 +236,7 @@ export const RecipientViewContents = Object.assign(
                                   overflow="hidden"
                                   textOverflow="ellipsis"
                                   whiteSpace="nowrap"
-                                  {...(field.title
+                                  {...(hasTitle
                                     ? {
                                         color: replies.some((r) => r.status === "REJECTED")
                                           ? "red.600"
@@ -242,12 +256,7 @@ export const RecipientViewContents = Object.assign(
                                         fontStyle: "italic",
                                       })}
                                 >
-                                  {field.title || (
-                                    <FormattedMessage
-                                      id="generic.untitled-field"
-                                      defaultMessage="Untitled field"
-                                    />
-                                  )}
+                                  {fieldTitle}
                                 </Box>
                                 {showCommentsCount(field) ? (
                                   <Badge
@@ -387,7 +396,9 @@ function useGetPagesAndFields<T extends PetitionSelection>(
       (pages.length === 0 || (field.options.hasPageBreak && !isHiddenToPublic))
     ) {
       pages.push({
-        title: field.title ?? null,
+        title: fieldLogic.headerNumber
+          ? `${fieldLogic.headerNumber}. ${field.title ?? ""}`
+          : (field.title ?? null),
         unreadCommentCount: 0,
         isInternal: field.isInternal,
         currentFieldUnreadCommentCount: field.unreadCommentCount,
