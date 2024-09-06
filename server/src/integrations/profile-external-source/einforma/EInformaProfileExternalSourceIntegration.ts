@@ -44,33 +44,33 @@ interface EInformaCompaniesSearchResponse {
   total: number;
   empresa: {
     id: string;
-    denominacion: string;
-    tipoDenominacion: string;
-    denominacionBusqueda: string;
-    provincia: string;
+    denominacion?: string;
+    tipoDenominacion?: string;
+    denominacionBusqueda?: string;
+    provincia?: string;
   }[];
 }
 
 interface EInformaEntityByIdResponse {
-  denominacion: string;
-  nombreComercial: string[];
-  domicilioSocial: string;
-  localidad: string;
-  formaJuridica: string;
-  cnae: string;
-  fechaUltimoBalance: string;
-  identificativo: string;
-  situacion: string;
-  telefono: number[];
-  fax: number[];
-  web: string[];
-  email: string;
-  cargoPrincipal: string;
-  capitalSocial: number;
-  ventas: number;
-  anioVentas: number;
-  empleados: number;
-  fechaConstitucion: string;
+  denominacion?: string;
+  nombreComercial?: string[];
+  domicilioSocial?: string;
+  localidad?: string;
+  formaJuridica?: string;
+  cnae?: string;
+  fechaUltimoBalance?: string;
+  identificativo?: string;
+  situacion?: string;
+  telefono?: number[];
+  fax?: number[];
+  web?: string[];
+  email?: string;
+  cargoPrincipal?: string;
+  capitalSocial?: number;
+  ventas?: number;
+  anioVentas?: number;
+  empleados?: number;
+  fechaConstitucion?: string;
 }
 
 interface EInformaIntegrationContext {
@@ -476,10 +476,11 @@ export class EInformaProfileExternalSourceIntegration
     this.validateStandardType(standardType);
 
     if (standardType === "INDIVIDUAL") {
-      const name = await this.parseFullName(entity.denominacion);
-      const parsedLocalidad = entity.localidad.match(
-        /^(?<zip>\d+) (?<city>[\w ]+) \((?<province>[\w ]+)\)$/,
-      );
+      const name = isNonNullish(entity.denominacion)
+        ? await this.parseFullName(entity.denominacion)
+        : null;
+      const parsedLocalidad =
+        entity.localidad?.match(/^(?<zip>\d+) (?<city>[\w ]+) \((?<province>[\w ]+)\)$/) ?? null;
       return Object.fromEntries(
         await pFilter(
           Object.entries({
@@ -508,12 +509,12 @@ export class EInformaProfileExternalSourceIntegration
         ),
       );
     } else if (standardType === "LEGAL_ENTITY") {
-      const parsedLocalidad = entity.localidad.match(
-        /^(?<zip>\d+) (?<city>[\w ]+) \((?<province>[\w ]+)\)$/,
-      );
-      const entityType = isNonNullish(entity.formaJuridica)
-        ? this.mapEntityType(entity.formaJuridica, entity.denominacion)
-        : undefined;
+      const parsedLocalidad =
+        entity.localidad?.match(/^(?<zip>\d+) (?<city>[\w ]+) \((?<province>[\w ]+)\)$/) ?? null;
+      const entityType =
+        isNonNullish(entity.formaJuridica) && isNonNullish(entity.denominacion)
+          ? this.mapEntityType(entity.formaJuridica, entity.denominacion)
+          : undefined;
       return Object.fromEntries(
         await pFilter(
           Object.entries({
