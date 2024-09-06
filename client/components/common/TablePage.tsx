@@ -6,7 +6,6 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps } from "@parallel/components/common/Table";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNullish } from "remeda";
 import { ScrollTableContainer } from "./ScrollTableContainer";
 import { SimpleMenuSelect } from "./SimpleMenuSelect";
 import { useSimpleSelectOptions } from "./SimpleSelect";
@@ -172,26 +171,15 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         position="relative"
         overflowX="auto"
       >
-        {isNullish(rows) && loading ? (
-          <Flex
-            position="absolute"
-            inset={0}
-            justifyContent="center"
-            alignItems="center"
-            backgroundColor="whiteAlpha.800"
-          >
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="primary.500"
-              size="xl"
-            />
-          </Flex>
-        ) : null}
         <ScrollTableContainer
-          minHeight={rows?.length ? "80px" : "unset"}
-          flex={rows?.length ? "1" : "unset"}
+          zIndex={1}
+          {...((rows?.length ?? 0) === 0
+            ? {
+                minHeight: "unset",
+                flex: "unset",
+                overflow: "visible",
+              }
+            : {})}
         >
           <Table
             columns={columns}
@@ -214,6 +202,16 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           <Flex flexDirection="column" flex="1 1 300px">
             {body}
           </Flex>
+        ) : loading ? (
+          <Center flex="1 1 300px">
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="primary.500"
+              size="xl"
+            />
+          </Center>
         ) : null}
       </Flex>
       <Stack

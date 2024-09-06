@@ -301,7 +301,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         label: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
           <Th width="40px" padding="0 !important">
-            <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleAll}>
+            <Center as="label" height="36px" cursor="pointer" onClick={onToggleAll}>
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
@@ -343,7 +343,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
     >
       <Thead {...unMaybeFunction(headProps, context as TContext)}>
-        <Tr height="42px">
+        <Tr>
           {_columns.map((column) => {
             if (column.Header) {
               return (
@@ -574,6 +574,8 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
       ref={referenceRef}
       key={column.key}
       className={sort?.field === column.key ? "sort-active" : undefined}
+      paddingY={0}
+      height="38px"
       aria-sort={
         column.isSortable
           ? sort?.field === column.key
