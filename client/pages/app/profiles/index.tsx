@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Flex,
   HStack,
   MenuButton,
@@ -399,41 +400,41 @@ function Profiles() {
             body={
               profiles && profiles.totalCount === 0 && !loading ? (
                 queryState.search ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text color="gray.300" fontSize="lg">
+                  <Center flex="1">
+                    <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-results"
                         defaultMessage="There's no profiles matching your criteria"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : queryState.status === "OPEN" ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Center flex="1">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-profiles"
                         defaultMessage="You have no profiles yet. Start by creating one now!"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : queryState.status === "CLOSED" ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Center flex="1">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-closed-profiles"
                         defaultMessage="There is no closed profile"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : queryState.status === "DELETION_SCHEDULED" ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Center flex="1">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-deleted-profiles"
                         defaultMessage="No profile in the bin"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : null
               ) : null
             }

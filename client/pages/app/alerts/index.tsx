@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -122,14 +122,14 @@ function Alerts() {
             body={
               totalCount === 0 && !loading ? (
                 queryState.search ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text color="gray.300" fontSize="lg">
+                  <Center flex="1">
+                    <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
                         id="page.alerts.no-results"
                         defaultMessage="There's no alerts matching your criteria"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : (
                   <Stack
                     flex="1"

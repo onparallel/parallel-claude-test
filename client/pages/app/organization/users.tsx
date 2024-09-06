@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Heading, Stack, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Heading, Stack, Text, useToast } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleFilledIcon,
@@ -629,14 +629,14 @@ function OrganizationUsers() {
           body={
             users && users.totalCount === 0 && !loading ? (
               state.search || state.status[0] !== "ACTIVE" ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex="1">
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="page.organization-users.no-search-results"
                       defaultMessage="There's no users matching your criteria"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : null
             ) : null
           }

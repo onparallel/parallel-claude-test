@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, Text, useToast } from "@chakra-ui/react";
+import { Center, Flex, Text, useToast } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -167,23 +167,23 @@ function Contacts() {
           body={
             contacts && contacts.totalCount === 0 && !loading ? (
               state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center" height="300px">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex="1">
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-results"
                       defaultMessage="There's no contacts matching your search"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center" height="300px">
+                <Center flex="1">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-contacts"
                       defaultMessage="You have no contacts yet. Start by creating one now!"
                     />
                   </Text>
-                </Flex>
+                </Center>
               )
             ) : null
           }

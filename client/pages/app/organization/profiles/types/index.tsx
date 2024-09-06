@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Flex, Text } from "@chakra-ui/react";
+import { Center, Flex, Text } from "@chakra-ui/react";
 import { ArchiveIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -216,32 +216,32 @@ function OrganizationProfileTypes() {
           body={
             profileTypes && profileTypes.totalCount === 0 && !loading ? (
               queryState.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex="1">
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="component.profile-types-table.no-results"
                       defaultMessage="There's no profile types matching your criteria"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : queryState.showArchived ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Center flex="1">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="component.profile-types-table.no-profiles-archived"
                       defaultMessage="There are no archived profiles"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Center flex="1">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="component.profile-types-table.no-profiles"
                       defaultMessage="You have no profile types yet. Start by creating one now!"
                     />
                   </Text>
-                </Flex>
+                </Center>
               )
             ) : null
           }

@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Flex,
   MenuButton,
   MenuItem,
@@ -656,18 +657,18 @@ function Petitions() {
                 state.tagsFilters ||
                 state.status ||
                 state.signature ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text color="gray.300" fontSize="lg">
+                  <Center flex="1">
+                    <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
                         id="page.petitions.no-results"
                         defaultMessage="There's no parallels matching your criteria"
                       />
                     </Text>
-                  </Flex>
+                  </Center>
                 ) : state.path !== "/" ? (
                   <EmptyFolderIllustration flex="1" isTemplate={state.type === "TEMPLATE"} />
                 ) : (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Center flex="1">
                     <Text fontSize="lg">
                       {state.type === "TEMPLATE" ? (
                         <FormattedMessage
@@ -681,7 +682,7 @@ function Petitions() {
                         />
                       )}
                     </Text>
-                  </Flex>
+                  </Center>
                 )
               ) : null
             }

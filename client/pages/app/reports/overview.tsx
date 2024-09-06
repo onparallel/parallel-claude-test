@@ -3,7 +3,7 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Flex,
+  Center,
   Grid,
   Heading,
   HStack,
@@ -370,14 +370,14 @@ export function Overview() {
               body={
                 tableRows.length === 0 ? (
                   search ? (
-                    <Flex flex="1" alignItems="center" justifyContent="center">
-                      <Text color="gray.300" fontSize="lg">
+                    <Center flex="1">
+                      <Text color="gray.400" fontSize="lg">
                         <FormattedMessage
                           id="page.reports-overview.no-templates-matching-search"
                           defaultMessage="There's no templates matching your search"
                         />
                       </Text>
-                    </Flex>
+                    </Center>
                   ) : (
                     <Stack flex="1" alignItems="center" justifyContent="center">
                       <Text fontSize="lg">

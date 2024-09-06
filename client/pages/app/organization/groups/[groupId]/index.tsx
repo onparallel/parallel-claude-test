@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Flex, Text, useToast } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -215,23 +215,23 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           body={
             userList.length === 0 && !loading ? (
               state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex="1">
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="page.group.no-results"
                       defaultMessage="There's no users matching your search"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Center flex="1">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="page.group.no-users"
                       defaultMessage="No users added to this team yet"
                     />
                   </Text>
-                </Flex>
+                </Center>
               )
             ) : null
           }

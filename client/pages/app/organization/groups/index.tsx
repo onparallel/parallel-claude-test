@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
+import { Button, Center, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -297,23 +297,23 @@ function OrganizationGroups() {
           body={
             userGroups && userGroups.totalCount === 0 && !loading ? (
               state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex="1">
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="page.groups.no-results"
                       defaultMessage="There's no teams matching your search"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Center flex="1">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="page.groups.no-groups"
                       defaultMessage="You have no teams yet"
                     />
                   </Text>
-                </Flex>
+                </Center>
               )
             ) : null
           }

@@ -1,5 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Flex, Heading, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  HStack,
+  Skeleton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -233,14 +243,14 @@ function DowJonesFieldSearchResults({
           }
           body={
             result?.items.length === 0 && !loading ? (
-              <Flex flex="1" alignItems="center" justifyContent="center">
-                <Text fontSize="lg">
+              <Center flex="1">
+                <Text color="gray.400" fontSize="lg">
                   <FormattedMessage
                     id="component.dow-jones-search-result.no-results"
                     defaultMessage="No results found for this search"
                   />
                 </Text>
-              </Flex>
+              </Center>
             ) : null
           }
         />

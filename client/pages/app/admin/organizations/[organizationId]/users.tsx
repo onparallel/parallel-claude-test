@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Stack, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Flex, Stack, Text, useToast } from "@chakra-ui/react";
 import { KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
@@ -262,23 +262,23 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           body={
             users?.items.length === 0 && !loading ? (
               state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+                <Center flex={1}>
+                  <Text color="gray.400" fontSize="lg">
                     <FormattedMessage
                       id="page.group.no-results"
                       defaultMessage="There's no users matching your search"
                     />
                   </Text>
-                </Flex>
+                </Center>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Center flex={1}>
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="page.group.no-users"
                       defaultMessage="No users added to this team yet"
                     />
                   </Text>
-                </Flex>
+                </Center>
               )
             ) : null
           }

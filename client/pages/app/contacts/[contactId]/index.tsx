@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormControlOptions,
@@ -247,15 +248,15 @@ function Contact({ contactId }: ContactProps) {
                 marginBottom={2}
               />
             ) : (
-              <Flex height="100px" alignItems="center" justifyContent="center">
-                <Text color="gray.300" fontSize="lg">
+              <Center height="100px">
+                <Text color="gray.400" fontSize="lg">
                   <FormattedMessage
                     id="contact.no-parallels"
                     defaultMessage="You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet"
                     values={{ name: contact!.firstName }}
                   />
                 </Text>
-              </Flex>
+              </Center>
             )}
           </Card>
         </Box>
