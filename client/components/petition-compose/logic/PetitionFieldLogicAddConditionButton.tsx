@@ -29,9 +29,11 @@ export const PetitionFieldLogicAddConditionButton = chakraForwardRef<
           "fieldId" in last ? fieldsWithIndices.find(([f]) => f.id === last.fieldId)![0] : null;
         if (
           isNonNullish(referencedField) &&
-          (referencedField.type === "CHECKBOX" ||
+          "fieldId" in last &&
+          ((referencedField.type === "CHECKBOX" && last.modifier !== "NUMBER_OF_REPLIES") ||
             (referencedField.type === "SELECT" &&
-              !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator)))
+              !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator) &&
+              last.modifier !== "NUMBER_OF_REPLIES"))
         ) {
           // if the previous condition is of type SELECT or CHECKBOX try to get the next value
           const values = referencedField.options.values as string[];
