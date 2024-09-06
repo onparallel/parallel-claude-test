@@ -552,8 +552,8 @@ function ImportFromExternalSourceDialogSearchResults({
       cancel={
         <Button onClick={() => onBack()}>
           <FormattedMessage
-            id="component.import-from-external-source-dialog.change-search-button"
-            defaultMessage="Change search params"
+            id="component.import-from-external-source-dialog.modify-search-button"
+            defaultMessage="Modify search"
           />
         </Button>
       }
@@ -880,8 +880,8 @@ function ImportFromExternalSourceDialogUpdateProfile({
         <Button onClick={() => onBack()}>
           {fromStep === "SEARCH" ? (
             <FormattedMessage
-              id="component.import-from-external-source-dialog.change-search-button"
-              defaultMessage="Change search params"
+              id="component.import-from-external-source-dialog.modify-search-button"
+              defaultMessage="Modify search"
             />
           ) : fromStep === "SEARCH_RESULTS" ? (
             <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
@@ -1081,8 +1081,8 @@ function ImportFromExternalSourceDialogCreateProfile({
         <Button onClick={() => onBack()}>
           {fromStep === "SEARCH" ? (
             <FormattedMessage
-              id="component.import-from-external-source-dialog.change-search-button"
-              defaultMessage="Change search params"
+              id="component.import-from-external-source-dialog.modify-search-button"
+              defaultMessage="Modify search"
             />
           ) : fromStep === "SEARCH_RESULTS" ? (
             <FormattedMessage id="generic.go-back" defaultMessage="Go back" />

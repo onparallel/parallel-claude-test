@@ -3590,9 +3590,9 @@
     "context": "Field not visible"
   },
   {
-    "term": "component.import-from-external-source-dialog.change-search-button",
+    "term": "component.import-from-external-source-dialog.modify-search-button",
     "definition": "Cambiar búsqueda",
-    "context": "Change search params"
+    "context": "Modify search"
   },
   {
     "term": "component.import-from-external-source-dialog.create-profile-button",
