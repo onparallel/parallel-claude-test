@@ -108,14 +108,16 @@ export function ConfigureAutomaticNumberingDialog({
               )}
             />
           </FormControl>
-          <FormControl>
-            <Checkbox {...register("updateExistingFields")}>
-              <FormattedMessage
-                id="component.configure-automatic-numbering-dialog.update-existing-fields"
-                defaultMessage="Activate in existing text blocks"
-              />
-            </Checkbox>
-          </FormControl>
+          {isUpdating ? null : (
+            <FormControl>
+              <Checkbox {...register("updateExistingFields")}>
+                <FormattedMessage
+                  id="component.configure-automatic-numbering-dialog.update-existing-fields"
+                  defaultMessage="Activate in existing text blocks"
+                />
+              </Checkbox>
+            </FormControl>
+          )}
         </Stack>
       }
       confirm={
