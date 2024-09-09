@@ -21,6 +21,12 @@ export type DocumentData<TDocType extends DocumentProcessingType> = TDocType ext
       employeeId: Maybe<string>;
       employerName: Maybe<string>;
       employerId: Maybe<string>;
+      hasSeizures: Maybe<boolean>;
+      hasAdvances: Maybe<boolean>;
+      hasSickLeave: Maybe<boolean>;
+      isNotFromFuture: Maybe<boolean>;
+      hasEssentialData: Maybe<boolean>;
+      payMatchesCalculations: Maybe<boolean>;
     }
   : never;
 

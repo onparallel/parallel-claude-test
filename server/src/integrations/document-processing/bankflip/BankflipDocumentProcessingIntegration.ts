@@ -33,6 +33,11 @@ interface BankflipDocument {
   contentType: string;
 }
 
+type BankflipValidityCheckKey =
+  | "NetPayMatchesCalculation"
+  | "PayslipIsNotFromFuture"
+  | "PayslipHasEssentialData";
+
 interface BankflipPayslip {
   document?: Maybe<BankflipDocument>;
   employerName?: Maybe<string>;
@@ -63,6 +68,18 @@ interface BankflipPayslip {
     value: Maybe<number>;
     currency: Maybe<string>;
   }>;
+  hasEmbargoes: Maybe<"yes" | "no" | "unsure">;
+  hasAdvances: Maybe<"yes" | "no" | "unsure">;
+  hasSickLeave: Maybe<"yes" | "no" | "unsure">;
+  validityCheckResults: Maybe<
+    {
+      result: boolean;
+      validityCheck: {
+        key: BankflipValidityCheckKey;
+        params: {};
+      };
+    }[]
+  >;
 }
 
 interface BankflipPayslipAnalysisResult {
@@ -189,7 +206,7 @@ export class BankflipDocumentProcessingIntegration
 
             return { response, currencyData };
           }).then(({ response, currencyData }) => {
-            function convert(data?: { value: number | null; currency: string | null } | null) {
+            function convertMoney(data?: { value: number | null; currency: string | null } | null) {
               if (!isNullish(data?.value) && !isNullish(data?.currency)) {
                 const fractionalUnit = currencyData[data.currency];
 
@@ -207,6 +224,24 @@ export class BankflipDocumentProcessingIntegration
               return null;
             }
 
+            function convertBoolean(value: "yes" | "no" | "unsure" | null) {
+              if (value === "yes") {
+                return true;
+              }
+              if (value === "no") {
+                return false;
+              }
+              return null;
+            }
+
+            function passesValidityCheck(payslip: BankflipPayslip, key: BankflipValidityCheckKey) {
+              return (
+                payslip.validityCheckResults?.some(
+                  (r) => r.validityCheck.key === key && r.result === true,
+                ) ?? null
+              );
+            }
+
             if (response.completed) {
               this.service.onCompleted<"PAYSLIP">(
                 `BANKFLIP/${body.payload.analysisRequestId}`,
@@ -220,9 +255,18 @@ export class BankflipDocumentProcessingIntegration
                       employeeId: payslip.employeeId?.number ?? null,
                       employerName: payslip.employerName ?? null,
                       employerId: payslip.employerId?.number ?? null,
-                      netPay: convert(payslip.netPay),
-                      totalAccrued: convert(payslip.totalAccrued),
-                      totalDeduction: convert(payslip.totalDeduction),
+                      netPay: convertMoney(payslip.netPay),
+                      totalAccrued: convertMoney(payslip.totalAccrued),
+                      totalDeduction: convertMoney(payslip.totalDeduction),
+                      hasSeizures: convertBoolean(payslip.hasEmbargoes),
+                      hasAdvances: convertBoolean(payslip.hasAdvances),
+                      hasSickLeave: convertBoolean(payslip.hasSickLeave),
+                      isNotFromFuture: passesValidityCheck(payslip, "PayslipIsNotFromFuture"),
+                      hasEssentialData: passesValidityCheck(payslip, "PayslipHasEssentialData"),
+                      payMatchesCalculations: passesValidityCheck(
+                        payslip,
+                        "NetPayMatchesCalculation",
+                      ),
                     })),
                   ),
               );
