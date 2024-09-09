@@ -17,7 +17,13 @@ export function PetitionRepliesFieldFilePassword({ password }: { password: strin
           defaultMessage="Password: {password}"
           values={{
             password: (
-              <Text as="span" fontSize="md" fontWeight={400} color="gray.800">
+              <Text
+                as="span"
+                fontFamily="monospace"
+                fontSize="md"
+                fontWeight={400}
+                color="gray.800"
+              >
                 {showPassword ? password : "•".repeat(password.length)}
               </Text>
             ),
