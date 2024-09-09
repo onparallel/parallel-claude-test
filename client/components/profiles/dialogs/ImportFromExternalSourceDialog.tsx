@@ -147,19 +147,22 @@ function ImportFromExternalSourceDialogSelectSource({
   const noIntegrations = options.length === 0 && !loading;
   return (
     <ConfirmDialog
+      size="lg"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ orgIntegrationId }) => {
-          return onStep(
-            "SEARCH",
-            {
-              orgIntegration: integrations!.find((o) => o.id === orgIntegrationId)!,
-              profileId,
-              profileType,
-            },
-            { orgIntegrationId: orgIntegrationId! },
-          );
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ orgIntegrationId }) => {
+            return onStep(
+              "SEARCH",
+              {
+                orgIntegration: integrations!.find((o) => o.id === orgIntegrationId)!,
+                profileId,
+                profileType,
+              },
+              { orgIntegrationId: orgIntegrationId! },
+            );
+          }),
+        },
       }}
       initialFocusRef={focusRef}
       hasCloseButton
@@ -270,43 +273,45 @@ function ImportFromExternalSourceDialogSearch({
       size="lg"
       initialFocusRef={focusRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          setNoResults(false);
-          const res = await search({
-            variables: {
-              integrationId: orgIntegration.id,
-              locale: intl.locale as UserLocale,
-              profileTypeId: profileType.id,
-              profileId: profileId,
-              search: data,
-            },
-          });
-          if (isNonNullish(res.data)) {
-            const result = res.data.profileExternalSourceSearch;
-            if (result.__typename === "ProfileExternalSourceSearchMultipleResults") {
-              if (result.results.rows.length > 0) {
-                onStep(
-                  "SEARCH_RESULTS",
-                  { profileType, profileId, orgIntegration, searchResults: result.results, data },
-                  { data },
-                );
-              } else {
-                setNoResults(true);
-              }
-            } else if (result.__typename === "ProfileExternalSourceSearchSingleResult") {
-              if (isNonNullish(profileId)) {
-                onStep(
-                  "UPDATE_PROFILE",
-                  { profileType, profileId, orgIntegration, result },
-                  { data },
-                );
-              } else {
-                onStep("CREATE_PROFILE", { profileType, orgIntegration, result }, { data });
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            setNoResults(false);
+            const res = await search({
+              variables: {
+                integrationId: orgIntegration.id,
+                locale: intl.locale as UserLocale,
+                profileTypeId: profileType.id,
+                profileId: profileId,
+                search: data,
+              },
+            });
+            if (isNonNullish(res.data)) {
+              const result = res.data.profileExternalSourceSearch;
+              if (result.__typename === "ProfileExternalSourceSearchMultipleResults") {
+                if (result.results.rows.length > 0) {
+                  onStep(
+                    "SEARCH_RESULTS",
+                    { profileType, profileId, orgIntegration, searchResults: result.results, data },
+                    { data },
+                  );
+                } else {
+                  setNoResults(true);
+                }
+              } else if (result.__typename === "ProfileExternalSourceSearchSingleResult") {
+                if (isNonNullish(profileId)) {
+                  onStep(
+                    "UPDATE_PROFILE",
+                    { profileType, profileId, orgIntegration, result },
+                    { data },
+                  );
+                } else {
+                  onStep("CREATE_PROFILE", { profileType, orgIntegration, result }, { data });
+                }
               }
             }
-          }
-        }),
+          }),
+        },
       }}
       hasCloseButton
       header={
@@ -431,38 +436,40 @@ function ImportFromExternalSourceDialogSearchResults({
       size="3xl"
       initialFocusRef={radioRefs[selectedResult]}
       content={{
-        as: "form",
-        onSubmit: async (e) => {
-          e.preventDefault();
-          e.persist();
-          try {
-            const res = await search({
-              variables: {
-                integrationId: orgIntegration.id,
-                profileTypeId: profileType.id,
-                profileId: profileId,
-                externalId: selectedResult,
-              },
-            });
-            if (isNonNullish(res.data)) {
-              const result = res.data.profileExternalSourceDetails;
-              if (isNonNullish(profileId)) {
-                onStep(
-                  "UPDATE_PROFILE",
-                  { profileType, profileId, orgIntegration, result },
-                  { selectedResult },
-                );
-              } else {
-                onStep(
-                  "CREATE_PROFILE",
-                  { profileType, orgIntegration, result },
-                  { selectedResult },
-                );
+        containerProps: {
+          as: "form",
+          onSubmit: async (e) => {
+            e.preventDefault();
+            e.persist();
+            try {
+              const res = await search({
+                variables: {
+                  integrationId: orgIntegration.id,
+                  profileTypeId: profileType.id,
+                  profileId: profileId,
+                  externalId: selectedResult,
+                },
+              });
+              if (isNonNullish(res.data)) {
+                const result = res.data.profileExternalSourceDetails;
+                if (isNonNullish(profileId)) {
+                  onStep(
+                    "UPDATE_PROFILE",
+                    { profileType, profileId, orgIntegration, result },
+                    { selectedResult },
+                  );
+                } else {
+                  onStep(
+                    "CREATE_PROFILE",
+                    { profileType, orgIntegration, result },
+                    { selectedResult },
+                  );
+                }
               }
+            } catch (e: any) {
+              showGenericErrorToast(e);
             }
-          } catch (e: any) {
-            showGenericErrorToast(e);
-          }
+          },
         },
       }}
       hasCloseButton
@@ -610,27 +617,29 @@ function ImportFromExternalSourceDialogUpdateProfile({
     <ConfirmDialog
       size="4xl"
       content={{
-        as: "form",
-        onSubmit: async (e) => {
-          e.preventDefault();
-          e.persist();
-          try {
-            const res = await updateProfile({
-              variables: {
-                profileExternalSourceEntityId: result.id,
-                profileTypeId: profileType.id,
-                profileId: profileId,
-                conflictResolutions: entries(resolutions).map(([profileTypeFieldId, action]) => ({
-                  profileTypeFieldId,
-                  action: action ?? "IGNORE",
-                })),
-              },
-            });
-            if (isNonNullish(res.data)) {
-              return props.onResolve();
-            }
-          } catch {}
-          showGenericError();
+        containerProps: {
+          as: "form",
+          onSubmit: async (e) => {
+            e.preventDefault();
+            e.persist();
+            try {
+              const res = await updateProfile({
+                variables: {
+                  profileExternalSourceEntityId: result.id,
+                  profileTypeId: profileType.id,
+                  profileId: profileId,
+                  conflictResolutions: entries(resolutions).map(([profileTypeFieldId, action]) => ({
+                    profileTypeFieldId,
+                    action: action ?? "IGNORE",
+                  })),
+                },
+              });
+              if (isNonNullish(res.data)) {
+                return props.onResolve();
+              }
+            } catch {}
+            showGenericError();
+          },
         },
       }}
       initialFocusRef={confirmRef}
@@ -938,23 +947,27 @@ function ImportFromExternalSourceDialogCreateProfile({
     <ConfirmDialog
       size="4xl"
       content={{
-        as: "form",
-        onSubmit: async (e) => {
-          e.preventDefault();
-          e.persist();
-          try {
-            const res = await createProfile({
-              variables: {
-                profileExternalSourceEntityId: result.id,
-                profileTypeId: profileType.id,
-                conflictResolutions: [],
-              },
-            });
-            if (isNonNullish(res.data)) {
-              return props.onResolve({ profileId: res.data.completeProfileFromExternalSource.id });
-            }
-          } catch {}
-          showGenericError();
+        containerProps: {
+          as: "form",
+          onSubmit: async (e) => {
+            e.preventDefault();
+            e.persist();
+            try {
+              const res = await createProfile({
+                variables: {
+                  profileExternalSourceEntityId: result.id,
+                  profileTypeId: profileType.id,
+                  conflictResolutions: [],
+                },
+              });
+              if (isNonNullish(res.data)) {
+                return props.onResolve({
+                  profileId: res.data.completeProfileFromExternalSource.id,
+                });
+              }
+            } catch {}
+            showGenericError();
+          },
         },
       }}
       initialFocusRef={confirmRef}
