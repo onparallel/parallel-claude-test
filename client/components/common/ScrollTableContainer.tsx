@@ -5,6 +5,7 @@ export const ScrollTableContainer = chakraForwardRef<"div", {}>((props, ref) => 
   return (
     <ScrollShadows
       ref={ref}
+      direction="both"
       shadowTop={false}
       overflow="auto"
       flex={1}

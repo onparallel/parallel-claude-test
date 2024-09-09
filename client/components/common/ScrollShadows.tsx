@@ -1,12 +1,14 @@
 import { Box, useSafeLayoutEffect } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { scrollBarSize } from "@parallel/utils/scrollBarSize";
 import useMergedRef from "@react-hook/merged-ref";
 import useResizeObserver from "@react-hook/resize-observer";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
+import { fromEntries } from "remeda";
 
 interface ScrollShadowsProps {
   size?: number;
-  direction?: "horizontal" | "vertical";
+  direction?: "horizontal" | "vertical" | "both";
   shadowTop?: boolean;
   shadowBottom?: boolean;
   shadowStart?: boolean;
@@ -28,9 +30,63 @@ export const ScrollShadows = chakraForwardRef<"div", ScrollShadowsProps>(functio
 ) {
   const innerRef = useRef<HTMLDivElement>(null);
   const _ref = useMergedRef(ref, innerRef);
-  const scrollRef = useRef<[boolean | null, boolean | null]>([null, null]);
+  const scrollRef = useRef<Record<"top" | "end" | "bottom" | "start", boolean | null>>({
+    top: null,
+    end: null,
+    bottom: null,
+    start: null,
+  });
 
-  const checkScroll = direction === "horizontal" ? checkScrollHorizontal : checkScrollVertical;
+  const checkScroll = useCallback(() => {
+    const element = innerRef.current!;
+    const { top: prevTop, end: prevEnd, bottom: prevBottom, start: prevStart } = scrollRef.current!;
+    const isTop = element.scrollTop === 0;
+    const isBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
+    element.setAttribute(
+      "data-scroll-bar-vertical",
+      `${element.scrollHeight >= element.offsetHeight}`,
+    );
+    if ((direction === "vertical" || direction === "both") && (!isTop || !isBottom)) {
+      if (prevTop !== isTop) {
+        if (shadowTop) {
+          element.setAttribute("data-scroll-top", `${isTop}`);
+        }
+        scrollRef.current.top = isTop;
+      }
+      if (prevBottom !== isBottom) {
+        if (shadowBottom) {
+          element.setAttribute("data-scroll-bottom", `${isBottom}`);
+        }
+        scrollRef.current.bottom = isBottom;
+      }
+    } else {
+      element.removeAttribute("data-scroll-top");
+      element.removeAttribute("data-scroll-bottom");
+    }
+    const isStart = element.scrollLeft === 0;
+    const isEnd = element.scrollLeft + element.clientWidth >= element.scrollWidth;
+    element.setAttribute(
+      "data-scroll-bar-horizontal",
+      `${element.scrollWidth >= element.offsetWidth}`,
+    );
+    if ((direction === "horizontal" || direction === "both") && (!isStart || !isEnd)) {
+      if (prevStart !== isStart) {
+        if (shadowStart) {
+          element.setAttribute("data-scroll-start", `${isStart}`);
+        }
+        scrollRef.current.start = isStart;
+      }
+      if (prevEnd !== isEnd) {
+        if (shadowEnd) {
+          element.setAttribute("data-scroll-end", `${isEnd}`);
+        }
+        scrollRef.current.end = isEnd;
+      }
+    } else {
+      element.removeAttribute("data-scroll-start");
+      element.removeAttribute("data-scroll-end");
+    }
+  }, [direction]);
 
   useResizeObserver(innerRef, checkScroll);
   useSafeLayoutEffect(() => {
@@ -38,54 +94,14 @@ export const ScrollShadows = chakraForwardRef<"div", ScrollShadowsProps>(functio
     return () => {
       const element = innerRef.current;
       element?.removeEventListener("scroll", checkScroll);
-      if (direction === "horizontal") {
-        element?.removeAttribute("data-scroll-start");
-        element?.removeAttribute("data-scroll-end");
-      } else {
-        element?.removeAttribute("data-scroll-top");
-        element?.removeAttribute("data-scroll-bottom");
-      }
+      element?.removeAttribute("data-scroll-start");
+      element?.removeAttribute("data-scroll-end");
+      element?.removeAttribute("data-scroll-top");
+      element?.removeAttribute("data-scroll-bottom");
+      element?.removeAttribute("data-scroll-bar-vertical");
+      element?.removeAttribute("data-scroll-bar-horizontal");
     };
   }, [direction]);
-
-  function checkScrollVertical() {
-    const element = innerRef.current!;
-    const [prevTop, prevBottom] = scrollRef.current!;
-    const isTop = element.scrollTop === 0;
-    const isBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
-    if (prevTop !== isTop) {
-      if (shadowTop) {
-        element.setAttribute("data-scroll-top", `${isTop}`);
-      }
-      scrollRef.current[0] = isTop;
-    }
-    if (prevBottom !== isBottom) {
-      if (shadowBottom) {
-        element.setAttribute("data-scroll-bottom", `${isBottom}`);
-      }
-      scrollRef.current[1] = isBottom;
-    }
-  }
-
-  function checkScrollHorizontal() {
-    const element = innerRef.current!;
-    const [prevStart, prevEnd] = scrollRef.current!;
-    const isStart = element.scrollLeft === 0;
-    const isEnd = element.scrollLeft + element.clientWidth >= element.scrollWidth;
-
-    if (prevStart !== isStart) {
-      if (shadowStart) {
-        element.setAttribute("data-scroll-start", `${isStart}`);
-      }
-      scrollRef.current[0] = isStart;
-    }
-    if (prevEnd !== isEnd) {
-      if (shadowEnd) {
-        element.setAttribute("data-scroll-end", `${isEnd}`);
-      }
-      scrollRef.current[1] = isEnd;
-    }
-  }
 
   return (
     <Box
@@ -94,38 +110,79 @@ export const ScrollShadows = chakraForwardRef<"div", ScrollShadowsProps>(functio
       sx={{
         ...props.sx,
         "--scroll-shadow-size": `${size}px`,
-        ...(direction === "horizontal"
-          ? {
-              '&[data-scroll-start="false"]': {
-                maskImage:
-                  "linear-gradient(to right, transparent 0%, #000 var(--scroll-shadow-size));",
-              },
-              '&[data-scroll-end="false"]': {
-                maskImage:
-                  "linear-gradient(to left,transparent 0%, #000 var(--scroll-shadow-size));",
-              },
-              '&[data-scroll-start="false"][data-scroll-end="false"]': {
-                maskImage:
-                  "linear-gradient(90deg,#000,transparent 0,#000 var(--scroll-shadow-size),#000 calc(100% - var(--scroll-shadow-size)),transparent);",
-              },
+        "--scroll-shadow-start":
+          "linear-gradient(to right, transparent 0%, #000 var(--scroll-shadow-size))",
+        "--scroll-shadow-end":
+          "linear-gradient(to left,transparent 0%, #000 var(--scroll-shadow-size))",
+        "--scroll-shadow-top":
+          "linear-gradient(to bottom, transparent 0%, #000 var(--scroll-shadow-size))",
+        "--scroll-shadow-bottom":
+          "linear-gradient(to top, transparent 0%, #000 var(--scroll-shadow-size))",
+        "--scroll-shadow-end-scroll-bar": `linear-gradient(to left, #000 0%, #000 ${scrollBarSize()}px, transparent ${scrollBarSize()}px, #000 var(--scroll-shadow-size))`,
+        "--scroll-shadow-bottom-scroll-bar": `linear-gradient(to top, #000 0%, #000 ${scrollBarSize()}px, transparent ${scrollBarSize()}px, #000 var(--scroll-shadow-size))`,
+        maskComposite: "intersect",
+        ...fromEntries(
+          combinations.flatMap((sides) => {
+            // when showing bottom or end shadow we must account for possible scrollbars
+            if (sides.includes("bottom") || sides.includes("end")) {
+              return [false, true].flatMap((scrollBarVertical) =>
+                [false, true]
+                  .map((scrollBarHorizontal) => [scrollBarVertical, scrollBarHorizontal] as const)
+                  .map(
+                    ([scrollBarVertical, scrollBarHorizontal]) =>
+                      [
+                        "&" +
+                          (scrollBarVertical ? `[data-scroll-bar-vertical="true"]` : "") +
+                          (scrollBarHorizontal ? `[data-scroll-bar-horizontal="true"]` : "") +
+                          sides.map((s) => `[data-scroll-${s}="false"]`).join(""),
+                        {
+                          maskImage: sides
+                            .map((s) => {
+                              if (
+                                (s === "bottom" && scrollBarHorizontal) ||
+                                (s === "end" && scrollBarVertical)
+                              ) {
+                                return `var(--scroll-shadow-${s}-scroll-bar)`;
+                              }
+                              return `var(--scroll-shadow-${s})`;
+                            })
+                            .join(", "),
+                        },
+                      ] as const,
+                  ),
+              );
             }
-          : {
-              '&[data-scroll-top="false"]': {
-                maskImage:
-                  "linear-gradient(to bottom, transparent 0%, #000 var(--scroll-shadow-size));",
-              },
-              '&[data-scroll-bottom="false"]': {
-                maskImage:
-                  "linear-gradient(to top, transparent 0%, #000 var(--scroll-shadow-size));",
-              },
-              '&[data-scroll-top="false"][data-scroll-bottom="false"]': {
-                maskImage:
-                  "linear-gradient(#000,transparent 0,#000 var(--scroll-shadow-size),#000 calc(100% - var(--scroll-shadow-size)),transparent);",
-              },
-            }),
+            return [
+              [
+                "&" + sides.map((s) => `[data-scroll-${s}="false"]`).join(""),
+                {
+                  maskImage: sides.map((s) => `var(--scroll-shadow-${s})`).join(", "),
+                },
+              ] as const,
+            ];
+          }),
+        ),
       }}
     >
       {children}
     </Box>
   );
 });
+
+const combinations = [
+  ["start"],
+  ["end"],
+  ["top"],
+  ["bottom"],
+  ["start", "end"],
+  ["start", "top"],
+  ["start", "bottom"],
+  ["end", "top"],
+  ["end", "bottom"],
+  ["top", "bottom"],
+  ["start", "end", "top"],
+  ["start", "end", "bottom"],
+  ["start", "top", "bottom"],
+  ["end", "top", "bottom"],
+  ["start", "end", "top", "bottom"],
+] satisfies ("start" | "end" | "top" | "bottom")[][];
