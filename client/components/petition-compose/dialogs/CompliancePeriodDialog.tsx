@@ -66,8 +66,10 @@ export function CompliancePeriodDialog({
     <ConfirmDialog
       size="xl"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(handleFormSubmit),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(handleFormSubmit),
+        },
       }}
       header={
         <FormattedMessage

@@ -66,14 +66,16 @@ export function ConfigureAutomateSearchDialog({
     <ConfirmDialog
       size="xl"
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve({
-            name: data.name.map((field) => field.id),
-            date: data.date?.id ?? null,
-            type: data.type,
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve({
+              name: data.name.map((field) => field.id),
+              date: data.date?.id ?? null,
+              type: data.type,
+            });
+          }),
+        },
       }}
       header={
         <FormattedMessage

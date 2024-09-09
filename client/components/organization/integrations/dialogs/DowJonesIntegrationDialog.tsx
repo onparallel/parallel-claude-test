@@ -61,19 +61,21 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
     <ConfirmDialog
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          try {
-            await createDowJonesKycIntegration({ variables: data });
-            props.onResolve();
-          } catch {
-            reset(undefined, {
-              keepValues: true,
-            });
-            setIsInvalid(true);
-            return;
-          }
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            try {
+              await createDowJonesKycIntegration({ variables: data });
+              props.onResolve();
+            } catch {
+              reset(undefined, {
+                keepValues: true,
+              });
+              setIsInvalid(true);
+              return;
+            }
+          }),
+        },
       }}
       initialFocusRef={clientIdRef}
       header={

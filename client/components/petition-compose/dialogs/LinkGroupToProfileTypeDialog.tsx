@@ -51,13 +51,15 @@ function LinkGroupToProfileTypeDialog({
   return (
     <ConfirmDialog
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async ({ profileTypeId, groupName }) => {
-          props.onResolve({
-            profileTypeId: isNonNullish(dirtyFields.profileTypeId) ? profileTypeId : null,
-            groupName: isNonNullish(dirtyFields.groupName) ? groupName : null,
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ profileTypeId, groupName }) => {
+            props.onResolve({
+              profileTypeId: isNonNullish(dirtyFields.profileTypeId) ? profileTypeId : null,
+              groupName: isNonNullish(dirtyFields.groupName) ? groupName : null,
+            });
+          }),
+        },
       }}
       initialFocusRef={selectRef}
       header={

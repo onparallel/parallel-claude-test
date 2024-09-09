@@ -50,10 +50,12 @@ function ConfirmSignerInfoDialog({
       initialFocusRef={firstNameRef}
       size="md"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ email, firstName, lastName }) => {
-          props.onResolve({ email, firstName, lastName });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ email, firstName, lastName }) => {
+            props.onResolve({ email, firstName, lastName });
+          }),
+        },
       }}
       header={
         <FormattedMessage

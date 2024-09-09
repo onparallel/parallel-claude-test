@@ -258,211 +258,215 @@ function CreateOrUpdateProfileTypeFieldDialog({
       closeOnOverlayClick={false}
       size={selectedType === "SELECT" ? "3xl" : "lg"}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (formData) => {
-          let profileField = {} as useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (formData) => {
+            let profileField =
+              {} as useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
 
-          try {
-            const dirtyFieldsKeys = getDirtyFieldsKeys(omit(dirtyFields, ["type"]));
-            const dirtyData = pick(
-              formData,
-              dirtyFieldsKeys as (keyof CreateOrUpdateProfileTypeFieldDialogData)[],
-            );
+            try {
+              const dirtyFieldsKeys = getDirtyFieldsKeys(omit(dirtyFields, ["type"]));
+              const dirtyData = pick(
+                formData,
+                dirtyFieldsKeys as (keyof CreateOrUpdateProfileTypeFieldDialogData)[],
+              );
 
-            const expiryAlertAheadTime =
-              formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
-                ? expirationToDuration(formData.expiryAlertAheadTime)
-                : null;
+              const expiryAlertAheadTime =
+                formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
+                  ? expirationToDuration(formData.expiryAlertAheadTime)
+                  : null;
 
-            if (isUpdating) {
-              if (formData.type === "SELECT") {
-                const hasStandardList =
-                  formData.options.listingType === "STANDARD" && formData.options.standardList;
+              if (isUpdating) {
+                if (formData.type === "SELECT") {
+                  const hasStandardList =
+                    formData.options.listingType === "STANDARD" && formData.options.standardList;
 
-                const options = isNonNullish(dirtyData.options)
-                  ? {
-                      showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
-                      standardList: hasStandardList ? dirtyData.options.standardList : null,
-                      values: hasStandardList
-                        ? []
-                        : dirtyData.options.values!.map((value: any) =>
-                            omit(value, ["id", "existing"]),
-                          ),
-                    }
-                  : undefined;
-                try {
-                  await updateProfileTypeField({
-                    variables: {
-                      profileTypeId: profileType.id,
-                      profileTypeFieldId: profileTypeField.id,
-                      data: {
-                        ...(isStandard
-                          ? {}
-                          : {
-                              ...dirtyData,
-                              ...(isNonNullish(dirtyData.alias)
-                                ? { alias: dirtyData.alias || null }
-                                : {}),
-                            }),
-
-                        options,
-                        isExpirable: formData.isExpirable,
-                        expiryAlertAheadTime,
-                      },
-                    },
-                  });
-                } catch (error) {
-                  if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
-                    const removedOptions = error.graphQLErrors[0].extensions
-                      ?.removedOptions as (SelectOptionValue & { count: number })[];
-
-                    const currentOptions = error.graphQLErrors[0].extensions
-                      ?.currentOptions as SelectOptionValue[];
-
-                    const optionValuesToUpdate =
-                      await showConfirmRemovedSelectOptionsReplacementDialog({
-                        currentOptions,
-                        removedOptions,
+                  const options = isNonNullish(dirtyData.options)
+                    ? {
                         showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
-                      });
-
+                        standardList: hasStandardList ? dirtyData.options.standardList : null,
+                        values: hasStandardList
+                          ? []
+                          : dirtyData.options.values!.map((value: any) =>
+                              omit(value, ["id", "existing"]),
+                            ),
+                      }
+                    : undefined;
+                  try {
                     await updateProfileTypeField({
                       variables: {
                         profileTypeId: profileType.id,
                         profileTypeFieldId: profileTypeField.id,
                         data: {
-                          ...(isStandard ? {} : dirtyData),
-                          ...(isNonNullish(dirtyData.alias)
-                            ? { alias: dirtyData.alias || null }
-                            : {}),
+                          ...(isStandard
+                            ? {}
+                            : {
+                                ...dirtyData,
+                                ...(isNonNullish(dirtyData.alias)
+                                  ? { alias: dirtyData.alias || null }
+                                  : {}),
+                              }),
+
                           options,
                           isExpirable: formData.isExpirable,
                           expiryAlertAheadTime,
-                          substitutions: optionValuesToUpdate,
                         },
                       },
                     });
-                  } else {
-                    throw error;
-                  }
-                }
-              } else {
-                try {
-                  await updateProfileTypeField({
-                    variables: {
-                      profileTypeId: profileType.id,
-                      profileTypeFieldId: profileTypeField.id,
-                      data: {
-                        ...dirtyData,
-                        ...(isNonNullish(dirtyData.alias)
-                          ? { alias: dirtyData.alias || null }
-                          : {}),
-                        options:
-                          formData.type === "DATE"
-                            ? pick(formData.options, ["useReplyAsExpiryDate"])
-                            : formData.type === "BACKGROUND_CHECK"
-                              ? formData.options.hasMonitoring
-                                ? pick(formData.options, ["monitoring"])
-                                : { monitoring: null }
-                              : {},
-                        isExpirable: formData.isExpirable,
-                        expiryAlertAheadTime,
-                      },
-                    },
-                  });
-                } catch (error) {
-                  if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
-                    try {
-                      const profileIds = error.graphQLErrors[0]?.extensions?.profileIds as string[];
-                      await showConfirmDisableMonitoringDialog({
-                        profileCount: profileIds?.length ?? 1,
-                      });
+                  } catch (error) {
+                    if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
+                      const removedOptions = error.graphQLErrors[0].extensions
+                        ?.removedOptions as (SelectOptionValue & { count: number })[];
+
+                      const currentOptions = error.graphQLErrors[0].extensions
+                        ?.currentOptions as SelectOptionValue[];
+
+                      const optionValuesToUpdate =
+                        await showConfirmRemovedSelectOptionsReplacementDialog({
+                          currentOptions,
+                          removedOptions,
+                          showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
+                        });
+
                       await updateProfileTypeField({
                         variables: {
                           profileTypeId: profileType.id,
                           profileTypeFieldId: profileTypeField.id,
                           data: {
-                            ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
-                            alias: formData.alias || null,
+                            ...(isStandard ? {} : dirtyData),
+                            ...(isNonNullish(dirtyData.alias)
+                              ? { alias: dirtyData.alias || null }
+                              : {}),
+                            options,
+                            isExpirable: formData.isExpirable,
                             expiryAlertAheadTime,
-                            options:
-                              formData.type === "DATE"
-                                ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                : formData.type === "BACKGROUND_CHECK"
-                                  ? formData.options.hasMonitoring
-                                    ? pick(formData.options, ["monitoring"])
-                                    : { monitoring: null }
-                                  : {},
+                            substitutions: optionValuesToUpdate,
                           },
-                          force: true,
                         },
                       });
-                    } catch {}
+                    } else {
+                      throw error;
+                    }
+                  }
+                } else {
+                  try {
+                    await updateProfileTypeField({
+                      variables: {
+                        profileTypeId: profileType.id,
+                        profileTypeFieldId: profileTypeField.id,
+                        data: {
+                          ...dirtyData,
+                          ...(isNonNullish(dirtyData.alias)
+                            ? { alias: dirtyData.alias || null }
+                            : {}),
+                          options:
+                            formData.type === "DATE"
+                              ? pick(formData.options, ["useReplyAsExpiryDate"])
+                              : formData.type === "BACKGROUND_CHECK"
+                                ? formData.options.hasMonitoring
+                                  ? pick(formData.options, ["monitoring"])
+                                  : { monitoring: null }
+                                : {},
+                          isExpirable: formData.isExpirable,
+                          expiryAlertAheadTime,
+                        },
+                      },
+                    });
+                  } catch (error) {
+                    if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
+                      try {
+                        const profileIds = error.graphQLErrors[0]?.extensions
+                          ?.profileIds as string[];
+                        await showConfirmDisableMonitoringDialog({
+                          profileCount: profileIds?.length ?? 1,
+                        });
+                        await updateProfileTypeField({
+                          variables: {
+                            profileTypeId: profileType.id,
+                            profileTypeFieldId: profileTypeField.id,
+                            data: {
+                              ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
+                              alias: formData.alias || null,
+                              expiryAlertAheadTime,
+                              options:
+                                formData.type === "DATE"
+                                  ? pick(formData.options, ["useReplyAsExpiryDate"])
+                                  : formData.type === "BACKGROUND_CHECK"
+                                    ? formData.options.hasMonitoring
+                                      ? pick(formData.options, ["monitoring"])
+                                      : { monitoring: null }
+                                    : {},
+                            },
+                            force: true,
+                          },
+                        });
+                      } catch {}
+                    }
                   }
                 }
-              }
-            } else {
-              const hasStandardList =
-                formData.options.listingType === "STANDARD" && formData.options.standardList;
+              } else {
+                const hasStandardList =
+                  formData.options.listingType === "STANDARD" && formData.options.standardList;
 
-              let options = {};
-              switch (formData.type) {
-                case "SELECT":
-                  options = {
-                    showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
-                    standardList: hasStandardList ? formData.options.standardList : null,
-                    values: hasStandardList
-                      ? []
-                      : formData.options.values!.map((value: any) =>
-                          omit(value, ["id", "existing"]),
-                        ),
-                  };
-                  break;
-                case "DATE":
-                  options = pick(formData.options, ["useReplyAsExpiryDate"]);
-                  break;
-                case "BACKGROUND_CHECK":
-                  options = formData.options.hasMonitoring
-                    ? pick(formData.options, ["monitoring"])
-                    : { monitoring: null };
-                  break;
-                case "SHORT_TEXT":
-                  options = pick(formData.options, ["format"]);
-                  break;
-                default:
-                  break;
-              }
+                let options = {};
+                switch (formData.type) {
+                  case "SELECT":
+                    options = {
+                      showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
+                      standardList: hasStandardList ? formData.options.standardList : null,
+                      values: hasStandardList
+                        ? []
+                        : formData.options.values!.map((value: any) =>
+                            omit(value, ["id", "existing"]),
+                          ),
+                    };
+                    break;
+                  case "DATE":
+                    options = pick(formData.options, ["useReplyAsExpiryDate"]);
+                    break;
+                  case "BACKGROUND_CHECK":
+                    options = formData.options.hasMonitoring
+                      ? pick(formData.options, ["monitoring"])
+                      : { monitoring: null };
+                    break;
+                  case "SHORT_TEXT":
+                    options = pick(formData.options, ["format"]);
+                    break;
+                  default:
+                    break;
+                }
 
-              const { data } = await createProfileTypeField({
-                variables: {
-                  profileTypeId: profileType.id,
-                  data: {
-                    ...omit(formData, ["expiryAlertAheadTime", "alias"]),
-                    alias: formData.alias || null,
-                    options,
-                    expiryAlertAheadTime,
+                const { data } = await createProfileTypeField({
+                  variables: {
+                    profileTypeId: profileType.id,
+                    data: {
+                      ...omit(formData, ["expiryAlertAheadTime", "alias"]),
+                      alias: formData.alias || null,
+                      options,
+                      expiryAlertAheadTime,
+                    },
                   },
-                },
-              });
-              if (data?.createProfileTypeField) {
-                profileField = data!.createProfileTypeField;
+                });
+                if (data?.createProfileTypeField) {
+                  profileField = data!.createProfileTypeField;
+                }
+              }
+
+              props.onResolve({ profileTypeField: profileField });
+            } catch (e) {
+              if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
+                setError("alias", { type: "unavailable" });
+              }
+              if (
+                isApolloError(e, "ARG_VALIDATION_ERROR") &&
+                (e.graphQLErrors[0].extensions?.extra as any)?.code ===
+                  "REMOVE_STANDARD_OPTIONS_ERROR"
+              ) {
+                setError("options.values", { type: "validate" });
               }
             }
-
-            props.onResolve({ profileTypeField: profileField });
-          } catch (e) {
-            if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
-              setError("alias", { type: "unavailable" });
-            }
-            if (
-              isApolloError(e, "ARG_VALIDATION_ERROR") &&
-              (e.graphQLErrors[0].extensions?.extra as any)?.code ===
-                "REMOVE_STANDARD_OPTIONS_ERROR"
-            ) {
-              setError("options.values", { type: "validate" });
-            }
-          }
-        }),
+          }),
+        },
       }}
       header={
         isUpdating ? (

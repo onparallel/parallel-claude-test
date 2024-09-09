@@ -193,14 +193,16 @@ export function PublicLinkSettingsDialog({
       size="xl"
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve({
-            ...pick(data, ["title", "description", "slug", "allowMultiplePetitions"]),
-            petitionNamePattern: data.petitionNamePattern ?? null,
-            prefillSecret: data.prefillSecret || null,
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve({
+              ...pick(data, ["title", "description", "slug", "allowMultiplePetitions"]),
+              petitionNamePattern: data.petitionNamePattern ?? null,
+              prefillSecret: data.prefillSecret || null,
+            });
+          }),
+        },
       }}
       initialFocusRef={titleRef}
       header={

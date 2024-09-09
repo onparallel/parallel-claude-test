@@ -542,23 +542,25 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
     <ConfirmDialog
       {...props}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async ({ tagId, color, name }) => {
-          try {
-            await updateTag({
-              variables: { id: tagId!, data: { color, name } },
-              update(cache) {
-                cache.evict({ fieldName: "tags", args: { search: "" } });
-                cache.gc();
-              },
-            });
-            reset({ tagId, color, name });
-          } catch (e) {
-            if (isApolloError(e, "TAG_ALREADY_EXISTS")) {
-              setError("name", { type: "unavailable" });
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ tagId, color, name }) => {
+            try {
+              await updateTag({
+                variables: { id: tagId!, data: { color, name } },
+                update(cache) {
+                  cache.evict({ fieldName: "tags", args: { search: "" } });
+                  cache.gc();
+                },
+              });
+              reset({ tagId, color, name });
+            } catch (e) {
+              if (isApolloError(e, "TAG_ALREADY_EXISTS")) {
+                setError("name", { type: "unavailable" });
+              }
             }
-          }
-        }),
+          }),
+        },
       }}
       hasCloseButton
       closeOnEsc

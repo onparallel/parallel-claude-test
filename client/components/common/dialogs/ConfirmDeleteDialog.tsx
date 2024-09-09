@@ -48,7 +48,14 @@ function ConfirmDeleteDialog({
   return (
     <ConfirmDialog
       initialFocusRef={inputRef}
-      content={{ ...props.content, as: "form", onSubmit: handleSubmit(() => props.onResolve()) }}
+      content={{
+        ...props.content,
+        containerProps: {
+          ...props.content?.containerProps,
+          as: "form",
+          onSubmit: handleSubmit(() => props.onResolve()),
+        },
+      }}
       body={
         <Stack spacing={2}>
           {description}

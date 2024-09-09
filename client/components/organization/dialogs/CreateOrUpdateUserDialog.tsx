@@ -69,8 +69,10 @@ function CreateOrUpdateUserDialog({
     <ConfirmDialog
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => props.onResolve(data)),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => props.onResolve(data)),
+        },
       }}
       initialFocusRef={emailRef}
       header={

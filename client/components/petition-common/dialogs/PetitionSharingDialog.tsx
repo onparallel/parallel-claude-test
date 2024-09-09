@@ -303,7 +303,9 @@ export function PetitionSharingDialog({
       initialFocusRef={usersRef}
       hasCloseButton
       {...props}
-      content={{ as: "form", onSubmit: handleAddPetitionPermissions }}
+      content={{
+        containerProps: { as: "form", onSubmit: handleAddPetitionPermissions },
+      }}
       header={
         <Stack direction="row">
           <Circle role="presentation" size="32px" backgroundColor="primary.500" color="white">

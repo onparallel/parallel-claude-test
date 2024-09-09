@@ -199,7 +199,9 @@ export function SignatureConfigDialog({
       hasCloseButton
       initialFocusRef={titleRef}
       size="xl"
-      content={{ as: "form" }}
+      content={{
+        containerProps: { as: "form" },
+      }}
       header={
         <Flex alignItems="center">
           {stepHeaders[currentStep]}

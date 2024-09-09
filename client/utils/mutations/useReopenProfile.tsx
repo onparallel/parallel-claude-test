@@ -52,9 +52,11 @@ function ReopenProfileDialog({
     <ConfirmDialog
       {...props}
       content={{
-        as: "form",
-        onSubmit: () => {
-          props.onResolve();
+        containerProps: {
+          as: "form",
+          onSubmit: () => {
+            props.onResolve();
+          },
         },
       }}
       hasCloseButton

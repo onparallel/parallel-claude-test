@@ -239,42 +239,44 @@ export function ConfirmPetitionSignersDialog(
       closeOnOverlayClick={!isDirty}
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit(
-          ({ signers, message, allowAdditionalSigners, customDocumentTemporaryFileId }) => {
-            if (
-              !props.isUpdate &&
-              props.signatureConfig.useCustomDocument &&
-              !customDocumentTemporaryFileId
-            ) {
-              setFileDropError("document-not-selected");
-              return;
-            }
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(
+            ({ signers, message, allowAdditionalSigners, customDocumentTemporaryFileId }) => {
+              if (
+                !props.isUpdate &&
+                props.signatureConfig.useCustomDocument &&
+                !customDocumentTemporaryFileId
+              ) {
+                setFileDropError("document-not-selected");
+                return;
+              }
 
-            props.onResolve({
-              customDocumentTemporaryFileId,
-              message: showMessage ? message : null,
-              signers: [
-                ...signers.map((s) => ({
-                  contactId: s.contactId,
-                  email: s.email,
-                  firstName: s.firstName,
-                  lastName: s.lastName ?? "",
-                })),
-                ...presetSigners.map((s) => ({
-                  contactId: s.contactId,
-                  email: s.email,
-                  firstName: s.firstName,
-                  lastName: s.lastName ?? "",
-                  isPreset: true,
-                })),
-              ],
-              allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
-                ? !isMaxSignersReached && allowAdditionalSigners
-                : false,
-            });
-          },
-        ),
+              props.onResolve({
+                customDocumentTemporaryFileId,
+                message: showMessage ? message : null,
+                signers: [
+                  ...signers.map((s) => ({
+                    contactId: s.contactId,
+                    email: s.email,
+                    firstName: s.firstName,
+                    lastName: s.lastName ?? "",
+                  })),
+                  ...presetSigners.map((s) => ({
+                    contactId: s.contactId,
+                    email: s.email,
+                    firstName: s.firstName,
+                    lastName: s.lastName ?? "",
+                    isPreset: true,
+                  })),
+                ],
+                allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
+                  ? !isMaxSignersReached && allowAdditionalSigners
+                  : false,
+              });
+            },
+          ),
+        },
       }}
       header={
         <HStack>

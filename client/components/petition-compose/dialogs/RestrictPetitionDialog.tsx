@@ -41,12 +41,14 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
         />
       }
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ password }) => {
-          props.onResolve({
-            password: password.length > 0 ? password : null,
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ password }) => {
+            props.onResolve({
+              password: password.length > 0 ? password : null,
+            });
+          }),
+        },
       }}
       body={
         <Stack spacing={2}>

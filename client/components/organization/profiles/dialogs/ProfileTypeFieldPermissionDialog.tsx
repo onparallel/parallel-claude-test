@@ -164,19 +164,21 @@ export function ProfileTypeFieldPermissionDialog({
       hasCloseButton
       {...props}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ defaultPermission, permissions }) => {
-          props.onResolve({
-            defaultPermission,
-            permissions: permissions.map((p) => {
-              return {
-                userGroupId: p.target.__typename === "UserGroup" ? p.target.id : undefined,
-                userId: p.target.__typename === "User" ? p.target.id : undefined,
-                permission: p.permission,
-              };
-            }),
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ defaultPermission, permissions }) => {
+            props.onResolve({
+              defaultPermission,
+              permissions: permissions.map((p) => {
+                return {
+                  userGroupId: p.target.__typename === "UserGroup" ? p.target.id : undefined,
+                  userId: p.target.__typename === "User" ? p.target.id : undefined,
+                  permission: p.permission,
+                };
+              }),
+            });
+          }),
+        },
       }}
       header={
         <FormattedMessage

@@ -175,31 +175,33 @@ export function TemplateDefaultPermissionsDialog({
       size="xl"
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async ({ editors, isSubscribed, permissionType }) => {
-          if (editors.length === 0) {
-            props.onResolve();
-          } else {
-            try {
-              setIsSubmitting(true);
-              await onUpdatePermissions(
-                editors
-                  .map((x) => ({
-                    isSubscribed,
-                    permissionType,
-                    ...(x.__typename === "User"
-                      ? { userId: x.id }
-                      : x.__typename === "UserGroup"
-                        ? { userGroupId: x.id }
-                        : (null as never)),
-                  }))
-                  .concat(defaultPermissions.map(mapPermission)),
-              );
-              setValue("editors", []);
-            } catch {}
-            setIsSubmitting(false);
-          }
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ editors, isSubscribed, permissionType }) => {
+            if (editors.length === 0) {
+              props.onResolve();
+            } else {
+              try {
+                setIsSubmitting(true);
+                await onUpdatePermissions(
+                  editors
+                    .map((x) => ({
+                      isSubscribed,
+                      permissionType,
+                      ...(x.__typename === "User"
+                        ? { userId: x.id }
+                        : x.__typename === "UserGroup"
+                          ? { userGroupId: x.id }
+                          : (null as never)),
+                    }))
+                    .concat(defaultPermissions.map(mapPermission)),
+                );
+                setValue("editors", []);
+              } catch {}
+              setIsSubmitting(false);
+            }
+          }),
+        },
       }}
       initialFocusRef={editorsRef}
       header={

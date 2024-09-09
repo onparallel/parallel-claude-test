@@ -55,8 +55,10 @@ export function GenerateNewTokenDialog(props: DialogProps) {
       closeOnOverlayClick={!apiKey}
       initialFocusRef={tokenNameRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(submit),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(submit),
+        },
       }}
       header={
         <FormattedMessage

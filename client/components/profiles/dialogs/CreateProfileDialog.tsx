@@ -114,38 +114,40 @@ function CreateProfileDialog({
       closeOnEsc
       size="md"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async ({ profileTypeId, fieldValues }) => {
-          try {
-            const profile = await createProfile({
-              variables: {
-                profileTypeId: profileTypeId!,
-                fields: fieldValues.filter(
-                  (value) => isNonNullish(value?.content?.value) && value!.content!.value !== "",
-                ),
-              },
-            });
-            props.onResolve({
-              profile: profile.data!.createProfile,
-              hasValues: fieldValues.length > 0,
-            });
-          } catch (error) {
-            if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
-              const aggregatedErrors =
-                (error.graphQLErrors[0].extensions!.aggregatedErrors as {
-                  profileTypeFieldId: string;
-                  code: string;
-                }[]) ?? [];
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ profileTypeId, fieldValues }) => {
+            try {
+              const profile = await createProfile({
+                variables: {
+                  profileTypeId: profileTypeId!,
+                  fields: fieldValues.filter(
+                    (value) => isNonNullish(value?.content?.value) && value!.content!.value !== "",
+                  ),
+                },
+              });
+              props.onResolve({
+                profile: profile.data!.createProfile,
+                hasValues: fieldValues.length > 0,
+              });
+            } catch (error) {
+              if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+                const aggregatedErrors =
+                  (error.graphQLErrors[0].extensions!.aggregatedErrors as {
+                    profileTypeFieldId: string;
+                    code: string;
+                  }[]) ?? [];
 
-              for (const err of aggregatedErrors) {
-                const index = fieldValues.findIndex(
-                  (f) => f.profileTypeFieldId === err.profileTypeFieldId,
-                );
-                setError(`fieldValues.${index}.content.value`, { type: "validate" });
+                for (const err of aggregatedErrors) {
+                  const index = fieldValues.findIndex(
+                    (f) => f.profileTypeFieldId === err.profileTypeFieldId,
+                  );
+                  setError(`fieldValues.${index}.content.value`, { type: "validate" });
+                }
               }
             }
-          }
-        }),
+          }),
+        },
       }}
       initialFocusRef={selectRef}
       header={

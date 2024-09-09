@@ -166,107 +166,111 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       initialFocusRef={petitionSelectorRef}
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          if (currentStep === 0) {
-            if (data.sourcePetitionId) {
-              const res = await getSelectedPetition({
-                variables: {
-                  petitionId: data.sourcePetitionId,
-                },
-                fetchPolicy: "cache-and-network",
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            if (currentStep === 0) {
+              if (data.sourcePetitionId) {
+                const res = await getSelectedPetition({
+                  variables: {
+                    petitionId: data.sourcePetitionId,
+                  },
+                  fetchPolicy: "cache-and-network",
+                });
+
+                setInitialMapping(res.data);
+                nextStep();
+              }
+            } else {
+              const mappedFields = mapReplyContents({
+                mapping: data.mapping,
+                fields: allFields,
+                sourcePetitionFields: allSelectedPetitionFields,
+                overwriteExisting: data.overwriteExisting,
               });
 
-              setInitialMapping(res.data);
-              nextStep();
-            }
-          } else {
-            const mappedFields = mapReplyContents({
-              mapping: data.mapping,
-              fields: allFields,
-              sourcePetitionFields: allSelectedPetitionFields,
-              overwriteExisting: data.overwriteExisting,
-            });
-
-            const fieldGroups = mappedFields.fields.filter(
-              (f) => Object.keys(f.content).length === 0,
-            );
-
-            const groupsWithoutChildren = fieldGroups.length
-              ? fieldGroups
-                  .filter(({ id }) => !mappedFields.children.some((ch) => ch.targetFieldId === id))
-                  .map((r) => r.id)
-              : [];
-
-            if (
-              (mappedFields.fields.length || mappedFields.children.length) &&
-              groupsWithoutChildren.length === 0
-            ) {
-              let res =
-                null as FetchResult<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
-
-              if (mappedFields.fields.length) {
-                res = await createPetitionFieldReplies({
-                  variables: {
-                    petitionId,
-                    fields: mappedFields.fields.map((data) => pick(data, ["id", "content"])),
-                    overwriteExisting: data.overwriteExisting,
-                  },
-                });
-              }
-
-              let childrenFields = [] as CreatePetitionFieldReplyInput[];
-
-              Object.entries(groupBy(mappedFields.children, (ch) => ch.targetFieldId)).forEach(
-                ([targetFieldId, childrenReplyInput]) => {
-                  const field =
-                    res?.data?.createPetitionFieldReplies.filter(
-                      (r) => r.field?.id === targetFieldId,
-                    )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
-
-                  const replies =
-                    field?.replies.filter((reply) =>
-                      reply.children?.every((child) => child.replies.length === 0),
-                    ) ?? [];
-
-                  childrenFields = childrenFields.concat(
-                    Object.values(groupBy(childrenReplyInput, (ch) => ch.replyParentId)).flatMap(
-                      (petitionFieldReplies, index) => {
-                        return petitionFieldReplies.map((reply) => {
-                          return {
-                            id: reply.id,
-                            content: reply.content,
-                            parentReplyId: replies?.[index]?.id,
-                          };
-                        });
-                      },
-                    ),
-                  );
-                },
+              const fieldGroups = mappedFields.fields.filter(
+                (f) => Object.keys(f.content).length === 0,
               );
 
-              if (childrenFields.length) {
-                await createPetitionFieldReplies({
-                  variables: {
-                    petitionId,
-                    fields: childrenFields,
-                    overwriteExisting: data.overwriteExisting,
-                  },
-                });
-              }
+              const groupsWithoutChildren = fieldGroups.length
+                ? fieldGroups
+                    .filter(
+                      ({ id }) => !mappedFields.children.some((ch) => ch.targetFieldId === id),
+                    )
+                    .map((r) => r.id)
+                : [];
 
-              props.onResolve();
-            } else {
-              if (groupsWithoutChildren.length) {
-                setInvalidGroups(groupsWithoutChildren);
+              if (
+                (mappedFields.fields.length || mappedFields.children.length) &&
+                groupsWithoutChildren.length === 0
+              ) {
+                let res =
+                  null as FetchResult<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
+
+                if (mappedFields.fields.length) {
+                  res = await createPetitionFieldReplies({
+                    variables: {
+                      petitionId,
+                      fields: mappedFields.fields.map((data) => pick(data, ["id", "content"])),
+                      overwriteExisting: data.overwriteExisting,
+                    },
+                  });
+                }
+
+                let childrenFields = [] as CreatePetitionFieldReplyInput[];
+
+                Object.entries(groupBy(mappedFields.children, (ch) => ch.targetFieldId)).forEach(
+                  ([targetFieldId, childrenReplyInput]) => {
+                    const field =
+                      res?.data?.createPetitionFieldReplies.filter(
+                        (r) => r.field?.id === targetFieldId,
+                      )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
+
+                    const replies =
+                      field?.replies.filter((reply) =>
+                        reply.children?.every((child) => child.replies.length === 0),
+                      ) ?? [];
+
+                    childrenFields = childrenFields.concat(
+                      Object.values(groupBy(childrenReplyInput, (ch) => ch.replyParentId)).flatMap(
+                        (petitionFieldReplies, index) => {
+                          return petitionFieldReplies.map((reply) => {
+                            return {
+                              id: reply.id,
+                              content: reply.content,
+                              parentReplyId: replies?.[index]?.id,
+                            };
+                          });
+                        },
+                      ),
+                    );
+                  },
+                );
+
+                if (childrenFields.length) {
+                  await createPetitionFieldReplies({
+                    variables: {
+                      petitionId,
+                      fields: childrenFields,
+                      overwriteExisting: data.overwriteExisting,
+                    },
+                  });
+                }
+
+                props.onResolve();
               } else {
-                setError("mapping", {
-                  type: "no_replies",
-                });
+                if (groupsWithoutChildren.length) {
+                  setInvalidGroups(groupsWithoutChildren);
+                } else {
+                  setError("mapping", {
+                    type: "no_replies",
+                  });
+                }
               }
             }
-          }
-        }),
+          }),
+        },
       }}
       header={
         <Flex alignItems="baseline">

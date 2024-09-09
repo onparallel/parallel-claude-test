@@ -57,7 +57,9 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
     <ConfirmDialog
       {...props}
       size="lg"
-      content={{ as: "form", onSubmit: handleSubmit(props.onResolve) }}
+      content={{
+        containerProps: { as: "form", onSubmit: handleSubmit(props.onResolve) },
+      }}
       header={header}
       body={
         <Grid templateColumns="auto 1fr 1fr" gap={3} alignItems="flex-end">

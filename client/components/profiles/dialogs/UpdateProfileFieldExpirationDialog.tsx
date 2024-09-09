@@ -74,10 +74,12 @@ function UpdateProfileFieldExpirationDialog({
       closeOnOverlayClick={false}
       size="md"
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve(data);
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve(data);
+          }),
+        },
       }}
       header={
         <HStack>

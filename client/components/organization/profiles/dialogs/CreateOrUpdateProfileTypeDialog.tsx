@@ -44,10 +44,12 @@ function CreateOrUpdateProfileTypeDialog({
       initialFocusRef={focusRef}
       size="md"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ name }) => {
-          props.onResolve({ name });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ name }) => {
+            props.onResolve({ name });
+          }),
+        },
       }}
       header={
         isNonNullish(name) && isEditing ? (

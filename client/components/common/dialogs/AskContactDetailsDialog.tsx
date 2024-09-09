@@ -59,8 +59,10 @@ export function AskContactDetailsDialog({
       closeOnOverlayClick={false}
       initialFocusRef={email ? firstNameRef : emailRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(onCreateContact),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(onCreateContact),
+        },
       }}
       header={
         <FormattedMessage

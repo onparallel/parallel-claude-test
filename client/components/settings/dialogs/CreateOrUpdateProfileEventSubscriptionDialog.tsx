@@ -204,37 +204,40 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
       initialFocusRef={eventsUrlInputRef}
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          try {
-            if (currentStep === 0) {
-              setNewSubscriptionId(
-                await onSubscriptionSubmit(newSubscriptionId, {
-                  name: data.name?.trim() || null,
-                  eventsUrl: data.eventsUrl,
-                  eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
-                  fromProfileTypeId: data.fromProfileTypeId,
-                  fromProfileTypeFieldIds:
-                    isNonNullish(data.fromProfileTypeId) && data.fromProfileTypeFieldIds.length > 0
-                      ? data.fromProfileTypeFieldIds
-                      : null,
-                }),
-              );
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            try {
+              if (currentStep === 0) {
+                setNewSubscriptionId(
+                  await onSubscriptionSubmit(newSubscriptionId, {
+                    name: data.name?.trim() || null,
+                    eventsUrl: data.eventsUrl,
+                    eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
+                    fromProfileTypeId: data.fromProfileTypeId,
+                    fromProfileTypeFieldIds:
+                      isNonNullish(data.fromProfileTypeId) &&
+                      data.fromProfileTypeFieldIds.length > 0
+                        ? data.fromProfileTypeFieldIds
+                        : null,
+                  }),
+                );
 
-              clearErrors("eventsUrl");
-              nextStep();
-            } else {
-              props.onResolve();
-            }
-          } catch (error) {
-            if (error instanceof ApolloError) {
-              const code = error.graphQLErrors[0]?.extensions?.code;
-              if (code === "WEBHOOK_CHALLENGE_FAILED") {
-                setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
+                clearErrors("eventsUrl");
+                nextStep();
+              } else {
+                props.onResolve();
+              }
+            } catch (error) {
+              if (error instanceof ApolloError) {
+                const code = error.graphQLErrors[0]?.extensions?.code;
+                if (code === "WEBHOOK_CHALLENGE_FAILED") {
+                  setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
+                }
               }
             }
-          }
-        }),
+          }),
+        },
       }}
       header={
         <Flex alignItems="baseline">

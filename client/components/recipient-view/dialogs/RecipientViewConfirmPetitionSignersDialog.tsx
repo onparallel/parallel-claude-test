@@ -135,17 +135,19 @@ function RecipientViewConfirmPetitionSignersDialog({
       hasCloseButton
       closeOnOverlayClick={!isDirty}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ additionalSigners, message }) => {
-          props.onResolve({
-            message: showMessage ? message : null,
-            additionalSigners: additionalSigners.map((s) => ({
-              email: s.email,
-              firstName: s.firstName,
-              lastName: s.lastName ?? "",
-            })),
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ additionalSigners, message }) => {
+            props.onResolve({
+              message: showMessage ? message : null,
+              additionalSigners: additionalSigners.map((s) => ({
+                email: s.email,
+                firstName: s.firstName,
+                lastName: s.lastName ?? "",
+              })),
+            });
+          }),
+        },
       }}
       header={
         <HStack>

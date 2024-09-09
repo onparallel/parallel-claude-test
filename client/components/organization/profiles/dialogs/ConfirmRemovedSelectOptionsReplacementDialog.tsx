@@ -66,12 +66,14 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
       closeOnOverlayClick={false}
       size="xl"
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          props.onResolve(
-            data.values.map(([option, value]) => ({ old: option.value, new: value })),
-          );
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            props.onResolve(
+              data.values.map(([option, value]) => ({ old: option.value, new: value })),
+            );
+          }),
+        },
       }}
       header={
         <FormattedMessage

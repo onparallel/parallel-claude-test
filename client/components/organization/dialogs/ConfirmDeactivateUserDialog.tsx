@@ -75,10 +75,12 @@ function ConfirmDeactivateUserDialog({
       size="lg"
       initialFocusRef={userSelectRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ user, tagIds, includeDrafts }) => {
-          props.onResolve({ userId: user!.id, tagIds, includeDrafts });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ user, tagIds, includeDrafts }) => {
+            props.onResolve({ userId: user!.id, tagIds, includeDrafts });
+          }),
+        },
       }}
       header={
         showTransferText ? (

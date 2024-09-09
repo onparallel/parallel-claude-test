@@ -84,15 +84,17 @@ export function AddAliasToFieldDialog({
       hasCloseButton
       initialFocusRef={aliasRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          try {
-            await updateField(field.id, {
-              alias: data.alias,
-            });
-            props.onResolve(data.alias);
-          } catch {}
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            try {
+              await updateField(field.id, {
+                alias: data.alias,
+              });
+              props.onResolve(data.alias);
+            } catch {}
+          }),
+        },
       }}
       {...props}
       header={

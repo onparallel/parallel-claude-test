@@ -37,8 +37,10 @@ function AssociateProfileToPetitionDialog({
       hasCloseButton={true}
       initialFocusRef={selectRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
+        },
       }}
       {...props}
       header={

@@ -47,14 +47,16 @@ function AddNewSignerDialog({
       closeOnOverlayClick={false}
       initialFocusRef={isNonNullish(email) ? firstNameRef : emailRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) =>
-          props.onResolve({
-            firstName: data.firstName.trim(),
-            lastName: data.lastName.trim(),
-            email: data.email.toLowerCase(),
-          }),
-        ),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) =>
+            props.onResolve({
+              firstName: data.firstName.trim(),
+              lastName: data.lastName.trim(),
+              email: data.email.toLowerCase(),
+            }),
+          ),
+        },
       }}
       header={
         <FormattedMessage

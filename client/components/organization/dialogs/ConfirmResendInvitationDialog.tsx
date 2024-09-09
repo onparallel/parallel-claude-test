@@ -9,9 +9,11 @@ function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ ful
       hasCloseButton
       size="lg"
       content={{
-        as: "form",
-        onSubmit: () => {
-          props.onResolve();
+        containerProps: {
+          as: "form",
+          onSubmit: () => {
+            props.onResolve();
+          },
         },
       }}
       header={

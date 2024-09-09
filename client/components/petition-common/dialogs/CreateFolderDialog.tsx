@@ -100,10 +100,12 @@ function CreateFolderDialog({
       hasCloseButton={true}
       initialFocusRef={nameRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          return props.onResolve(data);
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            return props.onResolve(data);
+          }),
+        },
       }}
       {...props}
       header={

@@ -111,18 +111,20 @@ function ProfileSubscribersDialog({
     <ConfirmDialog
       {...props}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          if (data.subscribe.length > 0) {
-            await subscribe({
-              variables: {
-                profileIds,
-                userIds: data.subscribe.map((u) => u.id),
-              },
-            });
-          }
-          props.onResolve();
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            if (data.subscribe.length > 0) {
+              await subscribe({
+                variables: {
+                  profileIds,
+                  userIds: data.subscribe.map((u) => u.id),
+                },
+              });
+            }
+            props.onResolve();
+          }),
+        },
       }}
       initialFocusRef={usersRef}
       hasCloseButton

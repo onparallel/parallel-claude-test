@@ -80,9 +80,11 @@ function RecoverProfileDialog({
     <ConfirmDialog
       {...props}
       content={{
-        as: "form",
-        onSubmit: () => {
-          props.onResolve({ status });
+        containerProps: {
+          as: "form",
+          onSubmit: () => {
+            props.onResolve({ status });
+          },
         },
       }}
       hasCloseButton

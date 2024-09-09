@@ -27,8 +27,10 @@ export function PreviewImportFromProfileDialog({
     <ConfirmDialog
       initialFocusRef={selectRef}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ profileId }) => props.onResolve(profileId!)),
+        },
       }}
       {...props}
       header={

@@ -80,8 +80,10 @@ function DelegateAccessDialog({
       hasCloseButton
       {...props}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(props.onResolve),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(props.onResolve),
+        },
       }}
       header={
         <HStack spacing={2.5}>

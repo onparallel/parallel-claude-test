@@ -146,37 +146,39 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
       closeOnEsc={true}
       closeOnOverlayClick={false}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          if (!petition) return;
-          try {
-            const relationships = data.relationships
-              .filter((r) => isNonNullish(r.leftFieldGroup))
-              .map<UpdatePetitionFieldGroupRelationshipInput>(
-                ({
-                  relationshipId,
-                  leftFieldGroup,
-                  rightFieldGroup,
-                  profileRelationshipTypeWithDirection,
-                }) => {
-                  return {
-                    direction: profileRelationshipTypeWithDirection!.direction,
-                    id: relationshipId,
-                    leftSidePetitionFieldId: leftFieldGroup!.id,
-                    profileRelationshipTypeId:
-                      profileRelationshipTypeWithDirection!.profileRelationshipType.id,
-                    rightSidePetitionFieldId: rightFieldGroup!.id,
-                  };
-                },
-              );
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            if (!petition) return;
+            try {
+              const relationships = data.relationships
+                .filter((r) => isNonNullish(r.leftFieldGroup))
+                .map<UpdatePetitionFieldGroupRelationshipInput>(
+                  ({
+                    relationshipId,
+                    leftFieldGroup,
+                    rightFieldGroup,
+                    profileRelationshipTypeWithDirection,
+                  }) => {
+                    return {
+                      direction: profileRelationshipTypeWithDirection!.direction,
+                      id: relationshipId,
+                      leftSidePetitionFieldId: leftFieldGroup!.id,
+                      profileRelationshipTypeId:
+                        profileRelationshipTypeWithDirection!.profileRelationshipType.id,
+                      rightSidePetitionFieldId: rightFieldGroup!.id,
+                    };
+                  },
+                );
 
-            await updatePetitionFieldGroupRelationships({
-              variables: { petitionId, relationships },
-            });
+              await updatePetitionFieldGroupRelationships({
+                variables: { petitionId, relationships },
+              });
 
-            props.onResolve();
-          } catch (e) {}
-        }),
+              props.onResolve();
+            } catch (e) {}
+          }),
+        },
       }}
       {...props}
       header={

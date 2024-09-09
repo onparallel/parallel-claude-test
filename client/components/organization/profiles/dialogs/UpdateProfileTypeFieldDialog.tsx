@@ -74,13 +74,15 @@ function UpdateProfileTypeFieldDialog({
       closeOnEsc
       size="md"
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve({
-            isExpirable: data.isExpirable!,
-            expiryAlertAheadTime: data.expiryAlertAheadTime!,
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve({
+              isExpirable: data.isExpirable!,
+              expiryAlertAheadTime: data.expiryAlertAheadTime!,
+            });
+          }),
+        },
       }}
       header={
         <FormattedMessage

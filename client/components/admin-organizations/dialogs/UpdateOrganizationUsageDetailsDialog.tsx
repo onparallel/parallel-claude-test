@@ -156,13 +156,15 @@ export function UpdateOrganizationUsageDetailsDialog({
       {...props}
       size="lg"
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve({
-            ...omit(data, ["periodUnits", "periodValue"]),
-            duration: { [data.periodUnits as keyof Duration]: data.periodValue },
-          });
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve({
+              ...omit(data, ["periodUnits", "periodValue"]),
+              duration: { [data.periodUnits as keyof Duration]: data.periodValue },
+            });
+          }),
+        },
       }}
       header={header}
       body={

@@ -105,24 +105,26 @@ function CreateOrUpdatePetitionVariableDialog({
       closeOnEsc={false}
       closeOnOverlayClick={false}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          try {
-            if (isEditing) {
-              await handleUpdateVariable(data.defaultValue);
-            } else {
-              await handleCreateVariable(data);
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            try {
+              if (isEditing) {
+                await handleUpdateVariable(data.defaultValue);
+              } else {
+                await handleCreateVariable(data);
+              }
+              props.onResolve(data);
+            } catch (e) {
+              if (
+                isApolloError(e, "ALIAS_ALREADY_EXISTS") ||
+                isApolloError(e, "PETITION_VARIABLE_ALREADY_EXISTS_ERROR")
+              ) {
+                setError("name", { type: "unavailable" });
+              }
             }
-            props.onResolve(data);
-          } catch (e) {
-            if (
-              isApolloError(e, "ALIAS_ALREADY_EXISTS") ||
-              isApolloError(e, "PETITION_VARIABLE_ALREADY_EXISTS_ERROR")
-            ) {
-              setError("name", { type: "unavailable" });
-            }
-          }
-        }),
+          }),
+        },
       }}
       header={
         isEditing ? (

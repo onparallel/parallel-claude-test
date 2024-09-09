@@ -605,7 +605,9 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
       {...props}
       initialFocusRef={initialFocusRef}
       size="xl"
-      content={{ as: "form", onSubmit: () => props.onResolve(action) }}
+      content={{
+        containerProps: { as: "form", onSubmit: () => props.onResolve(action) },
+      }}
       header={
         <FormattedMessage
           id="component.multiple-emails-pasted-dialog.header"

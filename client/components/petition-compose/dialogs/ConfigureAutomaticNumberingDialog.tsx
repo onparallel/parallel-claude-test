@@ -61,10 +61,12 @@ export function ConfigureAutomaticNumberingDialog({
       size="lg"
       hasCloseButton
       content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => {
-          props.onResolve(data);
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit((data) => {
+            props.onResolve(data);
+          }),
+        },
       }}
       header={
         isUpdating ? (

@@ -87,10 +87,12 @@ function ConfigureExpirationsDateDialog({
       closeOnOverlayClick={false}
       hasCloseButton={true}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          props.onResolve(data.expirations);
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            props.onResolve(data.expirations);
+          }),
+        },
       }}
       {...props}
       header={

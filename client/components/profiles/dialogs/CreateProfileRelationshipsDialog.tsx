@@ -96,65 +96,67 @@ function CreateProfileRelationshipsDialog({
       closeOnEsc={true}
       closeOnOverlayClick={false}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(({ relationships }) => {
-          // validate no duplicate rows, we group by unique key, is a group has more than one item, it's duplicated
-          const groups = groupBy(
-            [
-              // existing relationships
-              ...profile.relationships.map((r) => {
-                const [otherProfile, direction] =
-                  r.leftSideProfile.id === profile.id
-                    ? ([r.rightSideProfile, "RIGHT_LEFT"] as const)
-                    : ([r.leftSideProfile, "LEFT_RIGHT"] as const);
-                return [
-                  [
-                    r.relationshipType.id,
-                    otherProfile.id,
-                    r.relationshipType.isReciprocal ? "" : direction,
-                  ].join(","),
-                  -1,
-                ] as const;
-              }),
-              // added relationships
-              ...relationships.map(
-                (r, i) =>
-                  [
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ relationships }) => {
+            // validate no duplicate rows, we group by unique key, is a group has more than one item, it's duplicated
+            const groups = groupBy(
+              [
+                // existing relationships
+                ...profile.relationships.map((r) => {
+                  const [otherProfile, direction] =
+                    r.leftSideProfile.id === profile.id
+                      ? ([r.rightSideProfile, "RIGHT_LEFT"] as const)
+                      : ([r.leftSideProfile, "LEFT_RIGHT"] as const);
+                  return [
                     [
-                      r.profileRelationshipTypeWithDirection!.profileRelationshipType.id,
-                      r.profile!.id,
-                      r.profileRelationshipTypeWithDirection!.profileRelationshipType.isReciprocal
-                        ? ""
-                        : r.profileRelationshipTypeWithDirection?.direction,
+                      r.relationshipType.id,
+                      otherProfile.id,
+                      r.relationshipType.isReciprocal ? "" : direction,
                     ].join(","),
-                    i,
-                  ] as const,
-              ),
-            ],
-            ([key]) => key,
-          );
-          let valid = true;
-          for (const group of Object.values(groups)) {
-            if (group.length > 1) {
-              for (const [_, i] of group.slice(1)) {
-                setError(`relationships.${i}`, {
-                  type: group[0][1] === -1 ? "existing" : "duplicated",
-                });
-                valid = false;
+                    -1,
+                  ] as const;
+                }),
+                // added relationships
+                ...relationships.map(
+                  (r, i) =>
+                    [
+                      [
+                        r.profileRelationshipTypeWithDirection!.profileRelationshipType.id,
+                        r.profile!.id,
+                        r.profileRelationshipTypeWithDirection!.profileRelationshipType.isReciprocal
+                          ? ""
+                          : r.profileRelationshipTypeWithDirection?.direction,
+                      ].join(","),
+                      i,
+                    ] as const,
+                ),
+              ],
+              ([key]) => key,
+            );
+            let valid = true;
+            for (const group of Object.values(groups)) {
+              if (group.length > 1) {
+                for (const [_, i] of group.slice(1)) {
+                  setError(`relationships.${i}`, {
+                    type: group[0][1] === -1 ? "existing" : "duplicated",
+                  });
+                  valid = false;
+                }
               }
             }
-          }
-          if (valid) {
-            props.onResolve(
-              relationships.map((r) => ({
-                profileId: r.profile!.id,
-                profileRelationshipTypeId:
-                  r.profileRelationshipTypeWithDirection!.profileRelationshipType.id,
-                direction: r.profileRelationshipTypeWithDirection!.direction,
-              })),
-            );
-          }
-        }),
+            if (valid) {
+              props.onResolve(
+                relationships.map((r) => ({
+                  profileId: r.profile!.id,
+                  profileRelationshipTypeId:
+                    r.profileRelationshipTypeWithDirection!.profileRelationshipType.id,
+                  direction: r.profileRelationshipTypeWithDirection!.direction,
+                })),
+              );
+            }
+          }),
+        },
       }}
       {...props}
       header={

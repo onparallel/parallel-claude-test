@@ -44,14 +44,16 @@ export function UnrestrictPetitionDialog({
         />
       }
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async ({ password }) => {
-          if (await onUnrestrictPetition(password)) {
-            props.onResolve();
-          } else {
-            setError("password", { type: "invalid" });
-          }
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ password }) => {
+            if (await onUnrestrictPetition(password)) {
+              props.onResolve();
+            } else {
+              setError("password", { type: "invalid" });
+            }
+          }),
+        },
       }}
       body={
         <Stack spacing={4}>

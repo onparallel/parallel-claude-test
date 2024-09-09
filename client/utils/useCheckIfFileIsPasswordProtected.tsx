@@ -61,8 +61,10 @@ function EnterFilePasswordDialog({
   return (
     <ConfirmDialog
       content={{
-        as: "form",
-        onSubmit: handleSubmit(props.onResolve),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(props.onResolve),
+        },
       }}
       initialFocusRef={passwordRef}
       header={

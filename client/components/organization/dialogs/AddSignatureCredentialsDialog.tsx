@@ -90,49 +90,51 @@ function AddSignatureCredentialsDialog({
       hasCloseButton
       closeOnOverlayClick={false}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          if (data.provider === "SIGNATURIT") {
-            try {
-              await createSignaturitIntegration({
-                variables: {
-                  apiKey: data.credentials.API_KEY,
-                  name: data.name,
-                  isDefault: data.isDefault,
-                },
-              });
-            } catch {
-              setError("credentials.API_KEY", { type: "invalid" }, { shouldFocus: true });
-              return;
-            }
-          } else if (data.provider === "DOCUSIGN") {
-            try {
-              await showDocusignConsentPopup({
-                environment: data.credentials.sandboxMode ? "sandbox" : "production",
-                isDefault: form.getValues("isDefault"),
-                name: form.getValues("name"),
-              });
-              toast({
-                isClosable: true,
-                status: "success",
-                title: intl.formatMessage({
-                  id: "component.add-signature-credentials-dialog.toast-title",
-                  defaultMessage: "Success",
-                }),
-                description: intl.formatMessage(
-                  {
-                    id: "component.add-signature-credentials-dialog.toast-description",
-                    defaultMessage: "{provider} integration created successfully.",
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            if (data.provider === "SIGNATURIT") {
+              try {
+                await createSignaturitIntegration({
+                  variables: {
+                    apiKey: data.credentials.API_KEY,
+                    name: data.name,
+                    isDefault: data.isDefault,
                   },
-                  { provider: "Docusign" },
-                ),
-              });
-            } catch (e) {
-              return;
+                });
+              } catch {
+                setError("credentials.API_KEY", { type: "invalid" }, { shouldFocus: true });
+                return;
+              }
+            } else if (data.provider === "DOCUSIGN") {
+              try {
+                await showDocusignConsentPopup({
+                  environment: data.credentials.sandboxMode ? "sandbox" : "production",
+                  isDefault: form.getValues("isDefault"),
+                  name: form.getValues("name"),
+                });
+                toast({
+                  isClosable: true,
+                  status: "success",
+                  title: intl.formatMessage({
+                    id: "component.add-signature-credentials-dialog.toast-title",
+                    defaultMessage: "Success",
+                  }),
+                  description: intl.formatMessage(
+                    {
+                      id: "component.add-signature-credentials-dialog.toast-description",
+                      defaultMessage: "{provider} integration created successfully.",
+                    },
+                    { provider: "Docusign" },
+                  ),
+                });
+              } catch (e) {
+                return;
+              }
             }
-          }
-          props.onResolve();
-        }),
+            props.onResolve();
+          }),
+        },
       }}
       header={
         <Flex alignItems="baseline">

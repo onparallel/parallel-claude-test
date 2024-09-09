@@ -112,15 +112,17 @@ function ResolveProfilePropertiesConflictsDialog({
       closeOnOverlayClick={false}
       hasCloseButton={true}
       content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          props.onResolve(
-            data.conflicts.map((conflict) => ({
-              profileTypeFieldId: conflict.property.field.id,
-              action: conflict.action!,
-            })),
-          );
-        }),
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            props.onResolve(
+              data.conflicts.map((conflict) => ({
+                profileTypeFieldId: conflict.property.field.id,
+                action: conflict.action!,
+              })),
+            );
+          }),
+        },
       }}
       {...props}
       header={

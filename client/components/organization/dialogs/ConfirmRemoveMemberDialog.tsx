@@ -15,9 +15,11 @@ function ConfirmRemoveMemberDialog({
       hasCloseButton
       size="lg"
       content={{
-        as: "form",
-        onSubmit: () => {
-          props.onResolve();
+        containerProps: {
+          as: "form",
+          onSubmit: () => {
+            props.onResolve();
+          },
         },
       }}
       header={

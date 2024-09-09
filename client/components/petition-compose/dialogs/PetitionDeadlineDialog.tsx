@@ -35,8 +35,10 @@ export function PetitionDeadlineDialog({ ...props }: DialogProps<{}, Date>) {
     <ConfirmDialog
       size="xl"
       content={{
-        as: "form",
-        ...{ noValidate: true },
+        containerProps: {
+          as: "form",
+          ...{ noValidate: true },
+        },
       }}
       header={
         <FormattedMessage

@@ -32,7 +32,12 @@ export function AskViewNameDialog({
       closeOnOverlayClick={false}
       hasCloseButton={true}
       initialFocusRef={nameRef}
-      content={{ as: "form", onSubmit: handleSubmit(({ name }) => props.onResolve(name)) }}
+      content={{
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(({ name }) => props.onResolve(name)),
+        },
+      }}
       {...props}
       header={header}
       body={
