@@ -742,6 +742,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                       values={{ integrationName: orgIntegration.name }}
                     />
                   </Th>
+                  <Th width="40px"></Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -788,7 +789,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                         </HStack>
                       </Td>
                       <Td padding={0} height="100%">
-                        <HStack as="label" height="100%" padding={2} paddingInlineEnd={4}>
+                        <HStack as="label" height="100%" padding={2}>
                           <HStack flex={1}>
                             <Center height="21px" alignSelf="start">
                               <Radio value="OVERWRITE" isDisabled={!canWriteValue} />
@@ -805,68 +806,70 @@ function ImportFromExternalSourceDialogUpdateProfile({
                               )}
                             </Box>
                           </HStack>
-                          {isSameContent ? (
-                            <Center>
-                              <SmallPopover
-                                placement="right"
-                                content={
-                                  <Text fontSize="sm">
+                        </HStack>
+                      </Td>
+                      <Td>
+                        {isSameContent ? (
+                          <Center>
+                            <SmallPopover
+                              placement="right"
+                              content={
+                                <Text fontSize="sm">
+                                  <FormattedMessage
+                                    id="component.import-from-external-source-dialog.value-matches-external-source"
+                                    defaultMessage="The current value matches with the one in {providerName}."
+                                    values={{
+                                      providerName: <Text as="em">{orgIntegration.name}</Text>,
+                                    }}
+                                  />
+                                </Text>
+                              }
+                            >
+                              <CheckIcon
+                                color="green.600"
+                                _hover={{ color: "green.700" }}
+                                _focus={{ color: "green.700" }}
+                                tabIndex={0}
+                              />
+                            </SmallPopover>
+                          </Center>
+                        ) : !canReadValue || !canWriteValue || isNonNullish(currentContent) ? (
+                          <Center>
+                            <SmallPopover
+                              placement="right"
+                              content={
+                                <Text fontSize="sm">
+                                  {!canReadValue ? (
                                     <FormattedMessage
-                                      id="component.import-from-external-source-dialog.value-matches-external-source"
-                                      defaultMessage="The current value matches with the one in {providerName}."
+                                      id="component.import-from-external-source-dialog.no-read-permission"
+                                      defaultMessage="You don't have permission to view this field"
+                                    />
+                                  ) : !canWriteValue ? (
+                                    <FormattedMessage
+                                      id="component.import-from-external-source-dialog.no-write-permission"
+                                      defaultMessage="You don't have permission to edit this field"
+                                    />
+                                  ) : isNonNullish(currentContent) ? (
+                                    <FormattedMessage
+                                      id="component.import-from-external-source-dialog.value-differs-external-source"
+                                      defaultMessage="The current value differs from the one in {providerName}."
                                       values={{
                                         providerName: <Text as="em">{orgIntegration.name}</Text>,
                                       }}
                                     />
-                                  </Text>
-                                }
-                              >
-                                <CheckIcon
-                                  color="green.600"
-                                  _hover={{ color: "green.700" }}
-                                  _focus={{ color: "green.700" }}
-                                  tabIndex={0}
-                                />
-                              </SmallPopover>
-                            </Center>
-                          ) : !canReadValue || !canWriteValue || isNonNullish(currentContent) ? (
-                            <Center>
-                              <SmallPopover
-                                placement="right"
-                                content={
-                                  <Text fontSize="sm">
-                                    {!canReadValue ? (
-                                      <FormattedMessage
-                                        id="component.import-from-external-source-dialog.no-read-permission"
-                                        defaultMessage="You don't have permission to view this field"
-                                      />
-                                    ) : !canWriteValue ? (
-                                      <FormattedMessage
-                                        id="component.import-from-external-source-dialog.no-write-permission"
-                                        defaultMessage="You don't have permission to edit this field"
-                                      />
-                                    ) : isNonNullish(currentContent) ? (
-                                      <FormattedMessage
-                                        id="component.import-from-external-source-dialog.value-differs-external-source"
-                                        defaultMessage="The current value differs from the one in {providerName}."
-                                        values={{
-                                          providerName: <Text as="em">{orgIntegration.name}</Text>,
-                                        }}
-                                      />
-                                    ) : null}
-                                  </Text>
-                                }
-                              >
-                                <AlertCircleFilledIcon
-                                  color="yellow.500"
-                                  _hover={{ color: "yellow.600" }}
-                                  _focus={{ color: "yellow.600" }}
-                                  tabIndex={0}
-                                />
-                              </SmallPopover>
-                            </Center>
-                          ) : null}
-                        </HStack>
+                                  ) : null}
+                                </Text>
+                              }
+                            >
+                              <AlertCircleFilledIcon
+                                color="yellow.500"
+                                _hover={{ color: "yellow.600" }}
+                                _focus={{ color: "yellow.600" }}
+                                tabIndex={0}
+                              />
+                            </SmallPopover>
+                          </Center>
+                        ) : null}
                       </Td>
                     </RadioGroup>
                   );

@@ -27,8 +27,8 @@ export const tableTheme = defineMultiStyleConfig({
           background: "gray.50",
         },
         tr: {
-          th: { _first: { paddingStart: 4 } },
-          td: { _first: { paddingStart: 4 } },
+          th: { _first: { paddingStart: 4 }, _last: { paddingEnd: 4 } },
+          td: { _first: { paddingStart: 4 }, _last: { paddingEnd: 4 } },
           _selected: {
             backgroundColor: "primary.50",
           },

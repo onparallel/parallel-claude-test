@@ -461,8 +461,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       }),
     cellProps: {
       minWidth: "300px",
-      padding: 0,
-      _last: { paddingEnd: 0 },
+      padding: "0 !important",
     },
     isFilterable: true,
     Filter: PetitionListTagFilter,
