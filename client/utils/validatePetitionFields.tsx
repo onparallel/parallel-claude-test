@@ -180,7 +180,10 @@ export function validatePetitionFields<T extends PartialField>(
   const features = petition.organization?.features ?? [];
 
   const blockedPaidFields = fieldsWithIndices.filter(([field]) => {
-    return features.some((feature) => feature.name === field.type && !feature.value);
+    return (
+      features.some((feature) => feature.name === field.type && !feature.value) ||
+      (field.type === "ID_VERIFICATION" && !petition.organization.hasIdVerification)
+    );
   });
 
   if (blockedPaidFields.length > 0) {
@@ -226,6 +229,7 @@ validatePetitionFields.fragments = {
           name
           value
         }
+        hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
       }
     }
   `,

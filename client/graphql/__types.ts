@@ -33311,6 +33311,7 @@ export type PetitionActivity_PetitionFragment = {
   organization: {
     __typename?: "Organization";
     id: string;
+    hasIdVerification: boolean;
     petitionsPeriod?: {
       __typename?: "OrganizationUsageLimit";
       id: string;
@@ -34549,6 +34550,7 @@ export type PetitionActivity_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             id: string;
@@ -35871,6 +35873,7 @@ export type PetitionActivity_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             id: string;
@@ -36039,6 +36042,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
+    hasIdVerification: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
@@ -36358,6 +36362,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "Organization";
     id: string;
     customHost?: string | null;
+    hasIdVerification: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
@@ -39194,6 +39199,7 @@ export type PetitionCompose_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
             __typename?: "FeatureFlagNameValue";
@@ -39535,6 +39541,7 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "Organization";
           id: string;
           customHost?: string | null;
+          hasIdVerification: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
             __typename?: "FeatureFlagNameValue";
@@ -40642,6 +40649,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
+    hasIdVerification: boolean;
     hasDowJones: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
@@ -41095,6 +41103,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
+    hasIdVerification: boolean;
     hasDowJones: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
@@ -41568,6 +41577,7 @@ export type PetitionPreview_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           hasDowJones: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
@@ -42033,6 +42043,7 @@ export type PetitionPreview_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           hasDowJones: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
@@ -42460,6 +42471,7 @@ export type PetitionPreview_completePetitionMutation = {
     organization: {
       __typename?: "Organization";
       id: string;
+      hasIdVerification: boolean;
       hasDowJones: boolean;
       brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
       features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
@@ -42937,6 +42949,7 @@ export type PetitionPreview_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           hasDowJones: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
@@ -43402,6 +43415,7 @@ export type PetitionPreview_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
+          hasIdVerification: boolean;
           hasDowJones: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           features: Array<{
@@ -54502,6 +54516,7 @@ export type validatePetitionFields_PetitionBase_Petition_Fragment = {
   id: string;
   organization: {
     __typename?: "Organization";
+    hasIdVerification: boolean;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
 };
@@ -54511,6 +54526,7 @@ export type validatePetitionFields_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   organization: {
     __typename?: "Organization";
+    hasIdVerification: boolean;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
 };
@@ -58315,6 +58331,7 @@ export const validatePetitionFields_PetitionBaseFragmentDoc = gql`
         name
         value
       }
+      hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
     }
   }
 ` as unknown as DocumentNode<validatePetitionFields_PetitionBaseFragment, unknown>;
