@@ -2102,6 +2102,68 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("updates fields 'isUsedInProfileName' when changing the profile name pattern", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+              fields {
+                alias
+                isUsedInProfileName
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileNamePattern: `CLIENT {{ ${toGlobalId("ProfileTypeField", profileType0Fields[0].id)} }} ({{ ${toGlobalId("ProfileTypeField", profileType0Fields[5].id)} }})`,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        fields: [
+          {
+            alias: "FIRST_NAME",
+            isUsedInProfileName: true,
+          },
+          {
+            alias: "LAST_NAME",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "BIRTH_DATE",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "PHONE",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "EMAIL",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "PASSPORT",
+            isUsedInProfileName: true,
+          },
+          {
+            alias: "RISK",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "GENDER",
+            isUsedInProfileName: false,
+          },
+        ],
+      });
+    });
   });
 
   describe("cloneProfileType", () => {

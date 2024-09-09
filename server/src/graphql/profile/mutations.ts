@@ -157,6 +157,8 @@ export const updateProfileType = mutationField("updateProfileType", {
       updateData.profile_name_pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
         p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text,
       );
+      // clear cache for correct resolve of ProfileTypeField.isUsedInProfileName field
+      ctx.profiles.loadProfileType.dataloader.clear(profileTypeId);
     }
     const profileType = await ctx.profiles.updateProfileType(
       profileTypeId,
