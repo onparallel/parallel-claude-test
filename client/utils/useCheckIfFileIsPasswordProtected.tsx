@@ -2,6 +2,7 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Text } from "@chakra-
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import * as Sentry from "@sentry/nextjs";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -17,6 +18,7 @@ export function useCheckIfFileIsPasswordProtected() {
       const [error, pdfJs] = await withError(loadPdfJs());
       if (error) {
         // fail gracefully
+        Sentry.captureException(error);
         return { message: "NO_PASSWORD" as const };
       }
       if (await checkPassword(pdfJs, file, undefined)) {
@@ -41,8 +43,13 @@ async function checkPassword(pdfjs: PdfJs, file: File, password: string | undefi
     task.onPassword = () => {
       resolve(false);
     };
-    // if opening fails it's probably an invalid PDF, just let it go through
-    task.promise.then(() => resolve(true)).catch(() => resolve(true));
+    task.promise
+      .then(() => resolve(true))
+      .catch((e) => {
+        Sentry.captureException(e);
+        // if opening fails it's probably an invalid PDF, just let it go through
+        return resolve(true);
+      });
   });
 }
 
