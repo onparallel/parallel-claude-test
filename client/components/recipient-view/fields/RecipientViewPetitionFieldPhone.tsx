@@ -131,21 +131,31 @@ export function RecipientViewPetitionFieldPhone({
         return;
       }
       setIsSaving(true);
+      let selection: { selectionStart: number | null; selectionEnd: number | null } | undefined;
       try {
+        if (isNonNullish(newReplyRef.current)) {
+          // save selection to restore it after creating the reply,
+          // need to do it before createReply because it will remove the input from the DOM
+          // and the ref will be null
+          selection = pick(newReplyRef.current, ["selectionStart", "selectionEnd"]);
+        }
         const replyId = await onCreateReply({ value });
         if (replyId) {
-          const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
             await waitFor(1);
             const newReplyElement = replyRefs[replyId].current!;
             if (newReplyElement) {
-              Object.assign(newReplyElement, selection);
+              newReplyElement.selectionStart =
+                selection?.selectionStart ?? newReplyElement.value.length;
+              newReplyElement.selectionEnd =
+                selection?.selectionEnd ?? newReplyElement.value.length;
+
               newReplyElement.focus();
               newReplyElement.setSelectionRange(
-                newReplyElement.value.length,
-                newReplyElement.value.length,
+                selection?.selectionStart ?? newReplyElement.value.length,
+                selection?.selectionEnd ?? newReplyElement.value.length,
               );
             }
           }
