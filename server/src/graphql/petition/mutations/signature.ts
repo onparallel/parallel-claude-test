@@ -77,6 +77,12 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         `User:${ctx.user!.id}`,
       );
 
+      await ctx.petitions.createEvent({
+        petition_id: petitionId,
+        type: "PETITION_COMPLETED",
+        data: { user_id: ctx.user!.id },
+      });
+
       const { signatureRequest } = await ctx.signature.createSignatureRequest(
         petition.id,
         {
