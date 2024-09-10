@@ -446,13 +446,14 @@ export class PetitionBinder implements IPetitionBinder {
       await pMap(
         files,
         async (file) => {
-          if (file.content_type.startsWith("image/")) {
+          const fileHasSize = file.size !== "0";
+          if (fileHasSize && file.content_type.startsWith("image/")) {
             const imageUrl = await this.convertImage(file.path, file.content_type);
             return await this.writeTemporaryFile(
               this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
               "pdf",
             );
-          } else if (file.content_type === "application/pdf") {
+          } else if (fileHasSize && file.content_type === "application/pdf") {
             let readable = await this.storage.fileUploads.downloadFile(file.path);
             if (file.password) {
               const decryptedFilePath = await removePasswordFromPdf(

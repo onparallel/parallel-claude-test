@@ -965,6 +965,11 @@
     "context": "The file is too large. Maximum size allowed {size}"
   },
   {
+    "term": "generic.dropzone-error-file-too-small",
+    "definition": "O arquivo é muito pequeno. Tamanho mínimo permitido {size}",
+    "context": "The file is too small. Minimum size allowed {size}"
+  },
+  {
     "term": "generic.edit",
     "definition": "Editar",
     "context": "Edit"

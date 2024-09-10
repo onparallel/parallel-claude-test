@@ -965,6 +965,11 @@
     "context": "The file is too large. Maximum size allowed {size}"
   },
   {
+    "term": "generic.dropzone-error-file-too-small",
+    "definition": "El fitxer és massa petit. Mida mínima permesa {size}",
+    "context": "The file is too small. Minimum size allowed {size}"
+  },
+  {
     "term": "generic.edit",
     "definition": "Editar",
     "context": "Edit"

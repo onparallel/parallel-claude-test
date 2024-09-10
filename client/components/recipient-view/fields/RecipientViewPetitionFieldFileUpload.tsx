@@ -379,6 +379,7 @@ function PetitionFieldFileUploadDropzone({
     return Object.assign({}, ...acceptTypes.map((type) => formats[type]));
   }
 
+  const MIN_FILE_SIZE = 1;
   const MAX_FILE_SIZE = maxFileSize ?? 300 * 1024 * 1024;
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
@@ -416,6 +417,7 @@ function PetitionFieldFileUploadDropzone({
         multiple={field.multiple}
         accept={accepts ? getAcceptFormats(accepts) : undefined}
         disabled={_isDisabled}
+        minSize={MIN_FILE_SIZE}
         maxSize={MAX_FILE_SIZE}
         isInvalid={isInvalid}
         id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
@@ -459,11 +461,20 @@ function PetitionFieldFileUploadDropzone({
         )}
       </Dropzone>
       {fileDropError === "file-too-large" ? (
-        <Text color="red.600" fontSize="sm">
+        <Text color="red.600" fontSize="sm" marginTop={2}>
           <FormattedMessage
             id="generic.dropzone-error-file-too-large"
             defaultMessage="The file is too large. Maximum size allowed {size}"
             values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
+          />
+        </Text>
+      ) : null}
+      {fileDropError === "file-too-small" ? (
+        <Text color="red.600" fontSize="sm" marginTop={2}>
+          <FormattedMessage
+            id="generic.dropzone-error-file-too-small"
+            defaultMessage="The file is too small. Minimum size allowed {size}"
+            values={{ size: <FileSize value={MIN_FILE_SIZE} /> }}
           />
         </Text>
       ) : null}
