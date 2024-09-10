@@ -48,7 +48,7 @@ export const CopyLiquidReferenceButton = Object.assign(
                 : (field.type === "CHECKBOX" &&
                       (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1)) ||
                     field.multiple ||
-                    field.isChild
+                    (field.isChild && field.parent?.multiple)
                   ? [
                       `{% for ${loopVariable} in ${alias} -%}`,
                       `- {{ ${loopVariable}${defaultFilter} }}`,
@@ -79,6 +79,10 @@ export const CopyLiquidReferenceButton = Object.assign(
           multiple
           options
           isChild
+          parent {
+            id
+            multiple
+          }
         }
       `,
     },

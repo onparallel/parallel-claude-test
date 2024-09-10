@@ -12502,6 +12502,7 @@ export type CopyLiquidReferenceButton_PetitionFieldFragment = {
   multiple: boolean;
   options: { [key: string]: any };
   isChild: boolean;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
 };
 
 export type MessageClosingEmailEditor_PetitionBase_Petition_Fragment = {
@@ -15408,6 +15409,7 @@ export type PetitionComposeContents_PetitionFieldFragment = {
     alias?: string | null;
     options: { [key: string]: any };
   }> | null;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
 };
 
 export type PetitionComposeField_PetitionBase_Petition_Fragment = {
@@ -18033,6 +18035,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
     id: string;
     showInPdf: boolean;
     isInternal: boolean;
+    multiple: boolean;
     children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
   } | null;
   children?: Array<{
@@ -18109,6 +18112,7 @@ export type SettingsRowAlias_PetitionFieldFragment = {
   multiple: boolean;
   options: { [key: string]: any };
   isChild: boolean;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -36098,6 +36102,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -36205,6 +36210,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -36418,6 +36424,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -36525,6 +36532,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -36694,6 +36702,7 @@ export type PetitionCompose_PetitionFieldFragment = {
     position: number;
     showInPdf: boolean;
     isInternal: boolean;
+    multiple: boolean;
     children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
   } | null;
   children?: Array<{
@@ -36725,6 +36734,7 @@ export type PetitionCompose_PetitionFieldFragment = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -36820,6 +36830,7 @@ export type PetitionCompose_updatePetitionFieldFragment = {
     position: number;
     showInPdf: boolean;
     isInternal: boolean;
+    multiple: boolean;
     children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
   } | null;
   children?: Array<{
@@ -36851,6 +36862,7 @@ export type PetitionCompose_updatePetitionFieldFragment = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -37666,6 +37678,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -37701,6 +37714,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -37963,6 +37977,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -37998,6 +38013,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -38200,6 +38216,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -38235,6 +38252,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -38339,6 +38357,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -38374,6 +38393,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -38488,6 +38508,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -38523,6 +38544,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -38647,6 +38669,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -38682,6 +38705,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -38908,6 +38932,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
       position: number;
       showInPdf: boolean;
       isInternal: boolean;
+      multiple: boolean;
       children?: Array<{
         __typename?: "PetitionField";
         id: string;
@@ -38943,6 +38968,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
         position: number;
         showInPdf: boolean;
         isInternal: boolean;
+        multiple: boolean;
         children?: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -39259,6 +39285,7 @@ export type PetitionCompose_petitionQuery = {
               position: number;
               showInPdf: boolean;
               isInternal: boolean;
+              multiple: boolean;
               children?: Array<{
                 __typename?: "PetitionField";
                 id: string;
@@ -39366,6 +39393,7 @@ export type PetitionCompose_petitionQuery = {
             position: number;
             showInPdf: boolean;
             isInternal: boolean;
+            multiple: boolean;
             children?: Array<{
               __typename?: "PetitionField";
               id: string;
@@ -39601,6 +39629,7 @@ export type PetitionCompose_petitionQuery = {
               position: number;
               showInPdf: boolean;
               isInternal: boolean;
+              multiple: boolean;
               children?: Array<{
                 __typename?: "PetitionField";
                 id: string;
@@ -39708,6 +39737,7 @@ export type PetitionCompose_petitionQuery = {
             position: number;
             showInPdf: boolean;
             isInternal: boolean;
+            multiple: boolean;
             children?: Array<{
               __typename?: "PetitionField";
               id: string;
@@ -59586,6 +59616,10 @@ export const CopyLiquidReferenceButton_PetitionFieldFragmentDoc = gql`
     multiple
     options
     isChild
+    parent {
+      id
+      multiple
+    }
   }
 ` as unknown as DocumentNode<CopyLiquidReferenceButton_PetitionFieldFragment, unknown>;
 export const AddAliasToFieldDialog_PetitionFieldFragmentDoc = gql`
