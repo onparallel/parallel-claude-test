@@ -3590,11 +3590,6 @@
     "context": "Field not visible"
   },
   {
-    "term": "component.import-from-external-source-dialog.modify-search-button",
-    "definition": "Modify search",
-    "context": "Modify search"
-  },
-  {
     "term": "component.import-from-external-source-dialog.create-profile-button",
     "definition": "Create profile",
     "context": "Create profile"
@@ -3658,6 +3653,11 @@
     "term": "component.import-from-external-source-dialog.missing-integration-message",
     "definition": "Hi, I would like more information about checking external data sources.",
     "context": "Hi, I would like more information about checking external data sources."
+  },
+  {
+    "term": "component.import-from-external-source-dialog.modify-search-button",
+    "definition": "Modify search",
+    "context": "Modify search"
   },
   {
     "term": "component.import-from-external-source-dialog.no-read-permission",
@@ -11065,51 +11065,6 @@
     "context": "Do you still want to create the contact?"
   },
   {
-    "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",
-    "definition": "We have found parallels sent to some of these contacts.",
-    "context": "We have found parallels sent to some of these contacts."
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-alert-single-text",
-    "definition": "This contact has access to:",
-    "context": "This contact has access to:"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-closed-parallels",
-    "definition": "{count} closed {count, plural, =1{parallel} other{parallels}}",
-    "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-completed-parallels",
-    "definition": "{count} completed {count, plural, =1{parallel} other{parallels}}",
-    "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-pending-parallels",
-    "definition": "{count} pending {count, plural, =1{parallel} other{parallels}}",
-    "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-body.1",
-    "definition": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore.",
-    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-body.2",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-button",
-    "definition": "Yes, delete {count, plural, =1{contact} other {contacts}}",
-    "context": "Yes, delete {count, plural, =1{contact} other {contacts}}"
-  },
-  {
-    "term": "util.use-delete-contact.confirm-delete-header",
-    "definition": "Delete {count, plural, =1{{email}} other {# contacts}}",
-    "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
-  },
-  {
     "term": "component.use-delete-profile-type.confirm-delete-header",
     "definition": "Delete {count, plural, =1 {profile type} other {# profile types}}",
     "context": "Delete {count, plural, =1 {profile type} other {# profile types}}"
@@ -14860,6 +14815,26 @@
     "context": "Profiles"
   },
   {
+    "term": "page.public-petition-link.error-reminder-description",
+    "definition": "You can only send one reminder each 24 hours",
+    "context": "You can only send one reminder each 24 hours"
+  },
+  {
+    "term": "page.public-petition-link.error-reminder-title",
+    "definition": "Reminder already sent",
+    "context": "Reminder already sent"
+  },
+  {
+    "term": "page.public-petition-link.link-unavailable-description",
+    "definition": "Contact with {fullName} <{email}> to continue.",
+    "context": "Contact with {fullName} <{email}> to continue."
+  },
+  {
+    "term": "page.public-petition-link.link-unavailable-title",
+    "definition": "This process is closed",
+    "context": "This process is closed"
+  },
+  {
     "term": "page.public-petition.invalid-email-toast-description",
     "definition": "The provided email is invalid.",
     "context": "The provided email is invalid."
@@ -16365,26 +16340,6 @@
     "context": "Preview"
   },
   {
-    "term": "page.public-petition-link.link-unavailable-description",
-    "definition": "Contact with {fullName} <{email}> to continue.",
-    "context": "Contact with {fullName} <{email}> to continue."
-  },
-  {
-    "term": "page.public-petition-link.link-unavailable-title",
-    "definition": "This process is closed",
-    "context": "This process is closed"
-  },
-  {
-    "term": "page.public-petition-link.error-reminder-description",
-    "definition": "You can only send one reminder each 24 hours",
-    "context": "You can only send one reminder each 24 hours"
-  },
-  {
-    "term": "page.public-petition-link.error-reminder-title",
-    "definition": "Reminder already sent",
-    "context": "Reminder already sent"
-  },
-  {
     "term": "public.resend-verification-email.success-description",
     "definition": "Please, check your email.",
     "context": "Please, check your email."
@@ -16953,6 +16908,51 @@
     "term": "util.recipient-view-delegate-access.toast-header",
     "definition": "Access delegated",
     "context": "Access delegated"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",
+    "definition": "We have found parallels sent to some of these contacts.",
+    "context": "We have found parallels sent to some of these contacts."
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-alert-single-text",
+    "definition": "This contact has access to:",
+    "context": "This contact has access to:"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-body.1",
+    "definition": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore.",
+    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-body.2",
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-button",
+    "definition": "Yes, delete {count, plural, =1{contact} other {contacts}}",
+    "context": "Yes, delete {count, plural, =1{contact} other {contacts}}"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-closed-parallels",
+    "definition": "{count} closed {count, plural, =1{parallel} other{parallels}}",
+    "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-completed-parallels",
+    "definition": "{count} completed {count, plural, =1{parallel} other{parallels}}",
+    "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-header",
+    "definition": "Delete {count, plural, =1{{email}} other {# contacts}}",
+    "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
+  },
+  {
+    "term": "util.use-delete-contact.confirm-delete-pending-parallels",
+    "definition": "{count} pending {count, plural, =1{parallel} other{parallels}}",
+    "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

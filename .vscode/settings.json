@@ -9,5 +9,8 @@
     "**/.next": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "prettier.prettierPath": "node_modules/prettier/index.cjs"
+  "prettier.prettierPath": "node_modules/prettier/index.cjs",
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }

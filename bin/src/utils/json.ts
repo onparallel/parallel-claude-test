@@ -13,7 +13,7 @@ export async function writeJson(path: string, contents: any, opts?: WriteJsonOpt
   const { pretty } = { pretty: false, ...opts };
   await fs.writeFile(
     path,
-    (pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents)) + "\n",
+    pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents),
     "utf-8",
   );
 }

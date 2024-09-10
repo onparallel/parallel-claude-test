@@ -26,12 +26,16 @@ async function getCurrencies() {
     ).json();
     const data = tables[0];
     // if any of these asserts fails make sure the table still has the same structure and correct code accordingly
-    assert(data[0][0] === "State / Territory[1]");
-    assert(data[0][1] === "Currency[1][2]");
-    assert(data[0][2] === "Symbol[upper-alpha 4] orAbbrev.[3]");
-    assert(data[0][3] === "ISO code[2]");
-    assert(data[0][4] === "Fractionalunit");
-    assert(data[0][5] === "Numberto basic");
+    [
+      "State / Territory[2]",
+      "Currency[2][3]",
+      "Symbol[upper-alpha 4] orAbbrev.[4]",
+      "ISO code[3]",
+      "Fractionalunit",
+      "Numberto basic",
+    ].forEach((header, i) =>
+      assert(data[0][i] === header, `Header ${i} mismatch, please check table structure`),
+    );
     return (CURRENCIES = new Map(
       data
         .slice(1)

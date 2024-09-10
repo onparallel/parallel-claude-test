@@ -1455,6 +1455,26 @@
     "context": "Opt out from emails"
   },
   {
+    "term": "page.public-petition-link.error-reminder-description",
+    "definition": "",
+    "context": "You can only send one reminder each 24 hours"
+  },
+  {
+    "term": "page.public-petition-link.error-reminder-title",
+    "definition": "",
+    "context": "Reminder already sent"
+  },
+  {
+    "term": "page.public-petition-link.link-unavailable-description",
+    "definition": "",
+    "context": "Contact with {fullName} <{email}> to continue."
+  },
+  {
+    "term": "page.public-petition-link.link-unavailable-title",
+    "definition": "",
+    "context": "This process is closed"
+  },
+  {
     "term": "page.public-petition.invalid-email-toast-description",
     "definition": "",
     "context": "The provided email is invalid."
@@ -1633,26 +1653,6 @@
     "term": "public.home-link",
     "definition": "",
     "context": "Home"
-  },
-  {
-    "term": "page.public-petition-link.link-unavailable-description",
-    "definition": "",
-    "context": "Contact with {fullName} <{email}> to continue."
-  },
-  {
-    "term": "page.public-petition-link.link-unavailable-title",
-    "definition": "",
-    "context": "This process is closed"
-  },
-  {
-    "term": "page.public-petition-link.error-reminder-description",
-    "definition": "",
-    "context": "You can only send one reminder each 24 hours"
-  },
-  {
-    "term": "page.public-petition-link.error-reminder-title",
-    "definition": "",
-    "context": "Reminder already sent"
   },
   {
     "term": "public.slogan.alternative",

@@ -19,12 +19,14 @@ async function getCurrencies() {
         const tables = await (await fetch("https://www.wikitable2json.com/api/List_of_circulating_currencies?table=0")).json();
         const data = tables[0];
         // if any of these asserts fails make sure the table still has the same structure and correct code accordingly
-        (0, ts_essentials_1.assert)(data[0][0] === "State / Territory[1]");
-        (0, ts_essentials_1.assert)(data[0][1] === "Currency[1][2]");
-        (0, ts_essentials_1.assert)(data[0][2] === "Symbol[upper-alpha 4] orAbbrev.[3]");
-        (0, ts_essentials_1.assert)(data[0][3] === "ISO code[2]");
-        (0, ts_essentials_1.assert)(data[0][4] === "Fractionalunit");
-        (0, ts_essentials_1.assert)(data[0][5] === "Numberto basic");
+        [
+            "State / Territory[2]",
+            "Currency[2][3]",
+            "Symbol[upper-alpha 4] orAbbrev.[4]",
+            "ISO code[3]",
+            "Fractionalunit",
+            "Numberto basic",
+        ].forEach((header, i) => (0, ts_essentials_1.assert)(data[0][i] === header, `Header ${i} mismatch, please check table structure`));
         return (CURRENCIES = new Map(data
             .slice(1)
             .filter((row) => row[3] !== "(none)" && row.length > 0)
