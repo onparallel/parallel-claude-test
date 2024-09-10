@@ -6,6 +6,7 @@ import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { loadPdfJs, PdfJs } from "./pdfjs";
+import { withError } from "./promises/withError";
 import { useRegisterWithRef } from "./react-form-hook/useRegisterWithRef";
 import { turnOffPasswordManagers } from "./turnOffPasswordManagers";
 
@@ -13,7 +14,11 @@ export function useCheckIfFileIsPasswordProtected() {
   const showEnterFilePasswordDialog = useDialog(EnterFilePasswordDialog);
   return useCallback(async (file: File) => {
     if (file.type === "application/pdf") {
-      const pdfJs = await loadPdfJs();
+      const [error, pdfJs] = await withError(loadPdfJs());
+      if (error) {
+        // fail gracefully
+        return { message: "NO_PASSWORD" as const };
+      }
       if (await checkPassword(pdfJs, file, undefined)) {
         return { message: "NO_PASSWORD" as const };
       } else {

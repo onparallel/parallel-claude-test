@@ -1,3 +1,5 @@
+import "@parallel/polyfills";
+// keep
 import { ChakraProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme/theme";
