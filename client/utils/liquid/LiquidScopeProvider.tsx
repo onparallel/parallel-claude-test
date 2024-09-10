@@ -71,9 +71,9 @@ export function LiquidScopeProvider({
       }
       if (field.type === "HEADING") {
         scope._[fieldIndex] = logic.headerNumber;
-      }
-      if (isNonNullish(field.alias)) {
-        scope[field.alias] = logic.headerNumber;
+        if (isNonNullish(field.alias)) {
+          scope[field.alias] = logic.headerNumber;
+        }
       }
     }
     return scope;
