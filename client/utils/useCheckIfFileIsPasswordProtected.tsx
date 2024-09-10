@@ -41,7 +41,8 @@ async function checkPassword(pdfjs: PdfJs, file: File, password: string | undefi
     task.onPassword = () => {
       resolve(false);
     };
-    task.promise.then(() => resolve(true));
+    // if opening fails it's probably an invalid PDF, just let it go through
+    task.promise.then(() => resolve(true)).catch(() => resolve(true));
   });
 }
 
