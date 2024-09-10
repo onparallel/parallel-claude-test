@@ -109,7 +109,7 @@ export function LiquidScopeProvider({
           return content.value;
       }
     }
-  }, [petition.fields]);
+  }, [fieldsWithIndices, fieldLogic, intl.locale]);
   return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
 }
 
