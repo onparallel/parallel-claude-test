@@ -47,6 +47,7 @@ sudo systemctl enable parallel-email-events-queue.service
 sudo systemctl enable parallel-email-sender-queue.service
 sudo systemctl enable parallel-event-processor-queue.service
 sudo systemctl enable parallel-signature-worker-queue.service
+sudo systemctl enable parallel-task-worker-queue.service
 if [[ "$ENV" == "production" ]]; then
   sudo systemctl enable parallel-task-worker-queue\@{1..3}.service
 else
