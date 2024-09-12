@@ -388,6 +388,8 @@ export class PetitionBinder implements IPetitionBinder {
       [
         // for GIF images, we only need the first frame
         contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
+        "-resize",
+        "2000x2000>", // ">" means only shrink larger images
         "-background",
         "white",
         "-flatten",
