@@ -16,6 +16,7 @@ sudo yum install -y \
 # mount shared folder
 sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
+echo "fs-05b0e1c4df3ecd227.efs.eu-central-1.amazonaws.com:/ /nfs/parallel nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" | sudo tee -a /etc/fstab > /dev/null
 
 # Installing node.js
 sudo curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
