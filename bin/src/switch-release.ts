@@ -110,11 +110,13 @@ async function main() {
     : [];
 
   await pMap(oldInstancesFull, async (instance) => {
-    const ipAddress = instance.PrivateIpAddress!;
-    const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
-    console.log(chalk.yellow`Stopping workers on ${instance.InstanceId!} ${instanceName}`);
-    await executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
-    console.log(chalk.green.bold`Workers stopped on ${instance.InstanceId!} ${instanceName}`);
+    if (instance.State?.Name === InstanceStateName.running) {
+      const ipAddress = instance.PrivateIpAddress!;
+      const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
+      console.log(chalk.yellow`Stopping workers on ${instance.InstanceId!} ${instanceName}`);
+      await executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
+      console.log(chalk.green.bold`Workers stopped on ${instance.InstanceId!} ${instanceName}`);
+    }
   });
 
   console.log(chalk.yellow`Registering new instances on LB`);
