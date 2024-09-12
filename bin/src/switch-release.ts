@@ -226,10 +226,12 @@ async function main() {
   );
 
   await pMap(oldInstancesFull, async (instance) => {
-    const ipAddress = instance.PrivateIpAddress!;
-    const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
-    await executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
-    console.log(chalk.green`Server stopped in ${instance.InstanceId} ${instanceName}`);
+    if (instance.State?.Name === InstanceStateName.running) {
+      const ipAddress = instance.PrivateIpAddress!;
+      const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
+      await executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+      console.log(chalk.green`Server stopped in ${instance.InstanceId} ${instanceName}`);
+    }
   });
 }
 

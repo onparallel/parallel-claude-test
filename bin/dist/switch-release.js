@@ -160,11 +160,13 @@ async function main() {
         }));
     });
     await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
-        var _a;
-        const ipAddress = instance.PrivateIpAddress;
-        const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
-        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh stop`);
-        console.log(chalk_1.default.green `Server stopped in ${instance.InstanceId} ${instanceName}`);
+        var _a, _b;
+        if (((_a = instance.State) === null || _a === void 0 ? void 0 : _a.Name) === client_ec2_1.InstanceStateName.running) {
+            const ipAddress = instance.PrivateIpAddress;
+            const instanceName = (_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value;
+            await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh stop`);
+            console.log(chalk_1.default.green `Server stopped in ${instance.InstanceId} ${instanceName}`);
+        }
     });
 }
 (0, run_1.run)(main);
