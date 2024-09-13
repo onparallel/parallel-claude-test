@@ -86,6 +86,11 @@ export type TaskInput<TName extends TaskName> = {
     integration_id: number;
     external_id: string;
   };
+  FILE_EXPORT: {
+    integration_id: number;
+    petition_id: number;
+    pattern: string | null;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -222,6 +227,10 @@ export type TaskOutput<TName extends TaskName> = {
   ID_VERIFICATION_SESSION_COMPLETED: {
     success: boolean;
     error?: any;
+  };
+  FILE_EXPORT: {
+    file_export_log_id: number;
+    window_url: string;
   };
 }[TName];
 

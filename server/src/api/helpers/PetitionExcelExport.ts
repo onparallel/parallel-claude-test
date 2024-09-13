@@ -1,10 +1,11 @@
 import Excel from "exceljs";
 import { IntlShape } from "react-intl";
 import { Readable } from "stream";
-import { ApiContext, WorkerContext } from "../../context";
-import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
+import { PetitionField, PetitionFieldReply } from "../../db/__types";
+import { ContactRepository } from "../../db/repositories/ContactRepository";
+import { PetitionRepository } from "../../db/repositories/PetitionRepository";
+import { UserRepository } from "../../db/repositories/UserRepository";
 import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
-import { ZipFileInput } from "../../util/createZipFile";
 import { FORMATS } from "../../util/dates";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
@@ -23,27 +24,29 @@ export class PetitionExcelExport {
   private wb: Excel.Workbook;
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
-  private intl!: IntlShape;
 
   constructor(
-    private locale: UserLocale,
-    private context: ApiContext | WorkerContext,
+    private intl: IntlShape,
+    private parallelUrl: string,
+    private context: {
+      petitions: PetitionRepository;
+      users: UserRepository;
+      contacts: ContactRepository;
+    },
   ) {
     this.wb = new Excel.Workbook();
   }
 
   public async init() {
-    this.intl = await this.context.i18n.getIntl(this.locale);
-
     this.textRepliesTab = new TextRepliesExcelWorksheet(
       this.intl.formatMessage({
         id: "petition-excel-export.replies",
         defaultMessage: "Replies",
       }),
       this.wb,
-      this.context,
+      this.intl,
     );
-    await this.textRepliesTab.init(this.locale);
+    await this.textRepliesTab.init();
 
     this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
       this.intl.formatMessage({
@@ -51,9 +54,10 @@ export class PetitionExcelExport {
         defaultMessage: "Comments",
       }),
       this.wb,
+      this.intl,
       this.context,
     );
-    await this.fieldCommentsTab.init(this.locale);
+    await this.fieldCommentsTab.init();
   }
 
   public addPetitionVariables(variables: Record<string, number>) {
@@ -88,7 +92,7 @@ export class PetitionExcelExport {
 
   private extractBackgroundCheckReply(field: ComposedPetitionField) {
     return this.extractReplies(field, (r) =>
-      backgroundCheckFieldReplyUrl(this.context.config.misc.parallelUrl, this.locale, field, r),
+      backgroundCheckFieldReplyUrl(this.parallelUrl, this.intl.locale, field, r),
     );
   }
 
@@ -155,7 +159,7 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.addFieldComments(fields);
   }
 
-  public async export(): Promise<ZipFileInput> {
+  public async export<T>(outputFn: (stream: Readable, filename: string) => Promise<T>): Promise<T> {
     const stream = new Readable();
     // remove the tabs that only contain the headings row
     if (this.textRepliesTab.rowCount === 1) {
@@ -167,15 +171,13 @@ export class PetitionExcelExport {
     stream.push(await this.wb.xlsx.writeBuffer());
     stream.push(null); // end of stream
 
-    const intl = await this.context.i18n.getIntl(this.locale);
-
-    return {
-      filename: `${intl.formatMessage({
+    return await outputFn(
+      stream,
+      `${this.intl.formatMessage({
         id: "petition-excel-export.replies",
         defaultMessage: "Replies",
       })}.xlsx`,
-      stream,
-    };
+    );
   }
 
   public hasRows() {

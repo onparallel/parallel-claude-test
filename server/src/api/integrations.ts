@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Container } from "inversify";
 import { BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION } from "../integrations/document-processing/bankflip/BankflipDocumentProcessingIntegration";
+import { IMANAGE_FILE_EXPORT_INTEGRATION } from "../integrations/file-export/imanage/IManageFileExportIntegration";
 import { WebhookIntegration } from "../integrations/helpers/WebhookIntegration";
 import { BANKFLIP_ID_VERIFICATION_INTEGRATION } from "../integrations/id-verification/bankflip/BankflipIdVerificationIntegration";
 import {
@@ -29,6 +30,15 @@ export function integrations(container: Container) {
   router.use(
     bankflipDocumentProcessingIntegration.WEBHOOK_API_PREFIX,
     bankflipDocumentProcessingIntegration.handler(),
+  );
+
+  /* FILE EXPORT */
+  const iManageFileExportIntegration = container.get<WebhookIntegration<any>>(
+    IMANAGE_FILE_EXPORT_INTEGRATION,
+  );
+  router.use(
+    iManageFileExportIntegration.WEBHOOK_API_PREFIX,
+    iManageFileExportIntegration.handler(),
   );
 
   return router;

@@ -139,7 +139,7 @@ export class BankflipIdVerificationIntegration
   extends WebhookIntegration<"ID_VERIFICATION", "BANKFLIP", {}, IIdVerificationService>
   implements IIdVerificationIntegration
 {
-  public override WEBHOOK_API_PREFIX = "/id-verification/bankflip/";
+  public override WEBHOOK_API_PREFIX = "/id-verification/bankflip";
   public override service!: IIdVerificationService;
 
   protected override type = "ID_VERIFICATION" as const;
@@ -203,7 +203,7 @@ export class BankflipIdVerificationIntegration
         {
           method: "POST",
           body: JSON.stringify({
-            webhookUrl: `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}${metadata.integrationId}/events`,
+            webhookUrl: `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/${metadata.integrationId}/events`,
             customization,
             metadata,
             identityVerification: {

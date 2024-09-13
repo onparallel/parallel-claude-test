@@ -8801,4 +8801,31 @@ export class PetitionRepository extends BaseRepository {
         updated_by: updatedBy,
       });
   }
+
+  async attachPetitionMetadata(petitionId: number, metadata: any, updatedBy: string) {
+    await this.from("petition")
+      .where("id", petitionId)
+      .update({
+        metadata: this.knex.raw("metadata || ?", [this.json(metadata)]),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
+  }
+  async attachPetitionFieldReplyMetadata(replyId: number, metadata: any, updatedBy: string) {
+    await this.from("petition_field_reply")
+      .where("id", replyId)
+      .update({
+        metadata: this.knex.raw("metadata || ?", [this.json(metadata)]),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
+  }
+  async attachPetitionSignatureRequestMetadata(petitionSignatureRequestId: number, metadata: any) {
+    await this.from("petition_signature_request")
+      .where("id", petitionSignatureRequestId)
+      .update({
+        metadata: this.knex.raw("metadata || ?", [this.json(metadata)]),
+        updated_at: this.now(),
+      });
+  }
 }

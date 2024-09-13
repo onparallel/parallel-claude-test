@@ -1,14 +1,10 @@
 import Excel from "exceljs";
 import pMap from "p-map";
 import { IntlShape } from "react-intl";
-import { ApiContext, WorkerContext } from "../../context";
-import {
-  Contact,
-  PetitionField,
-  PetitionFieldComment,
-  UserData,
-  UserLocale,
-} from "../../db/__types";
+import { Contact, PetitionField, PetitionFieldComment, UserData } from "../../db/__types";
+import { ContactRepository } from "../../db/repositories/ContactRepository";
+import { PetitionRepository } from "../../db/repositories/PetitionRepository";
+import { UserRepository } from "../../db/repositories/UserRepository";
 import { fullName } from "../../util/fullName";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { renderSlateWithMentionsToText } from "../../util/slate/mentions";
@@ -28,14 +24,17 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
   constructor(
     worksheetName: string,
     wb: Excel.Workbook,
-    private context: ApiContext | WorkerContext,
+    private intl: IntlShape,
+    private context: {
+      petitions: PetitionRepository;
+      users: UserRepository;
+      contacts: ContactRepository;
+    },
   ) {
     super(worksheetName, wb);
   }
-  private intl!: IntlShape;
-  public async init(locale: UserLocale) {
-    this.intl = await this.context.i18n.getIntl(locale);
 
+  public async init() {
     this.page.columns = [
       {
         key: "content",

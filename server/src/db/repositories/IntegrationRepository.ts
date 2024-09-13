@@ -6,7 +6,9 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
 import {
   CreateDocumentProcessingLog,
+  CreateFileExportLog,
   CreateOrgIntegration,
+  FileExportLog,
   IntegrationType,
   OrgIntegration,
   User,
@@ -21,6 +23,7 @@ interface IntegrationProviders {
   ID_VERIFICATION: "BANKFLIP";
   DOCUMENT_PROCESSING: "BANKFLIP";
   PROFILE_EXTERNAL_SOURCE: "EINFORMA";
+  FILE_EXPORT: "IMANAGE";
 }
 
 type SignaturitSettings = {
@@ -71,6 +74,12 @@ interface EInformaProfileExternalSourceSettings {
   ENVIRONMENT: "production" | "test";
 }
 
+interface IManageFileExportSettings {
+  CREDENTIALS: {
+    CLIENT_ID: string;
+  };
+}
+
 export type IntegrationProvider<TType extends IntegrationType> =
   TType extends keyof IntegrationProviders ? IntegrationProviders[TType] : string;
 
@@ -103,6 +112,11 @@ export type IntegrationSettings<
   PROFILE_EXTERNAL_SOURCE: TProvider extends IntegrationProviders["PROFILE_EXTERNAL_SOURCE"]
     ? {
         EINFORMA: EInformaProfileExternalSourceSettings;
+      }[TProvider]
+    : never;
+  FILE_EXPORT: TProvider extends IntegrationProviders["FILE_EXPORT"]
+    ? {
+        IMANAGE: IManageFileExportSettings;
       }[TProvider]
     : never;
 }[TType];
@@ -438,5 +452,45 @@ export class IntegrationRepository extends BaseRepository {
       );
 
     return log;
+  }
+
+  readonly loadFileExportLog = this.buildLoadBy("file_export_log", "id");
+
+  async createFileExportLog(data: CreateFileExportLog, createdBy: string) {
+    const [log] = await this.insert("file_export_log", {
+      ...data,
+      json_export: this.json(data.json_export),
+      created_by: createdBy,
+      updated_by: createdBy,
+    }).returning("*");
+
+    return log;
+  }
+
+  async updateFileExportLog(id: number, data: Partial<FileExportLog>) {
+    const [log] = await this.from("file_export_log")
+      .where("id", id)
+      .update(
+        {
+          ...data,
+          ...(data.json_export ? { json_export: this.json(data.json_export) } : {}),
+          updated_at: this.now(),
+        },
+        "*",
+      );
+
+    return log;
+  }
+
+  async appendFileExportRequestLog(fileExportLogId: number, requestLog: any) {
+    await this.from("file_export_log")
+      .where("id", fileExportLogId)
+      .update({
+        request_log: this.knex.raw(
+          /* sql */ `jsonb_path_query_array(? || "request_log", '$[0 to 99]')`,
+          this.json({ ...requestLog, timestamp: Date.now() }),
+        ),
+        updated_at: this.now(),
+      });
   }
 }

@@ -848,3 +848,53 @@ export const createEInformaProfileExternalSourceIntegration = mutationField(
     },
   },
 );
+
+export const createIManageFileExportIntegration = mutationField(
+  "createIManageFileExportIntegration",
+  {
+    description: "Creates a new iManage File Export integration on the provided organization",
+    type: "SupportMethodResponse",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(
+        globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
+      ),
+      clientId: nonNull(stringArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "FILE_EXPORT",
+          "IMANAGE",
+        );
+        if (integrations.length > 0) {
+          throw new Error(`Organization already has an iManage File Export integration`);
+        }
+
+        const data = await ctx.integrationsSetup.createIManageFileExportIntegration(
+          {
+            org_id: args.orgId,
+            name: "iManage",
+            settings: {
+              CREDENTIALS: {
+                CLIENT_ID: args.clientId,
+              },
+            },
+          },
+          `User:${ctx.user!.id}`,
+        );
+
+        return {
+          result: "SUCCESS",
+          message: `Integration:${data.id} created successfully`,
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
+    },
+  },
+);

@@ -821,6 +821,7 @@ enum IntegrationType {
   AI_COMPLETION
   DOCUMENT_PROCESSING
   DOW_JONES_KYC
+  FILE_EXPORT
   ID_VERIFICATION
   PROFILE_EXTERNAL_SOURCE
   SIGNATURE
@@ -1274,6 +1275,11 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
+  Creates a task for exporting files from a petition using an integration
+  """
+  createFileExportTask(integrationId: GID!, pattern: String, petitionId: GID!): Task!
+
+  """
   Creates a reply to a file upload field.
   """
   createFileUploadReply(
@@ -1292,6 +1298,18 @@ type Mutation {
   Notifies the backend that the upload is complete.
   """
   createFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
+
+  """
+  Creates a new iManage File Export integration on the provided organization
+  """
+  createIManageFileExportIntegration(
+    clientId: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
 
   """
   Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.
@@ -7671,6 +7689,7 @@ enum TaskName {
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
+  FILE_EXPORT
   ID_VERIFICATION_SESSION_COMPLETED
   PETITION_SHARING
   PETITION_SUMMARY

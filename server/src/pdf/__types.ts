@@ -713,6 +713,7 @@ export type IntegrationType =
   | "AI_COMPLETION"
   | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
+  | "FILE_EXPORT"
   | "ID_VERIFICATION"
   | "PROFILE_EXTERNAL_SOURCE"
   | "SIGNATURE"
@@ -901,10 +902,14 @@ export type Mutation = {
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   createFieldGroupReplyFromProfile: PetitionFieldReply;
+  /** Creates a task for exporting files from a petition using an integration */
+  createFileExportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
+  /** Creates a new iManage File Export integration on the provided organization */
+  createIManageFileExportIntegration: SupportMethodResponse;
   /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
@@ -1550,6 +1555,12 @@ export type MutationcreateFieldGroupReplyFromProfileArgs = {
   profileId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateFileExportTaskArgs = {
+  integrationId: Scalars["GID"]["input"];
+  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
@@ -1561,6 +1572,11 @@ export type MutationcreateFileUploadReplyArgs = {
 export type MutationcreateFileUploadReplyCompleteArgs = {
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateIManageFileExportIntegrationArgs = {
+  clientId: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -5833,6 +5849,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "FILE_EXPORT"
   | "ID_VERIFICATION_SESSION_COMPLETED"
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"

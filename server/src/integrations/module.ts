@@ -9,6 +9,11 @@ import {
 } from "./document-processing/bankflip/BankflipDocumentProcessingIntegration";
 import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./dow-jones/DowJonesClient";
 import { DowJonesIntegration } from "./dow-jones/DowJonesIntegration";
+import { IFileExportIntegration } from "./file-export/FileExportIntegration";
+import {
+  IMANAGE_FILE_EXPORT_INTEGRATION,
+  IManageFileExportIntegration,
+} from "./file-export/imanage/IManageFileExportIntegration";
 import { IIdVerificationIntegration } from "./id-verification/IdVerificationIntegration";
 import {
   BANKFLIP_ID_VERIFICATION_INTEGRATION,
@@ -50,4 +55,6 @@ export const integrationsModule = new ContainerModule((bind) => {
   bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
     EInformaProfileExternalSourceIntegration,
   );
+
+  bind<IFileExportIntegration>(IMANAGE_FILE_EXPORT_INTEGRATION).to(IManageFileExportIntegration);
 });

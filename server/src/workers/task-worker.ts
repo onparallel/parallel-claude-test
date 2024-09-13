@@ -10,6 +10,7 @@ import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
+import { FileExportRunner } from "./tasks/FileExportRunner";
 import { IdVerificationSessionCompletedRunner } from "./tasks/IdVerificationSessionCompletedRunner";
 import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
@@ -36,6 +37,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   PETITION_SHARING: PetitionSharingRunner,
   PROFILE_NAME_PATTERN_UPDATED: ProfileNamePatternUpdatedRunner,
   ID_VERIFICATION_SESSION_COMPLETED: IdVerificationSessionCompletedRunner,
+  FILE_EXPORT: FileExportRunner,
 };
 
 export interface TaskWorkerPayload {

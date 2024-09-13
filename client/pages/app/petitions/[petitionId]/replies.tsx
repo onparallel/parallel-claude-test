@@ -107,6 +107,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useExportRepliesTask } from "@parallel/utils/tasks/useExportRepliesTask";
+import { useFileExportTask } from "@parallel/utils/tasks/useFileExportTask";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
@@ -252,6 +253,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showExportRepliesDialog = useExportRepliesDialog();
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleExportRepliesTask = useExportRepliesTask();
+  const handleFileExportTask = useFileExportTask();
 
   const handleDownloadAllClick = useCallback(async () => {
     try {
@@ -262,13 +264,16 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
       if (res.type === "DOWNLOAD_ZIP") {
         handleExportRepliesTask(petition.id, res.pattern);
-      } else {
+      } else if (res.type === "EXPORT_CUATRECASAS") {
         const { pattern, externalClientId } = res;
         await showExportRepliesProgressDialog({
           petitionId: petition.id,
           pattern,
           externalClientId,
         });
+      } else if (res.type === "FILE_EXPORT_PROVIDER") {
+        const integrationId = me.organization.fileExportIntegrations.items[0].id;
+        handleFileExportTask(petition.id, integrationId, res.pattern);
       }
     } catch {}
   }, [petitionId, petition.fields]);
@@ -1146,6 +1151,13 @@ PetitionReplies.queries = [
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
             limit
+          }
+          fileExportIntegrations: integrations(offset: 0, limit: 10, type: FILE_EXPORT) {
+            items {
+              id
+              type
+              name
+            }
           }
         }
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)

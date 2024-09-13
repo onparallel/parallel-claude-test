@@ -1,7 +1,5 @@
 import Excel from "exceljs";
 import { IntlShape } from "react-intl";
-import { ApiContext, WorkerContext } from "../../context";
-import { UserLocale } from "../../db/__types";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -14,15 +12,12 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
   constructor(
     worksheetName: string,
     wb: Excel.Workbook,
-    private context: ApiContext | WorkerContext,
+    private intl: IntlShape,
   ) {
     super(worksheetName, wb);
   }
 
-  private intl!: IntlShape;
-  public async init(locale: UserLocale) {
-    this.intl = await this.context.i18n.getIntl(locale);
-
+  public async init() {
     this.page.columns = [
       {
         key: "title",

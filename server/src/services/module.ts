@@ -35,6 +35,7 @@ import {
   IEventSubscriptionService,
 } from "./EventSubscriptionService";
 import { FETCH_SERVICE, FetchService, IFetchService } from "./FetchService";
+import { FILE_EXPORT_SERVICE, FileExportService, IFileExportService } from "./FileExportService";
 import { I18N_SERVICE, I18nService, II18nService } from "./I18nService";
 import {
   ID_VERIFICATION_SERVICE,
@@ -125,4 +126,5 @@ export const servicesModule = new ContainerModule((bind) => {
     ProfileExternalSourcesService,
   );
   bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
+  bind<IFileExportService>(FILE_EXPORT_SERVICE).to(FileExportService);
 });

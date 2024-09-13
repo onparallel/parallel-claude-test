@@ -106,7 +106,8 @@ export type IntegrationType =
   | "AI_COMPLETION"
   | "ID_VERIFICATION"
   | "DOCUMENT_PROCESSING"
-  | "PROFILE_EXTERNAL_SOURCE";
+  | "PROFILE_EXTERNAL_SOURCE"
+  | "FILE_EXPORT";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
@@ -117,6 +118,7 @@ export const IntegrationTypeValues = [
   "ID_VERIFICATION",
   "DOCUMENT_PROCESSING",
   "PROFILE_EXTERNAL_SOURCE",
+  "FILE_EXPORT",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -495,7 +497,8 @@ export type TaskName =
   | "BACKGROUND_CHECK_PROFILE_PDF"
   | "PETITION_SHARING"
   | "PROFILE_NAME_PATTERN_UPDATED"
-  | "ID_VERIFICATION_SESSION_COMPLETED";
+  | "ID_VERIFICATION_SESSION_COMPLETED"
+  | "FILE_EXPORT";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -513,6 +516,7 @@ export const TaskNameValues = [
   "PETITION_SHARING",
   "PROFILE_NAME_PATTERN_UPDATED",
   "ID_VERIFICATION_SESSION_COMPLETED",
+  "FILE_EXPORT",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -617,6 +621,7 @@ export interface TableTypes {
   event_subscription_signature_key: EventSubscriptionSignatureKey;
   feature_flag: FeatureFlag;
   feature_flag_override: FeatureFlagOverride;
+  file_export_log: FileExportLog;
   file_upload: FileUpload;
   license_code: LicenseCode;
   organization: Organization;
@@ -685,6 +690,7 @@ export interface TableCreateTypes {
   event_subscription_signature_key: CreateEventSubscriptionSignatureKey;
   feature_flag: CreateFeatureFlag;
   feature_flag_override: CreateFeatureFlagOverride;
+  file_export_log: CreateFileExportLog;
   file_upload: CreateFileUpload;
   license_code: CreateLicenseCode;
   organization: CreateOrganization;
@@ -753,6 +759,7 @@ export interface TablePrimaryKeys {
   event_subscription_signature_key: "id";
   feature_flag: "id";
   feature_flag_override: "id";
+  file_export_log: "id";
   file_upload: "id";
   license_code: "id";
   organization: "id";
@@ -1064,6 +1071,23 @@ export interface FeatureFlagOverride {
 export type CreateFeatureFlagOverride = PartialProps<
   Omit<FeatureFlagOverride, "id">,
   "org_id" | "user_id"
+>;
+
+export interface FileExportLog {
+  id: number; // int4
+  integration_id: number; // int4
+  json_export: any; // jsonb
+  created_by_user_id: number; // int4
+  request_log: any; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateFileExportLog = PartialProps<
+  Omit<FileExportLog, "id">,
+  "request_log" | "created_at" | "created_by" | "updated_at" | "updated_by"
 >;
 
 export interface FileUpload {

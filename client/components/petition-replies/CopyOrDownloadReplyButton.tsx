@@ -11,6 +11,7 @@ import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
+import { FileExportAccessIconButton } from "../common/FileExportAccessIconButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { PetitionRepliesFieldAction } from "./PetitionRepliesFieldReply";
@@ -66,6 +67,13 @@ export function CopyOrDownloadReplyButton({
           externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
           size="xs"
           placement="right"
+        />
+      ) : null}
+      {reply.metadata.FILE_EXPORT_IMANAGE_URL !== undefined ? (
+        <FileExportAccessIconButton
+          size="xs"
+          placement="right"
+          url={reply.metadata.FILE_EXPORT_IMANAGE_URL}
         />
       ) : null}
     </Stack>

@@ -27,7 +27,7 @@ export const Task = objectType({
           return null;
         }
 
-        if (isNonNullish(t.output?.temporary_file_id)) {
+        if (isNonNullish(t.output?.temporary_file_id) || t.name === "PETITION_SUMMARY") {
           return {};
         }
 
@@ -40,6 +40,12 @@ export const Task = objectType({
                 ...omit(r, ["petition_id"]),
                 petitionId: r.petition_id ? toGlobalId("Petition", r.petition_id) : null,
               })) ?? null,
+          };
+        } else if (t.name === "FILE_EXPORT") {
+          const output = t.output as TaskOutput<"FILE_EXPORT">;
+          return {
+            fileExportLogId: toGlobalId("FileExportLog", output.file_export_log_id),
+            windowUrl: output.window_url,
           };
         }
         return t.output;

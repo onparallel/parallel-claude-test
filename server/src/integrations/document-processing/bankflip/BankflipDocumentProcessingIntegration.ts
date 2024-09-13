@@ -117,7 +117,7 @@ export class BankflipDocumentProcessingIntegration
   extends WebhookIntegration<"DOCUMENT_PROCESSING", "BANKFLIP", {}, IDocumentProcessingService>
   implements IDocumentProcessingIntegration
 {
-  public override WEBHOOK_API_PREFIX = "/document-processing/bankflip/";
+  public override WEBHOOK_API_PREFIX = "/document-processing/bankflip";
   public override service!: IDocumentProcessingService;
 
   protected override type = "DOCUMENT_PROCESSING" as const;
@@ -385,7 +385,7 @@ export class BankflipDocumentProcessingIntegration
 
     // search for a subscribed webhook on this API key
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
-    const webhookUrl = `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}events`;
+    const webhookUrl = `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/events`;
     const webhooks = await this.apiRequest<WebhookSubscriptionResponse>(
       data.settings.CREDENTIALS,
       `/webhook-subscription?${new URLSearchParams({

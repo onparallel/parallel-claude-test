@@ -765,6 +765,7 @@ export type IntegrationType =
   | "AI_COMPLETION"
   | "DOCUMENT_PROCESSING"
   | "DOW_JONES_KYC"
+  | "FILE_EXPORT"
   | "ID_VERIFICATION"
   | "PROFILE_EXTERNAL_SOURCE"
   | "SIGNATURE"
@@ -962,10 +963,14 @@ export interface Mutation {
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   createFieldGroupReplyFromProfile: PetitionFieldReply;
+  /** Creates a task for exporting files from a petition using an integration */
+  createFileExportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
+  /** Creates a new iManage File Export integration on the provided organization */
+  createIManageFileExportIntegration: SupportMethodResponse;
   /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
@@ -1611,6 +1616,12 @@ export interface MutationcreateFieldGroupReplyFromProfileArgs {
   profileId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateFileExportTaskArgs {
+  integrationId: Scalars["GID"]["input"];
+  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
@@ -1622,6 +1633,11 @@ export interface MutationcreateFileUploadReplyArgs {
 export interface MutationcreateFileUploadReplyCompleteArgs {
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateIManageFileExportIntegrationArgs {
+  clientId: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateOrganizationArgs {
@@ -6052,6 +6068,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "FILE_EXPORT"
   | "ID_VERIFICATION_SESSION_COMPLETED"
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
@@ -7787,6 +7804,7 @@ export type TaskProgressDialog_TaskFragment = {
   id: string;
   status: TaskStatus;
   progress?: number | null;
+  output?: any | null;
 };
 
 export type TaskProgressDialog_taskQueryVariables = Exact<{
@@ -7794,7 +7812,13 @@ export type TaskProgressDialog_taskQueryVariables = Exact<{
 }>;
 
 export type TaskProgressDialog_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+  };
 };
 
 export type TaskProgressDialog_publicTaskQueryVariables = Exact<{
@@ -7803,7 +7827,13 @@ export type TaskProgressDialog_publicTaskQueryVariables = Exact<{
 }>;
 
 export type TaskProgressDialog_publicTaskQuery = {
-  publicTask: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+  publicTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+  };
 };
 
 export type HasFeatureFlagQueryVariables = Exact<{
@@ -24839,6 +24869,7 @@ export type useConfigureExpirationsDateDialog_PetitionFieldReplyFragment = {
 export type ExportRepliesDialog_UserFragment = {
   __typename?: "User";
   hasExportCuatrecasas: boolean;
+  organization: { __typename?: "Organization"; id: string; hasIManage: boolean };
 };
 
 export type ExportRepliesDialog_PetitionFragment = {
@@ -46484,7 +46515,26 @@ export type PetitionReplies_userQuery = {
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
       iconUrl92?: string | null;
+      hasIManage: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      fileExportIntegrations: {
+        __typename?: "IOrgIntegrationPagination";
+        items: Array<
+          | { __typename?: "OrgIntegration"; id: string; type: IntegrationType; name: string }
+          | {
+              __typename?: "ProfileExternalSourceOrgIntegration";
+              id: string;
+              type: IntegrationType;
+              name: string;
+            }
+          | {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              type: IntegrationType;
+              name: string;
+            }
+        >;
+      };
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
         id: string;
@@ -52657,6 +52707,7 @@ export type useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePd
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -52679,6 +52730,7 @@ export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMuta
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -52737,6 +52789,7 @@ export type useExportRepliesTask_createExportRepliesTaskMutation = {
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -52746,6 +52799,22 @@ export type useExportRepliesTask_getTaskResultFileMutationVariables = Exact<{
 
 export type useExportRepliesTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
+};
+
+export type useFileExportTask_createFileExportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  integrationId: Scalars["GID"]["input"];
+  pattern?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type useFileExportTask_createFileExportTaskMutation = {
+  createFileExportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+  };
 };
 
 export type usePetitionSharingTask_createAddPetitionPermissionTaskMutationVariables = Exact<{
@@ -52824,6 +52893,7 @@ export type usePrintPdfTask_createPrintPdfTaskMutation = {
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -52853,6 +52923,7 @@ export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation = {
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -52878,6 +52949,7 @@ export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation
     id: string;
     status: TaskStatus;
     progress?: number | null;
+    output?: any | null;
   };
 };
 
@@ -54921,6 +54993,7 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     id
     status
     progress
+    output
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
@@ -56397,6 +56470,10 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
 export const ExportRepliesDialog_UserFragmentDoc = gql`
   fragment ExportRepliesDialog_User on User {
     hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
+    organization {
+      id
+      hasIManage: hasIntegration(integration: FILE_EXPORT, provider: "IMANAGE")
+    }
   }
 ` as unknown as DocumentNode<ExportRepliesDialog_UserFragment, unknown>;
 export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
@@ -68716,6 +68793,13 @@ export const PetitionReplies_userDocument = gql`
         petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
           limit
         }
+        fileExportIntegrations: integrations(offset: 0, limit: 10, type: FILE_EXPORT) {
+          items {
+            id
+            type
+            name
+          }
+        }
       }
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       ...ExportRepliesDialog_User
@@ -70030,6 +70114,25 @@ export const useExportRepliesTask_getTaskResultFileDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileMutation,
   useExportRepliesTask_getTaskResultFileMutationVariables
+>;
+export const useFileExportTask_createFileExportTaskDocument = gql`
+  mutation useFileExportTask_createFileExportTask(
+    $petitionId: GID!
+    $integrationId: GID!
+    $pattern: String
+  ) {
+    createFileExportTask(
+      petitionId: $petitionId
+      integrationId: $integrationId
+      pattern: $pattern
+    ) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useFileExportTask_createFileExportTaskMutation,
+  useFileExportTask_createFileExportTaskMutationVariables
 >;
 export const usePetitionSharingTask_createAddPetitionPermissionTaskDocument = gql`
   mutation usePetitionSharingTask_createAddPetitionPermissionTask(

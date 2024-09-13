@@ -1995,8 +1995,10 @@ export interface NexusGenFieldTypes {
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFieldGroupReplyFromProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createFileExportTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createIManageFileExportIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganization: NexusGenRootTypes["Organization"]; // Organization!
     createOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -4639,8 +4641,10 @@ export interface NexusGenFieldTypeNames {
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
     createFieldGroupReplyFromProfile: "PetitionFieldReply";
+    createFileExportTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
+    createIManageFileExportIntegration: "SupportMethodResponse";
     createOrganization: "Organization";
     createOrganizationPdfDocumentTheme: "Organization";
     createPetition: "PetitionBase";
@@ -7004,6 +7008,12 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       profileId: NexusGenScalars["GID"]; // GID!
     };
+    createFileExportTask: {
+      // args
+      integrationId: NexusGenScalars["GID"]; // GID!
+      pattern?: string | null; // String
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createFileUploadReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -7016,6 +7026,11 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    createIManageFileExportIntegration: {
+      // args
+      clientId: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     createOrganization: {
       // args

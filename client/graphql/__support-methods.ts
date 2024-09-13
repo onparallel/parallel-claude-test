@@ -281,6 +281,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createIManageFileExportIntegration",
+      description: "Creates a new iManage File Export integration on the provided organization",
+      args: [
+        {
+          name: "clientId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "e.g. yw7RQt2cQ4XDHdrbtL3",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "deleteAzureOpenAiIntegration",
       description: "Removes the Azure OpenAI integration of the user's organization",
       args: [

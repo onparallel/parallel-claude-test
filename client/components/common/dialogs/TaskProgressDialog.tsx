@@ -133,6 +133,7 @@ TaskProgressDialog.fragments = {
       id
       status
       progress
+      output
     }
   `,
 };

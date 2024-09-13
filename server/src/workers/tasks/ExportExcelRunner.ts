@@ -1,5 +1,4 @@
 import sanitizeFilename from "sanitize-filename";
-import { getPetitionFiles } from "../helpers/getPetitionFiles";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
@@ -18,18 +17,26 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
 
     const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
 
-    const exportExcel = await getPetitionFiles(
-      petitionId,
-      this.task.user_id,
-      {
-        locale: userData!.preferred_locale,
-        xlsxOnly: true,
-        onProgress: async (progress) => {
-          await this.onProgress(progress * 100 * 0.95);
+    const exportExcel = await this.ctx.fileExport
+      .getPetitionFiles(
+        petitionId,
+        this.task.user_id,
+        async (storage, path, filename) => ({
+          filename: sanitizeFilename(filename),
+          stream: await storage.downloadFile(path),
+        }),
+        {
+          locale: userData!.preferred_locale,
+          include: ["excel-file"],
+          onProgress: async (progress) => {
+            this.ctx.logger.info(
+              `Exporting excel file for petition ${petitionId}: ${progress * 100}%`,
+            );
+            await this.onProgress(progress * 100 * 0.95);
+          },
         },
-      },
-      this.ctx,
-    ).next();
+      )
+      .next();
 
     if (!exportExcel.value) {
       throw new Error(`No replies to export to xlsx file on Petition:${petitionId}`);

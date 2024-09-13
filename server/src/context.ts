@@ -42,6 +42,7 @@ import {
   EventSubscriptionService,
 } from "./services/EventSubscriptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
+import { FILE_EXPORT_SERVICE, IFileExportService } from "./services/FileExportService";
 import { I18N_SERVICE, II18nService } from "./services/I18nService";
 import { ID_VERIFICATION_SERVICE, IdVerificationService } from "./services/IdVerificationService";
 import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
@@ -182,6 +183,7 @@ export class WorkerContext {
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
     @inject(DOCUMENT_PROCESSING_SERVICE)
     public readonly documentProcessing: IDocumentProcessingService,
+    @inject(FILE_EXPORT_SERVICE) public readonly fileExport: IFileExportService,
 
     // Repositories
     public readonly contacts: ContactRepository,

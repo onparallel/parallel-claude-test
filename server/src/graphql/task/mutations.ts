@@ -38,7 +38,10 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
-import { authenticateBackgroundCheckToken } from "../integrations/authorizers";
+import {
+  authenticateBackgroundCheckToken,
+  userHasAccessToIntegrations,
+} from "../integrations/authorizers";
 import {
   petitionHasRepliableFields,
   petitionIsNotAnonymized,
@@ -841,3 +844,33 @@ export const createRemovePetitionPermissionTask = mutationField(
     },
   },
 );
+
+export const createFileExportTask = mutationField("createFileExportTask", {
+  description: "Creates a task for exporting files from a petition using an integration",
+  type: "Task",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreOfTypePetition("petitionId"),
+    userHasAccessToIntegrations("integrationId", ["FILE_EXPORT"], true),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    integrationId: nonNull(globalIdArg("OrgIntegration")),
+    pattern: nullable(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.tasks.createTask(
+      {
+        name: "FILE_EXPORT",
+        user_id: ctx.user!.id,
+        input: {
+          petition_id: args.petitionId,
+          integration_id: args.integrationId,
+          pattern: args.pattern ?? null,
+        },
+      },
+      `User:${ctx.user!.id}`,
+    );
+  },
+});

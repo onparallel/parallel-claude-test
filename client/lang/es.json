@@ -3010,6 +3010,16 @@
     "context": "Export files to a folder in NetDocuments."
   },
   {
+    "term": "component.export-replies-dialog.export-to-provider",
+    "definition": "Exportar a {provider}",
+    "context": "Export to {provider}"
+  },
+  {
+    "term": "component.export-replies-dialog.export-to-provider-description",
+    "definition": "Exportar archivos a una carpeta en {provider}.",
+    "context": "Export files to a folder in {provider}."
+  },
+  {
     "term": "component.export-replies-dialog.header",
     "definition": "Exportar respuestas",
     "context": "Export replies"
@@ -3438,6 +3448,16 @@
     "term": "component.field-used-for-searches.see-configuration",
     "definition": "Ver configuración",
     "context": "See configuration"
+  },
+  {
+    "term": "component.file-export-access-icon-button.access-file",
+    "definition": "Acceder al archivo en {provider}",
+    "context": "Access file in {provider}"
+  },
+  {
+    "term": "component.file-export-access-icon-button.error-message-popover",
+    "definition": "Ocurrió un error subiendo el archivo. Por favor, inténtalo de nuevo.",
+    "context": "There was an error uploading the file. Please try again."
   },
   {
     "term": "component.file-icon.audio-file",
@@ -16958,6 +16978,16 @@
     "term": "util.use-delete-contact.confirm-delete-pending-parallels",
     "definition": "{count, plural, =1{# parallel pendiente} other{# parallels pendientes}}",
     "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
+  },
+  {
+    "term": "util.use-file-export-task.continue-button",
+    "definition": "Continuar con {provider}",
+    "context": "Continue to {provider}"
+  },
+  {
+    "term": "util.use-file-export-task.header",
+    "definition": "Exportando respuestas...",
+    "context": "Exporting replies..."
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

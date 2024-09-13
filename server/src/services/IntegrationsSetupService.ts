@@ -13,6 +13,10 @@ import {
 } from "../integrations/document-processing/bankflip/BankflipDocumentProcessingIntegration";
 import { DowJonesIntegration } from "../integrations/dow-jones/DowJonesIntegration";
 import {
+  IMANAGE_FILE_EXPORT_INTEGRATION,
+  IManageFileExportIntegration,
+} from "../integrations/file-export/imanage/IManageFileExportIntegration";
+import {
   BANKFLIP_ID_VERIFICATION_INTEGRATION,
   BankflipIdVerificationIntegration,
 } from "../integrations/id-verification/bankflip/BankflipIdVerificationIntegration";
@@ -73,6 +77,13 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">>;
+  createIManageFileExportIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"FILE_EXPORT", "IMANAGE">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"FILE_EXPORT", "IMANAGE">>;
 }
 
 @injectable()
@@ -88,6 +99,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     private bankflipDocumentProcessingIntegration: BankflipDocumentProcessingIntegration,
     @inject(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     private eInformaProfileExternalSourceIntegration: EInformaProfileExternalSourceIntegration,
+    @inject(IMANAGE_FILE_EXPORT_INTEGRATION)
+    private iManageFileExportIntegration: IManageFileExportIntegration,
   ) {}
 
   async createSignaturitIntegration(
@@ -182,5 +195,15 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
       createdBy,
       t,
     );
+  }
+
+  async createIManageFileExportIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"FILE_EXPORT", "IMANAGE">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"FILE_EXPORT", "IMANAGE">> {
+    return await this.iManageFileExportIntegration.createOrgIntegration(data, createdBy, t);
   }
 }

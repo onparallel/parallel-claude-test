@@ -41,7 +41,8 @@ export interface ExportRepliesDialogProps {
 
 export type ExportParams =
   | { type: "DOWNLOAD_ZIP"; pattern: string }
-  | { type: "EXPORT_CUATRECASAS"; pattern: string; externalClientId: string };
+  | { type: "EXPORT_CUATRECASAS"; pattern: string; externalClientId: string }
+  | { type: "FILE_EXPORT_PROVIDER"; pattern: string };
 
 export type ExportType = ExportParams["type"];
 
@@ -61,6 +62,9 @@ export function ExportRepliesDialog({
     { type: "DOWNLOAD_ZIP", isEnabled: true },
     ...(user.hasExportCuatrecasas
       ? [{ type: "EXPORT_CUATRECASAS" as const, isEnabled: false }]
+      : []),
+    ...(user.organization?.hasIManage
+      ? [{ type: "FILE_EXPORT_PROVIDER" as const, isEnabled: true }]
       : []),
   ]);
   const [selectedOption, setSelectedOption] = useState<ExportType>("DOWNLOAD_ZIP");
@@ -84,6 +88,22 @@ export function ExportRepliesDialog({
         id: "component.export-replies-dialog.export-cuatrecasas-description",
         defaultMessage: "Export files to a folder in NetDocuments.",
       }),
+    },
+    FILE_EXPORT_PROVIDER: {
+      title: intl.formatMessage(
+        {
+          id: "component.export-replies-dialog.export-to-provider",
+          defaultMessage: "Export to {provider}",
+        },
+        { provider: "iManage" },
+      ),
+      description: intl.formatMessage(
+        {
+          id: "component.export-replies-dialog.export-to-provider-description",
+          defaultMessage: "Export files to a folder in {provider}.",
+        },
+        { provider: "iManage" },
+      ),
     },
   };
 
@@ -154,6 +174,8 @@ export function ExportRepliesDialog({
           externalClientId,
         });
       }
+    } else {
+      props.onResolve({ type: selectedOption, pattern: _pattern });
     }
   };
 
@@ -298,6 +320,10 @@ ExportRepliesDialog.fragments = {
   User: gql`
     fragment ExportRepliesDialog_User on User {
       hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
+      organization {
+        id
+        hasIManage: hasIntegration(integration: FILE_EXPORT, provider: "IMANAGE")
+      }
     }
   `,
   Petition: gql`

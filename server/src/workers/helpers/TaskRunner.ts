@@ -42,14 +42,17 @@ export abstract class TaskRunner<T extends TaskName> {
     }
   }
 
-  protected async onProgress(value: number) {
+  protected async onProgress(_value: number) {
     if (this.abort.signal.aborted) {
       return;
     }
-    if (value < 0 || value > 100) {
-      throw new Error("value must be between 0 and 100");
+    if (_value < 0 || _value > 100) {
+      this.ctx.logger.warn(`Progress value should be between 0 and 100, got ${_value}`);
     }
+
+    const value = Math.min(Math.max(_value, 0), 100);
     const progress = Math.round(value);
+
     if (progress >= this.previousProgress + 5) {
       // Avoid updating progress too much
       this.previousProgress = progress;
