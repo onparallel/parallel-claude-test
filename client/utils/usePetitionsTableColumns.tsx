@@ -195,7 +195,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
               />
             )}
             renderOther={({ children, remaining }) => (
-              <ContactListPopover key="other" contacts={remaining} onContactClick={goToContact}>
+              <ContactListPopover contacts={remaining} onContactClick={goToContact}>
                 <Link
                   href={`/app/petitions/${row.id}/activity`}
                   onClick={(e: MouseEvent) => e.stopPropagation()}

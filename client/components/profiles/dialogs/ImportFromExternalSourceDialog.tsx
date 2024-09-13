@@ -683,10 +683,10 @@ function ImportFromExternalSourceDialogUpdateProfile({
                     <EnumerateList
                       values={fieldsWithoutRead}
                       maxItems={10}
-                      renderItem={(i) => (
-                        <Text as="strong">
+                      renderItem={({ value }, i) => (
+                        <Text as="strong" key={i}>
                           <LocalizableUserTextRender
-                            value={i.value.name}
+                            value={value.name}
                             default={intl.formatMessage({
                               id: "generic.unnamed-profile-type-field",
                               defaultMessage: "Unnamed property",
@@ -714,10 +714,10 @@ function ImportFromExternalSourceDialogUpdateProfile({
                     <EnumerateList
                       values={fieldsWithoutWrite}
                       maxItems={10}
-                      renderItem={(i) => (
-                        <Text as="strong">
+                      renderItem={({ value }, i) => (
+                        <Text as="strong" key={i}>
                           <LocalizableUserTextRender
-                            value={i.value.name}
+                            value={value.name}
                             default={intl.formatMessage({
                               id: "generic.unnamed-profile-type-field",
                               defaultMessage: "Unnamed property",
@@ -1004,10 +1004,10 @@ function ImportFromExternalSourceDialogCreateProfile({
                     <EnumerateList
                       values={fieldsWithoutWrite}
                       maxItems={10}
-                      renderItem={(i) => (
-                        <Text as="strong">
+                      renderItem={({ value }, i) => (
+                        <Text as="strong" key={i}>
                           <LocalizableUserTextRender
-                            value={i.value.name}
+                            value={value.name}
                             default={intl.formatMessage({
                               id: "generic.unnamed-profile-type-field",
                               defaultMessage: "Unnamed property",

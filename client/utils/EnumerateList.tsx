@@ -1,5 +1,5 @@
 import { IntlListFormatOptions } from "@formatjs/intl-listformat";
-import { ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 
 export interface EnumerateListProps<TValue> extends IntlListFormatOptions {
@@ -23,7 +23,7 @@ export interface EnumerateListProps<TValue> extends IntlListFormatOptions {
  * <EnumerateList
  *  maxItems={1}
  *  values={contacts}
- *  renderItem={({ value }) => <Contact value={value} />}
+ *  renderItem={({ value }, i) => <Contact key={i} value={value} />}
  *  renderOther={({ children, remaining }) => <Popover>{children}</Popover>}
  *  type="conjunction"
  * />;
@@ -40,16 +40,18 @@ export function EnumerateList<TValue>({
   const value = sample.map((value, index) => renderItem({ value }, index));
   if (values.length > maxItems) {
     value.push(
-      renderOther({
-        remaining: values.slice(maxItems),
-        children: (
-          <FormattedMessage
-            id="generic.n-more"
-            defaultMessage="{count} more"
-            values={{ count: values.length - maxItems }}
-          />
-        ),
-      }),
+      <Fragment key={-1}>
+        {renderOther({
+          remaining: values.slice(maxItems),
+          children: (
+            <FormattedMessage
+              id="generic.n-more"
+              defaultMessage="{count} more"
+              values={{ count: values.length - maxItems }}
+            />
+          ),
+        })}
+      </Fragment>,
     );
   }
   return <FormattedList value={value} {...options} />;
