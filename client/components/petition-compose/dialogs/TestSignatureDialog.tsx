@@ -4,7 +4,6 @@ import { Stack, Text } from "@chakra-ui/layout";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -72,7 +71,7 @@ export function useTestSignatureDialog() {
 
 export function useHandledTestSignatureDialog() {
   const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
-    useUserPreference("show-test-signature-dialog", true);
+    useLocalStorage("show-test-signature-dialog", true);
   const showTestSignatureDialog = useTestSignatureDialog();
 
   return useCallback(

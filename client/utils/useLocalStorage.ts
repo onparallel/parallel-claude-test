@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { localStorageGet, localStorageSet } from "./localStorage";
 
-export function useUserPreference<S>(
+export function useLocalStorage<S>(
   name: string,
   defaultValue: S,
 ): [S, Dispatch<SetStateAction<S>>] {

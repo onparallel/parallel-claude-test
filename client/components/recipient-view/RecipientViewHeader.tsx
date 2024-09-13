@@ -18,7 +18,6 @@ import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -60,7 +59,7 @@ export const RecipientViewHeader = Object.assign(
     const hasClientPortalAccess = access.hasClientPortalAccess;
     const organization = access.petition.organization;
     const [poppoverClosed, setPoppoverClosed] = useState(true);
-    const [isFirstTime, setIsFirstTime] = useUserPreference("recipient-first-time-check", "");
+    const [isFirstTime, setIsFirstTime] = useLocalStorage("recipient-first-time-check", "");
     const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
 
     useEffect(() => {

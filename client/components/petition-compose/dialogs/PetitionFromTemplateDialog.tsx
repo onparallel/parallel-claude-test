@@ -3,7 +3,6 @@ import { Checkbox } from "@chakra-ui/checkbox";
 import { Box, Stack, Text } from "@chakra-ui/layout";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -86,7 +85,7 @@ export function useHandledPetitionFromTemplateDialog() {
   const [
     showPetitionFromTemplateDialogUserPreference,
     setShowPetitionFromTemplateDialogUserPreference,
-  ] = useUserPreference("show-petition-from-template-dialog", true);
+  ] = useLocalStorage("show-petition-from-template-dialog", true);
   const showPetitionFromTemplateDialog = usePetitionFromTemplateDialog();
 
   return useCallback(async () => {

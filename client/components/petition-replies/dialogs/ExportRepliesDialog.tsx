@@ -30,7 +30,7 @@ import {
   useFilenamePlaceholders,
   useFilenamePlaceholdersRename,
 } from "@parallel/utils/useFilenamePlaceholders";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
+import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -104,7 +104,7 @@ export function ExportRepliesDialog({
     ping().then();
   }, [user.hasExportCuatrecasas]);
 
-  const [rename, setRename] = useUserPreference("export-replies-rename", true);
+  const [rename, setRename] = useLocalStorage("export-replies-rename", true);
   const placeholders = useFilenamePlaceholders();
   const [pattern, setPattern] = useState("{{file-name}}");
   const [externalClientId, setExternalClientId] = useState("");

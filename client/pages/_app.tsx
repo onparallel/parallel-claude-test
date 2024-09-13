@@ -5,14 +5,17 @@ import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import { LiquidProvider } from "@parallel/utils/liquid/LiquidContext";
+import { CookieProvider } from "@parallel/utils/useCookie";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect, useRef } from "react";
 
-interface MyAppProps extends AppProps, I18nProps {}
+interface MyAppProps extends AppProps, I18nProps {
+  cookie: string | null;
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
+function MyApp({ Component, pageProps, router, cookie, ...props }: MyAppProps) {
   useEffect(() => {
     const handleRouteChange = () => {
       window.analytics?.page({
@@ -33,25 +36,27 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   const toastPortalRef = useRef<HTMLDivElement>(null);
 
   return (
-    <LiquidProvider>
-      <I18nProvider {...props}>
-        <ChakraProvider
-          theme={theme}
-          resetCSS
-          portalZIndex={40}
-          cssVarsRoot="body"
-          toastOptions={{
-            portalProps: {
-              containerRef: toastPortalRef,
-            },
-          }}
-        >
-          <Fonts />
-          <Component {...pageProps} />
-          <div ref={toastPortalRef} />
-        </ChakraProvider>
-      </I18nProvider>
-    </LiquidProvider>
+    <CookieProvider value={cookie ?? (typeof document !== "undefined" ? document.cookie : "")}>
+      <LiquidProvider>
+        <I18nProvider {...props}>
+          <ChakraProvider
+            theme={theme}
+            resetCSS
+            portalZIndex={40}
+            cssVarsRoot="body"
+            toastOptions={{
+              portalProps: {
+                containerRef: toastPortalRef,
+              },
+            }}
+          >
+            <Fonts />
+            <Component {...pageProps} />
+            <div ref={toastPortalRef} />
+          </ChakraProvider>
+        </I18nProvider>
+      </LiquidProvider>
+    </CookieProvider>
   );
 }
 

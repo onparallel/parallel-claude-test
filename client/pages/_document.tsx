@@ -59,9 +59,7 @@ const POLYFILLS_INTL = [
   "Intl.RelativeTimeFormat",
 ];
 
-interface MyDocumentProps extends I18nProps {
-  isRecipientPage: boolean;
-}
+interface MyDocumentProps extends I18nProps {}
 
 class MyDocument extends Document<MyDocumentProps> {
   static override async getInitialProps(
@@ -83,7 +81,10 @@ class MyDocument extends Document<MyDocumentProps> {
       renderPage({
         // eslint-disable-next-line @typescript-eslint/naming-convention
         enhanceApp: (App) => (props) => (
-          <App {...props} {...{ locale, messages, isRecipientPage }} />
+          <App
+            {...props}
+            {...{ locale, messages, isRecipientPage, cookie: ctx.req?.headers["cookie"] ?? null }}
+          />
         ),
       });
     const initialProps = await Document.getInitialProps(ctx);
