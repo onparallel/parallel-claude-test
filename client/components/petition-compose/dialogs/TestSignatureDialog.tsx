@@ -4,6 +4,7 @@ import { Stack, Text } from "@chakra-ui/layout";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
+import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";

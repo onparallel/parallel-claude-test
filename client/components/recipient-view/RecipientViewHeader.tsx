@@ -18,6 +18,7 @@ import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
+import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
