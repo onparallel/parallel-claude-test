@@ -3699,26 +3699,45 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
     return await this.withTransaction(async (t) => {
-      await this.from("petition_access", t)
+      const updatedAccesses = await this.from("petition_access", t)
         .whereIn("id", unique(data.map((r) => r.petition_access_id)))
-        .update({
-          reminders_left: this.knex.raw(`"reminders_left" - 1`),
-          automatic_reminders_left:
-            type === "AUTOMATIC"
-              ? this.knex.raw(`"automatic_reminders_left" - 1`)
-              : this.knex.raw(`least("reminders_left" - 1, "automatic_reminders_left")`),
-          // if only one automatic reminder left, deactivate automatic reminders
-          next_reminder_at: this.knex.raw(/* sql */ `
+        .where("reminders_left", ">", 0)
+        .mmodify((q) => {
+          if (type === "AUTOMATIC") {
+            q.where("automatic_reminders_left", ">", 0);
+          }
+        })
+        .update(
+          {
+            reminders_left: this.knex.raw(`"reminders_left" - 1`),
+            automatic_reminders_left:
+              type === "AUTOMATIC"
+                ? this.knex.raw(`"automatic_reminders_left" - 1`)
+                : this.knex.raw(`least("reminders_left" - 1, "automatic_reminders_left")`),
+            // if only one automatic reminder left, deactivate automatic reminders
+            next_reminder_at: this.knex.raw(/* sql */ `
             case when "automatic_reminders_left" <= 1 then null else "next_reminder_at" end
           `),
-          reminders_active: this.knex.raw(/* sql */ `
+            reminders_active: this.knex.raw(/* sql */ `
             case when "automatic_reminders_left" <= 1 then false else "reminders_active" end
           `),
-        });
+          },
+          "*",
+        );
+
+      // make sure to only process reminders for accesses that have reminders left
+      const reminders = updatedAccesses
+        .map((a) => data.find((d) => d.petition_access_id === a.id))
+        .filter(isNonNullish);
+
+      if (reminders.length === 0) {
+        return [];
+      }
+
       return await this.insert(
         "petition_reminder",
-        data.map((d) => ({
-          ...d,
+        reminders.map((r) => ({
+          ...r,
           type,
           status: "PROCESSING",
         })),

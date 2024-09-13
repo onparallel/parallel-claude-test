@@ -539,6 +539,29 @@ describe("repositories/PetitionRepository", () => {
         reminders_active: false,
       });
     });
+
+    test("should not create and send reminders if provided access has no reminders left", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [contact] = await mocks.createRandomContacts(organization.id, 1);
+      const [access] = await mocks.createPetitionAccess(
+        petition.id,
+        user.id,
+        [contact.id],
+        user.id,
+        () => ({
+          reminders_left: 0,
+          automatic_reminders_left: 0,
+          next_reminder_at: null,
+          reminders_active: false,
+        }),
+      );
+
+      const reminders = await petitions.createReminders("MANUAL", [
+        { petition_access_id: access.id, sender_id: user.id },
+      ]);
+
+      expect(reminders).toHaveLength(0);
+    });
   });
 
   describe("clonePetitionField", () => {

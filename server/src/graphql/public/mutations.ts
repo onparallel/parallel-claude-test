@@ -1119,6 +1119,10 @@ export const publicSendReminder = mutationField("publicSendReminder", {
         },
       ]);
 
+      if (!reminder) {
+        throw new Error("Failed to create reminder");
+      }
+
       await Promise.all([
         ctx.petitions.createEvent({
           type: "REMINDER_SENT",
@@ -1131,7 +1135,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
       ]);
 
       return RESULT.SUCCESS;
-    } catch (error: any) {
+    } catch (error) {
       return RESULT.FAILURE;
     }
   },

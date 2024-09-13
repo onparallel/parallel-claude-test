@@ -29,15 +29,17 @@ createCronWorker("reminder-trigger", async (context) => {
         created_by: `PetitionAccess:${access.id}`,
       })),
     );
-    await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
-    await context.petitions.createEvent(
-      reminders.map((reminder) => ({
-        type: "REMINDER_SENT",
-        petition_id: remindableAccesses[0].petition_id,
-        data: {
-          petition_reminder_id: reminder.id,
-        },
-      })),
-    );
+    if (reminders.length > 0) {
+      await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
+      await context.petitions.createEvent(
+        reminders.map((reminder) => ({
+          type: "REMINDER_SENT",
+          petition_id: remindableAccesses[0].petition_id,
+          data: {
+            petition_reminder_id: reminder.id,
+          },
+        })),
+      );
+    }
   }
 });
