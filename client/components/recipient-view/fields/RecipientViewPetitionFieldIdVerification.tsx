@@ -13,6 +13,7 @@ import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-comm
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
+import { UnwrapArray } from "@parallel/utils/types";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { useRef, useState } from "react";
@@ -21,6 +22,7 @@ import { isNonNullish } from "remeda";
 import { useRecipientViewIdVerificationStartAgainDialog } from "../dialogs/RecipientViewIdVerificationStartAgainDialog";
 import {
   RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 
@@ -53,7 +55,6 @@ export function RecipientViewPetitionFieldIdVerification({
   parentReplyId,
   hasIdVerificationFeature,
 }: RecipientViewPetitionFieldIdVerificationProps) {
-  const intl = useIntl();
   const tone = useTone();
 
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
@@ -204,99 +205,13 @@ export function RecipientViewPetitionFieldIdVerification({
               </Button>
             ) : (
               <Stack spacing={2}>
-                {field.replies.map((reply) => {
-                  const contentType = reply.content?.contentType ?? "";
-                  const isVideo = contentType.includes("video");
-                  const hasError =
-                    isNonNullish(reply.content.error) && reply.content.error.length > 0;
-
-                  return (
-                    <HStack
-                      key={reply.id}
-                      width="100%"
-                      alignItems="top"
-                      id={`reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`}
-                    >
-                      <Center
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        width={10}
-                        height={10}
-                      >
-                        {hasError ? (
-                          <AlertCircleIcon color="red.600" />
-                        ) : (
-                          <CloudOkIcon color="green.600" />
-                        )}
-                      </Center>
-                      {hasError ? (
-                        <Stack spacing={0} flex="1">
-                          <Text fontSize="sm">
-                            <FormattedMessage
-                              id="component.recipient-view-petition-field-id-verification.verification-not-completed"
-                              defaultMessage="Identity verification not completed"
-                            />
-                          </Text>
-                          <Text color="red.600" fontSize="sm">
-                            <FormattedMessage
-                              id="component.recipient-view-petition-field-id-verification.verification-canceled"
-                              defaultMessage="The verification was cancelled before completion. Please try again."
-                              values={{
-                                tone,
-                              }}
-                            />
-                          </Text>
-                        </Stack>
-                      ) : (
-                        <>
-                          <Stack spacing={0} flex="1">
-                            <Text fontSize="sm">
-                              {isVideo ? (
-                                <FormattedMessage
-                                  id="component.recipient-view-petition-field-id-verification.video-successfully-completed"
-                                  defaultMessage="Video identification completed successfully"
-                                />
-                              ) : (
-                                <FormattedMessage
-                                  id="component.recipient-view-petition-field-id-verification.id-document-successfully-completed"
-                                  defaultMessage="Identity document verification completed successfully"
-                                />
-                              )}
-                            </Text>
-                            <DateTime
-                              fontSize="xs"
-                              value={reply.createdAt}
-                              format={FORMATS.LLL}
-                              useRelativeTime
-                            />
-                          </Stack>
-                          <Center boxSize={10}>
-                            {reply.status === "APPROVED" ? (
-                              <Tooltip
-                                label={intl.formatMessage({
-                                  id: "component.recipient-view-petition-field-reply.approved-file",
-                                  defaultMessage: "This file has been approved",
-                                })}
-                              >
-                                <CheckIcon color="green.600" />
-                              </Tooltip>
-                            ) : reply.status === "REJECTED" ? (
-                              <Tooltip
-                                label={intl.formatMessage({
-                                  id: "component.recipient-view-petition-field-reply.rejected-file",
-                                  defaultMessage: "This file has been rejected",
-                                })}
-                              >
-                                <CloseIcon fontSize="14px" color="red.500" />
-                              </Tooltip>
-                            ) : null}
-                          </Center>
-                        </>
-                      )}
-                    </HStack>
-                  );
-                })}
+                {field.replies.map((reply) => (
+                  <RecipientViewIdVerificationReplyContent
+                    key={reply.id}
+                    fieldId={field.id}
+                    reply={reply}
+                  />
+                ))}
               </Stack>
             )}
 
@@ -337,5 +252,91 @@ export function RecipientViewPetitionFieldIdVerification({
         <RestrictedPetitionFieldAlert marginTop={2} fieldType="ID_VERIFICATION" />
       ) : null}
     </RecipientViewPetitionFieldLayout>
+  );
+}
+
+export function RecipientViewIdVerificationReplyContent({
+  fieldId,
+  reply,
+}: {
+  fieldId: string;
+  reply: UnwrapArray<RecipientViewPetitionFieldLayout_PetitionFieldSelection["replies"]>;
+}) {
+  const tone = useTone();
+  const intl = useIntl();
+
+  const contentType = reply.content?.contentType ?? "";
+  const isVideo = contentType.includes("video");
+  const hasError = isNonNullish(reply.content.error) && reply.content.error.length > 0;
+  return (
+    <HStack
+      key={reply.id}
+      width="100%"
+      alignItems="top"
+      id={`reply-${fieldId}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`}
+    >
+      <Center borderRadius="md" border="1px solid" borderColor="gray.200" width={10} height={10}>
+        {hasError ? <AlertCircleIcon color="red.600" /> : <CloudOkIcon color="green.600" />}
+      </Center>
+      {hasError ? (
+        <Stack spacing={0} flex="1">
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.recipient-view-petition-field-id-verification.verification-not-completed"
+              defaultMessage="Identity verification not completed"
+            />
+          </Text>
+          <Text color="red.600" fontSize="sm">
+            <FormattedMessage
+              id="component.recipient-view-petition-field-id-verification.verification-canceled"
+              defaultMessage="The verification was cancelled before completion. Please try again."
+              values={{
+                tone,
+              }}
+            />
+          </Text>
+        </Stack>
+      ) : (
+        <>
+          <Stack spacing={0} flex="1">
+            <Text fontSize="sm">
+              {isVideo ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-id-verification.video-successfully-completed"
+                  defaultMessage="Video identification completed successfully"
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-id-verification.id-document-successfully-completed"
+                  defaultMessage="Identity document verification completed successfully"
+                />
+              )}
+            </Text>
+            <DateTime fontSize="xs" value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
+          </Stack>
+          <Center boxSize={10}>
+            {reply.status === "APPROVED" ? (
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "component.recipient-view-petition-field-reply.approved-file",
+                  defaultMessage: "This file has been approved",
+                })}
+              >
+                <CheckIcon color="green.600" />
+              </Tooltip>
+            ) : reply.status === "REJECTED" ? (
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "component.recipient-view-petition-field-reply.rejected-file",
+                  defaultMessage: "This file has been rejected",
+                })}
+              >
+                <CloseIcon fontSize="14px" color="red.500" />
+              </Tooltip>
+            ) : null}
+          </Center>
+        </>
+      )}
+    </HStack>
   );
 }

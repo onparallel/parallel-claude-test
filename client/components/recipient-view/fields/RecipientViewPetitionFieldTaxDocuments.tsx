@@ -12,6 +12,7 @@ import { FormattedMessage } from "react-intl";
 import { isNonNullish, pick, zip } from "remeda";
 import { useEsTaxDocumentsChangePersonDialog } from "../dialogs/EsTaxDocumentsChangePersonDialog";
 import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
+import { RecipientViewIdVerificationReplyContent } from "./RecipientViewPetitionFieldIdVerification";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -252,19 +253,24 @@ export function RecipientViewPetitionFieldTaxDocuments({
                 animate={{ opacity: 1, x: 0, transition: { ease: "easeOut" } }}
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
-                <RecipientViewPetitionFieldReplyFileUpload
-                  id={`reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`}
-                  type="ES_TAX_DOCUMENTS"
-                  reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
-                  onRemove={
-                    !hideDeleteReplyButton
-                      ? () => handleDeletePetitionReply({ replyId: reply.id })
-                      : undefined
-                  }
-                  onDownload={onDownloadReply}
-                  isDownloadDisabled={isCacheOnly || reply.isAnonymized}
-                />
+                {reply.content.type === "identity-verification" ||
+                reply.content.type === "identity-verification-selfie" ? (
+                  <RecipientViewIdVerificationReplyContent fieldId={field.id} reply={reply} />
+                ) : (
+                  <RecipientViewPetitionFieldReplyFileUpload
+                    id={`reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`}
+                    type="ES_TAX_DOCUMENTS"
+                    reply={reply}
+                    isDisabled={isDisabled || isDeletingReply[reply.id]}
+                    onRemove={
+                      !hideDeleteReplyButton
+                        ? () => handleDeletePetitionReply({ replyId: reply.id })
+                        : undefined
+                    }
+                    onDownload={onDownloadReply}
+                    isDownloadDisabled={isCacheOnly || reply.isAnonymized}
+                  />
+                )}
               </motion.li>
             ))}
           </AnimatePresence>

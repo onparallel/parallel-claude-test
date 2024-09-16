@@ -701,7 +701,7 @@ export const PublicPetitionFieldReply = objectType({
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
                 ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                  ? { warning: root.content.warning }
+                  ? pick(root.content, ["warning", "type"])
                   : {}),
               }
             : root.anonymized_at

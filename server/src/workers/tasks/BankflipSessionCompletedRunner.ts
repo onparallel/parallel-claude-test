@@ -3,7 +3,6 @@ import pMap from "p-map";
 import { groupBy, isNonNullish, isNullish, pick, zip } from "remeda";
 import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import {
-  IdentityVerification,
   ModelRequest,
   ModelRequestDocument,
   ModelRequestOutcome,
@@ -404,7 +403,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
   private async extractAndUploadIdentityVerificationDocuments(
     metadata: SessionMetadata,
-    idVerification: IdentityVerification,
+    idVerification: NonNullable<SessionSummaryResponse["identityVerification"]>,
     sessionId: string,
     createdBy: string,
   ): Promise<Pick<CreatePetitionFieldReply, "content" | "metadata">[]> {
@@ -414,7 +413,12 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       return [];
     }
 
-    if (idVerification.state === "ko" && idVerification.documents.length === 0) {
+    const idVerificationSummary = await this.ctx.bankflip.fetchIdVerificationSummary(
+      metadata.orgId,
+      idVerification.id,
+    );
+
+    if (idVerification.state === "ko" && (idVerificationSummary.documents ?? []).length === 0) {
       return [
         {
           content: {
@@ -428,8 +432,10 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       ];
     }
 
-    return await pMap(
-      idVerification.documents,
+    const replies: Pick<CreatePetitionFieldReply, "content" | "metadata">[] = [];
+
+    const documentReplies = await pMap(
+      idVerificationSummary.documents ?? [],
       async (doc) => {
         if (isNullish(doc.imagesDocument)) {
           return {
@@ -448,13 +454,26 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           doc.imagesDocument.id,
         );
 
-        let jsonContents: any = null;
-        if (isNonNullish(doc.dataDocument) && doc.dataDocument.extension === "json") {
-          jsonContents = await this.ctx.bankflip.fetchJsonDocumentContents(
-            metadata.orgId,
-            doc.dataDocument.id,
-          );
-        }
+        const jsonContents = pick(doc, [
+          "type",
+          "idNumber",
+          "firstName",
+          "surname",
+          "birthDate",
+          "birthPlace",
+          "nationality",
+          "issueDate",
+          "expirationDate",
+          "issuingCountry",
+          "unexpiredDocument",
+          "matchesExpectedDocument",
+          "faceFrontSide",
+          "uncompromisedDocument",
+          "notShownScreen",
+          "coherentDates",
+          "checkedMRZ",
+          "createdAt",
+        ]);
 
         const path = random(16);
         const res = await this.ctx.storage.fileUploads.uploadFile(
@@ -506,7 +525,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           },
           metadata: isNonNullish(jsonContents?.type)
             ? {
-                inferred_type: jsonContents.type,
+                inferred_type: jsonContents.type.toUpperCase(),
                 inferred_data: jsonContents,
               }
             : null,
@@ -514,5 +533,46 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       },
       { concurrency: 1 },
     );
+
+    replies.push(...documentReplies);
+
+    if (isNonNullish(idVerificationSummary.selfie?.videoDocument)) {
+      const videoBuffer = await this.ctx.bankflip.fetchBinaryDocumentContents(
+        metadata.orgId,
+        idVerificationSummary.selfie.videoDocument.id,
+      );
+
+      const path = random(16);
+      const res = await this.ctx.storage.fileUploads.uploadFile(
+        path,
+        idVerificationSummary.selfie.videoDocument.contentType,
+        videoBuffer,
+      );
+      const [file] = await this.ctx.files.createFileUpload(
+        {
+          path,
+          content_type: idVerificationSummary.selfie.videoDocument.contentType,
+          filename: `${idVerificationSummary.selfie.videoDocument.name}.${idVerificationSummary.selfie.videoDocument.extension}`,
+          size: res["ContentLength"]!.toString(),
+          upload_complete: true,
+        },
+        createdBy,
+      );
+
+      replies.push({
+        content: {
+          file_upload_id: file.id,
+          type: "identity-verification-selfie",
+          request: field.options.identityVerification,
+          bankflip_session_id: sessionId,
+        },
+        metadata: {
+          inferred_type: "VIDEOSELFIE",
+          inferred_data: pick(idVerificationSummary.selfie, ["liveness", "onlyOneFace"]),
+        },
+      });
+    }
+
+    return replies;
   }
 }

@@ -1213,7 +1213,7 @@ export const PetitionFieldReply = objectType({
                   : {}),
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
                 ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                  ? { warning: root.content.warning }
+                  ? pick(root.content, ["warning", "type"])
                   : {}),
               }
             : root.anonymized_at

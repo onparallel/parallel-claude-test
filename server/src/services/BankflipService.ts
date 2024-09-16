@@ -72,15 +72,37 @@ interface IdentityVerificationDocumentInfo {
 
 interface IdentityVerificationDocument {
   type: "id_card" | "passport" | "residence_permit" | "driver_license";
-  country: string;
-  frontPictureDocument: Maybe<IdentityVerificationDocumentInfo>;
-  backPictureDocument: Maybe<IdentityVerificationDocumentInfo>;
   dataDocument: Maybe<IdentityVerificationDocumentInfo>;
   imagesDocument: Maybe<IdentityVerificationDocumentInfo>;
+  idNumber: Maybe<string>;
+  firstName: Maybe<string>;
+  surname: Maybe<string>;
+  birthDate: Maybe<string>;
+  birthPlace: Maybe<string>;
+  nationality: Maybe<string>;
+  issueDate: Maybe<string>;
+  expirationDate: Maybe<string>;
+  unexpiredDocument: Maybe<number>;
+  matchesExpectedDocument: Maybe<number>;
+  faceFrontSide: Maybe<number>;
+  uncompromisedDocument: Maybe<number>;
+  notShownScreen: Maybe<number>;
+  coherentDates: Maybe<number>;
+  checkedMRZ: Maybe<number>;
+  issuingCountry: Maybe<string>;
+  documentSecurity: Maybe<boolean>;
+  documentRead: Maybe<boolean>;
+  notForged: Maybe<number>;
+  notPrinted: Maybe<number>;
+  faceMatching: Maybe<number>;
+  notSyntheticDocument: Maybe<number>;
+  authenticNFCChip: Maybe<number>;
+  frontBackSameDocument: Maybe<number>;
+  createdAt: string;
 }
 
-export interface IdentityVerification {
-  id: Maybe<string>;
+interface IdentityVerification {
+  id: string;
   createdAt: Maybe<string>;
   state: "ok" | "ko";
   koReason:
@@ -97,7 +119,6 @@ export interface IdentityVerification {
     | "user_blocked_expired_document"
     | "user_blocked_underage"
     | null;
-  documents: IdentityVerificationDocument[];
 }
 
 export interface SessionSummaryResponse {
@@ -105,6 +126,23 @@ export interface SessionSummaryResponse {
   identityVerification: Maybe<IdentityVerification>;
 }
 
+interface IdentityVerificationSummaryResponse {
+  id: string;
+  createdAt: Maybe<string>;
+  firstName: Maybe<string>;
+  surname: Maybe<string>;
+  birthDate: Maybe<string>;
+  nationality: Maybe<string>;
+  birthPlace: Maybe<string>;
+  documents: Maybe<IdentityVerificationDocument[]>;
+  selfie: Maybe<{
+    pictureDocument: Maybe<IdentityVerificationDocumentInfo>;
+    videoDocument: Maybe<IdentityVerificationDocumentInfo>;
+    createdAt: string;
+    liveness: Maybe<number>;
+    onlyOneFace: Maybe<number>;
+  }>;
+}
 interface SessionResponse {
   id: string;
   metadata: SessionMetadata;
@@ -121,6 +159,10 @@ export interface IBankflipService {
   webhookSecret(orgId: string): string;
   fetchSessionMetadata(orgId: string, sessionId: string): Promise<SessionMetadata>;
   fetchSessionSummary(orgId: string, sessionId: string): Promise<SessionSummaryResponse>;
+  fetchIdVerificationSummary(
+    orgId: string,
+    idVerificationId: string,
+  ): Promise<IdentityVerificationSummaryResponse>;
   fetchBinaryDocumentContents(orgId: string, documentId: string): Promise<Buffer>;
   fetchJsonDocumentContents(orgId: string, documentId: string): Promise<any>;
 }
@@ -280,6 +322,13 @@ export class BankflipService implements IBankflipService {
 
   async fetchSessionSummary(orgId: string, sessionId: string) {
     return await this.apiRequest<SessionSummaryResponse>(orgId, `/session/${sessionId}/summary`);
+  }
+
+  async fetchIdVerificationSummary(orgId: string, idVerificationId: string) {
+    return await this.apiRequest<IdentityVerificationSummaryResponse>(
+      orgId,
+      `/identity-verification/${idVerificationId}`,
+    );
   }
 
   async fetchBinaryDocumentContents(orgId: string, documentId: string) {

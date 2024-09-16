@@ -23,6 +23,7 @@ interface PetitionRepliesFieldIdVerificationReplyProps {
 
 interface MetadataLiveness {
   inferred_data: InferredDataLiveness;
+  inferred_type: "VIDEOSELFIE";
 }
 
 interface InferredDataLiveness {
@@ -63,11 +64,17 @@ export function PetitionRepliesFieldIdVerificationReply({
     return <ErrorMessageContent />;
   }
 
-  if (isNonNullish(reply.metadata.inferred_type)) {
+  if (
+    ["PASSPORT", "ID_CARD", "DRIVER_LICENSE", "RESIDENCE_PERMIT"].includes(
+      reply.metadata.inferred_type,
+    )
+  ) {
     return <IDCardView reply={reply} />;
+  } else if (reply.metadata.inferred_type === "VIDEOSELFIE") {
+    return <LivenessView reply={reply} />;
   }
 
-  return <LivenessView reply={reply} />;
+  return null;
 }
 
 PetitionRepliesFieldIdVerificationReply.fragments = {
@@ -136,22 +143,22 @@ function IDCardView({
       <Stack>
         <HStack>
           <Text>
-            {metadata.inferred_data.type === "PASSPORT" ? (
+            {metadata.inferred_type === "PASSPORT" ? (
               <FormattedMessage
                 id="component.petition-replies-field-id-verification-reply.passport-number"
                 defaultMessage="Passport"
               />
-            ) : metadata.inferred_data.type === "ID_CARD" ? (
+            ) : metadata.inferred_type === "ID_CARD" ? (
               <FormattedMessage
                 id="component.petition-replies-field-id-verification-reply.id-number"
                 defaultMessage="ID"
               />
-            ) : metadata.inferred_data.type === "DRIVER_LICENSE" ? (
+            ) : metadata.inferred_type === "DRIVER_LICENSE" ? (
               <FormattedMessage
                 id="component.petition-replies-field-id-verification-reply.driver-license-number"
                 defaultMessage="Driver license"
               />
-            ) : metadata.inferred_data.type === "RESIDENCE_PERMIT" ? (
+            ) : metadata.inferred_type === "RESIDENCE_PERMIT" ? (
               <FormattedMessage
                 id="component.petition-replies-field-id-verification-reply.residence-permit-number"
                 defaultMessage="Residence permit"

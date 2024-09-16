@@ -299,7 +299,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
           },
           metadata: isNonNullish(jsonContents?.type)
             ? {
-                inferred_type: jsonContents.type,
+                inferred_type: jsonContents.type.toUpperCase(),
                 inferred_data: jsonContents,
               }
             : null,
@@ -344,6 +344,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
         },
         metadata: {
           inferred_data: pick(summary.selfie, ["liveness", "onlyOneFace"]),
+          inferred_type: "VIDEOSELFIE",
         },
       });
     }

@@ -200,7 +200,11 @@ export function PetitionRepliesFieldReply({
                         .join("_")
                     )}
                   </Text>
-                ) : type === "ID_VERIFICATION" ? (
+                ) : type === "ID_VERIFICATION" ||
+                  (type === "ES_TAX_DOCUMENTS" &&
+                    ["identity-verification", "identity-verification-selfie"].includes(
+                      reply.content.type,
+                    )) ? (
                   <PetitionRepliesFieldIdVerificationReply reply={reply} />
                 ) : type === "DOW_JONES_KYC" ? (
                   <Stack spacing={1}>
