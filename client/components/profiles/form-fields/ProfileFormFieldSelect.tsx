@@ -9,10 +9,12 @@ import { PropsWithChildren, forwardRef, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
 import Select, {
+  IndicatorsContainerProps,
   OptionProps,
   SelectInstance,
   Props as SelectProps,
   SingleValueProps,
+  ValueContainerProps,
   components,
 } from "react-select";
 import { sortBy } from "remeda";
@@ -67,16 +69,24 @@ export function ProfileFormFieldSelect({
                   control: (baseStyles) => ({
                     ...baseStyles,
                     borderColor: "transparent",
-                    "&:hover": {
+                    ":hover": {
                       borderColor: "inherit",
                     },
-                    "&:hover *, :focus-within *": {
-                      opacity: 1,
+                    ":focus-within": {
+                      borderColor: baseStyles.borderColor,
                     },
+                    ":hover, :focus-within": {
+                      "[data-rs='value-container']": { paddingInlineEnd: 0 },
+                      "[data-rs='indicators-container']": { display: "flex" },
+                    },
+                  }),
+                  valueContainer: (baseStyles) => ({
+                    ...baseStyles,
+                    paddingInlineEnd: "16px",
                   }),
                   indicatorsContainer: (baseStyles) => ({
                     ...baseStyles,
-                    opacity: 0,
+                    display: "none",
                   }),
                   placeholder: (baseStyles) => ({
                     ...baseStyles,
@@ -119,6 +129,8 @@ export const ProfileFormFieldSelectInner = forwardRef<
     components: {
       SingleValue,
       Option,
+      ValueContainer,
+      IndicatorsContainer,
       ...props.components,
     },
   });
@@ -160,6 +172,32 @@ export const ProfileFormFieldSelectInner = forwardRef<
 
 interface ReactSelectExtraProps {
   showOptionsWithColors?: boolean;
+}
+
+function ValueContainer(
+  props: ValueContainerProps<SelectOptionValue, false, never> & {
+    selectProps: ReactSelectExtraProps;
+  },
+) {
+  return (
+    <components.ValueContainer
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "value-container" } }}
+    />
+  );
+}
+
+function IndicatorsContainer(
+  props: IndicatorsContainerProps<SelectOptionValue, false, never> & {
+    selectProps: ReactSelectExtraProps;
+  },
+) {
+  return (
+    <components.IndicatorsContainer
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "indicators-container" } }}
+    />
+  );
 }
 
 function SingleValue({

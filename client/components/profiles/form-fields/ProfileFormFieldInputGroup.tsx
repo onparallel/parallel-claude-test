@@ -54,9 +54,10 @@ export function ProfileFormFieldInputGroup({
           },
         }}
       >
-        <Box flex="1">{children}</Box>
-
-        {(browserName === "Firefox" && field.type === "DATE") ||
+        <Box flex="1" minWidth={0}>
+          {children}
+        </Box>
+        {(field.type === "DATE" && browserName === "Firefox") ||
         field.type === "SELECT" ||
         field.type === "BACKGROUND_CHECK" ||
         isDisabled ? null : (
