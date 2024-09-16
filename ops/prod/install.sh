@@ -54,13 +54,16 @@ else
   sudo systemctl enable parallel-task-worker-queue\@{1..2}.service
 fi
 sudo systemctl enable parallel-delay-queue.service
-sudo systemctl enable parallel-reminder-trigger-cron.service
-sudo systemctl enable parallel-scheduled-trigger-cron.service
-sudo systemctl enable parallel-petition-notifications-cron.service
-sudo systemctl enable parallel-organization-limits-cron.service
-sudo systemctl enable parallel-anonymizer-cron.service
-sudo systemctl enable parallel-old-notifications-cron.service
-sudo systemctl enable parallel-expiring-properties-cron.service
-sudo systemctl enable parallel-background-check-monitor-cron.service
+
+if [[ "$INSTANCE_NUMBER" == "1" ]]; then
+  sudo systemctl enable parallel-reminder-trigger-cron.service
+  sudo systemctl enable parallel-scheduled-trigger-cron.service
+  sudo systemctl enable parallel-petition-notifications-cron.service
+  sudo systemctl enable parallel-organization-limits-cron.service
+  sudo systemctl enable parallel-anonymizer-cron.service
+  sudo systemctl enable parallel-old-notifications-cron.service
+  sudo systemctl enable parallel-expiring-properties-cron.service
+  sudo systemctl enable parallel-background-check-monitor-cron.service
+fi
 
 sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
