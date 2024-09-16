@@ -77,7 +77,20 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         isNonNullish(field.options.labels) &&
         field.options.values.length === field.options.labels.length;
 
+      const validOptions = value.filter((v) => !isEmptyParagraph(v));
+      const isInvalid =
+        field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
+
+      const standardList =
+        field.type === "SELECT" && field.options.standardList ? field.options.standardList : null;
+
+      const isNotEditable =
+        field.isLinkedToProfileTypeField || isReadOnly || hasLabels || isNonNullish(standardList);
+
       useEffect(() => {
+        if (isNotEditable) {
+          return;
+        }
         if (!hasLabels && !shallowEqualArrays(field.options.values, currentValues.current)) {
           const newSlateValue = valuesToSlateNodes(field.options.values);
           onChange(newSlateValue);
@@ -100,24 +113,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
 
           currentValues.current = field.options.values;
         }
-      }, [field.options.values.join(","), hasLabels]);
-
-      useImperativeHandle(
-        ref,
-        () =>
-          ({
-            focus: (position) => {
-              const editor = editorRef.current;
-              ReactEditor.focus(editor);
-              if (position) {
-                Transforms.select(
-                  editor,
-                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, []),
-                );
-              }
-            },
-          }) as PetitionFieldOptionsListEditorRef,
-      );
+      }, [isNotEditable, field.options.values.join(","), hasLabels]);
 
       const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
@@ -177,14 +173,28 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         }
       }, [field.options.values, value, onFieldEdit, onChange]);
 
-      const validOptions = value.filter((v) => !isEmptyParagraph(v));
-      const isInvalid =
-        field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
+      useImperativeHandle(
+        ref,
+        () =>
+          ({
+            focus: (position) => {
+              if (isNotEditable) {
+                return;
+              }
+              const editor = editorRef.current;
+              ReactEditor.focus(editor);
+              if (position) {
+                Transforms.select(
+                  editor,
+                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, []),
+                );
+              }
+            },
+          }) as PetitionFieldOptionsListEditorRef,
+        [isNotEditable],
+      );
 
-      const standardList =
-        field.type === "SELECT" && field.options.standardList ? field.options.standardList : null;
-
-      return field.isLinkedToProfileTypeField || isReadOnly || hasLabels || standardList ? (
+      return isNotEditable ? (
         <>
           {standardList && !field.isLinkedToProfileTypeField ? (
             <Text fontSize="sm">

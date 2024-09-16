@@ -94,7 +94,7 @@ const SCHEMAS = {
       showOptionsWithColors: { type: ["boolean", "null"] },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "CNAE", "NACE", null],
       },
     },
   },
@@ -351,6 +351,33 @@ export async function profileTypeFieldSelectValues(
               return [locale, label.filter(isNonNullish).join(" - ")];
             }),
           ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+      case "CNAE": {
+        const locales = ["es", "en"] as const;
+        const cnaeByLocale = Object.fromEntries(
+          await pMap(locales, async (locale) => [
+            locale,
+            (await import(join(__dirname, `../../../data/cnae/cnae_${locale}.json`))).default,
+          ]),
+        );
+
+        const codes = Object.keys(cnaeByLocale["en"]);
+
+        return codes.map((code) => ({
+          value: code,
+          label: Object.fromEntries(
+            locales.map((locale) => [locale, `${code} - ${cnaeByLocale[locale][code]}`]),
+          ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+      case "NACE": {
+        const nace = (await import(join(__dirname, `../../../data/nace/nace_en.json`))).default;
+        return Object.keys(nace).map((code) => ({
+          value: code,
+          label: { en: `${code} - ${nace[code]}` } as Record<UserLocale, string>,
           isStandard: true,
         }));
       }

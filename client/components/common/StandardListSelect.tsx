@@ -31,6 +31,16 @@ const STANDARD_LISTS = {
       id: "component.standard-list-select.currencies",
       defaultMessage: "List of currencies",
     }),
+  NACE: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.nace",
+      defaultMessage: "NACE codes",
+    }),
+  CNAE: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.cnae",
+      defaultMessage: "CNAE codes",
+    }),
 } satisfies Record<string, (intl: IntlShape) => string>;
 
 type StandardListType = keyof typeof STANDARD_LISTS;

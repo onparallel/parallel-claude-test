@@ -10070,6 +10070,11 @@
     "context": "What would you like to do with them?"
   },
   {
+    "term": "component.standard-list-select.cnae",
+    "definition": "CNAE codes",
+    "context": "CNAE codes"
+  },
+  {
     "term": "component.standard-list-select.countries-iso",
     "definition": "List of countries",
     "context": "List of countries"
@@ -10083,6 +10088,11 @@
     "term": "component.standard-list-select.eu-countries-iso",
     "definition": "List of EU countries",
     "context": "List of EU countries"
+  },
+  {
+    "term": "component.standard-list-select.nace",
+    "definition": "NACE codes",
+    "context": "NACE codes"
   },
   {
     "term": "component.standard-list-select.no-list",

@@ -174,7 +174,7 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "NACE", "CNAE", null],
       },
     },
   },
@@ -630,6 +630,26 @@ export async function selectOptionsValuesAndLabels(
       return {
         values: currenciesCodes,
         labels: currenciesCodes.map((code) => currencies[code].filter(isNonNullish).join(" - ")),
+      };
+    }
+    case "NACE": {
+      const codes = (await import(join(__dirname, `../../../data/nace/nace_en.json`))).default;
+      const keys = Object.keys(codes);
+      return {
+        values: keys,
+        labels: keys.map((code) => `${code} - ${codes[code]}`),
+      };
+    }
+    case "CNAE": {
+      const codes = (
+        await import(
+          join(__dirname, `../../../data/cnae/cnae_${locale === "en" ? "en" : "es"}.json`)
+        )
+      ).default;
+      const keys = Object.keys(codes);
+      return {
+        values: keys,
+        labels: keys.map((code) => `${code} - ${codes[code]}`),
       };
     }
     default:
