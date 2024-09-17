@@ -51,6 +51,7 @@
     "p-map": "^4.0.0",
     "remeda": "^1.61.0",
     "rimraf": "^6.0.1",
+    "sanitize-filename": "^1.6.3",
     "timezone-support": "^3.1.0",
     "ts-essentials": "^10.0.2",
     "yargs": "^17.7.2"
