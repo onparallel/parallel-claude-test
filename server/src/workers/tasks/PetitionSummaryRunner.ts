@@ -13,7 +13,13 @@ import {
 import { Petition, PetitionFieldType } from "../../db/__types";
 import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
-import { evaluateFieldLogic } from "../../util/fieldLogic";
+import {
+  evaluateFieldLogic,
+  PetitionFieldLogicCondition,
+  PetitionFieldMath,
+  PetitionFieldMathOperation,
+  PetitionFieldVisibility,
+} from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -127,14 +133,18 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
         fields: composedPetition.fields
           .filter((f) => f.type !== "BACKGROUND_CHECK")
           .map((f) => ({
-            ...pick(f, ["type", "multiple", "alias", "options", "visibility", "math"]),
+            ...pick(f, ["type", "multiple", "alias", "options"]),
             id: toGlobalId("PetitionField", f.id),
+            visibility: this.mapFieldVisibility(f.visibility),
+            math: this.mapFieldMath(f.math),
             children:
               f.children
                 ?.filter((c) => c.type !== "BACKGROUND_CHECK")
                 .map((c) => ({
-                  ...pick(c, ["type", "multiple", "alias", "options", "visibility", "math"]),
+                  ...pick(c, ["type", "multiple", "alias", "options"]),
                   id: toGlobalId("PetitionField", c.id),
+                  visibility: this.mapFieldVisibility(c.visibility),
+                  math: this.mapFieldMath(c.math),
                   parent: { id: toGlobalId("PetitionField", f.id) },
                   replies: c.replies.map((r) => ({
                     content: r.content,
@@ -268,5 +278,58 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       organization: organization?.name,
       variables: fieldLogic[0].finalVariables,
     };
+  }
+
+  private mapCondition(
+    c: PetitionFieldLogicCondition<number>,
+  ): PetitionFieldLogicCondition<string> {
+    return {
+      operator: c.operator,
+      value: c.value,
+      ...("fieldId" in c
+        ? {
+            modifier: c.modifier,
+            fieldId: toGlobalId("PetitionField", c.fieldId),
+            column: c.column,
+          }
+        : { variableName: c.variableName }),
+    };
+  }
+
+  private mapOperation(o: PetitionFieldMathOperation<number>): PetitionFieldMathOperation<string> {
+    return {
+      variable: o.variable,
+      operator: o.operator,
+      operand:
+        o.operand.type === "FIELD"
+          ? { type: "FIELD", fieldId: toGlobalId("PetitionField", o.operand.fieldId) }
+          : o.operand,
+    };
+  }
+
+  private mapFieldVisibility(
+    v: PetitionFieldVisibility<number> | null,
+  ): PetitionFieldVisibility<string> | null {
+    if (!v) {
+      return null;
+    }
+    return {
+      type: v.type,
+      operator: v.operator,
+      conditions: v.conditions.map((c) => this.mapCondition(c)),
+    };
+  }
+
+  private mapFieldMath(
+    math: PetitionFieldMath<number>[] | null,
+  ): PetitionFieldMath<string>[] | null {
+    if (!math) {
+      return null;
+    }
+    return math.map((m) => ({
+      operator: m.operator,
+      conditions: m.conditions.map((c) => this.mapCondition(c)),
+      operations: m.operations.map((o) => this.mapOperation(o)),
+    }));
   }
 }
