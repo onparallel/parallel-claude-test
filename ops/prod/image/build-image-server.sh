@@ -3,6 +3,7 @@
 
 # versions
 nodejs_version="22" # https://nodejs.org/en
+typst_version="0.11.1" # https://nodejs.org/en
 nginx_version="1.26.1" # http://nginx.org/en/download.html
 fail2ban_version="1.1.0" # https://github.com/fail2ban/fail2ban/releases
 modsecurity_version="3.0.12" # https://github.com/SpiderLabs/ModSecurity/releases
@@ -44,6 +45,18 @@ sudo npm install -g npm@latest
 echo "Installing yarn"
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
 sudo yum -y install yarn
+
+echo "Installing typst"
+download_and_untar typst https://github.com/typst/typst/releases/download/v${typst_version}/typst-x86_64-unknown-linux-musl.tar.xz
+pushd typst
+sudo mv typst /usr/local/bin/
+popd
+if typst --version | grep -q "${typst_version}"; then
+  echo "Typst......ok"
+else
+  echo "Typst......failed"
+  exit 1 
+fi
 
 echo "Installing nginx"
 download_and_untar nginx https://nginx.org/download/nginx-${nginx_version}.tar.gz
@@ -142,6 +155,13 @@ popd
 
 sudo mv modsecurity-crs /etc/nginx/modsec/
 
+if /usr/sbin/nginx -v 2>&1 | grep -q "nginx version: nginx/${nginx_version}"; then
+  echo "Nginx.........ok"
+else
+  echo "Nginx.........failed"
+  exit 1 
+fi
+
 echo "Installing exiftool"
 download_and_untar image-exiftool https://exiftool.org/Image-ExifTool-${image_exiftool_version}.tar.gz
 pushd image-exiftool
@@ -150,12 +170,6 @@ make test
 sudo make install
 popd
 
-if /usr/sbin/nginx -v 2>&1 | grep -q "nginx version: nginx/${nginx_version}"; then
-  echo "Nginx.........ok"
-else
-  echo "Nginx.........failed"
-  exit 1 
-fi
 if exiftool -ver | grep -q "${exiftool_version}"; then
   echo "Exiftool......ok"
 else
