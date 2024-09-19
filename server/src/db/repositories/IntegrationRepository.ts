@@ -72,6 +72,11 @@ interface EInformaProfileExternalSourceSettings {
     CLIENT_SECRET: string;
   };
   ENVIRONMENT: "production" | "test";
+  /**
+   * Defines a map for custom properties mapping in any of the user's profile types.
+   * See AVAILABLE_EXTRA_PROPERTIES in EInformaProfileExternalSourceIntegration for a list of valid values.
+   */
+  CUSTOM_PROPERTIES_MAP?: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
 }
 
 interface IManageFileExportSettings {

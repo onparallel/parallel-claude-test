@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { ProfileType, User, UserLocale } from "../db/__types";
+import { ProfileType, ProfileTypeField, User, UserLocale } from "../db/__types";
 import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
@@ -125,6 +125,65 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     );
   }
 
+  private isPropertyCompatible(profileTypeFields: ProfileTypeField[]) {
+    return (profileTypeFieldId: number, property: Pick<ProfileTypeField, "type" | "options">) => {
+      const field = profileTypeFields.find((f) => f.id === profileTypeFieldId);
+      if (!field) {
+        this.logger.warn(`Field with id ${profileTypeFieldId} not found. Skipping...`);
+        return false;
+      }
+
+      return (
+        (field.type === "SELECT" &&
+          property.type === "SELECT" &&
+          field.options?.standardList === property.options?.standardList) ||
+        field.type === property.type
+      );
+    };
+  }
+
+  private isValidContentById(profileTypeFields: ProfileTypeField[]) {
+    return async (profileTypeFieldId: number, content: any) => {
+      try {
+        const field = profileTypeFields.find((f) => f.id === profileTypeFieldId);
+        if (!field) {
+          this.logger.warn(`Field with id ${profileTypeFieldId} not found. Skipping...`);
+          return false;
+        }
+        await validateProfileFieldValue(field, content);
+        return true;
+      } catch (error) {
+        if (error instanceof Error) {
+          this.logger.warn(
+            `Invalid content for field ${JSON.stringify([profileTypeFieldId, content])}: ${error.message}. Skipping...`,
+          );
+        }
+      }
+      return false;
+    };
+  }
+
+  private isValidContentByAlias(profileTypeFields: ProfileTypeField[]) {
+    return async (alias: string, content: any) => {
+      try {
+        const field = profileTypeFields.find((f) => f.alias === alias);
+        if (!field) {
+          this.logger.warn(`Field with alias ${alias} not found. Skipping...`);
+          return false;
+        }
+        await validateProfileFieldValue(field, content);
+        return true;
+      } catch (error) {
+        if (error instanceof Error) {
+          this.logger.warn(
+            `Invalid content for field ${JSON.stringify([alias, content])}: ${error.message}. Skipping...`,
+          );
+        }
+      }
+      return false;
+    };
+  }
+
   async entitySearch(
     integrationId: number,
     profileTypeId: number,
@@ -153,27 +212,21 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
             created_by_user_id: user.id,
             standard_type: profileType.standard_type!,
             data,
-            parsed_data: await provider.buildProfileTypeFieldValueContentsByAlias(
-              profileType.standard_type!,
-              data,
-              async (alias, content) => {
-                try {
-                  const field = profileTypeFields.find((f) => f.alias === alias);
-                  if (!field) {
-                    return false;
-                  }
-                  await validateProfileFieldValue(field, content);
-                  return true;
-                } catch (error) {
-                  if (error instanceof Error) {
-                    this.logger.warn(
-                      `Invalid content for field ${JSON.stringify([alias, content])}: ${error.message}. Skipping...`,
-                    );
-                  }
-                }
-                return false;
-              },
-            ),
+            parsed_data: {
+              ...(await provider.buildProfileTypeFieldValueContentsByAlias(
+                profileType.standard_type!,
+                data,
+                this.isValidContentByAlias(profileTypeFields),
+              )),
+              ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+                integrationId,
+                profileTypeId,
+                profileType.standard_type!,
+                data,
+                this.isPropertyCompatible(profileTypeFields),
+                this.isValidContentById(profileTypeFields),
+              )),
+            },
           },
           `User:${user.id}`,
         ),
@@ -206,27 +259,21 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
             created_by_user_id: user.id,
             standard_type: profileType.standard_type!,
             data,
-            parsed_data: await provider.buildProfileTypeFieldValueContentsByAlias(
-              profileType.standard_type!,
-              data,
-              async (alias, content) => {
-                try {
-                  const field = profileTypeFields.find((f) => f.alias === alias);
-                  if (!field) {
-                    return false;
-                  }
-                  await validateProfileFieldValue(field, content);
-                  return true;
-                } catch (error) {
-                  if (error instanceof Error) {
-                    this.logger.warn(
-                      `Invalid content for field ${JSON.stringify([alias, content])}: ${error.message}. Skipping...`,
-                    );
-                  }
-                }
-                return false;
-              },
-            ),
+            parsed_data: {
+              ...(await provider.buildProfileTypeFieldValueContentsByAlias(
+                profileType.standard_type!,
+                data,
+                this.isValidContentByAlias(profileTypeFields),
+              )),
+              ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+                integrationId,
+                profileTypeId,
+                profileType.standard_type!,
+                data,
+                this.isPropertyCompatible(profileTypeFields),
+                this.isValidContentById(profileTypeFields),
+              )),
+            },
           },
           `User:${user.id}`,
         ),

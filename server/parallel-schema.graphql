@@ -2518,6 +2518,17 @@ type Mutation {
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
+  updateEinformaCustomProperties(
+    """
+    {[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea
+    """
+    json: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
 
   """
   Activate or deactivate a feature flag on a specific user

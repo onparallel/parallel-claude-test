@@ -21,6 +21,7 @@ import {
   isNullish,
   pipe,
   unique,
+  uniqueBy,
   zip,
 } from "remeda";
 import { assert } from "ts-essentials";
@@ -46,6 +47,7 @@ import {
   profileTypeFieldSelectValues,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
+import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -2110,6 +2112,40 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
   },
 });
 
+async function mapSingleResultData(
+  profileTypeId: number,
+  userId: number,
+  parsedData: any,
+  profiles: ProfileRepository,
+) {
+  const profileTypeFields = await profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+  const effectivePermissions = await profiles.loadProfileTypeFieldUserEffectivePermission(
+    profileTypeFields.map((ptf) => ({ profileTypeFieldId: ptf.id, userId })),
+  );
+  const profileFieldsAndPermissions = zip(profileTypeFields, effectivePermissions);
+
+  return uniqueBy(
+    Object.entries(parsedData).map(([idOrAlias, content]) => {
+      const [profileTypeField, permission] = profileFieldsAndPermissions.find(([ptf]) =>
+        idOrAlias.startsWith("_.")
+          ? ptf.id === parseInt(idOrAlias.slice(2), 10)
+          : ptf.alias === idOrAlias,
+      )!;
+      return {
+        profileTypeFieldId: profileTypeField.id,
+        content: isAtLeast(permission, "READ") ? content : null,
+      };
+    }),
+    // make sure to not return duplicated profileTypeFieldIds
+    // (parsedData may contain the same property with alias and id index)
+    (p) => p.profileTypeFieldId,
+  ).sort((a, b) => {
+    const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeFieldId)!;
+    const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeFieldId)!;
+    return ptfA.position - ptfB.position;
+  });
+}
+
 export const profileExternalSourceSearch = mutationField("profileExternalSourceSearch", {
   type: nonNull("ProfileExternalSourceSearchResults"),
   authorize: authenticateAnd(
@@ -2135,7 +2171,7 @@ export const profileExternalSourceSearch = mutationField("profileExternalSourceS
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     profileId: nullable(globalIdArg("Profile")),
   },
-  resolve: async (_, args, ctx, info) => {
+  resolve: async (_, args, ctx) => {
     try {
       const data = await ctx.profileExternalSources.entitySearch(
         args.integrationId,
@@ -2146,32 +2182,16 @@ export const profileExternalSourceSearch = mutationField("profileExternalSourceS
       );
 
       if (data.type === "FOUND") {
-        const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-          args.profileTypeId,
-        );
-        const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
-          profileTypeFields.map((ptf) => ({ profileTypeFieldId: ptf.id, userId: ctx.user!.id })),
-        );
-        const profileFieldsAndPermissions = zip(profileTypeFields, effectivePermissions);
         return {
           type: "FOUND",
           id: data.entity.id,
           profileId: args.profileId ?? null,
-          data: Object.entries(data.entity.parsed_data)
-            .map(([alias, content]) => {
-              const [profileTypeField, permission] = profileFieldsAndPermissions.find(
-                ([ptf]) => ptf.alias === alias,
-              )!;
-              return {
-                profileTypeFieldId: profileTypeField.id,
-                content: isAtLeast(permission, "READ") ? content : null,
-              };
-            })
-            .sort((a, b) => {
-              const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeFieldId)!;
-              const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeFieldId)!;
-              return ptfA.position - ptfB.position;
-            }),
+          data: await mapSingleResultData(
+            args.profileTypeId,
+            ctx.user!.id,
+            data.entity.parsed_data,
+            ctx.profiles,
+          ),
         };
       } else {
         return {
@@ -2235,32 +2255,16 @@ export const profileExternalSourceDetails = mutationField("profileExternalSource
         ctx.user!,
       );
 
-      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-        args.profileTypeId,
-      );
-      const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
-        profileTypeFields.map((ptf) => ({ profileTypeFieldId: ptf.id, userId: ctx.user!.id })),
-      );
-      const profileFieldsAndPermissions = zip(profileTypeFields, effectivePermissions);
       return {
         type: "FOUND",
         id: data.entity.id,
         profileId: args.profileId ?? null,
-        data: Object.entries(data.entity.parsed_data)
-          .map(([alias, content]) => {
-            const [profileTypeField, permission] = profileFieldsAndPermissions.find(
-              ([ptf]) => ptf.alias === alias,
-            )!;
-            return {
-              profileTypeFieldId: profileTypeField.id,
-              content: isAtLeast(permission, "READ") ? content : null,
-            };
-          })
-          .sort((a, b) => {
-            const ptfA = profileTypeFields.find((ptf) => ptf.id === a.profileTypeFieldId)!;
-            const ptfB = profileTypeFields.find((ptf) => ptf.id === b.profileTypeFieldId)!;
-            return ptfA.position - ptfB.position;
-          }),
+        data: await mapSingleResultData(
+          args.profileTypeId,
+          ctx.user!.id,
+          data.entity.parsed_data,
+          ctx.profiles,
+        ),
       };
     } catch (error) {
       if (error instanceof ProfileExternalSourceRequestError) {
@@ -2343,9 +2347,13 @@ export const completeProfileFromExternalSource = mutationField(
       const fields: { content: any; profileTypeField: ProfileTypeField }[] = Object.entries(
         entity.parsed_data,
       )
-        .map(([alias, content]) => {
-          const profileTypeField = profileTypeFields.find((ptf) => ptf.alias === alias);
-          assert(profileTypeField, `ProfileTypeField with alias ${alias} not found`);
+        .map(([idOrAlias, content]) => {
+          const profileTypeField = profileTypeFields.find((ptf) =>
+            idOrAlias.startsWith("_.")
+              ? ptf.id === parseInt(idOrAlias.slice(2), 10)
+              : ptf.alias === idOrAlias,
+          );
+          assert(profileTypeField, `ProfileTypeField with alias ${idOrAlias} not found`);
 
           // check conflict resolution (no matter if the current value is the same as the external source)
           // in this flow there is no need to check if current value exists or is different from incoming

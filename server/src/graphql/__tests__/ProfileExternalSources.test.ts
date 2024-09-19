@@ -11,11 +11,15 @@ import {
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import {
+  EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+  EInformaProfileExternalSourceIntegration,
+} from "../../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
-describe("GraphQL / Profile External Sources", () => {
+describe("Profile External Sources", () => {
   let testClient: TestClient;
   let mocks: Mocks;
 
@@ -2474,6 +2478,83 @@ describe("GraphQL / Profile External Sources", () => {
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
+      });
+    });
+
+    describe("buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId", () => {
+      let eInforma: EInformaProfileExternalSourceIntegration;
+      let cnaeSelect: ProfileTypeField;
+
+      beforeAll(async () => {
+        eInforma = testClient.container.get<EInformaProfileExternalSourceIntegration>(
+          EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+        );
+
+        [cnaeSelect] = await mocks.knex.from("profile_type_field").insert(
+          {
+            type: "SELECT",
+            options: {
+              standardList: "CNAE",
+            },
+            profile_type_id: individualProfileType.id,
+            position: Object.entries(individualPTFsByAlias).length + 1,
+            name: { en: "CNAE", es: "CNAE" },
+            permission: "WRITE",
+          },
+          "*",
+        );
+
+        await mocks.knex
+          .from("org_integration")
+          .where("id", orgIntegration.id)
+          .update(
+            {
+              settings: {
+                ...orgIntegration.settings,
+                CUSTOM_PROPERTIES_MAP: {
+                  [individualProfileType.id]: {
+                    [cnaeSelect.id]: "cnae",
+                    [individualPTFsByAlias["p_source_of_funds"].id]: "web",
+                  },
+                },
+              },
+            },
+            "*",
+          );
+      });
+
+      it("builds custom properties data when providing CUSTOM_PROPERTY_MAP on integration settings", async () => {
+        const customData =
+          await eInforma.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+            orgIntegration.id,
+            individualProfileType.id,
+            "INDIVIDUAL",
+            {
+              denominacion: "MUTUA MADRILEÑA AUTOMOVILISTA SOCIEDAD DE SEGUROS A PRIMA FIJA",
+              nombreComercial: ["TORRE DE CRISTAL", "MUTUA MADRILEÑA AUTOMOVILISTA"],
+              domicilioSocial: "PASEO CASTELLANA, 33",
+              localidad: "28046 MADRID (Madrid)",
+              formaJuridica: "OTROS TIPOS NO DEFINIDOS",
+              cnae: "6512 - Seguros distintos de los seguros de vida",
+              identificativo: "V28027118",
+              situacion: "Activa",
+              telefono: [915555555, 902175176, 917025410, 902555550],
+              fax: [913083128],
+              web: ["www.grupomutua.es", "www.mutua-mad.es"],
+              email: "vmenchero@mutua.es",
+              cargoPrincipal: "GARRALDA RUIZ DE VELASCO, IGNACIO",
+              capitalSocial: 32611644.46,
+              empleados: 1727,
+              fechaConstitucion: "1930-03-13",
+            },
+            () => true,
+            async () => true,
+          );
+
+        expect(customData).toEqual({
+          [`_.${cnaeSelect.id}`]: { value: "6512" },
+          [`_.${individualPTFsByAlias["p_source_of_funds"].id}`]: { value: "www.grupomutua.es" },
+        });
       });
     });
   });

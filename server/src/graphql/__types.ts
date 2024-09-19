@@ -2148,6 +2148,7 @@ export interface NexusGenFieldTypes {
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
+    updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -4794,6 +4795,7 @@ export interface NexusGenFieldTypeNames {
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
     updateContact: "Contact";
+    updateEinformaCustomProperties: "SupportMethodResponse";
     updateFeatureFlag: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
@@ -7881,6 +7883,11 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateEinformaCustomProperties: {
+      // args
+      json: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateFeatureFlag: {
       // args

@@ -9,6 +9,7 @@ import {
   User,
   UserLocale,
 } from "../src/db/__types";
+import { EnhancedOrgIntegration } from "../src/db/repositories/IntegrationRepository";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
@@ -313,6 +314,23 @@ export class MockEInformaProfileExternalSourceIntegration
   extends EInformaProfileExternalSourceIntegration
   implements IProfileExternalSourceIntegration
 {
+  public override async fetchAccessToken() {
+    return "mocked-access-token";
+  }
+
+  protected override async withCredentials<TResult>(
+    orgIntegrationId: number,
+    handler: (credentials: any, context: any) => Promise<TResult>,
+  ): Promise<TResult> {
+    const integration = await this.integrations.loadIntegration(orgIntegrationId);
+
+    const context = this.getContext(
+      integration as EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA", false>,
+    );
+
+    return await handler({}, context);
+  }
+
   protected override async entitySearchByName(
     integrationId: number,
     standardType: ProfileTypeStandardType,

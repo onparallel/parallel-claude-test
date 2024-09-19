@@ -1,4 +1,10 @@
-import { ProfileExternalSourceEntity, ProfileTypeStandardType, UserLocale } from "../../db/__types";
+import {
+  ProfileExternalSourceEntity,
+  ProfileTypeField,
+  ProfileTypeFieldType,
+  ProfileTypeStandardType,
+  UserLocale,
+} from "../../db/__types";
 
 export interface ProfileExternalSourceSearchParamDefinition {
   type: "TEXT" | "SELECT";
@@ -55,6 +61,12 @@ export type ProfileExternalSourceSearchResults =
 export interface IProfileExternalSourceIntegration {
   STANDARD_TYPES: ProfileTypeStandardType[];
   PROVIDER_NAME: string;
+  AVAILABLE_EXTRA_PROPERTIES: Partial<
+    Record<
+      ProfileTypeStandardType,
+      { key: string; property: { type: ProfileTypeFieldType; options?: any } }[]
+    >
+  >;
 
   getSearchParamsDefinition(
     standardType: ProfileTypeStandardType,
@@ -81,6 +93,18 @@ export interface IProfileExternalSourceIntegration {
     standardType: ProfileTypeStandardType,
     entity: any,
     isValidContent: (alias: string, content: any) => Promise<boolean>,
+  ): Promise<Record<string, any>>;
+
+  buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+    integrationId: number,
+    profileTypeId: number,
+    standardType: ProfileTypeStandardType,
+    entity: any,
+    isPropertyCompatible: (
+      profileTypFieldId: number,
+      property: Pick<ProfileTypeField, "type" | "options">,
+    ) => boolean,
+    isValidContent: (profileTypeFieldId: number, content: any) => Promise<boolean>,
   ): Promise<Record<string, any>>;
 }
 

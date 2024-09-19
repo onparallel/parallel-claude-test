@@ -1273,6 +1273,7 @@ export interface Mutation {
   updateBackgroundCheckEntity: Success;
   /** Updates a contact. */
   updateContact: Contact;
+  updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a feature flag on a specific user */
   updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
@@ -2488,6 +2489,11 @@ export interface MutationupdateBackgroundCheckEntityArgs {
 export interface MutationupdateContactArgs {
   data: UpdateContactInput;
   id: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateEinformaCustomPropertiesArgs {
+  json: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateFeatureFlagArgs {

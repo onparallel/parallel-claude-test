@@ -1,9 +1,10 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import { outdent } from "outdent";
-import { isNonNullish, pick } from "remeda";
+import { filter, isNonNullish, isNullish, map, pick, pipe } from "remeda";
 import {
   ProfileExternalSourceEntity,
+  ProfileTypeField,
   ProfileTypeStandardType,
   UserLocale,
 } from "../../../db/__types";
@@ -73,9 +74,10 @@ interface EInformaEntityByIdResponse {
   fechaConstitucion?: string;
 }
 
-interface EInformaIntegrationContext {
+type EInformaIntegrationContext = {
   environment: "production" | "test";
-}
+  customPropertiesMap: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
+};
 
 @injectable()
 export class EInformaProfileExternalSourceIntegration
@@ -89,6 +91,35 @@ export class EInformaProfileExternalSourceIntegration
 
   public STANDARD_TYPES: ProfileTypeStandardType[] = ["LEGAL_ENTITY", "INDIVIDUAL"];
   public PROVIDER_NAME: string;
+  public AVAILABLE_EXTRA_PROPERTIES: Partial<
+    Record<
+      ProfileTypeStandardType,
+      { key: string; property: Pick<ProfileTypeField, "type" | "options"> }[]
+    >
+  > = {
+    INDIVIDUAL: [
+      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE" } } },
+      { key: "fechaUltimoBalance", property: { type: "DATE", options: {} } },
+      { key: "situacion", property: { type: "SHORT_TEXT", options: {} } },
+      { key: "web", property: { type: "SHORT_TEXT", options: {} } },
+      { key: "capitalSocial", property: { type: "NUMBER", options: {} } },
+      { key: "ventas", property: { type: "NUMBER", options: {} } },
+      { key: "anioVentas", property: { type: "NUMBER", options: {} } },
+      { key: "empleados", property: { type: "NUMBER", options: {} } },
+    ],
+    LEGAL_ENTITY: [
+      { key: "nombreComercial", property: { type: "SHORT_TEXT", options: {} } },
+      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE" } } },
+      { key: "fechaUltimoBalance", property: { type: "DATE", options: {} } },
+      { key: "situacion", property: { type: "SHORT_TEXT", options: {} } },
+      { key: "web", property: { type: "SHORT_TEXT", options: {} } },
+      { key: "capitalSocial", property: { type: "NUMBER", options: {} } },
+      { key: "ventas", property: { type: "NUMBER", options: {} } },
+      { key: "anioVentas", property: { type: "NUMBER", options: {} } },
+      { key: "empleados", property: { type: "NUMBER", options: {} } },
+      { key: "fechaConstitucion", property: { type: "DATE", options: {} } },
+    ],
+  };
 
   constructor(
     @inject(IntegrationRepository) integrations: IntegrationRepository,
@@ -108,6 +139,7 @@ export class EInformaProfileExternalSourceIntegration
   ): EInformaIntegrationContext {
     return {
       environment: integration.settings.ENVIRONMENT,
+      customPropertiesMap: integration.settings.CUSTOM_PROPERTIES_MAP ?? {},
     };
   }
 
@@ -537,6 +569,89 @@ export class EInformaProfileExternalSourceIntegration
     } else {
       never();
     }
+  }
+
+  public async buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+    integrationId: number,
+    profileTypeId: number,
+    standardType: ProfileTypeStandardType,
+    entity: EInformaEntityByIdResponse,
+    isPropertyCompatible: (
+      profileTypFieldId: number,
+      property: Pick<ProfileTypeField, "type" | "options">,
+    ) => boolean,
+    isValidContent: (profileTypeFieldId: number, content: any) => Promise<boolean>,
+  ) {
+    return await this.withExpirableAccessToken(
+      integrationId,
+      async (_, { customPropertiesMap }) => {
+        const customProperties = customPropertiesMap[profileTypeId];
+        if (!customProperties) {
+          return {};
+        }
+
+        return Object.fromEntries(
+          (
+            await pFilter<[number, any]>(
+              pipe(
+                Object.entries(customProperties),
+                filter(([_profileTypeFieldId, key]) => {
+                  // make sure the key is valid
+                  if (!(key in entity) || isNullish((entity as any)[key])) {
+                    this.logger.warn(`Custom property ${key} not found in entity. Skipping...`);
+                    return false;
+                  }
+
+                  // make sure the key is available for the standard type
+                  const profileTypeAvailableKeys =
+                    this.AVAILABLE_EXTRA_PROPERTIES[standardType]?.map(({ key }) => key) ?? [];
+                  if (!profileTypeAvailableKeys.includes(key)) {
+                    this.logger.warn(
+                      `Custom property ${key} not available for ${standardType} standard type. Skipping...`,
+                    );
+                    return false;
+                  }
+
+                  // make sure profileTypeFieldId is compatible with the property defined in the customPropertiesMap
+                  const property = this.AVAILABLE_EXTRA_PROPERTIES[standardType]!.find(
+                    (p) => p.key === key,
+                  )!.property;
+
+                  if (!isPropertyCompatible(parseInt(_profileTypeFieldId, 10), property)) {
+                    this.logger.warn(
+                      `Custom property ${key} is not compatible with the field type. Skipping...`,
+                    );
+                    return false;
+                  }
+
+                  return true;
+                }),
+                map(([profileTypeFieldId, key]) => {
+                  const id = parseInt(profileTypeFieldId, 10);
+                  // some entity keys need previous formatting based on the type and options of its related properties
+                  switch (key) {
+                    case "cnae":
+                      // "cnae" is mapped to a SELECT field of standardList:CNAE
+                      return [id, { value: entity["cnae"]!.slice(0, 4) }];
+                    case "web":
+                    case "nombreComercial":
+                      // "web" and "nombreComercial" are mapped to a SHORT_TEXT field
+                      // here we need only the first value
+                      return [id, { value: entity[key]![0] }];
+
+                    default:
+                      return [id, { value: entity[key as keyof EInformaEntityByIdResponse]! }];
+                  }
+                }),
+              ),
+              async ([profileTypeFieldId, content]) =>
+                await isValidContent(profileTypeFieldId, content),
+              { concurrency: 1 },
+            )
+          ).map(([profileTypeFieldId, content]) => [`_.${profileTypeFieldId}`, content]),
+        );
+      },
+    );
   }
 
   private formatPhoneNumber(phoneNumber: number) {

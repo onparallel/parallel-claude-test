@@ -1,6 +1,7 @@
+import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { isNonNullish, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { UserGroupPermissionName } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -898,3 +899,123 @@ export const createIManageFileExportIntegration = mutationField(
     },
   },
 );
+
+export const updateEinformaCustomProperties = mutationField("updateEinformaCustomProperties", {
+  type: "SupportMethodResponse",
+  authorize: superAdminAccess(),
+  args: {
+    orgId: nonNull(
+      globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
+    ),
+    json: nonNull(
+      stringArg({
+        description:
+          "{[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea",
+      }),
+    ),
+  },
+  resolve: async (_, { orgId, json }, ctx) => {
+    const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+      orgId,
+      "PROFILE_EXTERNAL_SOURCE",
+      "EINFORMA",
+    );
+    if (!integration) {
+      return {
+        result: RESULT.FAILURE,
+        message: "Organization does not have an eInforma Profile External Source integration",
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(json);
+      const ajv = new Ajv();
+      const isValid = ajv.validate(
+        {
+          type: "object",
+          patternProperties: {
+            "^[0-9]+$": {
+              type: "object",
+              patternProperties: {
+                "^[0-9]+$": {
+                  type: "string",
+                  enum: [
+                    "cnae",
+                    "fechaUltimoBalance",
+                    "situacion",
+                    "web",
+                    "capitalSocial",
+                    "ventas",
+                    "anioVentas",
+                    "empleados",
+                    "nombreComercial",
+                    "fechaConstitucion",
+                  ],
+                },
+              },
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+        },
+        parsed,
+      );
+
+      if (!isValid) {
+        return {
+          result: RESULT.FAILURE,
+          message: ajv.errorsText(),
+        };
+      }
+
+      const profileTypeIds = Object.keys(parsed).map((id) => parseInt(id));
+      const profileTypes = await ctx.profiles.loadProfileType(profileTypeIds);
+
+      if (profileTypes.some((pt) => pt?.org_id !== orgId)) {
+        return {
+          result: RESULT.FAILURE,
+          message: "Some profile types do not belong to the organization",
+        };
+      }
+
+      if (profileTypes.some((pt) => isNullish(pt?.standard_type))) {
+        return {
+          result: RESULT.FAILURE,
+          message: "Some profile types do not have a defined standard type",
+        };
+      }
+
+      for (const profileType of profileTypes) {
+        const profileTypeFieldIds = Object.keys(parsed[profileType!.id]).map((id) => parseInt(id));
+        const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+        if (profileTypeFields.some((ptf) => ptf?.profile_type_id !== profileType!.id)) {
+          return {
+            result: RESULT.FAILURE,
+            message: "Some profile type fields do not belong to the profile type",
+          };
+        }
+      }
+
+      await ctx.integrations.updateOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">(
+        integration.id,
+        {
+          settings: {
+            ...integration.settings,
+            CUSTOM_PROPERTIES_MAP: parsed,
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: "OK!",
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
