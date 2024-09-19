@@ -551,6 +551,7 @@ function NotificationsSection({ onHelpCenterClick }: { onHelpCenterClick: () => 
           }}
           icon={<NewsIcon boxSize={5} />}
           onClick={onHelpCenterClick}
+          data-canny-changelog
         >
           <FormattedMessage id="generic.product-news-label" defaultMessage="News" />
         </NavBarButton>
