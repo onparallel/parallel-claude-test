@@ -26,7 +26,7 @@ export function OrganizationProfilesLayout({
       {
         key: "types" as const,
         title: intl.formatMessage({
-          id: "organization.profiles.profile-types",
+          id: "component.organization-profiles-layout.profile-types",
           defaultMessage: "Profile types",
         }),
         href: "/app/organization/profiles/types",
@@ -34,7 +34,7 @@ export function OrganizationProfilesLayout({
       {
         key: "relationships" as const,
         title: intl.formatMessage({
-          id: "organization.profiles.relationships",
+          id: "component.organization-profiles-layout.relationships",
           defaultMessage: "Relationships",
         }),
         isDisabled: true,
@@ -51,7 +51,10 @@ export function OrganizationProfilesLayout({
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="organization.profiles.title" defaultMessage="Profiles" />
+          <FormattedMessage
+            id="component.organization-profiles-layout.title"
+            defaultMessage="Profiles"
+          />
         </Heading>
       }
     >

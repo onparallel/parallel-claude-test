@@ -4705,6 +4705,21 @@
     "context": "<b>Usage:</b> {usersCount}/{usersLimit} users"
   },
   {
+    "term": "component.organization-profiles-layout.profile-types",
+    "definition": "Tipos de perfil",
+    "context": "Profile types"
+  },
+  {
+    "term": "component.organization-profiles-layout.relationships",
+    "definition": "Relaciones",
+    "context": "Relationships"
+  },
+  {
+    "term": "component.organization-profiles-layout.title",
+    "definition": "Perfiles",
+    "context": "Profiles"
+  },
+  {
     "term": "component.organization-status-dialog.organization-status",
     "definition": "Estado de la organización",
     "context": "Organization status"
@@ -13538,21 +13553,6 @@
     "term": "organization.organization-created-success.toast-title",
     "definition": "Organización creada con éxito.",
     "context": "Organization created successfully."
-  },
-  {
-    "term": "organization.profiles.profile-types",
-    "definition": "Tipos de perfil",
-    "context": "Profile types"
-  },
-  {
-    "term": "organization.profiles.relationships",
-    "definition": "Relaciones",
-    "context": "Relationships"
-  },
-  {
-    "term": "organization.profiles.title",
-    "definition": "Perfiles",
-    "context": "Profiles"
   },
   {
     "term": "organization.signature-integrations.title",

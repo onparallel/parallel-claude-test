@@ -46,7 +46,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         ? [
             {
               title: intl.formatMessage({
-                id: "organization.profiles.title",
+                id: "component.organization-profiles-layout.title",
                 defaultMessage: "Profiles",
               }),
               path: "/app/organization/profiles/types",
