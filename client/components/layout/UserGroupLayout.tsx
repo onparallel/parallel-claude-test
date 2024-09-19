@@ -31,7 +31,7 @@ import { OrganizationSettingsLayout } from "./OrganizationSettingsLayout";
 
 type UserGroupSection = "users" | "permissions";
 
-interface UserGroupLayoutProps extends UserGroupLayout_QueryFragment {
+interface UserGroupLayoutProps extends Pick<UserGroupLayout_QueryFragment, "me" | "realMe"> {
   currentTabKey: UserGroupSection;
   groupId: string;
   children: ReactNode;

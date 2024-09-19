@@ -8,7 +8,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfilesOrganizationSection = "types" | "relationships";
 
-interface OrganizationProfilesLayoutProps extends OrganizationProfilesLayout_QueryFragment {
+interface OrganizationProfilesLayoutProps
+  extends Pick<OrganizationProfilesLayout_QueryFragment, "me" | "realMe"> {
   currentTabKey: ProfilesOrganizationSection;
   children: ReactNode;
 }

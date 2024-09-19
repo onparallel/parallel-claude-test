@@ -15,7 +15,8 @@ import { useOrganizationStatusDialog } from "./dialogs/OrganizationStatusDialog"
 
 type AdminOrganizationsSection = "users" | "features" | "subscriptions";
 
-interface AdminOrganizationsLayoutProps extends AdminOrganizationsLayout_QueryFragment {
+interface AdminOrganizationsLayoutProps
+  extends Pick<AdminOrganizationsLayout_QueryFragment, "me" | "realMe"> {
   currentTabKey: AdminOrganizationsSection;
   organization: AdminOrganizationsLayout_OrganizationFragment;
   children: ReactNode;

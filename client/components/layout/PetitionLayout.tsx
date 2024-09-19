@@ -38,7 +38,7 @@ import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/Confir
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
 const MotionBox = motion<BoxProps>(Box);
-export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
+export interface PetitionLayoutProps extends Pick<PetitionLayout_QueryFragment, "me" | "realMe"> {
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;

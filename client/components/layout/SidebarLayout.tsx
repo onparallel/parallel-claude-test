@@ -9,7 +9,7 @@ import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { AppLayout } from "./AppLayout";
 
-export interface SidebarLayoutProps extends SidebarLayout_QueryFragment {
+export interface SidebarLayoutProps extends Pick<SidebarLayout_QueryFragment, "me" | "realMe"> {
   basePath: string;
   title: string;
   sections: { title: string; path: string }[];

@@ -7,7 +7,7 @@ import { UserSettingsLayout } from "./UserSettingsLayout";
 
 type DevelopersSection = "subscriptions" | "tokens";
 
-interface DevelopersLayoutProps extends DevelopersLayout_QueryFragment {
+interface DevelopersLayoutProps extends Pick<DevelopersLayout_QueryFragment, "me" | "realMe"> {
   currentTabKey: DevelopersSection;
   children: ReactNode;
 }

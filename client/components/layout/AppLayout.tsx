@@ -30,7 +30,7 @@ import { AppLayoutNavBar } from "./AppLayoutNavBar";
 
 const HIDE_INTERCOM_PATHS = ["/app/petitions/[petitionId]/preview"];
 
-export interface AppLayoutProps extends AppLayout_QueryFragment {
+export interface AppLayoutProps extends Pick<AppLayout_QueryFragment, "me" | "realMe"> {
   title: string;
 }
 
