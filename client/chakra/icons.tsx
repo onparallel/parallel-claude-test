@@ -2852,3 +2852,58 @@ export const IManageIcon = createIcon({
     </>
   ),
 });
+
+export const BoxedArrowLeft = createIcon({
+  displayName: "BoxedArrowLeft",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m3 5c0-1.10457.89543-2 2-2h3.25 10.75c1.1046 0 2 .89543 2 2v14c0 1.1046-.8954 2-2 2h-7-3.75-3.25c-1.10457 0-2-.8954-2-2z" />
+      <g>
+        <path d="m12 16-4-4 4-4" />
+        <path d="m16 12h-8" />
+      </g>
+    </g>
+  ),
+});
+
+export const HamburgerMenuIcon = createIcon({
+  displayName: "HamburgerMenuIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m3 12h18" />
+      <path d="m3 6h18" />
+      <path d="m3 18h18" />
+    </g>
+  ),
+});
+
+export const SidebarIcon = createIcon({
+  displayName: "SidebarIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m21 5v14c0 1.1046-.8954 2-2 2h-7-7c-1.10457 0-2-.8954-2-2v-14c0-1.10457.89543-2 2-2h3.25 10.75c1.1046 0 2 .89543 2 2z" />
+      <path d="m8.3999 4v17" />
+    </g>
+  ),
+});

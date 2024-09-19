@@ -20,7 +20,6 @@ import {
   BellIcon,
   BusinessIcon,
   CommentIcon,
-  HelpOutlineIcon,
   KeyIcon,
   LogOutIcon,
   MapIcon,
@@ -36,10 +35,11 @@ import { UserAvatar } from "../common/UserAvatar";
 
 export interface UserMenuProps extends UserMenu_QueryFragment {
   placement?: UsePopperProps["placement"];
-  onHelpCenterClick: () => void;
+  extended?: boolean;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuProps) {
+export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -58,44 +58,91 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
   };
 
   return (
-    <Menu placement={placement}>
+    <Menu placement={placement} onOpen={() => onToggle?.(true)} onClose={() => onToggle?.(false)}>
       <Tooltip
         label={intl.formatMessage({
-          id: "header.user-menu-button",
-          defaultMessage: "User menu",
+          id: "component.user-menu.profile-and-organization",
+          defaultMessage: "Account & Organization settings",
         })}
-        placement="right"
+        placement={isMobile ? "bottom" : "right"}
+        openDelay={isMobile ? 0 : 450}
       >
-        <MenuButton
-          as={Button}
-          aria-label={intl.formatMessage({
-            id: "header.user-menu-button",
-            defaultMessage: "User menu",
-          })}
-          data-testid="user-menu"
-          data-action="open-user-menu"
-          _hover={{
-            shadow: "long",
-            transform: "scale(1.1)",
-          }}
-          _active={{
-            shadow: "long",
-            transform: "scale(1.1)",
-          }}
-          borderRadius="full"
-          height={12}
-          paddingStart={0}
-          paddingEnd={0}
-          transition="all 200ms"
-        >
-          <UserAvatar user={me} size="md">
-            {realMe && realMe.id !== me.id ? (
-              <AvatarBadge bgColor="white">
-                <UserAvatar user={realMe} size="xs" />
-              </AvatarBadge>
-            ) : null}
-          </UserAvatar>
-        </MenuButton>
+        {extended ? (
+          <MenuButton
+            className="user-menu-button"
+            as={Button}
+            variant="ghost"
+            aria-label={intl.formatMessage({
+              id: "component.user-menu.profile-and-organization",
+              defaultMessage: "Account & Organization settings",
+            })}
+            data-testid="user-menu"
+            data-action="open-user-menu"
+            paddingY={2}
+            paddingX={1}
+            minHeight={0}
+            height="auto"
+            textAlign="start"
+            width="100%"
+          >
+            <HStack>
+              <UserAvatar user={me} size="sm">
+                {realMe && realMe.id !== me.id ? (
+                  <AvatarBadge bgColor="white">
+                    <UserAvatar user={realMe} size="xs" />
+                  </AvatarBadge>
+                ) : null}
+              </UserAvatar>
+              <Stack spacing={1} minWidth={0}>
+                <Text
+                  as="span"
+                  fontWeight={500}
+                  data-testid="account-name"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  {me.fullName}
+                </Text>
+                <Text
+                  as="span"
+                  fontWeight={400}
+                  color="gray.600"
+                  fontSize="sm"
+                  data-testid="account-email"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  {me.email}
+                </Text>
+              </Stack>
+            </HStack>
+          </MenuButton>
+        ) : (
+          <MenuButton
+            as={Button}
+            aria-label={intl.formatMessage({
+              id: "component.user-menu.profile-and-organization",
+              defaultMessage: "Account & Organization settings",
+            })}
+            data-testid="user-menu"
+            data-action="open-user-menu"
+            borderRadius="full"
+            paddingStart={0}
+            paddingEnd={0}
+            transition="all 200ms"
+            boxSize="40px"
+          >
+            <UserAvatar user={me} boxSize="40px">
+              {realMe && realMe.id !== me.id ? (
+                <AvatarBadge bgColor="white">
+                  <UserAvatar user={realMe} size="xs" />
+                </AvatarBadge>
+              ) : null}
+            </UserAvatar>
+          </MenuButton>
+        )}
       </Tooltip>
       <Portal>
         <MenuList>
@@ -186,19 +233,6 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
             </NakedLink>
           ) : null}
           <MenuDivider />
-
-          {isMobile ? (
-            <MenuItem
-              as="a"
-              href={`https://help.onparallel.com/${intl.locale}`}
-              target="_blank"
-              rel="noopener"
-              icon={<HelpOutlineIcon display="block" boxSize={4} />}
-              onClick={onHelpCenterClick}
-            >
-              <FormattedMessage id="navbar.help-center" defaultMessage="Help center" />
-            </MenuItem>
-          ) : null}
           <MenuItem data-action="start-tour" icon={<MapIcon display="block" boxSize={4} />}>
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>

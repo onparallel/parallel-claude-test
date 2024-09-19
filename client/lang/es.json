@@ -290,32 +290,32 @@
     "context": "Subscribers"
   },
   {
-    "term": "component.app-layout-navbar.alerts-link",
+    "term": "component.app-layout-nav-bar.alerts-link",
     "definition": "Alertas",
     "context": "Alerts"
   },
   {
-    "term": "component.app-layout-navbar.contacts-link",
-    "definition": "Contactos",
-    "context": "Contacts"
+    "term": "component.app-layout-nav-bar.contacts-link",
+    "definition": "Destinatarios",
+    "context": "Recipients"
   },
   {
-    "term": "component.app-layout-navbar.parallels-link.limit-reached-warning",
+    "term": "component.app-layout-nav-bar.parallels-limit-reached-warning",
     "definition": "Parece que has alcanzado el límite de {limit} parallels, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.app-layout-navbar.profiles-link",
+    "term": "component.app-layout-nav-bar.profiles-link",
     "definition": "Perfiles",
     "context": "Profiles"
   },
   {
-    "term": "component.app-layout-navbar.reports-link",
+    "term": "component.app-layout-nav-bar.reports-link",
     "definition": "Informes",
     "context": "Reports"
   },
   {
-    "term": "component.app-layout-navbar.switch-organization",
+    "term": "component.app-layout-nav-bar.switch-organization",
     "definition": "Cambiar de organización",
     "context": "Switch organization"
   },
@@ -1948,6 +1948,11 @@
     "term": "component.create-folder-dialog.create-folder",
     "definition": "Crear carpeta",
     "context": "Create folder"
+  },
+  {
+    "term": "component.create-folder-dialog.new-folder",
+    "definition": "Nueva carpeta",
+    "context": "New folder"
   },
   {
     "term": "component.create-folder-dialog.no-options",
@@ -4410,6 +4415,26 @@
     "context": "New folder"
   },
   {
+    "term": "component.new-layout.help-button",
+    "definition": "Ayuda",
+    "context": "Help"
+  },
+  {
+    "term": "component.new-layout.hide-navigation",
+    "definition": "Esconder navegación",
+    "context": "Hide navigation"
+  },
+  {
+    "term": "component.new-layout.keep-navigation-open",
+    "definition": "Mantener navegación abierta",
+    "context": "Keep navigation open"
+  },
+  {
+    "term": "component.new-layout.open-navigation",
+    "definition": "Abrir navegación",
+    "context": "Open navigation"
+  },
+  {
     "term": "component.new-petition-empty-search.no-results",
     "definition": "No hay resultados para tu búsqueda.",
     "context": "There are no results for your search."
@@ -4593,6 +4618,11 @@
     "term": "component.notifications-button.notifications",
     "definition": "Notificaciones{count, plural, =0 {} other {, # sin leer}}",
     "context": "Notifications{count, plural, =0 {} other {, # unread}}"
+  },
+  {
+    "term": "component.notifications-button.notifications-button",
+    "definition": "Notificaciones",
+    "context": "Notifications"
   },
   {
     "term": "component.notifications-drawer.header",
@@ -11275,6 +11305,11 @@
     "context": "Notifications"
   },
   {
+    "term": "component.user-menu.profile-and-organization",
+    "definition": "Ajustes de cuenta y organización",
+    "context": "Account & Organization settings"
+  },
+  {
     "term": "component.user-select.placeholder-multi-with-groups",
     "definition": "Selecciona usuarios o equipos de tu organización",
     "context": "Select users or teams from your organization"
@@ -11473,11 +11508,6 @@
     "term": "contacts.successful-import-toast.title",
     "definition": "¡{count, plural, =1{# contacto importado} other{# contactos importados}} correctamente!",
     "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
-  },
-  {
-    "term": "contacts.title",
-    "definition": "Contactos",
-    "context": "Contacts"
   },
   {
     "term": "error.404.header",
@@ -12230,6 +12260,11 @@
     "context": "Help"
   },
   {
+    "term": "generic.help-center",
+    "definition": "Centro de ayuda",
+    "context": "Help center"
+  },
+  {
     "term": "generic.help-center-article",
     "definition": "Artículo de ayuda",
     "context": "Help center article"
@@ -12728,6 +12763,11 @@
     "term": "generic.previous-page",
     "definition": "Página anterior",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.product-news-label",
+    "definition": "Novedades",
+    "context": "News"
   },
   {
     "term": "generic.profile-property",
@@ -13288,16 +13328,6 @@
     "term": "navbar.feature-requests",
     "definition": "Sugerir funcionalidades",
     "context": "Feature requests"
-  },
-  {
-    "term": "navbar.help-center",
-    "definition": "Centro de ayuda",
-    "context": "Help center"
-  },
-  {
-    "term": "navbar.new-in-parallel",
-    "definition": "Novedades en Parallel",
-    "context": "New in Parallel"
   },
   {
     "term": "navbar.start-tour",
@@ -13908,6 +13938,11 @@
     "term": "page.compose.send-from-activity",
     "definition": "Si quieres enviarle el parallel a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+  },
+  {
+    "term": "page.contacts.title",
+    "definition": "Destinatarios",
+    "context": "Recipients"
   },
   {
     "term": "page.group.no-results",
@@ -14665,9 +14700,14 @@
     "context": "New"
   },
   {
-    "term": "page.petitions-list.create-folder",
-    "definition": "Crear carpeta",
-    "context": "Create folder"
+    "term": "page.petitions-list.create-template",
+    "definition": "Crear plantilla",
+    "context": "Create template"
+  },
+  {
+    "term": "page.petitions-list.new-folder",
+    "definition": "Nueva carpeta",
+    "context": "New folder"
   },
   {
     "term": "page.petitions-list.new-template",

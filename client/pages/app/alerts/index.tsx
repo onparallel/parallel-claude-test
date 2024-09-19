@@ -93,7 +93,7 @@ function Alerts() {
             <FormattedMessage id="page.alerts.title" defaultMessage="Alerts" />
           </Heading>
         </HStack>
-        <Box flex="1" paddingBottom={16}>
+        <Box flex="1" paddingBottom={20}>
           <TablePage
             flex="0 1 auto"
             columns={columns}

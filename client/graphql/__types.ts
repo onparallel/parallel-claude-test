@@ -6498,7 +6498,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -6515,6 +6515,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsLayout_updateOrganizationMutationVariables = Exact<{
@@ -7892,7 +7893,7 @@ export type AdminSettingsLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -7909,6 +7910,7 @@ export type AdminSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AppLayout_QueryFragment = {
@@ -7934,7 +7936,7 @@ export type AppLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -7951,9 +7953,10 @@ export type AppLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
-export type AppLayoutNavbar_QueryFragment = {
+export type AppLayoutNavBar_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
@@ -7975,7 +7978,7 @@ export type AppLayoutNavbar_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -7984,6 +7987,7 @@ export type AppLayoutNavbar_QueryFragment = {
       } | null;
     };
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type DevelopersLayout_QueryFragment = {
@@ -8009,7 +8013,7 @@ export type DevelopersLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8026,6 +8030,7 @@ export type DevelopersLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
@@ -8080,7 +8085,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8097,6 +8102,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionHeader_PetitionFragment = {
@@ -8302,7 +8308,7 @@ export type PetitionLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8319,6 +8325,7 @@ export type PetitionLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ReportsSidebarLayout_QueryFragment = {
@@ -8344,7 +8351,7 @@ export type ReportsSidebarLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8361,6 +8368,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type SidebarLayout_QueryFragment = {
@@ -8386,7 +8394,7 @@ export type SidebarLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8403,6 +8411,7 @@ export type SidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type UserGroupLayout_QueryFragment = {
@@ -8429,7 +8438,7 @@ export type UserGroupLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8446,6 +8455,7 @@ export type UserGroupLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type UserGroupLayout_UserGroupFragment = {
@@ -8534,7 +8544,7 @@ export type UserSettingsLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -8551,6 +8561,7 @@ export type UserSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type NotificationsButton_UserFragment = {
@@ -9699,7 +9710,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -9716,6 +9727,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ProfileTypeSettings_ProfileTypeFieldFragment = {
@@ -29544,7 +29556,7 @@ export type Admin_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -29561,6 +29573,7 @@ export type Admin_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsFeatures_OrganizationFragment = {
@@ -29606,7 +29619,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -29623,6 +29636,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsFeatures_updateFeatureFlagsMutationVariables = Exact<{
@@ -29741,7 +29755,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -29758,6 +29772,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryQueryVariables = Exact<{
@@ -30003,7 +30018,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -30020,6 +30035,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsMembers_organizationQueryVariables = Exact<{
@@ -30178,7 +30194,7 @@ export type AdminOrganizations_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -30195,6 +30211,7 @@ export type AdminOrganizations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizations_createOrganizationMutationVariables = Exact<{
@@ -30249,7 +30266,7 @@ export type AdminSupportMethods_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -30266,6 +30283,7 @@ export type AdminSupportMethods_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Alerts_ProfileFieldPropertyFragment = {
@@ -30338,7 +30356,7 @@ export type Alerts_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -30355,6 +30373,7 @@ export type Alerts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Alerts_expiringProfilePropertiesQueryVariables = Exact<{
@@ -31132,7 +31151,7 @@ export type Contact_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31149,6 +31168,7 @@ export type Contact_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Contact_contactQueryVariables = Exact<{
@@ -31300,7 +31320,7 @@ export type Contacts_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31317,6 +31337,7 @@ export type Contacts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ChooseOrg_OrganizationFragment = {
@@ -31384,7 +31405,7 @@ export type OrganizationBranding_userQuery = {
       logoUrl?: string | null;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31414,6 +31435,7 @@ export type OrganizationBranding_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationCompliance_OrganizationFragment = {
@@ -31461,7 +31483,7 @@ export type OrganizationCompliance_userQuery = {
       anonymizePetitionsAfterMonths?: number | null;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31478,6 +31500,7 @@ export type OrganizationCompliance_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationGeneral_updateOrgLogoMutationVariables = Exact<{
@@ -31522,7 +31545,7 @@ export type OrganizationGeneral_userQuery = {
       iconUrl240?: string | null;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31539,6 +31562,7 @@ export type OrganizationGeneral_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationGroup_UserGroupFragment = {
@@ -31689,7 +31713,7 @@ export type OrganizationGroup_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31706,6 +31730,7 @@ export type OrganizationGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PermissionsGroup_UserGroupFragment = {
@@ -31771,7 +31796,7 @@ export type PermissionsGroup_userQuery = {
       status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31788,6 +31813,7 @@ export type PermissionsGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PermissionsGroup_updateUserGroupPermissionsMutationVariables = Exact<{
@@ -31974,7 +32000,7 @@ export type OrganizationGroups_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -31991,6 +32017,7 @@ export type OrganizationGroups_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationSettings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -32018,7 +32045,7 @@ export type OrganizationSettings_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -32035,6 +32062,7 @@ export type OrganizationSettings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -32067,7 +32095,7 @@ export type OrganizationIntegrations_userQuery = {
       hasEInforma: boolean;
       hasDocuSign: boolean;
       petitionsSubscriptionEndDate?: string | null;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       integrations: {
         __typename?: "IOrgIntegrationPagination";
@@ -32109,6 +32137,7 @@ export type OrganizationIntegrations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables = Exact<{
@@ -32187,7 +32216,7 @@ export type IntegrationsSignature_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
@@ -32221,6 +32250,7 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileType_ProfileTypeFieldFragment = {
@@ -32386,7 +32416,7 @@ export type OrganizationProfileType_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -32403,6 +32433,7 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileType_updateProfileTypeFieldPermissionMutationVariables = Exact<{
@@ -32782,7 +32813,7 @@ export type OrganizationProfileTypes_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -32799,6 +32830,7 @@ export type OrganizationProfileTypes_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileTypes_createProfileTypeMutationVariables = Exact<{
@@ -32897,7 +32929,7 @@ export type OrganizationUsage_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       license?: {
         __typename?: "OrgLicense";
@@ -32932,6 +32964,7 @@ export type OrganizationUsage_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationUsers_UserFragment = {
@@ -33079,7 +33112,7 @@ export type OrganizationUsers_userQuery = {
       hasUserProvisioning: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -33096,6 +33129,7 @@ export type OrganizationUsers_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationUsers_orgUsersQueryVariables = Exact<{
@@ -34356,7 +34390,7 @@ export type PetitionActivity_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -34374,6 +34408,7 @@ export type PetitionActivity_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -35995,7 +36030,7 @@ export type PetitionActivity_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -36013,6 +36048,7 @@ export type PetitionActivity_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
@@ -36995,7 +37031,7 @@ export type PetitionCompose_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -37029,6 +37065,7 @@ export type PetitionCompose_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_updatePetitionFieldAutoSearchConfigMutationVariables = Exact<{
@@ -39152,7 +39189,7 @@ export type PetitionCompose_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -39186,6 +39223,7 @@ export type PetitionCompose_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_petitionQueryVariables = Exact<{
@@ -40028,7 +40066,7 @@ export type PetitionMessages_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -40045,6 +40083,7 @@ export type PetitionMessages_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionMessages_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -40073,7 +40112,7 @@ export type PetitionMessages_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -40090,6 +40129,7 @@ export type PetitionMessages_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionMessages_petitionQueryVariables = Exact<{
@@ -41576,7 +41616,7 @@ export type PetitionPreview_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
@@ -41599,6 +41639,7 @@ export type PetitionPreview_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
@@ -43897,7 +43938,7 @@ export type PetitionPreview_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
@@ -43916,6 +43957,7 @@ export type PetitionPreview_userQuery = {
     __typename?: "ConnectionMetadata";
     country?: string | null;
     browserName?: string | null;
+    deviceType?: string | null;
   };
   realMe: {
     __typename?: "User";
@@ -46514,7 +46556,7 @@ export type PetitionReplies_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       hasIManage: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       fileExportIntegrations: {
@@ -46560,6 +46602,7 @@ export type PetitionReplies_userQuery = {
     __typename?: "ConnectionMetadata";
     country?: string | null;
     browserName?: string | null;
+    deviceType?: string | null;
   };
   realMe: {
     __typename?: "User";
@@ -47600,7 +47643,7 @@ export type Petitions_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -47656,6 +47699,7 @@ export type Petitions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Petitions_petitionsQueryVariables = Exact<{
@@ -48163,7 +48207,7 @@ export type NewPetition_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48180,6 +48224,7 @@ export type NewPetition_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type NewPetition_templateQueryVariables = Exact<{
@@ -48409,7 +48454,7 @@ export type ProfileDetail_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48422,6 +48467,7 @@ export type ProfileDetail_userQuery = {
     __typename?: "ConnectionMetadata";
     country?: string | null;
     browserName?: string | null;
+    deviceType?: string | null;
   };
   realMe: {
     __typename?: "User";
@@ -48727,7 +48773,7 @@ export type Profiles_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48744,6 +48790,7 @@ export type Profiles_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Profiles_profileTypesQueryVariables = Exact<{
@@ -48840,7 +48887,7 @@ export type Reports_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48857,6 +48904,7 @@ export type Reports_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Overview_PetitionTemplateFragment = {
@@ -48890,7 +48938,7 @@ export type Overview_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48907,6 +48955,7 @@ export type Overview_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ReportsReplies_PetitionTemplateFragment = {
@@ -48940,7 +48989,7 @@ export type ReportsReplies_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -48957,6 +49006,7 @@ export type ReportsReplies_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ReportsTemplates_PetitionTemplateFragment = {
@@ -48990,7 +49040,7 @@ export type ReportsTemplates_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49007,6 +49057,7 @@ export type ReportsTemplates_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Account_QueryFragment = {
@@ -49035,7 +49086,7 @@ export type Account_QueryFragment = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49053,6 +49104,7 @@ export type Account_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Account_updateAccountMutationVariables = Exact<{
@@ -49120,7 +49172,7 @@ export type Account_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49138,6 +49190,7 @@ export type Account_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Subscriptions_PetitionEventSubscriptionFragment = {
@@ -49437,7 +49490,7 @@ export type Subscriptions_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49454,6 +49507,7 @@ export type Subscriptions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
@@ -49513,7 +49567,7 @@ export type Tokens_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49530,6 +49584,7 @@ export type Tokens_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Settings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -49557,7 +49612,7 @@ export type Settings_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49574,6 +49629,7 @@ export type Settings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -49609,7 +49665,7 @@ export type Security_userQuery = {
       name: string;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl92?: string | null;
+      iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -49626,6 +49682,7 @@ export type Security_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Forgot_resendVerificationEmailMutationVariables = Exact<{
@@ -53027,6 +53084,10 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   fields: { [key: string]: any };
 };
 
+export type useDeviceType_QueryFragment = {
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
 export type useDownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
@@ -54659,9 +54720,15 @@ export const UserMenu_QueryFragmentDoc = gql`
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<UserMenu_QueryFragment, unknown>;
-export const AppLayoutNavbar_QueryFragmentDoc = gql`
-  fragment AppLayoutNavbar_Query on Query {
-    ...UserMenu_Query
+export const useDeviceType_QueryFragmentDoc = gql`
+  fragment useDeviceType_Query on Query {
+    metadata {
+      deviceType
+    }
+  }
+` as unknown as DocumentNode<useDeviceType_QueryFragment, unknown>;
+export const AppLayoutNavBar_QueryFragmentDoc = gql`
+  fragment AppLayoutNavBar_Query on Query {
     realMe {
       id
       organizations {
@@ -54674,7 +54741,7 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
       organization {
         id
         name
-        iconUrl92: iconUrl(options: { resize: { width: 92 } })
+        iconUrl: iconUrl(options: { resize: { width: 80 } })
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
         currentUsagePeriod(limitName: PETITION_SEND) {
           id
@@ -54682,9 +54749,12 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
         }
       }
     }
+    ...UserMenu_Query
+    ...useDeviceType_Query
   }
   ${UserMenu_QueryFragmentDoc}
-` as unknown as DocumentNode<AppLayoutNavbar_QueryFragment, unknown>;
+  ${useDeviceType_QueryFragmentDoc}
+` as unknown as DocumentNode<AppLayoutNavBar_QueryFragment, unknown>;
 export const AppLayout_QueryFragmentDoc = gql`
   fragment AppLayout_Query on Query {
     me {
@@ -54708,9 +54778,9 @@ export const AppLayout_QueryFragmentDoc = gql`
     realMe {
       id
     }
-    ...AppLayoutNavbar_Query
+    ...AppLayoutNavBar_Query
   }
-  ${AppLayoutNavbar_QueryFragmentDoc}
+  ${AppLayoutNavBar_QueryFragmentDoc}
 ` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
 export const SidebarLayout_QueryFragmentDoc = gql`
   fragment SidebarLayout_Query on Query {

@@ -26,7 +26,7 @@ import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Canny } from "../scripts/Canny";
 import { Segment } from "../scripts/Segment";
-import { AppLayoutNavbar } from "./AppLayoutNavbar";
+import { AppLayoutNavBar } from "./AppLayoutNavBar";
 
 const HIDE_INTERCOM_PATHS = ["/app/petitions/[petitionId]/preview"];
 
@@ -217,24 +217,9 @@ export const AppLayout = Object.assign(
                 height: "-webkit-fill-available",
               },
             }}
-            flexDirection={{ base: "column-reverse", sm: "row" }}
+            flexDirection={{ base: "column", sm: "row" }}
           >
-            <Flex
-              flexDirection={{ base: "row", sm: "column" }}
-              flexShrink={0}
-              borderEndWidth={{ base: 0, sm: "1px" }}
-              borderTopWidth={{ base: "1px", sm: 0 }}
-              borderColor="gray.200"
-              overflow={{ base: "auto hidden", sm: "hidden auto" }}
-            >
-              <AppLayoutNavbar
-                me={me}
-                realMe={realMe}
-                onHelpCenterClick={handleHelpCenterClick}
-                flex="1"
-                zIndex="2"
-              />
-            </Flex>
+            <AppLayoutNavBar me={me} realMe={realMe} onHelpCenterClick={handleHelpCenterClick} />
             <Flex
               flex="1"
               flexDirection="column"
@@ -334,9 +319,9 @@ export const AppLayout = Object.assign(
           realMe {
             id
           }
-          ...AppLayoutNavbar_Query
+          ...AppLayoutNavBar_Query
         }
-        ${AppLayoutNavbar.fragments.Query}
+        ${AppLayoutNavBar.fragments.Query}
       `,
     },
   },

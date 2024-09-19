@@ -110,8 +110,8 @@ function CreateFolderDialog({
       {...props}
       header={
         <FormattedMessage
-          id="component.create-folder-dialog.create-folder"
-          defaultMessage="Create folder"
+          id="component.create-folder-dialog.new-folder"
+          defaultMessage="New folder"
         />
       }
       body={

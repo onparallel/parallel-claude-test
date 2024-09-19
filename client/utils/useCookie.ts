@@ -30,7 +30,7 @@ export function useCookie<S>(name: string, defaultValue: S): [S, Dispatch<SetSta
             typeof dispatch === "function"
               ? (dispatch as (prevState: S) => S)(current)
               : (dispatch as S);
-          document.cookie = serializeCookie(name, JSON.stringify(value));
+          document.cookie = serializeCookie(name, JSON.stringify(value), { path: "/" });
           return value;
         });
       },

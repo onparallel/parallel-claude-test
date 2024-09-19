@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Center, Flex, Text, useToast } from "@chakra-ui/react";
-import { DeleteIcon } from "@parallel/chakra/icons";
+import { Box, Center, Heading, HStack, Stack, Text, useToast } from "@chakra-ui/react";
+import { DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -120,75 +120,83 @@ function Contacts() {
   return (
     <AppLayout
       title={intl.formatMessage({
-        id: "contacts.title",
-        defaultMessage: "Contacts",
+        id: "page.contacts.title",
+        defaultMessage: "Recipients",
       })}
       me={me}
       realMe={realMe}
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
-        <TablePage
-          flex="0 1 auto"
-          columns={columns}
-          rows={contacts?.items}
-          rowKeyProp={"id"}
-          isSelectable={canDeleteContacts}
-          isHighlightable
-          loading={loading}
-          onRowClick={handleRowClick}
-          page={state.page}
-          pageSize={state.items}
-          totalCount={contacts?.totalCount ?? 0}
-          sort={state.sort}
-          onSelectionChange={onChangeSelectedIds}
-          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
-          }
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
-          actions={[
-            {
-              key: "delete",
-              onClick: handleDeleteClick,
-              leftIcon: <DeleteIcon />,
-              colorScheme: "red",
-              children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
-            },
-          ]}
-          header={
-            <ContactListHeader
-              search={state.search}
-              onSearchChange={handleSearchChange}
-              onReload={() => refetch()}
-              onCreateClick={handleCreateClick}
-              onImportClick={handleImportClick}
-            />
-          }
-          body={
-            contacts && contacts.totalCount === 0 && !loading ? (
-              state.search ? (
-                <Center flex="1">
-                  <Text color="gray.400" fontSize="lg">
-                    <FormattedMessage
-                      id="contacts.no-results"
-                      defaultMessage="There's no contacts matching your search"
-                    />
-                  </Text>
-                </Center>
-              ) : (
-                <Center flex="1">
-                  <Text fontSize="lg">
-                    <FormattedMessage
-                      id="contacts.no-contacts"
-                      defaultMessage="You have no contacts yet. Start by creating one now!"
-                    />
-                  </Text>
-                </Center>
-              )
-            ) : null
-          }
-        />
-      </Flex>
+      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+        <HStack padding={2}>
+          <UsersIcon boxSize={5} />
+          <Heading as="h2" size="lg">
+            <FormattedMessage id="page.contacts.title" defaultMessage="Recipients" />
+          </Heading>
+        </HStack>
+        <Box flex="1" paddingBottom={20}>
+          <TablePage
+            flex="0 1 auto"
+            columns={columns}
+            rows={contacts?.items}
+            rowKeyProp={"id"}
+            isSelectable={canDeleteContacts}
+            isHighlightable
+            loading={loading}
+            onRowClick={handleRowClick}
+            page={state.page}
+            pageSize={state.items}
+            totalCount={contacts?.totalCount ?? 0}
+            sort={state.sort}
+            onSelectionChange={onChangeSelectedIds}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onPageSizeChange={(items) =>
+              setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+            }
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
+            actions={[
+              {
+                key: "delete",
+                onClick: handleDeleteClick,
+                leftIcon: <DeleteIcon />,
+                colorScheme: "red",
+                children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+              },
+            ]}
+            header={
+              <ContactListHeader
+                search={state.search}
+                onSearchChange={handleSearchChange}
+                onReload={() => refetch()}
+                onCreateClick={handleCreateClick}
+                onImportClick={handleImportClick}
+              />
+            }
+            body={
+              contacts && contacts.totalCount === 0 && !loading ? (
+                state.search ? (
+                  <Center flex="1">
+                    <Text color="gray.400" fontSize="lg">
+                      <FormattedMessage
+                        id="contacts.no-results"
+                        defaultMessage="There's no contacts matching your search"
+                      />
+                    </Text>
+                  </Center>
+                ) : (
+                  <Center flex="1">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="contacts.no-contacts"
+                        defaultMessage="You have no contacts yet. Start by creating one now!"
+                      />
+                    </Text>
+                  </Center>
+                )
+              ) : null
+            }
+          />
+        </Box>
+      </Stack>
     </AppLayout>
   );
 }

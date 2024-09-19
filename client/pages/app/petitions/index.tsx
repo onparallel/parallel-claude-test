@@ -538,10 +538,7 @@ function Petitions() {
                 onClick={handleCreateFolder}
                 isDisabled={!userCanChangePath}
               >
-                <FormattedMessage
-                  id="page.petitions-list.create-folder"
-                  defaultMessage="Create folder"
-                />
+                <FormattedMessage id="page.petitions-list.new-folder" defaultMessage="New folder" />
               </Button>
             </RestrictedFeaturePopover>
             <RestrictedFeaturePopover
@@ -554,11 +551,11 @@ function Petitions() {
                 isDisabled={!userCanCreateTemplate && state.type === "TEMPLATE"}
               >
                 {state.type === "PETITION" ? (
-                  <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
+                  <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
                 ) : (
                   <FormattedMessage
-                    id="page.petitions-list.new-template"
-                    defaultMessage="New template"
+                    id="page.petitions-list.create-template"
+                    defaultMessage="Create template"
                   />
                 )}
               </Button>
@@ -578,8 +575,8 @@ function Petitions() {
                 <MenuList minWidth="fit-content">
                   <MenuItem onClick={handleCreateFolder} isDisabled={!userCanChangePath}>
                     <FormattedMessage
-                      id="page.petitions-list.create-folder"
-                      defaultMessage="Create folder"
+                      id="page.petitions-list.new-folder"
+                      defaultMessage="New folder"
                     />
                   </MenuItem>
                   <MenuItem
