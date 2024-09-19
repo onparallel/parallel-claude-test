@@ -199,32 +199,6 @@ export interface NexusGenInputs {
     fontFamily?: string | null; // String
     preferredTone?: NexusGenEnums["Tone"] | null; // Tone
   };
-  OrganizationPdfDocumentThemeInput: {
-    // input type
-    legalText?: NexusGenInputs["OrganizationPdfDocumentThemeInputLegalText"] | null; // OrganizationPdfDocumentThemeInputLegalText
-    marginBottom?: number | null; // Float
-    marginLeft?: number | null; // Float
-    marginRight?: number | null; // Float
-    marginTop?: number | null; // Float
-    showLogo?: boolean | null; // Boolean
-    textColor?: string | null; // String
-    textFontFamily?: string | null; // String
-    textFontSize?: number | null; // Float
-    title1Color?: string | null; // String
-    title1FontFamily?: string | null; // String
-    title1FontSize?: number | null; // Float
-    title2Color?: string | null; // String
-    title2FontFamily?: string | null; // String
-    title2FontSize?: number | null; // Float
-  };
-  OrganizationPdfDocumentThemeInputLegalText: {
-    // input type
-    ca?: NexusGenScalars["JSON"] | null; // JSON
-    en?: NexusGenScalars["JSON"] | null; // JSON
-    es?: NexusGenScalars["JSON"] | null; // JSON
-    it?: NexusGenScalars["JSON"] | null; // JSON
-    pt?: NexusGenScalars["JSON"] | null; // JSON
-  };
   OrganizationUpdateInput: {
     // input type
     name?: string | null; // String
@@ -7947,7 +7921,7 @@ export interface NexusGenArgTypes {
     };
     updateOrganizationPdfDocumentTheme: {
       // args
-      data?: NexusGenInputs["OrganizationPdfDocumentThemeInput"] | null; // OrganizationPdfDocumentThemeInput
+      data?: NexusGenScalars["JSONObject"] | null; // JSONObject
       isDefault?: boolean | null; // Boolean
       name?: string | null; // String
       orgThemeId: NexusGenScalars["GID"]; // GID!

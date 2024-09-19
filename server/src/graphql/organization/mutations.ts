@@ -1,7 +1,5 @@
 import {
-  arg,
   booleanArg,
-  core,
   inputObjectType,
   intArg,
   list,
@@ -10,7 +8,7 @@ import {
   nullable,
   stringArg,
 } from "nexus";
-import { isNonNullish, pick } from "remeda";
+import { fromEntries, isNonNullish, pick } from "remeda";
 import { ContactLocaleValues, Organization, OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { fullName } from "../../util/fullName";
@@ -19,21 +17,22 @@ import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { jsonObjectArg } from "../helpers/scalars/JSON";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd } from "../helpers/validateArgs";
-import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";
+import { jsonSchema } from "../helpers/validators/jsonSchema";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validFontFamily } from "../helpers/validators/validFontFamily";
-import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { RICH_TEXT_CONTENT_SCHEMA } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { validateFile } from "../helpers/validators/validateFile";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { superAdminAccess } from "../support/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasPermission } from "../users/authorizers";
+import families from "./../../pdf/utils/fonts.json";
 import {
   organizationHasOngoingUsagePeriod,
   organizationThemeIsNotDefault,
@@ -147,28 +146,42 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
   },
 });
 
-export function validateTheme<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-  argName: string,
-) {
-  return validateAnd(
-    ...["Top", "Right", "Bottom", "Left"].map((p) =>
-      inRange((args) => prop(args)?.[`margin${p}`], `${argName}.margin${p}`, 0),
+export const validateTheme = jsonSchema({
+  type: "object",
+  required: [
+    "doubleColumn",
+    ...["marginTop", "marginRight", "marginBottom", "marginLeft", "columnGap"],
+    ...["text", "title1", "title2"].flatMap((p) => [`${p}FontFamily`, `${p}Color`, `${p}FontSize`]),
+  ],
+  properties: {
+    doubleColumn: { type: "boolean" },
+    ...fromEntries(
+      ["marginTop", "marginRight", "marginBottom", "marginLeft", "columnGap"].map((p) => [
+        p,
+        { type: "number", minimum: 0, maximum: 100 },
+      ]),
     ),
-    ...["text", "title1", "title2"].flatMap((p) => [
-      validFontFamily((args) => prop(args)?.[`${p}FontFamily`], `${argName}.${p}FontFamily`),
-      validateHexColor((args) => prop(args)?.[`${p}Color`], `${argName}.${p}Color`),
-      inRange((args) => prop(args)?.[`${p}FontSize`], `${argName}.${p}FontSize`, 5, 72),
-    ]),
-    ...ContactLocaleValues.map((p) =>
-      validRichTextContent(
-        (args) => prop(args)?.legalText?.[p],
-        undefined, // this legal text cannot contain PetitionField references
-        `${argName}.legalText.${p}`,
+    ...fromEntries(
+      ["text", "title1", "title2"].flatMap(
+        (p) =>
+          [
+            [`${p}FontFamily`, { type: "string", enum: families.map((f) => f.family) }],
+            [`${p}Color`, { type: "string", pattern: "^#[a-fA-F0-9]{6}$" }],
+            [`${p}FontSize`, { type: "integer", minimum: 5, maximum: 72 }],
+          ] as [string, any][],
       ),
     ),
-  ) as unknown as FieldValidateArgsResolver<TypeName, FieldName>;
-}
+    legalText: {
+      type: "object",
+      required: ContactLocaleValues,
+      properties: Object.fromEntries(
+        ContactLocaleValues.map((locale) => [locale, { $ref: RICH_TEXT_CONTENT_SCHEMA.$ref }]),
+      ),
+      additionalProperties: false,
+    },
+  },
+  definitions: { ...RICH_TEXT_CONTENT_SCHEMA.definitions },
+});
 
 export const updateOrganizationPdfDocumentTheme = mutationField(
   "updateOrganizationPdfDocumentTheme",
@@ -183,7 +196,7 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
       orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
       name: stringArg(),
       isDefault: booleanArg(),
-      data: arg({ type: "OrganizationPdfDocumentThemeInput" }),
+      data: jsonObjectArg(),
     },
     validateArgs: validateAnd(
       maxLength((args) => args.name, "name", 50),

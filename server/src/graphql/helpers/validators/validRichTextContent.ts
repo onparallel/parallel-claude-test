@@ -6,7 +6,7 @@ import { SlateNode } from "../../../util/slate/render";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-const RICH_TEXT_CONTENT_SCHEMA = {
+export const RICH_TEXT_CONTENT_SCHEMA = {
   definitions: {
     "list-item": {
       type: "object",
@@ -101,14 +101,14 @@ const RICH_TEXT_CONTENT_SCHEMA = {
         { $ref: "#/definitions/link" },
       ],
     },
-    root: {
+    rte: {
       type: "array",
       items: {
         anyOf: [{ $ref: "#/definitions/paragraph" }, { $ref: "#/definitions/list" }],
       },
     },
   },
-  $ref: "#/definitions/root",
+  $ref: "#/definitions/rte",
 };
 
 export function validateRichTextContent(json: any) {

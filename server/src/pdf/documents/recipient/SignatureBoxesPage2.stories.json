@@ -1,0 +1,28 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Signature Boxes Page Typst",
+      "parameters": {
+        "server": {
+          "id": "documents/recipient/SignatureBoxesPage2"
+        }
+      },
+      "args": {
+        "assetsUrl": "https://static-staging.onparallel.com"
+      },
+      "argTypes": {
+        "assetsUrl": {
+          "control": {
+            "type": "text"
+          }
+        },
+        "petitionId": {
+          "control": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -2,10 +2,12 @@ import { ContactLocale } from "../db/__types";
 import { SlateNode } from "./slate/render";
 
 export interface PdfDocumentTheme {
+  doubleColumn: boolean;
   marginLeft: number;
   marginRight: number;
   marginTop: number;
   marginBottom: number;
+  columnGap: number;
   title1FontFamily: string;
   title1Color: string;
   title1FontSize: number;
@@ -22,6 +24,8 @@ export interface PdfDocumentTheme {
 }
 
 export const defaultPdfDocumentTheme: PdfDocumentTheme = {
+  doubleColumn: false,
+  columnGap: 0,
   marginLeft: 25.4,
   marginRight: 25.4,
   marginTop: 25.4,

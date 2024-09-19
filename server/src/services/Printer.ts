@@ -2,6 +2,7 @@ import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../config";
 import { ContactLocale } from "../db/__types";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
 import BackgroundCheckProfile, {
@@ -12,17 +13,21 @@ import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToP
 import PetitionExport, {
   PetitionExportInitialData,
 } from "../pdf/documents/recipient/PetitionExport";
+import PetitionExport2 from "../pdf/documents/recipient/PetitionExport2";
 import SignatureBoxesPage, {
   SignatureBoxesPageInitialData,
 } from "../pdf/documents/recipient/SignatureBoxesPage";
+import SignatureBoxesPage2 from "../pdf/documents/recipient/SignatureBoxesPage2";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./AuthService";
+
+type DocumentMetadata = Record<string, any[]>;
 
 export interface IPrinter {
   petitionExport(
     userId: number,
     data: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & { petitionId: number },
-  ): Promise<NodeJS.ReadableStream>;
+  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
   annexCoverPage(
     userId: number,
     props: AnnexCoverPageProps,
@@ -36,7 +41,7 @@ export interface IPrinter {
   signatureBoxesPage(
     userId: number,
     data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
-  ): Promise<NodeJS.ReadableStream>;
+  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
 }
 
 export const PRINTER = Symbol.for("PRINTER");
@@ -46,7 +51,8 @@ export class Printer implements IPrinter {
   constructor(
     @inject(AUTH) protected auth: IAuth,
     @inject(CONFIG) protected config: Config,
-    private petitions: PetitionRepository,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
   ) {}
 
   private async createClient(userId: number) {
@@ -58,15 +64,20 @@ export class Printer implements IPrinter {
 
   public async petitionExport(
     userId: number,
-    { petitionId, ...data }: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number },
+    {
+      petitionId,
+      ...data
+    }: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & { petitionId: number },
   ) {
+    const hasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
+
     const petition = await this.petitions.loadPetition(petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
     if (!petition) {
       throw new Error("Petition not available");
     }
     const client = await this.createClient(userId);
     return await buildPdf(
-      PetitionExport,
+      (hasExportV2 ? PetitionExport2 : PetitionExport) as any,
       {
         ...data,
         petitionId: toGlobalId("Petition", petitionId),
@@ -78,43 +89,43 @@ export class Printer implements IPrinter {
 
   public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: ContactLocale) {
     const client = await this.createClient(userId);
-    return await buildPdf(AnnexCoverPage, props, { client, locale });
+    return (await buildPdf(AnnexCoverPage, props, { client, locale })).stream;
   }
 
   public async imageToPdf(userId: number, props: ImageToPdfProps) {
     const client = await this.createClient(userId);
-    return await buildPdf(ImageToPdf, props, {
-      client,
-      locale: "es" /* locale doesn't matter here as this is an image-only document */,
-    });
+    return (
+      await buildPdf(ImageToPdf, props, {
+        client,
+        locale: "es" /* locale doesn't matter here as this is an image-only document */,
+      })
+    ).stream;
   }
 
   public async backgroundCheckProfile(userId: number, props: BackgroundCheckProfileProps) {
     const client = await this.createClient(userId);
-    return await buildPdf(
-      BackgroundCheckProfile,
-      { ...props, assetsUrl: this.config.misc.assetsUrl },
-      {
-        client,
-        locale: "en",
-      },
-    );
+    return (
+      await buildPdf(
+        BackgroundCheckProfile,
+        { ...props, assetsUrl: this.config.misc.assetsUrl },
+        { client, locale: "en" },
+      )
+    ).stream;
   }
 
   public async signatureBoxesPage(
     userId: number,
     data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
   ) {
+    const hasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
     const petition = await this.petitions.loadPetition(data.petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
     if (!petition) {
       throw new Error("Petition not available");
     }
     const client = await this.createClient(userId);
     return await buildPdf(
-      SignatureBoxesPage,
-      {
-        petitionId: toGlobalId("Petition", data.petitionId),
-      },
+      hasExportV2 ? SignatureBoxesPage2 : SignatureBoxesPage,
+      { petitionId: toGlobalId("Petition", data.petitionId) },
       { client, locale: petition.recipient_locale },
     );
   }

@@ -2,8 +2,11 @@ import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
+  Radio,
+  RadioGroup,
   Stack,
   Switch,
   Tab,
@@ -25,13 +28,11 @@ import { untranslated } from "@parallel/utils/untranslated";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isNonNullish, sort } from "remeda";
+import { isNonNullish, sort, zip } from "remeda";
 import fonts from "../../../utils/fonts.json";
 
 interface DocumentThemeEditorProps {
   user: DocumentThemeEditor_UserFragment;
-  canRestoreFonts: boolean;
-  onRestoreFonts: () => Promise<void>;
   isDisabled?: boolean;
   themeId: string;
 }
@@ -45,6 +46,8 @@ export interface DocumentThemeEditorData {
   marginBottom: number;
   marginLeft: number;
   marginRight: number;
+  columnGap: number;
+  doubleColumn: boolean;
   textColor: string;
   title1Color: string;
   title2Color: string;
@@ -58,13 +61,11 @@ export interface DocumentThemeEditorData {
   legalText: Record<PetitionLocale, any>;
 }
 
-export function DocumentThemeEditor({
-  user,
-  canRestoreFonts,
-  onRestoreFonts,
-  isDisabled,
-  themeId,
-}: DocumentThemeEditorProps) {
+const FONT_PROPERTIES = (["title1", "title2", "text"] as const).flatMap((k) =>
+  (["FontFamily", "FontSize", "Color"] as const).map((p) => `${k}${p}` as const),
+);
+
+export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentThemeEditorProps) {
   const intl = useIntl();
 
   const { watch, setValue, control, register, formState } =
@@ -89,87 +90,137 @@ export function DocumentThemeEditor({
     [fonts],
   );
 
+  const data = watch();
+  const defaultFontValues = [16, 14, 12].flatMap((s) => ["IBM Plex Sans", s, "#000000"]);
+  const canRestoreFonts = zip(
+    FONT_PROPERTIES.map((p) => data[p]),
+    defaultFontValues,
+  ).some(([a, b]) => a !== b);
+
+  async function handleRestoreFonts() {
+    for (const [prop, value] of zip(FONT_PROPERTIES, defaultFontValues)) {
+      setValue(prop, value, { shouldDirty: true });
+    }
+  }
+
   return (
     <Stack spacing={8}>
       <Stack spacing={4}>
-        <Text as="h4" fontSize="lg" fontWeight="semibold">
-          <FormattedMessage
-            id="component.document-theme-editor.margins-header"
-            defaultMessage="Margins"
-          />
-        </Text>
-        <HStack spacing={4}>
-          <FormControl isDisabled={isDisabled}>
-            <FormLabel fontWeight="normal" width="auto">
+        {user.hasPdfExportV2 ? (
+          <Stack spacing={2}>
+            <Text as="h4" id="layout-label" fontSize="lg" fontWeight="semibold">
               <FormattedMessage
-                id="component.document-theme-editor.margin-top"
-                defaultMessage="Top"
+                id="component.document-theme-editor.layout-header"
+                defaultMessage="Layout"
               />
-            </FormLabel>
+            </Text>
             <Controller
-              name="marginTop"
+              name="doubleColumn"
               control={control}
               render={({ field: { onChange, value, onBlur } }) => (
-                <NumeralInput
-                  background="white"
-                  decimals={1}
-                  onlyPositive
-                  suffix=" mm"
-                  value={value}
-                  onChange={(value) => onChange(value as number)}
-                  onBlur={onBlur}
-                />
+                <RadioGroup
+                  value={value ? "double" : "single"}
+                  onChange={(value) => onChange(value === "double")}
+                  aria-labelledby="layout-label"
+                >
+                  <Stack spacing={5} direction="row">
+                    <Radio value="single" flex={1}>
+                      <FormattedMessage
+                        id="component.document-theme-editor.layout-single-column"
+                        defaultMessage="Single column"
+                      />
+                    </Radio>
+                    <Radio value="double" flex={1}>
+                      <FormattedMessage
+                        id="component.document-theme-editor.layout-double-column"
+                        defaultMessage="Double column"
+                      />
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
               )}
             />
-          </FormControl>
-          <FormControl isDisabled={isDisabled}>
-            <FormLabel fontWeight="normal" width="auto">
+          </Stack>
+        ) : null}
+        <Stack spacing={2}>
+          <Text as="h4" fontSize="lg" fontWeight="semibold">
+            <FormattedMessage
+              id="component.document-theme-editor.margins-header"
+              defaultMessage="Margins"
+            />
+          </Text>
+          <HStack spacing={4}>
+            {[
+              {
+                key: "marginTop" as const,
+                label: intl.formatMessage({
+                  id: "component.document-theme-editor.margin-top",
+                  defaultMessage: "Top",
+                }),
+              },
+              {
+                key: "marginLeft" as const,
+                label: intl.formatMessage({
+                  id: "component.document-theme-editor.margin-sides",
+                  defaultMessage: "Sides",
+                }),
+              },
+              {
+                key: "marginBottom" as const,
+                label: intl.formatMessage({
+                  id: "component.document-theme-editor.margin-bottom",
+                  defaultMessage: "Bottom",
+                }),
+              },
+              ...(user.hasPdfExportV2
+                ? [
+                    {
+                      key: "columnGap" as const,
+                      label: intl.formatMessage({
+                        id: "component.document-theme-editor.column-gap",
+                        defaultMessage: "Column gap",
+                      }),
+                    },
+                  ]
+                : []),
+            ].map(({ key, label }) => (
+              <FormControl key={key} isDisabled={isDisabled} isInvalid={!!formState.errors[key]}>
+                <FormLabel fontWeight="normal" width="auto">
+                  {label}
+                </FormLabel>
+                <Controller
+                  name={key}
+                  control={control}
+                  rules={{ max: 100, min: 0 }}
+                  render={({ field: { onChange, value, onBlur } }) => (
+                    <NumeralInput
+                      background="white"
+                      decimals={1}
+                      onlyPositive
+                      suffix=" mm"
+                      value={value}
+                      onChange={(value) => onChange(value as number)}
+                      onBlur={onBlur}
+                    />
+                  )}
+                />
+              </FormControl>
+            ))}
+          </HStack>
+          <FormControl
+            isInvalid={(["marginTop", "marginBottom", "marginLeft", "columnGap"] as const).some(
+              (k) => !!formState.errors[k],
+            )}
+          >
+            <FormErrorMessage marginTop={0}>
               <FormattedMessage
-                id="component.document-theme-editor.margin-bottom"
-                defaultMessage="Bottom"
+                id="component.document-theme-editor.margin-range-error"
+                defaultMessage="Value must be between 0 and 100mm"
               />
-            </FormLabel>
-            <Controller
-              name="marginBottom"
-              control={control}
-              render={({ field: { onChange, value, onBlur } }) => (
-                <NumeralInput
-                  background="white"
-                  decimals={1}
-                  onlyPositive
-                  suffix=" mm"
-                  value={value}
-                  onChange={(value) => onChange(value as number)}
-                  onBlur={onBlur}
-                />
-              )}
-            />
+            </FormErrorMessage>
           </FormControl>
-          <FormControl isDisabled={isDisabled}>
-            <FormLabel fontWeight="normal" width="auto">
-              <FormattedMessage
-                id="component.document-theme-editor.margin-sides"
-                defaultMessage="Sides"
-              />
-            </FormLabel>
-            <Controller
-              name="marginLeft"
-              control={control}
-              render={({ field: { onChange, value, onBlur } }) => (
-                <NumeralInput
-                  background="white"
-                  decimals={1}
-                  onlyPositive
-                  suffix=" mm"
-                  value={value}
-                  onChange={(value) => onChange(value as number)}
-                  onBlur={onBlur}
-                />
-              )}
-            />
-          </FormControl>
-        </HStack>
-        <Stack>
+        </Stack>
+        <Stack spacing={2}>
           <Text as="h4" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
               id="component.document-theme-editor.show-logo-header"
@@ -191,98 +242,103 @@ export function DocumentThemeEditor({
             <Switch {...register("showLogo")} />
           </FormControl>
         </Stack>
+        <Stack spacing={2}>
+          <Text as="h4" fontSize="lg" fontWeight="semibold">
+            <FormattedMessage
+              id="component.document-theme-editor.fonts-header"
+              defaultMessage="Fonts"
+            />
+          </Text>
+          <Stack spacing={4}>
+            {(
+              [
+                {
+                  title: intl.formatMessage({
+                    id: "component.document-theme-editor.typography-title1",
+                    defaultMessage: "Title 1",
+                  }),
+                  key: "title1",
+                },
+                {
+                  title: intl.formatMessage({
+                    id: "component.document-theme-editor.typography-title2",
+                    defaultMessage: "Title 2",
+                  }),
+                  key: "title2",
+                },
+                {
+                  title: intl.formatMessage({
+                    id: "component.document-theme-editor.typography-text",
+                    defaultMessage: "Texts",
+                  }),
+                  key: "text",
+                },
+              ] as { title: string; key: "text" | "title1" | "title2" }[]
+            ).map(({ key, title }, i) => (
+              <HStack align="center" spacing={4} key={key}>
+                <FormControl isDisabled={isDisabled}>
+                  <FormLabel fontWeight="normal">{title}</FormLabel>
+                  <Select {...register(`${key}FontFamily`)} backgroundColor="white">
+                    {sortedFonts.map(({ family }) => (
+                      <option key={family} value={family}>
+                        {family}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl isDisabled={isDisabled}>
+                  <FormLabel fontWeight="normal">
+                    <FormattedMessage
+                      id="component.document-theme-editor.font-size"
+                      defaultMessage="Size"
+                    />
+                  </FormLabel>
+                  <Select
+                    {...register(`${key}FontSize`, { valueAsNumber: true })}
+                    backgroundColor="white"
+                  >
+                    {FONT_SIZES_PT.map((v) => (
+                      <option key={v} value={v}>
+                        {<FormattedNumber value={v} />} {untranslated("pt")}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl isDisabled={isDisabled} isInvalid={!!formState.errors[`${key}Color`]}>
+                  <FormLabel fontWeight="normal">
+                    <FormattedMessage
+                      id="component.document-theme-editor.font-color"
+                      defaultMessage="Color"
+                    />
+                  </FormLabel>
+                  <Controller
+                    control={control}
+                    name={`${key}Color`}
+                    rules={{ pattern: /^#[a-f\d]{6}$/i }}
+                    render={({ field: { onChange, value, onBlur } }) => (
+                      <ColorInput value={value} onChange={onChange} onBlur={onBlur} />
+                    )}
+                  />
+                </FormControl>
+              </HStack>
+            ))}
+          </Stack>
+        </Stack>
+        <HStack justifyContent="flex-end">
+          <Button
+            variant="link"
+            onClick={handleRestoreFonts}
+            isDisabled={!canRestoreFonts || isDisabled}
+          >
+            <FormattedMessage
+              id="component.document-theme-editor.restore-defaults"
+              defaultMessage="Restore defaults"
+            />
+          </Button>
+        </HStack>
       </Stack>
       <Divider borderColor="gray.300" />
-      <Stack spacing={4}>
-        <Text as="h4" fontSize="lg" fontWeight="semibold">
-          <FormattedMessage
-            id="component.document-theme-editor.fonts-header"
-            defaultMessage="Fonts"
-          />
-        </Text>
-        {(
-          [
-            {
-              title: intl.formatMessage({
-                id: "component.document-theme-editor.typography-title1",
-                defaultMessage: "Title 1",
-              }),
-              key: "title1",
-            },
-            {
-              title: intl.formatMessage({
-                id: "component.document-theme-editor.typography-title2",
-                defaultMessage: "Title 2",
-              }),
-              key: "title2",
-            },
-            {
-              title: intl.formatMessage({
-                id: "component.document-theme-editor.typography-text",
-                defaultMessage: "Texts",
-              }),
-              key: "text",
-            },
-          ] as { title: string; key: "text" | "title1" | "title2" }[]
-        ).map(({ key, title }, i) => (
-          <HStack align="center" spacing={4} key={key}>
-            <FormControl isDisabled={isDisabled}>
-              <FormLabel fontWeight="normal">{title}</FormLabel>
-              <Select {...register(`${key}FontFamily`)} backgroundColor="white">
-                {sortedFonts.map(({ family }) => (
-                  <option key={family} value={family}>
-                    {family}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl isDisabled={isDisabled}>
-              <FormLabel fontWeight="normal">
-                <FormattedMessage
-                  id="component.document-theme-editor.font-size"
-                  defaultMessage="Size"
-                />
-              </FormLabel>
-              <Select
-                {...register(`${key}FontSize`, { valueAsNumber: true })}
-                backgroundColor="white"
-              >
-                {FONT_SIZES_PT.map((v) => (
-                  <option key={v} value={v}>
-                    {<FormattedNumber value={v} />} {untranslated("pt")}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl isDisabled={isDisabled} isInvalid={!!formState.errors[`${key}Color`]}>
-              <FormLabel fontWeight="normal">
-                <FormattedMessage
-                  id="component.document-theme-editor.font-color"
-                  defaultMessage="Color"
-                />
-              </FormLabel>
-              <Controller
-                control={control}
-                name={`${key}Color`}
-                rules={{ pattern: /^#[a-f\d]{6}$/i }}
-                render={({ field: { onChange, value, onBlur } }) => (
-                  <ColorInput value={value} onChange={onChange} onBlur={onBlur} />
-                )}
-              />
-            </FormControl>
-          </HStack>
-        ))}
-      </Stack>
-      <HStack justifyContent="flex-end">
-        <Button variant="link" onClick={onRestoreFonts} isDisabled={!canRestoreFonts || isDisabled}>
-          <FormattedMessage
-            id="component.document-theme-editor.restore-defaults"
-            defaultMessage="Restore defaults"
-          />
-        </Button>
-      </HStack>
-      <Divider borderColor="gray.300" />
-      <Stack spacing={4}>
+      <Stack spacing={2}>
         <Text as="h4" fontSize="lg" fontWeight="semibold">
           <FormattedMessage
             id="component.document-theme-editor.legal-disclaimer"
@@ -295,7 +351,6 @@ export function DocumentThemeEditor({
             defaultMessage="This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the parallel."
           />
         </Text>
-
         <Tabs as={Card} variant="enclosed" key={themeId}>
           <TabList margin={"-1px"}>
             {locales.map(({ key, localizedLabel }) => (
@@ -333,6 +388,7 @@ export function DocumentThemeEditor({
 DocumentThemeEditor.fragments = {
   User: gql`
     fragment DocumentThemeEditor_User on User {
+      hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
       ...useAvailablePetitionLocales_User
     }
     ${useAvailablePetitionLocales.fragments.User}

@@ -111,17 +111,14 @@ export class PetitionBinder implements IPetitionBinder {
       const mainDocPaths: string[] = [];
 
       if (isNullish(customDocumentTemporaryFileId)) {
-        mainDocPaths.push(
-          await this.writeTemporaryFile(
-            await this.printer.petitionExport(userId, {
-              petitionId,
-              documentTitle,
-              showSignatureBoxes,
-              includeNetDocumentsLinks,
-            }),
-            "pdf",
-          ),
-        );
+        const petitionExport = await this.printer.petitionExport(userId, {
+          petitionId,
+          documentTitle,
+          showSignatureBoxes,
+          includeNetDocumentsLinks,
+        });
+
+        mainDocPaths.push(await this.writeTemporaryFile(petitionExport.stream, "pdf"));
       } else {
         const customFile = await this.files.loadTemporaryFile(customDocumentTemporaryFileId);
         mainDocPaths.push(
@@ -131,12 +128,8 @@ export class PetitionBinder implements IPetitionBinder {
           ),
         );
         if (showSignatureBoxes) {
-          mainDocPaths.push(
-            await this.writeTemporaryFile(
-              await this.printer.signatureBoxesPage(userId, { petitionId }),
-              "pdf",
-            ),
-          );
+          const signatureBoxesPage = await this.printer.signatureBoxesPage(userId, { petitionId });
+          mainDocPaths.push(await this.writeTemporaryFile(signatureBoxesPage.stream, "pdf"));
         }
       }
 

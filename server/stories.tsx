@@ -73,9 +73,13 @@ app
       const client = new GraphQLClient("http://localhost/graphql", {
         headers: { authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
       });
-      const { default: Component } = await import(`./src/pdf/documents/${document}.tsx`);
+      const { default: pdfDocument } = await import(`./src/pdf/documents/${document}`);
       const params = await parseArgs(req, `./src/pdf/documents/${document}.stories.json`);
-      (await buildPdf(Component, params, { client, locale })).pipe(res);
+      const { stream } = await buildPdf(pdfDocument, params, {
+        client,
+        locale,
+      });
+      stream.pipe(res);
     } catch (error) {
       if (error instanceof Error) {
         (

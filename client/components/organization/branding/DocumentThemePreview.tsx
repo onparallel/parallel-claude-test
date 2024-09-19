@@ -13,38 +13,24 @@ interface DocumentThemePreviewProps {
   theme: DocumentThemeEditorData;
 }
 
+const mm = (value: number) => `calc(${value} * var(--page-width) / 210)`;
+const pt = (value: number) => `calc(${value} * 25.4/72 * var(--page-width) / 210)`;
+
 export function DocumentThemePreview({ organization, theme }: DocumentThemePreviewProps) {
-  const mmRatio = "var(--page-width)/210";
-  const ptRatio = "25.4/72*var(--page-width)/210";
   const styles: Record<string, CSSProperties> = {
-    page: {
-      paddingTop: `calc(${mmRatio}*${theme.marginTop})`,
-      paddingRight: `calc(${mmRatio}*${theme.marginRight})`,
-      paddingLeft: `calc(${mmRatio}*${theme.marginLeft})`,
-      bottom: `calc(${mmRatio}*${theme.marginBottom})`,
-    },
-    logo: {
-      width: `calc(${mmRatio}*84)`,
-      maxHeight: `calc(${mmRatio}*55)`,
-      objectFit: "contain",
-    },
-    pageNumber: {
-      right: `calc(${mmRatio}*${theme.marginRight})`,
-      top: `calc(100% - ${mmRatio}*${theme.marginBottom})`,
-    },
     title1: {
       fontFamily: theme.title1FontFamily,
-      fontSize: `calc(${ptRatio}*${theme.title1FontSize})`,
+      fontSize: pt(theme.title1FontSize),
       color: theme.title1Color,
     },
     title2: {
       fontFamily: theme.title2FontFamily,
-      fontSize: `calc(${ptRatio}*${theme.title2FontSize})`,
+      fontSize: pt(theme.title2FontSize),
       color: theme.title2Color,
     },
     text: {
       fontFamily: theme.textFontFamily,
-      fontSize: `calc(${ptRatio}*${theme.textFontSize})`,
+      fontSize: pt(theme.textFontSize),
       color: theme.textColor,
       textAlign: "justify",
     },
@@ -72,12 +58,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
         margin="0 auto"
         position="relative"
         overflow="hidden"
-        _before={{
-          height: 0,
-          content: "''",
-          display: "block",
-          paddingBottom: `${(279 / 210) * 100}%`,
-        }}
+        aspectRatio={210 / 297}
         sx={{
           "--page-width": { base: "327px", sm: "500px" },
         }}
@@ -98,7 +79,12 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
             />
           </Text>
         </Box>
-        <Box position="absolute" style={{ ...styles.pageNumber, ...styles.text }}>
+        <Box
+          position="absolute"
+          insetEnd={mm(theme.marginRight)}
+          top={`calc(100% - ${mm(theme.marginBottom)})`}
+          style={{ ...styles.pageNumber, ...styles.text }}
+        >
           1
         </Box>
         <Flex
@@ -108,65 +94,99 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
           top={0}
           insetEnd={0}
           insetStart={0}
-          style={styles.page}
+          paddingTop={mm(theme.marginTop)}
+          paddingEnd={mm(theme.marginRight)}
+          paddingStart={mm(theme.marginLeft)}
+          bottom={mm(theme.marginBottom)}
         >
-          <Box marginBottom={`calc(${mmRatio}*10)`}>
+          <Box marginBottom={mm(10)}>
             {theme.showLogo ? (
               <Center>
-                <Image alt={organization.name} src={logoSrc} style={styles.logo} />
+                <Image
+                  alt={organization.name}
+                  src={logoSrc}
+                  width={mm(84)}
+                  maxHeight={mm(55)}
+                  objectFit="contain"
+                />
               </Center>
             ) : null}
-            <Center fontWeight="bold" style={styles.title1} marginTop={`calc(${mmRatio}*10)`}>
+            <Center fontWeight="bold" style={styles.title1} marginTop={mm(10)}>
               <FormattedMessage
                 id="component.branding-document-preview.document-title"
                 defaultMessage="Document title"
               />
             </Center>
           </Box>
-          <Stack spacing={`calc(${mmRatio}*5)`}>
-            <Stack spacing={`calc(${mmRatio}*2)`}>
-              <Text fontWeight="bold" style={styles.title2}>
-                {untranslated("Lorem ipsum")}
-              </Text>
-              <Text style={styles.text}>
-                {untranslated(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                )}
-              </Text>
-            </Stack>
+          <Box
+            flex="1"
+            minHeight={0}
+            sx={
+              theme.doubleColumn
+                ? { columnCount: 2, columnFill: "auto", columnGap: mm(theme.columnGap) }
+                : {}
+            }
+            overflow="hidden"
+          >
+            <Text fontWeight="bold" style={styles.title2}>
+              {untranslated("Lorem ipsum")}
+            </Text>
+            <Text style={styles.text} marginTop={mm(2)}>
+              {untranslated(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+              )}
+            </Text>
             <Stack
               border="1px solid"
               borderColor="gray.200"
-              borderRadius={`calc(${mmRatio}*1.5)`}
-              padding={`calc(${mmRatio}*4.2)`}
-              spacing={`calc(${mmRatio}*2)`}
+              borderRadius={mm(1.5)}
+              padding={mm(4.2)}
+              spacing={mm(2)}
+              marginTop={mm(5)}
             >
               <Text fontWeight="bold" style={styles.text}>
                 {untranslated("Lorem ipsum")}
               </Text>
               <Text style={styles.text}> {untranslated("Lorem ipsum")}</Text>
             </Stack>
-            <Stack spacing={`calc(${mmRatio}*2)`}>
-              <Text fontWeight="bold" style={styles.title2}>
+            <Text fontWeight="bold" style={styles.title2} marginTop={mm(5)}>
+              {untranslated("Lorem ipsum")}
+            </Text>
+            <Text style={styles.text} marginTop={mm(2)}>
+              {untranslated(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+              )}
+            </Text>
+            <Stack
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius={mm(1.5)}
+              padding={mm(4.2)}
+              spacing={mm(2)}
+              marginTop={mm(5)}
+            >
+              <Text fontWeight="bold" style={styles.text}>
                 {untranslated("Lorem ipsum")}
               </Text>
-              <Text style={styles.text}>
-                {untranslated(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                )}
-              </Text>
+              <Text style={styles.text}> {untranslated("Lorem ipsum")}</Text>
             </Stack>
-            <Stack spacing={`calc(${mmRatio}*2)`}>
-              <Text fontWeight="bold" style={styles.title2}>
-                {untranslated("Lorem ipsum")}
-              </Text>
-              <Text style={styles.text}>
-                {untranslated(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                )}
-              </Text>
-            </Stack>
-          </Stack>
+            <Text fontWeight="bold" style={styles.title2} marginTop={mm(5)}>
+              {untranslated("Lorem ipsum")}
+            </Text>
+            <Text style={styles.text} marginTop={mm(2)}>
+              {untranslated(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+              )}
+            </Text>
+            <Text fontWeight="bold" style={styles.title2} marginTop={mm(5)}>
+              {untranslated("Lorem ipsum")}
+            </Text>
+            <Text style={styles.text} marginTop={mm(2)}>
+              {untranslated(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+              )}
+            </Text>
+          </Box>
         </Flex>
       </Box>
       <Text width="full" textAlign="center" fontSize="sm" color="gray.600" mt={4}>

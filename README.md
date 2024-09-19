@@ -34,11 +34,12 @@ As external dependencies, the backend uses:
 - [ImageMagick](https://imagemagick.org/)
 - [Exiftool](https://exiftool.org/)
 - [QPdf](https://qpdf.sourceforge.io/)
+- [Typst](https://typst.app/)
 
 This libraries are used to generate a PDF document binder containing the replies of a given petition.
 You can install this dependencies via brew:
 
-`brew install ghostscript imagemagick exiftool qpdf`
+`brew install ghostscript imagemagick exiftool qpdf typst`
 
 On dev environment, we use [Ngrok](https://ngrok.com/) to launch a local tunnel in order to:
 

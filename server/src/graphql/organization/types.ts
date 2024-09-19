@@ -11,7 +11,6 @@ import {
   stringArg,
 } from "nexus";
 import { isNonNullish, omit } from "remeda";
-import { ContactLocaleValues } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { addDuration, multiplyDuration } from "../../util/duration";
 import { and, or } from "../helpers/authorize";
@@ -69,34 +68,6 @@ export const OrganizationTheme = objectType({
   },
   sourceType: "db.OrganizationTheme",
 });
-
-export const OrganizationPdfDocumentThemeInput = inputObjectType({
-  name: "OrganizationPdfDocumentThemeInput",
-  definition(t) {
-    t.float("marginTop");
-    t.float("marginRight");
-    t.float("marginBottom");
-    t.float("marginLeft");
-    t.boolean("showLogo");
-    t.string("title1FontFamily");
-    t.string("title1Color");
-    t.float("title1FontSize");
-    t.string("title2FontFamily");
-    t.string("title2Color");
-    t.float("title2FontSize");
-    t.string("textFontFamily");
-    t.string("textColor");
-    t.float("textFontSize");
-    t.field("legalText", {
-      type: inputObjectType({
-        name: "OrganizationPdfDocumentThemeInputLegalText",
-        definition(t) {
-          ContactLocaleValues.forEach((l) => t.json(l));
-        },
-      }),
-    });
-  },
-}).asArg();
 
 export const OrganizationUsageLimit = objectType({
   name: "OrganizationUsageLimit",

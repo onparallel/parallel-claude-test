@@ -13,7 +13,7 @@ export async function addFeatureFlag(
 ): Promise<void>;
 export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultValue?: boolean) {
   // need to commit the transaction before safely using new enum value
-  assert(featureFlag.match(/^[A-Z_]+$/));
+  assert(featureFlag.match(/^[A-Z_][A-Z0-9_]+$/));
   await knex.raw(/* sql */ `
     start transaction; alter type feature_flag_name add value '${featureFlag}'; commit;
   `);

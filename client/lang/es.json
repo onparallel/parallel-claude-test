@@ -5,21 +5,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "branding.edit-theme-tooltip",
-    "definition": "Editar tema",
-    "context": "Edit theme"
-  },
-  {
-    "term": "branding.new-theme-button",
-    "definition": "Nuevo tema",
-    "context": "New theme"
-  },
-  {
-    "term": "branding.themes-header",
-    "definition": "Temas",
-    "context": "Themes"
-  },
-  {
     "term": "component.account-delegates.delegates",
     "definition": "Delegados",
     "context": "Delegates"
@@ -718,6 +703,21 @@
     "term": "component.branding-document-preview.preview-label",
     "definition": "Ejemplo",
     "context": "Preview"
+  },
+  {
+    "term": "component.branding-document-theme.edit-theme-tooltip",
+    "definition": "Editar tema",
+    "context": "Edit theme"
+  },
+  {
+    "term": "component.branding-document-theme.new-theme-button",
+    "definition": "Nuevo tema",
+    "context": "New theme"
+  },
+  {
+    "term": "component.branding-document-theme.themes-header",
+    "definition": "Temas",
+    "context": "Themes"
   },
   {
     "term": "component.branding-general-preview.body",
@@ -2535,6 +2535,11 @@
     "context": "Tokens"
   },
   {
+    "term": "component.document-theme-editor.column-gap",
+    "definition": "Columnas",
+    "context": "Column gap"
+  },
+  {
     "term": "component.document-theme-editor.font-color",
     "definition": "Color",
     "context": "Color"
@@ -2550,6 +2555,21 @@
     "context": "Fonts"
   },
   {
+    "term": "component.document-theme-editor.layout-double-column",
+    "definition": "Columna doble",
+    "context": "Double column"
+  },
+  {
+    "term": "component.document-theme-editor.layout-header",
+    "definition": "Diseño",
+    "context": "Layout"
+  },
+  {
+    "term": "component.document-theme-editor.layout-single-column",
+    "definition": "Columna simple",
+    "context": "Single column"
+  },
+  {
     "term": "component.document-theme-editor.legal-disclaimer",
     "definition": "Texto legal",
     "context": "Legal disclaimer"
@@ -2561,8 +2581,13 @@
   },
   {
     "term": "component.document-theme-editor.margin-bottom",
-    "definition": "Parte inferior",
+    "definition": "Inferior",
     "context": "Bottom"
+  },
+  {
+    "term": "component.document-theme-editor.margin-range-error",
+    "definition": "El valor debe estar entre 0 y 100mm",
+    "context": "Value must be between 0 and 100mm"
   },
   {
     "term": "component.document-theme-editor.margin-sides",
@@ -2571,7 +2596,7 @@
   },
   {
     "term": "component.document-theme-editor.margin-top",
-    "definition": "Parte superior",
+    "definition": "Superior",
     "context": "Top"
   },
   {

@@ -569,6 +569,7 @@ export type FeatureFlag =
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
+  | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
@@ -2492,7 +2493,7 @@ export type MutationupdateOrganizationLogoArgs = {
 };
 
 export type MutationupdateOrganizationPdfDocumentThemeArgs = {
-  data?: InputMaybe<OrganizationPdfDocumentThemeInput>;
+  data?: InputMaybe<Scalars["JSONObject"]["input"]>;
   isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   orgThemeId: Scalars["GID"]["input"];
@@ -2902,32 +2903,6 @@ export type OrganizationPagination = {
   items: Array<Organization>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
-};
-
-export type OrganizationPdfDocumentThemeInput = {
-  legalText?: InputMaybe<OrganizationPdfDocumentThemeInputLegalText>;
-  marginBottom?: InputMaybe<Scalars["Float"]["input"]>;
-  marginLeft?: InputMaybe<Scalars["Float"]["input"]>;
-  marginRight?: InputMaybe<Scalars["Float"]["input"]>;
-  marginTop?: InputMaybe<Scalars["Float"]["input"]>;
-  showLogo?: InputMaybe<Scalars["Boolean"]["input"]>;
-  textColor?: InputMaybe<Scalars["String"]["input"]>;
-  textFontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  textFontSize?: InputMaybe<Scalars["Float"]["input"]>;
-  title1Color?: InputMaybe<Scalars["String"]["input"]>;
-  title1FontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  title1FontSize?: InputMaybe<Scalars["Float"]["input"]>;
-  title2Color?: InputMaybe<Scalars["String"]["input"]>;
-  title2FontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  title2FontSize?: InputMaybe<Scalars["Float"]["input"]>;
-};
-
-export type OrganizationPdfDocumentThemeInputLegalText = {
-  ca?: InputMaybe<Scalars["JSON"]["input"]>;
-  en?: InputMaybe<Scalars["JSON"]["input"]>;
-  es?: InputMaybe<Scalars["JSON"]["input"]>;
-  it?: InputMaybe<Scalars["JSON"]["input"]>;
-  pt?: InputMaybe<Scalars["JSON"]["input"]>;
 };
 
 /** The status of the organization. */

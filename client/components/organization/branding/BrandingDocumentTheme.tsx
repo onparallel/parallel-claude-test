@@ -24,7 +24,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, zip } from "remeda";
+import { isNonNullish } from "remeda";
 import {
   useAutoConfirmDiscardChangesDialog,
   useConfirmDiscardChangesDialog,
@@ -44,32 +44,20 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
 
   const form = useForm<DocumentThemeEditorData>({
     mode: "onChange",
-    defaultValues: selectedTheme.data,
+    defaultValues: {
+      ...(user.hasPdfExportV2 ? { doubleColumn: false, columnGap: 10 } : {}),
+      ...selectedTheme.data,
+    },
   });
   const {
     handleSubmit,
-    watch,
     formState: { isDirty, isValid },
     reset,
-    setValue,
+    watch,
   } = form;
+  const data = watch();
 
   useAutoConfirmDiscardChangesDialog(isDirty);
-
-  const fontProperties = (["title1", "title2", "text"] as const).flatMap((k) =>
-    (["FontFamily", "FontSize", "Color"] as const).map((p) => `${k}${p}` as const),
-  );
-  const data = watch();
-  const defaultFontValues = [16, 14, 12].flatMap((s) => ["IBM Plex Sans", s, "#000000"]);
-  const canRestoreFonts = zip(
-    fontProperties.map((p) => data[p]),
-    defaultFontValues,
-  ).some(([a, b]) => a !== b);
-  async function handleRestoreFonts() {
-    for (const [prop, value] of zip(fontProperties, defaultFontValues)) {
-      setValue(prop, value, { shouldDirty: true });
-    }
-  }
 
   const [deleteOrganizationPdfDocumentTheme] = useMutation(
     BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument,
@@ -165,13 +153,16 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       })}
       padding={6}
       gridColumnGap={{ base: 8, xl: 16 }}
-      gridRowGap={{ base: 6, xl: 8 }}
+      gridRowGap={{ base: 4, xl: 6 }}
       gridTemplateColumns={{ base: "1fr", xl: "fit-content(420px) 1fr" }}
       gridTemplateAreas={{ base: `"a" "c" "d"`, xl: `"a b" "c d"` }}
     >
       <Stack minWidth="0">
         <Heading as="h4" size="md" fontWeight="semibold">
-          <FormattedMessage id="branding.themes-header" defaultMessage="Themes" />
+          <FormattedMessage
+            id="component.branding-document-theme.themes-header"
+            defaultMessage="Themes"
+          />
         </Heading>
         <HStack width="100%">
           <Box flex="1" minWidth="0">
@@ -198,7 +189,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           <IconButtonWithTooltip
             icon={<EditIcon />}
             label={intl.formatMessage({
-              id: "branding.edit-theme-tooltip",
+              id: "component.branding-document-theme.edit-theme-tooltip",
               defaultMessage: "Edit theme",
             })}
             isDisabled={!userHasPermission}
@@ -212,7 +203,10 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               isDisabled={!userHasPermission}
               width="full"
             >
-              <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
+              <FormattedMessage
+                id="component.branding-document-theme.new-theme-button"
+                defaultMessage="New theme"
+              />
             </Button>
           </Box>
         </HStack>
@@ -225,7 +219,10 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           isDisabled={!userHasPermission}
           width="full"
         >
-          <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
+          <FormattedMessage
+            id="component.branding-document-theme.new-theme-button"
+            defaultMessage="New theme"
+          />
         </Button>
       </Box>
       <Stack spacing={8} gridArea="c">
@@ -234,8 +231,6 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           <DocumentThemeEditor
             user={user}
             themeId={selectedTheme.id}
-            canRestoreFonts={canRestoreFonts}
-            onRestoreFonts={handleRestoreFonts}
             isDisabled={!userHasPermission}
           />
         </FormProvider>
@@ -254,6 +249,7 @@ BrandingDocumentTheme.fragments = {
     return gql`
       fragment BrandingDocumentTheme_User on User {
         id
+        hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
         organization {
           ...DocumentThemePreview_Organization
           pdfDocumentThemes {
@@ -300,7 +296,7 @@ const _mutations = [
       $orgThemeId: GID!
       $name: String
       $isDefault: Boolean
-      $data: OrganizationPdfDocumentThemeInput
+      $data: JSONObject!
     ) {
       updateOrganizationPdfDocumentTheme(
         orgThemeId: $orgThemeId

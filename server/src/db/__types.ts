@@ -63,7 +63,8 @@ export type FeatureFlagName =
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
   | "BACKGROUND_CHECK"
-  | "CREATE_PROFILE_TYPE";
+  | "CREATE_PROFILE_TYPE"
+  | "PDF_EXPORT_V2";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -96,6 +97,7 @@ export const FeatureFlagNameValues = [
   "RECIPIENT_LANG_PT",
   "BACKGROUND_CHECK",
   "CREATE_PROFILE_TYPE",
+  "PDF_EXPORT_V2",
 ] as FeatureFlagName[];
 
 export type IntegrationType =

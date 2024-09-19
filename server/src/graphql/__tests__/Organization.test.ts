@@ -271,7 +271,7 @@ describe("GraphQL/Organization", () => {
       it("sends error when passing unknown font-family", async () => {
         const { errors, data } = await testClient.execute(
           gql`
-            mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
+            mutation ($orgThemeId: GID!, $data: JSONObject!) {
               updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
                 pdfDocumentThemes {
                   id
@@ -343,7 +343,7 @@ describe("GraphQL/Organization", () => {
       it("partially updates the data of a document theme", async () => {
         const { errors, data } = await testClient.execute(
           gql`
-            mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
+            mutation ($orgThemeId: GID!, $data: JSONObject!) {
               updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
                 pdfDocumentThemes {
                   id

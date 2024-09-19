@@ -5,21 +5,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "branding.edit-theme-tooltip",
-    "definition": "Edit theme",
-    "context": "Edit theme"
-  },
-  {
-    "term": "branding.new-theme-button",
-    "definition": "New theme",
-    "context": "New theme"
-  },
-  {
-    "term": "branding.themes-header",
-    "definition": "Themes",
-    "context": "Themes"
-  },
-  {
     "term": "component.account-delegates.delegates",
     "definition": "Delegates",
     "context": "Delegates"
@@ -718,6 +703,21 @@
     "term": "component.branding-document-preview.preview-label",
     "definition": "Preview",
     "context": "Preview"
+  },
+  {
+    "term": "component.branding-document-theme.edit-theme-tooltip",
+    "definition": "Edit theme",
+    "context": "Edit theme"
+  },
+  {
+    "term": "component.branding-document-theme.new-theme-button",
+    "definition": "New theme",
+    "context": "New theme"
+  },
+  {
+    "term": "component.branding-document-theme.themes-header",
+    "definition": "Themes",
+    "context": "Themes"
   },
   {
     "term": "component.branding-general-preview.body",
@@ -2535,6 +2535,11 @@
     "context": "Tokens"
   },
   {
+    "term": "component.document-theme-editor.column-gap",
+    "definition": "Column gap",
+    "context": "Column gap"
+  },
+  {
     "term": "component.document-theme-editor.font-color",
     "definition": "Color",
     "context": "Color"
@@ -2550,6 +2555,21 @@
     "context": "Fonts"
   },
   {
+    "term": "component.document-theme-editor.layout-double-column",
+    "definition": "Double column",
+    "context": "Double column"
+  },
+  {
+    "term": "component.document-theme-editor.layout-header",
+    "definition": "Layout",
+    "context": "Layout"
+  },
+  {
+    "term": "component.document-theme-editor.layout-single-column",
+    "definition": "Single column",
+    "context": "Single column"
+  },
+  {
     "term": "component.document-theme-editor.legal-disclaimer",
     "definition": "Legal disclaimer",
     "context": "Legal disclaimer"
@@ -2563,6 +2583,11 @@
     "term": "component.document-theme-editor.margin-bottom",
     "definition": "Bottom",
     "context": "Bottom"
+  },
+  {
+    "term": "component.document-theme-editor.margin-range-error",
+    "definition": "Value must be between 0 and 100mm",
+    "context": "Value must be between 0 and 100mm"
   },
   {
     "term": "component.document-theme-editor.margin-sides",

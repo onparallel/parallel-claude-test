@@ -18,7 +18,7 @@ async function tunnelUrl() {
         if (!res.ok) {
           Promise.reject(
             new Error(
-              `Tunnel at ${tunnelUrl} seems to be down with code ${status}. Run 'yarn localtunnel' on a separate terminal and try again.`,
+              `Tunnel at ${tunnelUrl} seems to be down with code ${res.status}. Run 'yarn localtunnel' on a separate terminal and try again.`,
             ),
           );
         }

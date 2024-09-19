@@ -612,6 +612,7 @@ export type FeatureFlag =
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
+  | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
@@ -2553,7 +2554,7 @@ export interface MutationupdateOrganizationLogoArgs {
 }
 
 export interface MutationupdateOrganizationPdfDocumentThemeArgs {
-  data?: InputMaybe<OrganizationPdfDocumentThemeInput>;
+  data?: InputMaybe<Scalars["JSONObject"]["input"]>;
   isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   orgThemeId: Scalars["GID"]["input"];
@@ -2968,32 +2969,6 @@ export interface OrganizationPagination {
   items: Array<Organization>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
-}
-
-export interface OrganizationPdfDocumentThemeInput {
-  legalText?: InputMaybe<OrganizationPdfDocumentThemeInputLegalText>;
-  marginBottom?: InputMaybe<Scalars["Float"]["input"]>;
-  marginLeft?: InputMaybe<Scalars["Float"]["input"]>;
-  marginRight?: InputMaybe<Scalars["Float"]["input"]>;
-  marginTop?: InputMaybe<Scalars["Float"]["input"]>;
-  showLogo?: InputMaybe<Scalars["Boolean"]["input"]>;
-  textColor?: InputMaybe<Scalars["String"]["input"]>;
-  textFontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  textFontSize?: InputMaybe<Scalars["Float"]["input"]>;
-  title1Color?: InputMaybe<Scalars["String"]["input"]>;
-  title1FontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  title1FontSize?: InputMaybe<Scalars["Float"]["input"]>;
-  title2Color?: InputMaybe<Scalars["String"]["input"]>;
-  title2FontFamily?: InputMaybe<Scalars["String"]["input"]>;
-  title2FontSize?: InputMaybe<Scalars["Float"]["input"]>;
-}
-
-export interface OrganizationPdfDocumentThemeInputLegalText {
-  ca?: InputMaybe<Scalars["JSON"]["input"]>;
-  en?: InputMaybe<Scalars["JSON"]["input"]>;
-  es?: InputMaybe<Scalars["JSON"]["input"]>;
-  it?: InputMaybe<Scalars["JSON"]["input"]>;
-  pt?: InputMaybe<Scalars["JSON"]["input"]>;
 }
 
 /** The status of the organization. */
@@ -9447,6 +9422,7 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 export type BrandingDocumentTheme_UserFragment = {
   __typename?: "User";
   id: string;
+  hasPdfExportV2: boolean;
   hasRecipientLangCA: boolean;
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
@@ -9496,7 +9472,7 @@ export type BrandingDocumentTheme_updateOrganizationPdfDocumentThemeMutationVari
   orgThemeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["String"]["input"]>;
   isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
-  data?: InputMaybe<OrganizationPdfDocumentThemeInput>;
+  data: Scalars["JSONObject"]["input"];
 }>;
 
 export type BrandingDocumentTheme_updateOrganizationPdfDocumentThemeMutation = {
@@ -9601,6 +9577,7 @@ export type BrandingGeneralPreview_UserFragment = {
 
 export type DocumentThemeEditor_UserFragment = {
   __typename?: "User";
+  hasPdfExportV2: boolean;
   hasRecipientLangCA: boolean;
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
@@ -31401,6 +31378,7 @@ export type OrganizationBranding_userQuery = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasRemovedParallelBranding: boolean;
+    hasPdfExportV2: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
@@ -55384,6 +55362,7 @@ export const useAvailablePetitionLocales_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<useAvailablePetitionLocales_UserFragment, unknown>;
 export const DocumentThemeEditor_UserFragmentDoc = gql`
   fragment DocumentThemeEditor_User on User {
+    hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
     ...useAvailablePetitionLocales_User
   }
   ${useAvailablePetitionLocales_UserFragmentDoc}
@@ -55391,6 +55370,7 @@ export const DocumentThemeEditor_UserFragmentDoc = gql`
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
   fragment BrandingDocumentTheme_User on User {
     id
+    hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
     organization {
       ...DocumentThemePreview_Organization
       pdfDocumentThemes {
@@ -64210,7 +64190,7 @@ export const BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument = 
     $orgThemeId: GID!
     $name: String
     $isDefault: Boolean
-    $data: OrganizationPdfDocumentThemeInput
+    $data: JSONObject!
   ) {
     updateOrganizationPdfDocumentTheme(
       orgThemeId: $orgThemeId
