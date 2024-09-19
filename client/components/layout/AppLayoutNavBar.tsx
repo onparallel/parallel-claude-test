@@ -18,6 +18,7 @@ import {
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AddIcon,
+  AlertCircleFilledIcon,
   BoxedArrowLeft,
   HamburgerMenuIcon,
   HelpOutlineIcon,
@@ -39,10 +40,12 @@ import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useRouter } from "next/router";
 import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
+import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
 import { Wrap } from "../common/Wrap";
@@ -353,7 +356,7 @@ function SectionList({ me }: SectionListProps) {
       {
         section: "petitions",
         href: "/app/petitions",
-        icon: <PaperPlaneIcon />,
+        icon: <PaperPlaneIcon boxSize={5} />,
         isActive:
           pathname.startsWith("/app/petitions") && !pathname.startsWith("/app/petitions/new"),
         text: intl.formatMessage({
@@ -389,7 +392,7 @@ function SectionList({ me }: SectionListProps) {
             {
               section: "profiles",
               href: "/app/profiles",
-              icon: <ProfilesIcon />,
+              icon: <ProfilesIcon boxSize={5} />,
               isActive: pathname.startsWith("/app/profiles"),
               onClick: me.hasProfilesAccess ? undefined : handleProfilesClick,
               text: intl.formatMessage({
@@ -404,7 +407,7 @@ function SectionList({ me }: SectionListProps) {
             {
               section: "alerts",
               href: "/app/alerts",
-              icon: <TimeAlarmIcon />,
+              icon: <TimeAlarmIcon boxSize={5} />,
               isActive: pathname.startsWith("/app/alerts"),
               onClick: me.hasProfilesAccess ? undefined : handleAlertsClick,
               text: intl.formatMessage({
@@ -418,7 +421,7 @@ function SectionList({ me }: SectionListProps) {
         ? [
             {
               section: "reports",
-              icon: <ReportsIcon />,
+              icon: <ReportsIcon boxSize={5} />,
               href: "/app/reports",
               isActive: pathname.startsWith("/app/reports"),
               text: intl.formatMessage({
@@ -433,7 +436,7 @@ function SectionList({ me }: SectionListProps) {
             {
               section: "contacts",
               href: "/app/contacts",
-              icon: <UsersIcon />,
+              icon: <UsersIcon boxSize={5} />,
               isActive: pathname.startsWith("/app/contacts"),
               text: intl.formatMessage({
                 id: "component.app-layout-nav-bar.contacts-link",
@@ -449,18 +452,37 @@ function SectionList({ me }: SectionListProps) {
     <List spacing={2}>
       {items.map(({ section, href, isActive, icon, text, warning, onClick }) => (
         <ListItem key={section}>
-          <NakedLink href={href!}>
-            <NavBarButton
-              as="a"
-              isActive={isActive}
-              section={section}
-              onClick={onClick}
-              leftIcon={icon}
-              warningPopover={warning}
-            >
-              {text}
-            </NavBarButton>
-          </NakedLink>
+          <Wrap
+            when={isNonNullish(warning)}
+            wrapper={({ children }) => (
+              <SmallPopover content={warning} placement="right" openDelay={450}>
+                <Box>{children}</Box>
+              </SmallPopover>
+            )}
+          >
+            <NakedLink href={href!}>
+              <NavBarButton
+                as="a"
+                isActive={isActive}
+                section={section}
+                onClick={onClick}
+                icon={icon}
+                badge={
+                  warning ? (
+                    <AlertCircleFilledIcon
+                      position="absolute"
+                      color="yellow.500"
+                      boxSize="14px"
+                      insetStart={-1}
+                      top={-1}
+                    />
+                  ) : null
+                }
+              >
+                {text}
+              </NavBarButton>
+            </NakedLink>
+          </Wrap>
         </ListItem>
       ))}
     </List>
@@ -520,15 +542,14 @@ function NotificationsSection({ onHelpCenterClick }: { onHelpCenterClick: () => 
             ".Canny_BadgeContainer .Canny_Badge": {
               backgroundColor: "red.500",
               border: "2px solid white",
-              top: "4px",
-              insetStart: "20px",
-              width: "16px",
-              height: "16px",
+              top: "7px",
+              insetStart: "23px",
+              boxSize: 3,
               borderRadius: "full",
               position: "absolute",
             },
           }}
-          leftIcon={<NewsIcon boxSize={5} />}
+          icon={<NewsIcon boxSize={5} />}
           onClick={onHelpCenterClick}
         >
           <FormattedMessage id="generic.product-news-label" defaultMessage="News" />
@@ -536,7 +557,7 @@ function NotificationsSection({ onHelpCenterClick }: { onHelpCenterClick: () => 
       </ListItem>
       <ListItem>
         <NakedLink href={`https://help.onparallel.com/${intl.locale}`}>
-          <NavBarButton onClick={onHelpCenterClick} leftIcon={<HelpOutlineIcon boxSize={5} />}>
+          <NavBarButton onClick={onHelpCenterClick} icon={<HelpOutlineIcon boxSize={5} />}>
             <FormattedMessage id="component.new-layout.help-button" defaultMessage="Help" />
           </NavBarButton>
         </NakedLink>
@@ -551,14 +572,16 @@ function NotificationsSectionMobile({ onHelpCenterClick }: { onHelpCenterClick: 
     <>
       <NotificationsButton />
       <IconButtonWithTooltip
+        position="relative"
         sx={{
           ".Canny_BadgeContainer .Canny_Badge": {
             backgroundColor: "red.500",
             border: "2px solid white",
             top: "5px",
             insetEnd: "3px",
-            width: "16px",
-            height: "16px",
+            boxSize: "16px",
+            borderRadius: "full",
+            position: "absolute",
           },
         }}
         label={intl.formatMessage({
