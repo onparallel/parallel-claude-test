@@ -359,6 +359,17 @@ export function useFeatureFlags() {
               defaultMessage: 'Allows turning off "Invite collaborator" on the recipient view',
             }),
           },
+          {
+            name: "PDF_EXPORT_V2",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.pdf-export-v2-name",
+              defaultMessage: "PDF Export V2",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.pdf-export-v2-description",
+              defaultMessage: 'Enables the new PDF engine "Typst"',
+            }),
+          },
           ...(["ca", "it", "pt"] as const).map((locale) => {
             const lang = locales.find((l) => l.key === locale)!.localizedLabel;
             return {
