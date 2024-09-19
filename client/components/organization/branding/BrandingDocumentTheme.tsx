@@ -296,7 +296,7 @@ const _mutations = [
       $orgThemeId: GID!
       $name: String
       $isDefault: Boolean
-      $data: JSONObject!
+      $data: JSONObject
     ) {
       updateOrganizationPdfDocumentTheme(
         orgThemeId: $orgThemeId

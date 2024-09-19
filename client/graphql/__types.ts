@@ -9472,7 +9472,7 @@ export type BrandingDocumentTheme_updateOrganizationPdfDocumentThemeMutationVari
   orgThemeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["String"]["input"]>;
   isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
-  data: Scalars["JSONObject"]["input"];
+  data?: InputMaybe<Scalars["JSONObject"]["input"]>;
 }>;
 
 export type BrandingDocumentTheme_updateOrganizationPdfDocumentThemeMutation = {
@@ -64190,7 +64190,7 @@ export const BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument = 
     $orgThemeId: GID!
     $name: String
     $isDefault: Boolean
-    $data: JSONObject!
+    $data: JSONObject
   ) {
     updateOrganizationPdfDocumentTheme(
       orgThemeId: $orgThemeId
