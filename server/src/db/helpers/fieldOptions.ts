@@ -293,6 +293,17 @@ const SCHEMAS = {
           },
         },
       },
+      identityVerification: {
+        type: "object",
+        required: ["type"],
+        additionalProperties: false,
+        properties: {
+          type: {
+            type: "string",
+            enum: ["simple", "extended"],
+          },
+        },
+      },
     },
   },
   DOW_JONES_KYC: {
