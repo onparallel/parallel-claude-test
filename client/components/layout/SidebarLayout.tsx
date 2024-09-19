@@ -55,7 +55,7 @@ export function SidebarLayout({
           direction="column"
           backgroundColor="white"
           borderEnd="1px solid"
-          borderEndColor="gray.100"
+          borderEndColor="gray.200"
           flex="1"
           minHeight={0}
           maxWidth={{ base: "auto", md: 64 }}
@@ -66,7 +66,7 @@ export function SidebarLayout({
             paddingX={4}
             height={16}
             borderBottom="1px solid"
-            borderBottomColor="gray.100"
+            borderBottomColor="gray.200"
           >
             <Heading as="h2" size="md">
               {sectionsHeader}
@@ -97,7 +97,7 @@ export function SidebarLayout({
               height={16}
               paddingX={4}
               borderBottom="1px solid"
-              borderBottomColor="gray.100"
+              borderBottomColor="gray.200"
             >
               <NakedLink href={basePath}>
                 <IconButton
@@ -160,7 +160,7 @@ function SidebarLayoutMenuItem({ path, children }: SidebarLayoutMenuItemProps) {
         as="a"
         display="flex"
         borderBottom="1px solid"
-        borderBottomColor="gray.100"
+        borderBottomColor="gray.200"
         borderEnd="4px solid"
         borderEndColor="transparent"
         backgroundColor="white"
