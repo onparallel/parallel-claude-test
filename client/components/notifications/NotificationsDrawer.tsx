@@ -40,10 +40,10 @@ export function NotificationsDrawer() {
     getData,
     { data, called, loading, refetch, fetchMore, networkStatus, startPolling, stopPolling },
   ] = useLazyQuery(NotificationsDrawer_notificationsDocument, {
-    pollInterval: POLL_INTERVAL,
     notifyOnNetworkStatusChange: true,
     variables: {
       limit: NOTIFICATIONS_LIMIT,
+      filter,
     },
   });
   const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
