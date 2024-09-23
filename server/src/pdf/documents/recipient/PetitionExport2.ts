@@ -658,6 +658,8 @@ function fieldDescription(
     }
     assert(isNonNullish(description));
   }
+  // after liquid there might be initial linebreaks, trim those
+  description = description.trim();
   const tokens = marked.lexer(description);
   return tokens.flatMap((t, i) =>
     t.type === "heading"
