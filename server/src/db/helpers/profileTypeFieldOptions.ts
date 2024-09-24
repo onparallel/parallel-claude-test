@@ -363,7 +363,7 @@ export async function profileTypeFieldSelectValues(
           ]),
         );
 
-        const codes = Object.keys(cnaeByLocale["en"]);
+        const codes = Object.keys(cnaeByLocale["en"]).sort((a, b) => a.localeCompare(b));
 
         return codes.map((code) => ({
           value: code,
@@ -375,11 +375,13 @@ export async function profileTypeFieldSelectValues(
       }
       case "NACE": {
         const nace = (await import(join(__dirname, `../../../data/nace/nace_en.json`))).default;
-        return Object.keys(nace).map((code) => ({
-          value: code,
-          label: { en: `${code} - ${nace[code]}` } as Record<UserLocale, string>,
-          isStandard: true,
-        }));
+        return Object.keys(nace)
+          .sort((a, b) => a.localeCompare(b))
+          .map((code) => ({
+            value: code,
+            label: { en: `${code} - ${nace[code]}` } as Record<UserLocale, string>,
+            isStandard: true,
+          }));
       }
     }
   }

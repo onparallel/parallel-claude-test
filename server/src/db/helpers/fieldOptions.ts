@@ -645,7 +645,7 @@ export async function selectOptionsValuesAndLabels(
     }
     case "NACE": {
       const codes = (await import(join(__dirname, `../../../data/nace/nace_en.json`))).default;
-      const keys = Object.keys(codes);
+      const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
       return {
         values: keys,
         labels: keys.map((code) => `${code} - ${codes[code]}`),
@@ -657,7 +657,7 @@ export async function selectOptionsValuesAndLabels(
           join(__dirname, `../../../data/cnae/cnae_${locale === "en" ? "en" : "es"}.json`)
         )
       ).default;
-      const keys = Object.keys(codes);
+      const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
       return {
         values: keys,
         labels: keys.map((code) => `${code} - ${codes[code]}`),
