@@ -299,7 +299,7 @@ export class TaskRepository extends BaseRepository {
     );
     await this.queues.enqueueMessages("task-worker", {
       groupId: `Task:${task.id}`,
-      body: { taskId: task.id },
+      body: { taskId: task.id, taskName: task.name },
     });
 
     return task;

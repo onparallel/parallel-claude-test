@@ -42,6 +42,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
 
 export interface TaskWorkerPayload {
   taskId: number;
+  taskName: TaskName;
 }
 
 createQueueWorker(
