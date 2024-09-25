@@ -1,0 +1,23 @@
+diff --git a/node_modules/ip-location-api/cjs/main.cjs b/node_modules/ip-location-api/cjs/main.cjs
+index de34b8c..ba5291a 100644
+--- a/node_modules/ip-location-api/cjs/main.cjs
++++ b/node_modules/ip-location-api/cjs/main.cjs
+@@ -485,6 +485,7 @@ const setCountryInfo = (geodata) => {
+ 	}
+ 	return geodata
+ }
+-reload(undefined, true)
++
++reload({autoUpdate: undefined}, true)
+ 
+ module.exports={lookup:lookup,setupWithoutReload:setupWithoutReload,clear:clear,reload:reload,watchDb:watchDb,stopWatchDb:stopWatchDb,updateDb:updateDb}
+diff --git a/node_modules/ip-location-api/src/main.mjs b/node_modules/ip-location-api/src/main.mjs
+index 53c8ad1..2894632 100644
+--- a/node_modules/ip-location-api/src/main.mjs
++++ b/node_modules/ip-location-api/src/main.mjs
+@@ -493,4 +493,4 @@ const setCountryInfo = (geodata) => {
+ 	return geodata
+ }
+ 
+-await reload()
++await reload({autoUpdate: undefined})

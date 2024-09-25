@@ -1,9 +1,9 @@
-import { lookup } from "geoip-country";
+import { lookup } from "ip-location-api";
 import { arg, idArg, list, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
 import { isNonNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
-import { NexusGenObjects } from "../__types";
+import { LazyPromise } from "../../util/promises/LazyPromise";
 import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import {
@@ -95,22 +95,33 @@ export const metadata = queryField("metadata", {
   },
   authorize: ifArgDefined("keycode", authenticatePublicAccess("keycode" as never), authenticate()),
   resolve: async (_, args, ctx) => {
-    const data: NexusGenObjects["ConnectionMetadata"] = {};
     const ip = getClientIp(ctx.req);
-    if (isNonNullish(ip)) {
-      data.ip = ip;
-      const geo = lookup(ip);
-      data.country = geo?.country ?? null;
-    }
-    const userAgent = ctx.req.headers["user-agent"];
-    if (isNonNullish(userAgent)) {
-      const ua = new UAParser(userAgent);
-      const browser = ua.getBrowser();
-      data.browserName = browser.name;
-      data.browserVersion = browser.version;
-      data.deviceType = ua.getDevice().type;
-    }
-    return data;
+    return {
+      ...(() => {
+        if (isNonNullish(ip)) {
+          return {
+            ip: ip,
+            country: LazyPromise.from(async () => {
+              return (await lookup(ip))?.country;
+            }),
+          };
+        }
+        return {};
+      })(),
+      ...(() => {
+        const userAgent = ctx.req.headers["user-agent"];
+        if (isNonNullish(userAgent)) {
+          const ua = new UAParser(userAgent);
+          const browser = ua.getBrowser();
+          return {
+            browserName: browser.name,
+            browserVersion: browser.version,
+            deviceType: ua.getDevice().type,
+          };
+        }
+        return {};
+      })(),
+    };
   },
 });
 

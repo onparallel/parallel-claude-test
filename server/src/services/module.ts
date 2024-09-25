@@ -92,7 +92,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
   bind<IAuth>(AUTH).to(Auth);
   bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
-  bind<IEmailsService>(EMAILS).to(EmailsService);
+  bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();
   bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();

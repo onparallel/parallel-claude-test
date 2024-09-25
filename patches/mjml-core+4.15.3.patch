@@ -1,0 +1,13 @@
+diff --git a/node_modules/mjml-core/lib/index.js b/node_modules/mjml-core/lib/index.js
+index 24ecd36..4dd3981 100644
+--- a/node_modules/mjml-core/lib/index.js
++++ b/node_modules/mjml-core/lib/index.js
+@@ -84,7 +84,7 @@ var _find2 = _interopRequireDefault(require("lodash/find"));
+ var _path = _interopRequireDefault(require("path"));
+ var _juice = _interopRequireDefault(require("juice"));
+ var _jsBeautify = require("js-beautify");
+-var _htmlMinifier = require("html-minifier");
++// var _htmlMinifier = require("html-minifier");
+ var _cheerio = require("cheerio");
+ var _mjmlParserXml = _interopRequireDefault(require("mjml-parser-xml"));
+ var _mjmlValidator = _interopRequireWildcard(require("mjml-validator"));
