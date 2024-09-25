@@ -17,7 +17,7 @@ export function unMaybeFunction<TResult, TArgs extends any[] = []>(
     : (maybeFunction as TResult);
 }
 
-export type UnwrapArray<T> = T extends Array<infer U> ? U : never;
+export type UnwrapArray<T> = T extends readonly (infer U)[] ? U : never;
 export type UnwrapPromise<T> = T extends Promise<infer U> ? U : never;
 export type Maybe<T> = T | null;
 export type Assert<T> = Exclude<T, null | undefined>;
