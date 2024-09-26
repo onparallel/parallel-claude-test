@@ -1,9 +1,8 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, unique } from "remeda";
-import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { FeatureFlagName, FeatureFlagOverride } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";

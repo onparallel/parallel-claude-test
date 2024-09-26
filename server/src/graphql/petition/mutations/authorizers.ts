@@ -2,10 +2,9 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
-import { unMaybeArray } from "../../../util/arrays";
 import { PetitionFieldMath, PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toGlobalId } from "../../../util/globalId";
-import { Maybe, MaybeArray } from "../../../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
 import { Arg } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";

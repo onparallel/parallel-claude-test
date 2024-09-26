@@ -41,7 +41,7 @@ describe("FetchService", () => {
       return new Response("OK", { status: 200 });
     });
 
-    const promise = fetchService.fetch("https://www.example.com", { timeout: 1_000 });
+    const promise = fetchService.fetch("https://www.example.com", {}, { timeout: 1_000 });
     jest.advanceTimersByTime(2_000);
     await expect(promise).rejects.toThrow(TimeoutError);
   });
@@ -56,22 +56,23 @@ describe("FetchService", () => {
       return Promise.resolve(new Response("", { status: 200, statusText: "OK" }));
     });
 
-    const response = await fetchService.fetch("https://www.example.com", { maxRetries: 1 });
+    const response = await fetchService.fetch("https://www.example.com", {}, { maxRetries: 1 });
     expect(response).toMatchObject({ ok: true, status: 200, statusText: "OK" });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("stops retrying if aborted from outside", async () => {
     fetchMock.mockImplementation(async (url, init) => {
-      await waitFor(1_000, { signal: (init?.signal ?? undefined) as any });
+      await waitFor(1_000, { signal: init?.signal ?? undefined });
       return new Response("Bad Gateway", { status: 502 });
     });
 
     const controller = new AbortController();
-    const promise = fetchService.fetch("https://www.example.com", {
-      signal: controller.signal as any,
-      maxRetries: 3,
-    });
+    const promise = fetchService.fetch(
+      "https://www.example.com",
+      {},
+      { maxRetries: 3, signal: controller.signal },
+    );
     waitFor(2_500).then(() => controller.abort());
     expect(fetchMock).toHaveBeenCalledTimes(1);
     jest.advanceTimersByTime(1_000);

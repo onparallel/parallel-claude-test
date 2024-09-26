@@ -1,6 +1,5 @@
 import Excel from "exceljs";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 
 export abstract class ExcelWorksheet<T> {
   protected page: Excel.Worksheet;

@@ -1,7 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { TaskName } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToTasks<

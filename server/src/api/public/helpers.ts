@@ -4,14 +4,13 @@ import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } from "remeda";
 import { ProfileTypeFieldType } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
 import { renderSlateToText } from "../../util/slate/render";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { isValidDate } from "../../util/time";
-import { Maybe, UnwrapArray } from "../../util/types";
+import { Maybe, unMaybeArray, UnwrapArray } from "../../util/types";
 import { FormDataFile, RestParameter } from "../rest/core";
 import { BadRequestError, InternalError } from "../rest/errors";
 import {

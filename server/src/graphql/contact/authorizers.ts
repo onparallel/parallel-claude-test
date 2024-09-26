@@ -1,8 +1,7 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { unique } from "remeda";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToContacts<

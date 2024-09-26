@@ -4,11 +4,10 @@ import { Knex } from "knex";
 import { indexBy, isNonNullish, unique } from "remeda";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
-import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
-import { Maybe, MaybeArray } from "../../util/types";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import {
   CreateOrganization,
   CreateOrganizationTheme,

@@ -6,9 +6,8 @@ import { chunk, isNonNullish } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
 import { TableTypes } from "../db/helpers/BaseRepository";
-import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
-import { MaybeArray } from "../util/types";
+import { MaybeArray, unMaybeArray } from "../util/types";
 import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
 import { ILogger, LOGGER } from "./Logger";
 

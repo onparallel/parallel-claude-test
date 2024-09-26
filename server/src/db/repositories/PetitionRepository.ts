@@ -29,7 +29,7 @@ import { validateReferencingFieldsPositions } from "../../graphql/helpers/valida
 import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
-import { average, unMaybeArray } from "../../util/arrays";
+import { average } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {
   PetitionFieldMath,
@@ -56,7 +56,7 @@ import {
 } from "../../util/slate/placeholders";
 import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
-import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
+import { Maybe, MaybeArray, Replace, UnwrapArray, unMaybeArray } from "../../util/types";
 import { validateReplyContent } from "../../util/validateReplyContent";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import {

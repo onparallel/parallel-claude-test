@@ -5,16 +5,16 @@ export function unMaybeArray<T>(maybeArray: MaybeArray<T>) {
   return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
 }
 
-export type MaybeFunction<TResult, TArgs extends any[] = []> =
-  | TResult
-  | ((...args: TArgs) => TResult);
+type AnyFunction = (...args: any) => any;
+
+export type MaybeFunction<TResult, TArgs extends any[] = []> = TResult extends AnyFunction
+  ? never
+  : TResult | ((...args: TArgs) => TResult);
 export function unMaybeFunction<TResult, TArgs extends any[] = []>(
   maybeFunction: MaybeFunction<TResult, TArgs>,
   ...args: TArgs
-) {
-  return typeof maybeFunction === "function"
-    ? (maybeFunction as (...args: TArgs) => TResult)(...args)
-    : (maybeFunction as TResult);
+): TResult {
+  return typeof maybeFunction === "function" ? maybeFunction(...args) : maybeFunction;
 }
 
 export type UnwrapArray<T> = T extends readonly (infer U)[] ? U : never;

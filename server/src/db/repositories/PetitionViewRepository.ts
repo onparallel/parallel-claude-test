@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { unMaybeArray } from "../../util/arrays";
-import { Maybe, MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { CreatePetitionListView, PetitionListView, User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";

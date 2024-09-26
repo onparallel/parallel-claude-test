@@ -2,9 +2,8 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { zip } from "remeda";
 import { ILogger, LOGGER } from "../../services/Logger";
-import { unMaybeArray } from "../../util/arrays";
 import { pMapChunk } from "../../util/promises/pMapChunk";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import {
   CreateFileUpload,
   CreatePublicFileUpload,

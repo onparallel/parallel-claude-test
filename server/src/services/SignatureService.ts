@@ -20,10 +20,9 @@ import {
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
 import { ISignatureClient, SIGNATURE_CLIENT } from "../integrations/signature/SignatureClient";
-import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
-import { MaybeArray } from "../util/types";
+import { MaybeArray, unMaybeArray } from "../util/types";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
 

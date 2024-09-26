@@ -150,15 +150,18 @@ export class DowJonesClient implements IDowJonesClient {
     return await this.dowJonesIntegration.withCredentials(
       integrationId,
       async ({ ACCESS_TOKEN: accessToken }) => {
-        const response = await this.fetch.fetch(url, {
-          method: opts.method,
-          body: opts.body ? JSON.stringify(opts.body) : undefined,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
+        const response = await this.fetch.fetch(
+          url,
+          {
+            method: opts.method,
+            body: opts.body ? JSON.stringify(opts.body) : undefined,
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
           },
-          timeout: 5_000,
-        });
+          { timeout: 5_000 },
+        );
 
         const data = await response.json();
 

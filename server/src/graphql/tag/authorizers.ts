@@ -1,7 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNullish } from "remeda";
-import { unMaybeArray } from "../../util/arrays";
-import { Maybe, MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToTags<

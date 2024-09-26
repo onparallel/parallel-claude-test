@@ -2,8 +2,7 @@ import { fromStream } from "file-type";
 import { FileUpload } from "graphql-upload/Upload.js";
 import match from "mime-match";
 import { core } from "nexus";
-import { unMaybeArray } from "../../../util/arrays";
-import { MaybeArray } from "../../../util/types";
+import { MaybeArray, unMaybeArray } from "../../../util/types";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 

@@ -15,10 +15,9 @@ import { Readable } from "stream";
 import { buffer } from "stream/consumers";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
-import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { retry } from "../util/retry";
-import { MaybeArray } from "../util/types";
+import { MaybeArray, unMaybeArray } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
 
 export interface IStorageImpl {

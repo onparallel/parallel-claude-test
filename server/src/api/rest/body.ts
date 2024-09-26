@@ -6,9 +6,9 @@ import { OpenAPIV3 } from "openapi-types";
 import { outdent } from "outdent";
 import { isNonNullish, isNullish } from "remeda";
 import typeIs from "type-is";
-import { unMaybeArray } from "../../util/arrays";
 import { JsonSchema, JsonSchemaFor } from "../../util/jsonSchema";
 import { isValidTime, isValidTimezone } from "../../util/time";
+import { unMaybeArray } from "../../util/types";
 import { FormDataFile, RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 

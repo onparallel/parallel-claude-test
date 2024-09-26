@@ -675,9 +675,7 @@ class SignaturitSDK {
     try {
       const response = await this.fetch.fetch(`${this.baseUrl}${path}`, {
         method,
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-        },
+        headers: { Authorization: `Bearer ${this.apiKey}` },
         body,
       });
 

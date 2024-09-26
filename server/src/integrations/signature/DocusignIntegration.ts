@@ -1,6 +1,5 @@
 import { Request } from "express";
 import { inject, injectable } from "inversify";
-import { omit } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { FeatureFlagName, OrgIntegration } from "../../db/__types";
 import { FeatureFlagRepository } from "../../db/repositories/FeatureFlagRepository";
@@ -107,12 +106,8 @@ export class DocusignIntegration extends OAuthIntegration<
     init: RequestInit,
   ): Promise<T> {
     const response = await this.fetch.fetch(`${this.baseUri(environment)}${url}`, {
-      ...omit(init, ["headers"]),
-      headers: {
-        ...init.headers,
-        "Cache-Control": "no-store",
-        Pragma: "no-cache",
-      },
+      ...init,
+      headers: { ...init.headers, "Cache-Control": "no-store", Pragma: "no-cache" },
     });
 
     if (!response.ok) {

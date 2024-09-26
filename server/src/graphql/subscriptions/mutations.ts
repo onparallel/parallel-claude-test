@@ -26,16 +26,19 @@ import {
 
 async function challengeWebhookUrl(url: string, fetch: IFetchService, headers?: HeadersInit) {
   const [, response] = await withError(
-    fetch.fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-        ...headers,
-      } as any,
-      body: JSON.stringify({}),
-      timeout: 5_000,
-    }),
+    fetch.fetch(
+      url,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+          ...headers,
+        } as any,
+        body: JSON.stringify({}),
+      },
+      { timeout: 5_000 },
+    ),
   );
   return response?.status === 200 ?? false;
 }
@@ -241,7 +244,11 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
       const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
         args.id,
       );
-      const headers = ctx.eventSubscription.buildSubscriptionSignatureHeaders(keys, "{}");
+      const headers = ctx.eventSubscription.buildSubscriptionSignatureHeaders(
+        keys,
+        args.eventsUrl,
+        "{}",
+      );
       const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch, headers);
       if (!challengePassed) {
         throw new ApolloError(
@@ -308,7 +315,11 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
       const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
         args.id,
       );
-      const headers = ctx.eventSubscription.buildSubscriptionSignatureHeaders(keys, "{}");
+      const headers = ctx.eventSubscription.buildSubscriptionSignatureHeaders(
+        keys,
+        args.eventsUrl,
+        "{}",
+      );
       const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch, headers);
       if (!challengePassed) {
         throw new ApolloError(

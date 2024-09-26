@@ -5,16 +5,15 @@ import PostgresInterval from "postgres-interval";
 import { isNonNullish, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
-import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
-import { unMaybeArray } from "../../../util/arrays";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { generateEDKeyPair } from "../../../util/keyPairs";
+import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
-import { MaybeArray, Replace } from "../../../util/types";
+import { MaybeArray, Replace, unMaybeArray } from "../../../util/types";
 import {
   Contact,
   ContactAuthentication,

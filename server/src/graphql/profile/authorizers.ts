@@ -10,9 +10,8 @@ import {
   ProfileTypeFieldType,
 } from "../../db/__types";
 import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFieldOptions";
-import { unMaybeArray } from "../../util/arrays";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";

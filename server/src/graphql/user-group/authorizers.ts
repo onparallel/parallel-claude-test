@@ -2,8 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isNonNullish, isNullish } from "remeda";
 import { ApiContext } from "../../context";
 import { UserGroupType } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export async function contextUserHasAccessToUserGroups(userGroupIds: number[], ctx: ApiContext) {

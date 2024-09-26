@@ -1,5 +1,4 @@
-import { unMaybeArray } from "./arrays";
-import { MaybeArray, Prettify } from "./types";
+import { MaybeArray, Prettify, unMaybeArray } from "./types";
 
 export function discriminator<T, K extends string & keyof T, V extends T[K]>(
   prop: K,

@@ -1,5 +1,6 @@
 import { verify } from "crypto";
 import { Knex } from "knex";
+import { fromEntries } from "remeda";
 import { createTestContainer } from "../../../test/testContainer";
 import { WorkerContext } from "../../context";
 import { EventSubscription, Organization, Petition, User } from "../../db/__types";
@@ -7,10 +8,18 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
-import { FETCH_SERVICE, FetchOptions, IFetchService } from "../../services/FetchService";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
+import { unMaybeFunction } from "../../util/types";
 import { petitionEventSubscriptionsListener } from "../event-listeners/petition-event-subscriptions-listener";
+
+function expectRequestInit(index: number, value: any) {
+  return expect.toSatisfy((init: Parameters<IFetchService["fetch"]>[1]) => {
+    expect(unMaybeFunction(init, index)).toMatchObject(value);
+    return true;
+  });
+}
 
 describe("Worker - Petition Event Subscriptions Listener", () => {
   let ctx: WorkerContext;
@@ -24,7 +33,10 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
   let petition: Petition;
   let subscriptions: EventSubscription[];
 
-  let fetchSpy: jest.SpyInstance;
+  let fetchSpy: jest.SpyInstance<
+    ReturnType<IFetchService["fetch"]>,
+    Parameters<IFetchService["fetch"]>
+  >;
   let emailSpy: jest.SpyInstance;
 
   let encryptionService: IEncryptionService;
@@ -148,48 +160,42 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     });
 
     expect(fetchSpy).toHaveBeenCalledTimes(3);
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      1,
+    expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      2,
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[1]).toMatchObject([
       "https://users.1.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      3,
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[2]).toMatchObject([
       "https://users.2.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 
   it("sends PETITION_COMPLETED event to subscribed users", async () => {
@@ -220,20 +226,18 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     });
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      1,
+    expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 
   it("adds signature on request headers only for users with configured signature keys", async () => {
@@ -273,61 +277,81 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     });
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      1,
+    expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
 
-    expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
-      2,
+    expect(fetchSpy.mock.calls[1]).toMatchObject([
       "https://users.1.com/events",
-      {
+      expectRequestInit(0, {
         method: "POST",
         body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-          "X-Parallel-Signature-1": expect.any(String),
-          "X-Parallel-Signature-2": expect.any(String),
-        },
-        timeout: 15_000,
-        maxRetries: 3,
-      },
-    );
-
-    const lastCallArgs = fetchSpy.mock.lastCall![1] as FetchOptions;
-    ["X-Parallel-Signature-1", "X-Parallel-Signature-2"].forEach((headerKey, index) => {
-      expect(
-        verify(
-          null,
-          Buffer.from(body),
-          {
-            key: Buffer.from(keys[index].public_key, "base64"),
-            format: "der",
-            type: "spki",
-          },
-          Buffer.from((lastCallArgs.headers as any)[headerKey], "base64"),
-        ),
-      ).toBe(true);
-    });
+        headers: expect.toSatisfy((headers: Record<string, string>) => {
+          expect(headers).toMatchObject({
+            "Content-Type": "application/json",
+            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+            "X-Parallel-Signature-Timestamp": expect.any(String),
+            ...fromEntries(
+              [0, 1].map((i) => [
+                `X-Parallel-Signature-${i + 1}`,
+                expect.toSatisfy((signature: string) =>
+                  verify(
+                    null,
+                    Buffer.from(body),
+                    {
+                      key: Buffer.from(keys[i].public_key, "base64"),
+                      format: "der",
+                      type: "spki",
+                    },
+                    Buffer.from(signature, "base64"),
+                  ),
+                ),
+              ]),
+            ),
+            ...fromEntries(
+              [0, 1].map((i) => [
+                `X-Parallel-Signature-V2-${i + 1}`,
+                expect.toSatisfy((signature: string) =>
+                  verify(
+                    null,
+                    Buffer.from(
+                      "https://users.1.com/events" +
+                        headers["X-Parallel-Signature-Timestamp"] +
+                        body,
+                    ),
+                    {
+                      key: Buffer.from(keys[i].public_key, "base64"),
+                      format: "der",
+                      type: "spki",
+                    },
+                    Buffer.from(signature, "base64"),
+                  ),
+                ),
+              ]),
+            ),
+          });
+          return true;
+        }),
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 
   it("sends email and sets subscription as failing when event can not be delivered", async () => {
-    fetchSpy.mockImplementation((url) => {
+    fetchSpy.mockImplementation(async (url) => {
       if (url === "https://users.0.com/events") {
-        return { ok: false, status: 111, statusText: "Mocked error" };
+        return new Response(null, { status: 418, statusText: "I'm a teapot" });
       } else {
-        return { ok: true };
+        return new Response(null, { status: 200, statusText: "OK" });
       }
     });
 
@@ -353,7 +377,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     const user0Subscription = subscriptions.find((s) => s.user_id === users[0].id)!;
     expect(emailSpy).toHaveBeenLastCalledWith(
       user0Subscription.id,
-      "Error 111: Mocked error for POST https://users.0.com/events",
+      "Error 418: I'm a teapot for POST https://users.0.com/events",
       {
         id: toGlobalId("PetitionEvent", event.id),
         petitionId: toGlobalId("Petition", event.petition_id),

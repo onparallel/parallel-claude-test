@@ -1,8 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, omit, partition, unique } from "remeda";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import {
   CreateUserGroup,
   User,

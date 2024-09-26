@@ -1,9 +1,4 @@
 import { identity, sumBy } from "remeda";
-import { MaybeArray } from "./types";
-
-export function unMaybeArray<T>(items: MaybeArray<T>) {
-  return Array.isArray(items) ? items : [items];
-}
 
 /**
  * Chunk the input array and keep adding elements to the current chunk as long as `predicate` returns true.

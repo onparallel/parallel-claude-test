@@ -1,5 +1,5 @@
 import pMap from "p-map";
-import { unMaybeArray } from "../util/arrays";
+import { unMaybeArray } from "../util/types";
 import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
 import { backgroundCheckMonitoringChanges } from "./emails/background-check-monitoring-changes";
 import { commentsContactNotification } from "./emails/comments-contact-notification";

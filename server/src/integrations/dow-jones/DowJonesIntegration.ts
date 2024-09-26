@@ -35,16 +35,19 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
       PASSWORD: password,
       REFRESH_TOKEN: refreshToken,
     } = credentials;
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        client_id: clientId,
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-        scope: "openid service_account_id",
-      }),
-      timeout: 5_000,
-    });
+    const response = await this.fetch.fetch(
+      "https://accounts.dowjones.com/oauth2/v1/token",
+      {
+        method: "POST",
+        body: new URLSearchParams({
+          client_id: clientId,
+          grant_type: "refresh_token",
+          refresh_token: refreshToken,
+          scope: "openid service_account_id",
+        }),
+      },
+      { timeout: 5_000 },
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -100,19 +103,22 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
     username: string,
     password: string,
   ): Promise<{ idToken: string; refreshToken: string }> {
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        client_id: clientId,
-        connection: "service-account",
-        device: "parallel-server",
-        username,
-        password,
-        grant_type: "password",
-        scope: "openid service_account_id offline_access",
-      }),
-      timeout: 5_000,
-    });
+    const response = await this.fetch.fetch(
+      "https://accounts.dowjones.com/oauth2/v1/token",
+      {
+        method: "POST",
+        body: new URLSearchParams({
+          client_id: clientId,
+          connection: "service-account",
+          device: "parallel-server",
+          username,
+          password,
+          grant_type: "password",
+          scope: "openid service_account_id offline_access",
+        }),
+      },
+      { timeout: 5_000 },
+    );
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
@@ -123,16 +129,19 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
   }
 
   private async getAccessToken(idToken: string, clientId: string): Promise<string> {
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        assertion: idToken,
-        client_id: clientId,
-        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        scope: "openid pib",
-      }),
-      timeout: 5_000,
-    });
+    const response = await this.fetch.fetch(
+      "https://accounts.dowjones.com/oauth2/v1/token",
+      {
+        method: "POST",
+        body: new URLSearchParams({
+          assertion: idToken,
+          client_id: clientId,
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+          scope: "openid pib",
+        }),
+      },
+      { timeout: 5_000 },
+    );
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {

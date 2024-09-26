@@ -4,6 +4,10 @@ export interface WaitForOptions {
 
 export function waitFor(millis: number, options?: WaitForOptions) {
   return new Promise<void>((resolve, reject) => {
+    if (options?.signal?.aborted) {
+      reject(new Error("The operation was aborted."));
+      return;
+    }
     const timeout = setTimeout(() => {
       resolve();
     }, millis);

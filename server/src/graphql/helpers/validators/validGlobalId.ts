@@ -1,7 +1,6 @@
 import { core } from "nexus";
-import { unMaybeArray } from "../../../util/arrays";
 import { isGlobalId } from "../../../util/globalId";
-import { MaybeArray } from "../../../util/types";
+import { MaybeArray, unMaybeArray } from "../../../util/types";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 

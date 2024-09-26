@@ -13,10 +13,9 @@ import {
   PetitionPermissionType,
   PetitionStatus,
 } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
 import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";

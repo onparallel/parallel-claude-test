@@ -161,7 +161,11 @@ describe("GraphQL/PetitionEventSubscription", () => {
         eventsUrl: "https://www.example.com/api",
       });
       subscriptionId = data!.createPetitionEventSubscription.id;
-      expect(spy).toHaveBeenCalledWith("https://www.example.com/api", expect.anything());
+      expect(spy).toHaveBeenCalledWith(
+        "https://www.example.com/api",
+        expect.anything(),
+        expect.anything(),
+      );
     });
 
     it("creates and returns a new subscription for the user's petitions created from some template", async () => {

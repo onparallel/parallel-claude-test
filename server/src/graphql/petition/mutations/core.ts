@@ -51,7 +51,7 @@ import {
   mapPetitionFieldReplyToProfileFieldValue,
   mapProfileTypeFieldToPetitionField,
 } from "../../../db/helpers/petitionProfileMapper";
-import { chunkWhile, unMaybeArray } from "../../../util/arrays";
+import { chunkWhile } from "../../../util/arrays";
 import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgroundCheck";
 import {
   PetitionFieldMath,
@@ -73,6 +73,7 @@ import {
   renderTextWithPlaceholders,
 } from "../../../util/slate/placeholders";
 import { hash, random } from "../../../util/token";
+import { unMaybeArray } from "../../../util/types";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import { RESULT } from "../../helpers/Result";
 import { SUCCESS } from "../../helpers/Success";

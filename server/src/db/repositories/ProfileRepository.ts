@@ -23,12 +23,11 @@ import {
 } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
-import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
-import { Maybe, MaybeArray, Replace } from "../../util/types";
+import { Maybe, MaybeArray, Replace, unMaybeArray } from "../../util/types";
 import {
   CreateProfile,
   CreateProfileExternalSourceEntity,

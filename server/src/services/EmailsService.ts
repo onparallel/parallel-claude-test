@@ -8,8 +8,7 @@ import { OrganizationUsageLimitName } from "../db/__types";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
-import { unMaybeArray } from "../util/arrays";
-import { Maybe, MaybeArray } from "../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
 import { QUEUES_SERVICE, QueuesService } from "./QueuesService";
 

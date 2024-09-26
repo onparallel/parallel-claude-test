@@ -1,8 +1,7 @@
 import { core } from "nexus";
 import pMap from "p-map";
 import { isNonNullish } from "remeda";
-import { unMaybeArray } from "../../../util/arrays";
-import { MaybeArray } from "../../../util/types";
+import { MaybeArray, unMaybeArray } from "../../../util/types";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 

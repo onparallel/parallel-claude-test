@@ -10,11 +10,10 @@ import {
   UserData,
 } from "../db/__types";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-import { unMaybeArray } from "../util/arrays";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
-import { Maybe, MaybeArray } from "../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../util/types";
 
 export type AnalyticsEventType =
   | "PETITION_CREATED"

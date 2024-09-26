@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateEmailEvent, CreateEmailLog, EmailLog, TemporaryFile } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";

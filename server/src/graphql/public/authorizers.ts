@@ -5,11 +5,10 @@ import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNonNullish, isNullish, partition, unique } from "remeda";
 import { FeatureFlagName } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 

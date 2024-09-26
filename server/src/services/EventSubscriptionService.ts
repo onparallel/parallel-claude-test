@@ -15,6 +15,7 @@ export interface IEventSubscriptionService {
   processSubscriptions(subscriptions: EventSubscription[], event: any): Promise<void>;
   buildSubscriptionSignatureHeaders(
     keys: EventSubscriptionSignatureKey[],
+    url: string,
     body: string,
   ): Record<string, string>;
 }
@@ -43,19 +44,19 @@ export class EventSubscriptionService implements IEventSubscriptionService {
           const body = JSON.stringify(event);
           const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);
 
-          const headers: Record<string, string> = {
-            "Content-Type": "application/json",
-            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-            ...this.buildSubscriptionSignatureHeaders(keys, body),
-          };
-
-          const response = await this.fetch.fetch(subscription.endpoint, {
-            method: "POST",
-            body,
-            headers,
-            maxRetries: 3,
-            timeout: 15_000,
-          });
+          const response = await this.fetch.fetch(
+            subscription.endpoint,
+            () => ({
+              method: "POST",
+              body,
+              headers: {
+                "Content-Type": "application/json",
+                "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+                ...this.buildSubscriptionSignatureHeaders(keys, subscription.endpoint, body),
+              },
+            }),
+            { maxRetries: 3, timeout: 15_000 },
+          );
           if (!response.ok) {
             throw new Error(
               `Error ${response.status}: ${response.statusText} for POST ${subscription.endpoint}`,
@@ -84,8 +85,15 @@ export class EventSubscriptionService implements IEventSubscriptionService {
     );
   }
 
-  buildSubscriptionSignatureHeaders(keys: EventSubscriptionSignatureKey[], body: string) {
-    const headers: HeadersInit = {};
+  buildSubscriptionSignatureHeaders(
+    keys: EventSubscriptionSignatureKey[],
+    url: string,
+    body: string,
+  ) {
+    const timestamp = Date.now();
+    const headers: Record<string, string> = {
+      "X-Parallel-Signature-Timestamp": `${timestamp}`,
+    };
     for (const key of keys) {
       const i = keys.indexOf(key);
       const privateKey = this.encryption.decrypt(Buffer.from(key.private_key, "base64"));
@@ -94,6 +102,15 @@ export class EventSubscriptionService implements IEventSubscriptionService {
         format: "der",
         type: "pkcs8",
       }).toString("base64");
+      headers[`X-Parallel-Signature-V2-${i + 1}`] = sign(
+        null,
+        Buffer.from(url + timestamp + body),
+        {
+          key: Buffer.from(privateKey, "base64"),
+          format: "der",
+          type: "pkcs8",
+        },
+      ).toString("base64");
     }
 
     return headers;

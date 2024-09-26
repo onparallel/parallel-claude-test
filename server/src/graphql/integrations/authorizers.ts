@@ -1,8 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { IntegrationType } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { parseBackgroundCheckToken } from "./utils";
 

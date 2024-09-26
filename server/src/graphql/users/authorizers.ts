@@ -1,7 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { UserGroupPermissionName, UserStatus } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
-import { Maybe, MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 
