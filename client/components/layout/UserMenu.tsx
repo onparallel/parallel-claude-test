@@ -79,14 +79,15 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
             data-testid="user-menu"
             data-action="open-user-menu"
             paddingY={2}
-            paddingX={1}
+            paddingX={2.5}
+            borderRadius={0}
             minHeight={0}
             height="auto"
             textAlign="start"
             width="100%"
           >
             <HStack>
-              <UserAvatar user={me} size="sm">
+              <UserAvatar user={me} boxSize="42px">
                 {realMe && realMe.id !== me.id ? (
                   <AvatarBadge bgColor="white">
                     <UserAvatar user={realMe} size="xs" />

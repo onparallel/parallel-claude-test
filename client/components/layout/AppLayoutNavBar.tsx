@@ -5,13 +5,13 @@ import {
   Drawer,
   DrawerContent,
   DrawerOverlay,
-  Flex,
   HStack,
   IconButton,
   Image,
   List,
   ListItem,
   Stack,
+  StackProps,
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
@@ -160,8 +160,8 @@ export const AppLayoutNavBar = Object.assign(
         >
           <Stack
             id="nav-bar-menu"
-            spacing={4}
-            overflow="hidden"
+            overflowX="hidden"
+            overflowY="auto"
             backgroundColor="white"
             zIndex={isMobile ? "modal" : 1}
             minWidth={isNavBarOpen ? "200px" : "64px"}
@@ -171,7 +171,7 @@ export const AppLayoutNavBar = Object.assign(
             top={0}
             insetStart={0}
             paddingY={4}
-            paddingX={3}
+            paddingX={0}
             borderEnd="1px solid"
             borderColor="gray.200"
             transitionDelay={{ base: "0s", sm: ANIMATION_DELAY }}
@@ -182,76 +182,76 @@ export const AppLayoutNavBar = Object.assign(
               sm: [`min-width`, `box-shadow`].join(", "),
             }}
           >
-            <HStack width="100%" justify="space-between">
-              <NakedLink href="/app">
-                <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "component.app-layout-nav-bar.switch-organization",
-                      defaultMessage: "Switch organization",
-                    })}
-                    placement="right"
-                    isDisabled={realMe.organizations.length === 1}
-                    openDelay={600}
-                  >
-                    <Box
-                      position="absolute"
-                      cursor="pointer"
-                      transition="transform 150ms"
-                      width="40px"
-                      height="40px"
-                      borderRadius="full"
-                      _hover={{
-                        color: "gray.900",
-                        shadow: "lg",
-                        transform: "scale(1.1)",
-                      }}
-                      overflow="hidden"
+            <Stack spacing={4} paddingX={3} flex="1">
+              <HStack width="100%" justify="space-between">
+                <NakedLink href="/app">
+                  <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
+                    <Tooltip
+                      label={intl.formatMessage({
+                        id: "component.app-layout-nav-bar.switch-organization",
+                        defaultMessage: "Switch organization",
+                      })}
+                      placement="right"
+                      isDisabled={realMe.organizations.length === 1}
+                      openDelay={600}
                     >
-                      {me.organization.iconUrl ? (
-                        <Image
-                          boxSize="40px"
-                          objectFit="contain"
-                          alt={me.organization.name}
-                          src={me.organization.iconUrl}
-                        />
-                      ) : (
-                        <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
-                      )}
-                    </Box>
-                  </Tooltip>
-                </Box>
-              </NakedLink>
-              <IconButtonWithTooltip
-                display={{ base: "none", sm: "inline-flex" }}
-                className="show-on-expand"
-                size="sm"
-                variant="outline"
-                aria-expanded={isForceOpen}
-                aria-controls="nav-bar"
-                icon={isForceOpen ? <BoxedArrowLeft boxSize={5} /> : <SidebarIcon boxSize={5} />}
-                label={
-                  isForceOpen
-                    ? intl.formatMessage({
-                        id: "component.new-layout.hide-navigation",
-                        defaultMessage: "Hide navigation",
-                      })
-                    : intl.formatMessage({
-                        id: "component.new-layout.keep-navigation-open",
-                        defaultMessage: "Keep navigation open",
-                      })
-                }
-                placement="right"
-                onClick={() => setIsForceOpen((x) => !x)}
-              />
-              <CloseButton
-                ref={closeRef}
-                display={{ base: "inline-flex", sm: "none" }}
-                size="sm"
-                onClick={() => setIsOpenMobile(false)}
-              />
-            </HStack>
-            <Flex>
+                      <Box
+                        position="absolute"
+                        cursor="pointer"
+                        transition="transform 150ms"
+                        width="40px"
+                        height="40px"
+                        borderRadius="full"
+                        _hover={{
+                          color: "gray.900",
+                          shadow: "lg",
+                          transform: "scale(1.1)",
+                        }}
+                        overflow="hidden"
+                      >
+                        {me.organization.iconUrl ? (
+                          <Image
+                            boxSize="40px"
+                            objectFit="contain"
+                            alt={me.organization.name}
+                            src={me.organization.iconUrl}
+                          />
+                        ) : (
+                          <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
+                        )}
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                </NakedLink>
+                <IconButtonWithTooltip
+                  display={{ base: "none", sm: "inline-flex" }}
+                  className="show-on-expand"
+                  size="sm"
+                  variant="outline"
+                  aria-expanded={isForceOpen}
+                  aria-controls="nav-bar"
+                  icon={isForceOpen ? <BoxedArrowLeft boxSize={5} /> : <SidebarIcon boxSize={5} />}
+                  label={
+                    isForceOpen
+                      ? intl.formatMessage({
+                          id: "component.new-layout.hide-navigation",
+                          defaultMessage: "Hide navigation",
+                        })
+                      : intl.formatMessage({
+                          id: "component.new-layout.keep-navigation-open",
+                          defaultMessage: "Keep navigation open",
+                        })
+                  }
+                  placement="right"
+                  onClick={() => setIsForceOpen((x) => !x)}
+                />
+                <CloseButton
+                  ref={closeRef}
+                  display={{ base: "inline-flex", sm: "none" }}
+                  size="sm"
+                  onClick={() => setIsOpenMobile(false)}
+                />
+              </HStack>
               <NakedLink href={`/app/petitions/new`}>
                 <Button
                   as="a"
@@ -268,12 +268,15 @@ export const AppLayoutNavBar = Object.assign(
                   </Text>
                 </Button>
               </NakedLink>
-            </Flex>
-            {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
-            <SectionList me={me} />
-            <Spacer />
-            <Stack spacing={2} display={{ base: "none", sm: "flex" }}>
-              <NotificationsSection onHelpCenterClick={onHelpCenterClick} />
+              {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
+              <SectionList me={me} />
+              <Spacer />
+              <NotificationsSection
+                display={{ base: "none", sm: "flex" }}
+                onHelpCenterClick={onHelpCenterClick}
+              />
+            </Stack>
+            <Box display={{ base: "none", sm: "flex" }}>
               <UserMenu
                 placement={isMobile ? "bottom-end" : "right-end"}
                 me={me}
@@ -281,7 +284,7 @@ export const AppLayoutNavBar = Object.assign(
                 extended
                 onToggle={(isOpen) => setUserMenuIsOpen(isOpen)}
               />
-            </Stack>
+            </Box>
           </Stack>
         </Wrap>
       </Box>
@@ -529,41 +532,47 @@ function SectionList({ me }: SectionListProps) {
 //   );
 // }
 
-function NotificationsSection({ onHelpCenterClick }: { onHelpCenterClick: () => void }) {
+interface NotificationsSectionProps extends StackProps {
+  onHelpCenterClick: () => void;
+}
+
+function NotificationsSection({ onHelpCenterClick, ...rest }: NotificationsSectionProps) {
   const intl = useIntl();
   return (
-    <List spacing={2}>
-      <ListItem>
-        <NotificationsButton extended />
-      </ListItem>
-      <ListItem>
-        <NavBarButton
-          sx={{
-            ".Canny_BadgeContainer .Canny_Badge": {
-              backgroundColor: "red.500",
-              border: "2px solid white",
-              top: "7px",
-              insetStart: "23px",
-              boxSize: 3,
-              borderRadius: "full",
-              position: "absolute",
-            },
-          }}
-          icon={<NewsIcon boxSize={5} />}
-          onClick={onHelpCenterClick}
-          data-canny-changelog
-        >
-          <FormattedMessage id="generic.product-news-label" defaultMessage="News" />
-        </NavBarButton>
-      </ListItem>
-      <ListItem>
-        <NakedLink href={`https://help.onparallel.com/${intl.locale}`}>
-          <NavBarButton onClick={onHelpCenterClick} icon={<HelpOutlineIcon boxSize={5} />}>
-            <FormattedMessage id="component.new-layout.help-button" defaultMessage="Help" />
+    <Stack {...rest}>
+      <List spacing={2}>
+        <ListItem>
+          <NotificationsButton extended />
+        </ListItem>
+        <ListItem>
+          <NavBarButton
+            sx={{
+              ".Canny_BadgeContainer .Canny_Badge": {
+                backgroundColor: "red.500",
+                border: "2px solid white",
+                top: "7px",
+                insetStart: "23px",
+                boxSize: 3,
+                borderRadius: "full",
+                position: "absolute",
+              },
+            }}
+            icon={<NewsIcon boxSize={5} />}
+            onClick={onHelpCenterClick}
+            data-canny-changelog
+          >
+            <FormattedMessage id="generic.product-news-label" defaultMessage="News" />
           </NavBarButton>
-        </NakedLink>
-      </ListItem>
-    </List>
+        </ListItem>
+        <ListItem>
+          <NakedLink href={`https://help.onparallel.com/${intl.locale}`}>
+            <NavBarButton onClick={onHelpCenterClick} icon={<HelpOutlineIcon boxSize={5} />}>
+              <FormattedMessage id="component.new-layout.help-button" defaultMessage="Help" />
+            </NavBarButton>
+          </NakedLink>
+        </ListItem>
+      </List>
+    </Stack>
   );
 }
 
