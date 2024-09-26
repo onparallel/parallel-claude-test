@@ -91,6 +91,9 @@ export type TaskInput<TName extends TaskName> = {
     petition_id: number;
     pattern: string | null;
   };
+  CLOSE_PETITIONS: {
+    template_id: number;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -231,6 +234,10 @@ export type TaskOutput<TName extends TaskName> = {
   FILE_EXPORT: {
     file_export_log_id: number;
     window_url: string;
+  };
+  CLOSE_PETITIONS: {
+    success: boolean;
+    error?: any;
   };
 }[TName];
 

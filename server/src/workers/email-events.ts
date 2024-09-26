@@ -70,7 +70,7 @@ createQueueWorker(
             true,
             context.config.instanceName,
           ),
-          context.petitions.updateRemindersForPetition(access.petition_id, null),
+          context.petitions.updateRemindersForPetitions(access.petition_id, null),
           context.petitions.cancelScheduledMessagesByAccessIds([access.id]),
           context.petitions.createEvent({
             type: "PETITION_REMINDER_BOUNCED",

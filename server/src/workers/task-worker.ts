@@ -20,6 +20,7 @@ import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExport
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
+import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -38,6 +39,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   PROFILE_NAME_PATTERN_UPDATED: ProfileNamePatternUpdatedRunner,
   ID_VERIFICATION_SESSION_COMPLETED: IdVerificationSessionCompletedRunner,
   FILE_EXPORT: FileExportRunner,
+  CLOSE_PETITIONS: ClosePetitionsRunner,
 };
 
 export interface TaskWorkerPayload {

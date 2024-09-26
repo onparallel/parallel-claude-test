@@ -739,13 +739,13 @@ export const closePetition = mutationField("closePetition", {
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      const [petition] = await ctx.petitions.closePetition(
+      const [petition] = await ctx.petitions.closePetitions(
         args.petitionId,
         `User:${ctx.user!.id}`,
         t,
       );
 
-      await ctx.petitions.updateRemindersForPetition(args.petitionId, null, t);
+      await ctx.petitions.updateRemindersForPetitions(args.petitionId, null, t);
       await ctx.petitions.createEvent(
         {
           petition_id: args.petitionId,

@@ -500,7 +500,8 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "ID_VERIFICATION_SESSION_COMPLETED"
-  | "FILE_EXPORT";
+  | "FILE_EXPORT"
+  | "CLOSE_PETITIONS";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -519,6 +520,7 @@ export const TaskNameValues = [
   "PROFILE_NAME_PATTERN_UPDATED",
   "ID_VERIFICATION_SESSION_COMPLETED",
   "FILE_EXPORT",
+  "CLOSE_PETITIONS",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

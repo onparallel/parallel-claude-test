@@ -1946,6 +1946,7 @@ export interface NexusGenFieldTypes {
     cloneProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     cloneUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
+    closePetitionsFromTemplate: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     completeProfileFromExternalSource: NexusGenRootTypes["Profile"]; // Profile!
@@ -4593,6 +4594,7 @@ export interface NexusGenFieldTypeNames {
     cloneProfileType: "ProfileType";
     cloneUserGroups: "UserGroup";
     closePetition: "Petition";
+    closePetitionsFromTemplate: "SupportMethodResponse";
     closeProfile: "Profile";
     completePetition: "Petition";
     completeProfileFromExternalSource: "Profile";
@@ -6842,6 +6844,10 @@ export interface NexusGenArgTypes {
     closePetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    closePetitionsFromTemplate: {
+      // args
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     closeProfile: {
       // args

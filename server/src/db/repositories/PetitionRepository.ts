@@ -1751,8 +1751,12 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
-  async closePetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
-    return await this.from("petition", t).where("id", petitionId).update(
+  async closePetitions(petitionId: MaybeArray<number>, updatedBy: string, t?: Knex.Transaction) {
+    const ids = unMaybeArray(petitionId);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("petition", t).whereIn("id", ids).update(
       {
         status: "CLOSED",
         closed_at: this.now(),
@@ -2350,19 +2354,18 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at").orderBy("id"),
   );
 
-  async updateRemindersForPetition(
-    petitionId: number,
+  async updateRemindersForPetitions(
+    petitionId: MaybeArray<number>,
     nextReminderAt: Maybe<Date>,
     t?: Knex.Transaction,
   ) {
-    return this.withTransaction(async (t) => {
-      return await this.from("petition_access", t).where("petition_id", petitionId).update(
-        {
-          next_reminder_at: nextReminderAt,
-        },
-        "*",
-      );
-    }, t);
+    const ids = unMaybeArray(petitionId);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("petition_access", t)
+      .whereIn("petition_id", ids)
+      .update({ next_reminder_at: nextReminderAt }, "*");
   }
 
   private async createReplyCreatedOrUpdatedEvents(
@@ -2955,7 +2958,7 @@ export class PetitionRepository extends BaseRepository {
 
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
-        await this.updateRemindersForPetition(petitionId, null, t);
+        await this.updateRemindersForPetitions(petitionId, null, t);
         const [updated] = await this.from("petition", t)
           .where("id", petitionId)
           .update(
@@ -8846,5 +8849,24 @@ export class PetitionRepository extends BaseRepository {
         metadata: this.knex.raw("metadata || ?", [this.json(metadata)]),
         updated_at: this.now(),
       });
+  }
+
+  async getPetitionIdsFromTemplateReadyToClose(templateId: number) {
+    const petitions = await this.from("petition")
+      .whereNull("deleted_at")
+      .whereNull("anonymized_at")
+      .where("template_public", false)
+      .where("from_template_id", templateId)
+      .whereIn("status", ["PENDING", "COMPLETED"])
+      .where((q) => {
+        q.whereNull("latest_signature_status").orWhereIn("latest_signature_status", [
+          "COMPLETED",
+          "CANCELLED",
+          "CANCELLED_BY_USER",
+        ]);
+      })
+      .select("id");
+
+    return petitions.map((p) => p.id);
   }
 }

@@ -1056,6 +1056,16 @@ type Mutation {
   closePetition(petitionId: GID!): Petition!
 
   """
+  Closes every parallel with status PENDING or COMPLETED that was created from the selected template. Parallels with ongoing signatures will NOT be closed.
+  """
+  closePetitionsFromTemplate(
+    """
+    Global ID of the template
+    """
+    templateId: GID!
+  ): SupportMethodResponse!
+
+  """
   Closes a profile that is in OPEN or DELETION_SCHEDULED status
   """
   closeProfile(profileIds: [GID!]!): [Profile!]!
@@ -7672,6 +7682,7 @@ enum TaskName {
   BACKGROUND_CHECK_PROFILE_PDF
   BANKFLIP_SESSION_COMPLETED
   BULK_PETITION_SEND
+  CLOSE_PETITIONS
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES

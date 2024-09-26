@@ -7,7 +7,8 @@ import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
-import { ArgValidationError } from "../helpers/errors";
+import { and } from "../helpers/authorize";
+import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -1010,6 +1011,43 @@ export const updateEinformaCustomProperties = mutationField("updateEinformaCusto
       return {
         result: RESULT.SUCCESS,
         message: "OK!",
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
+
+export const closePetitionsFromTemplate = mutationField("closePetitionsFromTemplate", {
+  description:
+    "Closes every parallel with status PENDING or COMPLETED that was created from the selected template. Parallels with ongoing signatures will NOT be closed.",
+  type: "SupportMethodResponse",
+  authorize: and(superAdminAccess(), async (_, { templateId }, ctx) => {
+    const template = await ctx.petitions.loadPetition(templateId);
+    if (!template || !template.is_template || template.template_public) {
+      throw new ForbiddenError("invalid templateId");
+    }
+    return true;
+  }),
+  args: {
+    templateId: nonNull(globalIdArg("Petition", { description: "Global ID of the template" })),
+  },
+  resolve: async (_, { templateId }, ctx) => {
+    try {
+      await ctx.tasks.createTask(
+        {
+          name: "CLOSE_PETITIONS",
+          user_id: ctx.user!.id,
+          input: { template_id: templateId },
+        },
+        `User:${ctx.user!.id}`,
+      );
+      return {
+        result: RESULT.SUCCESS,
+        message: "Petitions will start closing now. Please wait 1 minute.",
       };
     } catch (error) {
       return {

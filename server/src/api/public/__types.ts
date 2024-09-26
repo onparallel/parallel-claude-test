@@ -846,6 +846,8 @@ export type Mutation = {
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
   closePetition: Petition;
+  /** Closes every parallel with status PENDING or COMPLETED that was created from the selected template. Parallels with ongoing signatures will NOT be closed. */
+  closePetitionsFromTemplate: SupportMethodResponse;
   /** Closes a profile that is in OPEN or DELETION_SCHEDULED status */
   closeProfile: Array<Profile>;
   /**
@@ -1414,6 +1416,10 @@ export type MutationcloneUserGroupsArgs = {
 
 export type MutationclosePetitionArgs = {
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationclosePetitionsFromTemplateArgs = {
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationcloseProfileArgs = {
@@ -5827,6 +5833,7 @@ export type TaskName =
   | "BACKGROUND_CHECK_PROFILE_PDF"
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
+  | "CLOSE_PETITIONS"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
