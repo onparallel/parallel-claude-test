@@ -272,7 +272,16 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
   },
 );
 
-function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
+function RenderElement({
+  attributes,
+  nodeProps,
+  styles,
+  element,
+  editor,
+  leaf,
+  text,
+  ...props
+}: any) {
   return <Text {...attributes} {...props} />;
 }
 
