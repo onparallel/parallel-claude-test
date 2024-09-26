@@ -226,6 +226,7 @@ export const AppLayout = Object.assign(
               minHeight="0"
               minWidth="0"
               backgroundColor="gray.50"
+              zIndex={1}
             >
               <Flex
                 ref={ref}
