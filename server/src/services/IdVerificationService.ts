@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { assert } from "ts-essentials";
 import { CONFIG, Config } from "../config";
+import { ContactLocale } from "../db/__types";
 import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { TaskRepository } from "../db/repositories/TaskRepository";
@@ -49,6 +50,7 @@ export interface IIdVerificationService {
   createSession(
     request: IdentityVerificationSessionRequest,
     metadata: IdentityVerificationSessionRequestMetadata,
+    locale: ContactLocale,
   ): Promise<CreateIdentityVerificationSessionResponse>;
   onSessionCompleted(input: IdVerificationSessionCompletedInput): Promise<void>;
 }
@@ -100,6 +102,7 @@ export class IdVerificationService implements IIdVerificationService {
   async createSession(
     request: IdentityVerificationSessionRequest,
     metadata: IdentityVerificationSessionRequestMetadata,
+    locale: ContactLocale,
   ) {
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const field = await this.petitions.loadField(fieldId);
@@ -113,7 +116,7 @@ export class IdVerificationService implements IIdVerificationService {
       fromGlobalId(metadata.integrationId, "OrgIntegration").id,
     );
 
-    return await idVerification.createSession(metadata, request);
+    return await idVerification.createSession(metadata, request, locale);
   }
 
   async onSessionCompleted(input: IdVerificationSessionCompletedInput) {

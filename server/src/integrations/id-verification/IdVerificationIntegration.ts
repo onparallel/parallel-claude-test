@@ -1,3 +1,4 @@
+import { ContactLocale } from "../../db/__types";
 import { Maybe } from "../../util/types";
 
 export type IdentityVerificationSessionRequestMetadata = {
@@ -102,5 +103,6 @@ export interface IIdVerificationIntegration {
   createSession(
     metadata: IdentityVerificationSessionRequestMetadata,
     request: CreateIdentityVerificationSessionRequest,
+    locale: ContactLocale,
   ): Promise<CreateIdentityVerificationSessionResponse>;
 }

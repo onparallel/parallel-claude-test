@@ -1,15 +1,19 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish, isNullish } from "remeda";
 import { CONFIG, Config } from "../config";
+import { ContactLocale } from "../db/__types";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
+import { InvalidRequestError } from "../integrations/helpers/GenericIntegration";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
+import { retry, StopRetryError } from "../util/retry";
 import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IImageService, IMAGE_SERVICE } from "./ImageService";
+import { ILogger, LOGGER } from "./Logger";
 
 export type SessionMetadata = {
   petitionId: string;
@@ -152,9 +156,12 @@ export const BANKFLIP_SERVICE = Symbol.for("BANKFLIP_SERVICE");
 
 export interface IBankflipService {
   /** called to start a session with Bankflip to request a person's documents */
-  createSession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
+  createSession(metadata: SessionMetadata, locale: ContactLocale): Promise<CreateSessionResponse>;
   /** creates a 'retry' session, picking from the field only the model requests that resulted on an error */
-  createRetrySession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
+  createRetrySession(
+    metadata: SessionMetadata,
+    locale: ContactLocale,
+  ): Promise<CreateSessionResponse>;
   /** webhook callback for when document extraction has finished and the session is completed */
   webhookSecret(orgId: string): string;
   fetchSessionMetadata(orgId: string, sessionId: string): Promise<SessionMetadata>;
@@ -177,6 +184,7 @@ export class BankflipService implements IBankflipService {
     @inject(IMAGE_SERVICE) private images: IImageService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(CONFIG) private config: Config,
+    @inject(LOGGER) private logger: ILogger,
   ) {}
 
   webhookSecret(orgId: string) {
@@ -233,6 +241,17 @@ export class BankflipService implements IBankflipService {
       },
       ...init,
     });
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        const data = await response.json();
+        if (data.code === "VALIDATION_ERROR") {
+          throw new InvalidRequestError("VALIDATION_ERROR", data.message);
+        }
+      }
+
+      throw new Error(`${response.status} ${response.statusText}`);
+    }
     if (type === "json") {
       return await response.json();
     } else {
@@ -240,7 +259,13 @@ export class BankflipService implements IBankflipService {
     }
   }
 
-  async createSession(metadata: SessionMetadata) {
+  private mapContactLocaleToBankflip(locale: ContactLocale) {
+    // Bankflip does not support italian locale
+    if (locale === "it") return "en";
+    return locale;
+  }
+
+  async createSession(metadata: SessionMetadata, locale: ContactLocale) {
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const field = await this.petitions.loadField(fieldId);
@@ -248,19 +273,39 @@ export class BankflipService implements IBankflipService {
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);
 
-    return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
-      method: "POST",
-      body: JSON.stringify({
-        requests: field?.options.requests ?? [],
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}`,
-        customization,
-        metadata,
-        identityVerification: field?.options.identityVerification ?? null,
-      }),
-    });
+    return await retry(
+      async (i) => {
+        try {
+          return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
+            method: "POST",
+            body: JSON.stringify({
+              requests: field?.options.requests ?? [],
+              webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}`,
+              customization,
+              metadata,
+              identityVerification: field?.options.identityVerification ?? null,
+              ...(i === 0 ? { locale: this.mapContactLocaleToBankflip(locale) } : {}),
+            }),
+          });
+        } catch (error) {
+          if (error instanceof InvalidRequestError && error.code === "VALIDATION_ERROR") {
+            // Bankflip returns 400 with VALIDATION_ERROR when requested locale is not enabled in the account
+            // in this case, we want to retry the request without passing locale param (defaults to "es").
+            // log as error so we can be aware of this
+            this.logger.error(
+              `Organization:${orgId} BankflipService validation error: ${error.message}. Will retry request without locale param.`,
+            );
+            throw error;
+          }
+          // any other error, we don't want to retry
+          throw new StopRetryError(error);
+        }
+      },
+      { maxRetries: 1 },
+    );
   }
 
-  async createRetrySession(metadata: SessionMetadata) {
+  async createRetrySession(metadata: SessionMetadata, locale: ContactLocale) {
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const parentReplyId = metadata.parentReplyId
@@ -303,16 +348,36 @@ export class BankflipService implements IBankflipService {
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);
 
-    return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
-      method: "POST",
-      body: JSON.stringify({
-        requests,
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}?retry=true`,
-        customization,
-        metadata,
-        identityVerification,
-      }),
-    });
+    return await retry(
+      async (i) => {
+        try {
+          return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
+            method: "POST",
+            body: JSON.stringify({
+              requests,
+              webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}?retry=true`,
+              customization,
+              metadata,
+              identityVerification,
+              ...(i === 0 ? { locale: this.mapContactLocaleToBankflip(locale) } : {}),
+            }),
+          });
+        } catch (error) {
+          if (error instanceof InvalidRequestError && error.code === "VALIDATION_ERROR") {
+            // Bankflip returns 400 with VALIDATION_ERROR when requested locale is not enabled in the account
+            // in this case, we want to retry the request without passing locale param (defaults to "es").
+            // log as error so we can be aware of this
+            this.logger.error(
+              `Organization:${orgId} BankflipService validation error: ${error.message}. Will retry request without locale param.`,
+            );
+            throw error;
+          }
+          // any other error, we don't want to retry
+          throw new StopRetryError(error);
+        }
+      },
+      { maxRetries: 1 },
+    );
   }
 
   async fetchSessionMetadata(orgId: string, sessionId: string) {

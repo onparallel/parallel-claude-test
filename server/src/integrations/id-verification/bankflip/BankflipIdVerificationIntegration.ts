@@ -3,6 +3,7 @@ import { Request, Response, Router, json } from "express";
 import { inject, injectable } from "inversify";
 import { isNonNullish, omit, pick } from "remeda";
 import { CONFIG, Config } from "../../../config";
+import { ContactLocale } from "../../../db/__types";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import {
   IntegrationCredentials,
@@ -13,10 +14,12 @@ import { ENCRYPTION_SERVICE, EncryptionService } from "../../../services/Encrypt
 import { FETCH_SERVICE, IFetchService } from "../../../services/FetchService";
 import { IIdVerificationService } from "../../../services/IdVerificationService";
 import { IImageService, IMAGE_SERVICE } from "../../../services/ImageService";
+import { ILogger, LOGGER } from "../../../services/Logger";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../../../util/globalId";
+import { StopRetryError, retry } from "../../../util/retry";
 import { Maybe } from "../../../util/types";
-import { InvalidCredentialsError } from "../../helpers/GenericIntegration";
+import { InvalidCredentialsError, InvalidRequestError } from "../../helpers/GenericIntegration";
 import { WebhookIntegration } from "../../helpers/WebhookIntegration";
 import {
   CreateIdentityVerificationSessionRequest,
@@ -153,6 +156,7 @@ export class BankflipIdVerificationIntegration
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(CONFIG) private config: Config,
+    @inject(LOGGER) private logger: ILogger,
   ) {
     super(encryption, integrations);
   }
@@ -160,6 +164,7 @@ export class BankflipIdVerificationIntegration
   async createSession(
     metadata: IdentityVerificationSessionRequestMetadata,
     request: CreateIdentityVerificationSessionRequest,
+    locale: ContactLocale,
   ): Promise<CreateIdentityVerificationSessionResponse> {
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const integrationId = fromGlobalId(metadata.integrationId, "OrgIntegration").id;
@@ -196,22 +201,48 @@ export class BankflipIdVerificationIntegration
       }
     }
 
+    function mapContactLocaleToBankflip(locale: ContactLocale) {
+      // Bankflip does not support italian locale
+      if (locale === "it") return "en";
+      return locale;
+    }
+
     const response = await this.withCredentials(integrationId, async (credentials) => {
-      return await this.apiRequest<BankflipCreateIdentityVerificationSessionResponse>(
-        credentials,
-        "/session",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            webhookUrl: `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/${metadata.integrationId}/events`,
-            customization,
-            metadata,
-            identityVerification: {
-              type: mapRequestTypeToBankflip(request.type),
-              allowedDocuments: request.allowedDocuments?.map(mapDocumentTypeToBankflip),
-            },
-          }),
+      return await retry(
+        async (i) => {
+          try {
+            return await this.apiRequest<BankflipCreateIdentityVerificationSessionResponse>(
+              credentials,
+              "/session",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  webhookUrl: `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/${metadata.integrationId}/events`,
+                  customization,
+                  metadata,
+                  identityVerification: {
+                    type: mapRequestTypeToBankflip(request.type),
+                    allowedDocuments: request.allowedDocuments?.map(mapDocumentTypeToBankflip),
+                  },
+                  ...(i === 0 ? { locale: mapContactLocaleToBankflip(locale) } : {}),
+                }),
+              },
+            );
+          } catch (error) {
+            if (error instanceof InvalidRequestError && error.code === "VALIDATION_ERROR") {
+              // Bankflip returns 400 with VALIDATION_ERROR when requested locale is not enabled in the account
+              // in this case, we want to retry the request without passing locale param (defaults to "es").
+              // log as error so we can be aware of this
+              this.logger.error(
+                `Integration:${integrationId} Bankflip validation error: ${error.message}. Will retry request without locale param.`,
+              );
+              throw error;
+            }
+            // any other error, we don't want to retry
+            throw new StopRetryError(error);
+          }
         },
+        { maxRetries: 1 },
       );
     });
 
@@ -347,6 +378,12 @@ export class BankflipIdVerificationIntegration
     if (!response.ok) {
       if (response.status === 401) {
         throw new InvalidCredentialsError("INVALID_CREDENTIALS", response.statusText);
+      }
+      if (response.status === 400) {
+        const data = await response.json();
+        if (data.code === "VALIDATION_ERROR") {
+          throw new InvalidRequestError("VALIDATION_ERROR", data.message);
+        }
       }
       throw new Error(`${response.status} ${response.statusText}`);
     }

@@ -11,6 +11,7 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
@@ -352,18 +353,25 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     "fieldId",
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
-    const field = (await ctx.petitions.loadField(fieldId))!;
+    const field = await ctx.petitions.loadField(fieldId);
+    const petition = await ctx.petitions.loadPetition(petitionId);
+
+    assert(field, "Field not found");
+    assert(petition, "Petition not found");
 
     if (field.type === "ES_TAX_DOCUMENTS") {
-      const session = await ctx.bankflip.createSession({
-        petitionId: toGlobalId("Petition", petitionId),
-        orgId: toGlobalId("Organization", ctx.user!.org_id),
-        fieldId: toGlobalId("PetitionField", fieldId),
-        userId: toGlobalId("User", ctx.user!.id),
-        parentReplyId: isNonNullish(parentReplyId)
-          ? toGlobalId("PetitionFieldReply", parentReplyId)
-          : null,
-      });
+      const session = await ctx.bankflip.createSession(
+        {
+          petitionId: toGlobalId("Petition", petitionId),
+          orgId: toGlobalId("Organization", ctx.user!.org_id),
+          fieldId: toGlobalId("PetitionField", fieldId),
+          userId: toGlobalId("User", ctx.user!.id),
+          parentReplyId: isNonNullish(parentReplyId)
+            ? toGlobalId("PetitionFieldReply", parentReplyId)
+            : null,
+        },
+        petition.recipient_locale,
+      );
 
       return {
         type: "WINDOW",
@@ -390,14 +398,18 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       }
 
       try {
-        const session = await ctx.idVerification.createSession(options.config, {
-          integrationId: toGlobalId("OrgIntegration", integrationId),
-          petitionId: toGlobalId("Petition", petitionId),
-          orgId: toGlobalId("Organization", ctx.user!.org_id),
-          fieldId: toGlobalId("PetitionField", fieldId),
-          userId: toGlobalId("User", ctx.user!.id),
-          parentReplyId: parentReplyId ? toGlobalId("PetitionFieldReply", parentReplyId) : null,
-        });
+        const session = await ctx.idVerification.createSession(
+          options.config,
+          {
+            integrationId: toGlobalId("OrgIntegration", integrationId),
+            petitionId: toGlobalId("Petition", petitionId),
+            orgId: toGlobalId("Organization", ctx.user!.org_id),
+            fieldId: toGlobalId("PetitionField", fieldId),
+            userId: toGlobalId("User", ctx.user!.id),
+            parentReplyId: parentReplyId ? toGlobalId("PetitionFieldReply", parentReplyId) : null,
+          },
+          petition.recipient_locale,
+        );
 
         return {
           type: "WINDOW",
@@ -433,15 +445,21 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
-    const session = await ctx.bankflip.createRetrySession({
-      petitionId: toGlobalId("Petition", petitionId),
-      orgId: toGlobalId("Organization", ctx.user!.org_id),
-      fieldId: toGlobalId("PetitionField", fieldId),
-      userId: toGlobalId("User", ctx.user!.id),
-      parentReplyId: isNonNullish(parentReplyId)
-        ? toGlobalId("PetitionFieldReply", parentReplyId)
-        : null,
-    });
+    const petition = await ctx.petitions.loadPetition(petitionId);
+    assert(petition, "Petition not found");
+
+    const session = await ctx.bankflip.createRetrySession(
+      {
+        petitionId: toGlobalId("Petition", petitionId),
+        orgId: toGlobalId("Organization", ctx.user!.org_id),
+        fieldId: toGlobalId("PetitionField", fieldId),
+        userId: toGlobalId("User", ctx.user!.id),
+        parentReplyId: isNonNullish(parentReplyId)
+          ? toGlobalId("PetitionFieldReply", parentReplyId)
+          : null,
+      },
+      petition.recipient_locale,
+    );
 
     return {
       type: "WINDOW",
