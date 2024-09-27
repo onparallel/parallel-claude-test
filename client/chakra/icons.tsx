@@ -2907,3 +2907,19 @@ export const SidebarIcon = createIcon({
     </g>
   ),
 });
+
+export const PinIcon = createIcon({
+  displayName: "PinIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m9.11111 14.6667 4.01899 4.2016c.3698.3866 1.0215.202 1.1336-.3211l1.0165-4.7437c.0342-.1597.1259-.3013.2576-.3979l5.8356-4.2794c.3295-.24163.366-.72009.0771-1.00901l-5.5677-5.56772c-.2889-.28891-.7674-.25232-1.009.07717l-4.2636 5.81395c-.106.14459-.2658.24037-.4433.26572l-4.66061.66581c-.53711.07673-.76251.72868-.38748 1.12078zm0 0-7.11111 7.3333" />
+    </g>
+  ),
+});

@@ -18,12 +18,12 @@ import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   ArrowBackIcon,
   BellIcon,
-  BusinessIcon,
   CommentIcon,
+  EditIcon,
   KeyIcon,
   LogOutIcon,
   MapIcon,
-  UserIcon,
+  SettingsIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_QueryFragment } from "@parallel/graphql/__types";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
@@ -212,16 +212,16 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
           ) : null}
 
           <NakedLink href="/app/settings">
-            <MenuItem as="a" icon={<UserIcon display="block" boxSize={4} />}>
+            <MenuItem as="a" icon={<EditIcon display="block" boxSize={4} />}>
               <FormattedMessage
-                id="component.user-settings-layout.page-title"
-                defaultMessage="Settings"
+                id="component.user-menu.edit-account"
+                defaultMessage="Edit my account"
               />
             </MenuItem>
           </NakedLink>
 
           <NakedLink href="/app/organization">
-            <MenuItem as="a" icon={<BusinessIcon display="block" boxSize={4} />}>
+            <MenuItem as="a" icon={<SettingsIcon display="block" boxSize={4} />}>
               <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
             </MenuItem>
           </NakedLink>

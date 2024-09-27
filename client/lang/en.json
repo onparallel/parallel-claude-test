@@ -4461,8 +4461,8 @@
   },
   {
     "term": "component.new-layout.keep-navigation-open",
-    "definition": "Keep navigation open",
-    "context": "Keep navigation open"
+    "definition": "Pin navigation",
+    "context": "Pin navigation"
   },
   {
     "term": "component.new-layout.open-navigation",
@@ -11338,6 +11338,11 @@
     "term": "component.user-menu.back-to-account",
     "definition": "Back to my account",
     "context": "Back to my account"
+  },
+  {
+    "term": "component.user-menu.edit-account",
+    "definition": "Edit my account",
+    "context": "Edit my account"
   },
   {
     "term": "component.user-menu.log-out",

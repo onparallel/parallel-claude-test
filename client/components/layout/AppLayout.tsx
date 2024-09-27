@@ -11,6 +11,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
+import { useCookie } from "@parallel/utils/useCookie";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import * as Sentry from "@sentry/nextjs";
@@ -43,6 +44,7 @@ export const AppLayout = Object.assign(
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const hasNewVersion = useCheckForNewVersion();
+    const [hasNavBarExpanded] = useCookie(`navbar-expanded-${realMe.id}`, false);
 
     const timeoutRef = useRef<number>();
 
@@ -132,6 +134,7 @@ export const AppLayout = Object.assign(
             name: me.organization.name,
             petitionsSubscriptionEndDate: me.organization.petitionsSubscriptionEndDate,
           },
+          hasNavBarExpanded,
         });
       }
     }, [me.id, realMe.id]);

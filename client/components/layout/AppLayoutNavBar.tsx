@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Drawer,
   DrawerContent,
   DrawerOverlay,
@@ -19,14 +20,14 @@ import { Tooltip } from "@parallel/chakra/components";
 import {
   AddIcon,
   AlertCircleFilledIcon,
-  BoxedArrowLeft,
+  ChevronLeftIcon,
   HamburgerMenuIcon,
   HelpOutlineIcon,
   NewsIcon,
   PaperPlaneIcon,
+  PinIcon,
   ProfilesIcon,
   ReportsIcon,
-  SidebarIcon,
   TimeAlarmIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
@@ -38,13 +39,14 @@ import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { memo, MouseEvent, MouseEventHandler, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
+import { ScrollShadows } from "../common/ScrollShadows";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
@@ -92,6 +94,14 @@ export const AppLayoutNavBar = Object.assign(
 
     const isNavBarOpen = isMobile ? isOpenMobile : isForceOpen || isOpenDesktop;
 
+    const handlePinNavbarClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+      if (isForceOpen) {
+        // after unpinning feels strange that the menu wont close when moving the mouse away.
+        e.currentTarget.blur();
+      }
+      setIsForceOpen(!isForceOpen);
+    };
+
     return (
       <Box
         as="nav"
@@ -109,6 +119,12 @@ export const AppLayoutNavBar = Object.assign(
             },
             opacity: { sm: 0 },
           },
+          ".expand-button": {
+            opacity: 0,
+            // prevent tooltip showing when hovering the menu close to the button
+            pointerEvents: "none",
+            transition: `opacity ${ANIMATION_DURATION} ${ANIMATION_TIMING} ${ANIMATION_DELAY}`,
+          },
           '&[data-nav-bar-expanded="true"]': {
             ".show-on-expand": {
               opacity: { sm: 1 },
@@ -116,6 +132,10 @@ export const AppLayoutNavBar = Object.assign(
             "#nav-bar-menu": {
               minWidth: { sm: "200px" },
               boxShadow: { sm: isForceOpen ? "none" : "xl" },
+            },
+            ".expand-button": {
+              opacity: 1,
+              pointerEvents: "unset",
             },
           },
         }}
@@ -160,8 +180,7 @@ export const AppLayoutNavBar = Object.assign(
         >
           <Stack
             id="nav-bar-menu"
-            overflowX="hidden"
-            overflowY="auto"
+            overflow="visible"
             backgroundColor="white"
             zIndex={isMobile ? "modal" : 1}
             minWidth={isNavBarOpen ? "200px" : "64px"}
@@ -181,9 +200,10 @@ export const AppLayoutNavBar = Object.assign(
               base: "none",
               sm: [`min-width`, `box-shadow`].join(", "),
             }}
+            spacing={0}
           >
-            <Stack spacing={4} paddingX={3} flex="1">
-              <HStack width="100%" justify="space-between">
+            <Stack spacing={4} paddingX={3}>
+              <HStack width="100%" justify="space-between" position="relative">
                 <NakedLink href="/app">
                   <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
                     <Tooltip
@@ -223,28 +243,41 @@ export const AppLayoutNavBar = Object.assign(
                     </Tooltip>
                   </Box>
                 </NakedLink>
-                <IconButtonWithTooltip
+                {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes out 1px. Uncomment background to see */}
+                <Center
+                  rounded="100%"
+                  boxSize={10}
+                  // background="red"
                   display={{ base: "none", sm: "inline-flex" }}
-                  className="show-on-expand"
-                  size="sm"
-                  variant="outline"
-                  aria-expanded={isForceOpen}
-                  aria-controls="nav-bar"
-                  icon={isForceOpen ? <BoxedArrowLeft boxSize={5} /> : <SidebarIcon boxSize={5} />}
-                  label={
-                    isForceOpen
-                      ? intl.formatMessage({
-                          id: "component.new-layout.hide-navigation",
-                          defaultMessage: "Hide navigation",
-                        })
-                      : intl.formatMessage({
-                          id: "component.new-layout.keep-navigation-open",
-                          defaultMessage: "Keep navigation open",
-                        })
-                  }
-                  placement="right"
-                  onClick={() => setIsForceOpen((x) => !x)}
-                />
+                  position="absolute"
+                  insetEnd={-3}
+                  transform="translateX(50%)"
+                  top={0}
+                  className="expand-button"
+                >
+                  <IconButtonWithTooltip
+                    size="xs"
+                    variant="outline"
+                    aria-expanded={isForceOpen}
+                    aria-controls="nav-bar"
+                    borderRadius="full"
+                    backgroundColor="white"
+                    icon={isForceOpen ? <ChevronLeftIcon boxSize={5} /> : <PinIcon boxSize={3} />}
+                    label={
+                      isForceOpen
+                        ? intl.formatMessage({
+                            id: "component.new-layout.hide-navigation",
+                            defaultMessage: "Hide navigation",
+                          })
+                        : intl.formatMessage({
+                            id: "component.new-layout.keep-navigation-open",
+                            defaultMessage: "Pin navigation",
+                          })
+                    }
+                    placement="right"
+                    onClick={handlePinNavbarClick}
+                  />
+                </Center>
                 <CloseButton
                   ref={closeRef}
                   display={{ base: "inline-flex", sm: "none" }}
@@ -268,14 +301,26 @@ export const AppLayoutNavBar = Object.assign(
                   </Text>
                 </Button>
               </NakedLink>
+            </Stack>
+            <ScrollShadows
+              as={Stack}
+              spacing={4}
+              paddingX={3}
+              paddingTop={4}
+              paddingBottom={2}
+              flex="1"
+              overflowX="hidden"
+              overflowY="auto"
+              justify="space-between"
+            >
               {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
               <SectionList me={me} />
-              <Spacer />
+
               <NotificationsSection
                 display={{ base: "none", sm: "flex" }}
                 onHelpCenterClick={onHelpCenterClick}
               />
-            </Stack>
+            </ScrollShadows>
             <Box display={{ base: "none", sm: "flex" }}>
               <UserMenu
                 placement={isMobile ? "bottom-end" : "right-end"}

@@ -4456,13 +4456,13 @@
   },
   {
     "term": "component.new-layout.hide-navigation",
-    "definition": "Esconder navegación",
+    "definition": "Esconder menú",
     "context": "Hide navigation"
   },
   {
     "term": "component.new-layout.keep-navigation-open",
-    "definition": "Mantener navegación abierta",
-    "context": "Keep navigation open"
+    "definition": "Fijar el menú",
+    "context": "Pin navigation"
   },
   {
     "term": "component.new-layout.open-navigation",
@@ -11338,6 +11338,11 @@
     "term": "component.user-menu.back-to-account",
     "definition": "Volver a mi cuenta",
     "context": "Back to my account"
+  },
+  {
+    "term": "component.user-menu.edit-account",
+    "definition": "Editar mi cuenta",
+    "context": "Edit my account"
   },
   {
     "term": "component.user-menu.log-out",

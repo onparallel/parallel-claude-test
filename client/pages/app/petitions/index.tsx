@@ -19,7 +19,6 @@ import {
   ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
-  DocumentIcon,
   EditSimpleIcon,
   FolderIcon,
   PaperPlaneIcon,
@@ -483,13 +482,7 @@ function Petitions() {
                 backgroundColor="white"
                 data-action="change-parallel-template"
                 data-testid="petition-type-menu-button"
-                leftIcon={
-                  state.type === "PETITION" ? (
-                    <PaperPlaneIcon boxSize={6} />
-                  ) : (
-                    <DocumentIcon boxSize={6} />
-                  )
-                }
+                leftIcon={<PaperPlaneIcon boxSize={6} />}
                 rightIcon={<ChevronDownIcon boxSize={5} />}
               >
                 {state.type === "PETITION"
