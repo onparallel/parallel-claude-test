@@ -86,7 +86,7 @@ export const AppLayoutNavBar = Object.assign(
     const [isOpenDesktop, setIsOpenDesktop] = useLocalStorage("navbar-opened", false);
     useEffect(() => {
       if (!isMobile) {
-        setIsOpenDesktop(isFocusWithin || isHovered || userMenuIsOpen);
+        setIsOpenDesktop((isFocusWithin || isHovered || userMenuIsOpen) && !isForceOpen);
       }
     }, [isMobile, isFocusWithin, isHovered, userMenuIsOpen]);
 
@@ -97,7 +97,7 @@ export const AppLayoutNavBar = Object.assign(
         as="nav"
         ref={navRef}
         id="nav-bar"
-        zIndex={2}
+        zIndex={isOpenDesktop ? 41 : 2}
         data-nav-bar-expanded={isNavBarOpen}
         position="relative"
         width={{ base: "100%", sm: isForceOpen ? "200px" : "64px" }}
