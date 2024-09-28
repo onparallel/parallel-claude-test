@@ -39,14 +39,13 @@ import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, MouseEventHandler, useEffect, useMemo, useRef, useState } from "react";
+import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
-import { ScrollShadows } from "../common/ScrollShadows";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
@@ -180,7 +179,6 @@ export const AppLayoutNavBar = Object.assign(
         >
           <Stack
             id="nav-bar-menu"
-            overflow="visible"
             backgroundColor="white"
             zIndex={isMobile ? "modal" : 1}
             minWidth={isNavBarOpen ? "200px" : "64px"}
@@ -189,7 +187,6 @@ export const AppLayoutNavBar = Object.assign(
             position="absolute"
             top={0}
             insetStart={0}
-            paddingY={4}
             paddingX={0}
             borderEnd="1px solid"
             borderColor="gray.200"
@@ -200,10 +197,15 @@ export const AppLayoutNavBar = Object.assign(
               base: "none",
               sm: [`min-width`, `box-shadow`].join(", "),
             }}
-            spacing={0}
           >
-            <Stack spacing={4} paddingX={3}>
-              <HStack width="100%" justify="space-between" position="relative">
+            <Stack spacing={4} flex="1" minHeight={0}>
+              <HStack
+                paddingTop={4}
+                paddingX={3}
+                width="100%"
+                justify="space-between"
+                position="relative"
+              >
                 <NakedLink href="/app">
                   <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
                     <Tooltip
@@ -243,16 +245,16 @@ export const AppLayoutNavBar = Object.assign(
                     </Tooltip>
                   </Box>
                 </NakedLink>
-                {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes out 1px. Uncomment background to see */}
+                {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes by a slight margin. Uncomment background to see */}
                 <Center
                   rounded="100%"
                   boxSize={10}
                   // background="red"
                   display={{ base: "none", sm: "inline-flex" }}
                   position="absolute"
-                  insetEnd={-3}
+                  insetEnd={0}
                   transform="translateX(50%)"
-                  top={0}
+                  top={4}
                   className="expand-button"
                 >
                   <IconButtonWithTooltip
@@ -285,51 +287,52 @@ export const AppLayoutNavBar = Object.assign(
                   onClick={() => setIsOpenMobile(false)}
                 />
               </HStack>
-              <NakedLink href={`/app/petitions/new`}>
-                <Button
-                  as="a"
-                  colorScheme="purple"
-                  width="full"
-                  leftIcon={<AddIcon boxSize={4} />}
-                  iconSpacing={0}
-                  paddingInlineStart={3}
-                  paddingInlineEnd={3}
-                  justifyContent="space-evenly"
-                >
-                  <Text as="span" className="show-on-expand" minWidth={0}>
-                    <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
-                  </Text>
-                </Button>
-              </NakedLink>
+              <Box paddingX={3}>
+                <NakedLink href={`/app/petitions/new`}>
+                  <Button
+                    as="a"
+                    colorScheme="purple"
+                    width="full"
+                    leftIcon={<AddIcon boxSize={4} />}
+                    iconSpacing={0}
+                    paddingInlineStart={3}
+                    paddingInlineEnd={3}
+                    justifyContent="space-evenly"
+                  >
+                    <Text as="span" className="show-on-expand" minWidth={0}>
+                      <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
+                    </Text>
+                  </Button>
+                </NakedLink>
+                {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
+              </Box>
+              <Stack
+                spacing={4}
+                overflowY="auto"
+                overflowX="hidden"
+                minHeight={0}
+                paddingBottom={4}
+                flex={1}
+              >
+                <Stack flex={1} spacing={4} paddingX={3}>
+                  <SectionList me={me} />
+                  <Spacer />
+                  <NotificationsSection
+                    display={{ base: "none", sm: "flex" }}
+                    onHelpCenterClick={onHelpCenterClick}
+                  />
+                </Stack>
+                <Box display={{ base: "none", sm: "flex" }}>
+                  <UserMenu
+                    placement={isMobile ? "bottom-end" : "right-end"}
+                    me={me}
+                    realMe={realMe}
+                    extended
+                    onToggle={(isOpen) => setUserMenuIsOpen(isOpen)}
+                  />
+                </Box>
+              </Stack>
             </Stack>
-            <ScrollShadows
-              as={Stack}
-              spacing={4}
-              paddingX={3}
-              paddingTop={4}
-              paddingBottom={2}
-              flex="1"
-              overflowX="hidden"
-              overflowY="auto"
-              justify="space-between"
-            >
-              {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
-              <SectionList me={me} />
-
-              <NotificationsSection
-                display={{ base: "none", sm: "flex" }}
-                onHelpCenterClick={onHelpCenterClick}
-              />
-            </ScrollShadows>
-            <Box display={{ base: "none", sm: "flex" }}>
-              <UserMenu
-                placement={isMobile ? "bottom-end" : "right-end"}
-                me={me}
-                realMe={realMe}
-                extended
-                onToggle={(isOpen) => setUserMenuIsOpen(isOpen)}
-              />
-            </Box>
           </Stack>
         </Wrap>
       </Box>
