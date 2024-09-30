@@ -13,6 +13,7 @@ export const SimpleFileButton = chakraForwardRef<"button", SimpleFileButtonProps
     return (
       <Button
         ref={ref}
+        size="sm"
         variant="outline"
         backgroundColor="white"
         alignItems="center"

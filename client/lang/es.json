@@ -5800,6 +5800,16 @@
     "context": "Standard options from <b>\"{standardList}\"</b>. Edit from the field settings."
   },
   {
+    "term": "component.petition-field-replies-content.no-reply",
+    "definition": "Sin respuesta",
+    "context": "No reply"
+  },
+  {
+    "term": "component.petition-field-replies-content.no-value",
+    "definition": "Sin valor",
+    "context": "No value"
+  },
+  {
     "term": "component.petition-field-select.placeholder",
     "definition": "Selecciona un campo",
     "context": "Select a field"
@@ -7660,11 +7670,6 @@
     "context": "Suggested reply from:"
   },
   {
-    "term": "component.profile-field-value-content.no-value",
-    "definition": "Sin valor",
-    "context": "No value"
-  },
-  {
     "term": "component.profile-field.expiration-date",
     "definition": "Vencimiento: {date}",
     "context": "Expires at: {date}"
@@ -7758,6 +7763,11 @@
     "term": "component.profile-petitions-table.remove-petition",
     "definition": "Quitar asociación",
     "context": "Remove association"
+  },
+  {
+    "term": "component.profile-property-content.no-value",
+    "definition": "Sin valor",
+    "context": "No value"
   },
   {
     "term": "component.profile-relationship-type-with-direction-select.placeholder",
@@ -9453,11 +9463,6 @@
     "term": "component.reports-statistics-time.time-statistics-help-2",
     "definition": "Todos los tiempos se cuentan desde el paso anterior, no respecto al total.",
     "context": "All times are counted from the previous step, not with respect to the total."
-  },
-  {
-    "term": "component.resolve-profile-properties-conflicts-dialog.no-value",
-    "definition": "Sin valor",
-    "context": "No value"
   },
   {
     "term": "component.restrict-petition.optional-password-label",

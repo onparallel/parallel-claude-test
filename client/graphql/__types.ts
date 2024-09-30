@@ -6966,6 +6966,20 @@ export type PetitionFieldReference_PetitionFieldFragment = {
   title?: string | null;
 };
 
+export type PetitionFieldRepliesContent_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+};
+
+export type PetitionFieldRepliesContent_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+};
+
 export type PetitionFieldSelect_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   fields: Array<{
@@ -7232,11 +7246,22 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
       };
 };
 
-export type ProfileFieldValueContent_ProfileTypeFieldFragment = {
+export type ProfilePropertyContent_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   type: ProfileTypeFieldType;
   options: { [key: string]: any };
+};
+
+export type ProfilePropertyContent_ProfileFieldValueFragment = {
+  __typename?: "ProfileFieldValue";
+  content?: { [key: string]: any } | null;
+};
+
+export type ProfilePropertyContent_ProfileFieldFileFragment = {
+  __typename?: "ProfileFieldFile";
+  id?: string;
+  file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
 };
 
 export type ProfileReference_ProfileFragment = {
@@ -16123,6 +16148,14 @@ export type PetitionComposeNewFieldDrawer_PetitionBaseFragment =
   | PetitionComposeNewFieldDrawer_PetitionBase_Petition_Fragment
   | PetitionComposeNewFieldDrawer_PetitionBase_PetitionTemplate_Fragment;
 
+export type PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  alias?: string | null;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+};
+
 export type PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -23696,6 +23729,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
             name: { [locale in UserLocale]?: string };
           };
         } | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
     }> | null;
     associatedProfile?: {
@@ -23733,6 +23767,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
         name: { [locale in UserLocale]?: string };
       };
     } | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   }>;
 };
 
@@ -23825,6 +23860,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
               name: { [locale in UserLocale]?: string };
             };
           } | null;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
       }> | null;
       associatedProfile?: {
@@ -23862,6 +23898,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
           name: { [locale in UserLocale]?: string };
         };
       } | null;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
   }> | null;
   profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
@@ -23933,6 +23970,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
             name: { [locale in UserLocale]?: string };
           };
         } | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
     }> | null;
     associatedProfile?: {
@@ -23970,6 +24008,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
         name: { [locale in UserLocale]?: string };
       };
     } | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   }>;
 };
 
@@ -24076,6 +24115,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
           name: { [locale in UserLocale]?: string };
         };
       } | null;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
   }> | null;
   associatedProfile?: {
@@ -24113,6 +24153,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
       name: { [locale in UserLocale]?: string };
     };
   } | null;
+  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
 export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
@@ -24205,6 +24246,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
                 name: { [locale in UserLocale]?: string };
               };
             } | null;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
         }> | null;
         associatedProfile?: {
@@ -24242,6 +24284,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
             name: { [locale in UserLocale]?: string };
           };
         } | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
@@ -24325,6 +24368,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
               name: { [locale in UserLocale]?: string };
             };
           } | null;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
       }> | null;
       associatedProfile?: {
@@ -24362,6 +24406,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           name: { [locale in UserLocale]?: string };
         };
       } | null;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
@@ -24498,6 +24543,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                       name: { [locale in UserLocale]?: string };
                     };
                   } | null;
+                  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                 }>;
               }> | null;
               associatedProfile?: {
@@ -24535,6 +24581,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                   name: { [locale in UserLocale]?: string };
                 };
               } | null;
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
@@ -24622,6 +24669,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                     name: { [locale in UserLocale]?: string };
                   };
                 } | null;
+                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }>;
             }> | null;
             associatedProfile?: {
@@ -24659,6 +24707,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                 name: { [locale in UserLocale]?: string };
               };
             } | null;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
@@ -24787,6 +24836,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
             name: { [locale in UserLocale]?: string };
           };
         } | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
     }> | null;
     associatedProfile?: {
@@ -24824,6 +24874,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
         name: { [locale in UserLocale]?: string };
       };
     } | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   };
 };
 
@@ -25068,6 +25119,8 @@ export type useResolveProfilePropertiesConflictsDialog_ProfileFragment = {
 export type useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
   profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
 };
 
@@ -25075,6 +25128,7 @@ export type useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmen
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
+  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
 export type useResolveProfilePropertiesConflictsDialog_profileQueryVariables = Exact<{
@@ -44091,6 +44145,7 @@ export type PetitionReplies_PetitionFragment = {
                 name: { [locale in UserLocale]?: string };
               };
             } | null;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
         }> | null;
         associatedProfile?: {
@@ -44128,6 +44183,7 @@ export type PetitionReplies_PetitionFragment = {
             name: { [locale in UserLocale]?: string };
           };
         } | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
@@ -45067,6 +45123,7 @@ export type PetitionReplies_closePetitionMutation = {
                   name: { [locale in UserLocale]?: string };
                 };
               } | null;
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
           }> | null;
           associatedProfile?: {
@@ -45104,6 +45161,7 @@ export type PetitionReplies_closePetitionMutation = {
               name: { [locale in UserLocale]?: string };
             };
           } | null;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
         previewReplies: Array<{
           __typename?: "PetitionFieldReply";
@@ -45816,6 +45874,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                   name: { [locale in UserLocale]?: string };
                 };
               } | null;
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
           }> | null;
           associatedProfile?: {
@@ -45853,6 +45912,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               name: { [locale in UserLocale]?: string };
             };
           } | null;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
         previewReplies: Array<{
           __typename?: "PetitionFieldReply";
@@ -46742,6 +46802,7 @@ export type PetitionReplies_petitionQuery = {
                       name: { [locale in UserLocale]?: string };
                     };
                   } | null;
+                  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                 }>;
               }> | null;
               associatedProfile?: {
@@ -46779,6 +46840,7 @@ export type PetitionReplies_petitionQuery = {
                   name: { [locale in UserLocale]?: string };
                 };
               } | null;
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
             previewReplies: Array<{
               __typename?: "PetitionFieldReply";
@@ -55004,6 +55066,20 @@ export const PetitionSelect_PetitionBaseFragmentDoc = gql`
   }
   ${PetitionSelectOption_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionSelect_PetitionBaseFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+    content
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
+    id @include(if: true)
+    file {
+      filename
+      contentType
+    }
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
 export const ProfileTypeSelect_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeSelect_ProfileType on ProfileType {
     id
@@ -56982,13 +57058,13 @@ export const useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDire
     useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment,
     unknown
   >;
-export const ProfileFieldValueContent_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFieldValueContent_ProfileTypeField on ProfileTypeField {
+export const ProfilePropertyContent_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileTypeField on ProfileTypeField {
     id
     type
     options
   }
-` as unknown as DocumentNode<ProfileFieldValueContent_ProfileTypeFieldFragment, unknown>;
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileTypeFieldFragment, unknown>;
 export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragmentDoc =
   gql`
     fragment ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult on ProfileExternalSourceSearchSingleResult {
@@ -57011,13 +57087,13 @@ export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleRes
           id
           name
           myPermission
-          ...ProfileFieldValueContent_ProfileTypeField
+          ...ProfilePropertyContent_ProfileTypeField
         }
         content
       }
     }
     ${ProfileReference_ProfileFragmentDoc}
-    ${ProfileFieldValueContent_ProfileTypeFieldFragmentDoc}
+    ${ProfilePropertyContent_ProfileTypeFieldFragmentDoc}
   ` as unknown as DocumentNode<
     ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment,
     unknown
@@ -60136,17 +60212,26 @@ export const PetitionComposeFieldSettings_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_PetitionBaseFragment, unknown>;
+export const PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragmentDoc = gql`
+  fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField on ProfileTypeField {
+    id
+    alias
+    name
+    type
+  }
+` as unknown as DocumentNode<
+  PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment,
+  unknown
+>;
 export const PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFragmentDoc = gql`
   fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType on ProfileType {
     id
     name
     fields {
-      id
-      alias
-      name
-      type
+      ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField
     }
   }
+  ${PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFragment,
   unknown
@@ -61648,11 +61733,20 @@ export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerF
   useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment,
   unknown
 >;
-export const useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc = gql`
-  fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
+export const PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
     id
     content
+    parent {
+      id
+    }
   }
+` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldReplyFragment, unknown>;
+export const useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc = gql`
+  fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
+    ...PetitionFieldRepliesContent_PetitionFieldReply
+  }
+  ${PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment,
   unknown
@@ -61749,13 +61843,22 @@ export const useConfigureExpirationsDateDialog_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useConfigureExpirationsDateDialog_PetitionFieldFragment, unknown>;
+export const PetitionFieldRepliesContent_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldFragment, unknown>;
 export const useResolveProfilePropertiesConflictsDialog_PetitionFieldFragmentDoc = gql`
   fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
     id
+    ...PetitionFieldRepliesContent_PetitionField
     profileTypeField {
       id
     }
   }
+  ${PetitionFieldRepliesContent_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
   useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
   unknown

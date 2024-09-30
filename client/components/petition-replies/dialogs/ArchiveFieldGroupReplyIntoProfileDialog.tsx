@@ -280,7 +280,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           let expirations = [] as ArchiveFieldGroupReplyIntoProfileExpirationInput[];
 
           if (conflicts.length) {
-            const profileTypeFieldsWithReplies =
+            const conflictingPetitionFieldWithReplies =
               repliesWithProfileFields!.filter(([field]) =>
                 conflicts.includes(field.profileTypeField!.id),
               ) ?? [];
@@ -288,7 +288,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
               petitionId,
               profileId: profile!.id,
               profileName: <ProfileReference profile={profile} />,
-              profileTypeFieldsWithReplies,
+              conflictingPetitionFieldWithReplies,
             });
           }
 

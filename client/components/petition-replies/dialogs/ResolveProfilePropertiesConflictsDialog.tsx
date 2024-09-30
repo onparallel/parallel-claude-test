@@ -1,12 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Button,
-  Checkbox,
-  CheckboxGroup,
-  Flex,
   FormControl,
-  HStack,
-  Radio,
   Stack,
   Table,
   Tbody,
@@ -15,95 +10,103 @@ import {
   Th,
   Thead,
   Tr,
-  useRadioGroup,
 } from "@chakra-ui/react";
-import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { OverflownText } from "@parallel/components/common/OverflownText";
+import { NoElement } from "@parallel/components/common/NoElement";
+import { PetitionFieldRepliesContent } from "@parallel/components/common/PetitionFieldRepliesContent";
+import { ProfilePropertyContent } from "@parallel/components/common/ProfilePropertyContent";
+import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
 import { ScrollTableContainer } from "@parallel/components/common/ScrollTableContainer";
-import { SimpleFileButton } from "@parallel/components/common/SimpleFileButton";
+import { SelectableTd, SelectableTr } from "@parallel/components/common/SelectableTd";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { ProfileTypeFieldTypeName } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeName";
 import {
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction,
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput,
   useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
   useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment,
-  useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragment,
   useResolveProfilePropertiesConflictsDialog_profileDocument,
 } from "@parallel/graphql/__types";
-import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
-import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
-import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
-import { ReactNode, useEffect } from "react";
-import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { MaybeArray } from "@parallel/utils/types";
+import { ReactNode, useEffect, useMemo } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
+import { entries, filter, fromEntries, isNonNullish, isNullish, map, pipe } from "remeda";
 
 interface ResolveProfilePropertiesConflictsDialogProps {
   petitionId: string;
   profileId: string;
   profileName: ReactNode;
-  profileTypeFieldsWithReplies: [
+  conflictingPetitionFieldWithReplies: [
     useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
     useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment[],
   ][];
 }
 
-interface ResolveProfilePropertiesConflictsTableData {
-  conflicts: {
-    property: useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragment;
-    action: ArchiveFieldGroupReplyIntoProfileConflictResolutionAction | null;
-  }[];
-}
+type Resolution = ArchiveFieldGroupReplyIntoProfileConflictResolutionAction;
 
 function ResolveProfilePropertiesConflictsDialog({
   petitionId,
   profileId,
   profileName,
-  profileTypeFieldsWithReplies,
+  conflictingPetitionFieldWithReplies: profileTypeFieldsWithReplies,
   ...props
 }: DialogProps<
   ResolveProfilePropertiesConflictsDialogProps,
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput[]
 >) {
-  const { data, loading } = useQuery(useResolveProfilePropertiesConflictsDialog_profileDocument, {
+  const { data } = useQuery(useResolveProfilePropertiesConflictsDialog_profileDocument, {
     variables: { profileId },
     nextFetchPolicy: "cache-and-network",
   });
 
-  const form = useForm<ResolveProfilePropertiesConflictsTableData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      conflicts: [],
+      conflicts: {} as Record<string, Resolution | null>,
     },
   });
-  const { control, handleSubmit } = form;
 
-  const { fields, replace } = useFieldArray({ name: "conflicts", control });
+  const fieldsWithRepliesAndProperty = useMemo(() => {
+    if (isNonNullish(data?.profile)) {
+      return pipe(
+        profileTypeFieldsWithReplies,
+        map(([petitionField, replies]) => {
+          const property = data!.profile.properties.find(
+            (p) => p.field.id === petitionField.profileTypeField!.id,
+          );
+          return isNonNullish(property) ? ([petitionField, replies, property] as const) : null;
+        }),
+        filter(isNonNullish),
+      );
+    } else {
+      return [];
+    }
+  }, [profileTypeFieldsWithReplies, data?.profile]);
 
   useEffect(() => {
-    if (!loading) {
-      const conflicts = isNonNullish(data?.profile)
-        ? profileTypeFieldsWithReplies
-            .map(([petitionField]) => {
-              const property = data.profile.properties.find(
-                (property) => property.field.id === petitionField.profileTypeField!.id,
-              );
-              if (!property) {
-                return null;
-              }
-
-              return {
-                property,
-                action: property.field.type === "FILE" ? "APPEND" : "OVERWRITE",
-              };
-            })
-            .filter(isNonNullish)
-        : [];
-      replace(conflicts as ResolveProfilePropertiesConflictsTableData["conflicts"]);
-    }
-  }, [loading]);
+    reset({
+      conflicts: pipe(
+        fieldsWithRepliesAndProperty,
+        map(([, replies, property]) => {
+          return [
+            property.field.id,
+            replies.length === 0
+              ? ("IGNORE" as const)
+              : property.field.type === "FILE"
+                ? ("APPEND" as const)
+                : ("OVERWRITE" as const),
+          ] as const;
+        }),
+        filter(isNonNullish),
+        fromEntries(),
+      ),
+    });
+  }, [fieldsWithRepliesAndProperty]);
 
   return (
     <ConfirmDialog
@@ -116,9 +119,9 @@ function ResolveProfilePropertiesConflictsDialog({
           as: "form",
           onSubmit: handleSubmit(async (data) => {
             props.onResolve(
-              data.conflicts.map((conflict) => ({
-                profileTypeFieldId: conflict.property.field.id,
-                action: conflict.action!,
+              entries(data.conflicts).map(([profileTypeFieldId, action]) => ({
+                profileTypeFieldId,
+                action: action!,
               })),
             );
           }),
@@ -147,7 +150,7 @@ function ResolveProfilePropertiesConflictsDialog({
             />
           </Text>
           <ScrollTableContainer>
-            <Table variant="parallel" layout="fixed">
+            <Table variant="parallel" layout="fixed" height="1px">
               <Thead>
                 <Tr>
                   <Th width="33%">
@@ -171,21 +174,86 @@ function ResolveProfilePropertiesConflictsDialog({
                 </Tr>
               </Thead>
               <Tbody overflow="auto">
-                <FormProvider {...form}>
-                  {fields.map((field, index) => {
-                    const replies = profileTypeFieldsWithReplies[index][1];
-
-                    return (
-                      <TableRow
-                        key={field.id}
-                        index={index}
-                        petitionId={petitionId}
-                        profileId={profileId}
-                        replies={replies}
-                      />
-                    );
-                  })}
-                </FormProvider>
+                {fieldsWithRepliesAndProperty.map(([field, replies, property]) => {
+                  const selectableType =
+                    property.field.type === "FILE" && replies.length > 0 ? "CHECKBOX" : "RADIO";
+                  const isInvalid = !!errors.conflicts?.[property.field.id];
+                  return (
+                    <Controller
+                      key={property.field.id}
+                      control={control}
+                      name={`conflicts.${property.field.id}`}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => {
+                        let _value: MaybeArray<Resolution>;
+                        let handleChange: (value: any) => void;
+                        if (selectableType === "CHECKBOX") {
+                          handleChange = (value: Resolution[]) => {
+                            // both checkboxes selected => "APPEND"
+                            return value.length === 2
+                              ? onChange("APPEND")
+                              : onChange(value[0] ?? null);
+                          };
+                          if (value === "APPEND") {
+                            _value = ["IGNORE", "OVERWRITE"];
+                          } else {
+                            _value = isNullish(value) ? [] : [value];
+                          }
+                        } else {
+                          handleChange = onChange;
+                          _value = value as Resolution;
+                        }
+                        return (
+                          <FormControl as={NoElement} isInvalid={isInvalid}>
+                            <SelectableTr
+                              labelId={`conflict-profile-type-property.field-${property.field.id}`}
+                              type={selectableType}
+                              value={_value}
+                              onChange={handleChange}
+                              backgroundColor={isInvalid ? "red.50" : undefined}
+                            >
+                              <Td id={`conflict-profile-type-property.field-${property.field.id}`}>
+                                <ProfileTypeFieldReference field={property.field} />
+                              </Td>
+                              <SelectableTd
+                                value="IGNORE"
+                                _content={
+                                  property.field.type === "FILE" ||
+                                  property.field.type === "BACKGROUND_CHECK"
+                                    ? { paddingY: 1.5 }
+                                    : undefined
+                                }
+                              >
+                                <ProfilePropertyContent
+                                  profileId={profileId}
+                                  field={property.field}
+                                  value={property.value}
+                                  files={property.files}
+                                />
+                              </SelectableTd>
+                              <SelectableTd
+                                value="OVERWRITE"
+                                _content={
+                                  (isFileTypeField(field.type) ||
+                                    field.type === "BACKGROUND_CHECK") &&
+                                  replies.length > 0
+                                    ? { paddingY: 1.5 }
+                                    : undefined
+                                }
+                              >
+                                <PetitionFieldRepliesContent
+                                  petitionId={petitionId}
+                                  field={field}
+                                  replies={replies}
+                                />
+                              </SelectableTd>
+                            </SelectableTr>
+                          </FormControl>
+                        );
+                      }}
+                    />
+                  );
+                })}
               </Tbody>
             </Table>
           </ScrollTableContainer>
@@ -202,283 +270,6 @@ function ResolveProfilePropertiesConflictsDialog({
         </Button>
       }
     />
-  );
-}
-
-function TableRow({
-  index,
-  petitionId,
-  profileId,
-  replies,
-}: {
-  index: number;
-  petitionId: string;
-  profileId: string;
-  replies: useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment[];
-}) {
-  const intl = useIntl();
-  const {
-    control,
-    watch,
-    formState: { errors },
-  } = useFormContext<ResolveProfilePropertiesConflictsTableData>();
-
-  const property = watch(`conflicts.${index}.property`);
-  const { field } = property;
-
-  const getValue = (content: any) => {
-    if (field.type === "SELECT") {
-      const label = field.options.values.find(
-        (option: any) => option.value === content?.value,
-      )?.label;
-      return label ? <LocalizableUserTextRender value={label} default={<></>} /> : null;
-    }
-
-    if (field.type === "BACKGROUND_CHECK") {
-      return content?.entity
-        ? content.entity.name
-        : [
-            getEntityTypeLabel(intl, content?.query?.type),
-            content?.query?.name,
-            content?.query?.date,
-          ]
-            .filter(isNonNullish)
-            .join(" | ");
-    }
-
-    return content?.value;
-  };
-
-  const reply = replies[0];
-
-  const downloadReplyFile = useDownloadReplyFile();
-
-  const downloadProfileFieldFile = useDownloadProfileFieldFile();
-
-  return (
-    <FormControl as={Tr} isInvalid={!!errors.conflicts?.[index]?.action}>
-      <Td>
-        <ProfileTypeFieldTypeName type={field.type} name={field.name} />
-      </Td>
-      <Controller
-        name={`conflicts.${index}.action` as const}
-        control={control}
-        rules={{ required: true }}
-        render={({ field: { onChange, value } }) => {
-          const checkedItems = value === "APPEND" ? ["IGNORE", "OVERWRITE"] : value ? [value] : [];
-          const handleCheckBoxChange = (checked: string[]) => {
-            onChange(checked.length === 2 ? "APPEND" : checked[0]);
-          };
-
-          if (field.type === "FILE") {
-            if (replies.length > 0) {
-              return (
-                <CheckboxGroup
-                  colorScheme="primary"
-                  onChange={handleCheckBoxChange}
-                  defaultValue={checkedItems}
-                >
-                  <Td verticalAlign="middle">
-                    <HStack alignItems="flex-start">
-                      <Checkbox value="IGNORE" marginTop={1.5} />
-                      <Flex flex="1" gap={2} flexWrap="wrap" minWidth={0}>
-                        {property.files?.map(({ id, file }) => {
-                          if (!file) return null;
-                          return (
-                            <SimpleFileButton
-                              key={id}
-                              onClick={async () => {
-                                await downloadProfileFieldFile(
-                                  profileId,
-                                  property.field.id,
-                                  id,
-                                  true,
-                                );
-                              }}
-                              isDisabled={!file.isComplete}
-                              filename={file.filename}
-                              contentType={file.contentType}
-                            />
-                          );
-                        })}
-                      </Flex>
-                    </HStack>
-                  </Td>
-                  <Td verticalAlign="middle">
-                    <HStack alignItems="flex-start">
-                      <Checkbox value="OVERWRITE" marginTop={1.5} />
-                      <Flex gap={2} flexWrap="wrap" minWidth={0}>
-                        {replies.map((reply) => {
-                          const file = reply.content;
-                          return (
-                            <SimpleFileButton
-                              key={reply.id}
-                              onClick={async () => {
-                                await downloadReplyFile(petitionId, reply, true);
-                              }}
-                              isDisabled={!file.uploadComplete}
-                              filename={file.filename}
-                              contentType={file.contentType}
-                            />
-                          );
-                        })}
-                      </Flex>
-                    </HStack>
-                  </Td>
-                </CheckboxGroup>
-              );
-            } else {
-              return (
-                <FileRadioGroup
-                  newValue={
-                    <Text as="span" textStyle="hint">
-                      {intl.formatMessage({
-                        id: "component.resolve-profile-properties-conflicts-dialog.no-value",
-                        defaultMessage: "No value",
-                      })}
-                    </Text>
-                  }
-                  oldValue={
-                    <Flex flex="1" gap={2} flexWrap="wrap" minWidth={0}>
-                      {property.files?.map(({ id, file }) => {
-                        if (!file) return null;
-                        return (
-                          <SimpleFileButton
-                            key={id}
-                            onClick={async () => {
-                              await downloadProfileFieldFile(
-                                profileId,
-                                property.field.id,
-                                id,
-                                true,
-                              );
-                            }}
-                            isDisabled={!file.isComplete}
-                            filename={file.filename}
-                            contentType={file.contentType}
-                          />
-                        );
-                      })}
-                    </Flex>
-                  }
-                  onChange={onChange}
-                />
-              );
-            }
-          }
-
-          const oldValue = getValue(property.value?.content);
-          const newValue = getValue(reply?.content);
-
-          const getBgCheckIcon = (content: any) => {
-            return content?.entity ? (
-              content.entity.type === "Person" ? (
-                <UserIcon marginEnd={1} />
-              ) : (
-                <BusinessIcon marginEnd={1} />
-              )
-            ) : (
-              <SearchIcon marginEnd={1} />
-            );
-          };
-          const oldValueIcon =
-            field.type === "BACKGROUND_CHECK" ? getBgCheckIcon(property.value?.content) : null;
-          const newValueIcon =
-            field.type === "BACKGROUND_CHECK" ? getBgCheckIcon(reply?.content) : null;
-
-          return (
-            <TextValueRadioGroup
-              newValue={newValue}
-              oldValue={oldValue}
-              oldValueIcon={oldValueIcon}
-              newValueIcon={newValueIcon}
-              onChange={onChange}
-            />
-          );
-        }}
-      />
-    </FormControl>
-  );
-}
-
-function TextValueRadioGroup({
-  oldValue,
-  newValue,
-  onChange,
-  oldValueIcon,
-  newValueIcon,
-}: {
-  oldValue: string | null;
-  newValue: string | null;
-  onChange: (value: string) => void;
-  oldValueIcon?: ReactNode;
-  newValueIcon?: ReactNode;
-}) {
-  const intl = useIntl();
-  const { getRadioProps } = useRadioGroup({
-    defaultValue: "OVERWRITE",
-    onChange,
-  });
-
-  //TODO: fix overflown text
-
-  return (
-    <>
-      <Td verticalAlign="middle">
-        <HStack>
-          <Radio {...getRadioProps({ value: "IGNORE" })} />
-          <Flex minWidth={0}>
-            {oldValueIcon}
-            <OverflownText as="span">{oldValue}</OverflownText>
-          </Flex>
-        </HStack>
-      </Td>
-      <Td verticalAlign="middle">
-        <HStack>
-          <Radio {...getRadioProps({ value: "OVERWRITE" })} />
-          <Flex minWidth={0}>
-            {newValueIcon}
-            <OverflownText as="span" textStyle={isNonNullish(newValue) ? undefined : "hint"}>
-              {newValue ??
-                intl.formatMessage({
-                  id: "component.resolve-profile-properties-conflicts-dialog.no-value",
-                  defaultMessage: "No value",
-                })}
-            </OverflownText>
-          </Flex>
-        </HStack>
-      </Td>
-    </>
-  );
-}
-
-function FileRadioGroup({
-  oldValue,
-  newValue,
-  onChange,
-}: {
-  oldValue: ReactNode;
-  newValue: ReactNode;
-  onChange: (value: string) => void;
-}) {
-  const { getRadioProps } = useRadioGroup({
-    defaultValue: "OVERWRITE",
-    onChange,
-  });
-
-  return (
-    <>
-      <Td paddingX={2} paddingY={3} verticalAlign="middle">
-        <HStack>
-          <Radio {...getRadioProps({ value: "IGNORE" })}>{oldValue}</Radio>
-        </HStack>
-      </Td>
-      <Td paddingX={2} paddingY={3} verticalAlign="middle">
-        <HStack>
-          <Radio {...getRadioProps({ value: "OVERWRITE" })}>{newValue}</Radio>
-        </HStack>
-      </Td>
-    </>
   );
 }
 
@@ -527,18 +318,20 @@ useResolveProfilePropertiesConflictsDialog.fragments = {
     return gql`
       fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
         id
+        ...PetitionFieldRepliesContent_PetitionField
         profileTypeField {
           id
         }
       }
+      ${PetitionFieldRepliesContent.fragments.PetitionField}
     `;
   },
   get PetitionFieldReply() {
     return gql`
       fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
+        ...PetitionFieldRepliesContent_PetitionFieldReply
       }
+      ${PetitionFieldRepliesContent.fragments.PetitionFieldReply}
     `;
   },
 };

@@ -4,19 +4,21 @@ import { ProfilesIcon, SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBaseFragment,
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldFragment,
+  PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment,
   PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeDocument,
   PetitionFieldType,
   ProfileTypeFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
+import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { LocalizableUserText } from "../common/LocalizableUserTextRender";
+import { PaidBadge } from "../common/PaidBadge";
+import { ProfileTypeFieldReference } from "../common/ProfileTypeFieldReference";
 import { SearchInput } from "../common/SearchInput";
-import { ProfileTypeFieldTypeName } from "../organization/profiles/ProfileTypeFieldTypeName";
 import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "./dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { useLinkGroupToProfileTypeDialog } from "./dialogs/LinkGroupToProfileTypeDialog";
 
@@ -177,19 +179,21 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
           {filteredFields?.length ? (
             <Box {...extendFlexColumn} tabIndex={-1} overflow="auto">
               <Stack as="ul" spacing={1} paddingBottom={4}>
-                {filteredFields.map(({ id, name, type }) => {
+                {filteredFields.map((field) => {
                   const isDisabled = children.some(
                     (field) =>
-                      field.isLinkedToProfileTypeField && field.profileTypeField?.id === id,
+                      field.isLinkedToProfileTypeField && field.profileTypeField?.id === field.id,
                   );
                   const handleAddField = async () => {
-                    await onAddField(getPetitionFieldTypeFromProfileTypeFieldType(type), id);
+                    await onAddField(
+                      getPetitionFieldTypeFromProfileTypeFieldType(field.type),
+                      field.id,
+                    );
                   };
                   return (
-                    <Box as="li" key={id} paddingX={2}>
+                    <Box as="li" key={field.id} paddingX={2}>
                       <NewFieldProfileTypeFieldItem
-                        name={name}
-                        type={type}
+                        field={field}
                         onAddField={handleAddField}
                         isDisabled={isDisabled}
                       />
@@ -241,16 +245,15 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
 }
 
 function NewFieldProfileTypeFieldItem({
-  type,
-  name,
+  field,
   isDisabled,
   onAddField,
 }: {
-  type: ProfileTypeFieldType;
-  name: LocalizableUserText;
+  field: PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment;
   isDisabled: boolean;
   onAddField: () => Promise<void>;
 }) {
+  const hasBackgroundCheck = useHasBackgroundCheck();
   return (
     <Button
       isDisabled={isDisabled}
@@ -265,26 +268,40 @@ function NewFieldProfileTypeFieldItem({
         }
       }}
       data-action="add-petition-field"
-      data-profile-type-field-type={type}
+      data-profile-type-field-type={field.type}
     >
-      <ProfileTypeFieldTypeName type={type} name={name} />
+      <HStack flex={1} spacing={1} minWidth={0}>
+        <ProfileTypeFieldReference
+          flex={1}
+          field={field}
+          minWidth={0}
+          _icon={{ height: "28px", minWidth: "28px", rounded: "md", svg: { boxSize: "20px" } }}
+        />
+        {!hasBackgroundCheck && field.type === "BACKGROUND_CHECK" ? <PaidBadge /> : null}
+      </HStack>
     </Button>
   );
 }
 
 PetitionComposeNewFieldDrawerProfileTypeFields.fragments = {
+  ProfileTypeField: gql`
+    fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField on ProfileTypeField {
+      id
+      alias
+      name
+      type
+    }
+  `,
   get ProfileType() {
     return gql`
       fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType on ProfileType {
         id
         name
         fields {
-          id
-          alias
-          name
-          type
+          ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField
         }
       }
+      ${this.ProfileTypeField}
     `;
   },
   get PetitionFieldInner() {

@@ -1,4 +1,5 @@
 import { chakra, Flex, Text, ThemingProps } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/graphql/__types";
 import useMergedRef from "@react-hook/merged-ref";
@@ -35,21 +36,22 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(function FileNam
     );
   } else {
     return (
-      <Flex
-        display="inline-flex"
-        ref={mergedRef as any}
-        as="span"
-        minWidth={0}
-        title={isTruncated && value ? value : undefined}
-        {...props}
-      >
-        <chakra.span whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-          {value?.slice(0, -10)}
-        </chakra.span>
-        <chakra.span flexShrink={0} position="relative" insetStart="-0.2rem">
-          {value?.slice(-10)}
-        </chakra.span>
-      </Flex>
+      <Tooltip isDisabled={!isTruncated} label={value}>
+        {/* minWidth 20px is needed, if less than that ellipsis doesn't show in some browsers */}
+        <Flex display="inline-flex" ref={mergedRef as any} as="span" minWidth="20px" {...props}>
+          <chakra.span
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            minWidth="30px"
+          >
+            {value?.slice(0, -10)}
+          </chakra.span>
+          <chakra.span flexShrink={0} position="relative" insetStart="-0.2rem">
+            {value?.slice(-10)}
+          </chakra.span>
+        </Flex>
+      </Tooltip>
     );
   }
 });

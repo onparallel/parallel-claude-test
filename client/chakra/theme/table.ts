@@ -40,6 +40,8 @@ export const tableTheme = defineMultiStyleConfig({
           },
         },
         td: {
+          height: "40px",
+          lineHeight: "24px",
           paddingX: 2,
           paddingY: 2,
           borderBottom: "1px solid",

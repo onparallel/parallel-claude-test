@@ -1,0 +1,267 @@
+import { gql } from "@apollo/client";
+import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import {
+  PetitionFieldRepliesContent_PetitionFieldFragment,
+  PetitionFieldRepliesContent_PetitionFieldReplyFragment,
+  PetitionFieldType,
+} from "@parallel/graphql/__types";
+import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
+import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { never } from "@parallel/utils/never";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { withError } from "@parallel/utils/promises/withError";
+import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
+import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
+import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish, pick } from "remeda";
+import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
+import { Divider } from "./Divider";
+import { OverflownText } from "./OverflownText";
+import { SimpleFileButton } from "./SimpleFileButton";
+
+export interface PetitionFieldRepliesContentProps {
+  petitionId: string;
+  field: PetitionFieldRepliesContent_PetitionFieldFragment;
+  replies: PetitionFieldRepliesContent_PetitionFieldReplyFragment[];
+}
+
+export const PetitionFieldRepliesContent = Object.assign(
+  chakraForwardRef<"p" | "span" | "ul" | "div", PetitionFieldRepliesContentProps>(
+    function PetitionFieldRepliesContent(props, ref) {
+      if (isFileTypeField(props.field.type)) {
+        return <PetitionFieldRepliesContentFile ref={ref} {...(props as any)} />;
+      } else {
+        return <PetitionFieldRepliesContentNonFile ref={ref} {...(props as any)} />;
+      }
+    },
+  ),
+  {
+    fragments: {
+      PetitionField: gql`
+        fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
+          id
+          type
+          options
+        }
+      `,
+      PetitionFieldReply: gql`
+        fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
+          id
+          content
+          parent {
+            id
+          }
+        }
+      `,
+    },
+  },
+);
+
+const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepliesContentProps>(
+  function PetitionFieldRepliesContentFile({ petitionId, field, replies, ...props }, ref) {
+    const downloadReplyFile = useDownloadReplyFile();
+    const isShiftDown = useIsGlobalKeyDown("Shift");
+
+    const buttons = replies.map((reply) => (
+      <SimpleFileButton
+        key={undefined}
+        {...pick(reply.content!, ["filename", "contentType"])}
+        onClick={() => withError(downloadReplyFile(petitionId, reply, !isShiftDown))}
+      />
+    ));
+    return buttons.length === 0 ? (
+      <Box ref={ref} textStyle="hint" {...props}>
+        <FormattedMessage
+          id="component.petition-field-replies-content.no-value"
+          defaultMessage="No value"
+        />
+      </Box>
+    ) : buttons.length === 1 ? (
+      <Flex ref={ref} {...(props as any)}>
+        {buttons[0]}
+      </Flex>
+    ) : (
+      <List ref={ref} display="flex" flexWrap="wrap" gap={1} {...(props as any)}>
+        {buttons.map((button, i) => (
+          <ListItem key={i} minWidth={0} display="flex">
+            {button}
+          </ListItem>
+        ))}
+      </List>
+    );
+  },
+);
+
+const PetitionFieldRepliesContentNonFile = chakraForwardRef<
+  "p" | "span" | "button",
+  PetitionFieldRepliesContentProps
+>(function PetitionFieldRepliesContentNonFile({ petitionId, field, replies, ...props }, ref) {
+  const intl = useIntl();
+  if (replies.length === 0) {
+    return (
+      <Box ref={ref} as="span" textStyle="hint" {...props}>
+        <FormattedMessage
+          id="component.petition-field-replies-content.no-reply"
+          defaultMessage="No reply"
+        />
+      </Box>
+    );
+  } else {
+    const elements = replies.map((reply) => {
+      if (
+        (
+          ["SHORT_TEXT", "NUMBER", "DATE", "DATE_TIME", "SELECT", "PHONE"] as PetitionFieldType[]
+        ).includes(field.type)
+      ) {
+        return (
+          <Box key={undefined} as="span">
+            {field.type === "SHORT_TEXT" ? (
+              <>{reply.content.value}</>
+            ) : field.type === "NUMBER" ? (
+              <>
+                {formatNumberWithPrefix(
+                  intl,
+                  reply.content.value,
+                  field.options as FieldOptions["NUMBER"],
+                )}
+              </>
+            ) : field.type === "DATE" ? (
+              <FormattedDate value={reply.content.value} {...FORMATS.L} timeZone="UTC" />
+            ) : field.type === "DATE_TIME" ? (
+              <>
+                <FormattedDate
+                  value={reply.content.value}
+                  {...FORMATS["L+LT"]}
+                  timeZone={reply.content.timezone}
+                />
+                {" ("}
+                {prettifyTimezone(reply.content.timezone)}
+                {")"}
+              </>
+            ) : field.type === "SELECT" ? (
+              <>{getValueLabel(reply.content.value, field.options as FieldOptions["SELECT"])}</>
+            ) : field.type === "PHONE" ? (
+              <>{reply.content.value}</>
+            ) : null}
+          </Box>
+        );
+      } else if (field.type === "TEXT") {
+        return <Text key={undefined}>{reply.content.value}</Text>;
+      } else if (field.type === "BACKGROUND_CHECK") {
+        return (
+          <PetitionFieldBackgroundCheck
+            key={undefined}
+            petitionId={petitionId}
+            field={field}
+            reply={reply}
+          />
+        );
+      } else {
+        never(`PetitionFieldType ${field.type} not implemented`);
+      }
+    });
+    return elements.length === 1 ? (
+      <Flex ref={ref} {...(props as any)}>
+        {elements[0]}
+      </Flex>
+    ) : (
+      <Stack as={List} ref={ref} divider={<Divider />} {...(props as any)}>
+        {elements.map((element, i) => (
+          <ListItem key={i} display="flex" minWidth={0}>
+            {element}
+          </ListItem>
+        ))}
+      </Stack>
+    );
+  }
+});
+
+function getValueLabel(value: string, options: FieldOptions["CHECKBOX"] | FieldOptions["SELECT"]) {
+  if (isNonNullish(options.labels)) {
+    const index = options.values.indexOf(value);
+    return index >= 0 ? options.labels[index] : value;
+  } else {
+    return value;
+  }
+}
+
+interface PetitionFieldBackgroundCheckProps {
+  petitionId: string;
+  field: PetitionFieldRepliesContent_PetitionFieldFragment;
+  reply: PetitionFieldRepliesContent_PetitionFieldReplyFragment;
+}
+
+function PetitionFieldBackgroundCheck({
+  petitionId,
+  field,
+  reply,
+}: PetitionFieldBackgroundCheckProps) {
+  const intl = useIntl();
+  const content = reply.content;
+  const parentReplyId = reply.parent?.id;
+  const handleClick = async () => {
+    try {
+      const { entity, query } = content;
+      const { name, date, type } = query ?? {};
+      const url = `/${intl.locale}/app/background-check/${isNonNullish(entity) ? entity.id : "results"}?${new URLSearchParams(
+        {
+          token: btoa(
+            JSON.stringify({
+              fieldId: field.id,
+              petitionId,
+              ...(parentReplyId ? { parentReplyId } : {}),
+            }),
+          ),
+          ...(name ? { name } : {}),
+          ...(date ? { date } : {}),
+          ...(type ? { type } : {}),
+          readonly: "true",
+        },
+      )}`;
+      await openNewWindow(url);
+    } catch {}
+  };
+  return (
+    <Button
+      key={undefined}
+      variant="outline"
+      size="sm"
+      backgroundColor="white"
+      alignItems="center"
+      height="auto"
+      paddingX={2}
+      paddingY={1}
+      onClick={handleClick}
+    >
+      {isNonNullish(content.entity) ? (
+        <HStack display="inline-flex" minWidth={0}>
+          {content.entity.type === "Person" ? (
+            <UserIcon boxSize={4} />
+          ) : (
+            <BusinessIcon boxSize={4} />
+          )}
+          <OverflownText minWidth="40px">{content.entity.name}</OverflownText>
+          {(content.entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
+            <BackgroundCheckRiskLabel key={i} risk={topic} />
+          ))}
+        </HStack>
+      ) : (
+        <HStack display="inline-flex" minWidth={0}>
+          <SearchIcon />
+          <HStack
+            display="inline-flex"
+            divider={<Divider isVertical height={3.5} color="gray.500" />}
+          >
+            <Box>{getEntityTypeLabel(intl, content.query.type)}</Box>
+            <OverflownText minWidth="40px">{content.query.name}</OverflownText>
+          </HStack>
+        </HStack>
+      )}
+    </Button>
+  );
+}

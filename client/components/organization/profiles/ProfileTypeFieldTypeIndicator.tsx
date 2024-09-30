@@ -34,7 +34,7 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
         paddingX={1}
         spacing={0.5}
         minH={5}
-        justifyContent="space-between"
+        justifyContent={hideIcon ? "center" : "space-between"}
         {...props}
       >
         {hideIcon ? null : <Icon as={icon} boxSize="16px" role="presentation" />}

@@ -33,14 +33,14 @@ import {
 import { Divider } from "@parallel/components/common/Divider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { OverflownText } from "@parallel/components/common/OverflownText";
-import { ProfileFieldValueContent } from "@parallel/components/common/ProfileFieldValueContent";
+import { ProfilePropertyContent } from "@parallel/components/common/ProfilePropertyContent";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
+import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
 import { ScrollTableContainer } from "@parallel/components/common/ScrollTableContainer";
+import { SelectableTd, SelectableTr } from "@parallel/components/common/SelectableTd";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportLink } from "@parallel/components/common/SupportLink";
-import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
 import {
   ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument,
   ImportFromExternalSourceDialog_integrationsDocument,
@@ -50,7 +50,6 @@ import {
   ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment,
   ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment,
   ProfileExternalSourceConflictResolutionAction,
-  ProfileTypeField,
   useImportFromExternalSourceDialog_ProfileTypeFragment,
   UserLocale,
 } from "@parallel/graphql/__types";
@@ -756,19 +755,19 @@ function ImportFromExternalSourceDialogUpdateProfile({
               </Thead>
               <Tbody>
                 {result.data.map(({ profileTypeField: field, content }) => {
-                  const currentContent = result.profile!.properties.find(
+                  const currentValue = result.profile!.properties.find(
                     (p) => p.field.id === field.id,
-                  )!.value?.content;
+                  )!.value;
                   const isSameContent =
-                    isNonNullish(content) && content.value === currentContent?.value;
+                    isNonNullish(content) && content.value === currentValue?.content?.value;
                   const canWriteValue = field.myPermission === "WRITE";
                   const canReadValue = field.myPermission !== "HIDDEN";
                   return (
-                    <RadioGroup
+                    <SelectableTr
                       key={field.id}
-                      as={Tr}
+                      type="RADIO"
                       value={resolutions[field.id]}
-                      aria-labelledby={`import-profile-field-${field.id}`}
+                      labelId={`import-profile-type-field-${field.id}`}
                       isDisabled={isSameContent}
                       onChange={(value) =>
                         setResolutions((curr) => ({
@@ -777,46 +776,31 @@ function ImportFromExternalSourceDialogUpdateProfile({
                         }))
                       }
                     >
-                      <Td id={`import-profile-field-${field.id}`}>
-                        <ProfileFieldReference field={field} />
+                      <Td id={`import-profile-type-field-${field.id}`}>
+                        <ProfileTypeFieldReference field={field} />
                       </Td>
-                      {/* These 2 height="100%" make the HStack be full cell height. height="1px" on Table is needed too */}
-                      <Td padding={0} height="100%">
-                        <HStack as="label" padding={2} height="100%">
-                          <HStack>
-                            <Center height="21px" alignSelf="start">
-                              <Radio value="IGNORE" isDisabled={!canReadValue} />
-                            </Center>
-                            <Box opacity={isSameContent || !canReadValue ? 0.4 : undefined}>
-                              {canReadValue ? (
-                                <ProfileFieldValueContent field={field} content={currentContent} />
-                              ) : (
-                                "•".repeat(20)
-                              )}
-                            </Box>
-                          </HStack>
-                        </HStack>
-                      </Td>
-                      <Td padding={0} height="100%">
-                        <HStack as="label" height="100%" padding={2}>
-                          <HStack flex={1}>
-                            <Center height="21px" alignSelf="start">
-                              <Radio value="OVERWRITE" isDisabled={!canWriteValue} />
-                            </Center>
-                            <Box
-                              opacity={
-                                isSameContent || !canWriteValue || !canReadValue ? 0.4 : undefined
-                              }
-                            >
-                              {canReadValue ? (
-                                <ProfileFieldValueContent field={field} content={content} />
-                              ) : (
-                                "•".repeat(20)
-                              )}
-                            </Box>
-                          </HStack>
-                        </HStack>
-                      </Td>
+                      <SelectableTd
+                        value="IGNORE"
+                        isDisabled={!canReadValue}
+                        _content={{ opacity: isSameContent || !canReadValue ? 0.4 : undefined }}
+                      >
+                        {canReadValue ? (
+                          <ProfilePropertyContent field={field} value={currentValue} />
+                        ) : (
+                          "•".repeat(20)
+                        )}
+                      </SelectableTd>
+                      <SelectableTd
+                        value="OVERWRITE"
+                        isDisabled={!canWriteValue}
+                        _content={{ opacity: isSameContent || !canWriteValue ? 0.4 : undefined }}
+                      >
+                        {canReadValue ? (
+                          <ProfilePropertyContent field={field} value={{ content }} />
+                        ) : (
+                          "•".repeat(20)
+                        )}
+                      </SelectableTd>
                       <Td>
                         {isSameContent ? (
                           <Center>
@@ -842,7 +826,9 @@ function ImportFromExternalSourceDialogUpdateProfile({
                               />
                             </SmallPopover>
                           </Center>
-                        ) : !canReadValue || !canWriteValue || isNonNullish(currentContent) ? (
+                        ) : !canReadValue ||
+                          !canWriteValue ||
+                          isNonNullish(currentValue?.content) ? (
                           <Center>
                             <SmallPopover
                               placement="right"
@@ -858,7 +844,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                                       id="component.import-from-external-source-dialog.no-write-permission"
                                       defaultMessage="You don't have permission to edit this field"
                                     />
-                                  ) : isNonNullish(currentContent) ? (
+                                  ) : isNonNullish(currentValue?.content) ? (
                                     <FormattedMessage
                                       id="component.import-from-external-source-dialog.value-differs-external-source"
                                       defaultMessage="The current value differs from the one in {providerName}."
@@ -880,7 +866,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                           </Center>
                         ) : null}
                       </Td>
-                    </RadioGroup>
+                    </SelectableTr>
                   );
                 })}
               </Tbody>
@@ -1043,13 +1029,13 @@ function ImportFromExternalSourceDialogCreateProfile({
                   return (
                     <Tr key={field.id}>
                       <Td>
-                        <ProfileFieldReference field={field} />
+                        <ProfileTypeFieldReference field={field} />
                       </Td>
                       <Td>
                         <HStack>
                           <Box flex={1} opacity={!canWriteValue || !canReadValue ? 0.4 : undefined}>
                             {canReadValue ? (
-                              <ProfileFieldValueContent field={field} content={content} />
+                              <ProfilePropertyContent field={field} value={{ content }} />
                             ) : (
                               "•".repeat(20)
                             )}
@@ -1126,24 +1112,6 @@ function ImportFromExternalSourceDialogCreateProfile({
   );
 }
 
-function ProfileFieldReference({ field }: { field: Pick<ProfileTypeField, "name" | "type"> }) {
-  const intl = useIntl();
-  return (
-    <HStack>
-      <ProfileTypeFieldTypeIndicator type={field.type} />
-      <OverflownText>
-        <LocalizableUserTextRender
-          value={field.name}
-          default={intl.formatMessage({
-            id: "generic.unnamed-profile-type-field",
-            defaultMessage: "Unnamed property",
-          })}
-        />
-      </OverflownText>
-    </HStack>
-  );
-}
-
 function HeaderWithOrgIntegrationLogo({
   orgIntegration,
   children,
@@ -1188,13 +1156,13 @@ const _fragments = {
           id
           name
           myPermission
-          ...ProfileFieldValueContent_ProfileTypeField
+          ...ProfilePropertyContent_ProfileTypeField
         }
         content
       }
     }
     ${ProfileReference.fragments.Profile}
-    ${ProfileFieldValueContent.fragments.ProfileTypeField}
+    ${ProfilePropertyContent.fragments.ProfileTypeField}
   `,
 };
 
