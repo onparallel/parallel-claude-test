@@ -879,9 +879,8 @@ export const createIManageFileExportIntegration = mutationField(
             org_id: args.orgId,
             name: "iManage",
             settings: {
-              CREDENTIALS: {
-                CLIENT_ID: args.clientId,
-              },
+              CREDENTIALS: {},
+              CLIENT_ID: args.clientId,
             },
           },
           `User:${ctx.user!.id}`,

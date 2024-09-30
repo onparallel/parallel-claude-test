@@ -46,7 +46,7 @@ async function main() {
 
   const timestamp = Date.now().toString();
 
-  const secret = await loadSignatureSecret();
+  const secret = await loadSignatureSecret(environment);
 
   const signature = createHmac("sha256", Buffer.from(secret, "base64"))
     .update(url + body + timestamp)
@@ -74,13 +74,22 @@ main()
     process.exit(1);
   });
 
-async function loadSignatureSecret() {
+async function loadSignatureSecret(env: string) {
   try {
     const secretsManager = new SecretsManagerClient({ credentials: fromEnv() });
+
+    const id =
+      env === "dev"
+        ? "development/third-party-4RdbmB"
+        : env === "staging"
+          ? "staging/third-party-JUHVI7"
+          : env === "production"
+            ? "production/third-party-oIdNKR"
+            : (null as never);
+
     const secret = await secretsManager.send(
       new GetSecretValueCommand({
-        SecretId:
-          "arn:aws:secretsmanager:eu-central-1:749273139513:secret:development/third-party-4RdbmB",
+        SecretId: `arn:aws:secretsmanager:eu-central-1:749273139513:secret:${id}`,
       }),
     );
 

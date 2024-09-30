@@ -5,9 +5,11 @@ import fastSafeStringify from "fast-safe-stringify";
 import { inject, injectable } from "inversify";
 import { FromSchema } from "json-schema-to-ts";
 import { isNonNullish, zip } from "remeda";
-import { assert } from "ts-essentials";
 import { Config, CONFIG } from "../../../config";
-import { IntegrationRepository } from "../../../db/repositories/IntegrationRepository";
+import {
+  EnhancedOrgIntegration,
+  IntegrationRepository,
+} from "../../../db/repositories/IntegrationRepository";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../../../services/EncryptionService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../../util/globalId";
@@ -37,9 +39,13 @@ const FILE_SCHEMA = {
   },
 } as const;
 
+interface ImanageFileExportContext {
+  clientId: string;
+}
+
 @injectable()
 export class IManageFileExportIntegration
-  extends WebhookIntegration<"FILE_EXPORT", "IMANAGE">
+  extends WebhookIntegration<"FILE_EXPORT", "IMANAGE", ImanageFileExportContext>
   implements IFileExportIntegration
 {
   protected override type = "FILE_EXPORT" as const;
@@ -57,10 +63,17 @@ export class IManageFileExportIntegration
     super(encryption, integrations);
   }
 
+  protected override getContext(
+    integration: EnhancedOrgIntegration<"FILE_EXPORT", "IMANAGE", false>,
+  ) {
+    return {
+      clientId: integration.settings.CLIENT_ID,
+    };
+  }
+
   async buildWindowUrl(integrationId: number, fileExportLogId: number) {
-    return await this.withCredentials(integrationId, async (credentials) => {
+    return await this.withCredentials(integrationId, async (_, { clientId }) => {
       const timestamp = Date.now().toString();
-      const clientId = credentials.CLIENT_ID;
       const exportId = toGlobalId("FileExportLog", fileExportLogId);
       const signature = createHmac(
         "sha256",
@@ -218,7 +231,7 @@ export class IManageFileExportIntegration
 
         const isValidClientId = await this.withCredentials(
           fileExportLog.integration_id,
-          async (credentials) => credentials.CLIENT_ID === clientId,
+          async (_, context) => context.clientId === clientId,
         );
 
         if (!isValidClientId) {
@@ -239,7 +252,9 @@ export class IManageFileExportIntegration
         this.logger.info("Fetching file export JSON...");
         const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
         const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
-        assert(log, "File export log not found");
+        if (!log) {
+          throw new RequestError(403, "Invalid file export log ID");
+        }
 
         return res
           .json(
@@ -280,15 +295,24 @@ export class IManageFileExportIntegration
     return async (req, res, next) => {
       try {
         const body = req.body as FromSchema<typeof FILE_SCHEMA>[];
+        for (const url of body.map((data) => data.url).filter(isNonNullish)) {
+          try {
+            new URL(url);
+          } catch {
+            throw new RequestError(400, `Invalid URL: ${url}`);
+          }
+        }
 
         const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
         const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
-        assert(log, "File export log not found");
+        if (!log) {
+          throw new RequestError(403, "Invalid exportId");
+        }
 
         const files = body.map((data) => log.json_export.find((f) => f.id === data.id));
 
         if (!files.every(isNonNullish)) {
-          throw new RequestError(403, "Invalid file ID");
+          throw new RequestError(403, "Unknown file ID");
         }
 
         for (const [file, result] of zip(files, body)) {

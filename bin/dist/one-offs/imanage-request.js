@@ -45,7 +45,7 @@ async function main() {
             : "https://www.onparallel.com";
     const url = `${baseUrl}/api/integrations/export/imanage/client/${clientId}/export/${exportId}${complete ? "/complete" : ""}`;
     const timestamp = Date.now().toString();
-    const secret = await loadSignatureSecret();
+    const secret = await loadSignatureSecret(environment);
     const signature = (0, crypto_1.createHmac)("sha256", Buffer.from(secret, "base64"))
         .update(url + body + timestamp)
         .digest("base64");
@@ -67,11 +67,18 @@ main()
     console.error(error);
     process.exit(1);
 });
-async function loadSignatureSecret() {
+async function loadSignatureSecret(env) {
     try {
         const secretsManager = new client_secrets_manager_1.SecretsManagerClient({ credentials: (0, credential_providers_1.fromEnv)() });
+        const id = env === "dev"
+            ? "development/third-party-4RdbmB"
+            : env === "staging"
+                ? "staging/third-party-JUHVI7"
+                : env === "production"
+                    ? "production/third-party-oIdNKR"
+                    : null;
         const secret = await secretsManager.send(new client_secrets_manager_1.GetSecretValueCommand({
-            SecretId: "arn:aws:secretsmanager:eu-central-1:749273139513:secret:development/third-party-4RdbmB",
+            SecretId: `arn:aws:secretsmanager:eu-central-1:749273139513:secret:${id}`,
         }));
         return JSON.parse(secret.SecretString).FILE_EXPORT.IMANAGE.SIGNATURE_SECRET;
     }

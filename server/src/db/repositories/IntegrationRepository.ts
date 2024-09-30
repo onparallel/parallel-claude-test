@@ -80,9 +80,8 @@ interface EInformaProfileExternalSourceSettings {
 }
 
 interface IManageFileExportSettings {
-  CREDENTIALS: {
-    CLIENT_ID: string;
-  };
+  CREDENTIALS: {};
+  CLIENT_ID: string;
 }
 
 export type IntegrationProvider<TType extends IntegrationType> =
