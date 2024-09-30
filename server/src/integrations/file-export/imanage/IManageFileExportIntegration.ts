@@ -82,7 +82,7 @@ export class IManageFileExportIntegration
         .update(clientId + exportId + timestamp)
         .digest("base64");
 
-      return `https://parallel.lexsoft.com/export?${new URLSearchParams({
+      return `https://parallel.t3lexsoft.com/export?${new URLSearchParams({
         cid: clientId,
         eid: exportId,
         timestamp,
