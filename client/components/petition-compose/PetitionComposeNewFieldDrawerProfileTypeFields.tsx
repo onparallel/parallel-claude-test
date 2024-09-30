@@ -75,9 +75,9 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
     } catch {}
   };
 
-  const filteredFields = profileType?.fields.filter(({ alias, name }) => {
+  const filteredFields = profileType?.fields.filter((field) => {
     return search
-      ? [alias, name.en, name.es]
+      ? [field.alias, ...Object.values(field.name)]
           .filter(isNonNullish)
           .some((keyword: string) =>
             removeDiacriticsAndLowercase(keyword).includes(removeDiacriticsAndLowercase(search)),
@@ -181,8 +181,9 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               <Stack as="ul" spacing={1} paddingBottom={4}>
                 {filteredFields.map((field) => {
                   const isDisabled = children.some(
-                    (field) =>
-                      field.isLinkedToProfileTypeField && field.profileTypeField?.id === field.id,
+                    (petitionField) =>
+                      petitionField.isLinkedToProfileTypeField &&
+                      petitionField.profileTypeField?.id === field.id,
                   );
                   const handleAddField = async () => {
                     await onAddField(
