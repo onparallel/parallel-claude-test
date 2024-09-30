@@ -39,7 +39,7 @@ import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { memo, MouseEvent, MouseEventHandler, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
@@ -298,6 +298,7 @@ export const AppLayoutNavBar = Object.assign(
                     paddingInlineStart={3}
                     paddingInlineEnd={3}
                     justifyContent="space-evenly"
+                    overflow="hidden"
                   >
                     <Text as="span" className="show-on-expand" minWidth={0}>
                       <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
