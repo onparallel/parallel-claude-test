@@ -212,7 +212,10 @@ function ResolveProfilePropertiesConflictsDialog({
                               onChange={handleChange}
                               backgroundColor={isInvalid ? "red.50" : undefined}
                             >
-                              <Td id={`conflict-profile-type-property.field-${property.field.id}`}>
+                              <Td
+                                id={`conflict-profile-type-property.field-${property.field.id}`}
+                                verticalAlign="top"
+                              >
                                 <ProfileTypeFieldReference field={property.field} />
                               </Td>
                               <SelectableTd

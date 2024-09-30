@@ -776,7 +776,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                         }))
                       }
                     >
-                      <Td id={`import-profile-type-field-${field.id}`}>
+                      <Td id={`import-profile-type-field-${field.id}`} verticalAlign="top">
                         <ProfileTypeFieldReference field={field} />
                       </Td>
                       <SelectableTd
