@@ -56,9 +56,10 @@ export const ProfilePropertyContent = Object.assign(
           content
         }
       `,
+      // make id optional so "fake" values can be passed
       ProfileFieldFile: gql`
         fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
-          id @include(if: true) # make optional
+          id @include(if: true)
           file {
             filename
             contentType
