@@ -68,6 +68,19 @@ createCronWorker("anonymizer", async (ctx, config) => {
 
 async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorkers"]["anonymizer"]) {
   // profile field files and values are deleted after 30 days of being removed
+  await deleteRemovedProfileFilesAndValues(ctx, config);
+
+  // delete profiles in DELETION_SCHEDULED status for more than 90 days
+  await deleteProfilesScheduledForDeletion(ctx, config);
+
+  // anonymize profiles deleted more than 30 days ago
+  await anonymizeDeletedProfiles(ctx, config);
+}
+
+async function deleteRemovedProfileFilesAndValues(
+  ctx: WorkerContext,
+  config: Config["cronWorkers"]["anonymizer"],
+) {
   const filesCount = await ctx.profiles.deleteRemovedProfileFieldFiles(
     config.anonymizeAfterDays,
     "AnonymizerWorker",
@@ -79,18 +92,21 @@ async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorker
     "AnonymizerWorker",
   );
   ctx.logger.debug(`Deleted ${valuesCount} profile field values`);
+}
 
-  // delete profiles in DELETION_SCHEDULED status for more than 90 days
-  const profilesScheduledForDeletion = await ctx.profiles.getProfileIdsReadyForDeletion(
+async function deleteProfilesScheduledForDeletion(
+  ctx: WorkerContext,
+  config: Config["cronWorkers"]["anonymizer"],
+) {
+  const profileIds = await ctx.profiles.getProfileIdsReadyForDeletion(
     config.deleteScheduledProfilesAfterDays,
   );
-  if (profilesScheduledForDeletion.length > 0) {
-    ctx.logger.debug(
-      `Deleting ${profilesScheduledForDeletion.length} profiles in DELETION_SCHEDULED state`,
-    );
-    await ctx.profiles.deleteProfile(profilesScheduledForDeletion, "AnonymizerWorker");
+
+  if (profileIds.length > 0) {
+    ctx.logger.debug(`Deleting ${profileIds.length} profiles in DELETION_SCHEDULED state`);
+    await ctx.profiles.deleteProfile(profileIds, "AnonymizerWorker");
     const removedRelationships = await ctx.profiles.deleteProfileRelationshipsByProfileId(
-      profilesScheduledForDeletion,
+      profileIds,
       "AnonymizerWorker",
     );
 
@@ -138,7 +154,12 @@ async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorker
       );
     }
   }
+}
 
+async function anonymizeDeletedProfiles(
+  ctx: WorkerContext,
+  config: Config["cronWorkers"]["anonymizer"],
+) {
   const fileIdsToDelete: number[] = [];
 
   const profileIds = await ctx.profiles.getDeletedProfilesToAnonymize(config.anonymizeAfterDays);
