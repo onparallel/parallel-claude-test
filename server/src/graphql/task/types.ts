@@ -53,3 +53,18 @@ export const Task = objectType({
     });
   },
 });
+
+export const MaybeTask = objectType({
+  name: "MaybeTask",
+  description:
+    "If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null.",
+  definition(t) {
+    t.nonNull.field("status", {
+      type: enumType({
+        name: "MaybeTaskStatus",
+        members: ["PROCESSING", "COMPLETED"],
+      }),
+    });
+    t.nullable.field("task", { type: "Task" });
+  },
+});

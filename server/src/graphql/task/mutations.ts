@@ -10,6 +10,7 @@ import {
   objectType,
   stringArg,
 } from "nexus";
+import { outdent } from "outdent";
 import pMap from "p-map";
 import {
   differenceWith,
@@ -474,6 +475,7 @@ export const createBackgroundCheckProfilePdfTask = mutationField(
 
 export const createAddPetitionPermissionTask = mutationField("createAddPetitionPermissionTask", {
   type: "Task",
+  deprecation: "use createAddPetitionPermissionMaybeTask instead",
   description: `
     Adds permissions to users and groups on given petitions and folders.
     If the total amount of permission to add exceeds 100, a task will be created for async completion.
@@ -545,7 +547,7 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
     if (totalAffectedRows <= 200) {
       const permissionsBefore = (await ctx.petitions.loadEffectivePermissions(petitionIds)).flat();
 
-      const { newPermissions } = await ctx.petitions.addPetitionPermissions(
+      const newPermissions = await ctx.petitions.addPetitionPermissions(
         petitionIds,
         [
           ...(args.userIds ?? []).map((userId) => ({
@@ -633,6 +635,7 @@ export const createAddPetitionPermissionTask = mutationField("createAddPetitionP
 });
 
 export const createEditPetitionPermissionTask = mutationField("createEditPetitionPermissionTask", {
+  deprecation: "use createEditPetitionPermissionMaybeTask instead",
   description: `
     Edits permissions to users and groups on given petitions.
     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
@@ -721,6 +724,7 @@ export const createEditPetitionPermissionTask = mutationField("createEditPetitio
 export const createRemovePetitionPermissionTask = mutationField(
   "createRemovePetitionPermissionTask",
   {
+    deprecation: "use createRemovePetitionPermissionMaybeTask instead",
     description: `
       Removes permissions to users and groups on given petitions.
       If the total amount of permission to add exceeds 100, a task will be created for async completion.
@@ -874,3 +878,356 @@ export const createFileExportTask = mutationField("createFileExportTask", {
     );
   },
 });
+
+export const createAddPetitionPermissionMaybeTask = mutationField(
+  "createAddPetitionPermissionMaybeTask",
+  {
+    type: "MaybeTask",
+    description: outdent`
+    Adds permissions to users and groups on given petitions and folders.
+    If the total amount of permission to add exceeds 200, a task will be created for async completion.
+    If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+
+    If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+    Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+  `,
+    authorize: authenticateAnd(
+      ifArgDefined("petitionIds", userHasAccessToPetitions("petitionIds" as never)),
+      userHasAccessToUsers("userIds"),
+      userHasAccessToUserGroups("userGroupIds"),
+    ),
+    args: {
+      petitionIds: list(nonNull(globalIdArg("Petition"))),
+      folders: "FoldersInput",
+      userIds: list(nonNull(globalIdArg("User"))),
+      userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
+      permissionType: nonNull(arg({ type: "PetitionPermissionTypeRW" })),
+      notify: booleanArg({
+        description: "Wether to notify the user via email or not.",
+        default: false,
+      }),
+      subscribe: booleanArg({
+        description: "Subscribe to notifications.",
+        default: true,
+      }),
+      message: stringArg(),
+    },
+    validateArgs: validateAnd(
+      notEmptyArray((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray((args) => args.folders?.folderIds, "folders.folderIds"),
+      notEmptyArray((args) => args.userIds, "userIds"),
+      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
+      maxLength((args) => args.message, "message", 1000),
+      (_, args, ctx, info) => {
+        if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
+          throw new ArgValidationError(
+            info,
+            "userIds, userGroupIds",
+            "Either userIds or userGroupIds must be defined",
+          );
+        }
+        if (isNullish(args.folders) && isNullish(args.petitionIds)) {
+          throw new ArgValidationError(
+            info,
+            "folders, petitionIds",
+            "Either folders or petitionIds must be defined",
+          );
+        }
+      },
+    ),
+    resolve: async (_, args, ctx) => {
+      const petitionIds = await ctx.petitions.getPetitionIdsWithUserPermissions(
+        args.petitionIds ?? [],
+        args.folders?.folderIds ?? [],
+        args.folders?.type === "TEMPLATE",
+        ctx.user!,
+        ["OWNER", "WRITE"],
+      );
+
+      const groupMembers = isNonNullish(args.userGroupIds)
+        ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
+        : [0];
+
+      const totalAffectedRows =
+        petitionIds.length *
+        ((args.userIds?.length ?? 0) + // directly-inserted users
+          (args.userGroupIds?.length ?? 0) + // directly-inserted groups
+          sumBy(groupMembers, (m) => m)); // user members inserted through groups
+
+      if (totalAffectedRows <= 200) {
+        const permissionsBefore = (
+          await ctx.petitions.loadEffectivePermissions(petitionIds)
+        ).flat();
+
+        const newPermissions = await ctx.petitions.addPetitionPermissions(
+          petitionIds,
+          [
+            ...(args.userIds ?? []).map((userId) => ({
+              type: "User" as const,
+              id: userId,
+              isSubscribed: args.subscribe ?? true,
+              permissionType: args.permissionType,
+            })),
+            ...(args.userGroupIds ?? []).map((userGroupId) => ({
+              type: "UserGroup" as const,
+              id: userGroupId,
+              isSubscribed: args.subscribe ?? true,
+              permissionType: args.permissionType,
+            })),
+          ],
+          "User",
+          ctx.user!.id,
+          true,
+        );
+
+        if (args.notify) {
+          const newUserPermissions = pipe(
+            newPermissions,
+            filter((p) => isNonNullish(p.user_id)),
+            // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
+            uniqueBy((p) => `${p.user_id}:${p.petition_id}`),
+            // omit users who had access previously
+            differenceWith(
+              permissionsBefore,
+              (p1, p2) => p1.petition_id === p2.petition_id && p1.user_id === p2.user_id,
+            ),
+          );
+
+          if (newUserPermissions.length > 0) {
+            await ctx.emails.sendPetitionSharedEmail(
+              ctx.user!.id,
+              newUserPermissions.map((p) => p.id),
+              args.message ?? null,
+            );
+          }
+        }
+
+        return {
+          status: "COMPLETED",
+        };
+      } else {
+        return {
+          status: "PROCESSING",
+          task: await ctx.tasks.createTask(
+            {
+              name: "PETITION_SHARING",
+              user_id: ctx.user!.id,
+              input: {
+                action: "ADD",
+                petition_ids: args.petitionIds,
+                folders: args.folders,
+                user_ids: args.userIds,
+                user_group_ids: args.userGroupIds,
+                permission_type: args.permissionType,
+                notify: args.notify,
+                subscribe: args.subscribe,
+                message: args.message,
+              },
+            },
+            `User:${ctx.user!.id}`,
+          ),
+        };
+      }
+    },
+  },
+);
+
+export const createEditPetitionPermissionMaybeTask = mutationField(
+  "createEditPetitionPermissionMaybeTask",
+  {
+    description: outdent`
+    Edits permissions to users and groups on given petitions.
+    If the total amount of permissions to edit exceeds 200, a task will be created for async completion.
+
+    If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+    Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+  `,
+    type: "MaybeTask",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      userHasAccessToUsers("userIds"),
+      userHasAccessToUserGroups("userGroupIds"),
+    ),
+    args: {
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userIds: list(nonNull(globalIdArg("User"))),
+      userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
+      permissionType: nonNull(arg({ type: "PetitionPermissionTypeRW" })),
+    },
+    validateArgs: validateAnd(
+      notEmptyArray((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray((args) => args.userIds, "userIds"),
+      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
+      (_, args, ctx, info) => {
+        if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
+          throw new ArgValidationError(
+            info,
+            "userIds, userGroupIds",
+            "Either userIds or userGroupIds must be defined",
+          );
+        }
+      },
+    ),
+    resolve: async (_, args, ctx) => {
+      const groupMembers = isNonNullish(args.userGroupIds)
+        ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
+        : [0];
+
+      const totalAffectedRows =
+        args.petitionIds.length *
+        ((args.userIds?.length ?? 0) + // directly-inserted users
+          (args.userGroupIds?.length ?? 0) + // directly-inserted groups
+          sumBy(groupMembers, (m) => m)); // user members inserted through groups
+
+      if (totalAffectedRows <= 200) {
+        await ctx.petitions.editPetitionPermissions(
+          args.petitionIds,
+          args.userIds ?? [],
+          args.userGroupIds ?? [],
+          args.permissionType,
+          ctx.user!,
+        );
+        return {
+          status: "COMPLETED",
+        };
+      } else {
+        return {
+          status: "PROCESSING",
+          task: await ctx.tasks.createTask(
+            {
+              name: "PETITION_SHARING",
+              user_id: ctx.user!.id,
+              input: {
+                action: "EDIT",
+                petition_ids: args.petitionIds,
+                user_ids: args.userIds,
+                user_group_ids: args.userGroupIds,
+                permission_type: args.permissionType,
+              },
+            },
+            `User:${ctx.user!.id}`,
+          ),
+        };
+      }
+    },
+  },
+);
+
+export const createRemovePetitionPermissionMaybeTask = mutationField(
+  "createRemovePetitionPermissionMaybeTask",
+  {
+    description: outdent`
+      Removes permissions to users and groups on given petitions.
+      If the total amount of permission to add exceeds 200, a task will be created for async completion.
+
+      If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+      Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+    `,
+    type: "MaybeTask",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      userHasAccessToUsers("userIds"),
+      userHasAccessToUserGroups("userGroupIds"),
+    ),
+    args: {
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userIds: list(nonNull(globalIdArg("User"))),
+      userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
+      removeAll: booleanArg({
+        description:
+          "Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds",
+      }),
+    },
+    validateArgs: validateAnd(
+      notEmptyArray((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray((args) => args.userIds, "userIds"),
+      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
+      (_, args, ctx, info) => {
+        if (!args.removeAll && isNullish(args.userIds) && isNullish(args.userGroupIds)) {
+          throw new ArgValidationError(
+            info,
+            "userIds, userGroupIds",
+            "Either userIds or userGroupIds must be defined",
+          );
+        }
+      },
+      validateIf(
+        (args) => isNullish(args.userIds) && isNullish(args.userGroupIds),
+        validBooleanValue((args) => args.removeAll, "removeAll", true),
+      ),
+    ),
+    resolve: async (_, args, ctx) => {
+      const groupMembers = isNonNullish(args.userGroupIds)
+        ? await ctx.userGroups.loadUserGroupMemberCount(args.userGroupIds)
+        : [0];
+
+      const totalAffectedRows =
+        args.petitionIds.length *
+        ((args.userIds?.length ?? 0) + // directly-inserted users
+          (args.userGroupIds?.length ?? 0) + // directly-inserted groups
+          sumBy(groupMembers, (m) => m)); // user members inserted through groups
+
+      if (totalAffectedRows <= 200) {
+        const deletedPermissions = await ctx.petitions.removePetitionPermissions(
+          args.petitionIds,
+          args.userIds ?? [],
+          args.userGroupIds ?? [],
+          args.removeAll ?? false,
+          ctx.user!,
+        );
+        const deletedPermissionsByPetitionId = groupBy(deletedPermissions, (p) => p.petition_id);
+
+        const deletedPetitionIds = unique(deletedPermissions.map((p) => p.petition_id));
+
+        const effectivePermissions =
+          await ctx.petitions.loadEffectivePermissions(deletedPetitionIds);
+
+        // For each petition, delete permissions not present in effectivePermissions
+        await pMap(
+          zip(
+            deletedPetitionIds.map((id) => deletedPermissionsByPetitionId[id]),
+            effectivePermissions,
+          ),
+          async ([deletedPermissions, effectivePermissions]) => {
+            const petitionId = deletedPermissions[0].petition_id;
+            const hasPermissions = new Set(effectivePermissions.map((p) => p.user_id!));
+
+            // users of deletedPermissions that dont have any effectivePermission lost
+            // access to the petitions, their notifications need to be deleted
+            const userIds = unique(
+              deletedPermissions
+                .filter((p) => p.user_id !== null)
+                .map((p) => p.user_id!)
+                .filter((userId) => !hasPermissions.has(userId)),
+            );
+
+            await ctx.petitions.deletePetitionUserNotificationsByPetitionId([petitionId], userIds);
+          },
+          { concurrency: 20 },
+        );
+
+        return {
+          status: "COMPLETED",
+        };
+      } else {
+        return {
+          status: "PROCESSING",
+          task: await ctx.tasks.createTask(
+            {
+              name: "PETITION_SHARING",
+              user_id: ctx.user!.id,
+              input: {
+                action: "REMOVE",
+                petition_ids: args.petitionIds,
+                user_ids: args.userIds,
+                user_group_ids: args.userGroupIds,
+                remove_all: args.removeAll,
+              },
+            },
+            `User:${ctx.user!.id}`,
+          ),
+        };
+      }
+    },
+  },
+);

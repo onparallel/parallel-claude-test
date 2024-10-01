@@ -5543,19 +5543,7 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      const petitions = await this.from("petition", t)
-        .whereNull("deleted_at")
-        .whereIn("id", petitionIds)
-        .returning("*");
-
-      return {
-        petitions,
-        newPermissions: [
-          ...newUserPermissions,
-          ...newGroupPermissions,
-          ...groupAssignedNewUserPermissions,
-        ],
-      };
+      return [...newUserPermissions, ...newGroupPermissions, ...groupAssignedNewUserPermissions];
     }, t);
   }
 

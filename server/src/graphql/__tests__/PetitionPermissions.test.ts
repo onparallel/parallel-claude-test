@@ -18,7 +18,7 @@ import { TestClient, initServer } from "./server";
 describe("GraphQL/Petition Permissions", () => {
   let testClient: TestClient;
   let organization: Organization;
-  let loggedUser: User;
+  let user: User;
   let orgUsers: User[];
   let otherOrgUser: User;
   let mocks: Mocks;
@@ -34,7 +34,7 @@ describe("GraphQL/Petition Permissions", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user: loggedUser } = await mocks.createSessionUserAndOrganization());
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     const [otherOrg] = await mocks.createRandomOrganizations(1);
 
@@ -45,7 +45,7 @@ describe("GraphQL/Petition Permissions", () => {
   beforeEach(async () => {
     [userPetition, readPetition] = await mocks.createRandomPetitions(
       organization.id,
-      loggedUser.id,
+      user.id,
       2,
       undefined,
       (i) => ({
@@ -57,7 +57,7 @@ describe("GraphQL/Petition Permissions", () => {
     [userGroup] = await mocks.createUserGroups(1, organization.id);
     userGroupMembers = await mocks.createRandomUsers(organization.id, 2);
     await mocks.insertUserGroupMembers(userGroup.id, [
-      loggedUser.id,
+      user.id,
       userGroupMembers[0].id,
       userGroupMembers[1].id,
     ]);
@@ -120,7 +120,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -198,7 +198,7 @@ describe("GraphQL/Petition Permissions", () => {
             },
             {
               permissionType: "WRITE",
-              user: { id: toGlobalId("User", loggedUser.id) },
+              user: { id: toGlobalId("User", user.id) },
             },
             {
               permissionType: "WRITE",
@@ -285,7 +285,7 @@ describe("GraphQL/Petition Permissions", () => {
         `,
         variables: {
           ids: [],
-          userId: toGlobalId("User", loggedUser.id),
+          userId: toGlobalId("User", user.id),
         },
       });
 
@@ -332,7 +332,7 @@ describe("GraphQL/Petition Permissions", () => {
             },
             {
               permissionType: "WRITE",
-              user: { id: toGlobalId("User", loggedUser.id) },
+              user: { id: toGlobalId("User", user.id) },
             },
             {
               permissionType: "WRITE",
@@ -344,17 +344,20 @@ describe("GraphQL/Petition Permissions", () => {
     });
   });
 
-  describe("createAddPetitionPermissionTask", () => {
+  describe("createAddPetitionPermissionMaybeTask", () => {
     it("does nothing when trying to share petition with READ access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: WRITE
             ) {
               status
+              task {
+                id
+              }
             }
           }
         `,
@@ -365,7 +368,10 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
 
       const { errors: petitionQueryErrors, data: petitionQueryData } = await testClient.execute(
         gql`
@@ -399,7 +405,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "READ",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
         ],
       });
@@ -414,7 +420,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -422,6 +428,9 @@ describe("GraphQL/Petition Permissions", () => {
               message: "hello!"
             ) {
               status
+              task {
+                id
+              }
             }
           }
         `,
@@ -433,7 +442,10 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
 
       const { errors: petitionQueryErrors, data: petitionQueryData } = await testClient.execute(
         gql`
@@ -479,10 +491,10 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("adds new permissions on a given petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -490,18 +502,24 @@ describe("GraphQL/Petition Permissions", () => {
               message: "hello!"
             ) {
               status
+              task {
+                id
+              }
             }
           }
         `,
-        variables: {
+        {
           petitionIds: [toGlobalId("Petition", userPetition.id)],
           userIds: [toGlobalId("User", orgUsers[0].id)],
           type: "READ",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
 
       const { errors: petitionQueryErrors, data: petitionQueryData } = await testClient.execute(
         gql`
@@ -535,7 +553,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -550,31 +568,10 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("upgrades permissions from READ to WRITE adding permissions", async () => {
-      await testClient.execute(
+      const { errors: errors1, data: data1 } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
-              petitionIds: $petitionIds
-              userIds: $userIds
-              permissionType: $type
-              notify: true
-              message: "hello!"
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          petitionIds: [toGlobalId("Petition", userPetition.id)],
-          userIds: [toGlobalId("User", orgUsers[0].id)],
-          type: "READ",
-        },
-      );
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -588,12 +585,42 @@ describe("GraphQL/Petition Permissions", () => {
         {
           petitionIds: [toGlobalId("Petition", userPetition.id)],
           userIds: [toGlobalId("User", orgUsers[0].id)],
+          type: "READ",
+        },
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            createAddPetitionPermissionMaybeTask(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+              message: "hello!"
+            ) {
+              status
+              task {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[0].id)],
           type: "WRITE",
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
 
       const { errors: petitionQueryErrors, data: petitionQueryData } = await testClient.execute(
         gql`
@@ -627,7 +654,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -642,17 +669,17 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("try to downgrade from WRITE to READ adding permissions", async () => {
-      await testClient.execute(
+      const { errors: errors1, data: data1 } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
               notify: true
               message: "hello!"
             ) {
-              id
+              status
             }
           }
         `,
@@ -663,10 +690,13 @@ describe("GraphQL/Petition Permissions", () => {
         },
       );
 
+      expect(errors1).toBeUndefined();
+      expect(data1?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -685,7 +715,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: petitionQueryErrors, data: petitionQueryData } = await testClient.execute(
         gql`
@@ -719,7 +749,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -739,16 +769,16 @@ describe("GraphQL/Petition Permissions", () => {
         "sendPetitionSharedEmail",
       );
 
-      await testClient.execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
               notify: true
             ) {
-              id
+              status
             }
           }
         `,
@@ -759,6 +789,9 @@ describe("GraphQL/Petition Permissions", () => {
         },
       );
 
+      expect(errors).toBeUndefined();
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
+
       expect(sendPetitionSharedEmailSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -768,15 +801,15 @@ describe("GraphQL/Petition Permissions", () => {
         "sendPetitionSharedEmail",
       );
 
-      await testClient.execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -787,6 +820,8 @@ describe("GraphQL/Petition Permissions", () => {
         },
       );
 
+      expect(errors).toBeUndefined();
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
       expect(sendPetitionSharedEmailSpy).toHaveBeenCalledTimes(0);
     });
 
@@ -794,7 +829,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -818,12 +853,12 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -842,12 +877,12 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -872,7 +907,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -890,7 +925,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -924,7 +959,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -950,7 +985,7 @@ describe("GraphQL/Petition Permissions", () => {
 
       expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
-      >(loggedUser.id, [permission.id], null);
+      >(user.id, [permission.id], null);
     });
 
     it("notifies only once per user and petition", async () => {
@@ -971,14 +1006,14 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
               permissionType: $type
               notify: true
             ) {
-              id
+              status
             }
           }
         `,
@@ -1000,7 +1035,7 @@ describe("GraphQL/Petition Permissions", () => {
 
       expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
-      >(loggedUser.id, [permission.id], null);
+      >(user.id, [permission.id], null);
     });
 
     it("should not send notification to user with previous permissions", async () => {
@@ -1016,13 +1051,13 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
               notify: true
             ) {
-              id
+              status
             }
           }
         `,
@@ -1053,13 +1088,13 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
               notify: true
             ) {
-              id
+              status
             }
           }
         `,
@@ -1080,12 +1115,12 @@ describe("GraphQL/Petition Permissions", () => {
 
       expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
-      >(loggedUser.id, [permission.id], null);
+      >(user.id, [permission.id], null);
     });
 
     it("shares a petition with a group", async () => {
       const [newGroup] = await mocks.createUserGroups(1, organization.id);
-      await mocks.insertUserGroupMembers(newGroup.id, [loggedUser.id]);
+      await mocks.insertUserGroupMembers(newGroup.id, [user.id]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -1094,7 +1129,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1111,7 +1146,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1145,7 +1180,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1168,7 +1203,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1185,7 +1220,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1217,7 +1252,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1241,7 +1276,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1260,7 +1295,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1292,7 +1327,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1320,7 +1355,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1339,7 +1374,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createAddPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createAddPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1392,9 +1427,146 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
     });
+
+    it("starts a task if sharing more than 200 parallels", async () => {
+      const petitions = await mocks.createRandomPetitions(organization.id, user.id, 201);
+
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]) {
+            createAddPetitionPermissionMaybeTask(
+              permissionType: READ
+              petitionIds: $petitionIds
+              userIds: $userIds
+            ) {
+              status
+              task {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: petitions.slice(0, 200).map((p) => toGlobalId("Petition", p.id)),
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+        },
+      );
+
+      // up to 200 petitions should be shared immediately
+      expect(errors1).toBeUndefined();
+      expect(data1.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]) {
+            createAddPetitionPermissionMaybeTask(
+              permissionType: READ
+              petitionIds: $petitionIds
+              userIds: $userIds
+            ) {
+              status
+              task {
+                id
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: petitions.slice(0, 201).map((p) => toGlobalId("Petition", p.id)),
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+        },
+      );
+
+      // more than 200 petitions should start a task
+      expect(errors2).toBeUndefined();
+      expect(data2.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "PROCESSING",
+        task: {
+          id: expect.any(String),
+          status: "ENQUEUED",
+        },
+      });
+    });
+
+    it("starts a task if sharing a folder with more than 200 parallels", async () => {
+      await mocks.createRandomPetitions(organization.id, user.id, 200, () => ({
+        path: "/folder/",
+        is_template: false,
+      }));
+
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($folders: FoldersInput, $userIds: [GID!]) {
+            createAddPetitionPermissionMaybeTask(
+              permissionType: READ
+              userIds: $userIds
+              folders: $folders
+            ) {
+              status
+              task {
+                id
+              }
+            }
+          }
+        `,
+        {
+          folders: { folderIds: [toGlobalId("PetitionFolder", "/folder/")], type: "PETITION" },
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+        },
+      );
+
+      // up to 200 petitions should be shared immediately
+      expect(errors1).toBeUndefined();
+      expect(data1.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "COMPLETED",
+        task: null,
+      });
+
+      // add 1 more petition to folder
+      await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: false,
+        path: "/folder/",
+      }));
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($folders: FoldersInput, $userIds: [GID!]) {
+            createAddPetitionPermissionMaybeTask(
+              permissionType: READ
+              userIds: $userIds
+              folders: $folders
+            ) {
+              status
+              task {
+                id
+                status
+              }
+            }
+          }
+        `,
+        {
+          folders: { folderIds: [toGlobalId("PetitionFolder", "/folder/")], type: "PETITION" },
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+        },
+      );
+
+      // more than 200 petitions should start a task
+      expect(errors2).toBeUndefined();
+      expect(data2.createAddPetitionPermissionMaybeTask).toEqual({
+        status: "PROCESSING",
+        task: {
+          id: expect.any(String),
+          status: "ENQUEUED",
+        },
+      });
+    });
   });
 
-  describe("createEditPetitionPermissionTask", () => {
+  describe("createEditPetitionPermissionMaybeTask", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "WRITE");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "WRITE");
@@ -1409,12 +1581,12 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -1437,7 +1609,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1454,7 +1626,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createEditPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createEditPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1488,7 +1660,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1514,7 +1686,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userGroupIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1531,7 +1703,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createEditPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createEditPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1585,7 +1757,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionPermissionTypeRW!
           ) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1604,7 +1776,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createEditPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createEditPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1638,7 +1810,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1660,7 +1832,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1677,7 +1849,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createEditPetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createEditPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1711,7 +1883,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1733,7 +1905,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1757,12 +1929,12 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -1781,12 +1953,12 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            createEditPetitionPermissionTask(
+            createEditPetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
             ) {
-              id
+              status
             }
           }
         `,
@@ -1800,9 +1972,69 @@ describe("GraphQL/Petition Permissions", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("starts a task if editing more than 200 permissions", async () => {
+      const petitions = await mocks.createRandomPetitions(organization.id, user.id, 201);
+      await mocks.sharePetitions(
+        petitions.map((p) => p.id),
+        orgUsers[1].id,
+        "READ",
+      );
+
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            createEditPetitionPermissionMaybeTask(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+            ) {
+              status
+            }
+          }
+        `,
+        {
+          petitionIds: petitions.slice(0, 200).map((p) => toGlobalId("Petition", p.id)),
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+          type: "WRITE",
+        },
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.createEditPetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            createEditPetitionPermissionMaybeTask(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+            ) {
+              status
+              task {
+                id
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: petitions.map((p) => toGlobalId("Petition", p.id)),
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+          type: "READ",
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.createEditPetitionPermissionMaybeTask).toEqual({
+        status: "PROCESSING",
+        task: { id: expect.any(String), status: "ENQUEUED" },
+      });
+    });
   });
 
-  describe("createRemovePetitionPermissionTask", () => {
+  describe("createRemovePetitionPermissionMaybeTask", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "READ");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "READ");
@@ -1817,8 +2049,8 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, userIds: $userIds) {
-              id
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
+              status
             }
           }
         `,
@@ -1836,7 +2068,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, userIds: $userIds) {
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
               status
             }
           }
@@ -1848,7 +2080,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1880,7 +2112,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -1898,7 +2130,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $userGroupIds: [GID!]!) {
-            createRemovePetitionPermissionTask(
+            createRemovePetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -1915,7 +2147,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -1947,7 +2179,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "READ",
@@ -1961,7 +2193,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors: removeErrors, data: removeData } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $userGroupIds: [GID!]!) {
-            createRemovePetitionPermissionTask(
+            createRemovePetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -1978,7 +2210,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(removeErrors).toBeUndefined();
-      expect(removeData!.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(removeData!.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -2012,7 +2244,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
         ],
       });
@@ -2036,7 +2268,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $userGroupIds: [GID!]!) {
-            createRemovePetitionPermissionTask(
+            createRemovePetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -2053,7 +2285,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -2109,7 +2341,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, removeAll: true) {
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, removeAll: true) {
               status
             }
           }
@@ -2120,7 +2352,7 @@ describe("GraphQL/Petition Permissions", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data!.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -2154,7 +2386,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
         ],
       });
@@ -2164,8 +2396,8 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds) {
-              id
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds) {
+              status
             }
           }
         `,
@@ -2182,8 +2414,8 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, userIds: $userIds) {
-              id
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
+              status
             }
           }
         `,
@@ -2201,8 +2433,8 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, userIds: $userIds) {
-              id
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
+              status
             }
           }
         `,
@@ -2221,7 +2453,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            createRemovePetitionPermissionTask(petitionIds: $petitionIds, userIds: $userIds) {
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
               status
             }
           }
@@ -2232,7 +2464,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       );
       expect(errors).toBeUndefined();
-      expect(data?.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -2263,7 +2495,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "WRITE",
@@ -2299,7 +2531,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]!) {
-            createRemovePetitionPermissionTask(
+            createRemovePetitionPermissionMaybeTask(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
             ) {
@@ -2313,7 +2545,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       );
       expect(errors).toBeUndefined();
-      expect(data?.createRemovePetitionPermissionTask).toEqual({ status: "COMPLETED" });
+      expect(data?.createRemovePetitionPermissionMaybeTask).toEqual({ status: "COMPLETED" });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -2345,7 +2577,7 @@ describe("GraphQL/Petition Permissions", () => {
         permissions: [
           {
             permissionType: "OWNER",
-            user: { id: toGlobalId("User", loggedUser.id) },
+            user: { id: toGlobalId("User", user.id) },
           },
           {
             permissionType: "READ",
@@ -2360,6 +2592,38 @@ describe("GraphQL/Petition Permissions", () => {
             user: { id: toGlobalId("User", userGroupMembers[0].id) },
           },
         ],
+      });
+    });
+
+    it("starts a task if removing more than 200 permissions", async () => {
+      const petitions = await mocks.createRandomPetitions(organization.id, user.id, 201);
+      await mocks.sharePetitions(
+        petitions.map((p) => p.id),
+        orgUsers[1].id,
+        "READ",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
+            createRemovePetitionPermissionMaybeTask(petitionIds: $petitionIds, userIds: $userIds) {
+              status
+              task {
+                id
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionIds: petitions.map((p) => toGlobalId("Petition", p.id)),
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.createRemovePetitionPermissionMaybeTask).toEqual({
+        status: "PROCESSING",
+        task: { id: expect.any(String), status: "ENQUEUED" },
       });
     });
   });

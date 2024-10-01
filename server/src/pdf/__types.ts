@@ -774,6 +774,14 @@ export type LandingTemplatePagination = {
   totalCount: Scalars["Int"]["output"];
 };
 
+/** If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null. */
+export type MaybeTask = {
+  status: MaybeTaskStatus;
+  task: Maybe<Task>;
+};
+
+export type MaybeTaskStatus = "COMPLETED" | "PROCESSING";
+
 export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -859,11 +867,21 @@ export type Mutation = {
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
+   * Adds permissions to users and groups on given petitions and folders.
+   * If the total amount of permission to add exceeds 200, a task will be created for async completion.
+   * If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createAddPetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *     Adds permissions to users and groups on given petitions and folders.
    *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
    *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
    *
+   * @deprecated use createAddPetitionPermissionMaybeTask instead
    */
   createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
@@ -892,10 +910,19 @@ export type Mutation = {
   /** Creates a new eInforma Profile External Source integration on the provided organization */
   createEInformaProfileExternalSourceIntegration: SupportMethodResponse;
   /**
+   * Edits permissions to users and groups on given petitions.
+   * If the total amount of permissions to edit exceeds 200, a task will be created for async completion.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createEditPetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *     Edits permissions to users and groups on given petitions.
    *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
    *
+   * @deprecated use createEditPetitionPermissionMaybeTask instead
    */
   createEditPetitionPermissionTask: Task;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
@@ -966,10 +993,19 @@ export type Mutation = {
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
   createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /**
+   * Removes permissions to users and groups on given petitions.
+   * If the total amount of permission to add exceeds 200, a task will be created for async completion.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createRemovePetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *       Removes permissions to users and groups on given petitions.
    *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
    *
+   * @deprecated use createRemovePetitionPermissionMaybeTask instead
    */
   createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
@@ -1455,6 +1491,17 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
 export type MutationcreateAddPetitionPermissionTaskArgs = {
   folders?: InputMaybe<FoldersInput>;
   message?: InputMaybe<Scalars["String"]["input"]>;
@@ -1533,6 +1580,13 @@ export type MutationcreateEInformaProfileExternalSourceIntegrationArgs = {
   clientSecret: Scalars["String"]["input"];
   isPaidSubscription: Scalars["Boolean"]["input"];
   orgId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateEditPetitionPermissionMaybeTaskArgs = {
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateEditPetitionPermissionTaskArgs = {
@@ -1751,6 +1805,13 @@ export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
   data: Scalars["JSONObject"]["input"];
   path?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateRemovePetitionPermissionTaskArgs = {

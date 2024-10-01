@@ -908,6 +908,19 @@ type LandingTemplatePagination {
 
 scalar LocalizableUserText
 
+"""
+If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null.
+"""
+type MaybeTask {
+  status: MaybeTaskStatus!
+  task: Task
+}
+
+enum MaybeTaskStatus {
+  COMPLETED
+  PROCESSING
+}
+
 type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -1100,6 +1113,33 @@ type Mutation {
     profileTypeFieldId: GID!
   ): [ProfileFieldFile!]!
 
+  """
+  Adds permissions to users and groups on given petitions and folders.
+  If the total amount of permission to add exceeds 200, a task will be created for async completion.
+  If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+
+  If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+  Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+  """
+  createAddPetitionPermissionMaybeTask(
+    folders: FoldersInput
+    message: String
+
+    """
+    Wether to notify the user via email or not.
+    """
+    notify: Boolean = false
+    permissionType: PetitionPermissionTypeRW!
+    petitionIds: [GID!]
+
+    """
+    Subscribe to notifications.
+    """
+    subscribe: Boolean = true
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): MaybeTask!
+
   "\n    Adds permissions to users and groups on given petitions and folders.\n    If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.\n  "
   createAddPetitionPermissionTask(
     folders: FoldersInput
@@ -1118,7 +1158,7 @@ type Mutation {
     subscribe: Boolean = true
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): Task!
+  ): Task! @deprecated(reason: "use createAddPetitionPermissionMaybeTask instead")
 
   """
   Creates a new Azure OpenAI integration on the provided organization
@@ -1252,13 +1292,27 @@ type Mutation {
     orgId: GID!
   ): SupportMethodResponse!
 
+  """
+  Edits permissions to users and groups on given petitions.
+  If the total amount of permissions to edit exceeds 200, a task will be created for async completion.
+
+  If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+  Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+  """
+  createEditPetitionPermissionMaybeTask(
+    permissionType: PetitionPermissionTypeRW!
+    petitionIds: [GID!]!
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): MaybeTask!
+
   "\n    Edits permissions to users and groups on given petitions.\n    If the total amount of permissions to edit exceeds 100, a task will be created for async completion.\n  "
   createEditPetitionPermissionTask(
     permissionType: PetitionPermissionTypeRW!
     petitionIds: [GID!]!
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): Task!
+  ): Task! @deprecated(reason: "use createEditPetitionPermissionMaybeTask instead")
 
   """
   Creates a pair of asymmetric keys to be used for signing webhook events
@@ -1600,6 +1654,24 @@ type Mutation {
     publicPetitionLinkId: GID!
   ): String!
 
+  """
+  Removes permissions to users and groups on given petitions.
+  If the total amount of permission to add exceeds 200, a task will be created for async completion.
+
+  If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+  Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+  """
+  createRemovePetitionPermissionMaybeTask(
+    petitionIds: [GID!]!
+
+    """
+    Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
+    """
+    removeAll: Boolean
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): MaybeTask!
+
   "\n      Removes permissions to users and groups on given petitions.\n      If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    "
   createRemovePetitionPermissionTask(
     petitionIds: [GID!]!
@@ -1610,7 +1682,7 @@ type Mutation {
     removeAll: Boolean
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): Task!
+  ): Task! @deprecated(reason: "use createRemovePetitionPermissionMaybeTask instead")
 
   """
   Creates a new Signaturit integration on the user's organization

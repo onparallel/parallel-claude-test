@@ -104,20 +104,20 @@ import {
   ProfileTypeFragmentDoc,
   ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
-  RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
-  RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
+  RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskDocument,
+  RemoveUserPermission_createRemovePetitionPermissionMaybeTaskDocument,
   ReopenPetition_reopenPetitionDocument,
   SendPetitionFieldComment_createPetitionCommentDocument,
   SendPetitionFieldComment_getUsersOrGroupsDocument,
   SendPetitionFieldComment_petitionDocument,
   SendPetitionFieldComment_userGroupsDocument,
   SendPetitionFieldComment_usersByEmailDocument,
-  SharePetition_createAddPetitionPermissionTaskDocument,
+  SharePetition_createAddPetitionPermissionMaybeTaskDocument,
   SharePetition_petitionDocument,
   SharePetition_usersByEmailDocument,
   StartSignature_createCustomSignatureDocumentUploadLinkDocument,
   StartSignature_startSignatureRequestDocument,
-  StopSharing_createRemovePetitionPermissionTaskDocument,
+  StopSharing_createRemovePetitionPermissionMaybeTaskDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
@@ -2761,18 +2761,21 @@ export function publicApi(container: Container) {
           }
         `;
         const _mutation = gql`
-          mutation SharePetition_createAddPetitionPermissionTask(
+          mutation SharePetition_createAddPetitionPermissionMaybeTask(
             $petitionId: GID!
             $userIds: [GID!]
             $userGroupIds: [GID!]
           ) {
-            createAddPetitionPermissionTask(
+            createAddPetitionPermissionMaybeTask(
               petitionIds: [$petitionId]
               userIds: $userIds
               userGroupIds: $userGroupIds
               permissionType: WRITE
             ) {
-              ...Task
+              status
+              task {
+                ...Task
+              }
             }
           }
           ${TaskFragment}
@@ -2810,13 +2813,18 @@ export function publicApi(container: Container) {
           throw new BadRequestError("You must provide at least one user or user group");
         }
 
-        const task = await client.request(SharePetition_createAddPetitionPermissionTaskDocument, {
+        const {
+          createAddPetitionPermissionMaybeTask: { status, task },
+        } = await client.request(SharePetition_createAddPetitionPermissionMaybeTaskDocument, {
           petitionId: params.petitionId,
           userIds: userIds.length > 0 ? unique(userIds) : undefined,
           userGroupIds: userGroupIds.length > 0 ? unique(userGroupIds) : undefined,
         });
 
-        await waitForTask(client, task.createAddPetitionPermissionTask);
+        if (status === "PROCESSING") {
+          assert(isNonNullish(task), "Expected task to be defined");
+          await waitForTask(client, task);
+        }
 
         const result = await client.request(SharePetition_petitionDocument, {
           id: params.petitionId,
@@ -2837,18 +2845,26 @@ export function publicApi(container: Container) {
       },
       async ({ client, params }) => {
         const _mutation = gql`
-          mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
-            createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
-              ...Task
+          mutation StopSharing_createRemovePetitionPermissionMaybeTask($petitionId: GID!) {
+            createRemovePetitionPermissionMaybeTask(petitionIds: [$petitionId], removeAll: true) {
+              status
+              task {
+                ...Task
+              }
             }
           }
           ${TaskFragment}
         `;
-        const task = await client.request(StopSharing_createRemovePetitionPermissionTaskDocument, {
+        const {
+          createRemovePetitionPermissionMaybeTask: { status, task },
+        } = await client.request(StopSharing_createRemovePetitionPermissionMaybeTaskDocument, {
           petitionId: params.petitionId,
         });
 
-        await waitForTask(client, task.createRemovePetitionPermissionTask);
+        if (status === "PROCESSING") {
+          assert(isNonNullish(task), "Expected task to be defined");
+          await waitForTask(client, task);
+        }
 
         return NoContent();
       },
@@ -2870,25 +2886,36 @@ export function publicApi(container: Container) {
       },
       async ({ client, params }) => {
         const _mutation = gql`
-          mutation RemoveUserPermission_createRemovePetitionPermissionTask(
+          mutation RemoveUserPermission_createRemovePetitionPermissionMaybeTask(
             $petitionId: GID!
             $userId: GID!
           ) {
-            createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
-              ...Task
+            createRemovePetitionPermissionMaybeTask(
+              petitionIds: [$petitionId]
+              userIds: [$userId]
+            ) {
+              status
+              task {
+                ...Task
+              }
             }
           }
           ${TaskFragment}
         `;
-        const task = await client.request(
-          RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
+        const {
+          createRemovePetitionPermissionMaybeTask: { status, task },
+        } = await client.request(
+          RemoveUserPermission_createRemovePetitionPermissionMaybeTaskDocument,
           {
             petitionId: params.petitionId,
             userId: params.userId,
           },
         );
 
-        await waitForTask(client, task.createRemovePetitionPermissionTask);
+        if (status === "PROCESSING") {
+          assert(isNonNullish(task), "Expected task to be defined");
+          await waitForTask(client, task);
+        }
 
         return NoContent();
       },
@@ -2910,28 +2937,36 @@ export function publicApi(container: Container) {
       },
       async ({ client, params }) => {
         const _mutation = gql`
-          mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
+          mutation RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTask(
             $petitionId: GID!
             $userGroupId: GID!
           ) {
-            createRemovePetitionPermissionTask(
+            createRemovePetitionPermissionMaybeTask(
               petitionIds: [$petitionId]
               userGroupIds: [$userGroupId]
             ) {
-              ...Task
+              status
+              task {
+                ...Task
+              }
             }
           }
           ${TaskFragment}
         `;
-        const task = await client.request(
-          RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
+        const {
+          createRemovePetitionPermissionMaybeTask: { status, task },
+        } = await client.request(
+          RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskDocument,
           {
             petitionId: params.petitionId,
             userGroupId: params.userGroupId,
           },
         );
 
-        await waitForTask(client, task.createRemovePetitionPermissionTask);
+        if (status === "PROCESSING") {
+          assert(isNonNullish(task), "Expected task to be defined");
+          await waitForTask(client, task);
+        }
 
         return NoContent();
       },

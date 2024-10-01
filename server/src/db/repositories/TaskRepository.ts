@@ -312,6 +312,7 @@ export class TaskRepository extends BaseRepository {
     return task;
   }
 
+  /** @deprecated not used anymore */
   async createCompletedTask<TName extends TaskName>(
     data: Partial<Task<TName>>,
     createdBy?: string,

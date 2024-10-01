@@ -1,39 +1,51 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
-  usePetitionSharingTask_createAddPetitionPermissionTaskDocument,
-  usePetitionSharingTask_createAddPetitionPermissionTaskMutationVariables,
-  usePetitionSharingTask_createEditPetitionPermissionTaskDocument,
-  usePetitionSharingTask_createEditPetitionPermissionTaskMutationVariables,
-  usePetitionSharingTask_createRemovePetitionPermissionTaskDocument,
-  usePetitionSharingTask_createRemovePetitionPermissionTaskMutationVariables,
+  usePetitionSharingTask_createAddPetitionPermissionMaybeTaskDocument,
+  usePetitionSharingTask_createAddPetitionPermissionMaybeTaskMutationVariables,
+  usePetitionSharingTask_createEditPetitionPermissionMaybeTaskDocument,
+  usePetitionSharingTask_createEditPetitionPermissionMaybeTaskMutationVariables,
+  usePetitionSharingTask_createRemovePetitionPermissionMaybeTaskDocument,
+  usePetitionSharingTask_createRemovePetitionPermissionMaybeTaskMutationVariables,
+  usePetitionSharingTask_MaybeTaskFragment,
   usePetitionSharingTask_taskDocument,
 } from "@parallel/graphql/__types";
 import { useCallback, useState } from "react";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { waitFor } from "../promises/waitFor";
 import { BackgroundTaskOptions } from "./backgroundTaskOptions";
 
 export function usePetitionSharingBackgroundTask() {
   const apollo = useApolloClient();
-  const [createAddPetitionPermissionTask] = useMutation(
-    usePetitionSharingTask_createAddPetitionPermissionTaskDocument,
+  const [createAddPetitionPermissionMaybeTask] = useMutation(
+    usePetitionSharingTask_createAddPetitionPermissionMaybeTaskDocument,
   );
-  const [createEditPetitionPermissionTask] = useMutation(
-    usePetitionSharingTask_createEditPetitionPermissionTaskDocument,
+  const [createEditPetitionPermissionMaybeTask] = useMutation(
+    usePetitionSharingTask_createEditPetitionPermissionMaybeTaskDocument,
   );
-  const [createRemovePetitionPermissionTask] = useMutation(
-    usePetitionSharingTask_createRemovePetitionPermissionTaskDocument,
+  const [createRemovePetitionPermissionMaybeTask] = useMutation(
+    usePetitionSharingTask_createRemovePetitionPermissionMaybeTaskDocument,
   );
 
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleTask<TVariables>(initTask: (variables: TVariables) => Promise<string>) {
+  function handleMaybeTask<TVariables>(
+    initTask: (variables: TVariables) => Promise<usePetitionSharingTask_MaybeTaskFragment>,
+  ) {
     return useCallback(
       async (
         variables: TVariables,
         { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {},
       ) => {
         setIsLoading(true);
-        const taskId = await initTask(variables);
+        const { status, task: maybeTask } = await initTask(variables);
+
+        if (status === "COMPLETED") {
+          setIsLoading(false);
+          return;
+        }
+
+        assert(isNonNullish(maybeTask), "Expected task to be defined");
 
         const startTime = performance.now();
         while (true) {
@@ -49,12 +61,12 @@ export function usePetitionSharingBackgroundTask() {
             data: { task },
           } = await apollo.query({
             query: usePetitionSharingTask_taskDocument,
-            variables: { id: taskId },
+            variables: { id: maybeTask.id },
             fetchPolicy: "network-only",
           });
           if (task.status === "COMPLETED") {
             setIsLoading(false);
-            return task;
+            return;
           } else if (task.status === "FAILED") {
             setIsLoading(false);
             throw new Error("FAILED");
@@ -69,28 +81,28 @@ export function usePetitionSharingBackgroundTask() {
 
   return {
     isLoading,
-    addPetitionPermission: handleTask(
+    addPetitionPermission: handleMaybeTask(
       async (
-        variables: usePetitionSharingTask_createAddPetitionPermissionTaskMutationVariables,
+        variables: usePetitionSharingTask_createAddPetitionPermissionMaybeTaskMutationVariables,
       ) => {
-        const { data: initialData } = await createAddPetitionPermissionTask({ variables });
-        return initialData!.createAddPetitionPermissionTask.id;
+        const { data: initialData } = await createAddPetitionPermissionMaybeTask({ variables });
+        return initialData!.createAddPetitionPermissionMaybeTask;
       },
     ),
-    editPetitionPermission: handleTask(
+    editPetitionPermission: handleMaybeTask(
       async (
-        variables: usePetitionSharingTask_createEditPetitionPermissionTaskMutationVariables,
+        variables: usePetitionSharingTask_createEditPetitionPermissionMaybeTaskMutationVariables,
       ) => {
-        const { data: initialData } = await createEditPetitionPermissionTask({ variables });
-        return initialData!.createEditPetitionPermissionTask.id;
+        const { data: initialData } = await createEditPetitionPermissionMaybeTask({ variables });
+        return initialData!.createEditPetitionPermissionMaybeTask;
       },
     ),
-    removePetitionPermission: handleTask(
+    removePetitionPermission: handleMaybeTask(
       async (
-        variables: usePetitionSharingTask_createRemovePetitionPermissionTaskMutationVariables,
+        variables: usePetitionSharingTask_createRemovePetitionPermissionMaybeTaskMutationVariables,
       ) => {
-        const { data: initialData } = await createRemovePetitionPermissionTask({ variables });
-        return initialData!.createRemovePetitionPermissionTask.id;
+        const { data: initialData } = await createRemovePetitionPermissionMaybeTask({ variables });
+        return initialData!.createRemovePetitionPermissionMaybeTask;
       },
     ),
   };
@@ -98,7 +110,7 @@ export function usePetitionSharingBackgroundTask() {
 
 const _mutations = [
   gql`
-    mutation usePetitionSharingTask_createAddPetitionPermissionTask(
+    mutation usePetitionSharingTask_createAddPetitionPermissionMaybeTask(
       $petitionIds: [GID!]
       $folders: FoldersInput
       $permissionType: PetitionPermissionTypeRW!
@@ -108,7 +120,7 @@ const _mutations = [
       $notify: Boolean
       $message: String
     ) {
-      createAddPetitionPermissionTask(
+      createAddPetitionPermissionMaybeTask(
         petitionIds: $petitionIds
         folders: $folders
         permissionType: $permissionType
@@ -118,44 +130,53 @@ const _mutations = [
         notify: $notify
         message: $message
       ) {
-        id
         status
+        task {
+          id
+          status
+        }
       }
     }
   `,
   gql`
-    mutation usePetitionSharingTask_createEditPetitionPermissionTask(
+    mutation usePetitionSharingTask_createEditPetitionPermissionMaybeTask(
       $petitionIds: [GID!]!
       $permissionType: PetitionPermissionTypeRW!
       $userIds: [GID!]
       $userGroupIds: [GID!]
     ) {
-      createEditPetitionPermissionTask(
+      createEditPetitionPermissionMaybeTask(
         petitionIds: $petitionIds
         permissionType: $permissionType
         userIds: $userIds
         userGroupIds: $userGroupIds
       ) {
-        id
         status
+        task {
+          id
+          status
+        }
       }
     }
   `,
   gql`
-    mutation usePetitionSharingTask_createRemovePetitionPermissionTask(
+    mutation usePetitionSharingTask_createRemovePetitionPermissionMaybeTask(
       $petitionIds: [GID!]!
       $userIds: [GID!]
       $userGroupIds: [GID!]
       $removeAll: Boolean
     ) {
-      createRemovePetitionPermissionTask(
+      createRemovePetitionPermissionMaybeTask(
         petitionIds: $petitionIds
         userIds: $userIds
         userGroupIds: $userGroupIds
         removeAll: $removeAll
       ) {
-        id
         status
+        task {
+          id
+          status
+        }
       }
     }
   `,
@@ -171,3 +192,15 @@ const _queries = {
     }
   `,
 };
+
+const _fragments = [
+  gql`
+    fragment usePetitionSharingTask_MaybeTask on MaybeTask {
+      status
+      task {
+        id
+        status
+      }
+    }
+  `,
+];

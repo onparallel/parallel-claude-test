@@ -661,7 +661,7 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should insert new permission for user without access to the petitions", async () => {
-        const { newPermissions } = await petitions.addPetitionPermissions(
+        const newPermissions = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "READ" }],
           "User",
@@ -688,14 +688,14 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should not set new permission for user with access to the petitions", async () => {
-        const { newPermissions: firstPermissions } = await petitions.addPetitionPermissions(
+        const firstPermissions = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           "User",
           users[0].id,
         );
 
-        const { newPermissions } = await petitions.addPetitionPermissions(
+        const newPermissions = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           "User",
@@ -707,7 +707,7 @@ describe("repositories/PetitionRepository", () => {
 
       test("should share multiple petitions with a single user", async () => {
         const petitionIds = user0Petitions.map((u) => u.id);
-        const { newPermissions } = await petitions.addPetitionPermissions(
+        const newPermissions = await petitions.addPetitionPermissions(
           petitionIds,
           [{ type: "User", id: users[3].id, isSubscribed: true, permissionType: "WRITE" }],
           "User",
@@ -737,7 +737,7 @@ describe("repositories/PetitionRepository", () => {
       test("should share a single petition with multiple users", async () => {
         const userIds = users.slice(1).map((u) => u.id);
         const petitionId = user0Petitions[1].id;
-        const { newPermissions } = await petitions.addPetitionPermissions(
+        const newPermissions = await petitions.addPetitionPermissions(
           [petitionId],
           userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "READ" })),
           "User",
@@ -752,7 +752,7 @@ describe("repositories/PetitionRepository", () => {
       test("should share multiple petitions with multiple users", async () => {
         const userIds = users.slice(1).map((u) => u.id);
         const petitionIds = user0Petitions.map((p) => p.id);
-        const { newPermissions } = await petitions.addPetitionPermissions(
+        const newPermissions = await petitions.addPetitionPermissions(
           petitionIds,
           userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "WRITE" })),
           "User",

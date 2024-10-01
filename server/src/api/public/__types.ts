@@ -774,6 +774,14 @@ export type LandingTemplatePagination = {
   totalCount: Scalars["Int"]["output"];
 };
 
+/** If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null. */
+export type MaybeTask = {
+  status: MaybeTaskStatus;
+  task: Maybe<Task>;
+};
+
+export type MaybeTaskStatus = "COMPLETED" | "PROCESSING";
+
 export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -859,11 +867,21 @@ export type Mutation = {
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /**
+   * Adds permissions to users and groups on given petitions and folders.
+   * If the total amount of permission to add exceeds 200, a task will be created for async completion.
+   * If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createAddPetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *     Adds permissions to users and groups on given petitions and folders.
    *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
    *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
    *
+   * @deprecated use createAddPetitionPermissionMaybeTask instead
    */
   createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
@@ -892,10 +910,19 @@ export type Mutation = {
   /** Creates a new eInforma Profile External Source integration on the provided organization */
   createEInformaProfileExternalSourceIntegration: SupportMethodResponse;
   /**
+   * Edits permissions to users and groups on given petitions.
+   * If the total amount of permissions to edit exceeds 200, a task will be created for async completion.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createEditPetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *     Edits permissions to users and groups on given petitions.
    *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
    *
+   * @deprecated use createEditPetitionPermissionMaybeTask instead
    */
   createEditPetitionPermissionTask: Task;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
@@ -966,10 +993,19 @@ export type Mutation = {
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
   createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /**
+   * Removes permissions to users and groups on given petitions.
+   * If the total amount of permission to add exceeds 200, a task will be created for async completion.
+   *
+   * If the total amount of permissions to add is less than 200, it will execute synchronously and return a status code.
+   * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
+   */
+  createRemovePetitionPermissionMaybeTask: MaybeTask;
+  /**
    *
    *       Removes permissions to users and groups on given petitions.
    *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
    *
+   * @deprecated use createRemovePetitionPermissionMaybeTask instead
    */
   createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
@@ -1455,6 +1491,17 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
 export type MutationcreateAddPetitionPermissionTaskArgs = {
   folders?: InputMaybe<FoldersInput>;
   message?: InputMaybe<Scalars["String"]["input"]>;
@@ -1533,6 +1580,13 @@ export type MutationcreateEInformaProfileExternalSourceIntegrationArgs = {
   clientSecret: Scalars["String"]["input"];
   isPaidSubscription: Scalars["Boolean"]["input"];
   orgId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateEditPetitionPermissionMaybeTaskArgs = {
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateEditPetitionPermissionTaskArgs = {
@@ -1751,6 +1805,13 @@ export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
   data: Scalars["JSONObject"]["input"];
   path?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateRemovePetitionPermissionTaskArgs = {
@@ -8633,18 +8694,16 @@ export type SharePetition_usersByEmailQuery = {
   me: { organization: { usersByEmail: { items: Array<{ id: string; email: string }> } } };
 };
 
-export type SharePetition_createAddPetitionPermissionTaskMutationVariables = Exact<{
+export type SharePetition_createAddPetitionPermissionMaybeTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
-export type SharePetition_createAddPetitionPermissionTaskMutation = {
-  createAddPetitionPermissionTask: {
-    id: string;
-    progress: number | null;
-    status: TaskStatus;
-    output: any | null;
+export type SharePetition_createAddPetitionPermissionMaybeTaskMutation = {
+  createAddPetitionPermissionMaybeTask: {
+    status: MaybeTaskStatus;
+    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
   };
 };
 
@@ -8697,44 +8756,39 @@ export type SharePetition_petitionQuery = {
     | null;
 };
 
-export type StopSharing_createRemovePetitionPermissionTaskMutationVariables = Exact<{
+export type StopSharing_createRemovePetitionPermissionMaybeTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
 
-export type StopSharing_createRemovePetitionPermissionTaskMutation = {
-  createRemovePetitionPermissionTask: {
-    id: string;
-    progress: number | null;
-    status: TaskStatus;
-    output: any | null;
+export type StopSharing_createRemovePetitionPermissionMaybeTaskMutation = {
+  createRemovePetitionPermissionMaybeTask: {
+    status: MaybeTaskStatus;
+    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
   };
 };
 
-export type RemoveUserPermission_createRemovePetitionPermissionTaskMutationVariables = Exact<{
+export type RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userId: Scalars["GID"]["input"];
 }>;
 
-export type RemoveUserPermission_createRemovePetitionPermissionTaskMutation = {
-  createRemovePetitionPermissionTask: {
-    id: string;
-    progress: number | null;
-    status: TaskStatus;
-    output: any | null;
+export type RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutation = {
+  createRemovePetitionPermissionMaybeTask: {
+    status: MaybeTaskStatus;
+    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
   };
 };
 
-export type RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  userGroupId: Scalars["GID"]["input"];
-}>;
+export type RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    userGroupId: Scalars["GID"]["input"];
+  }>;
 
-export type RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutation = {
-  createRemovePetitionPermissionTask: {
-    id: string;
-    progress: number | null;
-    status: TaskStatus;
-    output: any | null;
+export type RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMutation = {
+  createRemovePetitionPermissionMaybeTask: {
+    status: MaybeTaskStatus;
+    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
   };
 };
 
@@ -12101,25 +12155,28 @@ export const SharePetition_usersByEmailDocument = gql`
   SharePetition_usersByEmailQuery,
   SharePetition_usersByEmailQueryVariables
 >;
-export const SharePetition_createAddPetitionPermissionTaskDocument = gql`
-  mutation SharePetition_createAddPetitionPermissionTask(
+export const SharePetition_createAddPetitionPermissionMaybeTaskDocument = gql`
+  mutation SharePetition_createAddPetitionPermissionMaybeTask(
     $petitionId: GID!
     $userIds: [GID!]
     $userGroupIds: [GID!]
   ) {
-    createAddPetitionPermissionTask(
+    createAddPetitionPermissionMaybeTask(
       petitionIds: [$petitionId]
       userIds: $userIds
       userGroupIds: $userGroupIds
       permissionType: WRITE
     ) {
-      ...Task
+      status
+      task {
+        ...Task
+      }
     }
   }
   ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  SharePetition_createAddPetitionPermissionTaskMutation,
-  SharePetition_createAddPetitionPermissionTaskMutationVariables
+  SharePetition_createAddPetitionPermissionMaybeTaskMutation,
+  SharePetition_createAddPetitionPermissionMaybeTaskMutationVariables
 >;
 export const SharePetition_petitionDocument = gql`
   query SharePetition_petition($id: GID!) {
@@ -12131,44 +12188,56 @@ export const SharePetition_petitionDocument = gql`
   }
   ${PermissionFragmentDoc}
 ` as unknown as DocumentNode<SharePetition_petitionQuery, SharePetition_petitionQueryVariables>;
-export const StopSharing_createRemovePetitionPermissionTaskDocument = gql`
-  mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
-    createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
-      ...Task
+export const StopSharing_createRemovePetitionPermissionMaybeTaskDocument = gql`
+  mutation StopSharing_createRemovePetitionPermissionMaybeTask($petitionId: GID!) {
+    createRemovePetitionPermissionMaybeTask(petitionIds: [$petitionId], removeAll: true) {
+      status
+      task {
+        ...Task
+      }
     }
   }
   ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  StopSharing_createRemovePetitionPermissionTaskMutation,
-  StopSharing_createRemovePetitionPermissionTaskMutationVariables
+  StopSharing_createRemovePetitionPermissionMaybeTaskMutation,
+  StopSharing_createRemovePetitionPermissionMaybeTaskMutationVariables
 >;
-export const RemoveUserPermission_createRemovePetitionPermissionTaskDocument = gql`
-  mutation RemoveUserPermission_createRemovePetitionPermissionTask(
+export const RemoveUserPermission_createRemovePetitionPermissionMaybeTaskDocument = gql`
+  mutation RemoveUserPermission_createRemovePetitionPermissionMaybeTask(
     $petitionId: GID!
     $userId: GID!
   ) {
-    createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
-      ...Task
+    createRemovePetitionPermissionMaybeTask(petitionIds: [$petitionId], userIds: [$userId]) {
+      status
+      task {
+        ...Task
+      }
     }
   }
   ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  RemoveUserPermission_createRemovePetitionPermissionTaskMutation,
-  RemoveUserPermission_createRemovePetitionPermissionTaskMutationVariables
+  RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutation,
+  RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutationVariables
 >;
-export const RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument = gql`
-  mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
+export const RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskDocument = gql`
+  mutation RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTask(
     $petitionId: GID!
     $userGroupId: GID!
   ) {
-    createRemovePetitionPermissionTask(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
-      ...Task
+    createRemovePetitionPermissionMaybeTask(
+      petitionIds: [$petitionId]
+      userGroupIds: [$userGroupId]
+    ) {
+      status
+      task {
+        ...Task
+      }
     }
   }
   ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutation,
-  RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutationVariables
+  RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMutation,
+  RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMutationVariables
 >;
 export const TransferPetition_searchUserByEmailDocument = gql`
   query TransferPetition_searchUserByEmail($search: String) {

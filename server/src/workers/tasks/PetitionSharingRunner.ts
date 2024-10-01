@@ -40,7 +40,7 @@ export class PetitionSharingRunner extends TaskRunner<"PETITION_SHARING"> {
       await this.ctx.petitions.loadEffectivePermissions(petitionIds)
     ).flat();
 
-    const { newPermissions } = await this.ctx.petitions.addPetitionPermissions(
+    const newPermissions = await this.ctx.petitions.addPetitionPermissions(
       petitionIds,
       [
         ...(args.user_ids ?? []).map((userId) => ({
