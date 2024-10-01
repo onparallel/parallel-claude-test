@@ -3,13 +3,13 @@ import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
+  Organization,
   OrganizationUsageLimitName,
   PetitionSignatureCancelReason,
   PetitionStatus,
   User,
   UserData,
 } from "../db/__types";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
@@ -242,7 +242,12 @@ export type AnalyticsEvent =
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(user: User, userData: UserData, extraTraits?: any): Promise<void>;
+  identifyUser(
+    user: User,
+    userData: UserData,
+    organization: Organization,
+    extraTraits?: any,
+  ): Promise<void>;
   trackEvent(events: MaybeArray<AnalyticsEvent>): void;
 }
 
@@ -250,10 +255,7 @@ export interface IAnalyticsService {
 export class AnalyticsService implements IAnalyticsService {
   readonly analytics?: Analytics;
 
-  constructor(
-    @inject(CONFIG) config: Config,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository,
-  ) {
+  constructor(@inject(CONFIG) config: Config) {
     if (config.analytics.writeKey) {
       this.analytics = new Analytics({
         writeKey: config.analytics.writeKey,
@@ -262,8 +264,12 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  async identifyUser(user: User, userData: UserData, extraTraits?: any) {
-    const org = (await this.organizations.loadOrg(user.org_id))!;
+  async identifyUser(
+    user: User,
+    userData: UserData,
+    organization: Organization,
+    extraTraits?: any,
+  ) {
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {
@@ -279,8 +285,8 @@ export class AnalyticsService implements IAnalyticsService {
         source: userData.details?.source,
         locale: userData.preferred_locale,
         company: {
-          id: toGlobalId("Organization", org.id),
-          name: org.name,
+          id: toGlobalId("Organization", organization.id),
+          name: organization.name,
         },
         isOrgOwner: user.is_org_owner,
         ...extraTraits,

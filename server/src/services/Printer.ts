@@ -2,8 +2,6 @@ import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../config";
 import { ContactLocale } from "../db/__types";
-import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
-import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
 import BackgroundCheckProfile, {
   BackgroundCheckProfileProps,
@@ -26,7 +24,11 @@ type DocumentMetadata = Record<string, any[]>;
 export interface IPrinter {
   petitionExport(
     userId: number,
-    data: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & { petitionId: number },
+    data: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & {
+      petitionId: number;
+      locale: ContactLocale;
+      useExportV2?: boolean;
+    },
   ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
   annexCoverPage(
     userId: number,
@@ -40,7 +42,11 @@ export interface IPrinter {
   ): Promise<NodeJS.ReadableStream>;
   signatureBoxesPage(
     userId: number,
-    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
+    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & {
+      petitionId: number;
+      locale: ContactLocale;
+      useExportV2?: boolean;
+    },
   ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
 }
 
@@ -51,8 +57,6 @@ export class Printer implements IPrinter {
   constructor(
     @inject(AUTH) protected auth: IAuth,
     @inject(CONFIG) protected config: Config,
-    @inject(PetitionRepository) private petitions: PetitionRepository,
-    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
   ) {}
 
   private async createClient(userId: number) {
@@ -66,24 +70,24 @@ export class Printer implements IPrinter {
     userId: number,
     {
       petitionId,
+      locale,
+      useExportV2,
       ...data
-    }: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & { petitionId: number },
+    }: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & {
+      petitionId: number;
+      locale: ContactLocale;
+      useExportV2?: boolean;
+    },
   ) {
-    const hasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
-
-    const petition = await this.petitions.loadPetition(petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
-    if (!petition) {
-      throw new Error("Petition not available");
-    }
     const client = await this.createClient(userId);
     return await buildPdf(
-      (hasExportV2 ? PetitionExport2 : PetitionExport) as any,
+      (useExportV2 ? PetitionExport2 : PetitionExport) as any,
       {
         ...data,
         petitionId: toGlobalId("Petition", petitionId),
         assetsUrl: this.config.misc.assetsUrl,
       },
-      { client, locale: petition.recipient_locale },
+      { client, locale },
     );
   }
 
@@ -115,18 +119,17 @@ export class Printer implements IPrinter {
 
   public async signatureBoxesPage(
     userId: number,
-    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & { petitionId: number },
+    data: Omit<SignatureBoxesPageInitialData, "petitionId"> & {
+      petitionId: number;
+      locale: ContactLocale;
+      useExportV2?: boolean;
+    },
   ) {
-    const hasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
-    const petition = await this.petitions.loadPetition(data.petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
-    if (!petition) {
-      throw new Error("Petition not available");
-    }
     const client = await this.createClient(userId);
     return await buildPdf(
-      hasExportV2 ? SignatureBoxesPage2 : SignatureBoxesPage,
+      data.useExportV2 ? SignatureBoxesPage2 : SignatureBoxesPage,
       { petitionId: toGlobalId("Petition", data.petitionId) },
-      { client, locale: petition.recipient_locale },
+      { client, locale: data.locale },
     );
   }
 }

@@ -130,11 +130,11 @@ export class Auth implements IAuth {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
-    private orgs: OrganizationRepository,
-    private integrations: IntegrationRepository,
-    private users: UserRepository,
-    private userAuthentication: UserAuthenticationRepository,
-    private system: SystemRepository,
+    @inject(OrganizationRepository) private orgs: OrganizationRepository,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(UserRepository) private users: UserRepository,
+    @inject(UserAuthenticationRepository) private userAuthentication: UserAuthenticationRepository,
+    @inject(SystemRepository) private system: SystemRepository,
   ) {}
 
   @Memoize() private get cognitoIdP() {

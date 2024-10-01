@@ -61,7 +61,7 @@ export interface IProfilesSetupService {
 export class ProfilesSetupService implements IProfilesSetupService {
   constructor(
     @inject(I18N_SERVICE) private intl: II18nService,
-    private profiles: ProfileRepository,
+    @inject(ProfileRepository) private profiles: ProfileRepository,
   ) {}
 
   async createDefaultProfileType(orgId: number, name: LocalizableUserText, createdBy: string) {

@@ -251,7 +251,12 @@ async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerConte
     loadUserStats(event.data.user_id, ctx),
     ctx.users.loadUserPermissions(event.data.user_id),
   ]);
-  await ctx.analytics.identifyUser(user, userData, { ...stats, permissions });
+
+  const organization = await ctx.organizations.loadOrg(user.org_id);
+  if (!organization) {
+    throw new Error(`Organization:${user.org_id} not found`);
+  }
+  await ctx.analytics.identifyUser(user, userData, organization, { ...stats, permissions });
   await ctx.analytics.trackEvent({
     type: "USER_LOGGED_IN",
     user_id: event.data.user_id,
@@ -311,7 +316,12 @@ async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext
     loadUser(event.data.user_id, ctx),
     loadUserDataByUserId(event.data.user_id, ctx),
   ]);
-  await ctx.analytics.identifyUser(user, userData);
+
+  const organization = await ctx.organizations.loadOrg(user.org_id);
+  if (!organization) {
+    throw new Error(`Organization:${user.org_id} not found`);
+  }
+  await ctx.analytics.identifyUser(user, userData, organization);
   await ctx.analytics.trackEvent({
     type: "USER_CREATED",
     user_id: event.data.user_id,

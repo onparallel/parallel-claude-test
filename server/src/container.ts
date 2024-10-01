@@ -7,7 +7,7 @@ import { backgroundCheckClientsModule } from "./services/background-check-client
 import { servicesModule } from "./services/module";
 
 export function createContainer() {
-  const container = new Container();
+  const container = new Container({ defaultScope: "Request" });
   container.bind<Config>(CONFIG).toDynamicValue(buildConfig).inSingletonScope();
   container.bind<ApiContext>(ApiContext).toSelf();
   container.bind<WorkerContext>(WorkerContext).toSelf();

@@ -12,6 +12,7 @@ import {
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
 } from "../db/__types";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -51,6 +52,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
     @inject(PRINTER) private printer: IPrinter,
@@ -91,7 +93,7 @@ export class PetitionBinder implements IPetitionBinder {
       this.info(`Temporary directory created at ${this.temporaryDirectory}`);
 
       const [petition, fieldsWithFiles, attachments] = await Promise.all([
-        this.petitions.loadPetition(petitionId),
+        this.petitions.loadPetition(petitionId, { refresh: true }), // refresh to get the correct petition.locale in case it has been recently updated
         this.getPrintableFiles(petitionId),
         this.petitions.loadPetitionAttachmentsByPetitionId(petitionId),
       ]);
@@ -110,12 +112,16 @@ export class PetitionBinder implements IPetitionBinder {
 
       const mainDocPaths: string[] = [];
 
+      const userHasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
+
       if (isNullish(customDocumentTemporaryFileId)) {
         const petitionExport = await this.printer.petitionExport(userId, {
           petitionId,
           documentTitle,
           showSignatureBoxes,
           includeNetDocumentsLinks,
+          locale: petition.recipient_locale,
+          useExportV2: userHasExportV2,
         });
 
         mainDocPaths.push(await this.writeTemporaryFile(petitionExport.stream, "pdf"));
@@ -128,7 +134,11 @@ export class PetitionBinder implements IPetitionBinder {
           ),
         );
         if (showSignatureBoxes) {
-          const signatureBoxesPage = await this.printer.signatureBoxesPage(userId, { petitionId });
+          const signatureBoxesPage = await this.printer.signatureBoxesPage(userId, {
+            petitionId,
+            locale: petition.recipient_locale,
+            useExportV2: userHasExportV2,
+          });
           mainDocPaths.push(await this.writeTemporaryFile(signatureBoxesPage.stream, "pdf"));
         }
       }

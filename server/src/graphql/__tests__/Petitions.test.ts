@@ -24,7 +24,6 @@ import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { defaultFieldProperties } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { AUTH, IAuth } from "../../services/AuthService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -2826,36 +2825,32 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("R/W user with group permissions should not be able to delete", async () => {
-      jest
-        .spyOn(testClient.container.get<IAuth>(AUTH), "validateRequestAuthentication")
-        .mockResolvedValueOnce([users[0]]);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { apiKey } = await mocks.createUserAuthToken("user[0]", users[0].id);
+      const { errors, data } = await testClient.withApiKey(apiKey).execute(
+        gql`
           mutation ($ids: [GID!]!) {
             deletePetitions(ids: $ids, force: true)
           }
         `,
-        variables: { ids: [toGlobalId("Petition", petition.id)] },
-      });
+        { ids: [toGlobalId("Petition", petition.id)] },
+      );
 
       expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
       expect(data).toBeNull();
     });
 
     it("R/W user with directly assigned and group permissions should not be able to delete", async () => {
-      jest
-        .spyOn(testClient.container.get<IAuth>(AUTH), "validateRequestAuthentication")
-        .mockResolvedValueOnce([users[1]]);
+      const { apiKey } = await mocks.createUserAuthToken("user[1]", users[1].id);
 
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.withApiKey(apiKey).execute(
+        gql`
           mutation ($ids: [GID!]!) {
             deletePetitions(ids: $ids, force: true)
           }
         `,
-        variables: { ids: [toGlobalId("Petition", petition.id)] },
-      });
+        { ids: [toGlobalId("Petition", petition.id)] },
+      );
+
       expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
       expect(data).toBeNull();
     });

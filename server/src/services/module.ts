@@ -89,27 +89,35 @@ import { ISmtp, SMTP, Smtp } from "./Smtp";
 import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageService";
 
 export const servicesModule = new ContainerModule((bind) => {
+  // Singleton Scope
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
-  bind<IAuth>(AUTH).to(Auth);
   bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
   bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();
   bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
-  bind<IPrinter>(PRINTER).to(Printer);
-  bind<ISignatureService>(SIGNATURE).to(SignatureService);
-  bind<IStorageService>(STORAGE_SERVICE).to(StorageService);
+  bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
+  bind<IStorageService>(STORAGE_SERVICE).to(StorageService).inSingletonScope();
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
-  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
-  bind<IOrgLimitsService>(ORG_LIMITS_SERVICE).to(OrgLimitsService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
+  bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
+    .to(BackgroundCheckService)
+    .inSingletonScope();
+  bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
+
+  // Request Scope
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
-  bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
+  bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
+  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
+  bind<IAuth>(AUTH).to(Auth);
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
     PetitionImportExportService,
   );
+  bind<ISignatureService>(SIGNATURE).to(SignatureService);
+  bind<IOrgLimitsService>(ORG_LIMITS_SERVICE).to(OrgLimitsService);
+  bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
   bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
   bind<IAccountSetupService>(ACCOUNT_SETUP_SERVICE).to(AccountSetupService);
   bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
@@ -117,14 +125,11 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPetitionMessageContextService>(PETITION_MESSAGE_CONTEXT_SERVICE).to(
     PetitionMessageContextService,
   );
-  bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
-  bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
   bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
   bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
   bind<IDocumentProcessingService>(DOCUMENT_PROCESSING_SERVICE).to(DocumentProcessingService);
   bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE).to(
     ProfileExternalSourcesService,
   );
-  bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
   bind<IFileExportService>(FILE_EXPORT_SERVICE).to(FileExportService);
 });

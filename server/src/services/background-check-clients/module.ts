@@ -5,5 +5,6 @@ import { OpenSanctionsClient } from "./OpenSanctionsClient";
 export const backgroundCheckClientsModule = new ContainerModule((bind) => {
   bind<IBackgroundCheckClient>(BACKGROUND_CHECK_CLIENT)
     .to(OpenSanctionsClient)
+    .inSingletonScope()
     .whenTargetNamed("OPEN_SANCTIONS");
 });

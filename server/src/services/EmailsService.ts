@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
 import { OrganizationUsageLimitName } from "../db/__types";
-import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import type { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { Maybe, MaybeArray, unMaybeArray } from "../util/types";

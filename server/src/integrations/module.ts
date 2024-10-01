@@ -34,6 +34,7 @@ export const integrationsModule = new ContainerModule((bind) => {
   bind<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT)
     .to(AzureOpenAiClient)
     .whenTargetNamed("AZURE_OPEN_AI");
+
   bind<AzureOpenAiIntegration>(AzureOpenAiIntegration).toSelf();
 
   bind<SignaturitIntegration>(SignaturitIntegration).toSelf();

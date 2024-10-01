@@ -28,7 +28,6 @@ import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/signature/SignaturitIntegration";
-import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
 export interface IIntegrationsSetupService {
@@ -89,7 +88,6 @@ export interface IIntegrationsSetupService {
 @injectable()
 export class IntegrationsSetupService implements IIntegrationsSetupService {
   constructor(
-    @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
     @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
