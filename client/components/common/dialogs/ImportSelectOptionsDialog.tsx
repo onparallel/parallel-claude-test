@@ -12,8 +12,11 @@ import {
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseDialog,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";

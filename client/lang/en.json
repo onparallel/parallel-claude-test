@@ -11495,17 +11495,17 @@
     "context": "Enter the contact details"
   },
   {
-    "term": "contacts.header.email",
+    "term": "page.contacts.header-email",
     "definition": "Email",
     "context": "Email"
   },
   {
-    "term": "contacts.header.first-name",
+    "term": "page.contacts.header-first-name",
     "definition": "First name",
     "context": "First name"
   },
   {
-    "term": "contacts.header.last-name",
+    "term": "page.contacts.header-last-name",
     "definition": "Last name",
     "context": "Last name"
   },
@@ -11560,17 +11560,17 @@
     "context": "Some of the emails could not be verified."
   },
   {
-    "term": "contacts.no-contacts",
+    "term": "page.contacts.no-contacts",
     "definition": "You have no contacts yet. Start by creating one now!",
     "context": "You have no contacts yet. Start by creating one now!"
   },
   {
-    "term": "contacts.no-results",
+    "term": "page.contacts.no-results",
     "definition": "There's no contacts matching your search",
     "context": "There's no contacts matching your search"
   },
   {
-    "term": "contacts.successful-import-toast.title",
+    "term": "page.contacts.successful-import-toast-title",
     "definition": "{count, plural, =1{# contact} other{# contacts}} imported successfully!",
     "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
   },

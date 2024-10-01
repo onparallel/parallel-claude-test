@@ -72,7 +72,7 @@ import { KeyProp, getKey } from "@parallel/utils/keyProp";
 import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
 import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
 import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { Focusable, UnwrapPromise } from "@parallel/utils/types";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSelection, useSelectionState } from "@parallel/utils/useSelectionState";
@@ -83,13 +83,14 @@ import {
   Key,
   MouseEvent,
   ReactNode,
+  RefObject,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { identity, noop } from "remeda";
+import { doNothing, identity } from "remeda";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -166,12 +167,14 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     } catch {}
   };
 
+  const headerMoreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   const [cloneProfileType] = useMutation(OrganizationProfileType_cloneProfileTypeDocument);
   const handleCloneProfileType = async () => {
     try {
       const { name } = await showCreateOrUpdateProfileTypeDialog({
         isEditing: false,
         name: profileType.name,
+        modalProps: { finalFocusRef: headerMoreOptionsButtonRef },
       });
       const res = await cloneProfileType({
         variables: {
@@ -287,11 +290,13 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   );
   const handleConfigureVisibility = async (
     rows: OrganizationProfileType_ProfileTypeFieldFragment[],
+    finalFocusRef?: RefObject<Focusable>,
   ) => {
     try {
       const { defaultPermission, permissions: data } = await showProfileTypeFieldPermissionDialog({
         profileTypeField: rows[0],
         userId: me.id,
+        modalProps: { finalFocusRef },
       });
 
       await updateProfileTypeFieldPermission({
@@ -309,11 +314,15 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     OrganizationProfileType_updateProfileTypeFieldDocument,
   );
 
-  const handleEditProperty = async (fields: OrganizationProfileType_ProfileTypeFieldFragment[]) => {
+  const handleEditProperty = async (
+    fields: OrganizationProfileType_ProfileTypeFieldFragment[],
+    finalFocusRef?: RefObject<Focusable>,
+  ) => {
     try {
       if (fields.length > 1) {
         const { isExpirable, expiryAlertAheadTime } = await showUpdateProfileTypeFieldDialog({
           fields,
+          modalProps: { finalFocusRef },
         });
         for (const field of fields) {
           await updateProfileTypeField({
@@ -445,6 +454,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
           </HStack>
           <WhenPermission permission="PROFILE_TYPES:CRUD_PROFILE_TYPES">
             <MoreOptionsMenuButton
+              ref={headerMoreOptionsButtonRef}
               variant="outline"
               options={
                 <MenuList>
@@ -518,9 +528,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             rows={profileType.fields}
             rowKeyProp="id"
             actions={actions}
-            onEdit={(profileTypeField) => handleEditProperty([profileTypeField])}
-            onConfigureVisibility={(profileTypeField) =>
-              handleConfigureVisibility([profileTypeField])
+            onEdit={(profileTypeField, finalFocusRef) =>
+              handleEditProperty([profileTypeField], finalFocusRef)
+            }
+            onConfigureVisibility={(profileTypeField, finalFocusRef) =>
+              handleConfigureVisibility([profileTypeField], finalFocusRef)
             }
             onDelete={(profileTypeField) => handleDeleteProperty([profileTypeField.id])}
             onSelectionChange={onChangeSelectedIds}
@@ -544,8 +556,14 @@ interface DraggableListProps extends BoxProps {
   rows: OrganizationProfileType_ProfileTypeFieldFragment[];
   rowKeyProp: KeyProp<OrganizationProfileType_ProfileTypeFieldFragment>;
   actions?: (ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode })[];
-  onEdit: (row: OrganizationProfileType_ProfileTypeFieldFragment) => void;
-  onConfigureVisibility: (row: OrganizationProfileType_ProfileTypeFieldFragment) => void;
+  onEdit: (
+    row: OrganizationProfileType_ProfileTypeFieldFragment,
+    finalFocusRef?: RefObject<Focusable>,
+  ) => void;
+  onConfigureVisibility: (
+    row: OrganizationProfileType_ProfileTypeFieldFragment,
+    finalFocusRef?: RefObject<Focusable>,
+  ) => void;
   onDelete: (row: OrganizationProfileType_ProfileTypeFieldFragment) => void;
   onSelectionChange: (selected: string[]) => void;
   onReorder: (ids: string[]) => void;
@@ -596,7 +614,7 @@ function DraggableList({
           <Checkbox
             isChecked={anySelected && allSelected}
             isIndeterminate={anySelected && !allSelected}
-            onChange={noop}
+            onChange={doNothing}
           />
         </Center>
         {selectedCount.current > 0 ? (
@@ -641,8 +659,8 @@ function DraggableList({
                 key={key}
                 item={item}
                 index={i}
-                onEdit={() => onEdit(item)}
-                onConfigureVisibility={() => onConfigureVisibility(item)}
+                onEdit={(buttonRef) => onEdit(item, buttonRef)}
+                onConfigureVisibility={(buttonRef) => onConfigureVisibility(item, buttonRef)}
                 onDelete={() => onDelete(item)}
                 onDragEnd={() => onReorder(list.map((i) => i.id))}
                 onToggle={(event) => toggle(key, event)}
@@ -660,8 +678,8 @@ interface ProfileTypeFieldProps {
   item: any;
   index: number;
   isSelected: boolean;
-  onEdit: () => void;
-  onConfigureVisibility: () => void;
+  onEdit: (finalFocusRef?: RefObject<Focusable>) => void;
+  onConfigureVisibility: (finalFocusRef?: RefObject<Focusable>) => void;
   onDelete: () => void;
   onDragEnd: () => void;
   onToggle: (event: MouseEvent) => void;
@@ -683,6 +701,8 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
 ) {
   const intl = useIntl();
   const dragControls = useDragControls();
+
+  const propertyMoreOptionsRef = useRef<HTMLButtonElement>(null);
 
   return (
     <Reorder.Item
@@ -755,12 +775,16 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
             />
           </Text>
           <MoreOptionsMenuButton
+            ref={propertyMoreOptionsRef}
             className="more-opetions-button"
             alignSelf="end"
             size="sm"
             options={
               <MenuList minWidth="160px">
-                <MenuItem icon={<EditIcon display="block" boxSize={4} />} onClick={onEdit}>
+                <MenuItem
+                  icon={<EditIcon display="block" boxSize={4} />}
+                  onClick={() => onEdit(propertyMoreOptionsRef)}
+                >
                   <FormattedMessage
                     id="component.draggable-list.edit-property"
                     defaultMessage="Edit property"
@@ -768,7 +792,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
                 </MenuItem>
                 <MenuItem
                   icon={<EyeIcon display="block" boxSize={4} />}
-                  onClick={onConfigureVisibility}
+                  onClick={() => onConfigureVisibility(propertyMoreOptionsRef)}
                 >
                   <FormattedMessage
                     id="component.draggable-list.configure-visiblity"

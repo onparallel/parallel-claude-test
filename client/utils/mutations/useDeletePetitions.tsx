@@ -2,7 +2,11 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Button, Center, ListItem, Spinner, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseModalProps,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
@@ -19,7 +23,7 @@ import { isApolloError } from "../apollo/isApolloError";
 import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
 
-export function useDeletePetitions() {
+export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps } = {}) {
   const intl = useIntl();
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
@@ -65,11 +69,12 @@ export function useDeletePetitions() {
               petitionIds: error.graphQLErrors[0].extensions!.petitionIds as string[],
               type,
               currentPath,
+              modalProps,
             });
           }
         } else if (!error) {
           if (!skipConfirmDialogs) {
-            await confirmDelete({ petitionsOrFolders: petitionsOrFolders, type });
+            await confirmDelete({ petitionsOrFolders: petitionsOrFolders, type, modalProps });
           }
         } else {
           throw error;
@@ -132,6 +137,7 @@ export function useDeletePetitions() {
                     </UnorderedList>
                   </>
                 ),
+              modalProps,
             });
             // can't delete a public template
           } else if (errorCode === "DELETE_PUBLIC_TEMPLATE_ERROR") {
@@ -166,6 +172,7 @@ export function useDeletePetitions() {
                     </UnorderedList>
                   </>
                 ),
+              modalProps,
             });
           }
         }

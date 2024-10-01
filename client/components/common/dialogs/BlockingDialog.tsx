@@ -1,7 +1,10 @@
 import { ModalBody, ModalContent, ModalFooter, ModalHeader } from "@chakra-ui/react";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseDialog,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { ReactNode, useEffect } from "react";
-import { BaseDialog } from "./BaseDialog";
 
 export interface BlockingDialogProps {
   header: ReactNode;

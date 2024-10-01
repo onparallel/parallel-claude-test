@@ -25,10 +25,10 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { UnwrapArray } from "@parallel/utils/types";
+import { Focusable, UnwrapArray } from "@parallel/utils/types";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, useMemo } from "react";
+import { MouseEvent, RefObject, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
 
@@ -79,9 +79,11 @@ function Contacts() {
     goToContact(row.id, event);
   }
 
-  async function handleCreateClick() {
+  async function handleCreateClick(finalFocusRef?: RefObject<Focusable>) {
     try {
-      await createContact({});
+      await createContact({
+        modalProps: { finalFocusRef },
+      });
       refetch();
     } catch {}
   }
@@ -97,14 +99,18 @@ function Contacts() {
 
   const showImportContactsDialog = useImportContactsDialog();
 
-  async function handleImportClick() {
-    const [error, data] = await withError(showImportContactsDialog());
+  async function handleImportClick(finalFocusRef?: RefObject<Focusable>) {
+    const [error, data] = await withError(
+      showImportContactsDialog({
+        modalProps: { finalFocusRef },
+      }),
+    );
     if (!error) {
       await refetch();
       showToast({
         title: intl.formatMessage(
           {
-            id: "contacts.successful-import-toast.title",
+            id: "page.contacts.successful-import-toast-title",
             defaultMessage:
               "{count, plural, =1{# contact} other{# contacts}} imported successfully!",
           },
@@ -177,7 +183,7 @@ function Contacts() {
                   <Center flex="1">
                     <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
-                        id="contacts.no-results"
+                        id="page.contacts.no-results"
                         defaultMessage="There's no contacts matching your search"
                       />
                     </Text>
@@ -186,7 +192,7 @@ function Contacts() {
                   <Center flex="1">
                     <Text fontSize="lg">
                       <FormattedMessage
-                        id="contacts.no-contacts"
+                        id="page.contacts.no-contacts"
                         defaultMessage="You have no contacts yet. Start by creating one now!"
                       />
                     </Text>
@@ -211,7 +217,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         key: "firstName",
         isSortable: true,
         label: intl.formatMessage({
-          id: "contacts.header.first-name",
+          id: "page.contacts.header-first-name",
           defaultMessage: "First name",
         }),
         cellProps: {
@@ -233,7 +239,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         key: "lastName",
         isSortable: true,
         label: intl.formatMessage({
-          id: "contacts.header.last-name",
+          id: "page.contacts.header-last-name",
           defaultMessage: "Last name",
         }),
         cellProps: {
@@ -254,7 +260,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         key: "email",
         isSortable: true,
         label: intl.formatMessage({
-          id: "contacts.header.email",
+          id: "page.contacts.header-email",
           defaultMessage: "Email",
         }),
         cellProps: {

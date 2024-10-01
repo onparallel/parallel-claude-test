@@ -49,7 +49,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
-import { Fragment, MouseEvent } from "react";
+import { Fragment, MouseEvent, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
@@ -111,6 +111,7 @@ export function TemplateDetailsModal({
     goToPetition(template.id, "preview", { event });
   };
 
+  const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async () => {
     try {
@@ -118,6 +119,7 @@ export function TemplateDetailsModal({
         userId: myId,
         petitionIds: [template.id],
         type: "TEMPLATE",
+        modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
       if (res?.close) {
         props.onClose();
@@ -270,6 +272,7 @@ export function TemplateDetailsModal({
                 )}
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <MoreOptionsMenuButton
+                    ref={moreOptionsButtonRef}
                     variant="outline"
                     data-testid="template-more-options-button"
                     options={

@@ -14,8 +14,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CircleCheckFilledIcon, TimeIcon } from "@parallel/chakra/icons";
-import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseDialog,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";

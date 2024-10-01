@@ -24,9 +24,10 @@ import {
 } from "@parallel/graphql/__types";
 import { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { SetQueryState } from "@parallel/utils/queryState";
+import { Focusable } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
@@ -66,85 +67,89 @@ export const ViewTabs = Object.assign(
     const hasDefaultView = views.some((v) => v.isDefault);
 
     const [updatePetitionListView] = useMutation(ViewTabs_updatePetitionListViewDocument);
-    const createRenameViewClickHandler = (view: ViewTabs_PetitionListViewFragment) => async () => {
-      try {
-        const name = await showAskViewNameDialog({
-          name: view.name,
-          header: (
-            <FormattedMessage
-              id="component.view-tabs.rename-view-header"
-              defaultMessage="Rename view"
-            />
-          ),
-          confirm: (
-            <FormattedMessage
-              id="component.view-tabs.rename-view-confirm"
-              defaultMessage="Rename"
-            />
-          ),
-        });
+    const createRenameViewClickHandler =
+      (view: ViewTabs_PetitionListViewFragment) => async (finalFocusRef?: RefObject<Focusable>) => {
+        try {
+          const name = await showAskViewNameDialog({
+            name: view.name,
+            header: (
+              <FormattedMessage
+                id="component.view-tabs.rename-view-header"
+                defaultMessage="Rename view"
+              />
+            ),
+            confirm: (
+              <FormattedMessage
+                id="component.view-tabs.rename-view-confirm"
+                defaultMessage="Rename"
+              />
+            ),
+            modalProps: { finalFocusRef },
+          });
 
-        await updatePetitionListView({
-          variables: { petitionListViewId: view.id, name },
-        });
-      } catch (error) {
-        if (isDialogError(error)) {
-          return;
-        } else {
-          showGenericErrorToast(error);
+          await updatePetitionListView({
+            variables: { petitionListViewId: view.id, name },
+          });
+        } catch (error) {
+          if (isDialogError(error)) {
+            return;
+          } else {
+            showGenericErrorToast(error);
+          }
         }
-      }
-    };
+      };
 
     const [createPetitionListView] = useMutation(ViewTabs_createPetitionListViewDocument);
-    const createCloneViewClickHandler = (view: ViewTabs_PetitionListViewFragment) => async () => {
-      try {
-        const name = await showAskViewNameDialog({
-          name: view.name,
-          header: (
-            <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
-          ),
-          confirm: (
-            <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
-          ),
-        });
-        const { data } = await createPetitionListView({
-          variables: {
-            name,
-            data: {
-              ...omit(view.data, ["__typename", "sharedWith", "tagsFilters", "sort"]),
-              sharedWith: isNonNullish(view.data.sharedWith)
-                ? {
-                    ...omit(view.data.sharedWith, ["__typename"]),
-                    filters: view.data.sharedWith.filters.map(omit(["__typename"])),
-                  }
-                : view.data.sharedWith,
-              tagsFilters: isNonNullish(view.data.tagsFilters)
-                ? {
-                    ...omit(view.data.tagsFilters, ["__typename"]),
-                    filters: view.data.tagsFilters.filters.map(omit(["__typename"])),
-                  }
-                : view.data.tagsFilters,
-              sort: isNonNullish(view.data.sort)
-                ? omit(view.data.sort, ["__typename"])
-                : view.data.sort,
-            },
-          },
-        });
-        if (isNonNullish(data)) {
-          onStateChange({
-            view: data.createPetitionListView.id,
-            ...omit(data.createPetitionListView.data, ["__typename"]),
+    const createCloneViewClickHandler =
+      (view: ViewTabs_PetitionListViewFragment) => async (finalFocusRef?: RefObject<Focusable>) => {
+        try {
+          const name = await showAskViewNameDialog({
+            name: view.name,
+            header: (
+              <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
+            ),
+            confirm: (
+              <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
+            ),
+            modalProps: { finalFocusRef },
           });
+          const { data } = await createPetitionListView({
+            variables: {
+              name,
+              data: {
+                ...omit(view.data, ["__typename", "sharedWith", "tagsFilters", "sort"]),
+                sharedWith: isNonNullish(view.data.sharedWith)
+                  ? {
+                      ...omit(view.data.sharedWith, ["__typename"]),
+                      filters: view.data.sharedWith.filters.map(omit(["__typename"])),
+                    }
+                  : view.data.sharedWith,
+                tagsFilters: isNonNullish(view.data.tagsFilters)
+                  ? {
+                      ...omit(view.data.tagsFilters, ["__typename"]),
+                      filters: view.data.tagsFilters.filters.map(omit(["__typename"])),
+                    }
+                  : view.data.tagsFilters,
+                sort: isNonNullish(view.data.sort)
+                  ? omit(view.data.sort, ["__typename"])
+                  : view.data.sort,
+              },
+            },
+          });
+          if (isNonNullish(data)) {
+            onStateChange({
+              view: data.createPetitionListView.id,
+              ...omit(data.createPetitionListView.data, ["__typename"]),
+            });
+          }
+        } catch (error) {
+          if (isDialogError(error)) {
+            return;
+          } else {
+            showGenericErrorToast(error);
+          }
         }
-      } catch (error) {
-        if (isDialogError(error)) {
-          return;
-        } else {
-          showGenericErrorToast(error);
-        }
-      }
-    };
+      };
 
     const [markPetitionListViewAsDefault] = useMutation(
       ViewTabs_markPetitionListViewAsDefaultDocument,
@@ -439,8 +444,8 @@ interface ViewTabProps {
   };
   isActive?: boolean;
   draggedViewId: string | null;
-  onRenameView: () => void;
-  onCloneView: () => void;
+  onRenameView: (finalFocusRef?: RefObject<Focusable>) => void;
+  onCloneView: (finalFocusRef?: RefObject<Focusable>) => void;
   onMarkViewAsDefault: () => void;
   onDeleteView: () => void;
   onDragStart: () => void;
@@ -458,6 +463,7 @@ export function ViewTab({
   onDragStart,
   onDragEnd,
 }: ViewTabProps) {
+  const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   return (
     <Flex
       {...((view.id === "ALL"
@@ -494,6 +500,7 @@ export function ViewTab({
         <Square size={6}>
           {isActive ? (
             <MoreOptionsMenuButton
+              ref={moreOptionsButtonRef}
               size="xs"
               variant="ghost"
               options={
@@ -501,14 +508,17 @@ export function ViewTab({
                   <MenuItem
                     isDisabled={view.id === "ALL"}
                     icon={<EditIcon boxSize={4} display="block" />}
-                    onClick={onRenameView}
+                    onClick={() => onRenameView(moreOptionsButtonRef)}
                   >
                     <FormattedMessage
                       id="component.view-tabs.action-rename-view"
                       defaultMessage="Rename view"
                     />
                   </MenuItem>
-                  <MenuItem icon={<CopyIcon boxSize={4} display="block" />} onClick={onCloneView}>
+                  <MenuItem
+                    icon={<CopyIcon boxSize={4} display="block" />}
+                    onClick={() => onCloneView(moreOptionsButtonRef)}
+                  >
                     <FormattedMessage
                       id="component.view-tabs.action-clone-view"
                       defaultMessage="Clone view"

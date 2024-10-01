@@ -1,7 +1,8 @@
 import { Box, Button, MenuItem, MenuList, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Focusable } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, RefObject, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -13,8 +14,8 @@ export interface ContactListHeaderProps {
   search: string | null;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
-  onCreateClick: () => void;
-  onImportClick: () => void;
+  onCreateClick: (finalFocusRef?: RefObject<Focusable>) => void;
+  onImportClick: (finalFocusRef?: RefObject<Focusable>) => void;
 }
 
 export function ContactListHeader({
@@ -27,6 +28,7 @@ export function ContactListHeader({
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [onSearchChange]);
+  const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -56,7 +58,7 @@ export function ContactListHeader({
         data-action="import-contacts"
         display={{ base: "none", md: "flex" }}
         variant="outline"
-        onClick={onImportClick}
+        onClick={() => onImportClick()}
       >
         <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           <FormattedMessage
@@ -71,18 +73,22 @@ export function ContactListHeader({
         icon={<UserPlusIcon />}
         hideIconOnDesktop
         colorScheme="primary"
-        onClick={onCreateClick}
+        onClick={() => onCreateClick()}
         label={intl.formatMessage({
           id: "component.contact-list-header.create-contact-button",
           defaultMessage: "Create contact",
         })}
       />
       <MoreOptionsMenuButton
+        ref={moreOptionsButtonRef}
         display={{ base: "block", md: "none" }}
         variant="outline"
         options={
           <MenuList minWidth="fit-content">
-            <MenuItem onClick={onImportClick} icon={<UploadIcon display="block" boxSize={4} />}>
+            <MenuItem
+              onClick={() => onImportClick(moreOptionsButtonRef)}
+              icon={<UploadIcon display="block" boxSize={4} />}
+            >
               <FormattedMessage
                 id="component.contact-list-header.import-contacts-button"
                 defaultMessage="Import contacts"
@@ -91,7 +97,7 @@ export function ContactListHeader({
             <MenuItem
               justifyContent="left"
               type="submit"
-              onClick={onCreateClick}
+              onClick={() => onCreateClick(moreOptionsButtonRef)}
               icon={<UserPlusIcon display="block" boxSize={4} />}
             >
               <FormattedMessage

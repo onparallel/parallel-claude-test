@@ -116,6 +116,8 @@ export const PetitionHeader = Object.assign(
       petition.__typename === "Petition" ? petition.myEffectivePermission!.isSubscribed : false;
     const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
+    const moreOptionsRef = useRef<HTMLButtonElement>(null);
+
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
       try {
@@ -180,6 +182,7 @@ export const PetitionHeader = Object.assign(
           userId: me.id,
           petitionIds: [petition.id],
           type: isPetition ? "PETITION" : "TEMPLATE",
+          modalProps: { finalFocusRef: moreOptionsRef },
         });
         if (res?.close) {
           router.push(isPetition ? "/app/petitions" : "/app/petitions/new");
@@ -189,11 +192,12 @@ export const PetitionHeader = Object.assign(
 
     const [movePetition] = useMutation(PetitionsHeader_movePetitionDocument);
     const showMoveFolderDialog = useMoveToFolderDialog();
-    const handleMovePetition = async () => {
+    const handleMovePetition = async (fromMenu?: boolean) => {
       try {
         const destination = await showMoveFolderDialog({
           type: isPetition ? "PETITION" : "TEMPLATE",
           currentPath: petition.path,
+          modalProps: fromMenu ? { finalFocusRef: moreOptionsRef } : undefined,
         });
         await movePetition({
           variables: {
@@ -317,7 +321,7 @@ export const PetitionHeader = Object.assign(
 
     const handleReopenPetition = useCallback(async () => {
       try {
-        await confirmReopenPetitionDialog();
+        await confirmReopenPetitionDialog({ modalProps: { finalFocusRef: moreOptionsRef } });
         await reopenPetition({
           variables: {
             petitionId: petition.id,
@@ -344,7 +348,10 @@ export const PetitionHeader = Object.assign(
     const showImportRepliesDialog = useImportRepliesDialog();
     const handleImportRepliesClick = async () => {
       try {
-        await showImportRepliesDialog({ petitionId: petition.id });
+        await showImportRepliesDialog({
+          petitionId: petition.id,
+          modalProps: { finalFocusRef: moreOptionsRef },
+        });
         onRefetch?.();
         toast({
           title: intl.formatMessage({
@@ -367,12 +374,13 @@ export const PetitionHeader = Object.assign(
       PetitionsHeader_associateProfileToPetitionDocument,
     );
     const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
-    const handleProfilesClick = async (forceAssociateNewProfile?: boolean) => {
+    const handleProfilesClick = async (forceAssociateNewProfile?: boolean, fromMenu?: boolean) => {
       assertTypename(petition, "Petition");
       try {
         if (forceAssociateNewProfile) {
           const profileId = await showAssociateProfileToPetitionDialog({
             excludeProfiles: petition.profiles.map((p) => p.id),
+            modalProps: fromMenu ? { finalFocusRef: moreOptionsRef } : undefined,
           });
 
           await associateProfileToPetition({
@@ -603,6 +611,7 @@ export const PetitionHeader = Object.assign(
           )}
           <Box>
             <MoreOptionsMenuButton
+              ref={moreOptionsRef}
               data-testid="petition-layout-header-menu-options"
               variant="outline"
               options={
@@ -637,7 +646,11 @@ export const PetitionHeader = Object.assign(
                   ) : null}
                   {petition.isDocumentGenerationEnabled ? (
                     <MenuItem
-                      onClick={() => handlePrintPdfTask(petition.id)}
+                      onClick={() =>
+                        handlePrintPdfTask(petition.id, {
+                          modalProps: { finalFocusRef: moreOptionsRef },
+                        })
+                      }
                       isDisabled={isAnonymized}
                       icon={<DownloadIcon display="block" boxSize={4} />}
                     >
@@ -652,7 +665,7 @@ export const PetitionHeader = Object.assign(
                   !petition.isAnonymized &&
                   myEffectivePermission !== "READ" ? (
                     <MenuItem
-                      onClick={() => handleProfilesClick(true)}
+                      onClick={() => handleProfilesClick(true, true)}
                       isDisabled={isAnonymized}
                       icon={<ArrowDiagonalRightIcon display="block" boxSize={4} />}
                     >
@@ -664,7 +677,11 @@ export const PetitionHeader = Object.assign(
                   ) : null}
                   {userCanDownloadResults && !isPetition ? (
                     <MenuItem
-                      onClick={() => handleTemplateRepliesReportTask(petition.id)}
+                      onClick={() =>
+                        handleTemplateRepliesReportTask(petition.id, null, null, {
+                          modalProps: { finalFocusRef: moreOptionsRef },
+                        })
+                      }
                       icon={<TableIcon display="block" boxSize={4} />}
                     >
                       <FormattedMessage
@@ -699,7 +716,7 @@ export const PetitionHeader = Object.assign(
                   ) : null}
 
                   <MenuItem
-                    onClick={handleMovePetition}
+                    onClick={() => handleMovePetition(true)}
                     icon={<FolderIcon display="block" boxSize={4} />}
                     isDisabled={!userCanChangePath}
                   >

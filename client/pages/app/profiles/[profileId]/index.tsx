@@ -39,6 +39,7 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withMetadata } from "@parallel/utils/withMetadata";
+import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getInitialProps>>;
@@ -108,6 +109,8 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     }
   };
 
+  const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
+
   const showSubscribersDialog = useProfileSubscribersDialog();
 
   const handleSubscribersClick = async () => {
@@ -117,6 +120,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
         me,
         users: profile.subscribers.map(({ user }) => user),
         isSubscribed: profile.subscribers.some(({ user }) => user.isMe),
+        modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
     } catch {}
   };
@@ -222,6 +226,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               operator="OR"
             >
               <MoreOptionsMenuButton
+                ref={moreOptionsButtonRef}
                 variant="outline"
                 options={
                   <MenuList width="fit-content" minWidth="200px">

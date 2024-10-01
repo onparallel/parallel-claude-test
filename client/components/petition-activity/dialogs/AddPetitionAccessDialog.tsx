@@ -183,6 +183,7 @@ export function AddPetitionAccessDialog({
   ];
 
   const recipientsRef = useRef<HTMLInputElement>(null);
+  const sendButtonRef = useRef<HTMLButtonElement>(null);
 
   const showScheduleMessageDialog = useScheduleMessageDialog();
   const showCopySignatureConfigDialog = useCopySignatureConfigDialog();
@@ -191,7 +192,9 @@ export function AddPetitionAccessDialog({
       try {
         await handleSubmit(async (data) => {
           assert(isNonNullish(data.body));
-          const scheduledAt = schedule ? await showScheduleMessageDialog() : null;
+          const scheduledAt = schedule
+            ? await showScheduleMessageDialog({ modalProps: { finalFocusRef: sendButtonRef } })
+            : null;
           // if the petition has signer contacts configured,
           // ask user if they want that contact(s) to sign all the petitions
           let bulkSendSigningMode: BulkSendSigningMode | undefined;
@@ -202,6 +205,7 @@ export function AddPetitionAccessDialog({
           ) {
             const option = await showCopySignatureConfigDialog({
               signers: data.signatureConfig.signers.filter(isNonNullish),
+              modalProps: { finalFocusRef: sendButtonRef },
             });
 
             bulkSendSigningMode = option;
@@ -565,6 +569,7 @@ export function AddPetitionAccessDialog({
       }
       confirm={
         <SendButton
+          ref={sendButtonRef}
           isDisabled={!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit}
           data-action="send-petition"
           onSendClick={handleSendClick(false)}

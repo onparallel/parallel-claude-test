@@ -1,4 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   TaskProgressDialog,
@@ -22,7 +23,12 @@ export function useTemplateRepliesReportTask() {
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
-  return async (petitionId: string, startDate?: Maybe<string>, endDate?: Maybe<string>) => {
+  return async (
+    petitionId: string,
+    startDate?: Maybe<string>,
+    endDate?: Maybe<string>,
+    { modalProps }: { modalProps?: BaseModalProps } = {},
+  ) => {
     const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
         initTask: async () => {
@@ -48,6 +54,7 @@ export function useTemplateRepliesReportTask() {
           id: "generic.download",
           defaultMessage: "Download",
         }),
+        modalProps,
       });
     });
 

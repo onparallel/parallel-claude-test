@@ -13,8 +13,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
-import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseDialog,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   CuatrecasasExportError,

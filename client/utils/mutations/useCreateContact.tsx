@@ -3,7 +3,11 @@ import { Button, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseModalProps,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
@@ -21,13 +25,15 @@ export function useCreateContact() {
     email,
     firstName,
     lastName,
+    modalProps,
   }: {
     email?: string;
     firstName?: string;
     lastName?: string;
+    modalProps?: BaseModalProps;
   }) {
     try {
-      const details = await askContactDetails({ email, firstName, lastName });
+      const details = await askContactDetails({ email, firstName, lastName, modalProps });
       try {
         const { data } = await createContact({
           variables: { data: details },

@@ -1,16 +1,22 @@
+import { Modal, ModalOverlay, ModalProps } from "@chakra-ui/react";
 import { Prettify } from "@parallel/utils/types";
 import { NextComponentType } from "next";
+import { useRouter } from "next/router";
 import {
   cloneElement,
   ComponentType,
   createContext,
+  PropsWithChildren,
   ReactElement,
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
+import { isNonNullish } from "remeda";
+import { Wrap } from "../Wrap";
 
 export interface DialogCallbacks<TResult = void> {
   onResolve: (value?: TResult) => void;
@@ -28,13 +34,13 @@ const DialogOpenerContext = createContext<DialogOpener | null>(null);
 interface UseDialogReturn<TProps = {}, TResult = void> {
   (
     ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
-      ? []
-      : [props: Prettify<Omit<TProps, keyof DialogCallbacks>>]
+      ? [props?: { modalProps?: BaseModalProps }]
+      : [props: Prettify<Omit<TProps, keyof DialogCallbacks> & { modalProps?: BaseModalProps }>]
   ): Promise<TResult>;
   ignoringDialogErrors: (
     ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
-      ? []
-      : [props: Prettify<Omit<TProps, keyof DialogCallbacks>>]
+      ? [props?: { modalProps?: BaseModalProps }]
+      : [props: Prettify<Omit<TProps, keyof DialogCallbacks> & { modalProps?: BaseModalProps }>]
   ) => Promise<void>;
 }
 
@@ -46,15 +52,42 @@ export function useDialog<TProps = {}, TResult = void>(
   return useMemo(
     () =>
       Object.assign(
-        async (props?: Omit<TProps, keyof DialogCallbacks>) =>
-          await opener((callbacks: DialogCallbacks<TResult>) => (
-            <Dialog {...callbacks} {...((props as any) ?? {})} />
-          )),
+        async (
+          props?: Prettify<
+            Omit<TProps, keyof DialogCallbacks | keyof BaseModalProps> & {
+              modalProps?: BaseModalProps;
+            }
+          >,
+        ) => {
+          const { modalProps, ...rest } = props ?? {};
+          return await opener((callbacks: DialogCallbacks<TResult>) => (
+            <Wrap
+              when={isNonNullish(modalProps)}
+              wrapper={({ children }) => (
+                <BaseDialogPropsProvider value={modalProps!}>{children}</BaseDialogPropsProvider>
+              )}
+            >
+              <Dialog {...callbacks} {...(rest as any)} />
+            </Wrap>
+          ));
+        },
         {
-          ignoringDialogErrors: async (props?: Omit<TProps, keyof DialogCallbacks>) => {
+          ignoringDialogErrors: async (
+            props?: Prettify<Omit<TProps, keyof DialogCallbacks> & { modalProps?: BaseModalProps }>,
+          ) => {
             try {
+              const { modalProps, ...rest } = props ?? {};
               await opener((callbacks: DialogCallbacks<TResult>) => (
-                <Dialog {...callbacks} {...((props as any) ?? {})} />
+                <Wrap
+                  when={isNonNullish(modalProps)}
+                  wrapper={({ children }) => (
+                    <BaseDialogPropsProvider value={modalProps!}>
+                      {children}
+                    </BaseDialogPropsProvider>
+                  )}
+                >
+                  <Dialog {...callbacks} {...(rest as any)} />
+                </Wrap>
               ));
             } catch (e) {
               if (e instanceof DialogError) {
@@ -65,7 +98,7 @@ export function useDialog<TProps = {}, TResult = void>(
             }
           },
         },
-      ),
+      ) as any,
     [Dialog],
   );
 }
@@ -126,4 +159,45 @@ export class DialogError extends Error {
 
 export function isDialogError(value: unknown): value is DialogError {
   return value instanceof DialogError;
+}
+
+export type BaseModalProps = Omit<ModalProps, "children" | "isOpen" | "onClose">;
+
+export interface BaseDialogProps<TResult> extends BaseModalProps, DialogProps<{}, TResult> {
+  closeOnNavigation?: boolean;
+  children: ReactNode;
+}
+
+export function BaseDialog<TResult = void>({
+  onResolve,
+  onReject,
+  closeOnNavigation,
+  children,
+  ...props
+}: BaseDialogProps<TResult>) {
+  const router = useRouter();
+  useEffect(() => {
+    if (closeOnNavigation) {
+      const routeChangeStartHandler = () => onReject("NAVIGATION");
+      router.events.on("routeChangeStart", routeChangeStartHandler);
+      return () => router.events.off("routeChangeStart", routeChangeStartHandler);
+    }
+  }, [closeOnNavigation]);
+  const contextProps = useContext(BaseDialogPropsContext);
+  return (
+    <Modal isOpen={true} onClose={() => onReject("CLOSE")} {...contextProps} {...props}>
+      <ModalOverlay>{children}</ModalOverlay>
+    </Modal>
+  );
+}
+
+const BaseDialogPropsContext = createContext<BaseModalProps>({});
+
+export function BaseDialogPropsProvider({
+  children,
+  value,
+}: PropsWithChildren<{ value: BaseModalProps }>) {
+  return (
+    <BaseDialogPropsContext.Provider value={value}>{children}</BaseDialogPropsContext.Provider>
+  );
 }

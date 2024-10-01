@@ -1,4 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   TaskProgressDialog,
@@ -26,7 +27,7 @@ export function usePrintPdfTask() {
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
-  return async (petitionId: string) => {
+  return async (petitionId: string, { modalProps }: { modalProps?: BaseModalProps } = {}) => {
     const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
         initTask: async () => {
@@ -47,6 +48,7 @@ export function usePrintPdfTask() {
           id: "component.print-pdf-task.confirm",
           defaultMessage: "Download PDF",
         }),
+        modalProps,
       });
     });
 

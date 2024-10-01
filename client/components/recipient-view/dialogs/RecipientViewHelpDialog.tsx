@@ -11,8 +11,11 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  BaseDialog,
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { StepsIndicator } from "@parallel/components/common/StepsIndicator";
 import { Tone } from "@parallel/graphql/__types";
 import { useState } from "react";

@@ -31,7 +31,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, useCallback, useMemo } from "react";
+import { MouseEvent, useCallback, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, noop } from "remeda";
 import { ContactReference } from "../common/ContactReference";
@@ -68,6 +68,8 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
 
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(petitions?.items, "id");
 
+  const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
+
   const [associateProfileToPetition] = useMutation(
     ProfilePetitionsTable_associateProfileToPetitionDocument,
   );
@@ -76,6 +78,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     try {
       const petitionId = await showAssociatePetitionToProfileDialog({
         excludePetitions: petitions?.items?.map((p) => p.id),
+        modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
 
       await associateProfileToPetition({
@@ -187,6 +190,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
             </RestrictedFeaturePopover>
             <Divider isVertical />
             <MoreOptionsMenuButton
+              ref={moreOptionsButtonRef}
               icon={<ChevronDownIcon />}
               borderStartRadius={0}
               minWidth={"auto"}
