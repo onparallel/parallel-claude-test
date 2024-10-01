@@ -53,6 +53,7 @@ yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile --
 set +e
 yarn patch-package
 set -e
+yarn update-ip-db
 popd
 
 tar -zcf $ARTIFACT_NAME $BUILD_ID
