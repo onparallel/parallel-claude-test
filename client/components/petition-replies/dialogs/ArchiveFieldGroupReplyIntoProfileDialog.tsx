@@ -27,7 +27,7 @@ import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { difference, isNonNullish, isNullish, unique, zip } from "remeda";
+import { difference, isNonNullish, isNullish, sort, unique, zip } from "remeda";
 import { useConfigureExpirationsDateDialog } from "./ConfigureExpirationsDateDialog";
 import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfilePropertiesConflictsDialog";
 
@@ -378,6 +378,19 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           return (
             petitionFilesToString.length !== profileFilesToString.length ||
             difference(petitionFilesToString, profileFilesToString).length > 0
+          );
+        }
+
+        if (f.type === "CHECKBOX") {
+          const replyValue = sort<string>(replies?.[0]?.content.value ?? [], (a, b) =>
+            a.localeCompare(b),
+          );
+          const profileValue = sort<string>(profileField.value?.content?.value ?? [], (a, b) =>
+            a.localeCompare(b),
+          );
+          return (
+            replyValue.length !== profileValue.length ||
+            replyValue.join(",") !== profileValue.join(",")
           );
         }
 

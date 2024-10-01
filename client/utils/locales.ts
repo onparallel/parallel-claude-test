@@ -1,3 +1,4 @@
+/** no-recipient */
 import { gql } from "@apollo/client";
 import {
   PetitionLocale,

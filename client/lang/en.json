@@ -5620,17 +5620,17 @@
     "context": "What do you need?"
   },
   {
-    "term": "component.petition-compose-select-settings.list-of-options-description-1",
+    "term": "component.petition-compose-field-settings.list-of-options-description-1",
     "definition": "Use our existing option lists to save time.",
     "context": "Use our existing option lists to save time."
   },
   {
-    "term": "component.petition-compose-select-settings.list-of-options-description-2",
+    "term": "component.petition-compose-field-settings.list-of-options-description-2",
     "definition": "These options will be fixed and not editable.",
     "context": "These options will be fixed and not editable."
   },
   {
-    "term": "component.petition-compose-select-settings.list-of-options-label",
+    "term": "component.petition-compose-field-settings.list-of-options-label",
     "definition": "List of options",
     "context": "List of options"
   },
@@ -8758,6 +8758,11 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} submitted",
     "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-checkbox.select-placeholder",
+    "definition": "Select an option",
+    "context": "Select an option"
   },
   {
     "term": "component.recipient-view-petition-field-date-time.change-zone",
@@ -12838,6 +12843,11 @@
     "term": "generic.profile-type-field-type-background-check",
     "definition": "Background check",
     "context": "Background check"
+  },
+  {
+    "term": "generic.profile-type-field-type-checkbox",
+    "definition": "Multiple choice",
+    "context": "Multiple choice"
   },
   {
     "term": "generic.profile-type-field-type-date",

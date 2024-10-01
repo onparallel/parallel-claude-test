@@ -40,6 +40,7 @@ import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
 import { ProfileFormFieldBackgroundCheck } from "./ProfileFormFieldBackgroundCheck";
+import { ProfileFormFieldCheckbox } from "./ProfileFormFieldCheckbox";
 import { ProfileFormFieldDate } from "./ProfileFormFieldDate";
 import { ProfileFormFieldExpirationButton } from "./ProfileFormFieldExpirationButton";
 import {
@@ -391,6 +392,8 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
             fieldsWithIndices={bgCheckSuggestions}
             petitionId={props.petitionId}
           />
+        ) : field.type === "CHECKBOX" ? (
+          <ProfileFormFieldCheckbox {...commonProps} />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
           <HStack marginTop={1} marginStart={1} color="gray.700" spacing={1.5}>

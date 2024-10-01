@@ -500,6 +500,11 @@
     "context": "{count}/{total} submitted"
   },
   {
+    "term": "component.recipient-view-petition-field-checkbox.select-placeholder",
+    "definition": "{tone, select, INFORMAL{Tria} other {Trïi}} una opció",
+    "context": "Select an option"
+  },
+  {
     "term": "component.recipient-view-petition-field-date-time.change-zone",
     "definition": "Canviar",
     "context": "Change"

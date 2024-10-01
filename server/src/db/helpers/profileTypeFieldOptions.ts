@@ -98,6 +98,30 @@ const SCHEMAS = {
       },
     },
   },
+  CHECKBOX: {
+    type: "object",
+    required: ["values"],
+    additionalProperties: false,
+    properties: {
+      values: {
+        type: "array",
+        maxItems: 1000,
+        items: {
+          type: "object",
+          required: ["label", "value"],
+          properties: {
+            label: LOCALIZABLE_USER_TEXT_SCHEMA,
+            value: { type: "string", maxLength: 50 },
+            isStandard: { type: "boolean" },
+          },
+        },
+      },
+      standardList: {
+        type: ["string", "null"],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "CNAE", "NACE", null],
+      },
+    },
+  },
   BACKGROUND_CHECK: {
     type: "object",
     additionalProperties: false,
@@ -255,6 +279,10 @@ export async function validateProfileTypeFieldOptions(
 export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType): any {
   if (type === "DATE") {
     return { useReplyAsExpiryDate: false };
+  } else if (type === "SELECT" || type === "CHECKBOX") {
+    return {
+      values: [],
+    };
   }
   return {};
 }
@@ -395,7 +423,7 @@ export async function mapProfileTypeFieldOptions(
   globalIdMap: (type: string, id: any) => any,
 ) {
   const _options =
-    type === "SELECT"
+    type === "SELECT" || type === "CHECKBOX"
       ? {
           ...options,
           values: await profileTypeFieldSelectValues(options),

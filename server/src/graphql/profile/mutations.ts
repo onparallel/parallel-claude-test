@@ -308,7 +308,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
         (type, id) => fromGlobalId(id, type).id,
       );
 
-      // mapper fills SELECT field values when passing a standardList, but we don't want to store every value in DB
+      // mapper fills SELECT and CHECKBOX field values when passing a standardList, but we don't want to store every value in DB
       if (isNonNullish(options.standardList)) {
         options.values = [];
       }
@@ -438,8 +438,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         throw error;
       }
 
-      if (profileTypeField.type === "SELECT") {
-        const fieldOptions = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
+      if (profileTypeField.type === "SELECT" || profileTypeField.type === "CHECKBOX") {
+        const fieldOptions = profileTypeField.options as ProfileTypeFieldOptions[
+          | "SELECT"
+          | "CHECKBOX"];
 
         const removedOptions = pipe(
           fieldOptions.values,
@@ -460,14 +462,14 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         }
 
         // append the isStandard flag to the new options
-        for (const value of (options as ProfileTypeFieldOptions["SELECT"]).values) {
+        for (const value of (options as ProfileTypeFieldOptions["SELECT" | "CHECKBOX"]).values) {
           if (fieldOptions.values.some((v) => v.value === value.value && v.isStandard)) {
             value.isStandard = true;
           }
         }
 
         /* 
-            when removing options from a SELECT field, we need to make sure that
+            when removing options from a SELECT or CHECKBOX field, we need to make sure that
             every profile_field_value using those options are updated to use the substitution.
 
             If the removed option is being used and does not have any substitution, throw an error
@@ -476,7 +478,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
 
         const currentValues = await profileTypeFieldSelectValues(profileTypeField.options);
         const newValues = await profileTypeFieldSelectValues(
-          args.data.options as ProfileTypeFieldOptions["SELECT"],
+          args.data.options as ProfileTypeFieldOptions["SELECT" | "CHECKBOX"],
         );
         const removedOptionsWithoutSubstitutions = pipe(
           currentValues,
@@ -487,6 +489,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         if (removedOptionsWithoutSubstitutions.length > 0) {
           const usedProfileFieldValues = await ctx.profiles.getProfileFieldValueCountWithContent(
             profileTypeField.id,
+            profileTypeField.type,
             removedOptionsWithoutSubstitutions.map((o) => o.value),
           );
 
@@ -509,6 +512,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           const { currentValues, previousValues } =
             await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
               profileTypeField.id,
+              profileTypeField.type,
               args.data.substitutions,
               ctx.user!.id,
             );
@@ -561,6 +565,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       }
 
       updateData.options = options;
+      if (isNonNullish(updateData.options.standardList)) {
+        // if setting a standard list, clear the values
+        updateData.options.values = [];
+      }
     }
 
     try {

@@ -15,6 +15,7 @@ import {
   ProfileRelationshipType,
   ProfileType,
   ProfileTypeField,
+  ProfileTypeFieldTypeValues,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -14553,6 +14554,369 @@ describe("GraphQL/Petition Fields", () => {
                 },
               },
             ]),
+          },
+        });
+      });
+    });
+
+    describe("archiveFieldGroupReplyIntoProfile / custom profile types", () => {
+      let profileType: ProfileType;
+      let profileTypeFields: ProfileTypeField[];
+
+      let petition: Petition;
+      let fieldGroup: PetitionField;
+      let checkboxChild: PetitionField;
+
+      beforeEach(async () => {
+        [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+        profileTypeFields = await mocks.createRandomProfileTypeFields(
+          organization.id,
+          profileType.id,
+          ProfileTypeFieldTypeValues.length,
+          (i) => ({ type: ProfileTypeFieldTypeValues[i], alias: ProfileTypeFieldTypeValues[i] }),
+        );
+
+        [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          status: "CLOSED",
+        }));
+        [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "FIELD_GROUP",
+          profile_type_id: profileType.id,
+        }));
+        [checkboxChild] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "CHECKBOX",
+          parent_petition_field_id: fieldGroup.id,
+          profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+        }));
+      });
+
+      it("archives a CHECKBOX reply into a profile", async () => {
+        const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+          user_id: user.id,
+        }));
+        await mocks.createCheckboxReply(checkboxChild.id, { userId: user.id }, ["A", "C"], () => ({
+          parent_petition_field_reply_id: groupReply.id,
+        }));
+
+        const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $parentReplyId: GID!
+              $profileId: GID!
+              $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+              $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            ) {
+              archiveFieldGroupReplyIntoProfile(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                parentReplyId: $parentReplyId
+                profileId: $profileId
+                conflictResolutions: $conflictResolutions
+                expirations: $expirations
+              ) {
+                associatedProfile {
+                  id
+                  properties {
+                    field {
+                      id
+                      type
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+            parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+            profileId: toGlobalId("Profile", profile.id),
+            conflictResolutions: [],
+            expirations: [],
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+          associatedProfile: {
+            id: toGlobalId("Profile", profile.id),
+            properties: [
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                  type: "TEXT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+                  type: "SHORT_TEXT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+                  type: "FILE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
+                  type: "DATE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
+                  type: "PHONE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[5].id),
+                  type: "NUMBER",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[6].id),
+                  type: "SELECT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                  type: "BACKGROUND_CHECK",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
+                  type: "CHECKBOX",
+                },
+                value: {
+                  content: { value: ["A", "C"] },
+                },
+              },
+            ],
+          },
+        });
+      });
+
+      it("throws conflict error if current CHECKBOX value in profile differs from parallel reply", async () => {
+        const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+          user_id: user.id,
+        }));
+        await mocks.createCheckboxReply(checkboxChild.id, { userId: user.id }, ["A", "C"], () => ({
+          parent_petition_field_reply_id: groupReply.id,
+        }));
+
+        const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+        await mocks.knex.from("profile_field_value").insert({
+          profile_id: profile.id,
+          profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+          type: "CHECKBOX",
+          content: { value: ["A"] },
+          created_by_user_id: user.id,
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $parentReplyId: GID!
+              $profileId: GID!
+              $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+              $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            ) {
+              archiveFieldGroupReplyIntoProfile(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                parentReplyId: $parentReplyId
+                profileId: $profileId
+                conflictResolutions: $conflictResolutions
+                expirations: $expirations
+              ) {
+                associatedProfile {
+                  id
+                  properties {
+                    field {
+                      id
+                      type
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+            parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+            profileId: toGlobalId("Profile", profile.id),
+            conflictResolutions: [],
+            expirations: [],
+          },
+        );
+        expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+          conflictResolutions: [
+            toGlobalId(
+              "ProfileTypeField",
+              profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+            ),
+          ],
+          expirations: [],
+        });
+        expect(data).toBeNull();
+      });
+
+      it("does not conflict if CHECKBOX values are the same but in different order", async () => {
+        const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+          user_id: user.id,
+        }));
+        await mocks.createCheckboxReply(checkboxChild.id, { userId: user.id }, ["A", "C"], () => ({
+          parent_petition_field_reply_id: groupReply.id,
+        }));
+
+        const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+        await mocks.knex.from("profile_field_value").insert({
+          profile_id: profile.id,
+          profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+          type: "CHECKBOX",
+          content: { value: ["C", "A"] },
+          created_by_user_id: user.id,
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $parentReplyId: GID!
+              $profileId: GID!
+              $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+              $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            ) {
+              archiveFieldGroupReplyIntoProfile(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                parentReplyId: $parentReplyId
+                profileId: $profileId
+                conflictResolutions: $conflictResolutions
+                expirations: $expirations
+              ) {
+                associatedProfile {
+                  id
+                  properties {
+                    field {
+                      id
+                      type
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+            parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+            profileId: toGlobalId("Profile", profile.id),
+            conflictResolutions: [],
+            expirations: [],
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+          associatedProfile: {
+            id: toGlobalId("Profile", profile.id),
+            properties: [
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                  type: "TEXT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+                  type: "SHORT_TEXT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+                  type: "FILE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
+                  type: "DATE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
+                  type: "PHONE",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[5].id),
+                  type: "NUMBER",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[6].id),
+                  type: "SELECT",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                  type: "BACKGROUND_CHECK",
+                },
+                value: null,
+              },
+              {
+                field: {
+                  id: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
+                  type: "CHECKBOX",
+                },
+                value: {
+                  content: { value: ["C", "A"] }, // keep the value in the profile
+                },
+              },
+            ],
           },
         });
       });

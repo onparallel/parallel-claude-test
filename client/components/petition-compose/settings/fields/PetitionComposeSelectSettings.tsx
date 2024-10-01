@@ -30,7 +30,7 @@ export function PetitionComposeSelectSettings({
       <SettingsRow
         label={
           <FormattedMessage
-            id="component.petition-compose-select-settings.list-of-options-label"
+            id="component.petition-compose-field-settings.list-of-options-label"
             defaultMessage="List of options"
           />
         }
@@ -38,13 +38,13 @@ export function PetitionComposeSelectSettings({
           <Stack>
             <Text>
               <FormattedMessage
-                id="component.petition-compose-select-settings.list-of-options-description-1"
+                id="component.petition-compose-field-settings.list-of-options-description-1"
                 defaultMessage="Use our existing option lists to save time."
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="component.petition-compose-select-settings.list-of-options-description-2"
+                id="component.petition-compose-field-settings.list-of-options-description-2"
                 defaultMessage="These options will be fixed and not editable."
               />
             </Text>

@@ -58,8 +58,7 @@ export function ProfileFormFieldInputGroup({
           {children}
         </Box>
         {(field.type === "DATE" && browserName === "Firefox") ||
-        field.type === "SELECT" ||
-        field.type === "BACKGROUND_CHECK" ||
+        ["CHECKBOX", "SELECT", "BACKGROUND_CHECK"].includes(field.type) ||
         isDisabled ? null : (
           <InputRightElement pointerEvents="none">
             <Flex className="edit-icon" opacity={0} transitionDuration="normal" color="gray.600">

@@ -6,10 +6,10 @@ import {
   filter,
   groupBy,
   indexBy,
+  isNonNull,
   isNonNullish,
   isNullish,
   map,
-  mapToObj,
   mapValues,
   omit,
   partition,
@@ -2030,21 +2030,43 @@ export class ProfileRepository extends BaseRepository {
     return profiles.map((p) => p.id);
   }
 
-  async getProfileFieldValueCountWithContent(profileTypeFieldId: number, content: string[]) {
-    const rows = await this.raw<{ value: string; count: number }>(
-      /* sql */ `
-      select content->>'value' as "value", count(*)::int as "count"
-      from profile_field_value
-      where profile_type_field_id = ? and deleted_at is null and removed_at is null and content->>'value' in ?
-      group by content->>'value'
-    `,
-      [profileTypeFieldId, this.sqlIn(content)],
+  async getProfileFieldValueCountWithContent(
+    profileTypeFieldId: number,
+    type: ProfileTypeFieldType,
+    content: string[],
+  ) {
+    const rows = await this.from("profile_field_value")
+      .where("profile_type_field_id", profileTypeFieldId)
+      .whereNull("deleted_at")
+      .whereNull("removed_at")
+      .mmodify((q) => {
+        if (type === "CHECKBOX") {
+          q.whereRaw(
+            /* sql */ `exists (
+            select 1
+            from jsonb_array_elements_text("content"->'value') as elem
+            where elem in ?
+          )`,
+            [this.sqlIn(content)],
+          );
+        } else {
+          q.whereRaw(/* sql */ `"content"->>'value' in ?`, [this.sqlIn(content)]);
+        }
+      })
+      .select("*");
+
+    return Object.fromEntries(
+      content
+        .map<
+          [string, number]
+        >((value) => [value, rows.filter((row) => (type === "CHECKBOX" ? row.content.value.includes(value) : row.content.value === value)).length])
+        .filter(([, count]) => count > 0),
     );
-    return mapToObj(rows, (r) => [r.value, r.count]);
   }
 
   async updateProfileFieldValueContentByProfileTypeFieldId(
     profileTypeFieldId: number,
+    type: ProfileTypeFieldType,
     data: {
       old: string;
       new?: string | null;
@@ -2056,13 +2078,45 @@ export class ProfileRepository extends BaseRepository {
         .whereNull("deleted_at")
         .whereNull("removed_at")
         .where("profile_type_field_id", profileTypeFieldId)
-        .whereRaw(/* sql */ `content->>'value' in ?`, this.sqlIn(data.map((d) => d.old)))
+        .mmodify((q) => {
+          if (type === "CHECKBOX") {
+            q.whereRaw(
+              /* sql */ `exists (
+              select 1
+              from jsonb_array_elements_text("content"->'value') as elem
+              where elem in ?
+            )`,
+              [this.sqlIn(data.map((d) => d.old))],
+            );
+          } else {
+            q.whereRaw(/* sql */ `content->>'value' in ?`, [this.sqlIn(data.map((d) => d.old))]);
+          }
+        })
+
         .update({ removed_at: this.now(), removed_by_user_id: userId })
         .returning("*");
 
-      const fieldsWithContent = previousValues
-        .filter((f) => data.find((d) => d.old === f.content.value && isNonNullish(d.new)))
-        .map((f) => ({ ...f, newContent: data.find((d) => d.old === f.content.value)!.new }));
+      const fieldsWithContent =
+        type === "CHECKBOX"
+          ? previousValues
+              .map((f) => ({
+                ...f,
+                content: {
+                  value: (f.content.value as string[])
+                    .map((value) => {
+                      const found = data.find((d) => d.old === value);
+                      return found ? found.new : value;
+                    })
+                    .filter(isNonNull),
+                },
+              }))
+              .filter((f) => f.content.value.length > 0)
+          : previousValues
+              .filter((f) => data.find((d) => d.old === f.content.value && isNonNullish(d.new)))
+              .map((f) => ({
+                ...f,
+                content: { value: data.find((d) => d.old === f.content.value)!.new },
+              }));
 
       let currentValues: ProfileFieldValue[] = [];
       if (fieldsWithContent.length) {
@@ -2072,7 +2126,7 @@ export class ProfileRepository extends BaseRepository {
             profile_id: f.profile_id,
             profile_type_field_id: f.profile_type_field_id,
             type: f.type,
-            content: JSON.stringify({ value: f.newContent }),
+            content: this.json(f.content),
             created_by_user_id: userId,
             expiry_date: f.expiry_date,
           })),

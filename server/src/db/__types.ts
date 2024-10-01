@@ -446,7 +446,8 @@ export type ProfileTypeFieldType =
   | "PHONE"
   | "NUMBER"
   | "SELECT"
-  | "BACKGROUND_CHECK";
+  | "BACKGROUND_CHECK"
+  | "CHECKBOX";
 
 export const ProfileTypeFieldTypeValues = [
   "TEXT",
@@ -457,6 +458,7 @@ export const ProfileTypeFieldTypeValues = [
   "NUMBER",
   "SELECT",
   "BACKGROUND_CHECK",
+  "CHECKBOX",
 ] as ProfileTypeFieldType[];
 
 export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";

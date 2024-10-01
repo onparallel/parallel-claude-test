@@ -21,6 +21,7 @@ const FIELD_TYPE_MAP: Record<ProfileTypeFieldType, PetitionFieldType> = {
   FILE: "FILE_UPLOAD",
   DATE: "DATE",
   BACKGROUND_CHECK: "BACKGROUND_CHECK",
+  CHECKBOX: "CHECKBOX",
 };
 
 function mapPetitionFieldTypeToProfileTypeFieldType(type: PetitionFieldType): ProfileTypeFieldType {
@@ -43,10 +44,11 @@ export function mapProfileTypeFieldToPetitionField(
   const defaultProperties = defaultFieldProperties(type);
 
   switch (profileTypeField.type) {
-    case "SHORT_TEXT":
+    case "SHORT_TEXT": {
       defaultProperties.options.format = profileTypeField.options.format ?? null;
       break;
-    case "SELECT":
+    }
+    case "SELECT": {
       const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
       defaultProperties.options.standardList = options.standardList ?? null;
       defaultProperties.options.values = isNonNullish(options.standardList)
@@ -58,6 +60,25 @@ export function mapProfileTypeFieldToPetitionField(
             (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
           );
       break;
+    }
+    case "CHECKBOX": {
+      const options = profileTypeField.options as ProfileTypeFieldOptions["CHECKBOX"];
+      defaultProperties.options.standardList = options.standardList ?? null;
+      defaultProperties.options.values = isNonNullish(options.standardList)
+        ? []
+        : options.values.map((v) => v.value);
+      defaultProperties.options.labels = isNonNullish(options.standardList)
+        ? []
+        : options.values.map(
+            (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
+          );
+      defaultProperties.options.limit = {
+        min: 1,
+        max: 1,
+        type: "UNLIMITED",
+      };
+      break;
+    }
     default:
       break;
   }
@@ -93,6 +114,12 @@ export function contentsAreEqual(
       value.content.query?.date === reply.content.query?.date &&
       value.content.query?.type === reply.content.query?.type &&
       value.content.entity?.id === reply.content.entity?.id
+    );
+  } else if (value.type === "CHECKBOX") {
+    // contents are equal if both arrays contain exactly the same elements in any order
+    return (
+      value.content.value.length === reply.content.value.length &&
+      value.content.value.every((v: string) => reply.content.value.includes(v))
     );
   } else {
     return value.content.value === reply.content.value;

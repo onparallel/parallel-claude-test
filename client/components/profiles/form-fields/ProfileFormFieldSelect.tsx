@@ -17,7 +17,7 @@ import Select, {
   ValueContainerProps,
   components,
 } from "react-select";
-import { sortBy } from "remeda";
+import { isNonNullish, sortBy } from "remeda";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -35,7 +35,6 @@ type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]
 export function ProfileFormFieldSelect({
   index,
   field,
-  register,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
@@ -64,7 +63,12 @@ export function ProfileFormFieldSelect({
                 field={field}
                 value={value}
                 onChange={onChange}
-                onBlur={onBlur}
+                onBlur={() => {
+                  if (isNonNullish(value)) {
+                    return showExpiryDateDialog({});
+                  }
+                  onBlur();
+                }}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,

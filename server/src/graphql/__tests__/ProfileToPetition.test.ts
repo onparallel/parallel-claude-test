@@ -10,6 +10,7 @@ import {
   ProfileRelationshipType,
   ProfileType,
   ProfileTypeField,
+  ProfileTypeFieldType,
   ProfileTypeFieldTypeValues,
   User,
 } from "../../db/__types";
@@ -5642,6 +5643,170 @@ describe("GraphQL/Profiles to Petitions", () => {
     });
   });
 
+  describe("createPetitionFromProfile / custom profile types", () => {
+    let profileType: ProfileType;
+    let profileFields: ProfileTypeField[];
+
+    let template: Petition;
+    let templateFieldGroup: PetitionField;
+    let groupChildren: PetitionField[];
+
+    beforeAll(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      profileFields = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        2,
+        (i) => ({
+          type: ["SHORT_TEXT", "CHECKBOX"][i] as ProfileTypeFieldType,
+          options:
+            i === 1
+              ? {
+                  values: [
+                    { value: "A", label: { en: "OPTION A", es: "OPCION A" } },
+                    { value: "B", label: { en: "OPTION B", es: "OPCION B" } },
+                    { value: "C", label: { en: "OPTION C", es: "OPCION C" } },
+                  ],
+                }
+              : {},
+        }),
+      );
+
+      [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
+      [templateFieldGroup] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+      groupChildren = await mocks.createRandomPetitionFields(template.id, 2, (i) => ({
+        parent_petition_field_id: templateFieldGroup.id,
+        profile_type_field_id: profileFields[i].id,
+        type: ["SHORT_TEXT", "CHECKBOX"][i] as PetitionFieldType,
+        options:
+          i === 1 ? { values: ["A", "B", "C"], labels: ["OPTION A", "OPTION B", "OPTION C"] } : {},
+      }));
+    });
+
+    it("creates a petition from a custom profile type", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "SHORT_TEXT reply" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[1].id,
+          type: "CHECKBOX",
+          content: { value: ["B", "C"] },
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $petitionFieldId: GID
+            $profileId: GID!
+            $prefill: [CreatePetitionFromProfilePrefillInput!]!
+          ) {
+            createPetitionFromProfile(
+              templateId: $templateId
+              petitionFieldId: $petitionFieldId
+              profileId: $profileId
+              prefill: $prefill
+            ) {
+              id
+              fields {
+                type
+                fromPetitionFieldId
+                replies {
+                  associatedProfile {
+                    id
+                  }
+                  children {
+                    field {
+                      type
+                      fromPetitionFieldId
+                      profileTypeField {
+                        id
+                      }
+                    }
+                    replies {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+          profileId: toGlobalId("Profile", profile.id),
+          prefill: [
+            {
+              petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+              profileIds: [toGlobalId("Profile", profile.id)],
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFromProfile).toEqual({
+        id: expect.any(String),
+        fields: [
+          {
+            type: "FIELD_GROUP",
+            fromPetitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+            replies: [
+              {
+                associatedProfile: {
+                  id: toGlobalId("Profile", profile.id),
+                },
+                children: [
+                  {
+                    field: {
+                      type: "SHORT_TEXT",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[0].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[0].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: { value: "SHORT_TEXT reply" },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      type: "CHECKBOX",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[1].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[1].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: { value: ["B", "C"] },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+  });
+
   describe("createFieldGroupReplyFromProfile", () => {
     let petition: Petition;
     let fieldGroup: PetitionField;
@@ -5649,7 +5814,7 @@ describe("GraphQL/Profiles to Petitions", () => {
 
     let profile: Profile;
     let profileType: ProfileType;
-    let propertiesIdx: Record<string, ProfileTypeField>;
+    let propertiesIdx: Record<ProfileTypeFieldType, ProfileTypeField>;
 
     beforeAll(async () => {
       [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
@@ -5674,7 +5839,15 @@ describe("GraphQL/Profiles to Petitions", () => {
                         { label: { en: "Low", es: "Bajo" }, value: "LOW" },
                       ],
                     }
-                  : {},
+                  : type === "CHECKBOX"
+                    ? {
+                        values: [
+                          { label: { en: "Option A", es: "Opción A" }, value: "A" },
+                          { label: { en: "Option B", es: "Opción B" }, value: "B" },
+                          { label: { en: "Option C", es: "Opción C" }, value: "C" },
+                        ],
+                      }
+                    : {},
           };
         },
       );
@@ -5756,6 +5929,13 @@ describe("GraphQL/Profiles to Petitions", () => {
             },
           },
         },
+        {
+          type: "CHECKBOX",
+          profile_id: profile.id,
+          profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+          content: { value: ["A", "C"] },
+          created_by_user_id: user.id,
+        },
       ]);
 
       const [file] = await mocks.createRandomFileUpload(1, () => ({
@@ -5822,6 +6002,11 @@ describe("GraphQL/Profiles to Petitions", () => {
               type: "BACKGROUND_CHECK" as PetitionFieldType,
               parent_petition_field_id: fieldGroup.id,
               profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
+            },
+            {
+              type: "CHECKBOX" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["CHECKBOX"].id,
             },
             {
               type: "SHORT_TEXT" as PetitionFieldType,
@@ -6025,6 +6210,21 @@ describe("GraphQL/Profiles to Petitions", () => {
                     properties: {},
                   },
                 },
+              },
+            ],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "CHECKBOX",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+              },
+            },
+            replies: [
+              {
+                id: expect.any(String),
+                content: { value: ["A", "C"] },
               },
             ],
           },
@@ -6278,6 +6478,16 @@ describe("GraphQL/Profiles to Petitions", () => {
               type: "BACKGROUND_CHECK",
               profileTypeField: {
                 id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+              },
+            },
+            replies: [],
+          },
+          {
+            field: {
+              id: expect.any(String),
+              type: "CHECKBOX",
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
               },
             },
             replies: [],

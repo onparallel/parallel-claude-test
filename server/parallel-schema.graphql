@@ -6138,6 +6138,7 @@ enum ProfileTypeFieldPermissionType {
 
 enum ProfileTypeFieldType {
   BACKGROUND_CHECK
+  CHECKBOX
   DATE
   FILE
   NUMBER

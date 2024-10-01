@@ -155,11 +155,11 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
             borderRadius="full"
             {...props}
           >
-            <LocalizableUserTextRender value={option.label} default={null} />
+            <LocalizableUserTextRender value={option.label} default={content.value} />
           </Box>
         ) : (
           <Box as="span" ref={ref} {...props}>
-            <LocalizableUserTextRender value={option.label} default={null} />
+            <LocalizableUserTextRender value={option.label} default={content.value} />
           </Box>
         );
       } else if (field.type === "DATE") {
@@ -179,6 +179,24 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
           <Box as="span" ref={ref} {...props}>
             <FormattedNumber value={content.value} />
           </Box>
+        );
+      } else if (field.type === "CHECKBOX") {
+        return (
+          <List key={undefined}>
+            {content.value.map((v: string) => {
+              assertType<ProfileTypeFieldOptions<"CHECKBOX">>(field.options);
+              const option = field.options.values.find((o) => o.value === v);
+              return (
+                <ListItem key={v}>
+                  {isNullish(option) ? (
+                    v
+                  ) : (
+                    <LocalizableUserTextRender value={option.label} default={v} />
+                  )}
+                </ListItem>
+              );
+            })}
+          </List>
         );
       } else if (field.type === "BACKGROUND_CHECK") {
         return (

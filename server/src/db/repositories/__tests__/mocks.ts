@@ -1168,6 +1168,7 @@ export class Mocks {
     fieldId: number,
     userOrAccess: { userId?: number; accessId?: number },
     value: string[],
+    builder?: () => Partial<Omit<PetitionFieldReply, "content">>,
   ) {
     const [reply] = await this.knex
       .from<PetitionFieldReply>("petition_field_reply")
@@ -1179,6 +1180,7 @@ export class Mocks {
           : { petition_access_id: userOrAccess.accessId! }),
         status: "PENDING",
         type: "CHECKBOX",
+        ...builder?.(),
       })
       .returning("*");
 
@@ -1338,7 +1340,8 @@ export class Mocks {
 
     return await this.knex<ProfileTypeField>("profile_type_field").insert(
       range(0, amount || 1).map((i) => {
-        const type = randomProfileTypeFieldType();
+        const data = builder?.(i) ?? {};
+        const type = data.type ?? randomProfileTypeFieldType();
         return {
           profile_type_id: profileTypeId,
           position: (max ?? -1) + 1 + i,
@@ -1406,6 +1409,18 @@ function randomProfileTypeFieldOptions(type: ProfileTypeFieldType) {
   switch (type) {
     case "DATE": {
       return { useReplyAsExpiryDate: faker.datatype.boolean() };
+    }
+    case "CHECKBOX": {
+      return {
+        values: [
+          { value: "A", label: { en: "Option A" } },
+          { value: "B", label: { en: "Option B" } },
+          { value: "C", label: { en: "Option C" } },
+        ],
+      };
+    }
+    case "SELECT": {
+      return { values: ["Option 1", "Option 2", "Option 3"] };
     }
     default: {
       return {};

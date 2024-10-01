@@ -258,6 +258,10 @@ const SCHEMAS = {
         },
         validateMinMax: true,
       },
+      standardList: {
+        type: ["string", "null"],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "NACE", "CNAE", null],
+      },
     },
   },
   ES_TAX_DOCUMENTS: {
@@ -690,7 +694,7 @@ export async function mapFieldOptions(
           }
         : {}),
     };
-  } else if (type === "SELECT") {
+  } else if (type === "SELECT" || type === "CHECKBOX") {
     return {
       ...options,
       ...(await selectOptionsValuesAndLabels(options, locale)),

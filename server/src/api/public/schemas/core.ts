@@ -2488,6 +2488,12 @@ const CreateProfileValue = {
         isFile: true,
       },
     },
+    {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
   ],
 } as const;
 
@@ -2582,6 +2588,12 @@ const UpdateProfileValue = {
       items: {
         type: "object",
         isFile: true,
+      },
+    },
+    {
+      type: "array",
+      items: {
+        type: "string",
       },
     },
   ],

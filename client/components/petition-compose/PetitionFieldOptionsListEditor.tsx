@@ -82,7 +82,9 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
 
       const standardList =
-        field.type === "SELECT" && field.options.standardList ? field.options.standardList : null;
+        (field.type === "SELECT" || field.type === "CHECKBOX") && field.options.standardList
+          ? field.options.standardList
+          : null;
 
       const isNotEditable =
         field.isLinkedToProfileTypeField || isReadOnly || hasLabels || isNonNullish(standardList);

@@ -74,7 +74,7 @@ export interface CreateOrUpdateProfileTypeFieldDialogProps {
 export interface CreateOrUpdateProfileTypeFieldDialogData<TType extends ProfileTypeFieldType = any>
   extends Omit<CreateProfileTypeFieldInput, "expiryAlertAheadTime" | "options"> {
   expiryAlertAheadTime: ExpirationOption;
-  options: TType extends "SELECT"
+  options: TType extends "SELECT" | "CHECKBOX"
     ? ProfileTypeFieldOptions<TType> & {
         listingType: "STANDARD" | "CUSTOM";
         values: (ProfileTypeFieldOptions<TType>["values"][number] & { id: string })[];
@@ -128,6 +128,20 @@ function CreateOrUpdateProfileTypeFieldDialog({
               }))
             : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
       };
+    } else if (profileTypeField?.type === "CHECKBOX") {
+      const options = profileTypeField.options as ProfileTypeFieldOptions<"CHECKBOX">;
+      return {
+        ...options,
+        listingType: options.standardList ? "STANDARD" : "CUSTOM",
+        values:
+          options.values?.length && !options.standardList
+            ? options.values.map((option) => ({
+                ...option,
+                id: nanoid(),
+                existing: true,
+              }))
+            : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
+      };
     } else if (profileTypeField?.type === "BACKGROUND_CHECK") {
       const options = profileTypeField.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
       return {
@@ -147,7 +161,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
       alias: profileTypeField?.alias ?? "",
       isExpirable: profileTypeField?.isExpirable ?? false,
       options:
-        profileTypeField?.type === "SELECT" || profileTypeField?.type === "BACKGROUND_CHECK"
+        profileTypeField?.type === "SELECT" ||
+        profileTypeField?.type === "CHECKBOX" ||
+        profileTypeField?.type === "BACKGROUND_CHECK"
           ? intialOptions
           : (profileTypeField?.options ?? {}),
       expiryAlertAheadTime:
@@ -256,7 +272,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
       hasCloseButton
       closeOnEsc
       closeOnOverlayClick={false}
-      size={selectedType === "SELECT" ? "3xl" : "lg"}
+      size={selectedType === "SELECT" || selectedType === "CHECKBOX" ? "3xl" : "lg"}
       content={{
         containerProps: {
           as: "form",
@@ -277,13 +293,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   : null;
 
               if (isUpdating) {
-                if (formData.type === "SELECT") {
+                if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
                   const hasStandardList =
                     formData.options.listingType === "STANDARD" && formData.options.standardList;
 
                   const options = isNonNullish(dirtyData.options)
                     ? {
-                        showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
+                        ...(formData.type === "SELECT"
+                          ? {
+                              showOptionsWithColors:
+                                dirtyData.options.showOptionsWithColors ?? false,
+                            }
+                          : {}),
                         standardList: hasStandardList ? dirtyData.options.standardList : null,
                         values: hasStandardList
                           ? []
@@ -421,6 +442,16 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           ),
                     };
                     break;
+                  case "CHECKBOX":
+                    options = {
+                      standardList: hasStandardList ? formData.options.standardList : null,
+                      values: hasStandardList
+                        ? []
+                        : formData.options.values!.map((value: any) =>
+                            omit(value, ["id", "existing"]),
+                          ),
+                    };
+                    break;
                   case "DATE":
                     options = pick(formData.options, ["useReplyAsExpiryDate"]);
                     break;
@@ -550,11 +581,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       "options",
                       value === "DATE"
                         ? { useReplyAsExpiryDate: true }
-                        : value === "SELECT"
+                        : value === "SELECT" || value === "CHECKBOX"
                           ? { values: [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }] }
                           : {},
                     );
-                    if (value === "SELECT") {
+                    if (value === "SELECT" || value === "CHECKBOX") {
                       setTimeout(() => setFocus("options.values.0.label"));
                     }
                   }}
@@ -620,12 +651,14 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {selectedType === "SHORT_TEXT" ? (
               <ProfileFieldShortTextSettings isDisabled={isUpdating || isDisabled} />
             ) : null}
-            {selectedType === "SELECT" ? (
+            {selectedType === "SELECT" || selectedType === "CHECKBOX" ? (
               <ProfileFieldSelectSettings
                 isStandard={isStandard || values?.some((v: any) => v.isStandard)}
                 isDisabled={isDisabled || referencedIn.length > 0}
+                hideColor={selectedType === "CHECKBOX"}
               />
             ) : null}
+
             {selectedType === "BACKGROUND_CHECK" ? (
               <ProfileFieldBackgroundCheckSettings
                 profileType={profileType}

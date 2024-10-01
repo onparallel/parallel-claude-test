@@ -1,4 +1,4 @@
-import { Box, Checkbox } from "@chakra-ui/react";
+import { Box, Checkbox, ThemeTypings } from "@chakra-ui/react";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useMemo } from "react";
 import { CSSObjectWithLabel, OptionProps, components, mergeStyles } from "react-select";
 import { isNonNullish, omit } from "remeda";
@@ -14,10 +14,15 @@ export type MultiCheckboxSimpleSelectInstance<
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 > = SimpleSelectInstance<T, true, OptionType>;
 
-export type MultiCheckboxSimpleSelectProps<
+interface ReactSelectExtraProps {
+  checkboxColorScheme?: ThemeTypings["colorSchemes"];
+}
+
+export interface MultiCheckboxSimpleSelectProps<
   T extends string = string,
   OptionType extends SimpleOption<T> = SimpleOption<T>,
-> = SimpleSelectProps<T, true, OptionType>;
+> extends SimpleSelectProps<T, true, OptionType>,
+    ReactSelectExtraProps {}
 
 export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimpleSelect<
   T extends string = string,
@@ -68,7 +73,13 @@ export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimple
     RefAttributes<MultiCheckboxSimpleSelectInstance<T, OptionType>>,
 ) => ReactElement;
 
-function Option({ innerProps, children, ...props }: OptionProps<SimpleOption>) {
+function Option({
+  innerProps,
+  children,
+  ...props
+}: OptionProps<SimpleOption> & {
+  selectProps: ReactSelectExtraProps;
+}) {
   return (
     <components.Option
       innerProps={{ ...innerProps, "data-value": props.data.value } as any}
@@ -79,6 +90,7 @@ function Option({ innerProps, children, ...props }: OptionProps<SimpleOption>) {
         isChecked={props.isSelected}
         pointerEvents="none"
         inputProps={{ "aria-hidden": true }}
+        colorScheme={props.selectProps.checkboxColorScheme}
       />
       <Box
         marginStart={2}

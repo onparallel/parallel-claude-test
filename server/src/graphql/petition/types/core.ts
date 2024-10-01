@@ -453,7 +453,7 @@ export const PetitionFieldMini = objectType({
     t.jsonObject("options", {
       description: "The options of the petition field.",
       resolve: async (o, _, ctx) => {
-        if (o.type === "SELECT") {
+        if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
           return await mapFieldOptions(o.type, o.options, petition.recipient_locale);
         }
@@ -723,7 +723,7 @@ export const PetitionField = objectType({
     t.jsonObject("options", {
       description: "The options of the petition field.",
       resolve: async (o, _, ctx) => {
-        if (o.type === "SELECT") {
+        if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
           return await mapFieldOptions(o.type, o.options, petition.recipient_locale);
         }

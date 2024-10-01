@@ -57,9 +57,11 @@ export interface SelectOptionValueData extends SelectOptionValue {
 export function ProfileFieldSelectSettings({
   isDisabled,
   isStandard,
+  hideColor,
 }: {
   isDisabled?: boolean;
   isStandard?: boolean;
+  hideColor?: boolean;
 }) {
   const intl = useIntl();
 
@@ -133,7 +135,9 @@ export function ProfileFieldSelectSettings({
                 id: nanoid(),
                 label,
                 value,
-                color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+                ...(hideColor
+                  ? {}
+                  : { color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined }),
               })),
             );
           } else {
@@ -202,20 +206,23 @@ export function ProfileFieldSelectSettings({
         </FormControl>
       ) : (
         <>
-          <FormControl as={HStack} spacing={0} isDisabled={isDisabled}>
-            <Checkbox {...register("options.showOptionsWithColors")}>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.enable-colored-options"
-                defaultMessage="Enable colored options"
-              />
-            </Checkbox>
-            <HelpPopover>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.enable-colored-options-help"
-                defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
-              />
-            </HelpPopover>
-          </FormControl>
+          {hideColor ? null : (
+            <FormControl as={HStack} spacing={0} isDisabled={isDisabled}>
+              <Checkbox {...register("options.showOptionsWithColors")}>
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.enable-colored-options"
+                  defaultMessage="Enable colored options"
+                />
+              </Checkbox>
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.enable-colored-options-help"
+                  defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
+                />
+              </HelpPopover>
+            </FormControl>
+          )}
+
           <Box maxHeight="360px" overflowY="auto">
             <Table variant="unstyled">
               <Thead>
@@ -281,7 +288,9 @@ export function ProfileFieldSelectSettings({
                   id: nanoid(),
                   label: { [intl.locale]: "" },
                   value: "",
-                  color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+                  ...(hideColor
+                    ? {}
+                    : { color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined }),
                 });
                 setTimeout(() => setFocus(`options.values.${fields.length}.label`));
               }}

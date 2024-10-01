@@ -4959,6 +4959,7 @@ export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType =
   | "BACKGROUND_CHECK"
+  | "CHECKBOX"
   | "DATE"
   | "FILE"
   | "NUMBER"

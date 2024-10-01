@@ -53,7 +53,7 @@ export function ProfileFormFieldPhone({
             inputRef={ref}
             {...rest}
             onBlur={(value) => {
-              if (value) {
+              if (isNonNullish(value)) {
                 return showExpiryDateDialog({});
               }
             }}

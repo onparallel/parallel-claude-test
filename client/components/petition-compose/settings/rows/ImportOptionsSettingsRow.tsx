@@ -60,7 +60,9 @@ export function ImportOptionsSettingsRow({
               ...field.options,
               values,
               labels,
-              ...(field.type === "SELECT" ? { standardList: null } : {}),
+              ...(field.type === "SELECT" || field.type === "CHECKBOX"
+                ? { standardList: null }
+                : {}),
             },
           });
         },

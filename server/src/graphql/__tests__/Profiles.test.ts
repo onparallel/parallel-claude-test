@@ -330,7 +330,7 @@ describe("GraphQL/Profiles", () => {
     profileType3Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[3].id,
-      4,
+      5,
       (i) =>
         [
           {
@@ -377,6 +377,20 @@ describe("GraphQL/Profiles", () => {
                 },
               ],
               showOptionsWithColors: true,
+            },
+          },
+          {
+            name: json({ en: "Options", es: "Opciones" }),
+            type: "CHECKBOX" as const,
+            alias: "OPTIONS",
+            is_expirable: false,
+            permission: "WRITE" as const,
+            options: {
+              values: [
+                { value: "A", label: { en: "Option A", es: "Opción A" } },
+                { value: "B", label: { en: "Option B", es: "Opción B" } },
+                { value: "C", label: { en: "Option C", es: "Opción C" } },
+              ],
             },
           },
         ][i],
@@ -1784,6 +1798,130 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("creates a profile and completes fields", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+              profileType {
+                id
+              }
+              properties {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[0].id),
+              content: { value: "2020-10-23" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[1].id),
+              content: { value: "Harry" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[2].id),
+              content: { value: "Potter" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[3].id),
+              content: { value: "high" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              content: { value: ["A", "C"] },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfile).toEqual({
+        id: expect.any(String),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[3].id),
+        },
+        properties: [
+          {
+            field: {
+              type: "DATE",
+            },
+            value: {
+              content: { value: "2020-10-23" },
+            },
+          },
+          {
+            field: {
+              type: "TEXT",
+            },
+            value: {
+              content: { value: "Harry" },
+            },
+          },
+          {
+            field: {
+              type: "TEXT",
+            },
+            value: {
+              content: { value: "Potter" },
+            },
+          },
+          {
+            field: {
+              type: "SELECT",
+            },
+            value: {
+              content: { value: "high" },
+            },
+          },
+          {
+            field: {
+              type: "CHECKBOX",
+            },
+            value: {
+              content: {
+                value: ["A", "C"],
+              },
+            },
+          },
+        ],
+      });
+    });
+
+    it("sends error if passing invalid values on fields input", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              content: { value: ["unknown"] },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createProfileType", () => {
@@ -2956,6 +3094,7 @@ describe("GraphQL/Profiles", () => {
     let backgroundCheckProfileTypeField: ProfileTypeField;
     let profileTypeField3: ProfileTypeField;
     let selectWithStandardOptions: ProfileTypeField;
+    let checkboxProfileTypeField: ProfileTypeField;
 
     beforeEach(async () => {
       [
@@ -2963,18 +3102,21 @@ describe("GraphQL/Profiles", () => {
         profileTypeField2,
         profileTypeField3,
         selectProfileTypeField,
+        checkboxProfileTypeField,
         backgroundCheckProfileTypeField,
       ] = await mocks.createRandomProfileTypeFields(
         organization.id,
         profileTypes[1].id,
-        5,
+        6,
         (i) => ({
           is_expirable: true,
           expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
           alias: i === 0 ? "alias" : null,
-          type: ["TEXT", "TEXT", "SELECT", "SELECT", "BACKGROUND_CHECK"][i] as ProfileTypeFieldType,
+          type: ["TEXT", "TEXT", "SELECT", "SELECT", "CHECKBOX", "BACKGROUND_CHECK"][
+            i
+          ] as ProfileTypeFieldType,
           options:
-            i === 2
+            i === 2 || i === 4
               ? {
                   values: [
                     { value: "AR", label: { es: "Argentina", en: "Argentina" } },
@@ -3281,6 +3423,10 @@ describe("GraphQL/Profiles", () => {
           },
           {
             field: { id: toGlobalId("ProfileTypeField", selectProfileTypeField.id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id) },
             value: null,
           },
           {
@@ -3892,6 +4038,158 @@ describe("GraphQL/Profiles", () => {
       );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("removes value from value array in CHECKBOX field value when removing it from the configuration", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          content: { value: ["ES", "AR"] },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          data: {
+            options: {
+              values: [{ value: "AR", label: { es: "Argentina", en: "Argentina" } }],
+            },
+            substitutions: [{ old: "ES", new: null }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const dbValues = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_type_field_id", checkboxProfileTypeField.id)
+        .select("content", "removed_at");
+
+      expect(dbValues).toIncludeSameMembers([
+        { content: { value: ["ES", "AR"] }, removed_at: expect.any(Date) },
+        { content: { value: ["AR"] }, removed_at: null },
+      ]);
+    });
+
+    it("removes profile value in CHECKBOX field value when removing all its values from configuration", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          content: { value: ["ES", "AR"] },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          data: {
+            options: {
+              values: [],
+            },
+            substitutions: [
+              { old: "ES", new: null },
+              { old: "AR", new: null },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const dbValues = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_type_field_id", checkboxProfileTypeField.id)
+        .select("content", "removed_at");
+
+      expect(dbValues).toIncludeSameMembers([
+        { content: { value: ["ES", "AR"] }, removed_at: expect.any(Date) },
+      ]);
+    });
+
+    it("replaces one of the profile values in CHECKBOX field value when passing substitution", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          content: { value: ["ES", "AR"] },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", checkboxProfileTypeField.id),
+          data: {
+            options: {
+              values: [
+                { value: "AR", label: { es: "Argentina", en: "Argentina" } },
+                { value: "BR", label: { es: "Brasil", en: "Brasil" } },
+              ],
+            },
+            substitutions: [{ old: "ES", new: "BR" }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const dbValues = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_type_field_id", checkboxProfileTypeField.id)
+        .select("content", "removed_at");
+
+      expect(dbValues).toIncludeSameMembers([
+        { content: { value: ["ES", "AR"] }, removed_at: expect.any(Date) },
+        { content: { value: ["BR", "AR"] }, removed_at: null },
+      ]);
     });
 
     it("fails if trying to update a profile type field that is being used in monitoring rules", async () => {
@@ -5083,6 +5381,83 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("updates a CHECKBOX property", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[3].id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              events(limit: 10, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+              properties {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              content: { value: ["A"] },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        events: {
+          totalCount: 2,
+          items: [{ type: "PROFILE_UPDATED" }, { type: "PROFILE_FIELD_VALUE_UPDATED" }],
+        },
+        properties: [
+          { field: { type: "DATE" }, value: null },
+          { field: { type: "TEXT" }, value: null },
+          { field: { type: "TEXT" }, value: null },
+          { field: { type: "SELECT" }, value: null },
+          { field: { type: "CHECKBOX" }, value: { content: { value: ["A"] } } },
+        ],
+      });
+    });
+
+    it("fails if passing invalid value on a CHECKBOX property", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[3].id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              content: { value: ["ABC"] },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
     });
   });

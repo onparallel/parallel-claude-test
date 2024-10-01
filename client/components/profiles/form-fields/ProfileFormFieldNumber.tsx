@@ -1,5 +1,6 @@
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { Controller } from "react-hook-form";
+import { isNonNullish } from "remeda";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -43,7 +44,7 @@ export function ProfileFormFieldNumber({
               value={value ?? undefined}
               onChange={(value) => onChange(value ?? null)}
               onBlur={() => {
-                if (value) {
+                if (isNonNullish(value)) {
                   return showExpiryDateDialog({});
                 }
               }}

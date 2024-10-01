@@ -49,7 +49,7 @@ export async function validateReplyContent(
       if (!options.includes(content.value)) {
         throw new ValidateReplyContentError(
           "UNKNOWN_OPTION_ERROR",
-          `Reply must be one of [${(options ?? []).map((opt) => `'${opt}'`).join(", ")}].`,
+          "Reply must be one of the available options.",
         );
       }
       break;
@@ -145,6 +145,7 @@ export async function validateReplyContent(
         );
       }
 
+      const options = (await selectOptionsValuesAndLabels(field.options)).values;
       const { type: subtype, min, max } = field.options.limit;
       if (subtype === "RADIO" && content.value.length !== 1) {
         throw new ValidateReplyContentError(
@@ -169,13 +170,11 @@ export async function validateReplyContent(
         );
       }
 
-      const differences = difference(content.value, field.options.values);
+      const differences = difference(content.value, options);
       if (differences.length !== 0) {
         throw new ValidateReplyContentError(
           "UNKNOWN_OPTION_ERROR",
-          `Reply must be some of [${(field.options.values ?? [])
-            .map((opt: string) => `'${opt}'`)
-            .join(", ")}].`,
+          "Reply must be some of the available options.",
         );
       }
       break;

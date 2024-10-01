@@ -1,17 +1,40 @@
 import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
-import { RadioButtonSelected } from "@parallel/chakra/icons";
+import { DeleteIcon, RadioButtonSelected } from "@parallel/chakra/icons";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  MultiCheckboxSimpleSelect,
+  MultiCheckboxSimpleSelectInstance,
+  MultiCheckboxSimpleSelectProps,
+} from "@parallel/components/common/MultiCheckboxSimpleSelect";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { useTone } from "@parallel/components/common/ToneProvider";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { ChangeEvent, useEffect, useState } from "react";
-import { FormattedMessage } from "react-intl";
-import { zip } from "remeda";
+import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
+import { ChangeEvent, forwardRef, useEffect, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import {
+  components,
+  createFilter,
+  MultiValueProps,
+  MultiValueRemoveProps,
+  PlaceholderProps,
+  ValueContainerProps,
+} from "react-select";
+import { filter, isIncludedIn, isNonNullish, isNot, zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
+type SelectOptionValue = {
+  label: LocalizableUserText;
+  value: string;
+};
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
@@ -52,10 +75,12 @@ export function RecipientViewPetitionFieldCheckbox({
   onCommentsButtonClick,
   onError,
 }: RecipientViewPetitionFieldCheckboxProps) {
+  const intl = useIntl();
+  const tone = useTone();
+
   const options = field.options as FieldOptions["CHECKBOX"];
-
+  const hasStandardList = isNonNullish(field.options.standardList);
   const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
-
   const reply = field.replies.length > 0 ? field.replies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
@@ -142,6 +167,8 @@ export function RecipientViewPetitionFieldCheckbox({
     }
   };
 
+  const checkedItemsLenght = (reply?.content?.value ?? []).length;
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -166,7 +193,7 @@ export function RecipientViewPetitionFieldCheckbox({
               {")"}
             </Text>
           ) : null}
-          {!isSaving && checkedItems?.length ? (
+          {!isSaving && checkedItemsLenght ? (
             <Box as="span" color={isInvalid || hasAlreadyRepliedError ? "red.600" : "gray.600"}>
               {showRadio ? null : "("}
               {hasAlreadyRepliedError ? (
@@ -183,13 +210,13 @@ export function RecipientViewPetitionFieldCheckbox({
                 <FormattedMessage
                   id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
                   defaultMessage="{count}/{total} submitted"
-                  values={{ count: checkedItems.length, total: max }}
+                  values={{ count: checkedItemsLenght, total: max }}
                 />
               ) : (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
                   defaultMessage="{count} submitted"
-                  values={{ count: checkedItems.length }}
+                  values={{ count: checkedItemsLenght }}
                 />
               )}
               {showRadio ? null : ")"}
@@ -201,23 +228,218 @@ export function RecipientViewPetitionFieldCheckbox({
             showSavedIcon={false}
           />
         </HStack>
+        {hasStandardList ? (
+          <HStack align="start">
+            <Box flex="1">
+              <PetitionFieldCheckboxStandardList
+                isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
+                isInvalid={isRejected || isInvalid || hasAlreadyRepliedError}
+                field={field}
+                value={checkedItems}
+                onChange={(values) => {
+                  setCheckedItems(values);
+                }}
+                onBlur={async () => {
+                  if (!checkedItems.length && isNonNullish(reply?.id)) {
+                    await handleDelete();
+                    return;
+                  }
 
-        {zip(options.values, options.labels ?? options.values).map(([value, label], index) => (
-          <Checkbox
-            key={index}
-            data-value={value}
-            isInvalid={isRejected || isInvalid || hasAlreadyRepliedError}
-            isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
-            isChecked={checkedItems.includes(value)}
-            value={value}
-            onChange={handleChange}
-            {...(showRadio ? { icon: <CustomIcon />, variant: "radio" } : {})}
-            colorScheme="blue"
-          >
-            {label}
-          </Checkbox>
-        ))}
+                  if (isNonNullish(reply) && isNonNullish(reply?.content?.value)) {
+                    if (
+                      checkedItems.length !== reply.content.value.length ||
+                      filter(checkedItems, isNot(isIncludedIn(reply.content.value))).length
+                    ) {
+                      await handleUpdate(checkedItems);
+                    }
+                  } else {
+                    await handleCreate(checkedItems);
+                  }
+                }}
+                placeholder={intl.formatMessage(
+                  {
+                    id: "component.recipient-view-petition-field-checkbox.select-placeholder",
+                    defaultMessage: "Select an option",
+                  },
+                  { tone },
+                )}
+                styles={{
+                  control: (baseStyles) => ({
+                    ...baseStyles,
+                    ":focus-within": {
+                      "[data-rs='multi-value']": { backgroundColor: "#e2e8f0" },
+
+                      "[data-rs='multi-value-remove']": { display: "flex" },
+                      "[data-rs='value-container'] > :last-child": {
+                        height: "auto",
+                        position: "relative",
+                      },
+                      "[data-rs='value-container'] > :last-child > input": {
+                        height: "auto",
+                      },
+                      "[data-rs='placeholder']": {
+                        display: "none",
+                      },
+                    },
+                    ":hover, :focus-within": {
+                      "[data-rs='value-container']": { paddingInlineEnd: 0 },
+                    },
+                  }),
+                  valueContainer: (baseStyles) => ({
+                    ...baseStyles,
+                    paddingInlineStart: "10px",
+                    paddingInlineEnd: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    justifyContent: "center",
+                  }),
+                  multiValue: (baseStyles) => ({
+                    ...baseStyles,
+                    backgroundColor: "transparent",
+                  }),
+                  multiValueRemove: (baseStyles) => ({
+                    ...baseStyles,
+                    display: "none",
+                  }),
+                  multiValueLabel: (baseStyles) => ({
+                    ...baseStyles,
+                    fontSize: "16px",
+                    whiteSpace: "wrap",
+                  }),
+                  placeholder: (baseStyles) => ({
+                    ...baseStyles,
+                    ...(isNonNullish(reply?.content?.value) ? { display: "none" } : {}),
+                    ":focus-within": {
+                      display: "none",
+                    },
+                  }),
+                  input: (baseStyles) => ({
+                    ...baseStyles,
+                    height: "0px",
+                    position: "absolute",
+
+                    "> input": {
+                      height: "0px",
+                    },
+                  }),
+                }}
+              />
+            </Box>
+
+            {isNonNullish(reply) ? (
+              <IconButtonWithTooltip
+                isDisabled={isDisabled || reply.status === "APPROVED"}
+                onClick={() => handleDelete()}
+                variant="ghost"
+                icon={<DeleteIcon />}
+                size="md"
+                placement="bottom"
+                label={intl.formatMessage({
+                  id: "component.recipient-view-petition-field-reply.remove-reply-label",
+                  defaultMessage: "Remove reply",
+                })}
+              />
+            ) : null}
+          </HStack>
+        ) : (
+          zip(options.values, options.labels ?? options.values).map(([value, label], index) => (
+            <Checkbox
+              key={index}
+              data-value={value}
+              isInvalid={isRejected || isInvalid || hasAlreadyRepliedError}
+              isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
+              isChecked={checkedItems.includes(value)}
+              value={value}
+              onChange={handleChange}
+              {...(showRadio ? { icon: <CustomIcon />, variant: "radio" } : {})}
+              colorScheme="blue"
+            >
+              {label}
+            </Checkbox>
+          ))
+        )}
       </Stack>
     </RecipientViewPetitionFieldLayout>
+  );
+}
+
+interface PetitionFieldCheckboxStandardListProps extends MultiCheckboxSimpleSelectProps {
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+}
+
+export const PetitionFieldCheckboxStandardList = forwardRef<
+  MultiCheckboxSimpleSelectInstance,
+  PetitionFieldCheckboxStandardListProps
+>(function ProfileFieldSelectInner({ field, value, ...props }, ref) {
+  const { values, labels } = field.options as FieldOptions["CHECKBOX"];
+
+  const options = useSimpleSelectOptions(
+    () =>
+      zip(values, labels ?? values).map(([value, label]) => ({
+        value,
+        label,
+      })),
+    [],
+  );
+
+  return (
+    <MultiCheckboxSimpleSelect
+      ref={ref}
+      {...props}
+      options={options}
+      value={value}
+      isClearable={false}
+      filterOption={createFilter({
+        // this improves search performance on long lists
+        ignoreAccents: options.length > 1000 ? false : true,
+      })}
+      components={
+        {
+          ValueContainer,
+          MultiValueRemove,
+          MultiValue,
+          Placeholder,
+          ...(options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}),
+        } as any
+      }
+      checkboxColorScheme="blue"
+    />
+  );
+});
+
+function Placeholder(props: PlaceholderProps<SelectOptionValue, true, never>) {
+  return (
+    <components.Placeholder
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "placeholder" } }}
+    />
+  );
+}
+
+function ValueContainer(props: ValueContainerProps<SelectOptionValue, true, never>) {
+  return (
+    <components.ValueContainer
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "value-container" } }}
+    />
+  );
+}
+
+function MultiValue(props: MultiValueProps<SelectOptionValue, true, never>) {
+  return (
+    <components.MultiValue
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "multi-value" } }}
+    />
+  );
+}
+
+function MultiValueRemove(props: MultiValueRemoveProps<SelectOptionValue, true, never>) {
+  return (
+    <components.MultiValueRemove
+      {...props}
+      innerProps={{ ...props.innerProps, ...{ "data-rs": "multi-value-remove" } }}
+    />
   );
 }

@@ -98,6 +98,7 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
   SELECT: ["SELECT", "CHECKBOX"],
   BACKGROUND_CHECK: ["BACKGROUND_CHECK"],
+  CHECKBOX: ["SELECT", "CHECKBOX"],
 };
 
 function normalize(alias: string) {

@@ -1,5 +1,6 @@
 import { ComponentWithAs, IconProps } from "@chakra-ui/react";
 import {
+  FieldCheckboxIcon,
   FieldDateIcon,
   FieldFileUploadIcon,
   FieldNumberIcon,
@@ -35,6 +36,13 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     standardList?: Maybe<string>;
   };
   BACKGROUND_CHECK: ProfileFieldBackgroundCheckSettings;
+  CHECKBOX: {
+    values: {
+      label: LocalizableUserText;
+      value: string;
+    }[];
+    standardList?: Maybe<string>;
+  };
 }[TType];
 
 export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
@@ -109,6 +117,15 @@ export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
       }),
     icon: ShortSearchIcon,
     color: "green.700",
+  },
+  CHECKBOX: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-checkbox",
+        defaultMessage: "Multiple choice",
+      }),
+    icon: FieldCheckboxIcon,
+    color: "#805AD5",
   },
 } as Record<
   ProfileTypeFieldType,

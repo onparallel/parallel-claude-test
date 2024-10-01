@@ -79,6 +79,7 @@ export interface FieldOptions {
       min: number;
       max: number;
     };
+    standardList?: Maybe<string>;
   };
   DATE: {};
   DOW_JONES_KYC: {};

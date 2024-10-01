@@ -537,6 +537,8 @@ export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content
 function mapProfilePropertyOptions(field: Pick<ProfileTypeFieldFragment, "type" | "options">) {
   if (field.type === "SELECT") {
     return pick(field.options ?? {}, ["values"]);
+  } else if (field.type === "CHECKBOX") {
+    return pick(field.options ?? {}, ["values"]);
   }
 
   return {};
@@ -824,7 +826,7 @@ export function parseProfileTypeFieldInput<
         : value && "value" in value && value.value === ""
           ? { value: null }
           : value
-    ) as { value?: string | number | FormDataFile[] | null; expiryDate?: string };
+    ) as { value?: string | string[] | number | FormDataFile[] | null; expiryDate?: string };
 
     if (!field.isExpirable && isNonNullish(content.expiryDate)) {
       throw new Error(`Can't set expiryDate on field '${field.alias}', as it is not expirable`);
@@ -845,22 +847,31 @@ export function parseProfileTypeFieldInput<
     if (
       content.value &&
       field.type !== "FILE" &&
+      field.type !== "CHECKBOX" &&
       typeof content.value !== "string" &&
       typeof content.value !== "number"
     ) {
       throw new Error(`Expected a string or number for field '${field.alias}'.`);
     }
 
+    if (content.value && field.type === "CHECKBOX") {
+      if (!Array.isArray(content.value) || !content.value.every((v) => typeof v === "string")) {
+        throw new Error(`Expected an array of strings for field '${field.alias}'.`);
+      }
+    }
+
     return [
       field,
-      content.value !== undefined
+      isNonNullish(content.value)
         ? {
             value:
               field.type === "NUMBER" && content.value
                 ? parseFloat(content.value as string)
                 : content.value,
           }
-        : undefined,
+        : // null is for removing the value
+          // undefined is for keeping the value as it is (may only update expiryDate)
+          content.value,
       content.expiryDate,
     ] as [T, { value: string | number | FormDataFile[] | null } | undefined, string | undefined];
   });

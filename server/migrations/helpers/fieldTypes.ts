@@ -85,6 +85,11 @@ export async function removeProfileTypeFieldType(knex: Knex, fieldName: string) 
   const fieldIds = fields.map((f) => f.id);
 
   await knex
+    .from("petition_field")
+    .whereIn("profile_type_field_id", fieldIds)
+    .update({ profile_type_field_id: null });
+
+  await knex
     .from("profile_type_field_permission")
     .whereIn("profile_type_field_id", fieldIds)
     .delete();

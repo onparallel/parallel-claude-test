@@ -152,6 +152,16 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
         );
       } else if (field.type === "TEXT") {
         return <Text key={undefined}>{reply.content.value}</Text>;
+      } else if (field.type === "CHECKBOX") {
+        return (
+          <List key={undefined}>
+            {reply.content.value.map((v: string) => (
+              <ListItem key={v}>
+                {getValueLabel(v, field.options as FieldOptions["CHECKBOX"])}
+              </ListItem>
+            ))}
+          </List>
+        );
       } else if (field.type === "BACKGROUND_CHECK") {
         return (
           <PetitionFieldBackgroundCheck
