@@ -395,7 +395,7 @@ function PetitionFieldFileUploadDropzone({
           const result = await checkIfPdfIsPasswordProtected(file);
           if (result.message === "PASSWORD_ENTERED") {
             finalFiles.push({ file, password: result.password });
-          } else if (result.message !== "PASSWORD_NOT_ENTERED") {
+          } else if (result.message === "NO_PASSWORD") {
             finalFiles.push({ file });
           }
         }

@@ -1,4 +1,14 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -7,29 +17,45 @@ import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { loadPdfJs, PdfJs } from "./pdfjs";
-import { withError } from "./promises/withError";
 import { useRegisterWithRef } from "./react-form-hook/useRegisterWithRef";
 import { turnOffPasswordManagers } from "./turnOffPasswordManagers";
 
 export function useCheckIfFileIsPasswordProtected() {
   const showEnterFilePasswordDialog = useDialog(EnterFilePasswordDialog);
+  const showConfirmUploadAnywaysDialog = useDialog(ConfirmUploadAnywaysDialog);
   return useCallback(async (file: File) => {
     if (file.type === "application/pdf") {
-      const [error, pdfJs] = await withError(loadPdfJs());
-      if (error) {
+      let pdfJs: PdfJs;
+      try {
+        pdfJs = await loadPdfJs();
+      } catch (error) {
         // fail gracefully
         Sentry.captureException(error);
         return { message: "NO_PASSWORD" as const };
       }
-      if (await checkPassword(pdfJs, file, undefined)) {
-        return { message: "NO_PASSWORD" as const };
-      } else {
+      let hasPassword: boolean;
+      try {
+        hasPassword = !(await checkPassword(pdfJs, file, undefined));
+      } catch (error) {
+        // this is usually due to malformed pdf files. we give the ability to upload anyways
+        try {
+          await showConfirmUploadAnywaysDialog();
+          // capture exception for further inspection. maybe pdf is ok but pdfjs is not.
+          Sentry.captureException(error);
+          return { message: "NO_PASSWORD" as const };
+        } catch {
+          return { message: "CANCEL" as const };
+        }
+      }
+      if (hasPassword) {
         try {
           const { password } = await showEnterFilePasswordDialog({ pdfJs, file });
           return { password, message: "PASSWORD_ENTERED" as const };
         } catch {
-          return { message: "PASSWORD_NOT_ENTERED" as const };
+          return { message: "CANCEL" as const };
         }
+      } else {
+        return { message: "NO_PASSWORD" as const };
       }
     } else {
       return { message: "NO_PASSWORD" as const };
@@ -38,18 +64,12 @@ export function useCheckIfFileIsPasswordProtected() {
 }
 
 async function checkPassword(pdfjs: PdfJs, file: File, password: string | undefined) {
-  return new Promise<boolean>(async (resolve) => {
+  return new Promise<boolean>(async (resolve, reject) => {
     const task = pdfjs.getDocument({ data: await file.arrayBuffer(), password });
     task.onPassword = () => {
       resolve(false);
     };
-    task.promise
-      .then(() => resolve(true))
-      .catch((e) => {
-        Sentry.captureException(e);
-        // if opening fails it's probably an invalid PDF, just let it go through
-        return resolve(true);
-      });
+    task.promise.then(() => resolve(true), reject);
   });
 }
 
@@ -113,6 +133,43 @@ function EnterFilePasswordDialog({
       confirm={
         <Button type="submit" colorScheme="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfirmUploadAnywaysDialog(props: DialogProps) {
+  return (
+    <ConfirmDialog
+      header={
+        <HStack>
+          <AlertCircleIcon role="presentation" />
+          <Box>
+            <FormattedMessage
+              id="component.enter-file-password-dialog.error-header"
+              defaultMessage="Something is wrong"
+            />
+          </Box>
+        </HStack>
+      }
+      body={
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.enter-file-password-dialog.error-description"
+              defaultMessage="We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload."
+            />
+          </Text>
+        </Stack>
+      }
+      confirm={
+        <Button onClick={() => props.onResolve()} colorScheme="primary">
+          <FormattedMessage
+            id="component.enter-file-password-dialog.error-confirm"
+            defaultMessage="Proceed with upload"
+          />
         </Button>
       }
       {...props}

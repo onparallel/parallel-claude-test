@@ -65,6 +65,21 @@
     "context": "Invite a collaborator to complete or review the missing information."
   },
   {
+    "term": "component.enter-file-password-dialog.error-confirm",
+    "definition": "Procedi con il caricamento",
+    "context": "Proceed with upload"
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-description",
+    "definition": "Non siamo riusciti a verificare che il file sia leggibile. Controlla se è corretto. Se sei sicuro, puoi comunque procedere con il caricamento.",
+    "context": "We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload."
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-header",
+    "definition": "Qualcosa non va",
+    "context": "Something is wrong"
+  },
+  {
     "term": "component.enter-file-password-dialog.header",
     "definition": "File protetto da password",
     "context": "File is password protected"

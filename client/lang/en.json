@@ -2895,6 +2895,21 @@
     "context": "The folder is empty"
   },
   {
+    "term": "component.enter-file-password-dialog.error-confirm",
+    "definition": "Proceed with upload",
+    "context": "Proceed with upload"
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-description",
+    "definition": "We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload.",
+    "context": "We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload."
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-header",
+    "definition": "Something is wrong",
+    "context": "Something is wrong"
+  },
+  {
     "term": "component.enter-file-password-dialog.header",
     "definition": "File is password protected",
     "context": "File is password protected"

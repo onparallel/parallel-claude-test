@@ -65,6 +65,21 @@
     "context": "Invite a collaborator to complete or review the missing information."
   },
   {
+    "term": "component.enter-file-password-dialog.error-confirm",
+    "definition": "Continuar amb la pujada",
+    "context": "Proceed with upload"
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-description",
+    "definition": "No hem pogut verificar que el fitxer sigui llegible. Comprova si és correcte. Si n'estàs segur, encara pots continuar amb la pujada.",
+    "context": "We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload."
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-header",
+    "definition": "Alguna cosa no funciona",
+    "context": "Something is wrong"
+  },
+  {
     "term": "component.enter-file-password-dialog.header",
     "definition": "Arxiu protegit amb contrasenya",
     "context": "File is password protected"

@@ -315,10 +315,12 @@ export class PetitionBinder implements IPetitionBinder {
     await retry(
       async (i) => {
         try {
-          await this.spawn("qpdf", ["--empty", "--pages", ...filePaths, "--", output], {
-            timeout: 120_000,
-            stdio: "pipe",
-          });
+          if (filePaths.length > 0) {
+            await this.spawn("qpdf", ["--empty", "--pages", ...filePaths, "--", output], {
+              timeout: 120_000,
+              stdio: "pipe",
+            });
+          }
         } catch (e) {
           if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
             this.info("qpdf exited with warnings");
@@ -339,17 +341,23 @@ export class PetitionBinder implements IPetitionBinder {
               .filter(isNonNullish);
             if (damagedFilePaths.length > 0) {
               this.info(`Found ${damagedFilePaths.length} damaged files. Attempting to repair...`);
-              filePaths = await pMap(
-                paths,
-                async (path) => {
-                  if (damagedFilePaths.includes(path)) {
-                    return await this.repairDocument(path);
-                  } else {
-                    return path;
-                  }
-                },
-                { concurrency: 1 },
-              );
+              filePaths = (
+                await pMap(
+                  paths,
+                  async (path) => {
+                    if (damagedFilePaths.includes(path)) {
+                      const repairedPath = await this.repairDocument(path);
+                      if (repairedPath === null) {
+                        this.info(`Failed to repair document ${path}, will ignore it...`);
+                      }
+                      return repairedPath;
+                    } else {
+                      return path;
+                    }
+                  },
+                  { concurrency: 1 },
+                )
+              ).filter(isNonNullish);
             }
           }
 
@@ -373,8 +381,8 @@ export class PetitionBinder implements IPetitionBinder {
       );
       return output;
     } catch (error) {
-      this.info("Error repairing document");
-      return filePath;
+      this.info(`Error repairing document: ${error}`);
+      return null;
     }
   }
 

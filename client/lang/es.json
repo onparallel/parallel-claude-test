@@ -2895,6 +2895,21 @@
     "context": "The folder is empty"
   },
   {
+    "term": "component.enter-file-password-dialog.error-confirm",
+    "definition": "Proceder con la subida",
+    "context": "Proceed with upload"
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-description",
+    "definition": "No pudimos verificar que el archivo sea legible. Por favor, revisa si es correcto. Si estás seguro, aún puedes proceder con la subida.",
+    "context": "We couldn't verify that the file is readable. Please check if it's correct. If you're confident, you can still proceed with the upload."
+  },
+  {
+    "term": "component.enter-file-password-dialog.error-header",
+    "definition": "Algo está mal",
+    "context": "Something is wrong"
+  },
+  {
     "term": "component.enter-file-password-dialog.header",
     "definition": "Archivo protegido con contraseña",
     "context": "File is password protected"
