@@ -5576,7 +5576,7 @@ export interface QuerypetitionFoldersArgs {
 }
 
 export interface QuerypetitionInformationArgs {
-  petitionId: Scalars["GID"]["input"];
+  petitionId: Scalars["ID"]["input"];
 }
 
 export interface QuerypetitionsArgs {

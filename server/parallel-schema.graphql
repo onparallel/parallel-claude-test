@@ -6998,7 +6998,12 @@ type Query {
   """
   Returns information about a petition: The name of the organization and emails of users with access to the petition
   """
-  petitionInformation(petitionId: GID!): SupportMethodResponse!
+  petitionInformation(
+    """
+    Numeric or global ID of the petition
+    """
+    petitionId: ID!
+  ): SupportMethodResponse!
 
   """
   The petitions of the user

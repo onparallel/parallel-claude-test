@@ -577,11 +577,11 @@ export const supportMethods: {
       args: [
         {
           name: "petitionId",
-          description: null,
+          description: "Numeric or global ID of the petition",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+            ofType: { kind: "SCALAR", name: "ID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,

@@ -1,7 +1,7 @@
 import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { outdent } from "outdent";
 import { isNonNullish, isNullish, zip } from "remeda";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { hash } from "../../util/token";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
@@ -104,10 +104,15 @@ export const petitionInformation = queryField("petitionInformation", {
   type: "SupportMethodResponse",
   authorize: superAdminAccess(),
   args: {
-    petitionId: nonNull(globalIdArg("Petition")),
+    petitionId: nonNull(idArg({ description: "Numeric or global ID of the petition" })),
   },
-  resolve: async (_, { petitionId }, ctx) => {
+  resolve: async (_, { petitionId: id }, ctx) => {
     try {
+      const petitionId = isGlobalId(id, "Petition") ? fromGlobalId(id).id : parseInt(id, 10);
+      if (typeof petitionId !== "number" || Number.isNaN(petitionId)) {
+        throw new Error("Invalid petition ID");
+      }
+
       const petition = await ctx.petitions.loadPetition(petitionId);
       if (!petition) {
         throw new Error(`Petition:${petitionId} not found`);

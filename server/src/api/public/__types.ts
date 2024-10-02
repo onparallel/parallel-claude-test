@@ -5381,7 +5381,7 @@ export type QuerypetitionFoldersArgs = {
 };
 
 export type QuerypetitionInformationArgs = {
-  petitionId: Scalars["GID"]["input"];
+  petitionId: Scalars["ID"]["input"];
 };
 
 export type QuerypetitionsArgs = {

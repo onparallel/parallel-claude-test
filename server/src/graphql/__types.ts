@@ -8487,7 +8487,7 @@ export interface NexusGenArgTypes {
     };
     petitionInformation: {
       // args
-      petitionId: NexusGenScalars["GID"]; // GID!
+      petitionId: string; // ID!
     };
     petitions: {
       // args
