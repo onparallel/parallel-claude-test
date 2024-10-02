@@ -84,6 +84,17 @@ export function TimelineSignatureCancelledEvent({ event }: TimelineSignatureCanc
               }}
             />
           )}
+          {event.cancelType === "REQUEST_EXPIRED" && (
+            <FormattedMessage
+              id="component.timeline-signature-cancelled-event.description-expired"
+              defaultMessage="The eSignature process has expired {timeAgo}"
+              values={{
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
           {event.cancelType === "REQUEST_ERROR" ? requestErrorMessage(event) : null}
         </Box>
         {event.cancelType === "REQUEST_ERROR" && isNonNullish(event.errorMessage) ? (

@@ -175,6 +175,9 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
               }
             : { userId: toGlobalId("User", event.data.cancel_data.user_id!) };
           break;
+        case "REQUEST_EXPIRED":
+          cancelData = {};
+          break;
         default:
           break;
       }

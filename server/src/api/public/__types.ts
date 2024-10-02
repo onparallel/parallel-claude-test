@@ -4020,6 +4020,7 @@ export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
   | "REQUEST_ERROR"
+  | "REQUEST_EXPIRED"
   | "REQUEST_RESTARTED";
 
 export type PetitionSignatureRequest = Timestamps & {

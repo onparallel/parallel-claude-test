@@ -333,13 +333,15 @@ export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
   | "REQUEST_ERROR"
-  | "REQUEST_RESTARTED";
+  | "REQUEST_RESTARTED"
+  | "REQUEST_EXPIRED";
 
 export const PetitionSignatureCancelReasonValues = [
   "CANCELLED_BY_USER",
   "DECLINED_BY_SIGNER",
   "REQUEST_ERROR",
   "REQUEST_RESTARTED",
+  "REQUEST_EXPIRED",
 ] as PetitionSignatureCancelReason[];
 
 export type PetitionSignatureStatus =

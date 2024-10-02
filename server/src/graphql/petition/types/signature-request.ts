@@ -1,14 +1,18 @@
 import { enumType, objectType } from "nexus";
 import { isNonNullish } from "remeda";
+import {
+  PetitionSignatureCancelReasonValues,
+  PetitionSignatureStatusValues,
+} from "../../../db/__types";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
-  members: ["ENQUEUED", "PROCESSING", "PROCESSED", "COMPLETED", "CANCELLING", "CANCELLED"],
+  members: PetitionSignatureStatusValues,
 });
 
 export const PetitionSignatureCancelReason = enumType({
   name: "PetitionSignatureCancelReason",
-  members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
+  members: PetitionSignatureCancelReasonValues,
 });
 
 export const PetitionSignatureRequestSignerStatus = objectType({

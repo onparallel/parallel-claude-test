@@ -41,6 +41,7 @@ const HANDLERS: Partial<
   email_delivered: emailDelivered,
   email_opened: emailOpened,
   email_bounced: emailBounced,
+  document_expired: documentExpired,
 };
 
 export const signaturitEventHandlers: RequestHandler = Router()
@@ -204,6 +205,14 @@ async function emailBounced(ctx: ApiContext, data: SignaturitEventBody, petition
     { email_bounced_at: new Date(data.created_at) },
     ctx,
   );
+}
+/** document has expired before every signer could sign it. we need to cancel the request in our DB */
+async function documentExpired(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
+    cancel_reason: "REQUEST_EXPIRED",
+    cancel_data: {},
+  });
 }
 
 async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {

@@ -340,7 +340,13 @@ const PetitionEventSchemas = {
       cancelReason: {
         description: "The reason of the cancel.",
         type: "string",
-        enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
+        enum: [
+          "CANCELLED_BY_USER",
+          "DECLINED_BY_SIGNER",
+          "REQUEST_ERROR",
+          "REQUEST_RESTARTED",
+          "REQUEST_EXPIRED",
+        ],
         example: "CANCELLED_BY_USER",
       },
       cancelData: {

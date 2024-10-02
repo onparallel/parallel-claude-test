@@ -5260,6 +5260,21 @@
     "context": "This field can only be used internally."
   },
   {
+    "term": "component.petition-compose-field-settings.list-of-options-description-1",
+    "definition": "Utiliza nuestros listados de opciones existentes para ahorrar tiempo.",
+    "context": "Use our existing option lists to save time."
+  },
+  {
+    "term": "component.petition-compose-field-settings.list-of-options-description-2",
+    "definition": "Estas opciones serán fijas y no editables.",
+    "context": "These options will be fixed and not editable."
+  },
+  {
+    "term": "component.petition-compose-field-settings.list-of-options-label",
+    "definition": "Listados de opciones",
+    "context": "List of options"
+  },
+  {
     "term": "component.petition-compose-field-settings.multiple-description",
     "definition": "Activar esta opción permitirá al destinatario responder más de una vez a este campo.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field."
@@ -5618,21 +5633,6 @@
     "term": "component.petition-compose-new-field.what-do-you-need",
     "definition": "¿Qué necesitas?",
     "context": "What do you need?"
-  },
-  {
-    "term": "component.petition-compose-field-settings.list-of-options-description-1",
-    "definition": "Utiliza nuestros listados de opciones existentes para ahorrar tiempo.",
-    "context": "Use our existing option lists to save time."
-  },
-  {
-    "term": "component.petition-compose-field-settings.list-of-options-description-2",
-    "definition": "Estas opciones serán fijas y no editables.",
-    "context": "These options will be fixed and not editable."
-  },
-  {
-    "term": "component.petition-compose-field-settings.list-of-options-label",
-    "definition": "Listados de opciones",
-    "context": "List of options"
   },
   {
     "term": "component.petition-compose-text-settings.format",
@@ -10865,6 +10865,11 @@
     "context": "{someone} cancelled the eSignature process {timeAgo}"
   },
   {
+    "term": "component.timeline-signature-cancelled-event.description-expired",
+    "definition": "El proceso de firma ha expirado {timeAgo}",
+    "context": "The eSignature process has expired {timeAgo}"
+  },
+  {
     "term": "component.timeline-signature-cancelled-event.description-restarted",
     "definition": "El proceso de firma ha sido reiniciado {timeAgo}",
     "context": "The eSignature process has been restarted {timeAgo}"
@@ -11495,21 +11500,6 @@
     "context": "Enter the contact details"
   },
   {
-    "term": "page.contacts.header-email",
-    "definition": "Correo electrónico",
-    "context": "Email"
-  },
-  {
-    "term": "page.contacts.header-first-name",
-    "definition": "Nombre",
-    "context": "First name"
-  },
-  {
-    "term": "page.contacts.header-last-name",
-    "definition": "Apellidos",
-    "context": "Last name"
-  },
-  {
     "term": "contacts.import-from-excel.attach-xlsx",
     "definition": "Adjunta un <b>archivo .xlsx</b> como el del modelo para añadir tus contactos.",
     "context": "Attach an <b>.xlsx file</b> like the one in the model to add your contacts."
@@ -11558,21 +11548,6 @@
     "term": "contacts.import-from-excel.import-error.details-domain-short",
     "definition": "Varios de los correos electrónicos no pudieron ser verificados.",
     "context": "Some of the emails could not be verified."
-  },
-  {
-    "term": "page.contacts.no-contacts",
-    "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
-    "context": "You have no contacts yet. Start by creating one now!"
-  },
-  {
-    "term": "page.contacts.no-results",
-    "definition": "No hemos encontrado contactos con esta búsqueda",
-    "context": "There's no contacts matching your search"
-  },
-  {
-    "term": "page.contacts.successful-import-toast-title",
-    "definition": "¡{count, plural, =1{# contacto importado} other{# contactos importados}} correctamente!",
-    "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
   },
   {
     "term": "error.404.header",
@@ -13993,6 +13968,36 @@
     "term": "page.compose.send-from-activity",
     "definition": "Si quieres enviarle el parallel a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+  },
+  {
+    "term": "page.contacts.header-email",
+    "definition": "Correo electrónico",
+    "context": "Email"
+  },
+  {
+    "term": "page.contacts.header-first-name",
+    "definition": "Nombre",
+    "context": "First name"
+  },
+  {
+    "term": "page.contacts.header-last-name",
+    "definition": "Apellidos",
+    "context": "Last name"
+  },
+  {
+    "term": "page.contacts.no-contacts",
+    "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
+    "context": "You have no contacts yet. Start by creating one now!"
+  },
+  {
+    "term": "page.contacts.no-results",
+    "definition": "No hemos encontrado contactos con esta búsqueda",
+    "context": "There's no contacts matching your search"
+  },
+  {
+    "term": "page.contacts.successful-import-toast-title",
+    "definition": "¡{count, plural, =1{# contacto importado} other{# contactos importados}} correctamente!",
+    "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
   },
   {
     "term": "page.contacts.title",
