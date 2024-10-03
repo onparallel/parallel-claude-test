@@ -24,5 +24,9 @@ Sentry.init({
      * Ignore these Next.js errors
      */
     "TypeError: Failed to fetch",
+    /**
+     * Ignore userflow infinite errors
+     */
+    "UserflowError: This Userflow.js client has reached a maximum of 100 operations in the last 1 minute",
   ],
 });
