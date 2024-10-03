@@ -123,6 +123,7 @@ completedFieldReplies.fragments = {
   get PetitionFieldReply() {
     return gql`
       fragment completedFieldReplies_PetitionFieldReply on PetitionFieldReply {
+        id
         content
         isAnonymized
       }
@@ -153,6 +154,7 @@ completedFieldReplies.fragments = {
   get PublicPetitionFieldReply() {
     return gql`
       fragment completedFieldReplies_PublicPetitionFieldReply on PublicPetitionFieldReply {
+        id
         content
         isAnonymized
       }
