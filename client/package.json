@@ -130,6 +130,7 @@
     "@graphql-codegen/typed-document-node": "^5.0.9",
     "@graphql-codegen/typescript": "^4.0.9",
     "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@sentry/cli": "^2.36.5",
     "@storybook/addon-essentials": "^8.2.9",
     "@storybook/nextjs": "^8.2.9",
     "@storybook/react": "^8.2.9",

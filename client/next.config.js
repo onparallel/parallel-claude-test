@@ -89,15 +89,16 @@ module.exports = [
   ...(process.env.SENTRY_AUTH_TOKEN
     ? [
         (config) =>
-          require("@sentry/nextjs").withSentryConfig(
-            config,
-            { silent: true, org: "parallel-org", project: "parallel" },
-            {
-              widenClientFileUpload: true,
-              transpileClientSDK: true,
-              hideSourceMaps: true,
-            },
-          ),
+          require("@sentry/nextjs").withSentryConfig(config, {
+            silent: true,
+            org: "parallel-org",
+            project: "parallel",
+            widenClientFileUpload: true,
+            tunnelRoute: "/monitoring",
+            hideSourceMaps: true,
+            disableLogger: true,
+            deleteSourcemapsAfterUpload: true,
+          }),
       ]
     : []),
 ].reduce((acc, curr) => curr(acc), config);

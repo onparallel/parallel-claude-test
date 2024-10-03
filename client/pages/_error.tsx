@@ -60,7 +60,8 @@ export default function CustomError(
   );
 }
 
-CustomError.getInitialProps = async ({ err, ...props }: NextPageContext) => {
+CustomError.getInitialProps = async (context: NextPageContext) => {
+  const err = context.err;
   let errorCode: string | undefined;
   if (typeof window !== "undefined") {
     if (window.__NEXT_DATA__.page === "/_error") {
@@ -71,12 +72,12 @@ CustomError.getInitialProps = async ({ err, ...props }: NextPageContext) => {
           ? err.graphQLErrors?.[0]?.extensions!.code
           : (err as any)?.message;
       if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
-        Sentry.captureException(err);
+        Sentry.captureUnderscoreErrorException(context);
       }
     }
   } else {
     if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
-      Sentry.captureException(err);
+      Sentry.captureUnderscoreErrorException(context);
     }
     errorCode =
       err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions!.code : (err as any)?.message;
