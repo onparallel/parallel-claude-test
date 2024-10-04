@@ -953,7 +953,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <FormattedMessage id="generic.contact" defaultMessage="Contact" />
                 </SupportButton>
               ),
-              confirm: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
+              confirmText: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
             }),
           );
           return true;

@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldErrorDialog } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { ReferencedFieldDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function useReferencedFieldDialog() {
@@ -23,11 +21,9 @@ export function ReferencedFieldDialog({
   referencedInMath: boolean;
   referencesInVisibility: boolean;
 }>) {
-  const focusRef = useRef<HTMLButtonElement>(null);
   return (
     <FieldErrorDialog
       {...props}
-      initialFocusRef={focusRef}
       closeOnOverlayClick={false}
       showCancel
       header={
@@ -57,25 +53,23 @@ export function ReferencedFieldDialog({
           />
         )
       }
-      confirm={
-        <Button colorScheme="primary" ref={focusRef} onClick={() => props.onResolve()}>
-          {!referencedInMath && referencesInVisibility ? (
-            <FormattedMessage
-              id="component.referenced-field-dialog.confirm-conditions"
-              defaultMessage="Remove conditions"
-            />
-          ) : referencedInMath && !referencesInVisibility ? (
-            <FormattedMessage
-              id="component.referenced-field-dialog.confirm-calculations"
-              defaultMessage="Remove calculations"
-            />
-          ) : (
-            <FormattedMessage
-              id="component.referenced-calculations-dialog.confirm-logic"
-              defaultMessage="Remove logic"
-            />
-          )}
-        </Button>
+      confirmText={
+        !referencedInMath && referencesInVisibility ? (
+          <FormattedMessage
+            id="component.referenced-field-dialog.confirm-conditions"
+            defaultMessage="Remove conditions"
+          />
+        ) : referencedInMath && !referencesInVisibility ? (
+          <FormattedMessage
+            id="component.referenced-field-dialog.confirm-calculations"
+            defaultMessage="Remove calculations"
+          />
+        ) : (
+          <FormattedMessage
+            id="component.referenced-calculations-dialog.confirm-logic"
+            defaultMessage="Remove logic"
+          />
+        )
       }
     />
   );

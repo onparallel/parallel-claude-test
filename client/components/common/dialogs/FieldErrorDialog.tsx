@@ -16,10 +16,11 @@ import { OverflownText } from "../OverflownText";
 
 export interface FieldErrorDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "header" | "confirm">,
-    Partial<Pick<ConfirmDialogProps<void>, "header" | "confirm" | "cancel">> {
+    Partial<Pick<ConfirmDialogProps<void>, "header" | "cancel">> {
   message: ReactNode;
   footer?: ReactNode;
   showCancel?: boolean;
+  confirmText?: ReactNode;
   fieldsWithIndices: (
     | [field: FieldErrorDialog_PetitionFieldFragment, fieldIndex: PetitionFieldIndex]
     | { field: FieldErrorDialog_PetitionFieldFragment; fieldIndex: PetitionFieldIndex }
@@ -31,7 +32,7 @@ export function FieldErrorDialog({
   footer,
   fieldsWithIndices,
   header,
-  confirm,
+  confirmText,
   showCancel,
   cancel,
   ...props
@@ -99,7 +100,7 @@ export function FieldErrorDialog({
           minWidth={24}
           onClick={() => props.onResolve()}
         >
-          {confirm ?? <FormattedMessage id="generic.ok" defaultMessage="OK" />}
+          {confirmText ?? <FormattedMessage id="generic.ok" defaultMessage="OK" />}
         </Button>
       }
       cancel={showCancel || cancel ? cancel : <></>}
