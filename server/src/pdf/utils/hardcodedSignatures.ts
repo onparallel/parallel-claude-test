@@ -67,9 +67,9 @@ export function getHardcodedSignatures(templateId: string) {
     ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb", "zas25KHxAByKX3mKDNQ"].includes(templateId)
   ) {
     signers.push({
-      fullName: "Dña Ana Ortiz Canela",
+      fullName: "Dña Ana Isabel Martín",
       signatureImageUrl:
-        "https://static.onparallel.com/static/images/signatures/ana-ortiz-canela-gesdocument.png",
+        "https://static.onparallel.com/static/images/signatures/ana-martin-adlanter.png",
     });
   } else if (["zas25KHxAByKWu4g76M"].includes(templateId)) {
     signers.push({
