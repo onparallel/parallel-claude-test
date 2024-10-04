@@ -6,6 +6,7 @@ import {
   Center,
   Circle,
   Flex,
+  PortalManager,
   Spinner,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -222,7 +223,10 @@ export const AppLayout = Object.assign(
             }}
             flexDirection={{ base: "column", sm: "row" }}
           >
-            <AppLayoutNavBar me={me} realMe={realMe} onHelpCenterClick={handleHelpCenterClick} />
+            <PortalManager zIndex={50}>
+              <AppLayoutNavBar me={me} realMe={realMe} onHelpCenterClick={handleHelpCenterClick} />
+            </PortalManager>
+
             <Flex
               flex="1"
               flexDirection="column"
