@@ -80,6 +80,11 @@
     "context": "Annex {n}"
   },
   {
+    "term": "document.damaged-file-page.text",
+    "definition": "Il file {fileName} non può essere allegato.",
+    "context": "The file {fileName} could not be attached."
+  },
+  {
     "term": "document.petition-export.default-group-name",
     "definition": "Risposta",
     "context": "Reply"

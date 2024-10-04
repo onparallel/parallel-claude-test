@@ -200,6 +200,11 @@
     "context": "Annex {n}"
   },
   {
+    "term": "document.damaged-file-page.text",
+    "definition": "El archivo {fileName} no se ha podido adjuntar.",
+    "context": "The file {fileName} could not be attached."
+  },
+  {
     "term": "document.petition-export.default-group-name",
     "definition": "Respuesta",
     "context": "Reply"

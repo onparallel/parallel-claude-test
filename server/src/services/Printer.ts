@@ -7,6 +7,7 @@ import BackgroundCheckProfile, {
   BackgroundCheckProfileProps,
 } from "../pdf/documents/BackgroundCheckProfile";
 import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/recipient/AnnexCoverPage";
+import DamagedFilePage, { DamagedFilePageProps } from "../pdf/documents/recipient/DamagedFilePage";
 import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdf";
 import PetitionExport, {
   PetitionExportInitialData,
@@ -47,6 +48,10 @@ export interface IPrinter {
       locale: ContactLocale;
       useExportV2?: boolean;
     },
+  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
+  damagedFilePage(
+    props: DamagedFilePageProps,
+    locale: ContactLocale,
   ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
 }
 
@@ -131,5 +136,9 @@ export class Printer implements IPrinter {
       { petitionId: toGlobalId("Petition", data.petitionId) },
       { client, locale: data.locale },
     );
+  }
+
+  public async damagedFilePage(props: DamagedFilePageProps, locale: ContactLocale) {
+    return await buildPdf(DamagedFilePage, props, { locale });
   }
 }

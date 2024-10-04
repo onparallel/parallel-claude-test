@@ -110,7 +110,7 @@ export class PetitionBinder implements IPetitionBinder {
         throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
       }
 
-      const mainDocPaths: string[] = [];
+      const mainDocs: { path: string; filename?: string }[] = [];
 
       const userHasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
 
@@ -124,26 +124,30 @@ export class PetitionBinder implements IPetitionBinder {
           useExportV2: userHasExportV2,
         });
 
-        mainDocPaths.push(await this.writeTemporaryFile(petitionExport.stream, "pdf"));
+        mainDocs.push({
+          path: await this.writeTemporaryFile(petitionExport.stream, "pdf"),
+        });
       } else {
         const customFile = await this.files.loadTemporaryFile(customDocumentTemporaryFileId);
-        mainDocPaths.push(
-          await this.writeTemporaryFile(
+        mainDocs.push({
+          path: await this.writeTemporaryFile(
             await this.storage.temporaryFiles.downloadFile(customFile!.path),
             "pdf",
           ),
-        );
+        });
         if (showSignatureBoxes) {
           const signatureBoxesPage = await this.printer.signatureBoxesPage(userId, {
             petitionId,
             locale: petition.recipient_locale,
             useExportV2: userHasExportV2,
           });
-          mainDocPaths.push(await this.writeTemporaryFile(signatureBoxesPage.stream, "pdf"));
+          mainDocs.push({
+            path: await this.writeTemporaryFile(signatureBoxesPage.stream, "pdf"),
+          });
         }
       }
 
-      this.info(`Main document created at ${mainDocPaths[0]}`);
+      this.info(`Main document created at ${mainDocs[0].path}`);
 
       const annexedDocumentPaths = includeAnnexedDocuments
         ? await pFlatMap(
@@ -164,16 +168,14 @@ export class PetitionBinder implements IPetitionBinder {
 
               const filePaths = await this.downloadFileUpload(files, userId, documentTheme);
 
-              return [coverPagePath, ...filePaths];
+              return [{ path: coverPagePath }, ...filePaths];
             },
             { concurrency: 2 },
           )
         : [];
 
       this.info(
-        `${annexedDocumentPaths.length} annexed documents created: ${annexedDocumentPaths.join(
-          ", ",
-        )}`,
+        `${annexedDocumentPaths.length} annexed documents created: ${JSON.stringify(annexedDocumentPaths)}`,
       );
 
       const attachmentPaths = Object.fromEntries(
@@ -193,14 +195,14 @@ export class PetitionBinder implements IPetitionBinder {
           ],
           { concurrency: 5 },
         ),
-      ) as Record<PetitionAttachmentType, string[]>;
+      ) as Record<PetitionAttachmentType, { path: string; filename?: string }[]>;
 
       this.info(`Attachment documents created: ${JSON.stringify(attachmentPaths)}`);
 
       return await this.merge(
         [
           ...attachmentPaths.FRONT,
-          ...mainDocPaths,
+          ...mainDocs,
           ...attachmentPaths.ANNEX,
           ...annexedDocumentPaths,
           ...attachmentPaths.BACK,
@@ -208,6 +210,13 @@ export class PetitionBinder implements IPetitionBinder {
         {
           maxOutputSize,
           outputFileName: outputFileName ? sanitizeFilename(outputFileName) : undefined,
+          onReplaceDamagedFile: async (fileName) => {
+            const { stream } = await this.printer.damagedFilePage(
+              { fileName, theme: documentTheme.data },
+              petition?.recipient_locale ?? "en",
+            );
+            return await this.writeTemporaryFile(stream, "pdf");
+          },
         },
       );
     } finally {
@@ -218,14 +227,18 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async merge(
-    filePaths: string[],
-    opts?: { maxOutputSize?: number; outputFileName?: string },
+    files: { path: string; filename?: string }[],
+    opts: {
+      maxOutputSize?: number;
+      outputFileName?: string;
+      onReplaceDamagedFile?: (filename: string) => Promise<string>;
+    },
   ) {
-    this.info(`Merging ${filePaths.length} files. opts: ${JSON.stringify(opts)}`);
+    this.info(`Merging ${files.length} files. opts: ${JSON.stringify(opts)}`);
     const DPIValues = [144, 110, 96, 72];
     let resultFilePath = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
 
-    await this.mergeFiles(filePaths, resultFilePath);
+    await this.mergeFiles(files, resultFilePath, opts.onReplaceDamagedFile);
 
     this.info(`Merged file created at ${resultFilePath}`);
 
@@ -309,11 +322,15 @@ export class PetitionBinder implements IPetitionBinder {
     }
   }
 
-  private async mergeFiles(paths: string[], output: string) {
-    let filePaths = paths;
+  private async mergeFiles(
+    files: { path: string; filename?: string }[],
+    output: string,
+    onReplaceDamagedFile?: (filename: string) => Promise<string>,
+  ) {
+    let filePaths = files.map((f) => f.path);
 
     await retry(
-      async (i) => {
+      async () => {
         try {
           if (filePaths.length > 0) {
             await this.spawn("qpdf", ["--empty", "--pages", ...filePaths, "--", output], {
@@ -327,7 +344,7 @@ export class PetitionBinder implements IPetitionBinder {
             return;
           }
 
-          if (i === 0 && e instanceof ChildProcessNonSuccessError) {
+          if (e instanceof ChildProcessNonSuccessError) {
             const damagedFilePaths = e.data.stderr
               .split("\n")
               .map((l) => {
@@ -343,12 +360,16 @@ export class PetitionBinder implements IPetitionBinder {
               this.info(`Found ${damagedFilePaths.length} damaged files. Attempting to repair...`);
               filePaths = (
                 await pMap(
-                  paths,
+                  filePaths,
                   async (path) => {
                     if (damagedFilePaths.includes(path)) {
                       const repairedPath = await this.repairDocument(path);
                       if (repairedPath === null) {
                         this.info(`Failed to repair document ${path}, will ignore it...`);
+                        const file = files.find((f) => f.path === path);
+                        return onReplaceDamagedFile
+                          ? await onReplaceDamagedFile(file?.filename ?? "")
+                          : null;
                       }
                       return repairedPath;
                     } else {
@@ -364,7 +385,7 @@ export class PetitionBinder implements IPetitionBinder {
           throw e;
         }
       },
-      { maxRetries: 1 },
+      { maxRetries: 20 },
     );
   }
 
@@ -462,10 +483,13 @@ export class PetitionBinder implements IPetitionBinder {
           const fileHasSize = file.size !== "0";
           if (fileHasSize && file.content_type.startsWith("image/")) {
             const imageUrl = await this.convertImage(file.path, file.content_type);
-            return await this.writeTemporaryFile(
-              this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
-              "pdf",
-            );
+            return {
+              filename: file.filename,
+              path: await this.writeTemporaryFile(
+                this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
+                "pdf",
+              ),
+            };
           } else if (fileHasSize && file.content_type === "application/pdf") {
             let readable = await this.storage.fileUploads.downloadFile(file.path);
             if (file.password) {
@@ -475,7 +499,10 @@ export class PetitionBinder implements IPetitionBinder {
               );
               readable = createReadStream(decryptedFilePath);
             }
-            return await this.writeTemporaryFile(readable, "pdf");
+            return {
+              filename: file.filename,
+              path: await this.writeTemporaryFile(readable, "pdf"),
+            };
           } else {
             this.logger.warn(
               `Cannot annex ${file.content_type} FileUpload:${file.id} to pdf binder. Skipping...`,

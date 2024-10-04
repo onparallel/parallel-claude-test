@@ -1,0 +1,37 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Damaged File Page",
+      "parameters": {
+        "server": {
+          "id": "documents/recipient/DamagedFilePage"
+        }
+      },
+      "args": {
+        "fileName": "document.pdf",
+        "theme": {
+          "marginLeft": 25.4,
+          "marginRight": 25.4,
+          "marginTop": 25.4,
+          "marginBottom": 25.4,
+          "textFontFamily": "Roboto",
+          "textFontSize": 12,
+          "textColor": "#000000"
+        }
+      },
+      "argTypes": {
+        "fileName": {
+          "control": {
+            "type": "text"
+          }
+        },
+        "theme": {
+          "control": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}
