@@ -12,7 +12,10 @@ import { fileSize } from "../../../util/fileSize";
 import { formatNumberWithPrefix } from "../../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { createLiquid } from "../../../util/liquid";
-import { buildPetitionFieldsLiquidScope } from "../../../util/liquidScope";
+import {
+  buildPetitionFieldsLiquidScope,
+  buildPetitionVariablesLiquidScope,
+} from "../../../util/liquidScope";
 import { never } from "../../../util/never";
 import { titleize } from "../../../util/strings";
 import { UnwrapArray } from "../../../util/types";
@@ -264,7 +267,11 @@ function PetitionExport2(
                           t(field.title ?? ""),
                         )
                       : []),
-                    ...fieldDescription(field.description, { liquid, scope, intl }),
+                    ...fieldDescription(field.description, {
+                      liquid,
+                      scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                      intl,
+                    }),
                   ),
                 ),
               ]
@@ -280,7 +287,11 @@ function PetitionExport2(
                           t(field.title),
                         )
                       : []),
-                    ...fieldDescription(field.description, { liquid, scope, intl }),
+                    ...fieldDescription(field.description, {
+                      liquid,
+                      scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                      intl,
+                    }),
                   ),
                 ),
                 ...zip(field.replies, logic.groupChildrenLogic!).flatMap(
@@ -314,7 +325,7 @@ function PetitionExport2(
                             : []),
                           ...fieldDescription(child.field.description, {
                             liquid,
-                            scope: Object.assign({}, scope, logic),
+                            scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
                             intl,
                           }),
                           ...fieldReplies(child.field, child.replies, {
@@ -331,7 +342,11 @@ function PetitionExport2(
                 ...(field.title
                   ? heading({ level: "2", numbering: "none", outlined: "false" }, t(field.title))
                   : []),
-                ...fieldDescription(field.description, { liquid, scope, intl }),
+                ...fieldDescription(field.description, {
+                  liquid,
+                  scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                  intl,
+                }),
                 ...fieldReplies(field, field.replies, {
                   intl,
                   assetsUrl,
