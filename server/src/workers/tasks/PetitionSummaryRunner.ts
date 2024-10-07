@@ -161,6 +161,8 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                       field: {
                         id: toGlobalId("PetitionField", c.field.id),
                         ...pick(c.field, ["type", "multiple", "alias", "options"]),
+                        visibility: this.mapFieldVisibility(c.field.visibility),
+                        math: this.mapFieldMath(c.field.math),
                       },
                       replies: c.replies,
                     }))
