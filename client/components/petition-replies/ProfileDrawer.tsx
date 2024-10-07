@@ -93,8 +93,9 @@ export const ProfileDrawer = Object.assign(
         </HStack>
         {profileData?.profile ? (
           <ProfileForm
+            key={profileData.profile.id}
             overlapsIntercomBadge
-            profile={profileData!.profile}
+            profile={profileData.profile}
             onRefetch={handleRefetchProfile}
             flex={1}
             minHeight={0}

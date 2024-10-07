@@ -143,7 +143,7 @@ export const ProfileForm = Object.assign(
     } = useForm<ProfileFormData>({
       defaultValues: buildFormDefaultValue(properties),
     });
-    useEffectSkipFirst(() => reset(buildFormDefaultValue(properties)), [profile]);
+    useEffectSkipFirst(() => reset(buildFormDefaultValue(properties)), [properties]);
 
     useAutoConfirmDiscardChangesDialog(formState.isDirty);
 
