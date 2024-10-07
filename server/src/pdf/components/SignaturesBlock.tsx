@@ -37,7 +37,7 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
 
   const date = intl.formatDate(new Date(), {
     timeZone: signatureConfig.timezone,
-    ...FORMATS.L,
+    ...FORMATS.LL,
   });
 
   const signers = [

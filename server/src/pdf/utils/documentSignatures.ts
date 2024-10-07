@@ -18,7 +18,7 @@ export function documentSignatures(
 ) {
   const date = intl.formatDate(new Date(), {
     timeZone: signatureConfig.timezone,
-    ...FORMATS.L,
+    ...FORMATS.LL,
   });
   const signers: { fullName: string; signatureImageUrl?: string }[] = [
     ...(process.env.NODE_ENV === "production" && isNonNullish(templateId)
