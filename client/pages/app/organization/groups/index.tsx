@@ -536,6 +536,7 @@ OrganizationGroups.queries = [
     query OrganizationGroups_user {
       ...OrganizationSettingsLayout_Query
       me {
+        id
         hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
       }
     }

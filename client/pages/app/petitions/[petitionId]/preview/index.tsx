@@ -1127,6 +1127,7 @@ const _queries = [
     query PetitionPreview_user {
       ...PetitionPreview_Query
       me {
+        id
         hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
       }
       metadata {

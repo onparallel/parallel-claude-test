@@ -153,6 +153,7 @@ usePetitionCanFinalize.fragments = {
         isReadOnly
         isInternal
         replies {
+          id
           createdAt
           updatedAt
           children {
@@ -163,6 +164,7 @@ usePetitionCanFinalize.fragments = {
               ...completedFieldReplies_PetitionField
             }
             replies {
+              id
               content
               isAnonymized
               createdAt
@@ -186,6 +188,7 @@ usePetitionCanFinalize.fragments = {
         isReadOnly
         isInternal
         replies {
+          id
           content
           isAnonymized
           createdAt
@@ -198,6 +201,7 @@ usePetitionCanFinalize.fragments = {
               ...completedFieldReplies_PublicPetitionField
             }
             replies {
+              id
               content
               isAnonymized
               createdAt

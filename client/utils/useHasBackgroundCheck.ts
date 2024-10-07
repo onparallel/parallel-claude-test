@@ -19,6 +19,7 @@ const _queries = [
   gql`
     query useHasBackgroundCheck_Me {
       me {
+        id
         hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
       }
     }

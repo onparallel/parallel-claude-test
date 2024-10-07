@@ -118,6 +118,7 @@ useGetPetitionPages.fragments = {
         options
         isInternal
         replies {
+          id
           children {
             field {
               isInternal

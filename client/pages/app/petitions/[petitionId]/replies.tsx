@@ -1146,6 +1146,7 @@ PetitionReplies.queries = [
     query PetitionReplies_user {
       ...PetitionLayout_Query
       me {
+        id
         organization {
           name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)

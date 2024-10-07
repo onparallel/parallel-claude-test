@@ -179,6 +179,7 @@ UserGroupLayout.fragments = {
     fragment UserGroupLayout_Query on Query {
       ...OrganizationSettingsLayout_Query
       me {
+        id
         hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
       }
     }

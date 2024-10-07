@@ -126,17 +126,20 @@ LiquidScopeProvider.fragments = {
               ...LiquidScopeProvider_PetitionField
             }
             replies {
+              id
               content
             }
           }
         }
         replies {
+          id
           content
           children {
             field {
               ...LiquidScopeProvider_PetitionField
             }
             replies {
+              id
               content
             }
           }
@@ -163,12 +166,14 @@ LiquidScopeProvider.fragments = {
       fields {
         ...LiquidScopeProvider_PublicPetitionField
         replies {
+          id
           content
           children {
             field {
               ...LiquidScopeProvider_PublicPetitionField
             }
             replies {
+              id
               content
             }
           }

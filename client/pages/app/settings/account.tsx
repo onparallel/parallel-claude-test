@@ -99,6 +99,7 @@ Account.fragments = {
     fragment Account_Query on Query {
       ...UserSettingsLayout_Query
       me {
+        id
         ...AccountChangeName_User
         ...AccountLocaleChange_User
         ...AccountDelegates_User

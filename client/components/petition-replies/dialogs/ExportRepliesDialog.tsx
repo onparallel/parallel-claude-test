@@ -344,6 +344,7 @@ ExportRepliesDialog.fragments = {
       type
       ...useFilenamePlaceholdersRename_PetitionField
       replies {
+        id
         status
         content
         ...useFilenamePlaceholdersRename_PetitionFieldReply

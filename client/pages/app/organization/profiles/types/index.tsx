@@ -469,6 +469,7 @@ OrganizationProfileTypes.queries = [
     query OrganizationProfileTypes_user {
       ...OrganizationProfilesLayout_Query
       me {
+        id
         hasCreateProfileType: hasFeatureFlag(featureFlag: CREATE_PROFILE_TYPE)
       }
     }

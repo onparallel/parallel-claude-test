@@ -88,6 +88,7 @@ OrganizationUsage.queries = [
     query OrganizationUsage_user {
       ...OrganizationSettingsLayout_Query
       me {
+        id
         organization {
           id
           activeUserCount

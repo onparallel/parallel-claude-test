@@ -212,6 +212,7 @@ Security.queries = [
     query Security_user {
       ...UserSettingsLayout_Query
       me {
+        id
         isSsoUser
       }
     }

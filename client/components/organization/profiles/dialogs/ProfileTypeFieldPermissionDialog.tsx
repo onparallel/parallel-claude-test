@@ -449,6 +449,7 @@ const _queries = [
   gql`
     query useProfileTypeFieldPermissionDialog_users($search: String!, $excludeIds: [GID!]) {
       me {
+        id
         organization {
           users(
             limit: 100

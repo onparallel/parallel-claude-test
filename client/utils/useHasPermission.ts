@@ -24,6 +24,7 @@ const _queries = [
   gql`
     query useHasPermission_Me {
       me {
+        id
         permissions
       }
     }

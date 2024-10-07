@@ -822,6 +822,7 @@ const _queries = [
     query PermissionsGroup_user {
       ...UserGroupLayout_Query
       me {
+        id
         permissions
         hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)

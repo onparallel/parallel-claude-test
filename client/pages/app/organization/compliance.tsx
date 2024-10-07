@@ -381,6 +381,7 @@ OrganizationCompliance.queries = [
     query OrganizationCompliance_user {
       ...OrganizationSettingsLayout_Query
       me {
+        id
         hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
         organization {
           ...OrganizationCompliance_Organization

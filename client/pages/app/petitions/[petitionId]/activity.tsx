@@ -561,6 +561,7 @@ const _fragments = {
     fragment PetitionActivity_Query on Query {
       ...PetitionLayout_Query
       me {
+        id
         organization {
           name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
@@ -676,6 +677,7 @@ const _queries = [
     query PetitionActivity_user {
       ...PetitionActivity_Query
       me {
+        id
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       }
     }

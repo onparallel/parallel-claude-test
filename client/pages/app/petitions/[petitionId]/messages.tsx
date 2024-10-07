@@ -96,6 +96,7 @@ const _fragments = {
     fragment PetitionMessages_Query on Query {
       ...PetitionLayout_Query
       me {
+        id
         ...PetitionTemplateRequestMessageCard_User
       }
     }

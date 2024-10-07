@@ -43,6 +43,7 @@ const _queries = [
       $filters: UserFilter
     ) {
       me {
+        id
         organization {
           users(
             limit: $limit

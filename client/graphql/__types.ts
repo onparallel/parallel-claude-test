@@ -10042,6 +10042,7 @@ export type useProfileTypeFieldPermissionDialog_usersQueryVariables = Exact<{
 export type useProfileTypeFieldPermissionDialog_usersQuery = {
   me: {
     __typename?: "User";
+    id: string;
     organization: {
       __typename?: "Organization";
       users: {
@@ -19094,9 +19095,9 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -19154,11 +19155,11 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -19264,9 +19265,9 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -19324,11 +19325,11 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -19404,9 +19405,9 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -19464,11 +19465,11 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -20501,9 +20502,9 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -20561,11 +20562,11 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -20641,9 +20642,9 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -20701,11 +20702,11 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -21517,9 +21518,9 @@ export type NewSignatureRequestRow_PetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -21577,11 +21578,11 @@ export type NewSignatureRequestRow_PetitionFragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -22724,11 +22725,11 @@ export type PetitionSignaturesCard_PetitionFragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -23001,11 +23002,11 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
+                id: string;
                 content: { [key: string]: any };
                 isAnonymized: boolean;
                 createdAt: string;
                 updatedAt: string;
-                id: string;
               }>;
             }> | null;
           }>;
@@ -23318,11 +23319,11 @@ export type PetitionSignaturesCard_completePetitionMutation = {
           };
           replies: Array<{
             __typename?: "PetitionFieldReply";
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
-            id: string;
           }>;
         }> | null;
       }>;
@@ -23595,11 +23596,11 @@ export type PetitionSignaturesCard_petitionQuery = {
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
+                id: string;
                 content: { [key: string]: any };
                 isAnonymized: boolean;
                 createdAt: string;
                 updatedAt: string;
-                id: string;
               }>;
             }> | null;
           }>;
@@ -25131,12 +25132,14 @@ export type ExportRepliesDialog_PetitionFragment = {
       title?: string | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
+        id: string;
         status: PetitionFieldReplyStatus;
         content: { [key: string]: any };
       }>;
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
@@ -25150,6 +25153,7 @@ export type ExportRepliesDialog_PetitionFieldFragment = {
   title?: string | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
+    id: string;
     status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
   }>;
@@ -28602,11 +28606,11 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
       math?: Array<{ [key: string]: any }> | null;
       replies: Array<{
         __typename?: "PublicPetitionFieldReply";
+        id: string;
         content: { [key: string]: any };
         isAnonymized: boolean;
         createdAt: string;
         updatedAt: string;
-        id: string;
         children?: Array<{
           __typename?: "PublicPetitionFieldGroupChildReply";
           field: {
@@ -28641,11 +28645,11 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
           };
           replies: Array<{
             __typename?: "PublicPetitionFieldReply";
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
-            id: string;
           }>;
         }> | null;
       }>;
@@ -29202,11 +29206,11 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       createdAt: string;
       updatedAt: string;
-      id: string;
       children?: Array<{
         __typename?: "PublicPetitionFieldGroupChildReply";
         field: {
@@ -29241,11 +29245,11 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
         };
         replies: Array<{
           __typename?: "PublicPetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -32034,8 +32038,8 @@ export type PermissionsGroup_userQueryVariables = Exact<{ [key: string]: never }
 export type PermissionsGroup_userQuery = {
   me: {
     __typename?: "User";
-    permissions: Array<string>;
     id: string;
+    permissions: Array<string>;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
@@ -44532,8 +44536,8 @@ export type PetitionReplies_PetitionFragment = {
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
-      content: { [key: string]: any };
       id: string;
+      content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
       status: PetitionFieldReplyStatus;
@@ -44630,8 +44634,8 @@ export type PetitionReplies_PetitionFragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
-          content: { [key: string]: any };
           id: string;
+          content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
@@ -45513,8 +45517,8 @@ export type PetitionReplies_closePetitionMutation = {
       }>;
       replies: Array<{
         __typename?: "PetitionFieldReply";
-        content: { [key: string]: any };
         id: string;
+        content: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
         status: PetitionFieldReplyStatus;
@@ -45611,8 +45615,8 @@ export type PetitionReplies_closePetitionMutation = {
           };
           replies: Array<{
             __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
             id: string;
+            content: { [key: string]: any };
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
@@ -46267,8 +46271,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       }>;
       replies: Array<{
         __typename?: "PetitionFieldReply";
-        content: { [key: string]: any };
         id: string;
+        content: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
         status: PetitionFieldReplyStatus;
@@ -46365,8 +46369,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           };
           replies: Array<{
             __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
             id: string;
+            content: { [key: string]: any };
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
@@ -47202,8 +47206,8 @@ export type PetitionReplies_petitionQuery = {
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
             id: string;
+            content: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
             status: PetitionFieldReplyStatus;
@@ -47300,8 +47304,8 @@ export type PetitionReplies_petitionQuery = {
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
-                content: { [key: string]: any };
                 id: string;
+                content: { [key: string]: any };
                 isAnonymized: boolean;
                 createdAt: string;
                 updatedAt: string;
@@ -50016,8 +50020,8 @@ export type Security_userQueryVariables = Exact<{ [key: string]: never }>;
 export type Security_userQuery = {
   me: {
     __typename?: "User";
-    isSsoUser: boolean;
     id: string;
+    isSsoUser: boolean;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
@@ -52191,8 +52195,8 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
-      content: { [key: string]: any };
       id: string;
+      content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
@@ -52280,8 +52284,8 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
-      content: { [key: string]: any };
       id: string;
+      content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
@@ -52357,8 +52361,8 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
-      content: { [key: string]: any };
       id: string;
+      content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
         __typename?: "PublicPetitionFieldGroupChildReply";
@@ -53874,7 +53878,7 @@ export type useGetPetitionPages_PetitionBaseFragment =
 export type useHasBackgroundCheck_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useHasBackgroundCheck_MeQuery = {
-  me: { __typename?: "User"; hasBackgroundCheck: boolean };
+  me: { __typename?: "User"; id: string; hasBackgroundCheck: boolean };
 };
 
 export type useHasIdVerification_MeQueryVariables = Exact<{ [key: string]: never }>;
@@ -53889,7 +53893,9 @@ export type useHasIdVerification_MeQuery = {
 
 export type useHasPermission_MeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type useHasPermission_MeQuery = { me: { __typename?: "User"; permissions: Array<string> } };
+export type useHasPermission_MeQuery = {
+  me: { __typename?: "User"; id: string; permissions: Array<string> };
+};
 
 export type useLoginAs_loginAsMutationVariables = Exact<{
   userId: Scalars["GID"]["input"];
@@ -53920,9 +53926,9 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -53980,11 +53986,11 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -54053,9 +54059,9 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -54113,11 +54119,11 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -54190,11 +54196,11 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       createdAt: string;
       updatedAt: string;
-      id: string;
       children?: Array<{
         __typename?: "PublicPetitionFieldGroupChildReply";
         field: {
@@ -54229,11 +54235,11 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
         };
         replies: Array<{
           __typename?: "PublicPetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -54550,6 +54556,7 @@ export type useSearchUsers_usersQueryVariables = Exact<{
 export type useSearchUsers_usersQuery = {
   me: {
     __typename?: "User";
+    id: string;
     organization: {
       __typename?: "Organization";
       users: {
@@ -54616,9 +54623,9 @@ export type useStartSignatureRequest_PetitionFragment = {
     math?: Array<{ [key: string]: any }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      id: string;
       createdAt: string;
       updatedAt: string;
-      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children?: Array<{
@@ -54676,11 +54683,11 @@ export type useStartSignatureRequest_PetitionFragment = {
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
+          id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
           createdAt: string;
           updatedAt: string;
-          id: string;
         }>;
       }> | null;
     }>;
@@ -54783,9 +54790,9 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           math?: Array<{ [key: string]: any }> | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
+            id: string;
             createdAt: string;
             updatedAt: string;
-            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
             children?: Array<{
@@ -54843,11 +54850,11 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
+                id: string;
                 content: { [key: string]: any };
                 isAnonymized: boolean;
                 createdAt: string;
                 updatedAt: string;
-                id: string;
               }>;
             }> | null;
           }>;
@@ -54955,9 +54962,9 @@ export type useStartSignatureRequest_completePetitionMutation = {
       math?: Array<{ [key: string]: any }> | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
+        id: string;
         createdAt: string;
         updatedAt: string;
-        id: string;
         content: { [key: string]: any };
         isAnonymized: boolean;
         children?: Array<{
@@ -55015,11 +55022,11 @@ export type useStartSignatureRequest_completePetitionMutation = {
           };
           replies: Array<{
             __typename?: "PetitionFieldReply";
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
             createdAt: string;
             updatedAt: string;
-            id: string;
           }>;
         }> | null;
       }>;
@@ -55549,6 +55556,7 @@ export const UserGroupLayout_QueryFragmentDoc = gql`
   fragment UserGroupLayout_Query on Query {
     ...OrganizationSettingsLayout_Query
     me {
+      id
       hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
     }
   }
@@ -60068,6 +60076,7 @@ export const PetitionActivity_QueryFragmentDoc = gql`
   fragment PetitionActivity_Query on Query {
     ...PetitionLayout_Query
     me {
+      id
       organization {
         name
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
@@ -60935,6 +60944,7 @@ export const PetitionMessages_QueryFragmentDoc = gql`
   fragment PetitionMessages_Query on Query {
     ...PetitionLayout_Query
     me {
+      id
       ...PetitionTemplateRequestMessageCard_User
     }
   }
@@ -61070,6 +61080,7 @@ export const usePetitionCanFinalize_PetitionBaseFragmentDoc = gql`
       isReadOnly
       isInternal
       replies {
+        id
         createdAt
         updatedAt
         children {
@@ -61080,6 +61091,7 @@ export const usePetitionCanFinalize_PetitionBaseFragmentDoc = gql`
             ...completedFieldReplies_PetitionField
           }
           replies {
+            id
             content
             isAnonymized
             createdAt
@@ -61353,6 +61365,7 @@ export const useGetPetitionPages_PetitionBaseFragmentDoc = gql`
       options
       isInternal
       replies {
+        id
         children {
           field {
             isInternal
@@ -61384,17 +61397,20 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
             ...LiquidScopeProvider_PetitionField
           }
           replies {
+            id
             content
           }
         }
       }
       replies {
+        id
         content
         children {
           field {
             ...LiquidScopeProvider_PetitionField
           }
           replies {
+            id
             content
           }
         }
@@ -62334,6 +62350,7 @@ export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
     type
     ...useFilenamePlaceholdersRename_PetitionField
     replies {
+      id
       status
       content
       ...useFilenamePlaceholdersRename_PetitionFieldReply
@@ -62978,6 +62995,7 @@ export const Account_QueryFragmentDoc = gql`
   fragment Account_Query on Query {
     ...UserSettingsLayout_Query
     me {
+      id
       ...AccountChangeName_User
       ...AccountLocaleChange_User
       ...AccountDelegates_User
@@ -63478,12 +63496,14 @@ export const LiquidScopeProvider_PublicPetitionFragmentDoc = gql`
     fields {
       ...LiquidScopeProvider_PublicPetitionField
       replies {
+        id
         content
         children {
           field {
             ...LiquidScopeProvider_PublicPetitionField
           }
           replies {
+            id
             content
           }
         }
@@ -63556,6 +63576,7 @@ export const usePetitionCanFinalize_PublicPetitionFragmentDoc = gql`
       isReadOnly
       isInternal
       replies {
+        id
         content
         isAnonymized
         createdAt
@@ -63568,6 +63589,7 @@ export const usePetitionCanFinalize_PublicPetitionFragmentDoc = gql`
             ...completedFieldReplies_PublicPetitionField
           }
           replies {
+            id
             content
             isAnonymized
             createdAt
@@ -64828,6 +64850,7 @@ export const useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocum
 export const useProfileTypeFieldPermissionDialog_usersDocument = gql`
   query useProfileTypeFieldPermissionDialog_users($search: String!, $excludeIds: [GID!]) {
     me {
+      id
       organization {
         users(
           limit: 100
@@ -67963,6 +67986,7 @@ export const OrganizationCompliance_userDocument = gql`
   query OrganizationCompliance_user {
     ...OrganizationSettingsLayout_Query
     me {
+      id
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
       organization {
         ...OrganizationCompliance_Organization
@@ -68057,6 +68081,7 @@ export const PermissionsGroup_userDocument = gql`
   query PermissionsGroup_user {
     ...UserGroupLayout_Query
     me {
+      id
       permissions
       hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
@@ -68134,6 +68159,7 @@ export const OrganizationGroups_userDocument = gql`
   query OrganizationGroups_user {
     ...OrganizationSettingsLayout_Query
     me {
+      id
       hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
     }
   }
@@ -68407,6 +68433,7 @@ export const OrganizationProfileTypes_userDocument = gql`
   query OrganizationProfileTypes_user {
     ...OrganizationProfilesLayout_Query
     me {
+      id
       hasCreateProfileType: hasFeatureFlag(featureFlag: CREATE_PROFILE_TYPE)
     }
   }
@@ -68448,6 +68475,7 @@ export const OrganizationUsage_userDocument = gql`
   query OrganizationUsage_user {
     ...OrganizationSettingsLayout_Query
     me {
+      id
       organization {
         id
         activeUserCount
@@ -68550,6 +68578,7 @@ export const OrganizationUsers_userDocument = gql`
   query OrganizationUsers_user {
     ...OrganizationSettingsLayout_Query
     me {
+      id
       hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
         id
@@ -68708,6 +68737,7 @@ export const PetitionActivity_userDocument = gql`
   query PetitionActivity_user {
     ...PetitionActivity_Query
     me {
+      id
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
     }
   }
@@ -69239,6 +69269,7 @@ export const PetitionPreview_userDocument = gql`
   query PetitionPreview_user {
     ...PetitionPreview_Query
     me {
+      id
       hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
     }
     metadata {
@@ -69357,6 +69388,7 @@ export const PetitionReplies_userDocument = gql`
   query PetitionReplies_user {
     ...PetitionLayout_Query
     me {
+      id
       organization {
         name
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
@@ -69869,6 +69901,7 @@ export const Security_userDocument = gql`
   query Security_user {
     ...UserSettingsLayout_Query
     me {
+      id
       isSsoUser
     }
   }
@@ -71029,6 +71062,7 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
 export const useHasBackgroundCheck_MeDocument = gql`
   query useHasBackgroundCheck_Me {
     me {
+      id
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     }
   }
@@ -71047,6 +71081,7 @@ export const useHasIdVerification_MeDocument = gql`
 export const useHasPermission_MeDocument = gql`
   query useHasPermission_Me {
     me {
+      id
       permissions
     }
   }
@@ -71122,6 +71157,7 @@ export const useSearchUsers_usersDocument = gql`
     $filters: UserFilter
   ) {
     me {
+      id
       organization {
         users(
           limit: $limit

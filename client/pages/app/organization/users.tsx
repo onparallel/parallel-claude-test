@@ -974,6 +974,7 @@ OrganizationUsers.queries = [
     query OrganizationUsers_user {
       ...OrganizationSettingsLayout_Query
       me {
+        id
         hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
           id
