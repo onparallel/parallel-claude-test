@@ -81,6 +81,7 @@ const config = {
   experimental: {
     largePageDataBytes: 0.5 * 1024 * 1024,
   },
+  transpilePackages: ["pdfjs-dist"],
 };
 
 module.exports = [
