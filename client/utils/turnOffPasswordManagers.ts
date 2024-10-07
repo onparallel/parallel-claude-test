@@ -8,5 +8,5 @@ export const turnOffPasswordManagers = {
   // Bitwarden
   "data-bwignore": "",
   // Other
-  autocomplete: "off",
+  autoComplete: "off",
 };
