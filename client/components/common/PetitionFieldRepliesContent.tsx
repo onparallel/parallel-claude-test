@@ -28,6 +28,7 @@ export interface PetitionFieldRepliesContentProps {
   petitionId: string;
   field: PetitionFieldRepliesContent_PetitionFieldFragment;
   replies: PetitionFieldRepliesContent_PetitionFieldReplyFragment[];
+  sample?: number;
 }
 
 export const PetitionFieldRepliesContent = Object.assign(
@@ -63,7 +64,7 @@ export const PetitionFieldRepliesContent = Object.assign(
 );
 
 const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepliesContentProps>(
-  function PetitionFieldRepliesContentFile({ petitionId, field, replies, ...props }, ref) {
+  function PetitionFieldRepliesContentFile({ petitionId, field, replies, sample, ...props }, ref) {
     const downloadReplyFile = useDownloadReplyFile();
     const isShiftDown = useIsGlobalKeyDown("Shift");
 
@@ -87,11 +88,20 @@ const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepl
       </Flex>
     ) : (
       <List ref={ref} display="flex" flexWrap="wrap" gap={1} {...(props as any)}>
-        {buttons.map((button, i) => (
+        {buttons.slice(0, sample).map((button, i) => (
           <ListItem key={i} minWidth={0} display="flex">
             {button}
           </ListItem>
         ))}
+        {isNonNullish(sample) && buttons.length > sample ? (
+          <ListItem textStyle="hint">
+            <FormattedMessage
+              id="component.map-fields-table.and-n-more"
+              defaultMessage="and {count} more"
+              values={{ count: buttons.length - sample }}
+            />
+          </ListItem>
+        ) : null}
       </List>
     );
   },
@@ -100,7 +110,10 @@ const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepl
 const PetitionFieldRepliesContentNonFile = chakraForwardRef<
   "p" | "span" | "button",
   PetitionFieldRepliesContentProps
->(function PetitionFieldRepliesContentNonFile({ petitionId, field, replies, ...props }, ref) {
+>(function PetitionFieldRepliesContentNonFile(
+  { petitionId, field, replies, sample, ...props },
+  ref,
+) {
   const intl = useIntl();
   if (replies.length === 0) {
     return (
@@ -111,6 +124,8 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
         />
       </Box>
     );
+  } else if (field.type === "FIELD_GROUP") {
+    return null;
   } else {
     const elements = replies.map((reply) => {
       if (
@@ -181,11 +196,20 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
       </Flex>
     ) : (
       <Stack as={List} ref={ref} divider={<Divider />} {...(props as any)}>
-        {elements.map((element, i) => (
+        {elements.slice(0, sample).map((element, i) => (
           <ListItem key={i} display="flex" minWidth={0}>
             {element}
           </ListItem>
         ))}
+        {isNonNullish(sample) && elements.length > sample ? (
+          <ListItem textStyle="hint">
+            <FormattedMessage
+              id="component.map-fields-table.and-n-more"
+              defaultMessage="and {count} more"
+              values={{ count: elements.length - sample }}
+            />
+          </ListItem>
+        ) : null}
       </Stack>
     );
   }

@@ -122,34 +122,42 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
 
     for (const field of filteredFields) {
       const replyIsApproved = field.replies.length === 1 && field.replies[0].status === "APPROVED";
+
+      // Need to check the children's answers to know if the group has an answer, as by default it will always have an empty one.
+      const isFieldGroupReplied =
+        field.type === "FIELD_GROUP" &&
+        !field.multiple &&
+        field.replies.some((r) => r.children?.some((ch) => ch.replies.length > 0));
+
+      // We check if the parent is matched, if not we do not try to match the children. We assume that the parent will be matched before the children.
+      // TODO: Improve the logic to not rely on assumptions
+      const isParentFieldReplied = field.parent?.id !== undefined && !(field.parent.id in mapping);
+
       const isFieldReplied =
+        isParentFieldReplied ||
+        isFieldGroupReplied ||
         (field.replies.length > 0 &&
           !field.multiple &&
           field.parent?.id === undefined &&
           field.type !== "FIELD_GROUP") ||
         replyIsApproved;
-      if (!isFieldReplied) {
+
+      if (!isFieldReplied || overwriteExisting) {
         const matchingField =
-          (isNonNullish(field.alias) &&
-            filteredSourceFields.find((f) => {
-              return (
-                field.alias === f.alias &&
-                isReplyContentCompatible(field, f) &&
-                isNonNullish(field.parent) === isNonNullish(f.parent)
-              );
-            })) ||
-          (isNonNullish(field.fromPetitionFieldId) &&
-            filteredSourceFields.find((f) => {
-              return (
-                field.fromPetitionFieldId === f.fromPetitionFieldId &&
-                isReplyContentCompatible(field, f) &&
-                isNonNullish(field.parent) === isNonNullish(f.parent)
-              );
-            })) ||
-          null;
-        if (isNonNullish(matchingField)) {
+          filteredSourceFields.find(
+            (f) =>
+              (isNonNullish(field.alias) && field.alias === f.alias) ||
+              (isNonNullish(field.fromPetitionFieldId) &&
+                field.fromPetitionFieldId === f.fromPetitionFieldId),
+          ) ?? null;
+
+        if (
+          matchingField &&
+          isReplyContentCompatible(field, matchingField) &&
+          isNonNullish(field.parent) === isNonNullish(matchingField.parent)
+        ) {
           mapping[field.id] = matchingField.id;
-          if (isNonNullish(field.parent) && isNonNullish(matchingField.parent)) {
+          if (field.parent && matchingField.parent) {
             mapping[field.parent.id] = matchingField.parent.id;
           }
         }

@@ -1,40 +1,24 @@
 import { gql } from "@apollo/client";
-import {
-  Flex,
-  HStack,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { HStack, Stack, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import {
   MapFieldsTable_PetitionBaseFragment,
   MapFieldsTable_PetitionFieldDataFragment,
-  MapFieldsTable_PetitionFieldReplyFragment,
   PetitionFieldType,
-  getReplyContents_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
 import useMergedRef from "@react-hook/merged-ref";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, isNullish, omit } from "remeda";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
-import { ReplyNotAvailable } from "../petition-replies/PetitionRepliesFieldReply";
 import { AlertPopover } from "./AlertPopover";
-import { FileSize } from "./FileSize";
 import { OverflownText } from "./OverflownText";
+import { PetitionFieldRepliesContent } from "./PetitionFieldRepliesContent";
 import { ScrollTableContainer } from "./ScrollTableContainer";
 import { SmallPopover } from "./SmallPopover";
 
@@ -94,8 +78,12 @@ export const MapFieldsTable = Object.assign(
       if (!overwriteExisting) {
         const newValue = { ...value };
         for (const field of fields) {
-          const hasReplies = field.replies.length > 0 && !field.multiple;
-          if (hasReplies) {
+          const hasReplies =
+            field.type === "FIELD_GROUP"
+              ? (field.children ?? []).some((child) => child.replies.length > 0)
+              : field.replies.length > 0;
+
+          if (hasReplies && !field.multiple) {
             delete newValue[field.id];
           }
         }
@@ -198,6 +186,11 @@ export const MapFieldsTable = Object.assign(
               id
               type
             }
+            children {
+              replies {
+                id
+              }
+            }
             ...getReplyContents_PetitionFieldReply
           }
           ${getReplyContents.fragments.PetitionFieldReply}
@@ -242,6 +235,7 @@ export const MapFieldsTable = Object.assign(
       get PetitionBase() {
         return gql`
           fragment MapFieldsTable_PetitionBase on PetitionBase {
+            id
             fields {
               ...MapFieldsTable_PetitionField
             }
@@ -330,13 +324,20 @@ function TableRow({
     : false;
 
   const replyIsApproved = field.replies.length === 1 && field.replies[0].status === "APPROVED";
+
+  // Need to check the children's answers to know if the group has an answer, as by default it will always have an empty one.
+  const fieldHasReplies =
+    field.type === "FIELD_GROUP"
+      ? field.replies.some((r) => r.children?.some((ch) => ch.replies.length > 0))
+      : field.replies.length > 0;
+
   const isFieldDisabled =
-    (field.replies.length > 0 && !allowOverwrite && !field.multiple && !targetFieldIsChild) ||
+    (fieldHasReplies && !allowOverwrite && !field.multiple && !targetFieldIsChild) ||
     replyIsApproved ||
     !hasFields;
 
   const alertOrArrow =
-    allowOverwrite && field.replies.length > 0 && !field.multiple ? (
+    allowOverwrite && fieldHasReplies && !field.multiple ? (
       <AlertPopover boxSize={5} padding={0} margin={0}>
         <Text>
           <FormattedMessage
@@ -370,56 +371,55 @@ function TableRow({
 
   return (
     <Tr>
-      <Td>
-        <HStack paddingStart={targetFieldIsChild ? 3 : 0}>
-          <PetitionFieldTypeIndicator
-            as="span"
-            marginTop="2px"
-            type={field.type}
-            fieldIndex={fieldIndex}
-          />
-          {field.title ? (
-            <OverflownText>{field.title}</OverflownText>
-          ) : (
-            <Text as="span" textStyle="hint">
-              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-            </Text>
-          )}
+      <Td verticalAlign="top">
+        <HStack paddingStart={targetFieldIsChild ? 3 : 0} height="40px">
+          <PetitionFieldTypeIndicator as="span" type={field.type} fieldIndex={fieldIndex} />(
+          <OverflownText>
+            {field.title || (
+              <Text as="span" textStyle="hint">
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              </Text>
+            )}
+          </OverflownText>
+          )
         </HStack>
       </Td>
-      <Td textAlign="center">
-        {isFieldDisabled ? (
-          <SmallPopover
-            content={
-              <Text fontSize="sm">
-                {replyIsApproved ? (
-                  <FormattedMessage
-                    id="component.map-fields-table.has-replies-approved-conflict-alert"
-                    defaultMessage="You cannot import new answers to this field because it has approved answers."
-                  />
-                ) : !hasFields ? (
-                  <FormattedMessage
-                    id="component.map-fields-table.no-compatible-fields-alert"
-                    defaultMessage="You cannot import replies to this field because no compatible fields have been found."
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="component.map-fields-table.has-replies-conflict-alert"
-                    defaultMessage="New answers cannot be imported into this field because it already contains at least one answer."
-                  />
-                )}
-              </Text>
-            }
-            placement="bottom"
-          >
-            <ForbiddenIcon />
-          </SmallPopover>
-        ) : selectedField ? (
-          alertOrArrow
-        ) : null}
+      <Td textAlign="center" verticalAlign="top">
+        <HStack height="40px">
+          {isFieldDisabled ? (
+            <SmallPopover
+              content={
+                <Text fontSize="sm">
+                  {replyIsApproved ? (
+                    <FormattedMessage
+                      id="component.map-fields-table.has-replies-approved-conflict-alert"
+                      defaultMessage="You cannot import new answers to this field because it has approved answers."
+                    />
+                  ) : !hasFields ? (
+                    <FormattedMessage
+                      id="component.map-fields-table.no-compatible-fields-alert"
+                      defaultMessage="You cannot import replies to this field because no compatible fields have been found."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.map-fields-table.has-replies-conflict-alert"
+                      defaultMessage="New answers cannot be imported into this field because it already contains at least one answer."
+                    />
+                  )}
+                </Text>
+              }
+              placement="bottom"
+            >
+              <ForbiddenIcon />
+            </SmallPopover>
+          ) : selectedField ? (
+            alertOrArrow
+          ) : null}
+        </HStack>
       </Td>
-      <Td minWidth="240px">
+      <Td lineHeight="21px" verticalAlign="top">
         <PetitionFieldSelect
+          key={parentFieldMatchedFieldId ? parentFieldMatchedFieldId + field.id : field.id}
           value={selectedField ?? null}
           petition={sourcePetition}
           filterFields={filterFields as any}
@@ -440,43 +440,20 @@ function TableRow({
           expandFieldGroups
         />
       </Td>
-      <Td padding={2} paddingEnd={4} minWidth={0} maxWidth="200px">
+      <Td>
         <HStack>
           {selectedField ? (
             <Stack minWidth={0} flex="1" spacing={2}>
               {selectedField.replies.length > 0 ? (
                 Object.values(groupedReplies).map((replies, i, groups) => {
                   return (
-                    <Stack key={i} minWidth={0} flex="1" spacing={0.5}>
-                      {replies.slice(0, 4).map((reply, index) => {
-                        if (hasMultipleRepliesConflict && index) return null;
-
-                        const repliesLimit = targetFieldIsChild && groups.length > 1 ? 2 : 3;
-
-                        if (index > repliesLimit) {
-                          return null;
-                        }
-                        if (index === repliesLimit && replies.length > repliesLimit + 1) {
-                          return (
-                            <Text key={index}>
-                              <FormattedMessage
-                                id="component.map-fields-table.and-n-more"
-                                defaultMessage="and {count} more"
-                                values={{ count: replies.length - repliesLimit }}
-                              />
-                            </Text>
-                          );
-                        }
-                        return (
-                          <FieldReplies
-                            key={index}
-                            sourceReply={reply}
-                            targetField={field}
-                            showOnlyFirstReply={hasMultipleRepliesConflict}
-                          />
-                        );
-                      })}
-                    </Stack>
+                    <PetitionFieldRepliesContent
+                      petitionId={sourcePetition.id}
+                      key={replies[0].parent?.id ?? -1}
+                      field={selectedField}
+                      replies={hasMultipleRepliesConflict ? [replies[0]] : replies}
+                      sample={3}
+                    />
                   );
                 })
               ) : (
@@ -520,87 +497,6 @@ function TableRow({
         </HStack>
       </Td>
     </Tr>
-  );
-}
-
-function FieldReplies({
-  sourceReply,
-  targetField,
-  showOnlyFirstReply,
-}: {
-  sourceReply: MapFieldsTable_PetitionFieldReplyFragment;
-  targetField: MapFieldsTable_PetitionFieldDataFragment;
-  showOnlyFirstReply?: boolean;
-}) {
-  const intl = useIntl();
-
-  // Need to pass the type from the "source" to obtain the correct format
-  // for the options, we need to pass the "target" options to obtain the valid final format that will be imported
-  const contents = getReplyContents({
-    intl,
-    reply: sourceReply,
-    petitionField: {
-      type: sourceReply.field!.type,
-      options: targetField.options,
-    } as getReplyContents_PetitionFieldFragment,
-  });
-
-  if (!contents || !Array.isArray(contents)) return null;
-
-  return (
-    <>
-      {contents.slice(0, showOnlyFirstReply ? 1 : 4).map((content, i) => {
-        if (i > 3) {
-          return null;
-        }
-        if (i === 3 && contents.length > 4) {
-          return (
-            <Text key={i}>
-              <FormattedMessage
-                id="component.map-fields-table.and-n-more"
-                defaultMessage="and {count} more"
-                values={{ count: contents.length - 3 }}
-              />
-            </Text>
-          );
-        }
-        return (
-          <Fragment key={i}>
-            {sourceReply.isAnonymized ||
-            (["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(sourceReply.field!.type) &&
-              content.error) ? (
-              <ReplyNotAvailable type={sourceReply.field!.type} />
-            ) : isFileTypeField(targetField.type) ? (
-              <Flex gap={2} alignItems="center" minHeight={6}>
-                <VisuallyHidden>
-                  {intl.formatMessage({
-                    id: "generic.file-name",
-                    defaultMessage: "File name",
-                  })}
-                </VisuallyHidden>
-
-                <OverflownText> {content.filename}</OverflownText>
-
-                {" - "}
-                <Text
-                  as="span"
-                  aria-label={intl.formatMessage({
-                    id: "generic.file-size",
-                    defaultMessage: "File size",
-                  })}
-                  fontSize="sm"
-                  color="gray.500"
-                >
-                  <FileSize value={content.size} />
-                </Text>
-              </Flex>
-            ) : (
-              <OverflownText>{content}</OverflownText>
-            )}
-          </Fragment>
-        );
-      })}
-    </>
   );
 }
 

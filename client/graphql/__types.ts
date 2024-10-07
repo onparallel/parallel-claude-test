@@ -6666,6 +6666,10 @@ export type MapFieldsTable_PetitionFieldReplyFragment = {
   isAnonymized: boolean;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+  children?: Array<{
+    __typename?: "PetitionFieldGroupChildReply";
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  }> | null;
 };
 
 export type MapFieldsTable_PetitionFieldFragment = {
@@ -6702,6 +6706,10 @@ export type MapFieldsTable_PetitionFieldFragment = {
       isAnonymized: boolean;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
     }>;
     parent?: { __typename?: "PetitionField"; id: string } | null;
     children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
@@ -6714,6 +6722,10 @@ export type MapFieldsTable_PetitionFieldFragment = {
     isAnonymized: boolean;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    }> | null;
   }>;
   parent?: { __typename?: "PetitionField"; id: string } | null;
 };
@@ -6739,6 +6751,10 @@ export type MapFieldsTable_PetitionFieldDataFragment = {
     isAnonymized: boolean;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    }> | null;
   }>;
   parent?: { __typename?: "PetitionField"; id: string } | null;
   children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
@@ -6746,6 +6762,7 @@ export type MapFieldsTable_PetitionFieldDataFragment = {
 
 export type MapFieldsTable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -6780,6 +6797,10 @@ export type MapFieldsTable_PetitionBase_Petition_Fragment = {
         isAnonymized: boolean;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }> | null;
       }>;
       parent?: { __typename?: "PetitionField"; id: string } | null;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
@@ -6793,12 +6814,17 @@ export type MapFieldsTable_PetitionBase_Petition_Fragment = {
       isAnonymized: boolean;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
     }>;
   }>;
 };
 
 export type MapFieldsTable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -6833,6 +6859,10 @@ export type MapFieldsTable_PetitionBase_PetitionTemplate_Fragment = {
         isAnonymized: boolean;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }> | null;
       }>;
       parent?: { __typename?: "PetitionField"; id: string } | null;
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
@@ -6846,6 +6876,10 @@ export type MapFieldsTable_PetitionBase_PetitionTemplate_Fragment = {
       isAnonymized: boolean;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
     }>;
   }>;
 };
@@ -55220,6 +55254,11 @@ export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`
       id
       type
     }
+    children {
+      replies {
+        id
+      }
+    }
     ...getReplyContents_PetitionFieldReply
   }
   ${getReplyContents_PetitionFieldReplyFragmentDoc}
@@ -55304,6 +55343,7 @@ export const PetitionFieldSelect_PetitionBaseFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionFieldSelect_PetitionBaseFragment, unknown>;
 export const MapFieldsTable_PetitionBaseFragmentDoc = gql`
   fragment MapFieldsTable_PetitionBase on PetitionBase {
+    id
     fields {
       ...MapFieldsTable_PetitionField
     }
