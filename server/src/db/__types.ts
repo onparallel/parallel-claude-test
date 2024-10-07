@@ -2036,6 +2036,8 @@ export interface ProfileType {
   archived_by_user_id: Maybe<number>; // int4
   archived_at: Maybe<Date>; // timestamptz
   standard_type: Maybe<ProfileTypeStandardType>; // profile_type_standard_type
+  name_plural: any; // jsonb
+  icon: string; // varchar
 }
 
 export type CreateProfileType = PartialProps<
@@ -2051,6 +2053,8 @@ export type CreateProfileType = PartialProps<
   | "archived_by_user_id"
   | "archived_at"
   | "standard_type"
+  | "name_plural"
+  | "icon"
 >;
 
 export interface ProfileTypeField {

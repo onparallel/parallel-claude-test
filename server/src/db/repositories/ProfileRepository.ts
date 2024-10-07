@@ -301,7 +301,7 @@ export class ProfileRepository extends BaseRepository {
     return await this.withTransaction(async (t) => {
       const sourceProfileType = (await this.loadProfileType.raw(id, t))!;
       const [profileType] = await this.createProfileType(
-        { ...pick(sourceProfileType, ["org_id", "name"]), ...data },
+        { ...pick(sourceProfileType, ["org_id", "name", "name_plural", "icon"]), ...data },
         createdBy,
         t,
       );

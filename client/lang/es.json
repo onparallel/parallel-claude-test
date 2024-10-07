@@ -2375,14 +2375,29 @@
     "context": "Edit profile type name"
   },
   {
-    "term": "component.create-profile-type-dialog.name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
     "term": "component.create-profile-type-dialog.new-profile-type",
     "definition": "Nuevo tipo de perfil",
     "context": "New profile type"
+  },
+  {
+    "term": "component.create-profile-type-dialog.plural-name",
+    "definition": "Nombre en plural",
+    "context": "Plural name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.plural-name-helper",
+    "definition": "Personas físicas",
+    "context": "Individuals"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name",
+    "definition": "Nombre en singular",
+    "context": "Singular name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name-helper",
+    "definition": "Persona física",
+    "context": "Individual"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -7875,6 +7890,91 @@
     "context": "Type"
   },
   {
+    "term": "component.profile-type-field-icon.certificate-icon",
+    "definition": "Icono de certificado",
+    "context": "Certificate icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.publication-icon",
+    "definition": "Icono de publicación",
+    "context": "Post icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.cube-icon",
+    "definition": "Icono de cubo",
+    "context": "Bucket icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.briefcase-icon",
+    "definition": "Icono de maletín",
+    "context": "Briefcase icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.building-icon",
+    "definition": "Icono de edificio",
+    "context": "Building icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.car-icon",
+    "definition": "Icono de coche",
+    "context": "Car icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.clipboard-icon",
+    "definition": "Icono de porta papeles",
+    "context": "Clipboard icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.document-icon",
+    "definition": "Icono de documento",
+    "context": "Document icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.house-icon",
+    "definition": "Icono de casa",
+    "context": "House icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.database-icon",
+    "definition": "Icono de base de datos",
+    "context": "Database icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.settings-icon",
+    "definition": "Icono de ajustes",
+    "context": "Settings icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.store-icon",
+    "definition": "Icono de tienda",
+    "context": "Store icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.shopping-cart-icon",
+    "definition": "Icono de carrito de la compra",
+    "context": "Shopping cart icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.verified-person-icon",
+    "definition": "Icono de persona verificada",
+    "context": "Verified person icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.person-icon",
+    "definition": "Icono de persona",
+    "context": "Person icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.people-icon",
+    "definition": "Icono de personas",
+    "context": "People icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.button",
+    "definition": "Cambiar icono",
+    "context": "Change icon"
+  },
+  {
     "term": "component.profile-type-field-permission-dialog.all-in-organization",
     "definition": "Todos en la organización",
     "context": "Everyone in the organization"
@@ -7923,6 +8023,21 @@
     "term": "component.profile-type-field-select.suggested-property",
     "definition": "Propiedad sugerida: <b>{label}</b>",
     "context": "Suggested property: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.contract",
+    "definition": "Contrato",
+    "context": "Contract"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.individual",
+    "definition": "Persona física",
+    "context": "Individual"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.legal-entity",
+    "definition": "Persona jurídica",
+    "context": "Legal entity"
   },
   {
     "term": "component.profile-type-header.archive-label",

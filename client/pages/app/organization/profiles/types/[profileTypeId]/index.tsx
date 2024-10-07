@@ -11,6 +11,8 @@ import {
   Checkbox,
   Divider,
   Flex,
+  Grid,
+  GridItem,
   HStack,
   Heading,
   MenuDivider,
@@ -38,6 +40,7 @@ import {
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { WhenPermission } from "@parallel/components/common/WhenPermission";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -45,7 +48,9 @@ import { WithApolloDataContext, withApolloData } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { ProfileTypeFieldStandardType } from "@parallel/components/organization/profiles/ProfileTypeFieldStandardType";
 import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
+import { ProfileTypeIconSelect } from "@parallel/components/organization/profiles/ProfileTypeIconSelect";
 import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
 import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
 import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
@@ -63,6 +68,7 @@ import {
   OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
   OrganizationProfileType_updateProfileTypeFieldPositionsDocument,
   OrganizationProfileType_userDocument,
+  ProfileTypeIcon,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -90,7 +96,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { doNothing, identity } from "remeda";
+import { doNothing, identity, isNonNullish } from "remeda";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -151,17 +157,35 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     [profileTypeId],
   );
 
+  const handleChangeIcon = useCallback(
+    async (icon: ProfileTypeIcon) => {
+      try {
+        await updateProfileType({
+          variables: {
+            profileTypeId,
+            icon,
+          },
+        });
+      } catch {
+        showError();
+      }
+    },
+    [profileTypeId],
+  );
+
   const showCreateOrUpdateProfileTypeDialog = useCreateOrUpdateProfileTypeDialog();
   const handleChangeProfileTypeName = async () => {
     try {
-      const { name } = await showCreateOrUpdateProfileTypeDialog({
+      const { name, pluralName } = await showCreateOrUpdateProfileTypeDialog({
         isEditing: true,
         name: profileType.name,
+        pluralName: profileType.pluralName,
       });
       await updateProfileType({
         variables: {
           profileTypeId,
           name,
+          pluralName,
         },
       });
     } catch {}
@@ -171,15 +195,17 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const [cloneProfileType] = useMutation(OrganizationProfileType_cloneProfileTypeDocument);
   const handleCloneProfileType = async () => {
     try {
-      const { name } = await showCreateOrUpdateProfileTypeDialog({
+      const { name, pluralName } = await showCreateOrUpdateProfileTypeDialog({
         isEditing: false,
         name: profileType.name,
+        pluralName: profileType.pluralName,
         modalProps: { finalFocusRef: headerMoreOptionsButtonRef },
       });
       const res = await cloneProfileType({
         variables: {
           profileTypeId,
           name,
+          pluralName,
         },
       });
       router.push(`/app/organization/profiles/types/${res.data?.cloneProfileType.id}`);
@@ -428,18 +454,19 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
         ) : null
       }
       header={
-        <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <HStack paddingEnd={2}>
-            <Heading as="h3" size="md" noOfLines={1} wordBreak="break-all">
-              <LocalizableUserTextRender
-                value={profileType.name}
-                default={intl.formatMessage({
-                  id: "generic.unnamed-profile-type",
-                  defaultMessage: "Unnamed profile type",
-                })}
-              />
-            </Heading>
-            {profileType.isStandard ? null : (
+        <HStack width="100%" justifyContent="space-between" alignItems="center">
+          <HStack spacing={3}>
+            <ProfileTypeIconSelect value={profileType.icon} onChange={handleChangeIcon} />
+            <HStack alignItems="baseline">
+              <Heading as="h3" size="md" noOfLines={1} wordBreak="break-all">
+                <LocalizableUserTextRender
+                  value={profileType.name}
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile-type",
+                    defaultMessage: "Unnamed profile type",
+                  })}
+                />
+              </Heading>
               <IconButtonWithTooltip
                 label={intl.formatMessage({
                   id: "generic.edit-name",
@@ -450,103 +477,125 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                 icon={<EditSimpleIcon />}
                 onClick={handleChangeProfileTypeName}
               />
-            )}
+              {isNonNullish(profileType.standardType) ? (
+                <Box minWidth={0} color="gray.500">
+                  <OverflownText>
+                    <ProfileTypeFieldStandardType as="span" type={profileType.standardType} />
+                  </OverflownText>
+                </Box>
+              ) : null}
+            </HStack>
           </HStack>
-          <WhenPermission permission="PROFILE_TYPES:CRUD_PROFILE_TYPES">
-            <MoreOptionsMenuButton
-              ref={headerMoreOptionsButtonRef}
-              variant="outline"
-              options={
-                <MenuList>
-                  {profileType.archivedAt ? (
-                    <MenuItem
-                      onClick={handleUnarchiveProfileType}
-                      icon={<ArchiveIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.profile-type-header.unarchive-label"
-                        defaultMessage="Unarchive profile type"
-                      />
-                    </MenuItem>
-                  ) : (
-                    <MenuItem
-                      onClick={handleCloneProfileType}
-                      icon={<CopyIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.profile-type-header.clone-label"
-                        defaultMessage="Clone profile type"
-                      />
-                    </MenuItem>
-                  )}
-                  {!profileType.isStandard ? (
-                    <>
-                      <MenuDivider />
-                      {profileType.archivedAt ? (
-                        <MenuItem
-                          color="red.500"
-                          onClick={handleDeleteProfileType}
-                          icon={<DeleteIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.profile-type-header.delete-label"
-                            defaultMessage="Delete profile type"
-                          />
-                        </MenuItem>
-                      ) : (
-                        <MenuItem
-                          color="red.500"
-                          onClick={handleArchiveProfileType}
-                          icon={<ArchiveIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.profile-type-header.archive-label"
-                            defaultMessage="Archive profile type"
-                          />
-                        </MenuItem>
-                      )}
-                    </>
-                  ) : null}
-                </MenuList>
-              }
-            />
-          </WhenPermission>
-        </Flex>
+          <Flex flex={1} justifyContent="end">
+            <WhenPermission permission="PROFILE_TYPES:CRUD_PROFILE_TYPES">
+              <MoreOptionsMenuButton
+                ref={headerMoreOptionsButtonRef}
+                variant="outline"
+                options={
+                  <MenuList>
+                    {profileType.archivedAt ? (
+                      <MenuItem
+                        onClick={handleUnarchiveProfileType}
+                        icon={<ArchiveIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.profile-type-header.unarchive-label"
+                          defaultMessage="Unarchive profile type"
+                        />
+                      </MenuItem>
+                    ) : (
+                      <MenuItem
+                        onClick={handleCloneProfileType}
+                        icon={<CopyIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.profile-type-header.clone-label"
+                          defaultMessage="Clone profile type"
+                        />
+                      </MenuItem>
+                    )}
+                    {!profileType.isStandard ? (
+                      <>
+                        <MenuDivider />
+                        {profileType.archivedAt ? (
+                          <MenuItem
+                            color="red.500"
+                            onClick={handleDeleteProfileType}
+                            icon={<DeleteIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="component.profile-type-header.delete-label"
+                              defaultMessage="Delete profile type"
+                            />
+                          </MenuItem>
+                        ) : (
+                          <MenuItem
+                            color="red.500"
+                            onClick={handleArchiveProfileType}
+                            icon={<ArchiveIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="component.profile-type-header.archive-label"
+                              defaultMessage="Archive profile type"
+                            />
+                          </MenuItem>
+                        )}
+                      </>
+                    ) : null}
+                  </MenuList>
+                }
+              />
+            </WhenPermission>
+          </Flex>
+        </HStack>
       }
       showBackButton={true}
     >
       <Box padding={4}>
-        <Stack spacing={6} maxWidth="container.lg">
-          <ProfileTypeSettings
-            key={`${profileType.id}-settings`}
-            profileType={profileType}
-            onSave={handleChangeProfileTypePattern}
-          />
-          <DraggableList
-            key={profileType.id}
-            width="full"
-            rows={profileType.fields}
-            rowKeyProp="id"
-            actions={actions}
-            onEdit={(profileTypeField, finalFocusRef) =>
-              handleEditProperty([profileTypeField], finalFocusRef)
-            }
-            onConfigureVisibility={(profileTypeField, finalFocusRef) =>
-              handleConfigureVisibility([profileTypeField], finalFocusRef)
-            }
-            onDelete={(profileTypeField) => handleDeleteProperty([profileTypeField.id])}
-            onSelectionChange={onChangeSelectedIds}
-            onReorder={handleReorderProperties}
-          />
-          <Center>
-            <Button colorScheme="primary" leftIcon={<AddIcon />} onClick={handleAddNewProperty}>
-              <FormattedMessage
-                id="page.organization-profile-type.add-profile-type-field"
-                defaultMessage="Add property"
+        <Grid
+          gap={4}
+          maxWidth="container.xl"
+          templateColumns={{
+            base: "1fr",
+            xl: "repeat(auto-fit, minmax(380px, 1fr))",
+          }}
+        >
+          <GridItem order={{ base: 1, xl: 2 }}>
+            <ProfileTypeSettings
+              key={`${profileType.id}-settings`}
+              profileType={profileType}
+              onSave={handleChangeProfileTypePattern}
+            />
+          </GridItem>
+          <GridItem order={{ base: 2, xl: 1 }}>
+            <Stack spacing={6}>
+              <DraggableList
+                key={profileType.id}
+                width="full"
+                rows={profileType.fields}
+                rowKeyProp="id"
+                actions={actions}
+                onEdit={(profileTypeField, finalFocusRef) =>
+                  handleEditProperty([profileTypeField], finalFocusRef)
+                }
+                onConfigureVisibility={(profileTypeField, finalFocusRef) =>
+                  handleConfigureVisibility([profileTypeField], finalFocusRef)
+                }
+                onDelete={(profileTypeField) => handleDeleteProperty([profileTypeField.id])}
+                onSelectionChange={onChangeSelectedIds}
+                onReorder={handleReorderProperties}
               />
-            </Button>
-          </Center>
-        </Stack>
+              <Center>
+                <Button colorScheme="primary" leftIcon={<AddIcon />} onClick={handleAddNewProperty}>
+                  <FormattedMessage
+                    id="page.organization-profile-type.add-profile-type-field"
+                    defaultMessage="Add property"
+                  />
+                </Button>
+              </Center>
+            </Stack>
+          </GridItem>
+        </Grid>
       </Box>
     </OrganizationSettingsLayout>
   );
@@ -941,7 +990,10 @@ const _fragments = {
       fragment OrganizationProfileType_ProfileType on ProfileType {
         id
         name
+        pluralName
+        icon
         isStandard
+        standardType
         fields {
           ...OrganizationProfileType_ProfileTypeField
         }
@@ -1000,12 +1052,16 @@ const _mutations = [
     mutation OrganizationProfileType_updateProfileType(
       $profileTypeId: GID!
       $name: LocalizableUserText
+      $pluralName: LocalizableUserText
       $profileNamePattern: String
+      $icon: ProfileTypeIcon
     ) {
       updateProfileType(
         profileTypeId: $profileTypeId
         name: $name
+        pluralName: $pluralName
         profileNamePattern: $profileNamePattern
+        icon: $icon
       ) {
         ...OrganizationProfileType_ProfileType
       }
@@ -1016,8 +1072,9 @@ const _mutations = [
     mutation OrganizationProfileType_cloneProfileType(
       $profileTypeId: GID!
       $name: LocalizableUserText
+      $pluralName: LocalizableUserText
     ) {
-      cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
+      cloneProfileType(profileTypeId: $profileTypeId, name: $name, pluralName: $pluralName) {
         ...OrganizationProfileType_ProfileType
       }
     }

@@ -18,11 +18,37 @@ export const ProfileTypeStandardType = enumType({
   members: ProfileTypeStandardTypeValues,
 });
 
+export const ProfileTypeIcon = enumType({
+  name: "ProfileTypeIcon",
+  members: [
+    "DATABASE",
+    "PERSON",
+    "BUILDING",
+    "DOCUMENT",
+    "VERIFIED_PERSON",
+    "PEOPLE",
+    "STORE",
+    "SHOPPING_CART",
+    "CLIPBOARD",
+    "SETTINGS",
+    "BRIEFCASE",
+    "PUBLICATION",
+    "HOUSE",
+    "CAR",
+    "CERTIFICATE",
+    "CUBE",
+  ],
+});
+
 export const ProfileType = objectType({
   name: "ProfileType",
   definition(t) {
     t.globalId("id");
     t.localizableUserText("name", { resolve: (o) => o.name });
+    t.localizableUserText("pluralName", {
+      resolve: (o) => o.name_plural,
+    });
+    t.field("icon", { type: "ProfileTypeIcon" });
     t.list.field("fields", {
       type: "ProfileTypeField",
       resolve: async (o, _, ctx) => {

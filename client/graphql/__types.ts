@@ -1504,6 +1504,7 @@ export interface MutationclonePetitionsArgs {
 
 export interface MutationcloneProfileTypeArgs {
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 }
 
@@ -1846,6 +1847,7 @@ export interface MutationcreateProfileRelationshipArgs {
 
 export interface MutationcreateProfileTypeArgs {
   name: Scalars["LocalizableUserText"]["input"];
+  pluralName: Scalars["LocalizableUserText"]["input"];
 }
 
 export interface MutationcreateProfileTypeFieldArgs {
@@ -2777,7 +2779,9 @@ export interface MutationupdateProfileFieldValueArgs {
 }
 
 export interface MutationupdateProfileTypeArgs {
+  icon?: InputMaybe<ProfileTypeIcon>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   profileNamePattern?: InputMaybe<Scalars["String"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 }
@@ -4921,9 +4925,11 @@ export interface ProfileType extends Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
+  icon: ProfileTypeIcon;
   id: Scalars["GID"]["output"];
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
+  pluralName: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   profileNamePatternFields: Array<Scalars["GID"]["output"]>;
   standardType?: Maybe<ProfileTypeStandardType>;
@@ -4973,6 +4979,24 @@ export interface ProfileTypeFilter {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
+
+export type ProfileTypeIcon =
+  | "BRIEFCASE"
+  | "BUILDING"
+  | "CAR"
+  | "CERTIFICATE"
+  | "CLIPBOARD"
+  | "CUBE"
+  | "DATABASE"
+  | "DOCUMENT"
+  | "HOUSE"
+  | "PEOPLE"
+  | "PERSON"
+  | "PUBLICATION"
+  | "SETTINGS"
+  | "SHOPPING_CART"
+  | "STORE"
+  | "VERIFIED_PERSON";
 
 export interface ProfileTypePagination {
   __typename?: "ProfileTypePagination";
@@ -32533,7 +32557,10 @@ export type OrganizationProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  pluralName: { [locale in UserLocale]?: string };
+  icon: ProfileTypeIcon;
   isStandard: boolean;
+  standardType?: ProfileTypeStandardType | null;
   profileNamePattern: string;
   createdAt: string;
   archivedAt?: string | null;
@@ -32585,7 +32612,10 @@ export type OrganizationProfileType_profileTypeQuery = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -32717,7 +32747,9 @@ export type OrganizationProfileType_updateProfileTypeFieldPermissionMutation = {
 export type OrganizationProfileType_updateProfileTypeMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   profileNamePattern?: InputMaybe<Scalars["String"]["input"]>;
+  icon?: InputMaybe<ProfileTypeIcon>;
 }>;
 
 export type OrganizationProfileType_updateProfileTypeMutation = {
@@ -32725,7 +32757,10 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -32772,6 +32807,7 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
 export type OrganizationProfileType_cloneProfileTypeMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
 }>;
 
 export type OrganizationProfileType_cloneProfileTypeMutation = {
@@ -32779,7 +32815,10 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -32833,7 +32872,10 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -32935,7 +32977,10 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -32983,6 +33028,8 @@ export type OrganizationProfileTypes_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  pluralName: { [locale in UserLocale]?: string };
+  icon: ProfileTypeIcon;
   createdAt: string;
   archivedAt?: string | null;
   isStandard: boolean;
@@ -32995,6 +33042,8 @@ export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     createdAt: string;
     archivedAt?: string | null;
     isStandard: boolean;
@@ -33018,6 +33067,8 @@ export type OrganizationProfileTypes_profileTypesQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      pluralName: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
       createdAt: string;
       archivedAt?: string | null;
       isStandard: boolean;
@@ -33073,6 +33124,7 @@ export type OrganizationProfileTypes_userQuery = {
 
 export type OrganizationProfileTypes_createProfileTypeMutationVariables = Exact<{
   name: Scalars["LocalizableUserText"]["input"];
+  pluralName: Scalars["LocalizableUserText"]["input"];
 }>;
 
 export type OrganizationProfileTypes_createProfileTypeMutation = {
@@ -33080,6 +33132,8 @@ export type OrganizationProfileTypes_createProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     createdAt: string;
     archivedAt?: string | null;
     isStandard: boolean;
@@ -33089,6 +33143,7 @@ export type OrganizationProfileTypes_createProfileTypeMutation = {
 export type OrganizationProfileTypes_cloneProfileTypeMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
 }>;
 
 export type OrganizationProfileTypes_cloneProfileTypeMutation = {
@@ -33096,7 +33151,10 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    pluralName: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
     isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -58333,7 +58391,10 @@ export const OrganizationProfileType_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileType on ProfileType {
     id
     name
+    pluralName
+    icon
     isStandard
+    standardType
     fields {
       ...OrganizationProfileType_ProfileTypeField
     }
@@ -58359,6 +58420,8 @@ export const OrganizationProfileTypes_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileTypes_ProfileType on ProfileType {
     id
     name
+    pluralName
+    icon
     createdAt
     archivedAt
     isStandard
@@ -68224,12 +68287,16 @@ export const OrganizationProfileType_updateProfileTypeDocument = gql`
   mutation OrganizationProfileType_updateProfileType(
     $profileTypeId: GID!
     $name: LocalizableUserText
+    $pluralName: LocalizableUserText
     $profileNamePattern: String
+    $icon: ProfileTypeIcon
   ) {
     updateProfileType(
       profileTypeId: $profileTypeId
       name: $name
+      pluralName: $pluralName
       profileNamePattern: $profileNamePattern
+      icon: $icon
     ) {
       ...OrganizationProfileType_ProfileType
     }
@@ -68243,8 +68310,9 @@ export const OrganizationProfileType_cloneProfileTypeDocument = gql`
   mutation OrganizationProfileType_cloneProfileType(
     $profileTypeId: GID!
     $name: LocalizableUserText
+    $pluralName: LocalizableUserText
   ) {
-    cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
+    cloneProfileType(profileTypeId: $profileTypeId, name: $name, pluralName: $pluralName) {
       ...OrganizationProfileType_ProfileType
     }
   }
@@ -68348,8 +68416,11 @@ export const OrganizationProfileTypes_userDocument = gql`
   OrganizationProfileTypes_userQueryVariables
 >;
 export const OrganizationProfileTypes_createProfileTypeDocument = gql`
-  mutation OrganizationProfileTypes_createProfileType($name: LocalizableUserText!) {
-    createProfileType(name: $name) {
+  mutation OrganizationProfileTypes_createProfileType(
+    $name: LocalizableUserText!
+    $pluralName: LocalizableUserText!
+  ) {
+    createProfileType(name: $name, pluralName: $pluralName) {
       ...OrganizationProfileTypes_ProfileType
     }
   }
@@ -68362,8 +68433,9 @@ export const OrganizationProfileTypes_cloneProfileTypeDocument = gql`
   mutation OrganizationProfileTypes_cloneProfileType(
     $profileTypeId: GID!
     $name: LocalizableUserText
+    $pluralName: LocalizableUserText
   ) {
-    cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
+    cloneProfileType(profileTypeId: $profileTypeId, name: $name, pluralName: $pluralName) {
       ...OrganizationProfileType_ProfileType
     }
   }

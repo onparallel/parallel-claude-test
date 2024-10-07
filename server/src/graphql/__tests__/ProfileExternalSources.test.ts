@@ -1864,12 +1864,12 @@ describe("Profile External Sources", () => {
                       },
                       {
                         id: toGlobalId("ProfileType", legalEntityProfileType.id),
-                        name: { en: "Legal entity", es: "Persona jurídica" },
+                        name: { en: "Company", es: "Compañía" },
                         standardType: "LEGAL_ENTITY",
                       },
                       {
                         id: toGlobalId("ProfileType", individualProfileType.id),
-                        name: { en: "Individual", es: "Persona física" },
+                        name: { en: "Individual", es: "Persona" },
                         standardType: "INDIVIDUAL",
                       },
                     ],

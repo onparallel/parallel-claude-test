@@ -5,10 +5,10 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { SettingsIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import {
@@ -64,6 +64,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
   return (
     <Card
       {...props}
+      height="fit-content"
       as="form"
       onSubmit={handleSubmit(async (data) => {
         try {
@@ -76,17 +77,10 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
         }
       })}
     >
-      <CardHeader leftIcon={<SettingsIcon />} headingSize="md" headingLevel="h2">
+      <CardHeader headingSize="md" headingLevel="h2">
         <FormattedMessage id="component.profile-type-settings.settings" defaultMessage="Settings" />
       </CardHeader>
-      <FormControl
-        id="pattern"
-        isInvalid={!!errors.pattern}
-        as={Stack}
-        paddingX={6}
-        paddingY={4}
-        direction={{ base: "column", lg: "row" }}
-      >
+      <FormControl id="pattern" isInvalid={!!errors.pattern} paddingX={6} paddingY={4}>
         <FormLabel
           whiteSpace="nowrap"
           display="flex"
@@ -121,41 +115,43 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
             </Text>
           </HelpPopover>
         </FormLabel>
-        <Stack flex="1" minW={0}>
-          <Controller
-            name="pattern"
-            control={control}
-            rules={{
-              required: true,
-              validate: { isNotEmptyText },
-            }}
-            render={({ field: { value, onChange } }) => (
-              <PlaceholderInput
-                key={profileType.id}
-                value={value}
-                placeholder={intl.formatMessage({
-                  id: "component.profile-type-settings.profile-name-pattern-placeholder",
-                  defaultMessage: "Select a property",
-                })}
-                onChange={onChange}
-                placeholders={placeholders}
-              />
-            )}
-          />
-          {errors.pattern?.type === "invalid_pattern" ? (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="component.profile-type-settings.add-profile-type-field-to-name-error"
-                defaultMessage="Please add a property to the name"
-              />
-            </FormErrorMessage>
-          ) : null}
-        </Stack>
-        <Box paddingTop={{ base: 2, lg: 0 }} alignSelf={{ base: "end", lg: "start" }}>
-          <Button isDisabled={!isDirty} colorScheme="primary" type="submit">
-            <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
-          </Button>
-        </Box>
+        <HStack>
+          <Stack flex="1" minW={0}>
+            <Controller
+              name="pattern"
+              control={control}
+              rules={{
+                required: true,
+                validate: { isNotEmptyText },
+              }}
+              render={({ field: { value, onChange } }) => (
+                <PlaceholderInput
+                  key={profileType.id}
+                  value={value}
+                  placeholder={intl.formatMessage({
+                    id: "component.profile-type-settings.profile-name-pattern-placeholder",
+                    defaultMessage: "Select a property",
+                  })}
+                  onChange={onChange}
+                  placeholders={placeholders}
+                />
+              )}
+            />
+            {errors.pattern?.type === "invalid_pattern" ? (
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="component.profile-type-settings.add-profile-type-field-to-name-error"
+                  defaultMessage="Please add a property to the name"
+                />
+              </FormErrorMessage>
+            ) : null}
+          </Stack>
+          <Box paddingTop={{ base: 2, lg: 0 }} alignSelf={{ base: "end", lg: "start" }}>
+            <Button isDisabled={!isDirty} colorScheme="primary" type="submit">
+              <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+            </Button>
+          </Box>
+        </HStack>
       </FormControl>
     </Card>
   );

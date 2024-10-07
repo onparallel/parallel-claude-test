@@ -122,11 +122,17 @@ export const createProfileType = mutationField("createProfileType", {
   ),
   args: {
     name: nonNull(arg({ type: "LocalizableUserText" })),
+    pluralName: nonNull(arg({ type: "LocalizableUserText" })),
   },
+  validateArgs: validateAnd(
+    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
+    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
+  ),
   resolve: async (_, args, ctx) => {
     return await ctx.profilesSetup.createDefaultProfileType(
       ctx.user!.org_id,
       args.name,
+      args.pluralName,
       `User:${ctx.user!.id}`,
     );
   },
@@ -138,32 +144,43 @@ export const updateProfileType = mutationField("updateProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-    ifArgDefined("name", profileTypeIsNotStandard("profileTypeId")),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     name: arg({ type: "LocalizableUserText" }),
+    pluralName: arg({ type: "LocalizableUserText" }),
     profileNamePattern: stringArg(),
+    icon: "ProfileTypeIcon",
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 }),
+    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
+    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
     validProfileNamePattern("profileTypeId", "profileNamePattern"),
   ),
-  resolve: async (_, { profileTypeId, name, profileNamePattern }, ctx) => {
+  resolve: async (_, args, ctx) => {
     const updateData: Partial<CreateProfileType> = {};
 
-    if (isNonNullish(name)) {
-      updateData.name = name;
+    if (isNonNullish(args.name)) {
+      updateData.name = args.name;
     }
-    if (isNonNullish(profileNamePattern)) {
-      updateData.profile_name_pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
-        p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text,
+    if (isNonNullish(args.profileNamePattern)) {
+      updateData.profile_name_pattern = parseTextWithPlaceholders(args.profileNamePattern).map(
+        (p) => (p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text),
       );
       // clear cache for correct resolve of ProfileTypeField.isUsedInProfileName field
-      ctx.profiles.loadProfileType.dataloader.clear(profileTypeId);
+      ctx.profiles.loadProfileType.dataloader.clear(args.profileTypeId);
     }
+
+    if (isNonNullish(args.icon)) {
+      updateData.icon = args.icon;
+    }
+
+    if (isNonNullish(args.pluralName)) {
+      updateData.name_plural = args.pluralName;
+    }
+
     const profileType = await ctx.profiles.updateProfileType(
-      profileTypeId,
+      args.profileTypeId,
       updateData,
       `User:${ctx.user!.id}`,
     );
@@ -173,7 +190,7 @@ export const updateProfileType = mutationField("updateProfileType", {
         {
           name: "PROFILE_NAME_PATTERN_UPDATED",
           input: {
-            profile_type_id: profileTypeId,
+            profile_type_id: args.profileTypeId,
           },
           user_id: ctx.user!.id,
         },
@@ -196,16 +213,23 @@ export const cloneProfileType = mutationField("cloneProfileType", {
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     name: arg({ type: "LocalizableUserText" }),
+    pluralName: arg({ type: "LocalizableUserText" }),
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 }),
+    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
+    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
   ),
-  resolve: async (_, { profileTypeId, name }, ctx) => {
+  resolve: async (_, { profileTypeId, name, pluralName }, ctx) => {
     const createData: Partial<CreateProfileType> = {};
 
     if (isNonNullish(name)) {
       createData.name = name;
     }
+
+    if (isNonNullish(pluralName)) {
+      createData.name_plural = pluralName;
+    }
+
     return await ctx.profiles.cloneProfileType(profileTypeId, createData, `User:${ctx.user!.id}`);
   },
 });

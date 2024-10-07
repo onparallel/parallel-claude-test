@@ -557,6 +557,23 @@ export interface NexusGenEnums {
   ProfileStatus: db.ProfileStatus;
   ProfileTypeFieldPermissionType: db.ProfileTypeFieldPermissionType;
   ProfileTypeFieldType: db.ProfileTypeFieldType;
+  ProfileTypeIcon:
+    | "BRIEFCASE"
+    | "BUILDING"
+    | "CAR"
+    | "CERTIFICATE"
+    | "CLIPBOARD"
+    | "CUBE"
+    | "DATABASE"
+    | "DOCUMENT"
+    | "HOUSE"
+    | "PEOPLE"
+    | "PERSON"
+    | "PUBLICATION"
+    | "SETTINGS"
+    | "SHOPPING_CART"
+    | "STORE"
+    | "VERIFIED_PERSON";
   ProfileTypeStandardType: db.ProfileTypeStandardType;
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
@@ -3213,9 +3230,11 @@ export interface NexusGenFieldTypes {
     archivedBy: NexusGenRootTypes["User"] | null; // User
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     fields: NexusGenRootTypes["ProfileTypeField"][]; // [ProfileTypeField!]!
+    icon: NexusGenEnums["ProfileTypeIcon"]; // ProfileTypeIcon!
     id: NexusGenScalars["GID"]; // GID!
     isStandard: boolean; // Boolean!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+    pluralName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     profileNamePattern: string; // String!
     profileNamePatternFields: NexusGenScalars["GID"][]; // [GID!]!
     standardType: NexusGenEnums["ProfileTypeStandardType"] | null; // ProfileTypeStandardType
@@ -5869,9 +5888,11 @@ export interface NexusGenFieldTypeNames {
     archivedBy: "User";
     createdAt: "DateTime";
     fields: "ProfileTypeField";
+    icon: "ProfileTypeIcon";
     id: "GID";
     isStandard: "Boolean";
     name: "LocalizableUserText";
+    pluralName: "LocalizableUserText";
     profileNamePattern: "String";
     profileNamePatternFields: "GID";
     standardType: "ProfileTypeStandardType";
@@ -6856,6 +6877,7 @@ export interface NexusGenArgTypes {
     cloneProfileType: {
       // args
       name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
+      pluralName?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     cloneUserGroups: {
@@ -7198,6 +7220,7 @@ export interface NexusGenArgTypes {
     createProfileType: {
       // args
       name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+      pluralName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     };
     createProfileTypeField: {
       // args
@@ -8129,7 +8152,9 @@ export interface NexusGenArgTypes {
     };
     updateProfileType: {
       // args
+      icon?: NexusGenEnums["ProfileTypeIcon"] | null; // ProfileTypeIcon
       name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
+      pluralName?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
       profileNamePattern?: string | null; // String
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };

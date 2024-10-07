@@ -1056,7 +1056,11 @@ type Mutation {
   Clone petition.
   """
   clonePetitions(keepTitle: Boolean = false, path: String, petitionIds: [GID!]!): [PetitionBase!]!
-  cloneProfileType(name: LocalizableUserText, profileTypeId: GID!): ProfileType!
+  cloneProfileType(
+    name: LocalizableUserText
+    pluralName: LocalizableUserText
+    profileTypeId: GID!
+  ): ProfileType!
 
   """
   Clones the user groups with all its members
@@ -1629,7 +1633,7 @@ type Mutation {
     profileId: GID!
     relationships: [CreateProfileRelationshipInput!]!
   ): Profile!
-  createProfileType(name: LocalizableUserText!): ProfileType!
+  createProfileType(name: LocalizableUserText!, pluralName: LocalizableUserText!): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
   """
@@ -2972,7 +2976,9 @@ type Mutation {
   ): ProfileEventSubscription!
   updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
   updateProfileType(
+    icon: ProfileTypeIcon
     name: LocalizableUserText
+    pluralName: LocalizableUserText
     profileNamePattern: String
     profileTypeId: GID!
   ): ProfileType!
@@ -6095,9 +6101,11 @@ type ProfileType implements Timestamps {
   """
   createdAt: DateTime!
   fields: [ProfileTypeField!]!
+  icon: ProfileTypeIcon!
   id: GID!
   isStandard: Boolean!
   name: LocalizableUserText!
+  pluralName: LocalizableUserText!
   profileNamePattern: String!
   profileNamePatternFields: [GID!]!
   standardType: ProfileTypeStandardType
@@ -6152,6 +6160,25 @@ enum ProfileTypeFieldType {
 input ProfileTypeFilter {
   onlyArchived: Boolean
   profileTypeId: [GID!]
+}
+
+enum ProfileTypeIcon {
+  BRIEFCASE
+  BUILDING
+  CAR
+  CERTIFICATE
+  CLIPBOARD
+  CUBE
+  DATABASE
+  DOCUMENT
+  HOUSE
+  PEOPLE
+  PERSON
+  PUBLICATION
+  SETTINGS
+  SHOPPING_CART
+  STORE
+  VERIFIED_PERSON
 }
 
 type ProfileTypePagination {

@@ -113,10 +113,11 @@ function OrganizationProfileTypes() {
   const showCreateProfileTypeDialog = useCreateOrUpdateProfileTypeDialog();
   const handleCreateNewProfileType = async () => {
     try {
-      const { name } = await showCreateProfileTypeDialog({});
+      const { name, pluralName } = await showCreateProfileTypeDialog({});
       await createProfileType({
         variables: {
           name,
+          pluralName,
         },
       });
       refetch();
@@ -126,14 +127,16 @@ function OrganizationProfileTypes() {
   const [cloneProfileType] = useMutation(OrganizationProfileTypes_cloneProfileTypeDocument);
   const handleCloneClick = async () => {
     try {
-      const { name } = await showCreateProfileTypeDialog({
+      const { name, pluralName } = await showCreateProfileTypeDialog({
         isEditing: true,
         name: selectedRows[0].name,
+        pluralName: selectedRows[0].pluralName,
       });
       await cloneProfileType({
         variables: {
           profileTypeId: selectedRows[0].id,
           name,
+          pluralName,
         },
       });
       refetch();
@@ -413,6 +416,8 @@ OrganizationProfileTypes.fragments = {
       fragment OrganizationProfileTypes_ProfileType on ProfileType {
         id
         name
+        pluralName
+        icon
         createdAt
         archivedAt
         isStandard
@@ -473,8 +478,11 @@ OrganizationProfileTypes.queries = [
 
 OrganizationProfileTypes.mutations = [
   gql`
-    mutation OrganizationProfileTypes_createProfileType($name: LocalizableUserText!) {
-      createProfileType(name: $name) {
+    mutation OrganizationProfileTypes_createProfileType(
+      $name: LocalizableUserText!
+      $pluralName: LocalizableUserText!
+    ) {
+      createProfileType(name: $name, pluralName: $pluralName) {
         ...OrganizationProfileTypes_ProfileType
       }
     }
@@ -484,8 +492,9 @@ OrganizationProfileTypes.mutations = [
     mutation OrganizationProfileTypes_cloneProfileType(
       $profileTypeId: GID!
       $name: LocalizableUserText
+      $pluralName: LocalizableUserText
     ) {
-      cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
+      cloneProfileType(profileTypeId: $profileTypeId, name: $name, pluralName: $pluralName) {
         ...OrganizationProfileType_ProfileType
       }
     }

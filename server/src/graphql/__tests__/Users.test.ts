@@ -1302,6 +1302,8 @@ describe("GraphQL/Users", () => {
                 totalCount
                 items {
                   name
+                  pluralName
+                  icon
                   profileNamePattern
                   isStandard
                   fields {
@@ -1331,7 +1333,9 @@ describe("GraphQL/Users", () => {
           totalCount: 3,
           items: [
             {
-              name: { en: "Individual", es: "Persona física" },
+              name: { en: "Individual", es: "Persona" },
+              pluralName: { en: "Individuals", es: "Personas" },
+              icon: "PERSON",
               isStandard: true,
               profileNamePattern: `{{ ${profilesData.profileTypes.items[0].fields[0].id} }} {{ ${profilesData.profileTypes.items[0].fields[1].id} }}`,
               fields: [
@@ -1643,7 +1647,9 @@ describe("GraphQL/Users", () => {
               ],
             },
             {
-              name: { en: "Legal entity", es: "Persona jurídica" },
+              name: { en: "Company", es: "Compañía" },
+              pluralName: { en: "Companies", es: "Compañías" },
+              icon: "BUILDING",
               isStandard: true,
               profileNamePattern: `{{ ${profilesData.profileTypes.items[1].fields[0].id} }}`,
               fields: [
@@ -2019,6 +2025,8 @@ describe("GraphQL/Users", () => {
             },
             {
               name: { en: "Contract", es: "Contrato" },
+              pluralName: { en: "Contracts", es: "Contratos" },
+              icon: "DOCUMENT",
               isStandard: true,
               profileNamePattern: `{{ ${profilesData.profileTypes.items[2].fields[0].id} }} - {{ ${profilesData.profileTypes.items[2].fields[1].id} }}`,
               fields: [

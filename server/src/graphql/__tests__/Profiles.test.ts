@@ -148,10 +148,13 @@ describe("GraphQL/Profiles", () => {
       4,
       (i) =>
         [
-          { name: json({ en: "Individual", es: "Persona física" }) },
-          { name: json({ en: "Legal entity", es: "Persona jurídica" }) },
-          { name: json({ en: "Contract", es: "Contrato" }) },
-          { name: json({ en: "Expirable fields", es: "Campos con expiración" }) },
+          { name: json({ en: "Individual", es: "Persona física" }), icon: "PERSON" },
+          { name: json({ en: "Legal entity", es: "Persona jurídica" }), icon: "BUILDING" },
+          { name: json({ en: "Contract", es: "Contrato" }), icon: "DOCUMENT" },
+          {
+            name: json({ en: "Expirable fields", es: "Campos con expiración" }),
+            icon: "DATABASE",
+          },
         ][i],
     );
 
@@ -1932,10 +1935,11 @@ describe("GraphQL/Profiles", () => {
     it("creates a new profile type on organization", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($name: LocalizableUserText!) {
-            createProfileType(name: $name) {
+          mutation ($name: LocalizableUserText!, $pluralName: LocalizableUserText!) {
+            createProfileType(name: $name, pluralName: $pluralName) {
               id
               name
+              pluralName
               fields {
                 id
                 name
@@ -1945,6 +1949,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           name: { en: "Individual" },
+          pluralName: { en: "Individuals" },
         },
       );
 
@@ -1952,6 +1957,7 @@ describe("GraphQL/Profiles", () => {
       expect(data?.createProfileType).toEqual({
         id: expect.any(String),
         name: { en: "Individual" },
+        pluralName: { en: "Individuals" },
         fields: [{ id: expect.any(String), name: { en: "Name", es: "Nombre" } }],
       });
     });
@@ -1959,17 +1965,18 @@ describe("GraphQL/Profiles", () => {
     it("fails when normal user tries to create a profile type", async () => {
       const { errors, data } = await testClient.withApiKey(normalUserApiKey).execute(
         gql`
-          mutation ($name: LocalizableUserText!) {
-            createProfileType(name: $name) {
+          mutation ($name: LocalizableUserText!, $pluralName: LocalizableUserText!) {
+            createProfileType(name: $name, pluralName: $pluralName) {
               id
               name
+              pluralName
               fields {
                 id
               }
             }
           }
         `,
-        { name: { en: "Individual" } },
+        { name: { en: "Individual" }, pluralName: { en: "Individuals" } },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -2213,7 +2220,7 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("fails when trying to update name of a standard profile type", async () => {
+    it("updates the name of a standard profile type", async () => {
       const [standardProfileType] = await mocks.createRandomProfileTypes(
         organization.id,
         1,
@@ -2228,6 +2235,7 @@ describe("GraphQL/Profiles", () => {
           mutation ($profileTypeId: GID!, $name: LocalizableUserText!) {
             updateProfileType(profileTypeId: $profileTypeId, name: $name) {
               id
+              name
             }
           }
         `,
@@ -2237,8 +2245,11 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileType).toEqual({
+        id: toGlobalId("ProfileType", standardProfileType.id),
+        name: { en: "Updated name" },
+      });
     });
 
     it("updates fields 'isUsedInProfileName' when changing the profile name pattern", async () => {
@@ -2312,6 +2323,7 @@ describe("GraphQL/Profiles", () => {
             cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
               id
               name
+              icon
               profileNamePattern
               fields {
                 id
@@ -2331,6 +2343,7 @@ describe("GraphQL/Profiles", () => {
       expect(data.cloneProfileType).toEqual({
         id: expect.any(String),
         name: { en: "cloned profile" },
+        icon: "PERSON",
         profileNamePattern: expect.anything(),
         fields: profileType0Fields.map((f) => ({
           id: expect.any(String),

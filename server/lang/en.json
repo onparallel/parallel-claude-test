@@ -1450,14 +1450,29 @@
     "context": "Contract"
   },
   {
+    "term": "profiles.default-profile-type.contract-plural",
+    "definition": "Contracts",
+    "context": "Contracts"
+  },
+  {
     "term": "profiles.default-profile-type.individual",
     "definition": "Individual",
     "context": "Individual"
   },
   {
+    "term": "profiles.default-profile-type.individual-plural",
+    "definition": "Individuals",
+    "context": "Individuals"
+  },
+  {
     "term": "profiles.default-profile-type.legal-entity",
-    "definition": "Legal entity",
-    "context": "Legal entity"
+    "definition": "Company",
+    "context": "Company"
+  },
+  {
+    "term": "profiles.default-profile-type.legal-entity-plural",
+    "definition": "Companies",
+    "context": "Companies"
   },
   {
     "term": "profiles.default-relationship-type.addendum",

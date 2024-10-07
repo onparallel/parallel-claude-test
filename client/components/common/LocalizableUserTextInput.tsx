@@ -34,17 +34,29 @@ interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, 
   inputProps?: any;
   onBlur?: () => void;
   placeholder?: string;
+  locale?: UserLocale;
+  onChangeLocale?: (locale: UserLocale) => void;
 }
 
 export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserTextInputProps>(
   function (
-    { value, onChange, onBlur, inputRef: _inputRef, inputProps, placeholder, ...props },
+    {
+      value,
+      onChange,
+      onBlur,
+      inputRef: _inputRef,
+      inputProps,
+      placeholder,
+      locale,
+      onChangeLocale,
+      ...props
+    },
     ref,
   ) {
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
     const mergedInputRef = useMergedRef(inputRef, ...(_inputRef ? [_inputRef] : []));
-    const [selectedLocale, setSelectedLocale] = useState(
+    const [_selectedLocale, setSelectedLocale] = useState(
       () =>
         // initial state, by priority get the first that is defined
         [
@@ -53,9 +65,10 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
           Object.keys(value)[0] as UserLocale,
         ].find((locale) => isNonNullish(value[locale])) || (intl.locale as UserLocale),
     );
+    const selectedLocale = locale ?? _selectedLocale;
     const [inputValue, setInputValue] = useState(() => value[selectedLocale] ?? "");
     function handleChangeLocale(locale: UserLocale) {
-      setSelectedLocale(locale);
+      onChangeLocale?.(locale) ?? setSelectedLocale(locale);
       setInputValue(value[locale] ?? "");
       inputRef.current?.focus();
     }
@@ -66,7 +79,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
 
     useEffectSkipFirst(() => {
       setInputValue(value[selectedLocale] ?? "");
-    }, [value]);
+    }, [value, selectedLocale]);
     return (
       <InputGroup ref={ref} {...props}>
         <Input

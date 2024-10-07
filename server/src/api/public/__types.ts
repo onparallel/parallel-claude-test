@@ -1442,6 +1442,7 @@ export type MutationclonePetitionsArgs = {
 
 export type MutationcloneProfileTypeArgs = {
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 };
 
@@ -1784,6 +1785,7 @@ export type MutationcreateProfileRelationshipArgs = {
 
 export type MutationcreateProfileTypeArgs = {
   name: Scalars["LocalizableUserText"]["input"];
+  pluralName: Scalars["LocalizableUserText"]["input"];
 };
 
 export type MutationcreateProfileTypeFieldArgs = {
@@ -2715,7 +2717,9 @@ export type MutationupdateProfileFieldValueArgs = {
 };
 
 export type MutationupdateProfileTypeArgs = {
+  icon?: InputMaybe<ProfileTypeIcon>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   profileNamePattern?: InputMaybe<Scalars["String"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 };
@@ -4753,9 +4757,11 @@ export type ProfileType = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
+  icon: ProfileTypeIcon;
   id: Scalars["GID"]["output"];
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
+  pluralName: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   profileNamePatternFields: Array<Scalars["GID"]["output"]>;
   standardType: Maybe<ProfileTypeStandardType>;
@@ -4803,6 +4809,24 @@ export type ProfileTypeFilter = {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
+
+export type ProfileTypeIcon =
+  | "BRIEFCASE"
+  | "BUILDING"
+  | "CAR"
+  | "CERTIFICATE"
+  | "CLIPBOARD"
+  | "CUBE"
+  | "DATABASE"
+  | "DOCUMENT"
+  | "HOUSE"
+  | "PEOPLE"
+  | "PERSON"
+  | "PUBLICATION"
+  | "SETTINGS"
+  | "SHOPPING_CART"
+  | "STORE"
+  | "VERIFIED_PERSON";
 
 export type ProfileTypePagination = {
   /** The requested slice of items. */

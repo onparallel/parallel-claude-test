@@ -632,16 +632,22 @@ export async function seed(knex: Knex): Promise<any> {
       const [individual, legalEntity, contract] = await knex("profile_type").insert(
         [
           {
-            name: { en: "Individual", es: "Persona física" },
+            name: { en: "Person", es: "Persona" },
+            name_plural: { en: "People", es: "Personas" },
             standard_type: "INDIVIDUAL" as ProfileTypeStandardType,
+            icon: "PERSON",
           },
           {
-            name: { en: "Legal entity", es: "Persona jurídica" },
+            name: { en: "Company", es: "Compañía" },
+            name_plural: { en: "Companies", es: "Compañías" },
             standard_type: "LEGAL_ENTITY" as ProfileTypeStandardType,
+            icon: "BUILDING",
           },
           {
             name: { en: "Contract", es: "Contrato" },
+            name_plural: { en: "Contracts", es: "Contratos" },
             standard_type: "CONTRACT" as ProfileTypeStandardType,
+            icon: "DOCUMENT",
           },
         ].map((data) => ({
           ...data,

@@ -40,6 +40,7 @@ export interface IProfilesSetupService {
   createDefaultProfileType(
     orgId: number,
     name: LocalizableUserText,
+    pluralName: LocalizableUserText,
     createdBy: string,
   ): Promise<ProfileType>;
   createDefaultProfileTypes(orgId: number, createdBy: string): Promise<void>;
@@ -64,10 +65,15 @@ export class ProfilesSetupService implements IProfilesSetupService {
     @inject(ProfileRepository) private profiles: ProfileRepository,
   ) {}
 
-  async createDefaultProfileType(orgId: number, name: LocalizableUserText, createdBy: string) {
+  async createDefaultProfileType(
+    orgId: number,
+    name: LocalizableUserText,
+    pluralName: LocalizableUserText,
+    createdBy: string,
+  ) {
     return await this.profiles.withTransaction(async (t) => {
       const [profileType] = await this.profiles.createProfileType(
-        { name, org_id: orgId },
+        { name, name_plural: pluralName, org_id: orgId },
         createdBy,
         t,
       );
@@ -1075,6 +1081,11 @@ export class ProfilesSetupService implements IProfilesSetupService {
           id: "profiles.default-profile-type.contract",
           defaultMessage: "Contract",
         }),
+        name_plural: await this.intl.getLocalizableUserText({
+          id: "profiles.default-profile-type.contract-plural",
+          defaultMessage: "Contracts",
+        }),
+        icon: "DOCUMENT",
         org_id: orgId,
       },
       createdBy,
@@ -1106,6 +1117,11 @@ export class ProfilesSetupService implements IProfilesSetupService {
           id: "profiles.default-profile-type.individual",
           defaultMessage: "Individual",
         }),
+        name_plural: await this.intl.getLocalizableUserText({
+          id: "profiles.default-profile-type.individual-plural",
+          defaultMessage: "Individuals",
+        }),
+        icon: "PERSON",
         org_id: orgId,
       },
       createdBy,
@@ -1139,8 +1155,13 @@ export class ProfilesSetupService implements IProfilesSetupService {
         standard_type: "LEGAL_ENTITY",
         name: await this.intl.getLocalizableUserText({
           id: "profiles.default-profile-type.legal-entity",
-          defaultMessage: "Legal entity",
+          defaultMessage: "Company",
         }),
+        name_plural: await this.intl.getLocalizableUserText({
+          id: "profiles.default-profile-type.legal-entity-plural",
+          defaultMessage: "Companies",
+        }),
+        icon: "BUILDING",
         org_id: orgId,
       },
       createdBy,

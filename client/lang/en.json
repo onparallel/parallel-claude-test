@@ -2375,14 +2375,29 @@
     "context": "Edit profile type name"
   },
   {
-    "term": "component.create-profile-type-dialog.name",
-    "definition": "Name",
-    "context": "Name"
-  },
-  {
     "term": "component.create-profile-type-dialog.new-profile-type",
     "definition": "New profile type",
     "context": "New profile type"
+  },
+  {
+    "term": "component.create-profile-type-dialog.plural-name",
+    "definition": "Plural name",
+    "context": "Plural name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.plural-name-helper",
+    "definition": "Individuals",
+    "context": "Individuals"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name",
+    "definition": "Singular name",
+    "context": "Singular name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name-helper",
+    "definition": "Individual",
+    "context": "Individual"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -7875,6 +7890,91 @@
     "context": "Type"
   },
   {
+    "term": "component.profile-type-field-icon.certificate-icon",
+    "definition": "Certificate icon",
+    "context": "Certificate icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.publication-icon",
+    "definition": "Post icon",
+    "context": "Post icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.cube-icon",
+    "definition": "Bucket icon",
+    "context": "Bucket icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.briefcase-icon",
+    "definition": "Briefcase icon",
+    "context": "Briefcase icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.building-icon",
+    "definition": "Building icon",
+    "context": "Building icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.car-icon",
+    "definition": "Car icon",
+    "context": "Car icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.clipboard-icon",
+    "definition": "Clipboard icon",
+    "context": "Clipboard icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.document-icon",
+    "definition": "Document icon",
+    "context": "Document icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.house-icon",
+    "definition": "House icon",
+    "context": "House icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.database-icon",
+    "definition": "Database icon",
+    "context": "Database icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.settings-icon",
+    "definition": "Settings icon",
+    "context": "Settings icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.store-icon",
+    "definition": "Store icon",
+    "context": "Store icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.shopping-cart-icon",
+    "definition": "Shopping cart icon",
+    "context": "Shopping cart icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.verified-person-icon",
+    "definition": "Verified person icon",
+    "context": "Verified person icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.person-icon",
+    "definition": "Person icon",
+    "context": "Person icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.people-icon",
+    "definition": "People icon",
+    "context": "People icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.button",
+    "definition": "Change icon",
+    "context": "Change icon"
+  },
+  {
     "term": "component.profile-type-field-permission-dialog.all-in-organization",
     "definition": "Everyone in the organization",
     "context": "Everyone in the organization"
@@ -7923,6 +8023,21 @@
     "term": "component.profile-type-field-select.suggested-property",
     "definition": "Suggested property: <b>{label}</b>",
     "context": "Suggested property: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.contract",
+    "definition": "Contract",
+    "context": "Contract"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.individual",
+    "definition": "Individual",
+    "context": "Individual"
+  },
+  {
+    "term": "component.profile-type-field-standard-type.legal-entity",
+    "definition": "Legal entity",
+    "context": "Legal entity"
   },
   {
     "term": "component.profile-type-header.archive-label",
