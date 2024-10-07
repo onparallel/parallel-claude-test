@@ -142,6 +142,7 @@ function PetitionExport2(
       justify: true,
     )
     #set list(indent: 1em)
+    #set enum(indent: 0.5em)
     #set table(
       stroke: (top: none, right: none, bottom: rgb("#e2e8f0"), left: none),
       inset: (y: ${theme.textFontSize * 0.2}mm, x: ${theme.textFontSize * 0.15}mm),
@@ -756,7 +757,7 @@ function mdList({ token }: { token: Tokens.List }) {
                 "  ".repeat(level),
                 j === 0
                   ? list.ordered
-                    ? `${(typeof list.start === "number" ? list.start : 1) + i}.`
+                    ? `${(typeof list.start === "number" ? list.start : 1) + i}. `
                     : "- "
                   : "  ",
                 mdInlineContent({ tokens: (t as Tokens.Text).tokens as InlineToken[] }),
