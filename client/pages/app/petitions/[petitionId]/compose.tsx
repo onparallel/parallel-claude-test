@@ -112,7 +112,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
     updateIsReadNotification({ isRead: true, filter: "SHARED", petitionIds: [petitionId] });
-  }, []);
+  }, [petitionId]);
 
   const isTemplate = petition.__typename === "PetitionTemplate";
 

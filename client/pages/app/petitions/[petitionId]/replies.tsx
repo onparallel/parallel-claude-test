@@ -142,7 +142,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
     updateIsReadNotification({ isRead: true, petitionIds: [petitionId] });
-  }, []);
+  }, [petitionId]);
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
   const allFieldsUnreadCommentCount =

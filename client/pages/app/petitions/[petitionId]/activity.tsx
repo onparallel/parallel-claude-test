@@ -98,7 +98,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
     updateIsReadNotification({ isRead: true, filter: "OTHER", petitionIds: [petitionId] });
-  }, []);
+  }, [petitionId]);
 
   assert(isNonNullish(petitionData.petition));
   assertTypename(petitionData.petition, "Petition");
