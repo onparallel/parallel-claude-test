@@ -169,6 +169,10 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
               keyArgs: ["offset", "limit", "search", "filters", "sortBy"],
               merge: false,
             },
+            metadata: {
+              keyArgs: ["keycode"],
+              merge: true,
+            },
           },
         },
         PetitionBase: {
