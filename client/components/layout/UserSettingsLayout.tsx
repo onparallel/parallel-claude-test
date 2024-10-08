@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Heading } from "@chakra-ui/react";
 import { SidebarLayout, SidebarLayoutProps } from "@parallel/components/layout/SidebarLayout";
-import { UserSettingsLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
@@ -10,20 +9,20 @@ import { FormattedMessage, useIntl } from "react-intl";
 export interface UserSettingsLayoutProps
   extends Omit<SidebarLayoutProps, "basePath" | "sectionsHeader" | "sections" | "title"> {
   title?: string;
-  me: UserSettingsLayout_QueryFragment["me"];
   basePath?: string;
 }
 
 export function UserSettingsLayout({
-  me,
   children,
   basePath,
   isBase,
   header,
   title,
+  queryObject,
   ...props
 }: UserSettingsLayoutProps) {
   const intl = useIntl();
+  const { me } = queryObject;
   const hasDeveloperPermissions = useHasPermission("INTEGRATIONS:CRUD_API");
   const sections = useMemo(
     () => [
@@ -68,7 +67,6 @@ export function UserSettingsLayout({
         />
       }
       sections={sections}
-      me={me}
       isBase={isBase}
       title={
         (title ?? isBase)
@@ -85,6 +83,7 @@ export function UserSettingsLayout({
           </Heading>
         )
       }
+      queryObject={queryObject}
       {...props}
     >
       {children}

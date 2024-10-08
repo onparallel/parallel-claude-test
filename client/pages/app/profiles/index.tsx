@@ -1,34 +1,12 @@
-import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Portal,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { Menu } from "@parallel/chakra/components";
-import {
-  ArchiveIcon,
-  BellIcon,
-  ChevronDownIcon,
-  DeleteIcon,
-  RepeatIcon,
-} from "@parallel/chakra/icons";
+import { gql, useMutation } from "@apollo/client";
+import { Box, Button, Center, Flex, HStack, Heading, Icon, Stack, Text } from "@chakra-ui/react";
+import { ArchiveIcon, BellIcon, DeleteIcon, PinIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  LocalizableUserTextRender,
-  localizableUserTextRender,
-} from "@parallel/components/common/LocalizableUserTextRender";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
+import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeReference";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
@@ -45,16 +23,17 @@ import {
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
+import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
+import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/profiles/dialogs/CreateProfileFromProfileTypeDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
   ProfileStatus,
   Profiles_ProfileFragment,
+  Profiles_pinProfileTypeDocument,
   Profiles_profileTypeDocument,
-  Profiles_profileTypesDocument,
   Profiles_profilesDocument,
+  Profiles_unpinProfileTypeDocument,
   Profiles_userDocument,
-  UserLocale,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
@@ -66,7 +45,6 @@ import { usePermanentlyDeleteProfile } from "@parallel/utils/mutations/usePerman
 import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { withError } from "@parallel/utils/promises/withError";
 import {
   QueryStateFrom,
   QueryStateOf,
@@ -84,7 +62,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNullish } from "remeda";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -96,7 +74,7 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "DESC",
   }),
-  type: string().list(),
+  type: string(),
   status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).orDefault("OPEN"),
 };
 type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
@@ -107,9 +85,8 @@ interface ProfilesTableContext {
 }
 function Profiles() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Profiles_userDocument);
+  const { data: queryObject } = useAssertQuery(Profiles_userDocument);
+  const { me } = queryObject;
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
   const navigate = useHandleNavigation();
@@ -127,47 +104,41 @@ function Profiles() {
       search: queryState.search,
       sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
       filter: {
-        profileTypeId: queryState.type || undefined,
+        profileTypeId: [queryState.type!],
         status: [queryState.status],
       },
     },
     fetchPolicy: "cache-and-network",
   });
 
-  const { data: _profileTypesData } = useQueryOrPreviousData(Profiles_profileTypesDocument, {
+  const { data: _profileTypeData } = useQueryOrPreviousData(Profiles_profileTypeDocument, {
     variables: {
-      offset: 0,
-      limit: 100,
-      locale: intl.locale as UserLocale,
+      profileTypeId: queryState.type!,
     },
     fetchPolicy: "cache-and-network",
   });
 
-  const { data: _profileTypeData } = useQueryOrPreviousData(Profiles_profileTypeDocument, {
-    variables: {
-      profileTypeId: queryState.type?.[0] ?? "",
-    },
-    fetchPolicy: "cache-first",
-    skip:
-      !queryState.type ||
-      queryState.type.length > 1 ||
-      _profileTypesData?.profileTypes.items.some((pt) => pt.id === queryState.type![0]),
-  });
-
   const profiles = data?.profiles;
-  const profileTypes = _profileTypesData?.profileTypes;
+
+  const profileType = _profileTypeData?.profileType ?? null;
 
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
   const columns = useProfileTableColumns(status);
 
-  const showCreateProfileDialog = useCreateProfileDialog();
+  const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
   const handleCreateProfile = async () => {
+    if (isNullish(profileType)) {
+      return;
+    }
     try {
       const {
         hasValues,
         profile: { id },
-      } = await showCreateProfileDialog({});
+      } = await showCreateProfileFromProfileTypeDialog({
+        profileTypeId: profileType.id,
+        profileTypeName: profileType.name,
+      });
       if (hasValues) {
         navigate(`/app/profiles/${id}`);
       }
@@ -196,15 +167,6 @@ function Profiles() {
   const handleRowClick = useCallback((row: Profiles_ProfileFragment, event: MouseEvent) => {
     navigate(`/app/profiles/${row.id}`, event);
   }, []);
-
-  const hasMultipleProfileTypes = isNonNullish(queryState.type) && queryState.type.length > 1;
-
-  const profileType =
-    queryState.type && queryState.type.length === 1
-      ? (profileTypes?.items.find((pt) => pt.id === queryState.type![0]) ??
-        _profileTypeData?.profileType ??
-        null)
-      : null;
 
   const showSubscribersDialog = useProfileSubscribersDialog();
   const handleSubscribeClick = useCallback(async () => {
@@ -265,6 +227,30 @@ function Profiles() {
     } catch {}
   };
 
+  const [pinProfileType] = useMutation(Profiles_pinProfileTypeDocument);
+  const [unpinProfileType] = useMutation(Profiles_unpinProfileTypeDocument);
+
+  const handlePinAndUnpinProfileType = async () => {
+    if (isNullish(profileType)) {
+      return;
+    }
+    try {
+      if (profileType.isPinned) {
+        await unpinProfileType({
+          variables: {
+            profileTypeId: profileType.id,
+          },
+        });
+      } else {
+        await pinProfileType({
+          variables: {
+            profileTypeId: profileType.id,
+          },
+        });
+      }
+    } catch {}
+  };
+
   const actions = useProfileListActions({
     canDelete: userCanDeleteProfiles,
     canCloseOpen: userCanCloseOpenProfiles,
@@ -279,91 +265,71 @@ function Profiles() {
     selectedCount: selectedIds.length,
   });
 
+  const icon = getProfileTypeFieldIcon(profileType?.icon);
+
   return (
     <AppLayout
       title={intl.formatMessage({ id: "page.profiles.title", defaultMessage: "Profiles" })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
-          <Flex minWidth="0" width="fit-content">
-            <Menu matchWidth>
-              <MenuButton
-                as={Button}
-                size="lg"
-                variant="outline"
-                fontSize="2xl"
-                paddingX={4}
-                backgroundColor="white"
-                data-action="change-profile-type"
-                data-testid="profile-type-menu-button"
-                rightIcon={<ChevronDownIcon boxSize={5} />}
-              >
-                {hasMultipleProfileTypes
-                  ? intl.formatMessage({
-                      id: "page.profiles.multiple-profile-types",
-                      defaultMessage: "Multiple types",
-                    })
-                  : isNonNullish(profileType)
-                    ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
-                    : intl.formatMessage({
-                        id: "page.profiles.all-profiles",
-                        defaultMessage: "All profiles",
-                      })}
-              </MenuButton>
-              <Portal>
-                <MenuList minWidth="180px" maxWidth="320px">
-                  <MenuOptionGroup
-                    value={
-                      queryState.type
-                        ? hasMultipleProfileTypes
-                          ? "multiple"
-                          : queryState.type?.[0]
-                        : ""
+          <HStack padding={2}>
+            <Icon as={icon} boxSize={5} />
+            <Heading as="h2" size="lg">
+              {profileType ? <ProfileTypeReference profileType={profileType} usePlural /> : null}
+            </Heading>
+            <IconButtonWithTooltip
+              variant="unstyled"
+              sx={{
+                ...(profileType?.isPinned
+                  ? {
+                      "svg > g": {
+                        stroke: "purple.600",
+                        fill: "purple.600",
+                      },
                     }
-                    onChange={(value) => {
-                      setQueryState((s) => ({ ...s, type: value ? [value as string] : null }));
-                    }}
-                  >
-                    <MenuItemOption value="" data-testid="profile-type-all">
-                      <FormattedMessage
-                        id="page.profiles.all-profiles"
-                        defaultMessage="All profiles"
-                      />
-                    </MenuItemOption>
-                    {profileTypes?.items.map((profileType) => {
-                      return (
-                        <MenuItemOption
-                          key={profileType.id}
-                          value={profileType.id}
-                          data-testid={`profile-type-${profileType.id}`}
-                        >
-                          <Text noOfLines={2}>
-                            <LocalizableUserTextRender
-                              value={profileType.name}
-                              default={intl.formatMessage({
-                                id: "generic.unamed-profile-type",
-                                defaultMessage: "Unnamed profile type",
-                              })}
-                            />
-                          </Text>
-                        </MenuItemOption>
-                      );
-                    })}
-                  </MenuOptionGroup>
-                </MenuList>
-              </Portal>
-            </Menu>
-          </Flex>
+                  : {}),
+              }}
+              size="sm"
+              icon={<PinIcon boxSize={4} />}
+              label={
+                profileType?.isPinned
+                  ? intl.formatMessage({
+                      id: "component.app-layout-nav-bar.remove-from-menu",
+                      defaultMessage: "Remove from menu",
+                    })
+                  : intl.formatMessage({
+                      id: "component.app-layout-nav-bar.pin-to-menu",
+                      defaultMessage: "Pin to menu",
+                    })
+              }
+              onClick={handlePinAndUnpinProfileType}
+            />
+          </HStack>
           <Spacer minW={4} />
           <Box>
             <Button
               colorScheme="primary"
               onClick={handleCreateProfile}
-              isDisabled={!userCanCreateProfiles}
+              isDisabled={!userCanCreateProfiles || isNullish(profileType)}
             >
-              <FormattedMessage id="page.profiles.create-profile" defaultMessage="Create profile" />
+              <FormattedMessage
+                id="component.create-profile-from-profile-type-dialog.create-profile"
+                defaultMessage="Create {profileTypeName}"
+                values={{
+                  profileTypeName: profileType
+                    ? localizableUserTextRender({
+                        value: profileType.name,
+                        intl,
+                        default: intl.formatMessage({
+                          id: "generic.unnamed-profile-type",
+                          defaultMessage: "Unnamed profile type",
+                        }),
+                      }).toLowerCase()
+                    : "",
+                }}
+              />
             </Button>
           </Box>
         </Flex>
@@ -768,7 +734,11 @@ const _fragments = {
       fragment Profiles_ProfileType on ProfileType {
         id
         name
+        icon
+        isPinned
+        ...ProfileTypeReference_ProfileType
       }
+      ${ProfileTypeReference.fragments.ProfileType}
     `;
   },
   get Profile() {
@@ -822,17 +792,6 @@ const _queries = [
     ${useProfileSubscribersDialog.fragments.User}
   `,
   gql`
-    query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {
-      profileTypes(offset: $offset, limit: $limit, locale: $locale) {
-        items {
-          ...Profiles_ProfileType
-        }
-        totalCount
-      }
-    }
-    ${_fragments.ProfileType}
-  `,
-  gql`
     query Profiles_profileType($profileTypeId: GID!) {
       profileType(profileTypeId: $profileTypeId) {
         ...Profiles_ProfileType
@@ -856,18 +815,49 @@ const _queries = [
   `,
 ];
 
+const _mutations = [
+  gql`
+    mutation Profiles_pinProfileType($profileTypeId: GID!) {
+      pinProfileType(profileTypeId: $profileTypeId) {
+        id
+        isPinned
+      }
+    }
+  `,
+  gql`
+    mutation Profiles_unpinProfileType($profileTypeId: GID!) {
+      unpinProfileType(profileTypeId: $profileTypeId) {
+        id
+        isPinned
+      }
+    }
+  `,
+];
+
 Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
-  const [_, [error]] = await Promise.all([
-    fetchQuery(Profiles_userDocument),
-    withError(
-      state.type && state.type.length === 1
-        ? fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type[0] } })
-        : null,
-    ),
-  ]);
-  if (error) {
-    throw new RedirectError("/app/profiles");
+  if (isNullish(state.type)) {
+    throw new RedirectError("/app");
+  }
+  try {
+    await Promise.all([
+      fetchQuery(Profiles_userDocument),
+      fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type } }),
+      fetchQuery(Profiles_profilesDocument, {
+        variables: {
+          offset: state.items * (state.page - 1),
+          limit: state.items,
+          search: state.search,
+          sortBy: [`${state.sort.field}_${state.sort.direction}` as const],
+          filter: {
+            profileTypeId: [state.type],
+            status: [state.status],
+          },
+        },
+      }),
+    ]);
+  } catch {
+    throw new RedirectError("/app");
   }
   return {};
 };

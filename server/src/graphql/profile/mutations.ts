@@ -248,6 +248,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
   },
   resolve: async (_, { profileTypeIds }, ctx) => {
     await ctx.profiles.withTransaction(async (t) => {
+      await ctx.profiles.deletePinnedProfileTypes(profileTypeIds, t);
       await ctx.profiles.deleteProfilesByProfileTypeId(profileTypeIds, `User:${ctx.user!.id}`, t);
       await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
         profileTypeIds,
@@ -2492,3 +2493,41 @@ export const completeProfileFromExternalSource = mutationField(
     },
   },
 );
+
+export const pinProfileType = mutationField("pinProfileType", {
+  description: "Pins a profile type to the user's navigation manu",
+  type: "ProfileType",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+  },
+  resolve: async (_, { profileTypeId }, ctx) => {
+    await ctx.profiles.pinProfileType(profileTypeId, ctx.user!.id);
+    const profileType = await ctx.profiles.loadProfileType(profileTypeId);
+    assert(profileType, "ProfileType not found");
+
+    return profileType;
+  },
+});
+
+export const unpinProfileType = mutationField("unpinProfileType", {
+  description: "Unpins a profile type to the user's navigation manu",
+  type: "ProfileType",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+  },
+  resolve: async (_, { profileTypeId }, ctx) => {
+    await ctx.profiles.unpinProfileType(profileTypeId, ctx.user!.id);
+    const profileType = await ctx.profiles.loadProfileType(profileTypeId);
+    assert(profileType, "ProfileType not found");
+
+    return profileType;
+  },
+});

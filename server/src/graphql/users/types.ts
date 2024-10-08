@@ -247,6 +247,14 @@ export const User = objectType({
     t.boolean("isOrgOwner", {
       resolve: (o) => o.is_org_owner,
     });
+    t.list.field("pinnedProfileTypes", {
+      type: "ProfileType",
+      description: "The pinned profile types of the user menu",
+      authorize: rootIsContextUser(),
+      resolve: async (root, _, ctx) => {
+        return await ctx.profiles.loadPinnedProfileTypesByUserId(root.id);
+      },
+    });
   },
 });
 

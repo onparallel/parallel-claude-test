@@ -65,7 +65,7 @@ function IntegrationsSignature() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const toast = useToast();
   const {
-    data: { me, realMe },
+    data: queryObject,
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(IntegrationsSignature_userDocument, {
@@ -74,6 +74,7 @@ function IntegrationsSignature() {
       limit: state.items,
     },
   });
+  const { me } = queryObject;
   const { totalCount: numberOfIntegrations, items: integrations } =
     me.organization.signatureIntegrations;
   assertTypenameArray(integrations, "SignatureOrgIntegration");
@@ -197,8 +198,7 @@ function IntegrationsSignature() {
         defaultMessage: "Signature integrations",
       })}
       basePath="/app/organization/integrations"
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage

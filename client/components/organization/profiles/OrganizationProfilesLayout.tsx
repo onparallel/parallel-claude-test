@@ -8,16 +8,15 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfilesOrganizationSection = "types" | "relationships";
 
-interface OrganizationProfilesLayoutProps
-  extends Pick<OrganizationProfilesLayout_QueryFragment, "me" | "realMe"> {
+interface OrganizationProfilesLayoutProps {
+  queryObject: OrganizationProfilesLayout_QueryFragment;
   currentTabKey: ProfilesOrganizationSection;
   children: ReactNode;
 }
 
 export function OrganizationProfilesLayout({
   currentTabKey,
-  me,
-  realMe,
+  queryObject,
   children,
 }: OrganizationProfilesLayoutProps) {
   const intl = useIntl();
@@ -47,8 +46,7 @@ export function OrganizationProfilesLayout({
   return (
     <OrganizationSettingsLayout
       title={`${currentTab.title}`}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage

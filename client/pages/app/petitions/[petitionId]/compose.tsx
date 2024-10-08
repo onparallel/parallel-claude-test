@@ -99,9 +99,8 @@ type FieldSelection = PetitionCompose_PetitionFieldFragment;
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(PetitionCompose_userDocument);
+  const { data: queryObject } = useAssertQuery(PetitionCompose_userDocument);
+  const { me } = queryObject;
   const { data, refetch } = useAssertQuery(PetitionCompose_petitionDocument, {
     variables: { id: petitionId },
   });
@@ -1190,8 +1189,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
         key={petition.id}
-        me={me}
-        realMe={realMe}
+        queryObject={queryObject}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
         onRefetch={() => refetch()}

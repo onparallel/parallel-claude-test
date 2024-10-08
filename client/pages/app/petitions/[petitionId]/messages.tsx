@@ -24,9 +24,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
 
 function PetitionMessages({ petitionId }: PetitionMessagesProps) {
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(PetitionMessages_userDocument);
+  const { data: queryObject } = useAssertQuery(PetitionMessages_userDocument);
   const { data } = useAssertQuery(PetitionMessages_petitionDocument, {
     variables: { id: petitionId },
   });
@@ -59,15 +57,14 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
   return (
     <PetitionLayout
       key={petition.id}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       petition={petition}
       onUpdatePetition={updatePetition}
       section="messages"
     >
       <Box paddingX={4} backgroundColor="primary.50">
         <Stack spacing={4} paddingY={4} maxWidth="container.md" margin="auto">
-          <PetitionTemplateRequestMessageCard {...cardCommonProps} user={me} />
+          <PetitionTemplateRequestMessageCard {...cardCommonProps} user={queryObject.me} />
           <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
           <PetitionTemplateClosingMessageCard {...cardCommonProps} />
         </Stack>

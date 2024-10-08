@@ -5,11 +5,9 @@ import { Settings_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 
 export function Settings() {
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Settings_userDocument);
+  const { data: queryObject } = useAssertQuery(Settings_userDocument);
 
-  return <UserSettingsLayout isBase me={me} realMe={realMe} />;
+  return <UserSettingsLayout isBase queryObject={queryObject} />;
 }
 
 Settings.queries = [

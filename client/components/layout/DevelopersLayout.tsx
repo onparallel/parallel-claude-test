@@ -7,12 +7,13 @@ import { UserSettingsLayout } from "./UserSettingsLayout";
 
 type DevelopersSection = "subscriptions" | "tokens";
 
-interface DevelopersLayoutProps extends Pick<DevelopersLayout_QueryFragment, "me" | "realMe"> {
+interface DevelopersLayoutProps {
+  queryObject: DevelopersLayout_QueryFragment;
   currentTabKey: DevelopersSection;
   children: ReactNode;
 }
 
-export function DevelopersLayout({ currentTabKey, me, realMe, children }: DevelopersLayoutProps) {
+export function DevelopersLayout({ currentTabKey, queryObject, children }: DevelopersLayoutProps) {
   const intl = useIntl();
   const tabs = useMemo(
     () => [
@@ -38,7 +39,7 @@ export function DevelopersLayout({ currentTabKey, me, realMe, children }: Develo
   const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 
   return (
-    <UserSettingsLayout title={`${currentTab.title}`} me={me} realMe={realMe}>
+    <UserSettingsLayout title={`${currentTab.title}`} queryObject={queryObject}>
       <SettingsTabsInnerLayout tabs={tabs} currentTabKey={currentTabKey}>
         {children}
       </SettingsTabsInnerLayout>

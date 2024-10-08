@@ -60,10 +60,8 @@ function OrganizationGroups() {
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(OrganizationGroups_userDocument);
-
+  const { data: queryObject } = useAssertQuery(OrganizationGroups_userDocument);
+  const { me } = queryObject;
   const { data, loading, refetch } = useQueryOrPreviousData(OrganizationGroups_userGroupsDocument, {
     variables: {
       offset: state.items * (state.page - 1),
@@ -225,8 +223,7 @@ function OrganizationGroups() {
         id: "page.groups.title",
         defaultMessage: "Teams",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="page.groups.title" defaultMessage="Teams" />

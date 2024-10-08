@@ -1,4 +1,4 @@
-import { assignRef, Box } from "@chakra-ui/react";
+import { assignRef, Box, PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import useMergedRef from "@react-hook/merged-ref";
@@ -7,10 +7,11 @@ import { ReactNode, useRef, useState } from "react";
 
 export interface OverflownTextProps {
   children: ReactNode;
+  placement?: PlacementWithLogical;
 }
 
 export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(function OverflownText(
-  { children, ...props },
+  { children, placement, ...props },
   ref,
 ) {
   const innerRef = useRef<HTMLElement>(null);
@@ -27,15 +28,8 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
   });
 
   return (
-    <Tooltip label={children} isDisabled={!children || !isOverflown}>
-      <Box
-        position="relative"
-        whiteSpace="nowrap"
-        overflow="hidden"
-        textOverflow="ellipsis"
-        ref={_ref}
-        {...props}
-      >
+    <Tooltip placement={placement} label={children} isDisabled={!children || !isOverflown}>
+      <Box whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" ref={_ref} {...props}>
         {children}
       </Box>
     </Tooltip>

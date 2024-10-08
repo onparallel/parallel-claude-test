@@ -68,10 +68,8 @@ function OrganizationCompliance() {
     });
   };
 
-  const {
-    data: { me, realMe },
-  } = useAssertQueryOrPreviousData(OrganizationCompliance_userDocument);
-
+  const { data: queryObject } = useAssertQueryOrPreviousData(OrganizationCompliance_userDocument);
+  const { me } = queryObject;
   const defaultPeriod = me.organization.anonymizePetitionsAfterMonths;
 
   const {
@@ -110,8 +108,7 @@ function OrganizationCompliance() {
         id: "organization.compliance.title",
         defaultMessage: "Compliance",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.compliance.title" defaultMessage="Compliance" />

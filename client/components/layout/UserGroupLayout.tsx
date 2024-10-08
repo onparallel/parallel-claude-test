@@ -31,7 +31,8 @@ import { OrganizationSettingsLayout } from "./OrganizationSettingsLayout";
 
 type UserGroupSection = "users" | "permissions";
 
-interface UserGroupLayoutProps extends Pick<UserGroupLayout_QueryFragment, "me" | "realMe"> {
+interface UserGroupLayoutProps {
+  queryObject: UserGroupLayout_QueryFragment;
   currentTabKey: UserGroupSection;
   groupId: string;
   children: ReactNode;
@@ -41,13 +42,13 @@ interface UserGroupLayoutProps extends Pick<UserGroupLayout_QueryFragment, "me" 
 export function UserGroupLayout({
   currentTabKey,
   groupId,
-  me,
-  realMe,
+  queryObject,
   children,
   userGroup,
 }: UserGroupLayoutProps) {
   const intl = useIntl();
   const router = useRouter();
+  const { me } = queryObject;
   const canCrudTeams = useHasPermission("TEAMS:CRUD_TEAMS");
   const canReadPermissions = useHasPermission("TEAMS:READ_PERMISSIONS");
   const tabs = useMemo<TabDefinition<UserGroupSection>[]>(
@@ -117,8 +118,7 @@ export function UserGroupLayout({
   return (
     <OrganizationSettingsLayout
       title={`${currentTab.title}`}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       basePath="/app/organization/groups"
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">

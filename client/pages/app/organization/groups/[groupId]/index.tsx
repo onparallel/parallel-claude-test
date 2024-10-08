@@ -50,9 +50,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(OrganizationGroup_userDocument);
+  const { data: queryObject } = useAssertQuery(OrganizationGroup_userDocument);
 
   const {
     data: { userGroup },
@@ -166,8 +164,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     <UserGroupLayout
       groupId={groupId}
       currentTabKey="users"
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       userGroup={userGroup}
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>

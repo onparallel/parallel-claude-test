@@ -583,6 +583,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
+  | "SHOW_CONTACTS_BUTTON"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -1071,6 +1072,8 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Pins a profile type to the user's navigation manu */
+  pinProfileType: ProfileType;
   profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
   profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
@@ -1190,6 +1193,8 @@ export type Mutation = {
   transferPetitionOwnership: Array<PetitionBase>;
   unarchiveProfileType: Array<ProfileType>;
   unlinkPetitionFieldChildren: PetitionField;
+  /** Unpins a profile type to the user's navigation manu */
+  unpinProfileType: ProfileType;
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
@@ -1992,6 +1997,10 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationpinProfileTypeArgs = {
+  profileTypeId: Scalars["GID"]["input"];
+};
+
 export type MutationprofileExternalSourceDetailsArgs = {
   externalId: Scalars["ID"]["input"];
   integrationId: Scalars["GID"]["input"];
@@ -2353,6 +2362,10 @@ export type MutationunlinkPetitionFieldChildrenArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   parentFieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationunpinProfileTypeArgs = {
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationunsubscribeFromProfileArgs = {
@@ -4622,6 +4635,7 @@ export type ProfileType = Timestamps & {
   fields: Array<ProfileTypeField>;
   icon: ProfileTypeIcon;
   id: Scalars["GID"]["output"];
+  isPinned: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   pluralName: Scalars["LocalizableUserText"]["output"];
@@ -5992,6 +6006,8 @@ export type User = Timestamps & {
   permissions: Array<Scalars["String"]["output"]>;
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
+  /** The pinned profile types of the user menu */
+  pinnedProfileTypes: Array<ProfileType>;
   preferredLocale: UserLocale;
   status: UserStatus;
   /** Lists the API tokens this user has. */

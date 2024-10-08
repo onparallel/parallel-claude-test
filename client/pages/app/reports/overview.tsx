@@ -85,9 +85,7 @@ type OverviewTableType = "STATUS" | "TIME";
 export function Overview() {
   const intl = useIntl();
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Overview_userDocument);
+  const { data: queryObject } = useAssertQuery(Overview_userDocument);
 
   const [{ status, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
@@ -207,8 +205,7 @@ export function Overview() {
         id: "page.reports.overview",
         defaultMessage: "Overview",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="page.reports.overview" defaultMessage="Overview" />

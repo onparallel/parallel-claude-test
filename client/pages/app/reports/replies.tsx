@@ -27,9 +27,7 @@ const QUERY_STATE = {
 export function ReportsReplies() {
   const intl = useIntl();
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(ReportsReplies_userDocument);
+  const { data: queryObject } = useAssertQuery(ReportsReplies_userDocument);
 
   const [{ status, activeTemplateId, activeRange, showDownload }, setState] = useState<{
     status: "IDLE" | "LOADING" | "ERROR";
@@ -65,8 +63,7 @@ export function ReportsReplies() {
         id: "page.reports.replies",
         defaultMessage: "Replies",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
           <Heading as="h3" size="md">

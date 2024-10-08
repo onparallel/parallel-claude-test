@@ -52,9 +52,9 @@ type AlertsQueryState = QueryStateFrom<typeof QUERY_STATE>;
 function Alerts() {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Alerts_userDocument);
+  const { data: queryObject } = useAssertQuery(Alerts_userDocument);
+  const { me } = queryObject;
+
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
 
   const { data, loading, refetch } = useQueryOrPreviousData(
@@ -83,8 +83,7 @@ function Alerts() {
   return (
     <AppLayout
       title={intl.formatMessage({ id: "page.alerts.title", defaultMessage: "Alerts" })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <HStack padding={2}>

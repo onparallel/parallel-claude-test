@@ -43,12 +43,10 @@ interface FeaturesFormData {
 }
 
 function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeaturesProps) {
-  const {
-    data: { me, realMe, ...data },
-  } = useAssertQuery(AdminOrganizationsFeatures_queryDocument, {
+  const { data: queryObject } = useAssertQuery(AdminOrganizationsFeatures_queryDocument, {
     variables: { id: organizationId },
   });
-  const organization = data.organization!;
+  const organization = queryObject.organization!;
 
   const [search, setSearch] = useState("");
 
@@ -80,9 +78,8 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
   return (
     <AdminOrganizationsLayout
       currentTabKey="features"
-      me={me}
+      queryObject={queryObject}
       organization={organization}
-      realMe={realMe}
     >
       <Box padding={4}>
         <Card maxWidth="container.sm" as="form" onSubmit={handleSubmit(handleSubmitFeatureFlags)}>

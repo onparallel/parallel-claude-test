@@ -8,9 +8,7 @@ import { useIntl } from "react-intl";
 
 function OrganizationSettings() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(OrganizationSettings_userDocument);
+  const { data: queryObject } = useAssertQuery(OrganizationSettings_userDocument);
 
   return (
     <OrganizationSettingsLayout
@@ -19,8 +17,7 @@ function OrganizationSettings() {
         defaultMessage: "Organization",
       })}
       isBase
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     />
   );
 }

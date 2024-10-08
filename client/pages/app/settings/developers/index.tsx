@@ -55,9 +55,7 @@ import { isNonNullish, isNullish } from "remeda";
 
 function Subscriptions() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Subscriptions_userDocument);
+  const { data: queryObject } = useAssertQuery(Subscriptions_userDocument);
 
   const {
     data: { subscriptions },
@@ -360,7 +358,7 @@ function Subscriptions() {
   ];
 
   return (
-    <DevelopersLayout currentTabKey="subscriptions" me={me} realMe={realMe}>
+    <DevelopersLayout currentTabKey="subscriptions" queryObject={queryObject}>
       <Stack padding={6} spacing={6} paddingBottom={24}>
         <Text>
           <FormattedMessage

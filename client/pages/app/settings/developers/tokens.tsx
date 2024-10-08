@@ -28,9 +28,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 function Tokens() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Tokens_userDocument);
+  const { data: queryObject } = useAssertQuery(Tokens_userDocument);
   const {
     data: {
       me: { tokens },
@@ -71,7 +69,7 @@ function Tokens() {
   ];
 
   return (
-    <DevelopersLayout currentTabKey="tokens" me={me} realMe={realMe}>
+    <DevelopersLayout currentTabKey="tokens" queryObject={queryObject}>
       <Stack padding={6} spacing={6} paddingBottom={24}>
         <Text>
           <FormattedMessage

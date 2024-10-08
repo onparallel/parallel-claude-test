@@ -45,11 +45,8 @@ import { useDowJonesIntegrationDialog } from "../../../../components/organizatio
 
 function OrganizationIntegrations() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-    refetch,
-  } = useAssertQuery(OrganizationIntegrations_userDocument);
-
+  const { data: queryObject, refetch } = useAssertQuery(OrganizationIntegrations_userDocument);
+  const { me } = queryObject;
   const userCanEditIntegrations = useHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS");
   const userHasApiAccess = useHasPermission("INTEGRATIONS:CRUD_API");
 
@@ -375,8 +372,7 @@ function OrganizationIntegrations() {
         id: "page.organization-integrations.title",
         defaultMessage: "Integrations",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage

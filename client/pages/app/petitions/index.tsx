@@ -152,9 +152,8 @@ function Petitions() {
     (state.type === "PETITION"
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Petitions_userDocument);
+  const { data: queryObject } = useAssertQuery(Petitions_userDocument);
+  const { me } = queryObject;
   const { data, loading, refetch } = useQueryOrPreviousData(
     Petitions_petitionsDocument,
     {
@@ -466,8 +465,7 @@ function Petitions() {
               defaultMessage: "Templates",
             })
       }
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">

@@ -23,9 +23,7 @@ type AdminSupportMethodsProps = Exclude<
 
 function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethodsProps) {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(AdminSupportMethods_userDocument);
+  const { data: queryObject } = useAssertQuery(AdminSupportMethods_userDocument);
 
   const [search, setSearch] = useState("");
 
@@ -52,8 +50,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
         id: "page.admin-support-methods.title",
         defaultMessage: "Support methods",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage

@@ -659,6 +659,7 @@ enum FeatureFlag {
   REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
   SETTING_DELEGATE_ACCESS
+  SHOW_CONTACTS_BUTTON
   SKIP_FORWARD_SECURITY
   TEMPLATE_REPLIES_CSV_EXPORT_TASK
   TEMPLATE_REPLIES_PREVIEW_URL
@@ -1978,6 +1979,11 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
+
+  """
+  Pins a profile type to the user's navigation manu
+  """
+  pinProfileType(profileTypeId: GID!): ProfileType!
   profileExternalSourceDetails(
     externalId: ID!
     integrationId: GID!
@@ -2480,6 +2486,11 @@ type Mutation {
     parentFieldId: GID!
     petitionId: GID!
   ): PetitionField!
+
+  """
+  Unpins a profile type to the user's navigation manu
+  """
+  unpinProfileType(profileTypeId: GID!): ProfileType!
   unsubscribeFromProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
   """
@@ -5960,6 +5971,7 @@ type ProfileType implements Timestamps {
   fields: [ProfileTypeField!]!
   icon: ProfileTypeIcon!
   id: GID!
+  isPinned: Boolean!
   isStandard: Boolean!
   name: LocalizableUserText!
   pluralName: LocalizableUserText!
@@ -6015,6 +6027,7 @@ enum ProfileTypeFieldType {
 }
 
 input ProfileTypeFilter {
+  includeArchived: Boolean
   onlyArchived: Boolean
   profileTypeId: [GID!]
 }
@@ -7975,6 +7988,11 @@ type User implements Timestamps {
   The petition views of the user
   """
   petitionListViews: [PetitionListView!]!
+
+  """
+  The pinned profile types of the user menu
+  """
+  pinnedProfileTypes: [ProfileType!]!
   preferredLocale: UserLocale!
   status: UserStatus!
 

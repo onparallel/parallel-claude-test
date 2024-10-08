@@ -285,14 +285,34 @@
     "context": "Recipients"
   },
   {
+    "term": "component.app-layout-nav-bar.create-new-button",
+    "definition": "Crear nuevo",
+    "context": "Create new"
+  },
+  {
+    "term": "component.app-layout-nav-bar.no-profiles",
+    "definition": "Sin perfiles",
+    "context": "No profiles"
+  },
+  {
     "term": "component.app-layout-nav-bar.parallels-limit-reached-warning",
     "definition": "Parece que has alcanzado el límite de {limit} parallels, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.app-layout-nav-bar.profiles-link",
+    "term": "component.app-layout-nav-bar.pin-to-menu",
+    "definition": "Fijar en el menú",
+    "context": "Pin to menu"
+  },
+  {
+    "term": "component.app-layout-nav-bar.profiles",
     "definition": "Perfiles",
     "context": "Profiles"
+  },
+  {
+    "term": "component.app-layout-nav-bar.remove-from-menu",
+    "definition": "Quitar del menú",
+    "context": "Remove from menu"
   },
   {
     "term": "component.app-layout-nav-bar.reports-link",
@@ -303,6 +323,11 @@
     "term": "component.app-layout-nav-bar.switch-organization",
     "definition": "Cambiar de organización",
     "context": "Switch organization"
+  },
+  {
+    "term": "component.app-layout-nav-bar.view-all-profiles",
+    "definition": "Ver todos los perfiles",
+    "context": "View all profiles"
   },
   {
     "term": "component.app-layout.new-version-available",
@@ -2315,6 +2340,11 @@
     "context": "Filter events from profiles created from a specific profile type (Optional)."
   },
   {
+    "term": "component.create-profile-from-profile-type-dialog.create-profile",
+    "definition": "Crear {profileTypeName}",
+    "context": "Create {profileTypeName}"
+  },
+  {
     "term": "component.create-profile-relationships-dialog.add-profile",
     "definition": "Añadir perfil",
     "context": "Add profile"
@@ -3433,6 +3463,16 @@
     "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-name",
     "definition": "Quitar el \"¿Por qué usamos Parallel?\"",
     "context": "Remove \"Why do we use Parallel?\""
+  },
+  {
+    "term": "component.feature-flag-descriptions.show-contacts-button-description",
+    "definition": "Muestra el botón de contactos en la barra de navegación",
+    "context": "Shows the contacts button in nav bar"
+  },
+  {
+    "term": "component.feature-flag-descriptions.show-contacts-button-name",
+    "definition": "Mostrar el botón de contactos",
+    "context": "Show contacts button"
   },
   {
     "term": "component.feature-flag-descriptions.skip-forward-security-description",
@@ -7890,21 +7930,6 @@
     "context": "Type"
   },
   {
-    "term": "component.profile-type-field-icon.certificate-icon",
-    "definition": "Icono de certificado",
-    "context": "Certificate icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.publication-icon",
-    "definition": "Icono de publicación",
-    "context": "Post icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.cube-icon",
-    "definition": "Icono de cubo",
-    "context": "Bucket icon"
-  },
-  {
     "term": "component.profile-type-field-icon.briefcase-icon",
     "definition": "Icono de maletín",
     "context": "Briefcase icon"
@@ -7915,14 +7940,34 @@
     "context": "Building icon"
   },
   {
+    "term": "component.profile-type-field-icon.button",
+    "definition": "Cambiar icono",
+    "context": "Change icon"
+  },
+  {
     "term": "component.profile-type-field-icon.car-icon",
     "definition": "Icono de coche",
     "context": "Car icon"
   },
   {
+    "term": "component.profile-type-field-icon.certificate-icon",
+    "definition": "Icono de certificado",
+    "context": "Certificate icon"
+  },
+  {
     "term": "component.profile-type-field-icon.clipboard-icon",
     "definition": "Icono de porta papeles",
     "context": "Clipboard icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.cube-icon",
+    "definition": "Icono de cubo",
+    "context": "Cube icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.database-icon",
+    "definition": "Icono de base de datos",
+    "context": "Database icon"
   },
   {
     "term": "component.profile-type-field-icon.document-icon",
@@ -7935,29 +7980,9 @@
     "context": "House icon"
   },
   {
-    "term": "component.profile-type-field-icon.database-icon",
-    "definition": "Icono de base de datos",
-    "context": "Database icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.settings-icon",
-    "definition": "Icono de ajustes",
-    "context": "Settings icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.store-icon",
-    "definition": "Icono de tienda",
-    "context": "Store icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.shopping-cart-icon",
-    "definition": "Icono de carrito de la compra",
-    "context": "Shopping cart icon"
-  },
-  {
-    "term": "component.profile-type-field-icon.verified-person-icon",
-    "definition": "Icono de persona verificada",
-    "context": "Verified person icon"
+    "term": "component.profile-type-field-icon.people-icon",
+    "definition": "Icono de personas",
+    "context": "People icon"
   },
   {
     "term": "component.profile-type-field-icon.person-icon",
@@ -7965,14 +7990,29 @@
     "context": "Person icon"
   },
   {
-    "term": "component.profile-type-field-icon.people-icon",
-    "definition": "Icono de personas",
-    "context": "People icon"
+    "term": "component.profile-type-field-icon.publication-icon",
+    "definition": "Icono de publicación",
+    "context": "Publication icon"
   },
   {
-    "term": "component.profile-type-field-icon.button",
-    "definition": "Cambiar icono",
-    "context": "Change icon"
+    "term": "component.profile-type-field-icon.settings-icon",
+    "definition": "Icono de ajustes",
+    "context": "Settings icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.shopping-cart-icon",
+    "definition": "Icono de carrito de la compra",
+    "context": "Shopping cart icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.store-icon",
+    "definition": "Icono de tienda",
+    "context": "Store icon"
+  },
+  {
+    "term": "component.profile-type-field-icon.verified-person-icon",
+    "definition": "Icono de persona verificada",
+    "context": "Verified person icon"
   },
   {
     "term": "component.profile-type-field-permission-dialog.all-in-organization",
@@ -13340,11 +13380,6 @@
     "context": "Please type {confirmation} to confirm"
   },
   {
-    "term": "generic.unamed-profile-type",
-    "definition": "Tipo de perfil sin nombre",
-    "context": "Unnamed profile type"
-  },
-  {
     "term": "generic.unarchive",
     "definition": "Recuperar",
     "context": "Unarchive"
@@ -15005,11 +15040,6 @@
     "context": "Unsubscribe"
   },
   {
-    "term": "page.profiles.all-profiles",
-    "definition": "Todos los perfiles",
-    "context": "All profiles"
-  },
-  {
     "term": "page.profiles.bin",
     "definition": "Papelera",
     "context": "Bin"
@@ -15025,19 +15055,9 @@
     "context": "Closed"
   },
   {
-    "term": "page.profiles.create-profile",
-    "definition": "Crear perfil",
-    "context": "Create profile"
-  },
-  {
     "term": "page.profiles.delete-permanently",
     "definition": "Eliminar permanentemente",
     "context": "Delete permanently"
-  },
-  {
-    "term": "page.profiles.multiple-profile-types",
-    "definition": "Múltiples tipos",
-    "context": "Multiple types"
   },
   {
     "term": "page.profiles.no-closed-profiles",

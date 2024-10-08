@@ -82,9 +82,7 @@ export interface ActiveReportData {
 export function ReportsTemplates() {
   const intl = useIntl();
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(ReportsTemplates_userDocument);
+  const { data: queryObject } = useAssertQuery(ReportsTemplates_userDocument);
 
   const [{ status, activeTemplateId, templateName, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
@@ -155,8 +153,7 @@ export function ReportsTemplates() {
         id: "page.reports.statistics",
         defaultMessage: "Template statistics",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
           <Heading as="h3" size="md">

@@ -58,9 +58,8 @@ interface ContactDetailsFormData {
 function Contact({ contactId }: ContactProps) {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Contact_userDocument);
+  const { data: queryObject } = useAssertQuery(Contact_userDocument);
+  const { me } = queryObject;
   const {
     data: { contact },
   } = useAssertQuery(Contact_contactDocument, {
@@ -129,7 +128,7 @@ function Contact({ contactId }: ContactProps) {
   };
 
   return (
-    <AppLayout title={contact!.fullName ?? contact!.email} me={me} realMe={realMe}>
+    <AppLayout title={contact!.fullName ?? contact!.email} queryObject={queryObject}>
       <Flex flex="1" padding={4}>
         <Box flex="2">
           <Card

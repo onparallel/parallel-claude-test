@@ -289,6 +289,7 @@ export interface NexusGenInputs {
   };
   ProfileTypeFilter: {
     // input type
+    includeArchived?: boolean | null; // Boolean
     onlyArchived?: boolean | null; // Boolean
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
@@ -2078,6 +2079,7 @@ export interface NexusGenFieldTypes {
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    pinProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     profileExternalSourceDetails: NexusGenRootTypes["ProfileExternalSourceSearchSingleResult"]; // ProfileExternalSourceSearchSingleResult!
     profileExternalSourceSearch: NexusGenRootTypes["ProfileExternalSourceSearchResults"]; // ProfileExternalSourceSearchResults!
     profileFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -2141,6 +2143,7 @@ export interface NexusGenFieldTypes {
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     unarchiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     unlinkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    unpinProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
@@ -3222,6 +3225,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["ProfileTypeField"][]; // [ProfileTypeField!]!
     icon: NexusGenEnums["ProfileTypeIcon"]; // ProfileTypeIcon!
     id: NexusGenScalars["GID"]; // GID!
+    isPinned: boolean; // Boolean!
     isStandard: boolean; // Boolean!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     pluralName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
@@ -3833,6 +3837,7 @@ export interface NexusGenFieldTypes {
     organizations: NexusGenRootTypes["Organization"][]; // [Organization!]!
     permissions: string[]; // [String!]!
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
+    pinnedProfileTypes: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
@@ -4724,6 +4729,7 @@ export interface NexusGenFieldTypeNames {
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
+    pinProfileType: "ProfileType";
     profileExternalSourceDetails: "ProfileExternalSourceSearchSingleResult";
     profileExternalSourceSearch: "ProfileExternalSourceSearchResults";
     profileFieldFileDownloadLink: "FileUploadDownloadLinkResult";
@@ -4787,6 +4793,7 @@ export interface NexusGenFieldTypeNames {
     transferPetitionOwnership: "PetitionBase";
     unarchiveProfileType: "ProfileType";
     unlinkPetitionFieldChildren: "PetitionField";
+    unpinProfileType: "ProfileType";
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
@@ -5868,6 +5875,7 @@ export interface NexusGenFieldTypeNames {
     fields: "ProfileTypeField";
     icon: "ProfileTypeIcon";
     id: "GID";
+    isPinned: "Boolean";
     isStandard: "Boolean";
     name: "LocalizableUserText";
     pluralName: "LocalizableUserText";
@@ -6479,6 +6487,7 @@ export interface NexusGenFieldTypeNames {
     organizations: "Organization";
     permissions: "String";
     petitionListViews: "PetitionListView";
+    pinnedProfileTypes: "ProfileType";
     preferredLocale: "UserLocale";
     status: "UserStatus";
     tokens: "UserAuthenticationToken";
@@ -7462,6 +7471,10 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    pinProfileType: {
+      // args
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
     profileExternalSourceDetails: {
       // args
       externalId: string; // ID!
@@ -7824,6 +7837,10 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       parentFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    unpinProfileType: {
+      // args
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     unsubscribeFromProfile: {
       // args

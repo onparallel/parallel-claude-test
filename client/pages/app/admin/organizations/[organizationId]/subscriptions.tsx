@@ -55,9 +55,7 @@ const QUERY_STATE = {
   }),
 };
 function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsSubscriptionsProps) {
-  const {
-    data: { me, realMe, ...data },
-  } = useAssertQuery(AdminOrganizationsSubscriptions_queryDocument, {
+  const { data: queryObject } = useAssertQuery(AdminOrganizationsSubscriptions_queryDocument, {
     variables: { id: organizationId },
   });
 
@@ -79,7 +77,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
     },
   );
 
-  const organization = data.organization!;
+  const organization = queryObject.organization!;
   const intl = useIntl();
 
   const showUpdateOrganizationUsageDetailsDialog = useUpdateOrganizationUsageDetailsDialog();
@@ -241,9 +239,8 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
   return (
     <AdminOrganizationsLayout
       currentTabKey="subscriptions"
-      me={me}
+      queryObject={queryObject}
       organization={organization}
-      realMe={realMe}
     >
       <Stack padding={4} spacing={4} paddingBottom={24}>
         <Grid gap={4} templateColumns={{ base: "auto", lg: "1fr 1fr 1fr" }}>

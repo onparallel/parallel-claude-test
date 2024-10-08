@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -6,32 +6,50 @@ import {
   Drawer,
   DrawerContent,
   DrawerOverlay,
+  Flex,
   HStack,
+  Icon,
   IconButton,
   Image,
+  LinkBox,
+  LinkOverlay,
   List,
   ListItem,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Stack,
   StackProps,
   Text,
   useBreakpointValue,
+  useMenuItem,
 } from "@chakra-ui/react";
-import { Tooltip } from "@parallel/chakra/components";
+import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   AddIcon,
   AlertCircleFilledIcon,
   ChevronLeftIcon,
   HamburgerMenuIcon,
   HelpOutlineIcon,
+  MoreVerticalIcon,
   NewsIcon,
   PaperPlaneIcon,
   PinIcon,
-  ProfilesIcon,
   ReportsIcon,
   TimeAlarmIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
-import { AppLayoutNavBar_QueryFragment } from "@parallel/graphql/__types";
+import {
+  AppLayoutNavBar_pinProfileTypeDocument,
+  AppLayoutNavBar_ProfileTypeFragment,
+  AppLayoutNavBar_QueryFragment,
+  AppLayoutNavBar_unpinProfileTypeDocument,
+  AppLayoutNavBar_UserFragmentDoc,
+} from "@parallel/graphql/__types";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { useHandleNavigation } from "@parallel/utils/navigation";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useCookie } from "@parallel/utils/useCookie";
 import { useDeviceType } from "@parallel/utils/useDeviceType";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
@@ -39,13 +57,27 @@ import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, MouseEventHandler, useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  MouseEvent,
+  MouseEventHandler,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
+import {
+  LocalizableUserText,
+  localizableUserTextRender,
+} from "../common/LocalizableUserTextRender";
 import { Logo } from "../common/Logo";
+import { OverflownText } from "../common/OverflownText";
+import { ProfileTypeReference } from "../common/ProfileTypeReference";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
@@ -53,6 +85,8 @@ import { Wrap } from "../common/Wrap";
 import { useAlertsContactUsDialog } from "../common/dialogs/AlertsContactUsDialog";
 import { useProfilesContactUsDialog } from "../common/dialogs/ProfilesContactUsDialog";
 import { NotificationsButton } from "../notifications/NotificationsButton";
+import { getProfileTypeFieldIcon } from "../organization/profiles/getProfileTypeFieldIcon";
+import { useCreateProfileFromProfileTypeDialog } from "../profiles/dialogs/CreateProfileFromProfileTypeDialog";
 import { NavBarButton } from "./NavBarButton";
 import { UserMenu } from "./UserMenu";
 
@@ -60,12 +94,14 @@ const ANIMATION_DURATION = "200ms";
 const ANIMATION_DELAY = "150ms";
 const ANIMATION_TIMING = "ease-in-out";
 
-export interface AppLayoutNavBarProps extends Pick<AppLayoutNavBar_QueryFragment, "realMe" | "me"> {
+export interface AppLayoutNavBarProps {
+  queryObject: AppLayoutNavBar_QueryFragment;
   onHelpCenterClick: () => void;
 }
 
 export const AppLayoutNavBar = Object.assign(
-  memo(function AppLayoutNavBar({ me, realMe, onHelpCenterClick }: AppLayoutNavBarProps) {
+  function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNavBarProps) {
+    const { me, realMe, profileTypes } = queryObject;
     const intl = useIntl();
 
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -75,8 +111,16 @@ export const AppLayoutNavBar = Object.assign(
     const isFocusWithin = useIsFocusWithin(navRef);
     const isHovered = useIsMouseOver(navRef);
     const [isOpenMobile, setIsOpenMobile] = useState(false);
-    // keep track of the state of the user menu to prevent the navbar to hide when the menu is open
-    const [userMenuIsOpen, setUserMenuIsOpen] = useState(false);
+    // keep track of the state of the different menus to prevent the navbar to hide when the menu is open
+    const [subMenuIsOpen, setSubMenuIsOpen] = useState(false);
+    function handleSubMenuToggle(isOpen: boolean) {
+      setSubMenuIsOpen(isOpen);
+      if (!isOpen && !isForceOpen) {
+        setTimeout(() => {
+          (document.activeElement as any)?.blur?.();
+        });
+      }
+    }
     const deviceType = useDeviceType();
     const isMobile = useBreakpointValue(
       { base: true, sm: false },
@@ -87,9 +131,9 @@ export const AppLayoutNavBar = Object.assign(
     const [isOpenDesktop, setIsOpenDesktop] = useLocalStorage("navbar-opened", false);
     useEffect(() => {
       if (!isMobile) {
-        setIsOpenDesktop((isFocusWithin || isHovered || userMenuIsOpen) && !isForceOpen);
+        setIsOpenDesktop((isFocusWithin || isHovered || subMenuIsOpen) && !isForceOpen);
       }
-    }, [isMobile, isFocusWithin, isHovered, userMenuIsOpen]);
+    }, [isMobile, isFocusWithin, isHovered, subMenuIsOpen]);
 
     const isNavBarOpen = isMobile ? isOpenMobile : isForceOpen || isOpenDesktop;
 
@@ -288,24 +332,11 @@ export const AppLayoutNavBar = Object.assign(
                 />
               </HStack>
               <Box paddingX={3}>
-                <NakedLink href={`/app/petitions/new`}>
-                  <Button
-                    as="a"
-                    colorScheme="purple"
-                    width="full"
-                    leftIcon={<AddIcon boxSize={4} />}
-                    iconSpacing={0}
-                    paddingInlineStart={3}
-                    paddingInlineEnd={3}
-                    justifyContent="space-evenly"
-                    overflow="hidden"
-                  >
-                    <Text as="span" className="show-on-expand" minWidth={0}>
-                      <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
-                    </Text>
-                  </Button>
-                </NakedLink>
-                {/* <CreateMenuButtonSection onOpenOrClose={handleOpenCloseMenu} isMobile={isMobile} /> */}
+                <CreateMenuButtonSection
+                  onToggle={handleSubMenuToggle}
+                  isMobile={isMobile}
+                  me={me}
+                />
               </Box>
               <Stack
                 spacing={4}
@@ -316,7 +347,12 @@ export const AppLayoutNavBar = Object.assign(
                 flex={1}
               >
                 <Stack flex={1} spacing={4} paddingX={3}>
-                  <SectionList me={me} />
+                  <SectionsAndProfilesList
+                    onToggle={handleSubMenuToggle}
+                    isMobile={isMobile}
+                    me={me}
+                    profileTypes={profileTypes}
+                  />
                   <Spacer />
                   <NotificationsSection
                     display={{ base: "none", sm: "flex" }}
@@ -329,7 +365,7 @@ export const AppLayoutNavBar = Object.assign(
                     me={me}
                     realMe={realMe}
                     extended
-                    onToggle={(isOpen) => setUserMenuIsOpen(isOpen)}
+                    onToggle={handleSubMenuToggle}
                   />
                 </Box>
               </Stack>
@@ -338,9 +374,44 @@ export const AppLayoutNavBar = Object.assign(
         </Wrap>
       </Box>
     );
-  }),
+  },
   {
     fragments: {
+      get ProfileType() {
+        return gql`
+          fragment AppLayoutNavBar_ProfileType on ProfileType {
+            id
+            name
+            icon
+            isPinned
+            ...ProfileTypeReference_ProfileType
+          }
+          ${ProfileTypeReference.fragments.ProfileType}
+        `;
+      },
+      get User() {
+        return gql`
+          fragment AppLayoutNavBar_User on User {
+            id
+            hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+            hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
+            organization {
+              id
+              name
+              iconUrl: iconUrl(options: { resize: { width: 80 } })
+              isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+              currentUsagePeriod(limitName: PETITION_SEND) {
+                id
+                limit
+              }
+            }
+            pinnedProfileTypes {
+              ...AppLayoutNavBar_ProfileType
+            }
+          }
+          ${this.ProfileType}
+        `;
+      },
       get Query() {
         return gql`
           fragment AppLayoutNavBar_Query on Query {
@@ -351,22 +422,19 @@ export const AppLayoutNavBar = Object.assign(
               }
             }
             me {
-              id
-              hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-              organization {
-                id
-                name
-                iconUrl: iconUrl(options: { resize: { width: 80 } })
-                isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-                currentUsagePeriod(limitName: PETITION_SEND) {
-                  id
-                  limit
-                }
+              ...AppLayoutNavBar_User
+            }
+            profileTypes(limit: 100, offset: 0, filter: { includeArchived: true }) {
+              totalCount
+              items {
+                ...AppLayoutNavBar_ProfileType
               }
             }
             ...UserMenu_Query
             ...useDeviceType_Query
           }
+          ${this.ProfileType}
+          ${this.User}
           ${UserMenu.fragments.Query}
           ${useDeviceType.fragments.Query}
         `;
@@ -375,9 +443,18 @@ export const AppLayoutNavBar = Object.assign(
   },
 );
 
-interface SectionListProps extends Pick<AppLayoutNavBar_QueryFragment, "me"> {}
+interface SectionsAndProfilesListProps
+  extends Pick<AppLayoutNavBar_QueryFragment, "me" | "profileTypes"> {
+  onToggle: (isOpen: boolean) => void;
+  isMobile: boolean;
+}
 
-function SectionList({ me }: SectionListProps) {
+function SectionsAndProfilesList({
+  onToggle,
+  isMobile,
+  me,
+  profileTypes,
+}: SectionsAndProfilesListProps) {
   const intl = useIntl();
   const router = useRouter();
   const { pathname, query } = router;
@@ -439,21 +516,6 @@ function SectionList({ me }: SectionListProps) {
             )
           : undefined,
       },
-      ...(!me.hasProfilesAccess || userCanViewProfiles
-        ? [
-            {
-              section: "profiles",
-              href: "/app/profiles",
-              icon: <ProfilesIcon boxSize={5} />,
-              isActive: pathname.startsWith("/app/profiles"),
-              onClick: me.hasProfilesAccess ? undefined : handleProfilesClick,
-              text: intl.formatMessage({
-                id: "component.app-layout-nav-bar.profiles-link",
-                defaultMessage: "Profiles",
-              }),
-            },
-          ]
-        : []),
       ...(!me.hasProfilesAccess || userCanViewAlerts
         ? [
             {
@@ -483,7 +545,7 @@ function SectionList({ me }: SectionListProps) {
             },
           ]
         : []),
-      ...(userCanViewContacts
+      ...(userCanViewContacts && me.hasShowContactsButton
         ? [
             {
               section: "contacts",
@@ -500,86 +562,394 @@ function SectionList({ me }: SectionListProps) {
     ],
     [intl.locale, pathname, query],
   );
+
+  const sortedProfileTypes = useMemo(() => {
+    return (
+      [...profileTypes.items].sort((profileTypeA, profileTypeB) => {
+        const profileTypeAName = localizableUserTextRender({
+          intl,
+          value: profileTypeA.pluralName,
+          default: localizableUserTextRender({
+            intl,
+            value: profileTypeA.name,
+            default: intl.formatMessage({
+              id: "generic.unnamed-profile-type",
+              defaultMessage: "Unnamed profile type",
+            }),
+          }),
+        });
+        const profileTypeBName = localizableUserTextRender({
+          intl,
+          value: profileTypeB.pluralName,
+          default: localizableUserTextRender({
+            intl,
+            value: profileTypeB.name,
+            default: intl.formatMessage({
+              id: "generic.unnamed-profile-type",
+              defaultMessage: "Unnamed profile type",
+            }),
+          }),
+        });
+        return profileTypeAName.localeCompare(profileTypeBName);
+      }) ?? []
+    );
+  }, [profileTypes.items.flatMap((p) => [p.id, p.isPinned]).join("")]);
+
+  const [pinProfileType] = useMutation(AppLayoutNavBar_pinProfileTypeDocument);
+  const [unpinProfileType] = useMutation(AppLayoutNavBar_unpinProfileTypeDocument);
+
+  const handlePinAndUnpinProfileType = async (profileType: AppLayoutNavBar_ProfileTypeFragment) => {
+    try {
+      if (profileType.isPinned) {
+        await unpinProfileType({
+          variables: {
+            profileTypeId: profileType.id,
+          },
+          update: (cache, { data }) => {
+            if (data?.unpinProfileType) {
+              const unnpinedProfileTypeId = data.unpinProfileType.id;
+              updateFragment(cache, {
+                fragment: AppLayoutNavBar_UserFragmentDoc,
+                fragmentName: "AppLayoutNavBar_User",
+                id: me.id,
+                data: (data) => ({
+                  ...data!,
+                  pinnedProfileTypes: data!.pinnedProfileTypes.filter(
+                    (pt) => pt.id !== unnpinedProfileTypeId,
+                  ),
+                }),
+              });
+            }
+          },
+        });
+      } else {
+        await pinProfileType({
+          variables: {
+            profileTypeId: profileType.id,
+          },
+          update: (cache, { data }) => {
+            if (data?.pinProfileType) {
+              const newPinnedProfileType = data.pinProfileType;
+              updateFragment(cache, {
+                fragment: AppLayoutNavBar_UserFragmentDoc,
+                fragmentName: "AppLayoutNavBar_User",
+                id: me.id,
+                data: (data) => ({
+                  ...data!,
+                  pinnedProfileTypes: [...data!.pinnedProfileTypes, newPinnedProfileType],
+                }),
+              });
+            }
+          },
+        });
+      }
+    } catch {}
+  };
   return (
-    <List spacing={2}>
-      {items.map(({ section, href, isActive, icon, text, warning, onClick }) => (
-        <ListItem key={section}>
-          <Wrap
-            when={isNonNullish(warning)}
-            wrapper={({ children }) => (
-              <SmallPopover content={warning} placement="right" openDelay={450}>
-                <Box>{children}</Box>
-              </SmallPopover>
+    <>
+      <List spacing={2}>
+        {items.map(({ section, href, isActive, icon, text, warning, onClick }) => (
+          <ListItem key={section}>
+            <Wrap
+              when={isNonNullish(warning)}
+              wrapper={({ children }) => (
+                <SmallPopover content={warning} placement="right" openDelay={450}>
+                  <Box>{children}</Box>
+                </SmallPopover>
+              )}
+            >
+              <NakedLink href={href!}>
+                <NavBarButton
+                  as="a"
+                  isActive={isActive}
+                  section={section}
+                  onClick={onClick}
+                  icon={icon}
+                  badge={
+                    warning ? (
+                      <AlertCircleFilledIcon
+                        position="absolute"
+                        color="yellow.500"
+                        boxSize="14px"
+                        insetStart={-1}
+                        top={-1}
+                      />
+                    ) : null
+                  }
+                >
+                  {text}
+                </NavBarButton>
+              </NakedLink>
+            </Wrap>
+          </ListItem>
+        ))}
+      </List>
+      {userCanViewProfiles ? (
+        <>
+          <HStack justify="space-between" className="show-on-expand">
+            <Text fontSize="sm" fontWeight={500}>
+              <FormattedMessage
+                id="component.app-layout-nav-bar.profiles"
+                defaultMessage="Profiles"
+              />
+              :
+            </Text>
+            <Menu
+              placement={isMobile ? "bottom" : "end"}
+              onOpen={() => onToggle(true)}
+              onClose={() => onToggle(false)}
+            >
+              <MenuButton
+                as={IconButtonWithTooltip}
+                size="xs"
+                variant="ghost"
+                icon={<MoreVerticalIcon boxSize={3} />}
+                label={intl.formatMessage({
+                  id: "component.app-layout-nav-bar.view-all-profiles",
+                  defaultMessage: "View all profiles",
+                })}
+              />
+              <Portal>
+                <MenuList
+                  minWidth="auto"
+                  maxWidth="280px"
+                  display="flex"
+                  flexDirection="column"
+                  gap={2}
+                  paddingY={4}
+                  paddingX={3}
+                >
+                  {sortedProfileTypes.map((profileType) => {
+                    const isActive = pathname === "/app/profiles" && query.type === profileType.id;
+                    return (
+                      <ProfileTypeButton
+                        key={profileType.id}
+                        profileType={profileType}
+                        isActive={isActive}
+                        onTogglePinned={handlePinAndUnpinProfileType.bind(null, profileType)}
+                      />
+                    );
+                  })}
+                </MenuList>
+              </Portal>
+            </Menu>
+          </HStack>
+          <List spacing={2}>
+            {me.pinnedProfileTypes.length ? (
+              me.pinnedProfileTypes.map((profileType) => {
+                const icon = getProfileTypeFieldIcon(profileType.icon);
+                return (
+                  <ListItem key={profileType.id}>
+                    <NakedLink href={`/app/profiles?type=${profileType.id}`}>
+                      <NavBarButton
+                        as="a"
+                        isActive={pathname === "/app/profiles" && query.type === profileType.id}
+                        section={`profiles`}
+                        icon={<Icon as={icon} boxSize={5} />}
+                        onClick={me.hasProfilesAccess ? undefined : handleProfilesClick}
+                      >
+                        <ProfileTypeReference profileType={profileType} usePlural />
+                      </NavBarButton>
+                    </NakedLink>
+                  </ListItem>
+                );
+              })
+            ) : (
+              <ListItem>
+                <Text textStyle="muted" fontSize="sm">
+                  <FormattedMessage
+                    id="component.app-layout-nav-bar.no-profiles"
+                    defaultMessage="No profiles"
+                  />
+                </Text>
+              </ListItem>
             )}
-          >
-            <NakedLink href={href!}>
-              <NavBarButton
-                as="a"
-                isActive={isActive}
-                section={section}
-                onClick={onClick}
-                icon={icon}
-                badge={
-                  warning ? (
-                    <AlertCircleFilledIcon
-                      position="absolute"
-                      color="yellow.500"
-                      boxSize="14px"
-                      insetStart={-1}
-                      top={-1}
-                    />
-                  ) : null
-                }
-              >
-                {text}
-              </NavBarButton>
-            </NakedLink>
-          </Wrap>
-        </ListItem>
-      ))}
-    </List>
+          </List>
+        </>
+      ) : null}
+    </>
   );
 }
 
-// function CreateMenuButtonSection({
-//   onOpenOrClose,
-//   isMobile,
-// }: {
-//   onOpenOrClose: (isOpen: boolean) => void;
-//   isMobile?: boolean;
-// }) {
-//   return (
-//     <Flex>
-//       <Menu
-//         placement={isMobile ? "bottom" : "end"}
-//         onOpen={() => onOpenOrClose(true)}
-//         onClose={() => onOpenOrClose(false)}
-//       >
-//         <MenuButton
-//           as={Button}
-//           colorScheme="purple"
-//           width="full"
-//           leftIcon={<AddIcon boxSize={4} />}
-//           iconSpacing={0}
-//         >
-//           <Text as="span" className="show-on-expand">
-//             <FormattedMessage
-//               id="component.new-layout.create-new-button"
-//               defaultMessage="Create new"
-//             />
-//           </Text>
-//         </MenuButton>
-//         <Portal>
-//           <MenuList minWidth="auto">
-//             <MenuItem icon={<PaperPlaneIcon boxSize={4} />}>{untranslated("Parallel")}</MenuItem>
-//             <MenuItem icon={<UserIcon boxSize={4} />}>{untranslated("Persona fisica")}</MenuItem>
-//             <MenuItem icon={<BusinessIcon boxSize={4} />}>{untranslated("Compañia")}</MenuItem>
-//           </MenuList>
-//         </Portal>
-//       </Menu>
-//     </Flex>
-//   );
-// }
+interface ProfileTypeButtonProps {
+  isActive: boolean;
+  profileType: AppLayoutNavBar_ProfileTypeFragment;
+  onTogglePinned: () => void;
+}
+
+const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
+  function ProfileTypeButton({ profileType, isActive, onTogglePinned, ...rest }, ref) {
+    const intl = useIntl();
+
+    const menuItemProps = useMenuItem(rest, ref);
+    const icon = getProfileTypeFieldIcon(profileType.icon);
+    return (
+      <LinkBox
+        key={profileType.id}
+        sx={{
+          color: "gray.600",
+          background: "transparent",
+          minHeight: "40px",
+          rounded: "md",
+          display: "flex",
+          gap: 3,
+          paddingX: 2.5,
+          alignItems: "center",
+          "&:focus-within, &:hover": {
+            color: "gray.800",
+            background: "gray.100",
+            ".show-on-hover": {
+              opacity: 1,
+            },
+            '&:has(a[aria-current="page"])': {
+              color: "blue.900",
+            },
+          },
+          '&:has(a[aria-current="page"])': {
+            color: "blue.700",
+            background: "blue.50",
+          },
+          "svg.custom-icon": {
+            transition: "transform 150ms ease",
+          },
+          "&:hover svg.custom-icon": {
+            transform: "scale(1.2)",
+          },
+        }}
+      >
+        <Icon className="custom-icon" as={icon} boxSize={5} />
+        <NakedLink href={`/app/profiles?type=${profileType.id}`}>
+          <OverflownText
+            as={LinkOverlay}
+            aria-current={isActive ? "page" : undefined}
+            minWidth={0}
+            flex={1}
+            _focusVisible={{ outline: "none" }}
+            {...menuItemProps}
+          >
+            <ProfileTypeReference profileType={profileType} usePlural />
+          </OverflownText>
+        </NakedLink>
+        <IconButtonWithTooltip
+          variant="unstyled"
+          rounded="full"
+          marginStart={1}
+          sx={{
+            "&:hover, &:focus": {
+              backgroundColor: "gray.200",
+              opacity: 1,
+              "svg > g": {
+                stroke: "gray.600",
+                fill: "primary.600",
+              },
+            },
+            ...(profileType.isPinned
+              ? {
+                  "svg > g": {
+                    stroke: "primary.600",
+                    fill: "primary.600",
+                  },
+                }
+              : {}),
+          }}
+          className="show-on-hover"
+          opacity={profileType.isPinned ? 1 : 0}
+          size="sm"
+          icon={<PinIcon boxSize={4} />}
+          label={
+            profileType.isPinned
+              ? intl.formatMessage({
+                  id: "component.app-layout-nav-bar.remove-from-menu",
+                  defaultMessage: "Remove from menu",
+                })
+              : intl.formatMessage({
+                  id: "component.app-layout-nav-bar.pin-to-menu",
+                  defaultMessage: "Pin to menu",
+                })
+          }
+          onClick={(e) => {
+            e.stopPropagation();
+            onTogglePinned();
+          }}
+        />
+      </LinkBox>
+    );
+  },
+);
+
+interface CreateMenuButtonSectionProps extends Pick<AppLayoutNavBar_QueryFragment, "me"> {
+  onToggle: (isOpen: boolean) => void;
+  isMobile?: boolean;
+}
+
+function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSectionProps) {
+  const navigate = useHandleNavigation();
+
+  const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
+  async function handleCreateNewProfileFromProfileType(
+    profileTypeId: string,
+    profileTypeName: LocalizableUserText,
+  ) {
+    try {
+      const { profile } = await showCreateProfileFromProfileTypeDialog({
+        profileTypeId,
+        profileTypeName,
+      });
+
+      navigate(`/app/profiles/${profile.id}`);
+    } catch {}
+  }
+  return (
+    <Flex>
+      <Menu
+        placement={isMobile ? "bottom" : "end"}
+        onOpen={() => onToggle(true)}
+        onClose={() => onToggle(false)}
+      >
+        <MenuButton
+          as={Button}
+          colorScheme="purple"
+          width="full"
+          iconSpacing={0}
+          paddingInlineStart={3}
+          paddingInlineEnd={3}
+          overflow="hidden"
+        >
+          <HStack margin="0 auto" width="fit-content">
+            <AddIcon boxSize={4} />
+            <Text as="span" className="show-on-expand" minWidth={0}>
+              <FormattedMessage
+                id="component.app-layout-nav-bar.create-new-button"
+                defaultMessage="Create new"
+              />
+            </Text>
+          </HStack>
+        </MenuButton>
+        <Portal>
+          <MenuList minWidth="auto">
+            <NakedLink href="/app/petitions/new">
+              <MenuItem icon={<PaperPlaneIcon boxSize={4} />}>{untranslated("Parallel")}</MenuItem>
+            </NakedLink>
+            {me.pinnedProfileTypes.map((profileType) => {
+              const icon = getProfileTypeFieldIcon(profileType.icon);
+              return (
+                <MenuItem
+                  key={profileType.id}
+                  icon={<Icon as={icon} boxSize={4} />}
+                  onClick={() =>
+                    handleCreateNewProfileFromProfileType(profileType.id, profileType.name)
+                  }
+                >
+                  <ProfileTypeReference profileType={profileType} />
+                </MenuItem>
+              );
+            })}
+          </MenuList>
+        </Portal>
+      </Menu>
+    </Flex>
+  );
+}
 
 interface NotificationsSectionProps extends StackProps {
   onHelpCenterClick: () => void;
@@ -677,3 +1047,22 @@ function NotificationsSectionMobile({ onHelpCenterClick }: { onHelpCenterClick: 
     </>
   );
 }
+
+const _mutations = [
+  gql`
+    mutation AppLayoutNavBar_pinProfileType($profileTypeId: GID!) {
+      pinProfileType(profileTypeId: $profileTypeId) {
+        ...AppLayoutNavBar_ProfileType
+      }
+    }
+    ${AppLayoutNavBar.fragments.ProfileType}
+  `,
+  gql`
+    mutation AppLayoutNavBar_unpinProfileType($profileTypeId: GID!) {
+      unpinProfileType(profileTypeId: $profileTypeId) {
+        ...AppLayoutNavBar_ProfileType
+      }
+    }
+    ${AppLayoutNavBar.fragments.ProfileType}
+  `,
+];

@@ -31,10 +31,8 @@ interface PasswordChangeFormData {
 function Security() {
   const toast = useToast();
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Security_userDocument);
-
+  const { data: queryObject } = useAssertQuery(Security_userDocument);
+  const { me } = queryObject;
   const [updatePassword] = useMutation(Security_updatePasswordDocument);
   const {
     handleSubmit,
@@ -85,7 +83,7 @@ function Security() {
   }
 
   return (
-    <UserSettingsLayout me={me} realMe={realMe}>
+    <UserSettingsLayout queryObject={queryObject}>
       <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
         <Stack spacing={4}>
           <Heading as="h4" size="md" fontWeight="semibold">

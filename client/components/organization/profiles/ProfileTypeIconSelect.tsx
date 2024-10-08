@@ -38,6 +38,80 @@ import { useIntl } from "react-intl";
 export function ProfileTypeIconSelect({ value, onChange }: ValueProps<ProfileTypeIcon, false>) {
   const intl = useIntl();
 
+  const options = useProfileTypeIconSelectOptions();
+
+  const selected = options.find((o) => o.key === value)!;
+
+  return (
+    <>
+      <Menu>
+        <MenuButton
+          as={IconButtonWithTooltip}
+          icon={<Icon as={selected.icon} boxSize={5} />}
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "component.profile-type-field-icon.button",
+            defaultMessage: "Change icon",
+          })}
+          aria-label={
+            selected.alt +
+            ". " +
+            intl.formatMessage({
+              id: "component.profile-type-field-icon.button",
+              defaultMessage: "Change icon",
+            })
+          }
+        />
+        <Portal>
+          <MenuList minWidth="min-content" padding={2}>
+            <MenuOptionGroup value={value} onChange={onChange as any}>
+              {options.map((option) => {
+                return (
+                  <MenuItemOption
+                    key={option.key}
+                    value={option.key}
+                    icon={option.icon}
+                    alt={option.alt}
+                  />
+                );
+              })}
+            </MenuOptionGroup>
+          </MenuList>
+        </Portal>
+      </Menu>
+    </>
+  );
+}
+
+function MenuOptionGroup(props: Pick<UseMenuOptionGroupProps, "value" | "onChange" | "children">) {
+  const ownProps = useMenuOptionGroup({ ...props, type: "radio" });
+  return <SimpleGrid justifyItems="center" columns={4} spacing={2} {...ownProps} />;
+}
+
+const MenuItemOption = forwardRef<
+  HTMLElement,
+  UseMenuOptionProps & { icon: ComponentType; alt: string }
+>(function MenuItemOption({ alt, icon, ...props }, ref) {
+  const optionProps = useMenuOption(props, ref);
+  return (
+    <IconButton
+      variant="ghost"
+      boxSize="40px"
+      {...optionProps}
+      _checked={{ backgroundColor: "blue.500", color: "white" }}
+      _focusVisible={{ boxShadow: "none" }}
+      _hover={{ backgroundColor: undefined }}
+      _focus={{ backgroundColor: "gray.200", _checked: { backgroundColor: "blue.600" } }}
+      icon={<Icon as={icon} boxSize={5} />}
+      aria-label={alt}
+    />
+  );
+});
+
+(MenuItemOption as any).id = "MenuItemOption"; // this is needed to make internal menu chakra work correctly
+
+function useProfileTypeIconSelectOptions() {
+  const intl = useIntl();
   const options = useMemo<
     {
       key: ProfileTypeIcon;
@@ -178,72 +252,5 @@ export function ProfileTypeIconSelect({ value, onChange }: ValueProps<ProfileTyp
     [intl.locale],
   );
 
-  const selected = options.find((o) => o.key === value)!;
-
-  return (
-    <>
-      <Menu>
-        <MenuButton
-          as={IconButtonWithTooltip}
-          icon={<Icon as={selected.icon} boxSize={5} />}
-          placement="bottom"
-          label={intl.formatMessage({
-            id: "component.profile-type-field-icon.button",
-            defaultMessage: "Change icon",
-          })}
-          aria-label={
-            selected.alt +
-            ". " +
-            intl.formatMessage({
-              id: "component.profile-type-field-icon.button",
-              defaultMessage: "Change icon",
-            })
-          }
-        />
-        <Portal>
-          <MenuList minWidth="min-content" padding={2}>
-            <MenuOptionGroup value={value} onChange={onChange as any}>
-              {options.map((option) => {
-                return (
-                  <MenuItemOption
-                    key={option.key}
-                    value={option.key}
-                    icon={option.icon}
-                    alt={option.alt}
-                  />
-                );
-              })}
-            </MenuOptionGroup>
-          </MenuList>
-        </Portal>
-      </Menu>
-    </>
-  );
+  return options;
 }
-
-function MenuOptionGroup(props: Pick<UseMenuOptionGroupProps, "value" | "onChange" | "children">) {
-  const ownProps = useMenuOptionGroup({ ...props, type: "radio" });
-  return <SimpleGrid justifyItems="center" columns={4} spacing={2} {...ownProps} />;
-}
-
-const MenuItemOption = forwardRef<
-  HTMLElement,
-  UseMenuOptionProps & { icon: ComponentType; alt: string }
->(function MenuItemOption({ alt, icon, ...props }, ref) {
-  const optionProps = useMenuOption(props, ref);
-  return (
-    <IconButton
-      variant="ghost"
-      boxSize="40px"
-      {...optionProps}
-      _checked={{ backgroundColor: "blue.500", color: "white" }}
-      _focusVisible={{ boxShadow: "none" }}
-      _hover={{ backgroundColor: undefined }}
-      _focus={{ backgroundColor: "gray.200", _checked: { backgroundColor: "blue.600" } }}
-      icon={<Icon as={icon} boxSize={5} />}
-      aria-label={alt}
-    />
-  );
-});
-
-(MenuItemOption as any).id = "MenuItemOption"; // this is needed to make internal menu chakra work correctly

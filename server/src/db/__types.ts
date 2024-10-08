@@ -64,7 +64,8 @@ export type FeatureFlagName =
   | "RECIPIENT_LANG_PT"
   | "BACKGROUND_CHECK"
   | "CREATE_PROFILE_TYPE"
-  | "PDF_EXPORT_V2";
+  | "PDF_EXPORT_V2"
+  | "SHOW_CONTACTS_BUTTON";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -98,6 +99,7 @@ export const FeatureFlagNameValues = [
   "BACKGROUND_CHECK",
   "CREATE_PROFILE_TYPE",
   "PDF_EXPORT_V2",
+  "SHOW_CONTACTS_BUTTON",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -683,6 +685,7 @@ export interface TableTypes {
   user_group_permission: UserGroupPermission;
   user_petition_event_log: UserPetitionEventLog;
   user_profile_event_log: UserProfileEventLog;
+  user_profile_type_pinned: UserProfileTypePinned;
 }
 
 export interface TableCreateTypes {
@@ -752,6 +755,7 @@ export interface TableCreateTypes {
   user_group_permission: CreateUserGroupPermission;
   user_petition_event_log: CreateUserPetitionEventLog;
   user_profile_event_log: CreateUserProfileEventLog;
+  user_profile_type_pinned: CreateUserProfileTypePinned;
 }
 
 export interface TablePrimaryKeys {
@@ -821,6 +825,7 @@ export interface TablePrimaryKeys {
   user_group_permission: "id";
   user_petition_event_log: "id";
   user_profile_event_log: "id";
+  user_profile_type_pinned: "id";
 }
 
 export interface AiCompletionLog {
@@ -2472,3 +2477,11 @@ export type CreateUserProfileEventLog = PartialProps<
   Omit<UserProfileEventLog, "id">,
   "user_id" | "profile_event_id"
 >;
+
+export interface UserProfileTypePinned {
+  id: number; // int4
+  user_id: number; // int4
+  profile_type_id: number; // int4
+}
+
+export type CreateUserProfileTypePinned = PartialProps<Omit<UserProfileTypePinned, "id">>;

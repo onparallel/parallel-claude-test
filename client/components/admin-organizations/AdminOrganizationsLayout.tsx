@@ -15,8 +15,8 @@ import { useOrganizationStatusDialog } from "./dialogs/OrganizationStatusDialog"
 
 type AdminOrganizationsSection = "users" | "features" | "subscriptions";
 
-interface AdminOrganizationsLayoutProps
-  extends Pick<AdminOrganizationsLayout_QueryFragment, "me" | "realMe"> {
+interface AdminOrganizationsLayoutProps {
+  queryObject: AdminOrganizationsLayout_QueryFragment;
   currentTabKey: AdminOrganizationsSection;
   organization: AdminOrganizationsLayout_OrganizationFragment;
   children: ReactNode;
@@ -24,8 +24,7 @@ interface AdminOrganizationsLayoutProps
 
 export function AdminOrganizationsLayout({
   currentTabKey,
-  me,
-  realMe,
+  queryObject,
   children,
   organization,
 }: AdminOrganizationsLayoutProps) {
@@ -96,8 +95,7 @@ export function AdminOrganizationsLayout({
     <AdminSettingsLayout
       title={`${organization.name} | ${currentTab.title}`}
       basePath="/app/admin/organizations"
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <HStack>
           <Badge

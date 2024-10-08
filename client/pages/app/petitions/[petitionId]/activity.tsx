@@ -76,9 +76,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const { query } = router;
 
   const goToSection = useGoToPetitionSection();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(PetitionActivity_userDocument);
+  const { data: queryObject } = useAssertQuery(PetitionActivity_userDocument);
+  const { me } = queryObject;
+
   const { data: petitionData, refetch: petitionRefetch } = useAssertQuery(
     PetitionActivity_petitionDocument,
     { variables: { id: petitionId } },
@@ -440,8 +440,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   return (
     <PetitionLayout
       key={petition.id}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       onRefetch={() => refetch()}

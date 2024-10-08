@@ -9,9 +9,7 @@ import { useIntl } from "react-intl";
 
 function Admin() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Admin_userDocument);
+  const { data: queryObject } = useAssertQuery(Admin_userDocument);
 
   return (
     <AdminSettingsLayout
@@ -20,8 +18,7 @@ function Admin() {
         defaultMessage: "Admin panel",
       })}
       isBase
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     />
   );
 }

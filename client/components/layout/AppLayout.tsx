@@ -32,15 +32,17 @@ import { AppLayoutNavBar } from "./AppLayoutNavBar";
 
 const HIDE_INTERCOM_PATHS = ["/app/petitions/[petitionId]/preview"];
 
-export interface AppLayoutProps extends Pick<AppLayout_QueryFragment, "me" | "realMe"> {
+export interface AppLayoutProps {
+  queryObject: AppLayout_QueryFragment;
   title: string;
 }
 
 export const AppLayout = Object.assign(
   chakraForwardRef<"div", AppLayoutProps>(function AppLayout(
-    { title, me, realMe, children, ...props },
+    { title, queryObject, children, ...props },
     ref,
   ) {
+    const { me, realMe } = queryObject;
     const rehydrated = useRehydrated();
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -224,7 +226,10 @@ export const AppLayout = Object.assign(
             flexDirection={{ base: "column", sm: "row" }}
           >
             <PortalManager zIndex={50}>
-              <AppLayoutNavBar me={me} realMe={realMe} onHelpCenterClick={handleHelpCenterClick} />
+              <AppLayoutNavBar
+                queryObject={queryObject}
+                onHelpCenterClick={handleHelpCenterClick}
+              />
             </PortalManager>
 
             <Flex

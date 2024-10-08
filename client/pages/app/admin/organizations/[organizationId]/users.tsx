@@ -55,12 +55,11 @@ type AdminOrganizationsMembersProps = UnwrapPromise<
 >;
 
 function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembersProps) {
-  const {
-    data: { me, realMe, ...rest },
-  } = useAssertQuery(AdminOrganizationsMembers_queryDocument, {
+  const { data: queryObject } = useAssertQuery(AdminOrganizationsMembers_queryDocument, {
     variables: { id: organizationId },
   });
-  const organization = rest.organization!;
+  const me = queryObject.me;
+  const organization = queryObject.organization!;
 
   const [state, setQueryState] = useQueryState(USERS_QUERY_STATE);
   const { data, loading, refetch } = useQueryOrPreviousData(
@@ -212,9 +211,8 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   return (
     <AdminOrganizationsLayout
       currentTabKey="users"
-      me={me}
       organization={organization}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>
         <TablePage

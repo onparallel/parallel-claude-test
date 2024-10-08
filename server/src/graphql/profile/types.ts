@@ -90,6 +90,18 @@ export const ProfileType = objectType({
       type: "ProfileTypeStandardType",
       resolve: (o) => o.standard_type,
     });
+    t.nonNull.boolean("isPinned", {
+      resolve: async (o, _, ctx) => {
+        if (isNullish(ctx.user)) {
+          return false;
+        }
+        const pinnedProfileTypes = await ctx.profiles.loadUserProfileTypePinnedByUserId(
+          ctx.user.id,
+        );
+
+        return pinnedProfileTypes.some((p) => p.profile_type_id === o.id);
+      },
+    });
   },
 });
 

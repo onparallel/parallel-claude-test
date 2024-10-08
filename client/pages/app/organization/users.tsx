@@ -92,9 +92,8 @@ function OrganizationUsers() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [status, setStatus] = useQueryStateSlice(state, setQueryState, "status");
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(OrganizationUsers_userDocument);
+  const { data: queryObject } = useAssertQuery(OrganizationUsers_userDocument);
+  const { me } = queryObject;
 
   const { data, loading, refetch } = useQueryOrPreviousData(OrganizationUsers_orgUsersDocument, {
     fetchPolicy: "cache-and-network",
@@ -514,8 +513,7 @@ function OrganizationUsers() {
         id: "page.users.title",
         defaultMessage: "Users",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="page.users.title" defaultMessage="Users" />

@@ -81,9 +81,9 @@ function NewPetition() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const mainRef = useRef<HTMLDivElement>(null);
 
-  const {
-    data: { me, realMe, hasTemplates: _hasTemplates, publicTemplateCategories },
-  } = useAssertQuery(NewPetition_userDocument);
+  const { data: queryObject } = useAssertQuery(NewPetition_userDocument);
+
+  const { me, hasTemplates: _hasTemplates, publicTemplateCategories } = queryObject;
 
   const { data: templateData } = useQuery(NewPetition_templateDocument, {
     variables: { templateId: state.template! },
@@ -249,8 +249,7 @@ function NewPetition() {
         id: "generic.new-petition",
         defaultMessage: "New parallel",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Container maxWidth="container.xl" flex="1" display="flex" flexDirection="column">
         <Tabs

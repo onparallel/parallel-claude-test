@@ -47,9 +47,8 @@ type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getIniti
 function ProfileDetail({ profileId }: ProfileDetailProps) {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(ProfileDetail_userDocument);
+  const { data: queryObject } = useAssertQuery(ProfileDetail_userDocument);
+  const { me } = queryObject;
 
   const {
     data: { profile },
@@ -161,8 +160,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
         id: "page.profile-details.title",
         defaultMessage: "Profile details",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       background="white"
     >
       <Flex minHeight="100%" direction="row">

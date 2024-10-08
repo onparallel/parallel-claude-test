@@ -38,7 +38,8 @@ import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/Confir
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
 const MotionBox = motion<BoxProps>(Box);
-export interface PetitionLayoutProps extends Pick<PetitionLayout_QueryFragment, "me" | "realMe"> {
+export interface PetitionLayoutProps {
+  queryObject: PetitionLayout_QueryFragment;
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
@@ -56,8 +57,7 @@ export interface PetitionLayoutProps extends Pick<PetitionLayout_QueryFragment, 
 }
 
 export function PetitionLayout({
-  me,
-  realMe,
+  queryObject,
   petition,
   section,
   onUpdatePetition,
@@ -74,6 +74,7 @@ export function PetitionLayout({
   leftPane,
 }: PropsWithChildren<PetitionLayoutProps>) {
   const intl = useIntl();
+  const { me } = queryObject;
   const title = useMemo(
     () =>
       petition.__typename === "Petition"
@@ -143,8 +144,7 @@ export function PetitionLayout({
               defaultMessage: "Unnamed template",
             }))
       } - ${title}`}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       position="relative"
     >
       <PetitionHeader

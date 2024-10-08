@@ -54,11 +54,8 @@ interface PermissionsFormData {
 
 export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-    refetch: refetchMe,
-  } = useAssertQuery(PermissionsGroup_userDocument);
-
+  const { data: queryObject, refetch: refetchMe } = useAssertQuery(PermissionsGroup_userDocument);
+  const { me } = queryObject;
   const {
     data: { userGroup },
   } = useAssertQuery(PermissionsGroup_userGroupDocument, {
@@ -643,8 +640,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     <UserGroupLayout
       groupId={groupId}
       currentTabKey="permissions"
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       userGroup={userGroup}
     >
       {me.hasPermissionManagement ? null : (

@@ -106,10 +106,8 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const intl = useIntl();
   const router = useRouter();
   const toast = useToast();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(OrganizationProfileType_userDocument);
-
+  const { data: queryObject } = useAssertQuery(OrganizationProfileType_userDocument);
+  const { me } = queryObject;
   const {
     data: { profileType },
     refetch,
@@ -417,8 +415,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
         }),
       })}
       basePath="/app/organization/profiles/types"
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       subHeader={
         profileType.isStandard ? (
           <Alert status="info">

@@ -124,9 +124,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const { query } = router;
   const toast = useToast();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(PetitionPreview_userDocument);
+  const { data: queryData } = useAssertQuery(PetitionPreview_userDocument);
+  const { me } = queryData;
   const { data, refetch } = useAssertQuery(PetitionPreview_petitionDocument, {
     variables: { id: petitionId },
   });
@@ -584,8 +583,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       <ToneProvider value={petition.organization.brandTheme.preferredTone}>
         <PetitionLayout
           key={petition.id}
-          me={me}
-          realMe={realMe}
+          queryObject={queryData}
           petition={petition}
           onUpdatePetition={handleUpdatePetition}
           onRefetch={() => refetch()}

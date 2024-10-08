@@ -202,6 +202,7 @@ export class ProfileRepository extends BaseRepository {
       locale?: UserLocale;
       sortBy?: SortBy<"created_at" | "name">[];
       filter?: {
+        includeArchived?: boolean | null;
         onlyArchived?: boolean | null;
         profileTypeId?: number[] | null;
       } | null;
@@ -214,7 +215,9 @@ export class ProfileRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, sortBy, locale, filter } = opts;
 
-          if (filter?.onlyArchived) {
+          if (filter?.includeArchived) {
+            //nothing
+          } else if (filter?.onlyArchived) {
             q.whereNotNull("archived_at");
           } else {
             q.whereNull("archived_at");
@@ -2669,5 +2672,47 @@ export class ProfileRepository extends BaseRepository {
     );
 
     return row;
+  }
+
+  readonly loadUserProfileTypePinnedByUserId = this.buildLoadMultipleBy(
+    "user_profile_type_pinned",
+    "user_id",
+    (q) => q.orderBy("id", "asc"),
+  );
+
+  readonly loadPinnedProfileTypesByUserId = this.buildLoader<number, ProfileType[]>(
+    async (userIds, t) => {
+      const rows = await this.from("user_profile_type_pinned", t)
+        .join("profile_type", "user_profile_type_pinned.profile_type_id", "profile_type.id")
+        .whereNull("profile_type.deleted_at")
+        .whereIn("user_profile_type_pinned.user_id", userIds)
+        .orderBy("user_profile_type_pinned.id", "asc")
+        .select<({ user_id: number } & ProfileType)[]>(["user_id", "profile_type.*"]);
+
+      const byUserId = groupBy(rows, (r) => r.user_id);
+      return userIds.map((userId) => (byUserId[userId] ?? []).map((d) => omit(d, ["user_id"])));
+    },
+  );
+
+  async pinProfileType(profileTypeId: number, userId: number) {
+    await this.from("user_profile_type_pinned")
+      .insert({
+        profile_type_id: profileTypeId,
+        user_id: userId,
+      })
+      .onConflict(["profile_type_id", "user_id"])
+      .ignore();
+  }
+
+  async unpinProfileType(profileTypeId: number, userId: number) {
+    await this.from("user_profile_type_pinned")
+      .where({ profile_type_id: profileTypeId, user_id: userId })
+      .delete();
+  }
+
+  async deletePinnedProfileTypes(profileTypeIds: number[], t?: Knex.Transaction) {
+    await this.from("user_profile_type_pinned", t)
+      .whereIn("profile_type_id", profileTypeIds)
+      .delete();
   }
 }

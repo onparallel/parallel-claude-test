@@ -130,9 +130,8 @@ const QUERY_STATE = {
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
   const router = useRouter();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(PetitionReplies_userDocument);
+  const { data: queryObject } = useAssertQuery(PetitionReplies_userDocument);
+  const { me } = queryObject;
   const { data, refetch } = useAssertQuery(PetitionReplies_petitionDocument, {
     variables: {
       id: petitionId,
@@ -588,8 +587,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   return (
     <PetitionLayout
       key={petition.id}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       onRefetch={() => refetch()}

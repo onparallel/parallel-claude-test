@@ -23,10 +23,8 @@ function OrganizationBranding() {
   const intl = useIntl();
   const router = useRouter();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
-
+  const { data: queryObject } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
+  const { me } = queryObject;
   const [{ style }] = useQueryState(QUERY_STATE);
   const buildStateUrl = useBuildStateUrl(QUERY_STATE);
   const tabs = useMemo(
@@ -57,8 +55,7 @@ function OrganizationBranding() {
         id: "organization.branding.title",
         defaultMessage: "Branding",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.branding.title" defaultMessage="Branding" />

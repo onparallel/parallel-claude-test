@@ -43,9 +43,8 @@ function Account() {
     });
   };
 
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Account_userDocument);
+  const { data: queryObject } = useAssertQuery(Account_userDocument);
+  const { me } = queryObject;
 
   const [updateAccount] = useMutation(Account_updateAccountDocument);
   const [updateUserPreferredLocale] = useMutation(Account_updateUserPreferredLocaleDocument);
@@ -82,7 +81,7 @@ function Account() {
   }
 
   return (
-    <UserSettingsLayout me={me} realMe={realMe}>
+    <UserSettingsLayout queryObject={queryObject}>
       <Stack padding={6} spacing={8} maxWidth="container.sm" width="100%" paddingBottom={16}>
         <AccountChangeName user={me} onSubmit={onSaveName} />
         <Divider borderColor="gray.300" />

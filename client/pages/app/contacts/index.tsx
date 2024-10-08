@@ -46,9 +46,7 @@ function Contacts() {
   const intl = useIntl();
   const showToast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Contacts_userDocument);
+  const { data: queryObject } = useAssertQuery(Contacts_userDocument);
   const { data, loading, refetch } = useQueryOrPreviousData(Contacts_contactsDocument, {
     variables: {
       offset: state.items * (state.page - 1),
@@ -129,8 +127,7 @@ function Contacts() {
         id: "page.contacts.title",
         defaultMessage: "Recipients",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <HStack padding={2}>

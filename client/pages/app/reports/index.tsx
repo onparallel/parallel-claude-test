@@ -32,9 +32,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export function Reports() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(Reports_userDocument);
+  const { data: queryObject } = useAssertQuery(Reports_userDocument);
 
   const hasOverviewAccess = useHasPermission("REPORTS:OVERVIEW");
   const hasTemplateStatisticsAccess = useHasPermission("REPORTS:TEMPLATE_STATISTICS");
@@ -91,8 +89,7 @@ export function Reports() {
         id: "page.reports.title",
         defaultMessage: "Reports",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
     >
       <Container
         maxWidth="container.xl"

@@ -67,10 +67,8 @@ interface OrganizationProfileTypesContext {
 
 function OrganizationProfileTypes() {
   const intl = useIntl();
-  const {
-    data: { me, realMe },
-  } = useAssertQueryOrPreviousData(OrganizationProfileTypes_userDocument);
-
+  const { data: queryObject } = useAssertQueryOrPreviousData(OrganizationProfileTypes_userDocument);
+  const { me } = queryObject;
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [showArchived, setShowArchived] = useQueryStateSlice(
     queryState,
@@ -183,7 +181,7 @@ function OrganizationProfileTypes() {
   );
 
   return (
-    <OrganizationProfilesLayout currentTabKey="types" me={me} realMe={realMe}>
+    <OrganizationProfilesLayout currentTabKey="types" queryObject={queryObject}>
       <Flex direction="column" flex="1" padding={4} paddingBottom={24}>
         <TablePage
           flex="0 1 auto"
@@ -316,7 +314,7 @@ function useProfileTypesTableColumns(): TableColumn<
             <LocalizableUserTextRender
               value={row.name}
               default={intl.formatMessage({
-                id: "generic.unamed-profile-type",
+                id: "generic.unnamed-profile-type",
                 defaultMessage: "Unnamed profile type",
               })}
             />

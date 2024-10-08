@@ -46,9 +46,7 @@ type OrganizationSelection = AdminOrganizations_OrganizationFragment;
 function AdminOrganizations() {
   const intl = useIntl();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const {
-    data: { me, realMe },
-  } = useAssertQuery(AdminOrganizations_userDocument);
+  const { data: queryObject } = useAssertQuery(AdminOrganizations_userDocument);
   const { data, loading, refetch } = useQueryOrPreviousData(
     AdminOrganizations_organizationsDocument,
     {
@@ -141,8 +139,7 @@ function AdminOrganizations() {
         id: "page.admin-organizations.title",
         defaultMessage: "Organizations",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="page.admin-organizations.title" defaultMessage="Organizations" />

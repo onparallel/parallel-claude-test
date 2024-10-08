@@ -119,7 +119,7 @@ function useConfirmDeleteProfileTypeDialog() {
                         value={profileTypes[0].name}
                         default={
                           <FormattedMessage
-                            id="generic.unamed-profile-type"
+                            id="generic.unnamed-profile-type"
                             defaultMessage="Unnamed profile type"
                           />
                         }

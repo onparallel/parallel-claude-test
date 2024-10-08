@@ -141,6 +141,7 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("petition_field_reply").update("associated_profile_id", null);
     await mocks.knex.from("profile").delete();
     await mocks.knex.from("petition_field").update("profile_type_id", null);
+    await mocks.knex.from("user_profile_type_pinned").delete();
     await mocks.knex.from("profile_type").delete();
 
     profileTypes = await mocks.createRandomProfileTypes(
@@ -2462,6 +2463,36 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("does not unpin profile type when archiving it", async () => {
+      await mocks.knex
+        .from("user_profile_type_pinned")
+        .insert({ user_id: sessionUser.id, profile_type_id: profileTypes[0].id });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+              isPinned
+              archivedAt
+            }
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveProfileType).toEqual([
+        {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          isPinned: true,
+          archivedAt: expect.any(Date),
+        },
+      ]);
+    });
   });
 
   describe("unarchiveProfileType", () => {
@@ -2693,6 +2724,38 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("unpins a profile type when deleting it", async () => {
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1, () => ({
+        archived_at: new Date(),
+        archived_by_user_id: sessionUser.id,
+      }));
+
+      await mocks.knex
+        .from("user_profile_type_pinned")
+        .insert({ user_id: sessionUser.id, profile_type_id: profileType.id });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileType.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileType).toEqual("SUCCESS");
+
+      const dbPinned = await mocks.knex
+        .from("user_profile_type_pinned")
+        .where({ profile_type_id: profileType.id })
+        .select("*");
+
+      expect(dbPinned).toHaveLength(0);
     });
   });
 
@@ -8863,6 +8926,227 @@ describe("GraphQL/Profiles", () => {
           },
         },
       });
+    });
+  });
+
+  describe("pinProfileType", () => {
+    it("pins a profile type to the user's navbar", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            pinProfileType(profileTypeId: $profileTypeId) {
+              id
+              isPinned
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.pinProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        isPinned: true,
+      });
+
+      const dbPinnedProfileType = await mocks.knex
+        .from("user_profile_type_pinned")
+        .where({
+          user_id: sessionUser.id,
+          profile_type_id: profileTypes[0].id,
+        })
+        .first();
+
+      expect(dbPinnedProfileType).toBeDefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(gql`
+        query {
+          me {
+            pinnedProfileTypes {
+              id
+            }
+          }
+        }
+      `);
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.me.pinnedProfileTypes).toEqual([
+        { id: toGlobalId("ProfileType", profileTypes[0].id) },
+      ]);
+    });
+
+    it("does nothing when pinning the same profile type twice", async () => {
+      // First pin
+      await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            pinProfileType(profileTypeId: $profileTypeId) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+        },
+      );
+
+      // Second pin (should not throw an error)
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            pinProfileType(profileTypeId: $profileTypeId) {
+              id
+              isPinned
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.pinProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[1].id),
+        isPinned: true,
+      });
+
+      const dbPinnedProfileTypes = await mocks.knex.from("user_profile_type_pinned").where({
+        user_id: sessionUser.id,
+        profile_type_id: profileTypes[1].id,
+      });
+
+      expect(dbPinnedProfileTypes).toHaveLength(1);
+    });
+
+    it("allows to pin an archived profile type", async () => {
+      await mocks.knex
+        .from("profile_type")
+        .where("id", profileTypes[2].id)
+        .update({ archived_at: new Date(), archived_by_user_id: sessionUser.id });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            pinProfileType(profileTypeId: $profileTypeId) {
+              id
+              isPinned
+              archivedAt
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.pinProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[2].id),
+        isPinned: true,
+        archivedAt: expect.any(Date),
+      });
+
+      const dbPinnedProfileType = await mocks.knex
+        .from("user_profile_type_pinned")
+        .where({
+          user_id: sessionUser.id,
+          profile_type_id: profileTypes[2].id,
+        })
+        .first();
+
+      expect(dbPinnedProfileType).toBeDefined();
+    });
+  });
+
+  describe("unpinProfileType", () => {
+    it("unpins a profile type from the user's navbar", async () => {
+      await mocks.knex
+        .from("user_profile_type_pinned")
+        .insert({ user_id: sessionUser.id, profile_type_id: profileTypes[0].id });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            unpinProfileType(profileTypeId: $profileTypeId) {
+              id
+              isPinned
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.unpinProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        isPinned: false,
+      });
+
+      const dbPinnedProfileType = await mocks.knex
+        .from("user_profile_type_pinned")
+        .where({
+          user_id: sessionUser.id,
+          profile_type_id: profileTypes[0].id,
+        })
+        .first();
+
+      expect(dbPinnedProfileType).toBeUndefined();
+    });
+
+    it("does nothing when unpinning the same profile type twice", async () => {
+      await mocks.knex
+        .from("user_profile_type_pinned")
+        .insert({ user_id: sessionUser.id, profile_type_id: profileTypes[1].id });
+
+      // Unpin the profile type
+      await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            unpinProfileType(profileTypeId: $profileTypeId) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+        },
+      );
+
+      // Try to unpin again (should not throw an error)
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            unpinProfileType(profileTypeId: $profileTypeId) {
+              id
+              isPinned
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.unpinProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[1].id),
+        isPinned: false,
+      });
+
+      const dbPinnedProfileType = await mocks.knex
+        .from("user_profile_type_pinned")
+        .where({
+          user_id: sessionUser.id,
+          profile_type_id: profileTypes[1].id,
+        })
+        .first();
+
+      expect(dbPinnedProfileType).toBeUndefined();
     });
   });
 });

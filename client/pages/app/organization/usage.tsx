@@ -14,11 +14,9 @@ import { FormattedMessage, useIntl } from "react-intl";
 function OrganizationUsage() {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQueryOrPreviousData(OrganizationUsage_userDocument);
+  const { data: queryObject } = useAssertQueryOrPreviousData(OrganizationUsage_userDocument);
 
-  const { organization } = me;
+  const { organization } = queryObject.me;
 
   const { activeUserCount, license, usageDetails, petitionsPeriod, signaturesPeriod } =
     organization;
@@ -29,8 +27,7 @@ function OrganizationUsage() {
         id: "organization.usage.title",
         defaultMessage: "Usage",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.usage.title" defaultMessage="Usage" />

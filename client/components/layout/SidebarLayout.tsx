@@ -9,7 +9,8 @@ import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { AppLayout } from "./AppLayout";
 
-export interface SidebarLayoutProps extends Pick<SidebarLayout_QueryFragment, "me" | "realMe"> {
+export interface SidebarLayoutProps {
+  queryObject: SidebarLayout_QueryFragment;
   basePath: string;
   title: string;
   sections: { title: string; path: string }[];
@@ -24,8 +25,7 @@ export interface SidebarLayoutProps extends Pick<SidebarLayout_QueryFragment, "m
 export function SidebarLayout({
   basePath,
   title,
-  me,
-  realMe,
+  queryObject,
   sections,
   sectionsHeader,
   isBase,
@@ -49,7 +49,7 @@ export function SidebarLayout({
   );
 
   return (
-    <AppLayout title={title} me={me} realMe={realMe}>
+    <AppLayout title={title} queryObject={queryObject}>
       <Flex flex="1" maxHeight="100vh">
         <Flex
           direction="column"

@@ -626,6 +626,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
+  | "SHOW_CONTACTS_BUTTON"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -1133,6 +1134,8 @@ export interface Mutation {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Pins a profile type to the user's navigation manu */
+  pinProfileType: ProfileType;
   profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
   profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
@@ -1252,6 +1255,8 @@ export interface Mutation {
   transferPetitionOwnership: Array<PetitionBase>;
   unarchiveProfileType: Array<ProfileType>;
   unlinkPetitionFieldChildren: PetitionField;
+  /** Unpins a profile type to the user's navigation manu */
+  unpinProfileType: ProfileType;
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
@@ -2054,6 +2059,10 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
+export interface MutationpinProfileTypeArgs {
+  profileTypeId: Scalars["GID"]["input"];
+}
+
 export interface MutationprofileExternalSourceDetailsArgs {
   externalId: Scalars["ID"]["input"];
   integrationId: Scalars["GID"]["input"];
@@ -2415,6 +2424,10 @@ export interface MutationunlinkPetitionFieldChildrenArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   parentFieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationunpinProfileTypeArgs {
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationunsubscribeFromProfileArgs {
@@ -4790,6 +4803,7 @@ export interface ProfileType extends Timestamps {
   fields: Array<ProfileTypeField>;
   icon: ProfileTypeIcon;
   id: Scalars["GID"]["output"];
+  isPinned: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   pluralName: Scalars["LocalizableUserText"]["output"];
@@ -4839,6 +4853,7 @@ export type ProfileTypeFieldType =
   | "TEXT";
 
 export interface ProfileTypeFilter {
+  includeArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
@@ -6215,6 +6230,8 @@ export interface User extends Timestamps {
   permissions: Array<Scalars["String"]["output"]>;
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
+  /** The pinned profile types of the user menu */
+  pinnedProfileTypes: Array<ProfileType>;
   preferredLocale: UserLocale;
   status: UserStatus;
   /** Lists the API tokens this user has. */
@@ -6406,6 +6423,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -6421,6 +6439,14 @@ export type AdminOrganizationsLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -6429,6 +6455,18 @@ export type AdminOrganizationsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -7311,6 +7349,13 @@ export type ProfileTypeFieldSelect_ProfileTypeFieldFragment = {
   type: ProfileTypeFieldType;
 };
 
+export type ProfileTypeReference_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  pluralName: { [locale in UserLocale]?: string };
+};
+
 export type ProfileTypeSelect_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -7861,6 +7906,7 @@ export type AdminSettingsLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7875,6 +7921,14 @@ export type AdminSettingsLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -7883,6 +7937,18 @@ export type AdminSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -7904,6 +7970,7 @@ export type AppLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7918,6 +7985,14 @@ export type AppLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -7927,7 +8002,55 @@ export type AppLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
+export type AppLayoutNavBar_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  icon: ProfileTypeIcon;
+  isPinned: boolean;
+  pluralName: { [locale in UserLocale]?: string };
+};
+
+export type AppLayoutNavBar_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasProfilesAccess: boolean;
+  hasShowContactsButton: boolean;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    iconUrl?: string | null;
+    isPetitionUsageLimitReached: boolean;
+    currentUsagePeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      limit: number;
+    } | null;
+  };
+  pinnedProfileTypes: Array<{
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
+    isPinned: boolean;
+    pluralName: { [locale in UserLocale]?: string };
+  }>;
 };
 
 export type AppLayoutNavBar_QueryFragment = {
@@ -7948,6 +8071,7 @@ export type AppLayoutNavBar_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7960,8 +8084,58 @@ export type AppLayoutNavBar_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
+export type AppLayoutNavBar_pinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type AppLayoutNavBar_pinProfileTypeMutation = {
+  pinProfileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
+    isPinned: boolean;
+    pluralName: { [locale in UserLocale]?: string };
+  };
+};
+
+export type AppLayoutNavBar_unpinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type AppLayoutNavBar_unpinProfileTypeMutation = {
+  unpinProfileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
+    isPinned: boolean;
+    pluralName: { [locale in UserLocale]?: string };
+  };
 };
 
 export type DevelopersLayout_QueryFragment = {
@@ -7981,6 +8155,7 @@ export type DevelopersLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7995,6 +8170,14 @@ export type DevelopersLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8003,6 +8186,18 @@ export type DevelopersLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8053,6 +8248,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8067,6 +8263,14 @@ export type OrganizationSettingsLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8075,6 +8279,18 @@ export type OrganizationSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8276,6 +8492,7 @@ export type PetitionLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8290,6 +8507,14 @@ export type PetitionLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8298,6 +8523,18 @@ export type PetitionLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8319,6 +8556,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8333,6 +8571,14 @@ export type ReportsSidebarLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8341,6 +8587,18 @@ export type ReportsSidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8362,6 +8620,7 @@ export type SidebarLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8376,6 +8635,14 @@ export type SidebarLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8384,6 +8651,18 @@ export type SidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8406,6 +8685,7 @@ export type UserGroupLayout_QueryFragment = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8420,6 +8700,14 @@ export type UserGroupLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8428,6 +8716,18 @@ export type UserGroupLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -8512,6 +8812,7 @@ export type UserSettingsLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8526,6 +8827,14 @@ export type UserSettingsLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -8534,6 +8843,18 @@ export type UserSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -9680,6 +10001,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9694,6 +10016,14 @@ export type OrganizationProfilesLayout_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -9702,6 +10032,18 @@ export type OrganizationProfilesLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -26485,6 +26827,98 @@ export type useCreateProfileDialog_createProfileMutation = {
   };
 };
 
+export type useCreateProfileFromProfileTypeDialog_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  };
+};
+
+export type useCreateProfileFromProfileTypeDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  createdAt: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+    name: { [locale in UserLocale]?: string };
+    isUsedInProfileName: boolean;
+    myPermission: ProfileTypeFieldPermissionType;
+    options: { [key: string]: any };
+    isExpirable: boolean;
+  }>;
+};
+
+export type useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragment = {
+  __typename?: "ProfileTypePagination";
+  totalCount: number;
+  items: Array<{
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    createdAt: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      name: { [locale in UserLocale]?: string };
+      isUsedInProfileName: boolean;
+      myPermission: ProfileTypeFieldPermissionType;
+      options: { [key: string]: any };
+      isExpirable: boolean;
+    }>;
+  }>;
+};
+
+export type useCreateProfileFromProfileTypeDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type useCreateProfileFromProfileTypeDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    createdAt: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      name: { [locale in UserLocale]?: string };
+      isUsedInProfileName: boolean;
+      myPermission: ProfileTypeFieldPermissionType;
+      options: { [key: string]: any };
+      isExpirable: boolean;
+    }>;
+  };
+};
+
+export type useCreateProfileFromProfileTypeDialog_createProfileMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
+}>;
+
+export type useCreateProfileFromProfileTypeDialog_createProfileMutation = {
+  createProfile: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+  };
+};
+
 export type useCreateProfileRelationshipsDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
@@ -29654,6 +30088,7 @@ export type Admin_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -29668,6 +30103,14 @@ export type Admin_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -29676,6 +30119,18 @@ export type Admin_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -29716,6 +30171,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -29731,6 +30187,14 @@ export type AdminOrganizationsFeatures_queryQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -29739,6 +30203,18 @@ export type AdminOrganizationsFeatures_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -29852,6 +30328,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -29867,6 +30344,14 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -29875,6 +30360,18 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -30115,6 +30612,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30130,6 +30628,14 @@ export type AdminOrganizationsMembers_queryQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -30138,6 +30644,18 @@ export type AdminOrganizationsMembers_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -30292,6 +30810,7 @@ export type AdminOrganizations_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30306,6 +30825,14 @@ export type AdminOrganizations_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -30314,6 +30841,18 @@ export type AdminOrganizations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -30364,6 +30903,7 @@ export type AdminSupportMethods_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30378,6 +30918,14 @@ export type AdminSupportMethods_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -30386,6 +30934,18 @@ export type AdminSupportMethods_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -30454,6 +31014,7 @@ export type Alerts_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30468,6 +31029,14 @@ export type Alerts_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -30476,6 +31045,18 @@ export type Alerts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31249,6 +31830,7 @@ export type Contact_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31263,6 +31845,14 @@ export type Contact_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31271,6 +31861,18 @@ export type Contact_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31418,6 +32020,7 @@ export type Contacts_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31432,6 +32035,14 @@ export type Contacts_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31440,6 +32051,18 @@ export type Contacts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31497,9 +32120,10 @@ export type OrganizationBranding_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
-    hasProfilesAccess: boolean;
     hasRemovedParallelBranding: boolean;
     hasPdfExportV2: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
@@ -31512,11 +32136,6 @@ export type OrganizationBranding_userQuery = {
       hasIdVerification: boolean;
       iconUrl?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-      } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -31530,7 +32149,20 @@ export type OrganizationBranding_userQuery = {
         data: { [key: string]: any };
         isDefault: boolean;
       }>;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31539,6 +32171,18 @@ export type OrganizationBranding_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31581,6 +32225,7 @@ export type OrganizationCompliance_userQuery = {
     hasAutoAnonymize: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31596,6 +32241,14 @@ export type OrganizationCompliance_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31604,6 +32257,18 @@ export type OrganizationCompliance_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31642,6 +32307,7 @@ export type OrganizationGeneral_userQuery = {
     hasCustomHost: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31658,6 +32324,14 @@ export type OrganizationGeneral_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31666,6 +32340,18 @@ export type OrganizationGeneral_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31812,6 +32498,7 @@ export type OrganizationGroup_userQuery = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31826,6 +32513,14 @@ export type OrganizationGroup_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31834,6 +32529,18 @@ export type OrganizationGroup_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -31894,6 +32601,7 @@ export type PermissionsGroup_userQuery = {
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31909,6 +32617,14 @@ export type PermissionsGroup_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -31917,6 +32633,18 @@ export type PermissionsGroup_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32099,6 +32827,7 @@ export type OrganizationGroups_userQuery = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32113,6 +32842,14 @@ export type OrganizationGroups_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32121,6 +32858,18 @@ export type OrganizationGroups_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32144,6 +32893,7 @@ export type OrganizationSettings_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32158,6 +32908,14 @@ export type OrganizationSettings_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32166,6 +32924,18 @@ export type OrganizationSettings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32191,6 +32961,7 @@ export type OrganizationIntegrations_userQuery = {
     hasDowJonesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32233,6 +33004,14 @@ export type OrganizationIntegrations_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32241,6 +33020,18 @@ export type OrganizationIntegrations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32313,8 +33104,9 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasBackgroundCheck: boolean;
-    hasProfilesAccess: boolean;
     hasDocusignSandbox: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32346,6 +33138,14 @@ export type IntegrationsSignature_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32354,6 +33154,18 @@ export type IntegrationsSignature_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32521,6 +33333,7 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32535,6 +33348,14 @@ export type OrganizationProfileType_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32543,6 +33364,18 @@ export type OrganizationProfileType_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -32939,6 +33772,7 @@ export type OrganizationProfileTypes_userQuery = {
     hasCreateProfileType: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -32953,6 +33787,14 @@ export type OrganizationProfileTypes_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -32961,6 +33803,18 @@ export type OrganizationProfileTypes_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -33060,6 +33914,7 @@ export type OrganizationUsage_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -33094,6 +33949,14 @@ export type OrganizationUsage_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -33102,6 +33965,18 @@ export type OrganizationUsage_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -33241,6 +34116,7 @@ export type OrganizationUsers_userQuery = {
     hasGhostLogin: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -33259,6 +34135,14 @@ export type OrganizationUsers_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -33267,6 +34151,18 @@ export type OrganizationUsers_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -34521,6 +35417,7 @@ export type PetitionActivity_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -34537,6 +35434,14 @@ export type PetitionActivity_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   realMe: {
@@ -34546,6 +35451,18 @@ export type PetitionActivity_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -36161,6 +37078,7 @@ export type PetitionActivity_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -36177,6 +37095,14 @@ export type PetitionActivity_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   realMe: {
@@ -36186,6 +37112,18 @@ export type PetitionActivity_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -37157,6 +38095,7 @@ export type PetitionCompose_QueryFragment = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
@@ -37173,11 +38112,6 @@ export type PetitionCompose_QueryFragment = {
       iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-      } | null;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
@@ -37193,7 +38127,20 @@ export type PetitionCompose_QueryFragment = {
         >;
       };
       pdfDocumentThemes: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   realMe: {
@@ -37203,6 +38150,18 @@ export type PetitionCompose_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -39315,6 +40274,7 @@ export type PetitionCompose_userQuery = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
@@ -39331,11 +40291,6 @@ export type PetitionCompose_userQuery = {
       iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-      } | null;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
@@ -39351,7 +40306,20 @@ export type PetitionCompose_userQuery = {
         >;
       };
       pdfDocumentThemes: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   realMe: {
@@ -39361,6 +40329,18 @@ export type PetitionCompose_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -40199,6 +41179,7 @@ export type PetitionMessages_QueryFragment = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -40213,6 +41194,14 @@ export type PetitionMessages_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -40221,6 +41210,18 @@ export type PetitionMessages_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -40245,6 +41246,7 @@ export type PetitionMessages_userQuery = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -40259,6 +41261,14 @@ export type PetitionMessages_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -40267,6 +41277,18 @@ export type PetitionMessages_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -41763,6 +42785,7 @@ export type PetitionPreview_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -41784,6 +42807,14 @@ export type PetitionPreview_QueryFragment = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   realMe: {
@@ -41793,6 +42824,18 @@ export type PetitionPreview_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -44125,6 +45168,7 @@ export type PetitionPreview_userQuery = {
     hasPublicLinkPrefill: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -44146,6 +45190,14 @@ export type PetitionPreview_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
   metadata: {
@@ -44161,6 +45213,18 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
 };
 
@@ -46758,6 +47822,7 @@ export type PetitionReplies_userQuery = {
     hasBackgroundCheck: boolean;
     hasExportCuatrecasas: boolean;
     hasSummaryAccess: boolean;
+    hasShowContactsButton: boolean;
     hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
@@ -46766,8 +47831,8 @@ export type PetitionReplies_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       hasIdVerification: boolean;
-      iconUrl?: string | null;
       hasIManage: boolean;
+      iconUrl?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       fileExportIntegrations: {
         __typename?: "IOrgIntegrationPagination";
@@ -46787,11 +47852,6 @@ export type PetitionReplies_userQuery = {
             }
         >;
       };
-      currentUsagePeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-      } | null;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
         items: Array<
@@ -46806,7 +47866,20 @@ export type PetitionReplies_userQuery = {
             }
         >;
       };
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: {
     __typename?: "ConnectionMetadata";
@@ -46821,6 +47894,18 @@ export type PetitionReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
 };
 
@@ -47852,6 +48937,7 @@ export type Petitions_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -47905,6 +48991,14 @@ export type Petitions_userQuery = {
         } | null;
       };
     }>;
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -47913,6 +49007,18 @@ export type Petitions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -48413,6 +49519,7 @@ export type NewPetition_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
@@ -48430,6 +49537,14 @@ export type NewPetition_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -48438,6 +49553,18 @@ export type NewPetition_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -48663,6 +49790,7 @@ export type ProfileDetail_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -48677,6 +49805,14 @@ export type ProfileDetail_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: {
     __typename?: "ConnectionMetadata";
@@ -48691,6 +49827,18 @@ export type ProfileDetail_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
 };
 
@@ -48907,6 +50055,9 @@ export type Profiles_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  icon: ProfileTypeIcon;
+  isPinned: boolean;
+  pluralName: { [locale in UserLocale]?: string };
 };
 
 export type Profiles_ProfileFragment = {
@@ -48982,6 +50133,7 @@ export type Profiles_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -48996,6 +50148,14 @@ export type Profiles_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49005,16 +50165,6 @@ export type Profiles_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
-};
-
-export type Profiles_profileTypesQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  limit?: InputMaybe<Scalars["Int"]["input"]>;
-  locale?: InputMaybe<UserLocale>;
-}>;
-
-export type Profiles_profileTypesQuery = {
   profileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -49022,8 +50172,12 @@ export type Profiles_profileTypesQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
     }>;
   };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Profiles_profileTypeQueryVariables = Exact<{
@@ -49035,6 +50189,9 @@ export type Profiles_profileTypeQuery = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    icon: ProfileTypeIcon;
+    isPinned: boolean;
+    pluralName: { [locale in UserLocale]?: string };
   };
 };
 
@@ -49077,6 +50234,22 @@ export type Profiles_profilesQuery = {
   };
 };
 
+export type Profiles_pinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type Profiles_pinProfileTypeMutation = {
+  pinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
+};
+
+export type Profiles_unpinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type Profiles_unpinProfileTypeMutation = {
+  unpinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
+};
+
 export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Reports_userQuery = {
@@ -49096,6 +50269,7 @@ export type Reports_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49110,6 +50284,14 @@ export type Reports_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49118,6 +50300,18 @@ export type Reports_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49147,6 +50341,7 @@ export type Overview_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49161,6 +50356,14 @@ export type Overview_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49169,6 +50372,18 @@ export type Overview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49198,6 +50413,7 @@ export type ReportsReplies_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49212,6 +50428,14 @@ export type ReportsReplies_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49220,6 +50444,18 @@ export type ReportsReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49249,6 +50485,7 @@ export type ReportsTemplates_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49263,6 +50500,14 @@ export type ReportsTemplates_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49271,6 +50516,18 @@ export type ReportsTemplates_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49293,8 +50550,9 @@ export type Account_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
-    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49310,6 +50568,14 @@ export type Account_QueryFragment = {
       } | null;
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49318,6 +50584,18 @@ export type Account_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49379,8 +50657,9 @@ export type Account_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
-    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49396,6 +50675,14 @@ export type Account_userQuery = {
       } | null;
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49404,6 +50691,18 @@ export type Account_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49699,6 +50998,7 @@ export type Subscriptions_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49713,6 +51013,14 @@ export type Subscriptions_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49721,6 +51029,18 @@ export type Subscriptions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49776,6 +51096,7 @@ export type Tokens_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49790,6 +51111,14 @@ export type Tokens_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49798,6 +51127,18 @@ export type Tokens_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49821,6 +51162,7 @@ export type Settings_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49835,6 +51177,14 @@ export type Settings_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49843,6 +51193,18 @@ export type Settings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -49874,6 +51236,7 @@ export type Security_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -49888,6 +51251,14 @@ export type Security_userQuery = {
         limit: number;
       } | null;
     };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -49896,6 +51267,18 @@ export type Security_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -54969,6 +56352,44 @@ export type validatePetitionFields_PetitionBaseFragment =
   | validatePetitionFields_PetitionBase_Petition_Fragment
   | validatePetitionFields_PetitionBase_PetitionTemplate_Fragment;
 
+export const ProfileTypeReference_ProfileTypeFragmentDoc = gql`
+  fragment ProfileTypeReference_ProfileType on ProfileType {
+    id
+    name
+    pluralName
+  }
+` as unknown as DocumentNode<ProfileTypeReference_ProfileTypeFragment, unknown>;
+export const AppLayoutNavBar_ProfileTypeFragmentDoc = gql`
+  fragment AppLayoutNavBar_ProfileType on ProfileType {
+    id
+    name
+    icon
+    isPinned
+    ...ProfileTypeReference_ProfileType
+  }
+  ${ProfileTypeReference_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<AppLayoutNavBar_ProfileTypeFragment, unknown>;
+export const AppLayoutNavBar_UserFragmentDoc = gql`
+  fragment AppLayoutNavBar_User on User {
+    id
+    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+    hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
+    organization {
+      id
+      name
+      iconUrl: iconUrl(options: { resize: { width: 80 } })
+      isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+      currentUsagePeriod(limitName: PETITION_SEND) {
+        id
+        limit
+      }
+    }
+    pinnedProfileTypes {
+      ...AppLayoutNavBar_ProfileType
+    }
+  }
+  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<AppLayoutNavBar_UserFragment, unknown>;
 export const UserAvatar_UserFragmentDoc = gql`
   fragment UserAvatar_User on User {
     fullName
@@ -55007,22 +56428,19 @@ export const AppLayoutNavBar_QueryFragmentDoc = gql`
       }
     }
     me {
-      id
-      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-      organization {
-        id
-        name
-        iconUrl: iconUrl(options: { resize: { width: 80 } })
-        isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-        currentUsagePeriod(limitName: PETITION_SEND) {
-          id
-          limit
-        }
+      ...AppLayoutNavBar_User
+    }
+    profileTypes(limit: 100, offset: 0, filter: { includeArchived: true }) {
+      totalCount
+      items {
+        ...AppLayoutNavBar_ProfileType
       }
     }
     ...UserMenu_Query
     ...useDeviceType_Query
   }
+  ${AppLayoutNavBar_UserFragmentDoc}
+  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
   ${UserMenu_QueryFragmentDoc}
   ${useDeviceType_QueryFragmentDoc}
 ` as unknown as DocumentNode<AppLayoutNavBar_QueryFragment, unknown>;
@@ -57274,6 +58692,45 @@ export const useCreateProfileDialog_ProfileTypePaginationFragmentDoc = gql`
   }
   ${useCreateProfileDialog_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypePaginationFragment, unknown>;
+export const useCreateProfileFromProfileTypeDialog_ProfileFragmentDoc = gql`
+  fragment useCreateProfileFromProfileTypeDialog_Profile on Profile {
+    id
+    localizableName
+    status
+    profileType {
+      id
+      name
+    }
+  }
+` as unknown as DocumentNode<useCreateProfileFromProfileTypeDialog_ProfileFragment, unknown>;
+export const useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc = gql`
+  fragment useCreateProfileFromProfileTypeDialog_ProfileType on ProfileType {
+    id
+    name
+    createdAt
+    fields {
+      id
+      type
+      name
+      isUsedInProfileName
+      myPermission
+      options
+      isExpirable
+    }
+  }
+` as unknown as DocumentNode<useCreateProfileFromProfileTypeDialog_ProfileTypeFragment, unknown>;
+export const useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragmentDoc = gql`
+  fragment useCreateProfileFromProfileTypeDialog_ProfileTypePagination on ProfileTypePagination {
+    items {
+      ...useCreateProfileFromProfileTypeDialog_ProfileType
+    }
+    totalCount
+  }
+  ${useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragment,
+  unknown
+>;
 export const useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragmentDoc =
   gql`
     fragment useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
@@ -62755,7 +64212,11 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
     id
     name
+    icon
+    isPinned
+    ...ProfileTypeReference_ProfileType
   }
+  ${ProfileTypeReference_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<Profiles_ProfileTypeFragment, unknown>;
 export const Profiles_ProfileFragmentDoc = gql`
   fragment Profiles_Profile on Profile {
@@ -64412,6 +65873,28 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
 ` as unknown as DocumentNode<
   ImportContactsDialog_bulkCreateContactsMutation,
   ImportContactsDialog_bulkCreateContactsMutationVariables
+>;
+export const AppLayoutNavBar_pinProfileTypeDocument = gql`
+  mutation AppLayoutNavBar_pinProfileType($profileTypeId: GID!) {
+    pinProfileType(profileTypeId: $profileTypeId) {
+      ...AppLayoutNavBar_ProfileType
+    }
+  }
+  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  AppLayoutNavBar_pinProfileTypeMutation,
+  AppLayoutNavBar_pinProfileTypeMutationVariables
+>;
+export const AppLayoutNavBar_unpinProfileTypeDocument = gql`
+  mutation AppLayoutNavBar_unpinProfileType($profileTypeId: GID!) {
+    unpinProfileType(profileTypeId: $profileTypeId) {
+      ...AppLayoutNavBar_ProfileType
+    }
+  }
+  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  AppLayoutNavBar_unpinProfileTypeMutation,
+  AppLayoutNavBar_unpinProfileTypeMutationVariables
 >;
 export const PetitionHeader_reopenPetitionDocument = gql`
   mutation PetitionHeader_reopenPetition($petitionId: GID!) {
@@ -66504,6 +67987,31 @@ export const useCreateProfileDialog_createProfileDocument = gql`
 ` as unknown as DocumentNode<
   useCreateProfileDialog_createProfileMutation,
   useCreateProfileDialog_createProfileMutationVariables
+>;
+export const useCreateProfileFromProfileTypeDialog_profileTypeDocument = gql`
+  query useCreateProfileFromProfileTypeDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      ...useCreateProfileFromProfileTypeDialog_ProfileType
+    }
+  }
+  ${useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateProfileFromProfileTypeDialog_profileTypeQuery,
+  useCreateProfileFromProfileTypeDialog_profileTypeQueryVariables
+>;
+export const useCreateProfileFromProfileTypeDialog_createProfileDocument = gql`
+  mutation useCreateProfileFromProfileTypeDialog_createProfile(
+    $profileTypeId: GID!
+    $fields: [UpdateProfileFieldValueInput!]
+  ) {
+    createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
+      ...useCreateProfileFromProfileTypeDialog_Profile
+    }
+  }
+  ${useCreateProfileFromProfileTypeDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateProfileFromProfileTypeDialog_createProfileMutation,
+  useCreateProfileFromProfileTypeDialog_createProfileMutationVariables
 >;
 export const useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDirectionDocument =
   gql`
@@ -69449,17 +70957,6 @@ export const Profiles_userDocument = gql`
   ${AppLayout_QueryFragmentDoc}
   ${useProfileSubscribersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<Profiles_userQuery, Profiles_userQueryVariables>;
-export const Profiles_profileTypesDocument = gql`
-  query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {
-    profileTypes(offset: $offset, limit: $limit, locale: $locale) {
-      items {
-        ...Profiles_ProfileType
-      }
-      totalCount
-    }
-  }
-  ${Profiles_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<Profiles_profileTypesQuery, Profiles_profileTypesQueryVariables>;
 export const Profiles_profileTypeDocument = gql`
   query Profiles_profileType($profileTypeId: GID!) {
     profileType(profileTypeId: $profileTypeId) {
@@ -69482,6 +70979,28 @@ export const Profiles_profilesDocument = gql`
   }
   ${Profiles_ProfilePaginationFragmentDoc}
 ` as unknown as DocumentNode<Profiles_profilesQuery, Profiles_profilesQueryVariables>;
+export const Profiles_pinProfileTypeDocument = gql`
+  mutation Profiles_pinProfileType($profileTypeId: GID!) {
+    pinProfileType(profileTypeId: $profileTypeId) {
+      id
+      isPinned
+    }
+  }
+` as unknown as DocumentNode<
+  Profiles_pinProfileTypeMutation,
+  Profiles_pinProfileTypeMutationVariables
+>;
+export const Profiles_unpinProfileTypeDocument = gql`
+  mutation Profiles_unpinProfileType($profileTypeId: GID!) {
+    unpinProfileType(profileTypeId: $profileTypeId) {
+      id
+      isPinned
+    }
+  }
+` as unknown as DocumentNode<
+  Profiles_unpinProfileTypeMutation,
+  Profiles_unpinProfileTypeMutationVariables
+>;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query

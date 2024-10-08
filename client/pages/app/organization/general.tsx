@@ -39,10 +39,8 @@ const MAX_FILE_SIZE = 1024 * 1024;
 function OrganizationGeneral() {
   const intl = useIntl();
 
-  const {
-    data: { me, realMe },
-  } = useAssertQueryOrPreviousData(OrganizationGeneral_userDocument);
-
+  const { data: queryObject } = useAssertQueryOrPreviousData(OrganizationGeneral_userDocument);
+  const { me } = queryObject;
   const userCanEditOrganization = useHasPermission("ORG_SETTINGS");
 
   const dropzoneRef = useRef<DropzoneRef>(null);
@@ -77,8 +75,7 @@ function OrganizationGeneral() {
         id: "organization.general.title",
         defaultMessage: "General",
       })}
-      me={me}
-      realMe={realMe}
+      queryObject={queryObject}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.general.title" defaultMessage="General" />

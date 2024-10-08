@@ -1288,6 +1288,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "SHOW_CONTACTS_BUTTON",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "SKIP_FORWARD_SECURITY",
         description: null,
         isDeprecated: false,

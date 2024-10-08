@@ -1,6 +1,7 @@
-import { Button, ButtonOptions, Center, Text, ThemingProps } from "@chakra-ui/react";
+import { Button, ButtonOptions, Center, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactElement, ReactNode } from "react";
+import { OverflownText } from "../common/OverflownText";
 
 interface NavBarButtonProps
   extends Omit<ButtonOptions, "leftIcon" | "rightIcon">,
@@ -42,7 +43,10 @@ export const NavBarButton = chakraForwardRef<"button", NavBarButtonProps>(functi
         },
         ...sx,
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        onClick?.(e);
+        e.currentTarget.blur();
+      }}
       paddingX={2.5}
       iconSpacing={3}
       justifyContent="flex-start"
@@ -54,9 +58,9 @@ export const NavBarButton = chakraForwardRef<"button", NavBarButtonProps>(functi
       }
       {...props}
     >
-      <Text className="show-on-expand" as="span" noOfLines={1}>
+      <OverflownText placement="end" className="show-on-expand">
         {children}
-      </Text>
+      </OverflownText>
     </Button>
   );
 });

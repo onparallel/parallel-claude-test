@@ -370,6 +370,17 @@ export function useFeatureFlags() {
               defaultMessage: 'Enables the new PDF engine "Typst"',
             }),
           },
+          {
+            name: "SHOW_CONTACTS_BUTTON",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.show-contacts-button-name",
+              defaultMessage: "Show contacts button",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.show-contacts-button-description",
+              defaultMessage: "Shows the contacts button in nav bar",
+            }),
+          },
           ...(["ca", "it", "pt"] as const).map((locale) => {
             const lang = locales.find((l) => l.key === locale)!.localizedLabel;
             return {

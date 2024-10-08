@@ -6,17 +6,17 @@ import { FormattedMessage } from "react-intl";
 
 export interface OrganizationSettingsLayoutProps
   extends Omit<SidebarLayoutProps, "basePath" | "sectionsHeader" | "sections"> {
-  me: OrganizationSettingsLayout_QueryFragment["me"];
+  queryObject: OrganizationSettingsLayout_QueryFragment;
   basePath?: string;
 }
 
 export function OrganizationSettingsLayout({
-  me,
+  queryObject,
   children,
   basePath,
   ...props
 }: OrganizationSettingsLayoutProps) {
-  const sections = useOrganizationSections(me);
+  const sections = useOrganizationSections(queryObject.me);
 
   return (
     <SidebarLayout
@@ -26,7 +26,7 @@ export function OrganizationSettingsLayout({
         <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
       }
       sections={sections}
-      me={me}
+      queryObject={queryObject}
     >
       {children}
     </SidebarLayout>
