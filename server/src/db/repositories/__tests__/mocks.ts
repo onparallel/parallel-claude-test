@@ -1366,7 +1366,8 @@ export class Mocks {
   ) {
     return await this.knex<Profile>("profile").insert(
       range(0, amount || 1).map((i) => ({
-        name: faker.word.words(2),
+        name: "",
+        localizable_name: { en: faker.word.words(2) },
         org_id: orgId,
         profile_type_id: profileTypeId,
         ...builder?.(i),

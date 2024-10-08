@@ -312,27 +312,6 @@ export class TaskRepository extends BaseRepository {
     return task;
   }
 
-  /** @deprecated not used anymore */
-  async createCompletedTask<TName extends TaskName>(
-    data: Partial<Task<TName>>,
-    createdBy?: string,
-  ) {
-    const [task] = await this.from("task").insert(
-      {
-        ...data,
-        created_by: createdBy,
-        progress: 100,
-        status: "COMPLETED",
-        started_at: new Date(),
-        processed_at: new Date(),
-        processed_by: createdBy,
-      },
-      "*",
-    );
-
-    return task;
-  }
-
   async updateTask<TName extends TaskName>(
     taskId: number,
     data: Partial<Task<TName>>,

@@ -875,15 +875,6 @@ export type Mutation = {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createAddPetitionPermissionMaybeTask: MaybeTask;
-  /**
-   *
-   *     Adds permissions to users and groups on given petitions and folders.
-   *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
-   *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
-   *
-   * @deprecated use createAddPetitionPermissionMaybeTask instead
-   */
-  createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -917,14 +908,6 @@ export type Mutation = {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createEditPetitionPermissionMaybeTask: MaybeTask;
-  /**
-   *
-   *     Edits permissions to users and groups on given petitions.
-   *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
-   *
-   * @deprecated use createEditPetitionPermissionMaybeTask instead
-   */
-  createEditPetitionPermissionTask: Task;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
   createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -946,11 +929,6 @@ export type Mutation = {
   createOrganizationPdfDocumentTheme: Organization;
   /** Create parallel */
   createPetition: PetitionBase;
-  /**
-   * Creates a contactless petition access
-   * @deprecated use createContactlessPetitionAccess
-   */
-  createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
   /** Create a petition comment. */
@@ -961,11 +939,6 @@ export type Mutation = {
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
-  /**
-   * Create a petition field comment.
-   * @deprecated use createPetitionComment
-   */
-  createPetitionFieldComment: PetitionFieldComment;
   /** Creates multiple replies for a petition at once */
   createPetitionFieldReplies: Array<PetitionFieldReply>;
   /** Creates a petition from a profile and a base template, prefilling the field groups linked to profile types with the provided profile and all its current relationships */
@@ -1000,14 +973,6 @@ export type Mutation = {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createRemovePetitionPermissionMaybeTask: MaybeTask;
-  /**
-   *
-   *       Removes permissions to users and groups on given petitions.
-   *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
-   *
-   * @deprecated use createRemovePetitionPermissionMaybeTask instead
-   */
-  createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -1045,11 +1010,6 @@ export type Mutation = {
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
   deletePetitionFieldAttachment: PetitionField;
-  /**
-   * Delete a petition field comment.
-   * @deprecated use deletePetitionComment
-   */
-  deletePetitionFieldComment: PetitionField;
   /** Deletes a petition list view of the user */
   deletePetitionListView: User;
   /** Deletes a reply to a petition field. */
@@ -1128,11 +1088,6 @@ export type Mutation = {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition comment. */
   publicCreatePetitionComment: PublicPetitionFieldComment;
-  /**
-   * Create a petition field comment.
-   * @deprecated Use publicCreatePetitionComment instead
-   */
-  publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates replies on a petition field as recipient. */
   publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
   /** Starts an export pdf task in a recipient context */
@@ -1141,11 +1096,6 @@ export type Mutation = {
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition comment. */
   publicDeletePetitionComment: PublicPetitionFieldOrPublicPetition;
-  /**
-   * Delete a petition field comment.
-   * @deprecated Use publicDeletePetitionComment instead
-   */
-  publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
   publicDeletePetitionFieldReply: PublicPetitionField;
   /** Notifies the backend that the upload is complete. */
@@ -1171,11 +1121,6 @@ export type Mutation = {
   publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition comment. */
   publicUpdatePetitionComment: PublicPetitionFieldComment;
-  /**
-   * Update a petition field comment.
-   * @deprecated Use publicUpdatePetitionComment instead
-   */
-  publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates replies on a petition field as recipient. */
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
   /** Reactivates the specified inactive petition accesses. */
@@ -1292,11 +1237,6 @@ export type Mutation = {
   updatePetitionField: PetitionField;
   /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
   updatePetitionFieldAutoSearchConfig: PetitionField;
-  /**
-   * Update a petition field comment.
-   * @deprecated use updatePetitionComment
-   */
-  updatePetitionFieldComment: PetitionFieldComment;
   updatePetitionFieldGroupRelationships: PetitionBase;
   /** Updates multiple replies for a petition at once */
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
@@ -1503,17 +1443,6 @@ export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
-export type MutationcreateAddPetitionPermissionTaskArgs = {
-  folders?: InputMaybe<FoldersInput>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
-  permissionType: PetitionPermissionTypeRW;
-  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
 export type MutationcreateAzureOpenAiIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   endpoint: Scalars["String"]["input"];
@@ -1590,13 +1519,6 @@ export type MutationcreateEditPetitionPermissionMaybeTaskArgs = {
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
-export type MutationcreateEditPetitionPermissionTaskArgs = {
-  permissionType: PetitionPermissionTypeRW;
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
 export type MutationcreateEventSubscriptionSignatureKeyArgs = {
   subscriptionId: Scalars["GID"]["input"];
 };
@@ -1664,10 +1586,6 @@ export type MutationcreatePetitionArgs = {
   type?: InputMaybe<PetitionBaseType>;
 };
 
-export type MutationcreatePetitionAccessArgs = {
-  petitionId: Scalars["GID"]["input"];
-};
-
 export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   data: Array<FileUploadInput>;
   petitionId: Scalars["GID"]["input"];
@@ -1704,17 +1622,6 @@ export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
   data: FileUploadInput;
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
-};
-
-export type MutationcreatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"]["input"];
-  isInternal: Scalars["Boolean"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
-  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
-  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
-  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationcreatePetitionFieldRepliesArgs = {
@@ -1816,13 +1723,6 @@ export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
-export type MutationcreateRemovePetitionPermissionTaskArgs = {
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-};
-
 export type MutationcreateSignaturitIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1913,12 +1813,6 @@ export type MutationdeletePetitionFieldArgs = {
 export type MutationdeletePetitionFieldAttachmentArgs = {
   attachmentId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-};
-
-export type MutationdeletePetitionFieldCommentArgs = {
-  petitionFieldCommentId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -2162,12 +2056,6 @@ export type MutationpublicCreatePetitionCommentArgs = {
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
-export type MutationpublicCreatePetitionFieldCommentArgs = {
-  content: Scalars["String"]["input"];
-  keycode: Scalars["ID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-};
-
 export type MutationpublicCreatePetitionFieldRepliesArgs = {
   fields: Array<CreatePetitionFieldReplyInput>;
   keycode: Scalars["ID"]["input"];
@@ -2188,12 +2076,6 @@ export type MutationpublicDelegateAccessToContactArgs = {
 export type MutationpublicDeletePetitionCommentArgs = {
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
-};
-
-export type MutationpublicDeletePetitionFieldCommentArgs = {
-  keycode: Scalars["ID"]["input"];
-  petitionFieldCommentId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicDeletePetitionFieldReplyArgs = {
@@ -2270,13 +2152,6 @@ export type MutationpublicUpdatePetitionCommentArgs = {
   content: Scalars["String"]["input"];
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
-};
-
-export type MutationpublicUpdatePetitionFieldCommentArgs = {
-  content: Scalars["String"]["input"];
-  keycode: Scalars["ID"]["input"];
-  petitionFieldCommentId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicUpdatePetitionFieldRepliesArgs = {
@@ -2629,17 +2504,6 @@ export type MutationupdatePetitionFieldAutoSearchConfigArgs = {
   config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
-};
-
-export type MutationupdatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"]["input"];
-  petitionFieldCommentId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
-  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
-  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
-  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationupdatePetitionFieldGroupRelationshipsArgs = {
@@ -4314,7 +4178,6 @@ export type Profile = Timestamps & {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   localizableName: Scalars["LocalizableUserText"]["output"];
-  /** @deprecated Use localizableName */
   name: Scalars["String"]["output"];
   permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   petitions: PetitionPagination;
@@ -5245,16 +5108,6 @@ export type Query = {
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut: Maybe<PublicRemindersOptOut>;
-  /**
-   * Search user groups
-   * @deprecated use paginated userGroups query instead
-   */
-  searchUserGroups: Array<UserGroup>;
-  /**
-   * Search users and user groups
-   * @deprecated Use me.organization.users
-   */
-  searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
@@ -5489,20 +5342,6 @@ export type QuerypublicTaskArgs = {
 
 export type QueryremindersOptOutArgs = {
   keycode: Scalars["ID"]["input"];
-};
-
-export type QuerysearchUserGroupsArgs = {
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  search: Scalars["String"]["input"];
-  type?: InputMaybe<Array<UserGroupType>>;
-};
-
-export type QuerysearchUsersArgs = {
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  includeGroups?: InputMaybe<Scalars["Boolean"]["input"]>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
-  search: Scalars["String"]["input"];
 };
 
 export type QuerytagsArgs = {

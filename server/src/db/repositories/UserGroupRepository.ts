@@ -303,39 +303,6 @@ export class UserGroupRepository extends BaseRepository {
     }, t);
   }
 
-  /** @deprecated use getPaginatedUserGroupsForOrg */
-  async searchUserGroups(
-    orgId: number,
-    search: string,
-    opts: {
-      excludeUserGroups: number[];
-      type?: UserGroupType[] | null;
-    },
-  ) {
-    return await this.from("user_group")
-      .where({
-        org_id: orgId,
-        deleted_at: null,
-      })
-      .mmodify((q) => {
-        if (opts.excludeUserGroups.length > 0) {
-          q.whereNotIn("id", opts.excludeUserGroups);
-        }
-        if (opts.type) {
-          q.whereIn("type", opts.type);
-        }
-      })
-      .where((q) => {
-        q.whereSearch("name", search).or.whereExists((q2) =>
-          q2
-            .select(this.knex.raw("1"))
-            .fromRaw(`jsonb_each_text(localizable_name) AS t(key, value)`)
-            .whereSearch("value", search),
-        );
-      })
-      .select("*");
-  }
-
   private async addUserGroupMemberPermissions(
     userGroupIds: number[],
     memberIds: number[],

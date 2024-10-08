@@ -377,38 +377,6 @@ export class UserRepository extends BaseRepository {
     return user;
   }
 
-  /** @deprecated */
-  async searchUsers(
-    orgId: number,
-    search: string,
-    opts: {
-      includeInactive: boolean;
-      excludeUsers: number[];
-    },
-  ) {
-    return await this.from("user")
-      .join("user_data", "user.user_data_id", "user_data.id")
-      .where({
-        org_id: orgId,
-
-        ...(opts.includeInactive ? {} : { status: "ACTIVE" }),
-      })
-      .whereNull("user.deleted_at")
-      .whereNull("user_data.deleted_at")
-      .mmodify((q) => {
-        if (opts.excludeUsers.length > 0) {
-          q.whereNotIn("user.id", opts.excludeUsers);
-        }
-        q.andWhere((q) => {
-          q.whereSearch(
-            this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`),
-            search,
-          ).or.whereSearch("user_data.email", search);
-        });
-      })
-      .select<User[]>("user.*");
-  }
-
   readonly loadAvatarPathByUserDataId = this.buildLoader<number, Maybe<string>>(
     async (userDataIds, t) => {
       const results = await this.raw<{ id: number; path: string }>(

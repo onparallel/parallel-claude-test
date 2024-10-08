@@ -178,7 +178,7 @@ export const profiles = queryField((t) => {
     resolve: async (_, { limit, offset, search, sortBy, filter }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
-        name: "name",
+        name: "name_en",
       } as const;
       return ctx.profiles.getPaginatedProfileForOrg(ctx.user!.org_id, {
         limit,

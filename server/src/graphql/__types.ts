@@ -1981,7 +1981,6 @@ export interface NexusGenFieldTypes {
     copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createAddPetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
-    createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
     createBankflipDocumentProcessingIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1995,7 +1994,6 @@ export interface NexusGenFieldTypes {
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
     createEInformaProfileExternalSourceIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createEditPetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
-    createEditPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
@@ -2007,13 +2005,11 @@ export interface NexusGenFieldTypes {
     createOrganization: NexusGenRootTypes["Organization"]; // Organization!
     createOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    createPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"][]; // [PetitionAttachmentUploadData!]!
     createPetitionComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
-    createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     createPetitionFromProfile: NexusGenRootTypes["Petition"]; // Petition!
     createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
@@ -2030,7 +2026,6 @@ export interface NexusGenFieldTypes {
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
     createRemovePetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
-    createRemovePetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesCsvExportTask: NexusGenRootTypes["Task"]; // Task!
@@ -2050,7 +2045,6 @@ export interface NexusGenFieldTypes {
     deletePetitionComment: NexusGenRootTypes["PetitionFieldOrPetition"]; // PetitionFieldOrPetition!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionListView: NexusGenRootTypes["User"]; // User!
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
@@ -2093,12 +2087,10 @@ export interface NexusGenFieldTypes {
     publicCreateAndSendPetitionFromPublicLink: NexusGenEnums["Result"]; // Result!
     publicCreateFileUploadReply: NexusGenRootTypes["PublicCreateFileUploadReply"]; // PublicCreateFileUploadReply!
     publicCreatePetitionComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
-    publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicCreatePetitionFieldReplies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     publicCreatePrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     publicDelegateAccessToContact: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicDeletePetitionComment: NexusGenRootTypes["PublicPetitionFieldOrPublicPetition"]; // PublicPetitionFieldOrPublicPetition!
-    publicDeletePetitionFieldComment: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicDeletePetitionFieldReply: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -2112,7 +2104,6 @@ export interface NexusGenFieldTypes {
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicStartAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     publicUpdatePetitionComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
-    publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReplies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2175,7 +2166,6 @@ export interface NexusGenFieldTypes {
     updatePetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldAutoSearchConfig: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldGroupRelationships: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -3545,8 +3535,6 @@ export interface NexusGenFieldTypes {
     publicTemplateCategories: string[]; // [String!]!
     realMe: NexusGenRootTypes["User"]; // User!
     remindersOptOut: NexusGenRootTypes["PublicRemindersOptOut"] | null; // PublicRemindersOptOut
-    searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
-    searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["EventSubscription"][]; // [EventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     tagsByName: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -4639,7 +4627,6 @@ export interface NexusGenFieldTypeNames {
     copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createAddPetitionPermissionMaybeTask: "MaybeTask";
-    createAddPetitionPermissionTask: "Task";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
     createBankflipDocumentProcessingIntegration: "SupportMethodResponse";
@@ -4653,7 +4640,6 @@ export interface NexusGenFieldTypeNames {
     createDowJonesProfileDownloadTask: "Task";
     createEInformaProfileExternalSourceIntegration: "SupportMethodResponse";
     createEditPetitionPermissionMaybeTask: "MaybeTask";
-    createEditPetitionPermissionTask: "Task";
     createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
@@ -4665,13 +4651,11 @@ export interface NexusGenFieldTypeNames {
     createOrganization: "Organization";
     createOrganizationPdfDocumentTheme: "Organization";
     createPetition: "PetitionBase";
-    createPetitionAccess: "PetitionAccess";
     createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
     createPetitionComment: "PetitionFieldComment";
     createPetitionEventSubscription: "PetitionEventSubscription";
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
-    createPetitionFieldComment: "PetitionFieldComment";
     createPetitionFieldReplies: "PetitionFieldReply";
     createPetitionFromProfile: "Petition";
     createPetitionListView: "PetitionListView";
@@ -4688,7 +4672,6 @@ export interface NexusGenFieldTypeNames {
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
     createRemovePetitionPermissionMaybeTask: "MaybeTask";
-    createRemovePetitionPermissionTask: "Task";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesCsvExportTask: "Task";
@@ -4708,7 +4691,6 @@ export interface NexusGenFieldTypeNames {
     deletePetitionComment: "PetitionFieldOrPetition";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldAttachment: "PetitionField";
-    deletePetitionFieldComment: "PetitionField";
     deletePetitionListView: "User";
     deletePetitionReply: "PetitionField";
     deletePetitionVariable: "Petition";
@@ -4751,12 +4733,10 @@ export interface NexusGenFieldTypeNames {
     publicCreateAndSendPetitionFromPublicLink: "Result";
     publicCreateFileUploadReply: "PublicCreateFileUploadReply";
     publicCreatePetitionComment: "PublicPetitionFieldComment";
-    publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
     publicCreatePetitionFieldReplies: "PublicPetitionFieldReply";
     publicCreatePrintPdfTask: "Task";
     publicDelegateAccessToContact: "PublicPetitionAccess";
     publicDeletePetitionComment: "PublicPetitionFieldOrPublicPetition";
-    publicDeletePetitionFieldComment: "PublicPetitionField";
     publicDeletePetitionFieldReply: "PublicPetitionField";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
     publicFileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
@@ -4770,7 +4750,6 @@ export interface NexusGenFieldTypeNames {
     publicSendVerificationCode: "VerificationCodeRequest";
     publicStartAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     publicUpdatePetitionComment: "PublicPetitionFieldComment";
-    publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldReplies: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     removePetitionPassword: "SupportMethodResponse";
@@ -4833,7 +4812,6 @@ export interface NexusGenFieldTypeNames {
     updatePetitionEventSubscription: "PetitionEventSubscription";
     updatePetitionField: "PetitionField";
     updatePetitionFieldAutoSearchConfig: "PetitionField";
-    updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldGroupRelationships: "PetitionBase";
     updatePetitionFieldReplies: "PetitionFieldReply";
     updatePetitionFieldRepliesStatus: "PetitionField";
@@ -6203,8 +6181,6 @@ export interface NexusGenFieldTypeNames {
     publicTemplateCategories: "String";
     realMe: "User";
     remindersOptOut: "PublicRemindersOptOut";
-    searchUserGroups: "UserGroup";
-    searchUsers: "UserOrUserGroup";
     subscriptions: "EventSubscription";
     tags: "TagPagination";
     tagsByName: "TagPagination";
@@ -6937,17 +6913,6 @@ export interface NexusGenArgTypes {
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
-    createAddPetitionPermissionTask: {
-      // args
-      folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
-      message?: string | null; // String
-      notify?: boolean | null; // Boolean
-      permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
-      petitionIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      subscribe: boolean | null; // Boolean
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     createAzureOpenAiIntegration: {
       // args
       apiKey: string; // String!
@@ -7024,13 +6989,6 @@ export interface NexusGenArgTypes {
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
-    createEditPetitionPermissionTask: {
-      // args
-      permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     createEventSubscriptionSignatureKey: {
       // args
       subscriptionId: NexusGenScalars["GID"]; // GID!
@@ -7098,10 +7056,6 @@ export interface NexusGenArgTypes {
       petitionId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
-    createPetitionAccess: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
     createPetitionAttachmentUploadLink: {
       // args
       data: NexusGenInputs["FileUploadInput"][]; // [FileUploadInput!]!
@@ -7139,17 +7093,6 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    createPetitionFieldComment: {
-      // args
-      content: NexusGenScalars["JSON"]; // JSON!
-      isInternal: boolean; // Boolean!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      sharePetition?: boolean | null; // Boolean
-      sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
-      sharePetitionSubscribed?: boolean | null; // Boolean
-      throwOnNoPermission?: boolean | null; // Boolean
     };
     createPetitionFieldReplies: {
       // args
@@ -7250,13 +7193,6 @@ export interface NexusGenArgTypes {
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
-    createRemovePetitionPermissionTask: {
-      // args
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      removeAll?: boolean | null; // Boolean
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     createSignaturitIntegration: {
       // args
       apiKey: string; // String!
@@ -7348,12 +7284,6 @@ export interface NexusGenArgTypes {
       // args
       attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    deletePetitionFieldComment: {
-      // args
-      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     deletePetitionListView: {
@@ -7596,12 +7526,6 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       petitionFieldId?: NexusGenScalars["GID"] | null; // GID
     };
-    publicCreatePetitionFieldComment: {
-      // args
-      content: string; // String!
-      keycode: string; // ID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
-    };
     publicCreatePetitionFieldReplies: {
       // args
       fields: NexusGenInputs["CreatePetitionFieldReplyInput"][]; // [CreatePetitionFieldReplyInput!]!
@@ -7623,12 +7547,6 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-    };
-    publicDeletePetitionFieldComment: {
-      // args
-      keycode: string; // ID!
-      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     publicDeletePetitionFieldReply: {
       // args
@@ -7705,13 +7623,6 @@ export interface NexusGenArgTypes {
       content: string; // String!
       keycode: string; // ID!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-    };
-    publicUpdatePetitionFieldComment: {
-      // args
-      content: string; // String!
-      keycode: string; // ID!
-      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     publicUpdatePetitionFieldReplies: {
       // args
@@ -8064,17 +7975,6 @@ export interface NexusGenArgTypes {
       config?: NexusGenInputs["UpdatePetitionFieldAutoSearchConfigInput"] | null; // UpdatePetitionFieldAutoSearchConfigInput
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    updatePetitionFieldComment: {
-      // args
-      content: NexusGenScalars["JSON"]; // JSON!
-      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      sharePetition?: boolean | null; // Boolean
-      sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
-      sharePetitionSubscribed?: boolean | null; // Boolean
-      throwOnNoPermission?: boolean | null; // Boolean
     };
     updatePetitionFieldGroupRelationships: {
       // args
@@ -8595,20 +8495,6 @@ export interface NexusGenArgTypes {
     remindersOptOut: {
       // args
       keycode: string; // ID!
-    };
-    searchUserGroups: {
-      // args
-      excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
-      search: string; // String!
-      type?: NexusGenEnums["UserGroupType"][] | null; // [UserGroupType!]
-    };
-    searchUsers: {
-      // args
-      excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
-      excludeUsers?: NexusGenScalars["GID"][] | null; // [GID!]
-      includeGroups?: boolean | null; // Boolean
-      includeInactive?: boolean | null; // Boolean
-      search: string; // String!
     };
     tags: {
       // args

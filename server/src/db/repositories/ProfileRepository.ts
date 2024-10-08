@@ -676,7 +676,7 @@ export class ProfileRepository extends BaseRepository {
     opts: {
       search?: string | null;
       filter?: ProfileFilter | null;
-      sortBy?: SortBy<"created_at" | "name">[];
+      sortBy?: SortBy<"created_at" | "name_en" | "name_es">[];
     } & PageOpts,
   ) {
     return this.getPagination<Profile>(
@@ -777,11 +777,19 @@ export class ProfileRepository extends BaseRepository {
               });
             }
           }
-          if (isNonNullish(sortBy)) {
-            q.orderBy(
-              sortBy.map(({ field, order }) => {
-                return { column: field, order };
-              }),
+          if (isNonNullish(sortBy) && sortBy.length > 0) {
+            q.orderByRaw(
+              sortBy
+                .map((s) => {
+                  if (s.field === "name_en") {
+                    return `"localizable_name"->>'en' ${s.order}`;
+                  } else if (s.field === "name_es") {
+                    return `"localizable_name"->>'es' ${s.order}`;
+                  } else {
+                    return `"${s.field}" ${s.order}`;
+                  }
+                })
+                .join(", "),
             );
           }
         })
@@ -919,7 +927,6 @@ export class ProfileRepository extends BaseRepository {
           from pv
         )
         update "profile" p set
-          "name" = en,
           localizable_name = ?,
           updated_by = ?,
           updated_at = now()

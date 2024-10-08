@@ -1144,26 +1144,6 @@ type Mutation {
     userIds: [GID!]
   ): MaybeTask!
 
-  "\n    Adds permissions to users and groups on given petitions and folders.\n    If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.\n  "
-  createAddPetitionPermissionTask(
-    folders: FoldersInput
-    message: String
-
-    """
-    Wether to notify the user via email or not.
-    """
-    notify: Boolean = false
-    permissionType: PetitionPermissionTypeRW!
-    petitionIds: [GID!]
-
-    """
-    Subscribe to notifications.
-    """
-    subscribe: Boolean = true
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): Task! @deprecated(reason: "use createAddPetitionPermissionMaybeTask instead")
-
   """
   Creates a new Azure OpenAI integration on the provided organization
   """
@@ -1310,14 +1290,6 @@ type Mutation {
     userIds: [GID!]
   ): MaybeTask!
 
-  "\n    Edits permissions to users and groups on given petitions.\n    If the total amount of permissions to edit exceeds 100, a task will be created for async completion.\n  "
-  createEditPetitionPermissionTask(
-    permissionType: PetitionPermissionTypeRW!
-    petitionIds: [GID!]!
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): Task! @deprecated(reason: "use createEditPetitionPermissionMaybeTask instead")
-
   """
   Creates a pair of asymmetric keys to be used for signing webhook events
   """
@@ -1432,12 +1404,6 @@ type Mutation {
   ): PetitionBase!
 
   """
-  Creates a contactless petition access
-  """
-  createPetitionAccess(petitionId: GID!): PetitionAccess!
-    @deprecated(reason: "use createContactlessPetitionAccess")
-
-  """
   Generates and returns a signed url to upload a petition attachment to AWS S3
   """
   createPetitionAttachmentUploadLink(
@@ -1505,36 +1471,6 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachmentUploadData!
-
-  """
-  Create a petition field comment.
-  """
-  createPetitionFieldComment(
-    content: JSON!
-    isInternal: Boolean!
-    petitionFieldId: GID!
-    petitionId: GID!
-
-    """
-    Automatically share the petition with mentioned users that have no permissions
-    """
-    sharePetition: Boolean
-
-    """
-    Permission to assign to the mentioned users if sharePetition=true
-    """
-    sharePetitionPermission: PetitionPermissionTypeRW
-
-    """
-    Wether to subscribe or not to notifications the mentioned users if sharePetition=true
-    """
-    sharePetitionSubscribed: Boolean
-
-    """
-    Throw error if set to true and a user with no permissions is mentioned
-    """
-    throwOnNoPermission: Boolean
-  ): PetitionFieldComment! @deprecated(reason: "use createPetitionComment")
 
   """
   Creates multiple replies for a petition at once
@@ -1676,18 +1612,6 @@ type Mutation {
     userIds: [GID!]
   ): MaybeTask!
 
-  "\n      Removes permissions to users and groups on given petitions.\n      If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    "
-  createRemovePetitionPermissionTask(
-    petitionIds: [GID!]!
-
-    """
-    Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
-    """
-    removeAll: Boolean
-    userGroupIds: [GID!]
-    userIds: [GID!]
-  ): Task! @deprecated(reason: "use createRemovePetitionPermissionMaybeTask instead")
-
   """
   Creates a new Signaturit integration on the user's organization
   """
@@ -1798,15 +1722,6 @@ type Mutation {
   Remove a petition field attachment
   """
   deletePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): PetitionField!
-
-  """
-  Delete a petition field comment.
-  """
-  deletePetitionFieldComment(
-    petitionFieldCommentId: GID!
-    petitionFieldId: GID!
-    petitionId: GID!
-  ): PetitionField! @deprecated(reason: "use deletePetitionComment")
 
   """
   Deletes a petition list view of the user
@@ -2156,15 +2071,6 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
-  Create a petition field comment.
-  """
-  publicCreatePetitionFieldComment(
-    content: String!
-    keycode: ID!
-    petitionFieldId: GID!
-  ): PublicPetitionFieldComment! @deprecated(reason: "Use publicCreatePetitionComment instead")
-
-  """
   Creates replies on a petition field as recipient.
   """
   publicCreatePetitionFieldReplies(
@@ -2195,15 +2101,6 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentId: GID!
   ): PublicPetitionFieldOrPublicPetition!
-
-  """
-  Delete a petition field comment.
-  """
-  publicDeletePetitionFieldComment(
-    keycode: ID!
-    petitionFieldCommentId: GID!
-    petitionFieldId: GID!
-  ): PublicPetitionField! @deprecated(reason: "Use publicDeletePetitionComment instead")
 
   """
   Deletes a reply to a petition field.
@@ -2310,16 +2207,6 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentId: GID!
   ): PublicPetitionFieldComment!
-
-  """
-  Update a petition field comment.
-  """
-  publicUpdatePetitionFieldComment(
-    content: String!
-    keycode: ID!
-    petitionFieldCommentId: GID!
-    petitionFieldId: GID!
-  ): PublicPetitionFieldComment! @deprecated(reason: "Use publicUpdatePetitionComment instead")
 
   """
   Updates replies on a petition field as recipient.
@@ -2848,36 +2735,6 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionField!
-
-  """
-  Update a petition field comment.
-  """
-  updatePetitionFieldComment(
-    content: JSON!
-    petitionFieldCommentId: GID!
-    petitionFieldId: GID!
-    petitionId: GID!
-
-    """
-    Automatically share the petition with mentioned users that have no permissions
-    """
-    sharePetition: Boolean
-
-    """
-    Permission to assign to the mentioned users if sharePetition=true
-    """
-    sharePetitionPermission: PetitionPermissionTypeRW
-
-    """
-    Wether to subscribe or not to notifications the mentioned users if sharePetition=true
-    """
-    sharePetitionSubscribed: Boolean
-
-    """
-    Throw error if set to true and a user with no permissions is mentioned
-    """
-    throwOnNoPermission: Boolean
-  ): PetitionFieldComment! @deprecated(reason: "use updatePetitionComment")
   updatePetitionFieldGroupRelationships(
     petitionId: GID!
     relationships: [UpdatePetitionFieldGroupRelationshipInput!]!
@@ -5581,7 +5438,7 @@ type Profile implements Timestamps {
   ): ProfileEventPagination!
   id: GID!
   localizableName: LocalizableUserText!
-  name: String! @deprecated(reason: "Use localizableName")
+  name: String!
   permanentDeletionAt: DateTime
   petitions(
     """
@@ -7146,26 +7003,6 @@ type Query {
   Exposes minimal information for reminders page so the contact doesn't need to be verified
   """
   remindersOptOut(keycode: ID!): PublicRemindersOptOut
-
-  """
-  Search user groups
-  """
-  searchUserGroups(
-    excludeUserGroups: [GID!]
-    search: String!
-    type: [UserGroupType!]
-  ): [UserGroup!]! @deprecated(reason: "use paginated userGroups query instead")
-
-  """
-  Search users and user groups
-  """
-  searchUsers(
-    excludeUserGroups: [GID!]
-    excludeUsers: [GID!]
-    includeGroups: Boolean
-    includeInactive: Boolean
-    search: String!
-  ): [UserOrUserGroup!]! @deprecated(reason: "Use me.organization.users")
   subscriptions: [EventSubscription!]!
 
   """

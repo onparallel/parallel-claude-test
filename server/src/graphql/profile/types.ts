@@ -179,7 +179,6 @@ export const Profile = objectType({
     t.globalId("id");
     t.string("name", {
       resolve: (o) => o.localizable_name.en ?? "",
-      deprecation: "Use localizableName",
     });
     t.localizableUserText("localizableName", { resolve: (o) => o.localizable_name });
     t.field("profileType", {

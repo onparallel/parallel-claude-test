@@ -1,15 +1,12 @@
-import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "nexus";
+import { idArg, list, nonNull, queryField, stringArg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { authenticate } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
-import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validGlobalId } from "../helpers/validators/validGlobalId";
-import { userHasAccessToUsers } from "../petition/mutations/authorizers";
-import { userHasAccessToUserGroups } from "../user-group/authorizers";
 
 export const userQueries = queryField((t) => {
   t.field("realMe", {
@@ -41,46 +38,6 @@ export const userQueries = queryField((t) => {
     ),
     resolve: () => true,
   });
-});
-
-/** @deprecated use me.organization.users */
-export const searchUsers = queryField("searchUsers", {
-  type: list("UserOrUserGroup"),
-  description: "Search users and user groups",
-  deprecation: "Use me.organization.users",
-  authorize: authenticateAnd(
-    userHasAccessToUsers("excludeUsers"),
-    userHasAccessToUserGroups("excludeUserGroups"),
-  ),
-  args: {
-    search: nonNull(stringArg()),
-    excludeUsers: list(nonNull(globalIdArg("User"))),
-    excludeUserGroups: list(nonNull(globalIdArg("UserGroup"))),
-    includeGroups: booleanArg(),
-    includeInactive: booleanArg(),
-  },
-  resolve: async (
-    _,
-    { search, includeGroups, includeInactive, excludeUsers, excludeUserGroups },
-    ctx,
-  ) => {
-    const [users, userGroups] = await Promise.all([
-      ctx.users
-        .searchUsers(ctx.user!.org_id, search, {
-          includeInactive: includeInactive ?? false,
-          excludeUsers: excludeUsers ?? [],
-        })
-        .then((us) => us.map((u) => ({ ...u, __type: "User" as const }))),
-      includeGroups
-        ? ctx.userGroups
-            .searchUserGroups(ctx.user!.org_id, search, {
-              excludeUserGroups: excludeUserGroups ?? [],
-            })
-            .then((ugs) => ugs.map((ug) => ({ ...ug, __type: "UserGroup" as const })))
-        : [],
-    ]);
-    return [...userGroups, ...users];
-  },
 });
 
 export const getUsersOrGroups = queryField("getUsersOrGroups", {
