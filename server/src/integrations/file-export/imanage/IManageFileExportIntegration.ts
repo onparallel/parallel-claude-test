@@ -168,7 +168,7 @@ export class IManageFileExportIntegration
 
         const hash = createHmac(
           "sha256",
-          Buffer.from(this.config.fileExport.iManage.signatureSecret, "base64"),
+          Buffer.from(this.config.fileExport.iManage.signatureSecret),
         )
           .update(Buffer.from(requestUri + requestBody + timestamp))
           .digest();

@@ -48,7 +48,7 @@ async function main() {
 
   const secret = await loadSignatureSecret(environment);
 
-  const signature = createHmac("sha256", Buffer.from(secret, "base64"))
+  const signature = createHmac("sha256", Buffer.from(secret))
     .update(url + body + timestamp)
     .digest("base64");
 
