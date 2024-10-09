@@ -7,6 +7,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
 import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
+import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
@@ -20,7 +21,6 @@ import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExport
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
-import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -60,10 +60,11 @@ createQueueWorker(
   {
     batchSize: 1,
     forkHandlers: true,
-    forkTimeout: async ({ taskId }, ctx) => {
-      const task = await ctx.tasks.loadTask(taskId);
-      if (task?.name === "BULK_PETITION_SEND") {
+    forkTimeout: async ({ taskName }) => {
+      if (taskName === "BULK_PETITION_SEND") {
         return 30 * 60_000;
+      } else if (taskName === "EXPORT_REPLIES") {
+        return 5 * 60_000;
       } else {
         return 2 * 60_000;
       }
