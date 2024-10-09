@@ -1,4 +1,4 @@
-import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
+import { booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isNonNullish } from "remeda";
 import { EventSubscription } from "../../db/__types";
 import { IFetchService } from "../../services/FetchService";
@@ -120,13 +120,15 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
     name: stringArg(),
     fromTemplateId: globalIdArg("Petition"),
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
+    challenge: nullable(booleanArg()),
   },
   validateArgs: validateAnd(
     validUrl((args) => args.eventsUrl, "eventsUrl"),
     notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds"),
   ),
   resolve: async (_, args, ctx) => {
-    const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
+    const challengePassed =
+      args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
     if (!challengePassed) {
       throw new ApolloError(
         "Your URL does not seem to accept POST requests.",
@@ -172,13 +174,15 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
     name: stringArg(),
     fromProfileTypeId: globalIdArg("ProfileType"),
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
+    challenge: nullable(booleanArg()),
   },
   validateArgs: validateAnd(
     validUrl((args) => args.eventsUrl, "eventsUrl"),
     notEmptyArray((args) => args.fromProfileTypeFieldIds, "fromProfileTypeFieldIds"),
   ),
   resolve: async (_, args, ctx) => {
-    const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
+    const challengePassed =
+      args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
     if (!challengePassed) {
       throw new ApolloError(
         "Your URL does not seem to accept POST requests.",

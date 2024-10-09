@@ -7084,6 +7084,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionEventSubscription: {
       // args
+      challenge?: boolean | null; // Boolean
       eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
       eventsUrl: string; // String!
       fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -7144,6 +7145,7 @@ export interface NexusGenArgTypes {
     };
     createProfileEventSubscription: {
       // args
+      challenge?: boolean | null; // Boolean
       eventTypes?: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
       eventsUrl: string; // String!
       fromProfileTypeFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]

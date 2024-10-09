@@ -1671,6 +1671,7 @@ export interface MutationcreatePetitionCommentArgs {
 }
 
 export interface MutationcreatePetitionEventSubscriptionArgs {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
@@ -1731,6 +1732,7 @@ export interface MutationcreateProfileArgs {
 }
 
 export interface MutationcreateProfileEventSubscriptionArgs {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;

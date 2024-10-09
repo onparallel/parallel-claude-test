@@ -1447,6 +1447,7 @@ type Mutation {
   Creates an event subscription for the user's petitions
   """
   createPetitionEventSubscription(
+    challenge: Boolean
     eventTypes: [PetitionEventType!]
     eventsUrl: String!
     fromTemplateFieldIds: [GID!]
@@ -1540,6 +1541,7 @@ type Mutation {
   Creates an event subscription for the user's profiles
   """
   createProfileEventSubscription(
+    challenge: Boolean
     eventTypes: [ProfileEventType!]
     eventsUrl: String!
     fromProfileTypeFieldIds: [GID!]

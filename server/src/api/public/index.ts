@@ -3830,6 +3830,12 @@ export function publicApi(container: Container) {
         operationId: "CreateSubscription",
         summary: "Create subscription",
         description: "Creates a new event subscription on any of your parallels of profiles.",
+        query: {
+          challenge: booleanParam({
+            required: false,
+            excludeFromSpec: true,
+          }),
+        },
         body: JsonBody(CreateEventSubscription),
         responses: {
           201: SuccessResponse(EventSubscription),
@@ -3889,19 +3895,21 @@ export function publicApi(container: Container) {
         },
         tags: ["Webhooks"],
       },
-      async ({ client, body }) => {
+      async ({ client, body, query }) => {
         const _petitionMutation = gql`
           mutation EventSubscriptions_createPetitionEventSubscription(
             $eventsUrl: String!
             $eventTypes: [PetitionEventType!]
             $name: String
             $fromTemplateId: GID
+            $challenge: Boolean
           ) {
             createPetitionEventSubscription(
               eventsUrl: $eventsUrl
               eventTypes: $eventTypes
               name: $name
               fromTemplateId: $fromTemplateId
+              challenge: $challenge
             ) {
               ...PetitionEventSubscription
             }
@@ -3914,12 +3922,14 @@ export function publicApi(container: Container) {
             $eventTypes: [ProfileEventType!]
             $name: String
             $fromProfileTypeId: GID
+            $challenge: Boolean
           ) {
             createProfileEventSubscription(
               eventsUrl: $eventsUrl
               eventTypes: $eventTypes
               name: $name
               fromProfileTypeId: $fromProfileTypeId
+              challenge: $challenge
             ) {
               ...ProfileEventSubscription
             }
@@ -3935,6 +3945,7 @@ export function publicApi(container: Container) {
                 eventTypes: body.eventTypes,
                 name: body.name,
                 fromTemplateId: body.fromTemplateId,
+                challenge: query.challenge,
               },
             );
 
@@ -3947,6 +3958,7 @@ export function publicApi(container: Container) {
                 eventTypes: body.eventTypes,
                 name: body.name,
                 fromProfileTypeId: body.fromProfileTypeId,
+                challenge: query.challenge,
               },
             );
 

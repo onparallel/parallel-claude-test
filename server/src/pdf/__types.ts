@@ -1609,6 +1609,7 @@ export type MutationcreatePetitionCommentArgs = {
 };
 
 export type MutationcreatePetitionEventSubscriptionArgs = {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
@@ -1669,6 +1670,7 @@ export type MutationcreateProfileArgs = {
 };
 
 export type MutationcreateProfileEventSubscriptionArgs = {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
@@ -4683,6 +4685,7 @@ export type ProfileTypeFieldType =
   | "TEXT";
 
 export type ProfileTypeFilter = {
+  includeArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };

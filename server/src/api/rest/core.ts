@@ -1,7 +1,7 @@
 import { json, Request, RequestHandler, Response, Router } from "express";
 import { OpenAPIV3 } from "openapi-types";
 import pProps from "p-props";
-import { omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { Readable } from "stream";
 import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
@@ -41,7 +41,7 @@ export type RestParameters<T> = {
 
 export interface RestParameter<T> {
   parse(value?: any): MaybePromise<T>;
-  spec: OpenAPIV3.ParameterBaseObject;
+  spec?: OpenAPIV3.ParameterBaseObject;
 }
 
 type PathParameters<TPath extends string> = {
@@ -201,13 +201,13 @@ const _PathResolver: any = (function () {
         if (body?.spec) {
           this.spec[method]!.requestBody = body?.spec;
         }
-        this.spec[method]!.parameters = Object.entries<RestParameter<any>>(query ?? {}).map(
-          ([name, parameter]) => ({
+        this.spec[method]!.parameters = Object.entries<RestParameter<any>>(query ?? {})
+          .filter(([, param]) => isNonNullish(param.spec))
+          .map(([name, parameter]) => ({
             name,
             in: "query",
-            ...parameter.spec,
-          }),
-        );
+            ...parameter.spec!,
+          }));
       }
       this.router[method](this.path, ...unMaybeArray(middleware), async (req, res, next) => {
         const response = await (async () => {

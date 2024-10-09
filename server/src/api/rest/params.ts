@@ -42,7 +42,7 @@ export type ParameterOptions<
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > = BaseParameterOptions<T, TRequired, TArray, TDefaultValue> &
-  If<TArray, ArrayParameterOptions, {}>;
+  If<TArray, ArrayParameterOptions, {}> & { excludeFromSpec?: boolean };
 
 export type GeneratedParameterType<
   T,
@@ -113,8 +113,20 @@ export function buildDefinition<
 >(
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
   schema: JsonSchema,
-): OpenAPIV3.ParameterBaseObject {
-  const { required = true, array = false, deprecated, description, example } = options;
+): OpenAPIV3.ParameterBaseObject | undefined {
+  const {
+    required = true,
+    array = false,
+    deprecated,
+    description,
+    example,
+    excludeFromSpec,
+  } = options;
+
+  if (excludeFromSpec) {
+    return undefined;
+  }
+
   return {
     description,
     deprecated,

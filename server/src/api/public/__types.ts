@@ -1609,6 +1609,7 @@ export type MutationcreatePetitionCommentArgs = {
 };
 
 export type MutationcreatePetitionEventSubscriptionArgs = {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
@@ -1669,6 +1670,7 @@ export type MutationcreateProfileArgs = {
 };
 
 export type MutationcreateProfileEventSubscriptionArgs = {
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
   eventsUrl: Scalars["String"]["input"];
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
@@ -4683,6 +4685,7 @@ export type ProfileTypeFieldType =
   | "TEXT";
 
 export type ProfileTypeFilter = {
+  includeArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
@@ -9164,6 +9167,7 @@ export type EventSubscriptions_createPetitionEventSubscriptionMutationVariables 
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type EventSubscriptions_createPetitionEventSubscriptionMutation = {
@@ -9183,6 +9187,7 @@ export type EventSubscriptions_createProfileEventSubscriptionMutationVariables =
   eventTypes?: InputMaybe<Array<ProfileEventType> | ProfileEventType>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  challenge?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type EventSubscriptions_createProfileEventSubscriptionMutation = {
@@ -12374,12 +12379,14 @@ export const EventSubscriptions_createPetitionEventSubscriptionDocument = gql`
     $eventTypes: [PetitionEventType!]
     $name: String
     $fromTemplateId: GID
+    $challenge: Boolean
   ) {
     createPetitionEventSubscription(
       eventsUrl: $eventsUrl
       eventTypes: $eventTypes
       name: $name
       fromTemplateId: $fromTemplateId
+      challenge: $challenge
     ) {
       ...PetitionEventSubscription
     }
@@ -12395,12 +12402,14 @@ export const EventSubscriptions_createProfileEventSubscriptionDocument = gql`
     $eventTypes: [ProfileEventType!]
     $name: String
     $fromProfileTypeId: GID
+    $challenge: Boolean
   ) {
     createProfileEventSubscription(
       eventsUrl: $eventsUrl
       eventTypes: $eventTypes
       name: $name
       fromProfileTypeId: $fromProfileTypeId
+      challenge: $challenge
     ) {
       ...ProfileEventSubscription
     }
