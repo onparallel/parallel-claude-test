@@ -8110,36 +8110,6 @@ export type AppLayoutNavBar_QueryFragment = {
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
-export type AppLayoutNavBar_pinProfileTypeMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type AppLayoutNavBar_pinProfileTypeMutation = {
-  pinProfileType: {
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    icon: ProfileTypeIcon;
-    isPinned: boolean;
-    pluralName: { [locale in UserLocale]?: string };
-  };
-};
-
-export type AppLayoutNavBar_unpinProfileTypeMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type AppLayoutNavBar_unpinProfileTypeMutation = {
-  unpinProfileType: {
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    icon: ProfileTypeIcon;
-    isPinned: boolean;
-    pluralName: { [locale in UserLocale]?: string };
-  };
-};
-
 export type DevelopersLayout_QueryFragment = {
   me: {
     __typename?: "User";
@@ -50236,22 +50206,6 @@ export type Profiles_profilesQuery = {
   };
 };
 
-export type Profiles_pinProfileTypeMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type Profiles_pinProfileTypeMutation = {
-  pinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
-};
-
-export type Profiles_unpinProfileTypeMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type Profiles_unpinProfileTypeMutation = {
-  unpinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
-};
-
 export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Reports_userQuery = {
@@ -55711,6 +55665,26 @@ export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
   | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
+export type usePinProfileType_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  isPinned: boolean;
+};
+
+export type usePinProfileType_UserFragment = {
+  __typename?: "User";
+  id: string;
+  pinnedProfileTypes: Array<{ __typename?: "ProfileType"; id: string; isPinned: boolean }>;
+};
+
+export type usePinProfileType_pinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type usePinProfileType_pinProfileTypeMutation = {
+  pinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
+};
+
 export type useSearchContacts_contactsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   exclude?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
@@ -56318,6 +56292,26 @@ export type useStartSignatureRequest_startSignatureRequestMutation = {
     id: string;
     status: PetitionSignatureRequestStatus;
   };
+};
+
+export type useUnpinProfileType_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  isPinned: boolean;
+};
+
+export type useUnpinProfileType_UserFragment = {
+  __typename?: "User";
+  id: string;
+  pinnedProfileTypes: Array<{ __typename?: "ProfileType"; id: string; isPinned: boolean }>;
+};
+
+export type useUnpinProfileType_unpinProfileTypeMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type useUnpinProfileType_unpinProfileTypeMutation = {
+  unpinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
 };
 
 export type validatePetitionFields_PetitionFieldFragment = {
@@ -65612,6 +65606,36 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
+export const usePinProfileType_ProfileTypeFragmentDoc = gql`
+  fragment usePinProfileType_ProfileType on ProfileType {
+    id
+    isPinned
+  }
+` as unknown as DocumentNode<usePinProfileType_ProfileTypeFragment, unknown>;
+export const usePinProfileType_UserFragmentDoc = gql`
+  fragment usePinProfileType_User on User {
+    id
+    pinnedProfileTypes {
+      ...usePinProfileType_ProfileType
+    }
+  }
+  ${usePinProfileType_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<usePinProfileType_UserFragment, unknown>;
+export const useUnpinProfileType_ProfileTypeFragmentDoc = gql`
+  fragment useUnpinProfileType_ProfileType on ProfileType {
+    id
+    isPinned
+  }
+` as unknown as DocumentNode<useUnpinProfileType_ProfileTypeFragment, unknown>;
+export const useUnpinProfileType_UserFragmentDoc = gql`
+  fragment useUnpinProfileType_User on User {
+    id
+    pinnedProfileTypes {
+      ...useUnpinProfileType_ProfileType
+    }
+  }
+  ${useUnpinProfileType_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<useUnpinProfileType_UserFragment, unknown>;
 export const AdminOrganizationsLayout_updateOrganizationDocument = gql`
   mutation AdminOrganizationsLayout_updateOrganization(
     $orgId: GID!
@@ -65875,28 +65899,6 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
 ` as unknown as DocumentNode<
   ImportContactsDialog_bulkCreateContactsMutation,
   ImportContactsDialog_bulkCreateContactsMutationVariables
->;
-export const AppLayoutNavBar_pinProfileTypeDocument = gql`
-  mutation AppLayoutNavBar_pinProfileType($profileTypeId: GID!) {
-    pinProfileType(profileTypeId: $profileTypeId) {
-      ...AppLayoutNavBar_ProfileType
-    }
-  }
-  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<
-  AppLayoutNavBar_pinProfileTypeMutation,
-  AppLayoutNavBar_pinProfileTypeMutationVariables
->;
-export const AppLayoutNavBar_unpinProfileTypeDocument = gql`
-  mutation AppLayoutNavBar_unpinProfileType($profileTypeId: GID!) {
-    unpinProfileType(profileTypeId: $profileTypeId) {
-      ...AppLayoutNavBar_ProfileType
-    }
-  }
-  ${AppLayoutNavBar_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<
-  AppLayoutNavBar_unpinProfileTypeMutation,
-  AppLayoutNavBar_unpinProfileTypeMutationVariables
 >;
 export const PetitionHeader_reopenPetitionDocument = gql`
   mutation PetitionHeader_reopenPetition($petitionId: GID!) {
@@ -70981,28 +70983,6 @@ export const Profiles_profilesDocument = gql`
   }
   ${Profiles_ProfilePaginationFragmentDoc}
 ` as unknown as DocumentNode<Profiles_profilesQuery, Profiles_profilesQueryVariables>;
-export const Profiles_pinProfileTypeDocument = gql`
-  mutation Profiles_pinProfileType($profileTypeId: GID!) {
-    pinProfileType(profileTypeId: $profileTypeId) {
-      id
-      isPinned
-    }
-  }
-` as unknown as DocumentNode<
-  Profiles_pinProfileTypeMutation,
-  Profiles_pinProfileTypeMutationVariables
->;
-export const Profiles_unpinProfileTypeDocument = gql`
-  mutation Profiles_unpinProfileType($profileTypeId: GID!) {
-    unpinProfileType(profileTypeId: $profileTypeId) {
-      id
-      isPinned
-    }
-  }
-` as unknown as DocumentNode<
-  Profiles_unpinProfileTypeMutation,
-  Profiles_unpinProfileTypeMutationVariables
->;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query
@@ -72459,6 +72439,17 @@ export const useLoginAs_restoreLoginDocument = gql`
   useLoginAs_restoreLoginMutation,
   useLoginAs_restoreLoginMutationVariables
 >;
+export const usePinProfileType_pinProfileTypeDocument = gql`
+  mutation usePinProfileType_pinProfileType($profileTypeId: GID!) {
+    pinProfileType(profileTypeId: $profileTypeId) {
+      ...usePinProfileType_ProfileType
+    }
+  }
+  ${usePinProfileType_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  usePinProfileType_pinProfileTypeMutation,
+  usePinProfileType_pinProfileTypeMutationVariables
+>;
 export const useSearchContacts_contactsDocument = gql`
   query useSearchContacts_contacts($search: String, $exclude: [GID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
@@ -72578,4 +72569,15 @@ export const useStartSignatureRequest_startSignatureRequestDocument = gql`
 ` as unknown as DocumentNode<
   useStartSignatureRequest_startSignatureRequestMutation,
   useStartSignatureRequest_startSignatureRequestMutationVariables
+>;
+export const useUnpinProfileType_unpinProfileTypeDocument = gql`
+  mutation useUnpinProfileType_unpinProfileType($profileTypeId: GID!) {
+    unpinProfileType(profileTypeId: $profileTypeId) {
+      ...useUnpinProfileType_ProfileType
+    }
+  }
+  ${useUnpinProfileType_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  useUnpinProfileType_unpinProfileTypeMutation,
+  useUnpinProfileType_unpinProfileTypeMutationVariables
 >;

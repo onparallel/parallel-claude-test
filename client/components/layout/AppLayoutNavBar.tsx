@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -41,13 +41,9 @@ import {
   UsersIcon,
 } from "@parallel/chakra/icons";
 import {
-  AppLayoutNavBar_pinProfileTypeDocument,
   AppLayoutNavBar_ProfileTypeFragment,
   AppLayoutNavBar_QueryFragment,
-  AppLayoutNavBar_unpinProfileTypeDocument,
-  AppLayoutNavBar_UserFragmentDoc,
 } from "@parallel/graphql/__types";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useCookie } from "@parallel/utils/useCookie";
@@ -56,6 +52,8 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
+import { usePinProfileType } from "@parallel/utils/usePinProfileType";
+import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
 import { useRouter } from "next/router";
 import {
   forwardRef,
@@ -68,6 +66,7 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
@@ -336,6 +335,7 @@ export const AppLayoutNavBar = Object.assign(
                   onToggle={handleSubMenuToggle}
                   isMobile={isMobile}
                   me={me}
+                  isForceOpen={isForceOpen}
                 />
               </Box>
               <Stack
@@ -595,53 +595,15 @@ function SectionsAndProfilesList({
     );
   }, [profileTypes.items.flatMap((p) => [p.id, p.isPinned]).join("")]);
 
-  const [pinProfileType] = useMutation(AppLayoutNavBar_pinProfileTypeDocument);
-  const [unpinProfileType] = useMutation(AppLayoutNavBar_unpinProfileTypeDocument);
+  const unpinProfileType = useUnpinProfileType();
+  const pinProfileType = usePinProfileType();
 
   const handlePinAndUnpinProfileType = async (profileType: AppLayoutNavBar_ProfileTypeFragment) => {
     try {
       if (profileType.isPinned) {
-        await unpinProfileType({
-          variables: {
-            profileTypeId: profileType.id,
-          },
-          update: (cache, { data }) => {
-            if (data?.unpinProfileType) {
-              const unnpinedProfileTypeId = data.unpinProfileType.id;
-              updateFragment(cache, {
-                fragment: AppLayoutNavBar_UserFragmentDoc,
-                fragmentName: "AppLayoutNavBar_User",
-                id: me.id,
-                data: (data) => ({
-                  ...data!,
-                  pinnedProfileTypes: data!.pinnedProfileTypes.filter(
-                    (pt) => pt.id !== unnpinedProfileTypeId,
-                  ),
-                }),
-              });
-            }
-          },
-        });
+        await unpinProfileType(profileType.id);
       } else {
-        await pinProfileType({
-          variables: {
-            profileTypeId: profileType.id,
-          },
-          update: (cache, { data }) => {
-            if (data?.pinProfileType) {
-              const newPinnedProfileType = data.pinProfileType;
-              updateFragment(cache, {
-                fragment: AppLayoutNavBar_UserFragmentDoc,
-                fragmentName: "AppLayoutNavBar_User",
-                id: me.id,
-                data: (data) => ({
-                  ...data!,
-                  pinnedProfileTypes: [...data!.pinnedProfileTypes, newPinnedProfileType],
-                }),
-              });
-            }
-          },
-        });
+        await pinProfileType(profileType.id);
       }
     } catch {}
   };
@@ -695,7 +657,7 @@ function SectionsAndProfilesList({
               :
             </Text>
             <Menu
-              placement={isMobile ? "bottom" : "end"}
+              placement={isMobile ? "bottom" : "end-start"}
               onOpen={() => onToggle(true)}
               onClose={() => onToggle(false)}
             >
@@ -711,13 +673,21 @@ function SectionsAndProfilesList({
               />
               <Portal>
                 <MenuList
+                  onFocus={(e) => {
+                    smoothScrollIntoView(e.target, {
+                      scrollMode: "if-needed",
+                      behavior: "smooth",
+                    });
+                  }}
                   minWidth="auto"
                   maxWidth="280px"
+                  maxHeight="400px"
                   display="flex"
                   flexDirection="column"
                   gap={2}
                   paddingY={4}
                   paddingX={3}
+                  overflow="auto"
                 >
                   {sortedProfileTypes.map((profileType) => {
                     const isActive = pathname === "/app/profiles" && query.type === profileType.id;
@@ -831,12 +801,12 @@ const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
           </OverflownText>
         </NakedLink>
         <IconButtonWithTooltip
-          variant="unstyled"
+          variant="ghost"
           rounded="full"
           marginStart={1}
           sx={{
             "&:hover, &:focus": {
-              backgroundColor: "gray.200",
+              background: "gray.200",
               opacity: 1,
               "svg > g": {
                 stroke: "gray.600",
@@ -879,11 +849,19 @@ const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
 
 interface CreateMenuButtonSectionProps extends Pick<AppLayoutNavBar_QueryFragment, "me"> {
   onToggle: (isOpen: boolean) => void;
-  isMobile?: boolean;
+  isMobile: boolean;
+  isForceOpen: boolean;
 }
 
-function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSectionProps) {
+function CreateMenuButtonSection({
+  onToggle,
+  isMobile,
+  isForceOpen,
+  me,
+}: CreateMenuButtonSectionProps) {
   const navigate = useHandleNavigation();
+  const emptyRef = useRef<any>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
   async function handleCreateNewProfileFromProfileType(
@@ -894,6 +872,7 @@ function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSec
       const { profile } = await showCreateProfileFromProfileTypeDialog({
         profileTypeId,
         profileTypeName,
+        modalProps: { finalFocusRef: isForceOpen ? buttonRef : emptyRef },
       });
 
       navigate(`/app/profiles/${profile.id}`);
@@ -902,12 +881,13 @@ function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSec
   return (
     <Flex>
       <Menu
-        placement={isMobile ? "bottom" : "end"}
+        placement={isMobile ? "bottom" : "end-start"}
         onOpen={() => onToggle(true)}
         onClose={() => onToggle(false)}
       >
         <MenuButton
           as={Button}
+          ref={buttonRef}
           colorScheme="purple"
           width="full"
           iconSpacing={0}
@@ -926,7 +906,18 @@ function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSec
           </HStack>
         </MenuButton>
         <Portal>
-          <MenuList minWidth="auto">
+          <MenuList
+            onFocus={(e) => {
+              smoothScrollIntoView(e.target, {
+                scrollMode: "if-needed",
+                behavior: "smooth",
+              });
+            }}
+            minWidth="auto"
+            maxWidth="300px"
+            maxHeight="400px"
+            overflow="auto"
+          >
             <NakedLink href="/app/petitions/new">
               <MenuItem icon={<PaperPlaneIcon boxSize={4} />}>{untranslated("Parallel")}</MenuItem>
             </NakedLink>
@@ -939,6 +930,7 @@ function CreateMenuButtonSection({ onToggle, isMobile, me }: CreateMenuButtonSec
                   onClick={() =>
                     handleCreateNewProfileFromProfileType(profileType.id, profileType.name)
                   }
+                  paddingEnd={5}
                 >
                   <ProfileTypeReference profileType={profileType} />
                 </MenuItem>
@@ -1047,22 +1039,3 @@ function NotificationsSectionMobile({ onHelpCenterClick }: { onHelpCenterClick: 
     </>
   );
 }
-
-const _mutations = [
-  gql`
-    mutation AppLayoutNavBar_pinProfileType($profileTypeId: GID!) {
-      pinProfileType(profileTypeId: $profileTypeId) {
-        ...AppLayoutNavBar_ProfileType
-      }
-    }
-    ${AppLayoutNavBar.fragments.ProfileType}
-  `,
-  gql`
-    mutation AppLayoutNavBar_unpinProfileType($profileTypeId: GID!) {
-      unpinProfileType(profileTypeId: $profileTypeId) {
-        ...AppLayoutNavBar_ProfileType
-      }
-    }
-    ${AppLayoutNavBar.fragments.ProfileType}
-  `,
-];

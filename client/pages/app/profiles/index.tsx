@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Box, Button, Center, Flex, HStack, Heading, Icon, Stack, Text } from "@chakra-ui/react";
 import { ArchiveIcon, BellIcon, DeleteIcon, PinIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -29,10 +29,8 @@ import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialo
 import {
   ProfileStatus,
   Profiles_ProfileFragment,
-  Profiles_pinProfileTypeDocument,
   Profiles_profileTypeDocument,
   Profiles_profilesDocument,
-  Profiles_unpinProfileTypeDocument,
   Profiles_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -59,7 +57,9 @@ import {
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { usePinProfileType } from "@parallel/utils/usePinProfileType";
 import { useSelection } from "@parallel/utils/useSelectionState";
+import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
 import { ChangeEvent, MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNullish } from "remeda";
@@ -227,8 +227,8 @@ function Profiles() {
     } catch {}
   };
 
-  const [pinProfileType] = useMutation(Profiles_pinProfileTypeDocument);
-  const [unpinProfileType] = useMutation(Profiles_unpinProfileTypeDocument);
+  const unpinProfileType = useUnpinProfileType();
+  const pinProfileType = usePinProfileType();
 
   const handlePinAndUnpinProfileType = async () => {
     if (isNullish(profileType)) {
@@ -236,17 +236,9 @@ function Profiles() {
     }
     try {
       if (profileType.isPinned) {
-        await unpinProfileType({
-          variables: {
-            profileTypeId: profileType.id,
-          },
-        });
+        await unpinProfileType(profileType.id);
       } else {
-        await pinProfileType({
-          variables: {
-            profileTypeId: profileType.id,
-          },
-        });
+        await pinProfileType(profileType.id);
       }
     } catch {}
   };
@@ -280,7 +272,8 @@ function Profiles() {
               {profileType ? <ProfileTypeReference profileType={profileType} usePlural /> : null}
             </Heading>
             <IconButtonWithTooltip
-              variant="unstyled"
+              variant="ghost"
+              rounded="full"
               sx={{
                 ...(profileType?.isPinned
                   ? {
@@ -812,25 +805,6 @@ const _queries = [
       }
     }
     ${_fragments.ProfilePagination}
-  `,
-];
-
-const _mutations = [
-  gql`
-    mutation Profiles_pinProfileType($profileTypeId: GID!) {
-      pinProfileType(profileTypeId: $profileTypeId) {
-        id
-        isPinned
-      }
-    }
-  `,
-  gql`
-    mutation Profiles_unpinProfileType($profileTypeId: GID!) {
-      unpinProfileType(profileTypeId: $profileTypeId) {
-        id
-        isPinned
-      }
-    }
   `,
 ];
 
