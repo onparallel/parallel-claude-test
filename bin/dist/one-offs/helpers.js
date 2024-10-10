@@ -23,7 +23,8 @@ async function* paginatedRequest(path, { query = new URLSearchParams(), method =
         offset = index;
     } while (index < totalCount);
 }
-async function request(path, { query, method = "GET", body, }) {
+async function request(path, options) {
+    const { query, method = "GET", body } = options !== null && options !== void 0 ? options : {};
     const res = await fetch(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
         method,
         body: body ? JSON.stringify(body) : undefined,

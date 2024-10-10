@@ -29,12 +29,9 @@ export async function* paginatedRequest<T>(
 
 export async function request<T = any>(
   path: string,
-  {
-    query,
-    method = "GET",
-    body,
-  }: { query?: URLSearchParams; method?: string; body?: Record<string, any> },
+  options?: { query?: URLSearchParams; method?: string; body?: Record<string, any> },
 ): Promise<T> {
+  const { query, method = "GET", body } = options ?? {};
   const res = await fetch(
     `https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${
       query && query.size > 0 ? `?${query}` : ""

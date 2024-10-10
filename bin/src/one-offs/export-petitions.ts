@@ -1,11 +1,11 @@
+import { mkdir } from "fs/promises";
+import sanitize from "sanitize-filename";
 import { fetchToFile } from "../utils/fetchToFile";
 import { getAvailableFileName } from "../utils/getAvailableFileName";
 import { run } from "../utils/run";
-import { paginatedRequest } from "./helpers";
+import { paginatedRequest, request } from "./helpers";
 
-/**
- * This script downloads all signatures.
- */
+const TEMPLATE_ID = "6Y8DSH92uxPaJ4BZPFDrr";
 
 async function main() {
   const DOWNLOAD = {
@@ -13,7 +13,9 @@ async function main() {
     signature: false,
     audit: false,
   };
-  const output = `${__dirname}/output`;
+  const template = await request<{ name: string }>(`/templates/${TEMPLATE_ID}`);
+  const output = `${__dirname}/output/${sanitize(template.name)}`;
+  await mkdir(output, { recursive: true });
   for await (const { item: petition, totalCount, index } of paginatedRequest<{
     id: string;
     name: string;
@@ -22,14 +24,14 @@ async function main() {
   }>("/petitions", {
     query: new URLSearchParams({
       limit: `${50}`,
-      fromTemplateId: "6Y8DSH92uxPaJ4BZKrdNM",
+      fromTemplateId: TEMPLATE_ID,
       include: ["recipients", ...(DOWNLOAD.signature || DOWNLOAD.audit ? ["signatures"] : [])].join(
         ",",
       ),
     }),
   })) {
     console.log(`Downloading ${petition.id} ${petition.name} (${index + 1}/${totalCount})`);
-    const name = petition.recipients[0]?.contact?.fullName ?? petition.name ?? petition.id;
+    const name = `${petition.id} - ${petition.recipients[0]?.contact?.fullName ?? petition.name}`;
     if (DOWNLOAD.zip) {
       await fetchToFile(
         `https://www.onparallel.com/api/v1/petitions/${petition.id}/export?${new URLSearchParams({
