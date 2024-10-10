@@ -725,8 +725,8 @@ function SectionsAndProfilesList({
                 );
               })
             ) : (
-              <ListItem>
-                <Text textStyle="muted" fontSize="sm">
+              <ListItem className="show-on-expand">
+                <Text textStyle="muted" fontSize="sm" noOfLines={1}>
                   <FormattedMessage
                     id="component.app-layout-nav-bar.no-profiles"
                     defaultMessage="No profiles"
