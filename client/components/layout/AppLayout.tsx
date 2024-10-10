@@ -212,7 +212,10 @@ export const AppLayout = Object.assign(
             <Canny />
           </>
         ) : null}
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider
+          backend={HTML5Backend}
+          context={typeof window !== "undefined" ? window : undefined}
+        >
           <Flex
             alignItems="stretch"
             overflow="hidden"
