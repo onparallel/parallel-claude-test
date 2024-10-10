@@ -46,7 +46,7 @@ async function main() {
     const url = `${baseUrl}/api/integrations/export/imanage/client/${clientId}/export/${exportId}${complete ? "/complete" : ""}`;
     const timestamp = Date.now().toString();
     const secret = await loadSignatureSecret(environment);
-    const signature = (0, crypto_1.createHmac)("sha256", Buffer.from(secret, "base64"))
+    const signature = (0, crypto_1.createHmac)("sha256", Buffer.from(secret))
         .update(url + body + timestamp)
         .digest("base64");
     const headers = {

@@ -77,7 +77,7 @@ export class IManageFileExportIntegration
       const exportId = toGlobalId("FileExportLog", fileExportLogId);
       const signature = createHmac(
         "sha256",
-        Buffer.from(this.config.fileExport.iManage.signatureSecret, "base64"),
+        Buffer.from(this.config.fileExport.iManage.signatureSecret),
       )
         .update(clientId + exportId + timestamp)
         .digest("base64");
