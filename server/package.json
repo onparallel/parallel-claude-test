@@ -54,7 +54,8 @@
     "archive-migrations": "ts-node ./migrations/scripts/archive-migrations.ts",
     "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts",
     "profile-types:remove-unused": "node dist/one-offs/remove-unused-profile-types.js",
-    "profile-types:sync-standard-types": "node dist/one-offs/sync-standard-profile-types.js"
+    "profile-types:sync-standard-types": "node dist/one-offs/sync-standard-profile-types.js",
+    "why-recipient": "yarn workspace @parallel/bin node dist/why-included.js --cwd ../server --from '../server/src/emails/emails/recipient/**/*.{ts,tsx}' '../server/src/pdf/documents/recipient/**/*.{ts,tsx}' '../server/lang/recipient-additional-terms.ts' --to"
   },
   "dependencies": {
     "@apollo/server": "^4.11.0",
