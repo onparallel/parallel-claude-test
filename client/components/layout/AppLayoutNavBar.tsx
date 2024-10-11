@@ -77,6 +77,7 @@ import {
 import { Logo } from "../common/Logo";
 import { OverflownText } from "../common/OverflownText";
 import { ProfileTypeReference } from "../common/ProfileTypeReference";
+import { ScrollShadows } from "../common/ScrollShadows";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
@@ -672,34 +673,37 @@ function SectionsAndProfilesList({
                 })}
               />
               <Portal>
-                <MenuList
-                  onFocus={(e) => {
-                    smoothScrollIntoView(e.target, {
-                      scrollMode: "if-needed",
-                      behavior: "smooth",
-                    });
-                  }}
-                  minWidth="auto"
-                  maxWidth="280px"
-                  maxHeight="400px"
-                  display="flex"
-                  flexDirection="column"
-                  gap={2}
-                  paddingY={4}
-                  paddingX={3}
-                  overflow="auto"
-                >
-                  {sortedProfileTypes.map((profileType) => {
-                    const isActive = pathname === "/app/profiles" && query.type === profileType.id;
-                    return (
-                      <ProfileTypeButton
-                        key={profileType.id}
-                        profileType={profileType}
-                        isActive={isActive}
-                        onTogglePinned={handlePinAndUnpinProfileType.bind(null, profileType)}
-                      />
-                    );
-                  })}
+                <MenuList padding={0}>
+                  <ScrollShadows
+                    onFocus={(e) => {
+                      smoothScrollIntoView(e.target, {
+                        scrollMode: "if-needed",
+                        behavior: "smooth",
+                      });
+                    }}
+                    minWidth="auto"
+                    maxWidth="280px"
+                    display="flex"
+                    flexDirection="column"
+                    gap={2}
+                    paddingY={4}
+                    paddingX={3}
+                    maxHeight="400px"
+                    overflow="auto"
+                  >
+                    {sortedProfileTypes.map((profileType) => {
+                      const isActive =
+                        pathname === "/app/profiles" && query.type === profileType.id;
+                      return (
+                        <ProfileTypeButton
+                          key={profileType.id}
+                          profileType={profileType}
+                          isActive={isActive}
+                          onTogglePinned={handlePinAndUnpinProfileType.bind(null, profileType)}
+                        />
+                      );
+                    })}
+                  </ScrollShadows>
                 </MenuList>
               </Portal>
             </Menu>
