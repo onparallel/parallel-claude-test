@@ -860,21 +860,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
           update: (cache, { data }) => {
             if (isTemplate && isNonNullish(parentFieldId) && isNonNullish(data)) {
-              // updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
-              //   return replies.map((r) => {
-              //     const children = [...r.children!];
-              //     children[0].__typename;
-              //     children.splice(position!, 0, {
-              //       __typename: "PetitionFieldGroupChildReply",
-              //       field: data.createProfileLinkedPetitionField,
-              //       replies: [],
-              //     });
-              //     return {
-              //       ...r,
-              //       children,
-              //     };
-              //   });
-              // });
+              updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+                return replies.map((r) => {
+                  const children = [...(r.children ?? [])];
+                  children.splice(position!, 0, {
+                    __typename: "PetitionFieldGroupChildReply",
+                    field: data.createProfileLinkedPetitionField,
+                    replies: [],
+                  });
+                  return {
+                    ...r,
+                    children,
+                  };
+                });
+              });
             }
           },
         });
@@ -886,8 +885,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             if (isTemplate && isNonNullish(parentFieldId) && isNonNullish(data)) {
               updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
                 return replies.map((r) => {
-                  const children = [...r.children!];
-                  children[0].__typename;
+                  const children = [...(r.children ?? [])];
                   children.splice(position!, 0, {
                     __typename: "PetitionFieldGroupChildReply",
                     field: data.createPetitionField,
