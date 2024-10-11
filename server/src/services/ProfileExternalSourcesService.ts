@@ -147,14 +147,14 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
       try {
         const field = profileTypeFields.find((f) => f.id === profileTypeFieldId);
         if (!field) {
-          this.logger.warn(`Field with id ${profileTypeFieldId} not found. Skipping...`);
+          this.logger.info(`Field with id ${profileTypeFieldId} not found. Skipping...`);
           return false;
         }
         await validateProfileFieldValue(field, content);
         return true;
       } catch (error) {
         if (error instanceof Error) {
-          this.logger.warn(
+          this.logger.info(
             `Invalid content for field ${JSON.stringify([profileTypeFieldId, content])}: ${error.message}. Skipping...`,
           );
         }
