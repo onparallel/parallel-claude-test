@@ -29,6 +29,7 @@ import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   AddIcon,
   AlertCircleFilledIcon,
+  BusinessIcon,
   ChevronLeftIcon,
   HamburgerMenuIcon,
   HelpOutlineIcon,
@@ -38,6 +39,7 @@ import {
   PinIcon,
   ReportsIcon,
   TimeAlarmIcon,
+  UserIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
 import {
@@ -608,6 +610,7 @@ function SectionsAndProfilesList({
       }
     } catch {}
   };
+
   return (
     <>
       <List spacing={2}>
@@ -647,7 +650,7 @@ function SectionsAndProfilesList({
           </ListItem>
         ))}
       </List>
-      {userCanViewProfiles && me.hasProfilesAccess ? (
+      {userCanViewProfiles ? (
         <>
           <HStack justify="space-between" className="show-on-expand">
             <Text fontSize="sm" fontWeight={500}>
@@ -657,7 +660,7 @@ function SectionsAndProfilesList({
               />
               :
             </Text>
-            {sortedProfileTypes.length > 0 ? (
+            {me.hasProfilesAccess && sortedProfileTypes.length > 0 ? (
               <Menu
                 placement={isMobile ? "bottom" : "end-start"}
                 onOpen={() => onToggle(true)}
@@ -710,37 +713,67 @@ function SectionsAndProfilesList({
               </Menu>
             ) : null}
           </HStack>
-          <List spacing={2}>
-            {me.pinnedProfileTypes.length ? (
-              me.pinnedProfileTypes.map((profileType) => {
-                const icon = getProfileTypeFieldIcon(profileType.icon);
-                return (
-                  <ListItem key={profileType.id}>
-                    <NakedLink href={`/app/profiles?type=${profileType.id}`}>
-                      <NavBarButton
-                        as="a"
-                        isActive={pathname === "/app/profiles" && query.type === profileType.id}
-                        section={`profiles`}
-                        icon={<Icon as={icon} boxSize={5} />}
-                        onClick={me.hasProfilesAccess ? undefined : handleProfilesClick}
-                      >
-                        <ProfileTypeReference profileType={profileType} usePlural />
-                      </NavBarButton>
-                    </NakedLink>
-                  </ListItem>
-                );
-              })
-            ) : (
-              <ListItem className="show-on-expand">
-                <Text textStyle="muted" fontSize="sm" noOfLines={1}>
+          {me.hasProfilesAccess ? (
+            <List spacing={2}>
+              {me.pinnedProfileTypes.length ? (
+                me.pinnedProfileTypes.map((profileType) => {
+                  const icon = getProfileTypeFieldIcon(profileType.icon);
+                  return (
+                    <ListItem key={profileType.id}>
+                      <NakedLink href={`/app/profiles?type=${profileType.id}`}>
+                        <NavBarButton
+                          as="a"
+                          isActive={pathname === "/app/profiles" && query.type === profileType.id}
+                          section={`profiles`}
+                          icon={<Icon as={icon} boxSize={5} />}
+                        >
+                          <ProfileTypeReference profileType={profileType} usePlural />
+                        </NavBarButton>
+                      </NakedLink>
+                    </ListItem>
+                  );
+                })
+              ) : (
+                <ListItem className="show-on-expand">
+                  <Text textStyle="muted" fontSize="sm" noOfLines={1}>
+                    <FormattedMessage
+                      id="component.app-layout-nav-bar.no-profiles"
+                      defaultMessage="No profiles"
+                    />
+                  </Text>
+                </ListItem>
+              )}
+            </List>
+          ) : (
+            <List spacing={2}>
+              <ListItem>
+                <NavBarButton
+                  as="a"
+                  href=""
+                  icon={<UserIcon boxSize={5} />}
+                  onClick={handleProfilesClick}
+                >
                   <FormattedMessage
-                    id="component.app-layout-nav-bar.no-profiles"
-                    defaultMessage="No profiles"
+                    id="component.app-layout-nav-bar.individuals-button"
+                    defaultMessage="Individuals"
                   />
-                </Text>
+                </NavBarButton>
               </ListItem>
-            )}
-          </List>
+              <ListItem>
+                <NavBarButton
+                  as="a"
+                  href=""
+                  icon={<BusinessIcon boxSize={5} />}
+                  onClick={handleProfilesClick}
+                >
+                  <FormattedMessage
+                    id="component.app-layout-nav-bar.companies-button"
+                    defaultMessage="Companies"
+                  />
+                </NavBarButton>
+              </ListItem>
+            </List>
+          )}
         </>
       ) : null}
     </>
@@ -884,6 +917,29 @@ function CreateMenuButtonSection({
       navigate(`/app/profiles/${profile.id}`);
     } catch {}
   }
+
+  if (!me.hasProfilesAccess) {
+    return (
+      <NakedLink href="/app/petitions/new">
+        <Button
+          as="a"
+          colorScheme="purple"
+          width="full"
+          paddingInlineStart={3}
+          paddingInlineEnd={3}
+          overflow="hidden"
+        >
+          <HStack margin="0 auto" width="fit-content" minWidth={0}>
+            <AddIcon boxSize={4} />
+            <Text as="span" className="show-on-expand" minWidth={0}>
+              <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
+            </Text>
+          </HStack>
+        </Button>
+      </NakedLink>
+    );
+  }
+
   return (
     <Flex>
       <Menu
@@ -896,7 +952,6 @@ function CreateMenuButtonSection({
           ref={buttonRef}
           colorScheme="purple"
           width="full"
-          iconSpacing={0}
           paddingInlineStart={3}
           paddingInlineEnd={3}
           overflow="hidden"

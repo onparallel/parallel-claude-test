@@ -280,6 +280,11 @@
     "context": "Alerts"
   },
   {
+    "term": "component.app-layout-nav-bar.companies-button",
+    "definition": "Companies",
+    "context": "Companies"
+  },
+  {
     "term": "component.app-layout-nav-bar.contacts-link",
     "definition": "Recipients",
     "context": "Recipients"
@@ -288,6 +293,11 @@
     "term": "component.app-layout-nav-bar.create-new-button",
     "definition": "Create new",
     "context": "Create new"
+  },
+  {
+    "term": "component.app-layout-nav-bar.individuals-button",
+    "definition": "Individuals",
+    "context": "Individuals"
   },
   {
     "term": "component.app-layout-nav-bar.no-profiles",
