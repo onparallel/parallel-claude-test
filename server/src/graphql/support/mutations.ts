@@ -794,7 +794,7 @@ export const createEInformaProfileExternalSourceIntegration = mutationField(
   "createEInformaProfileExternalSourceIntegration",
   {
     description:
-      "Creates a new eInforma Profile External Source integration on the provided organization",
+      "Creates a new eInforma Profile External Source integration on the provided organization, or updates it if the organization already has one.",
     type: "SupportMethodResponse",
     authorize: superAdminAccess(),
     args: {
@@ -811,36 +811,49 @@ export const createEInformaProfileExternalSourceIntegration = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
           args.orgId,
           "PROFILE_EXTERNAL_SOURCE",
           "EINFORMA",
         );
-        if (integrations.length > 0) {
-          throw new Error(
-            `Organization already has an eInforma Profile External Source integration`,
-          );
-        }
-
-        const data = await ctx.integrationsSetup.createEInformaProfileExternalSourceIntegration(
-          {
-            org_id: args.orgId,
-            name: "eInforma",
-            settings: {
-              CREDENTIALS: {
-                CLIENT_ID: args.clientId,
-                CLIENT_SECRET: args.clientSecret,
+        if (isNonNullish(integration)) {
+          await ctx.integrationsSetup.updateEInformaProfileExternalSourceIntegration(
+            integration.id,
+            {
+              settings: {
+                CREDENTIALS: {
+                  CLIENT_ID: args.clientId,
+                  CLIENT_SECRET: args.clientSecret,
+                },
+                ENVIRONMENT: args.isPaidSubscription ? "production" : "test",
               },
-              ENVIRONMENT: args.isPaidSubscription ? "production" : "test",
             },
-          },
-          `User:${ctx.user!.id}`,
-        );
+          );
+          return {
+            result: "SUCCESS",
+            message: `Integration:${integration.id} updated successfully`,
+          };
+        } else {
+          const data = await ctx.integrationsSetup.createEInformaProfileExternalSourceIntegration(
+            {
+              org_id: args.orgId,
+              name: "eInforma",
+              settings: {
+                CREDENTIALS: {
+                  CLIENT_ID: args.clientId,
+                  CLIENT_SECRET: args.clientSecret,
+                },
+                ENVIRONMENT: args.isPaidSubscription ? "production" : "test",
+              },
+            },
+            `User:${ctx.user!.id}`,
+          );
 
-        return {
-          result: "SUCCESS",
-          message: `Integration:${data.id} created successfully`,
-        };
+          return {
+            result: "SUCCESS",
+            message: `Integration:${data.id} created successfully`,
+          };
+        }
       } catch (error) {
         return {
           result: RESULT.FAILURE,

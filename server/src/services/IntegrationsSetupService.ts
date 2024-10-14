@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { CreateOrgIntegration } from "../db/__types";
+import { CreateOrgIntegration, OrgIntegration } from "../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
@@ -28,6 +28,7 @@ import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/signature/SignaturitIntegration";
+import { Replace } from "../util/types";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
 export interface IIntegrationsSetupService {
@@ -76,6 +77,14 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">>;
+  updateEInformaProfileExternalSourceIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "EINFORMA"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
   createIManageFileExportIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"FILE_EXPORT", "IMANAGE">;
@@ -191,6 +200,24 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     return await this.eInformaProfileExternalSourceIntegration.createOrgIntegration(
       data,
       createdBy,
+      t,
+    );
+  }
+
+  async updateEInformaProfileExternalSourceIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "EINFORMA"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void> {
+    // verify that credentials are valid
+    await this.eInformaProfileExternalSourceIntegration.fetchAccessToken(data.settings.CREDENTIALS);
+
+    await this.eInformaProfileExternalSourceIntegration.updateOrgIntegration(
+      integrationId,
+      data,
       t,
     );
   }

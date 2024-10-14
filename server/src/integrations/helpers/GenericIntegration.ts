@@ -126,7 +126,7 @@ export abstract class GenericIntegration<
     return integration;
   }
 
-  protected async updateOrgIntegration(
+  public async updateOrgIntegration(
     orgIntegrationId: number,
     data: Partial<
       Replace<

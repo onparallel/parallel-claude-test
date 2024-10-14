@@ -247,7 +247,7 @@ export const supportMethods: {
     field: {
       name: "createEInformaProfileExternalSourceIntegration",
       description:
-        "Creates a new eInforma Profile External Source integration on the provided organization",
+        "Creates a new eInforma Profile External Source integration on the provided organization, or updates it if the organization already has one.",
       args: [
         {
           name: "clientId",

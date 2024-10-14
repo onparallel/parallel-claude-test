@@ -961,7 +961,7 @@ export interface Mutation {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
-  /** Creates a new eInforma Profile External Source integration on the provided organization */
+  /** Creates a new eInforma Profile External Source integration on the provided organization, or updates it if the organization already has one. */
   createEInformaProfileExternalSourceIntegration: SupportMethodResponse;
   /**
    * Edits permissions to users and groups on given petitions.
