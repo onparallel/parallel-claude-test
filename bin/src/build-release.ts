@@ -4,6 +4,7 @@ import {
   DescribeInstancesCommand,
   DescribeVolumesCommand,
   EC2Client,
+  EC2ServiceException,
   HttpTokensState,
   InstanceMetadataEndpointState,
   InstanceStateName,
@@ -16,7 +17,7 @@ import {
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish, range } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
@@ -38,7 +39,7 @@ const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
-const YARN_CACHE_VOLUME = "vol-0d498fe71cba530de";
+const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-03d5cc33535174d62"];
 
 async function main() {
   const {
@@ -164,18 +165,34 @@ async function main() {
     );
     assert(isNonNullish(ipAddress));
     await waitForInstance(ipAddress);
-    await ec2.send(
-      new AttachVolumeCommand({
-        InstanceId: instanceId,
-        VolumeId: YARN_CACHE_VOLUME,
-        Device: "/dev/xvdy",
-      }),
-    );
+
+    let volumeId!: string;
+    for (const retry of range(0, 2)) {
+      try {
+        console.log(chalk.italic`Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
+        const res = await ec2.send(
+          new AttachVolumeCommand({
+            InstanceId: instanceId,
+            VolumeId: YARN_CACHE_VOLUMES[retry],
+            Device: "/dev/xvdy",
+          }),
+        );
+        volumeId = res.VolumeId!;
+        break;
+      } catch (e) {
+        if (e instanceof EC2ServiceException && e.name === "VolumeInUse") {
+          console.log(chalk.italic`${YARN_CACHE_VOLUMES[retry]} in use!`);
+        } else {
+          throw e;
+        }
+      }
+    }
+    if (isNullish(volumeId)) {
+      throw new Error("All yarn cache volumes are in use");
+    }
     await waitFor(
       async () => {
-        const result = await ec2.send(
-          new DescribeVolumesCommand({ VolumeIds: [YARN_CACHE_VOLUME] }),
-        );
+        const result = await ec2.send(new DescribeVolumesCommand({ VolumeIds: [volumeId] }));
         return (
           result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
           VolumeAttachmentState.attached

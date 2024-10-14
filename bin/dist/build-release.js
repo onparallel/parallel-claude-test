@@ -25,7 +25,7 @@ const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
-const YARN_CACHE_VOLUME = "vol-0d498fe71cba530de";
+const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-03d5cc33535174d62"];
 async function main() {
     const { commit: _commit, env, force, terminate, } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -131,14 +131,33 @@ async function main() {
         }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
         (0, ts_essentials_1.assert)((0, remeda_1.isNonNullish)(ipAddress));
         await waitForInstance(ipAddress);
-        await ec2.send(new client_ec2_1.AttachVolumeCommand({
-            InstanceId: instanceId,
-            VolumeId: YARN_CACHE_VOLUME,
-            Device: "/dev/xvdy",
-        }));
+        let volumeId;
+        for (const retry of (0, remeda_1.range)(0, 2)) {
+            try {
+                console.log(chalk_1.default.italic `Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
+                const res = await ec2.send(new client_ec2_1.AttachVolumeCommand({
+                    InstanceId: instanceId,
+                    VolumeId: YARN_CACHE_VOLUMES[retry],
+                    Device: "/dev/xvdy",
+                }));
+                volumeId = res.VolumeId;
+                break;
+            }
+            catch (e) {
+                if (e instanceof client_ec2_1.EC2ServiceException && e.name === "VolumeInUse") {
+                    console.log(chalk_1.default.italic `${YARN_CACHE_VOLUMES[retry]} in use!`);
+                }
+                else {
+                    throw e;
+                }
+            }
+        }
+        if ((0, remeda_1.isNullish)(volumeId)) {
+            throw new Error("All yarn cache volumes are in use");
+        }
         await (0, wait_1.waitFor)(async () => {
             var _a, _b, _c;
-            const result = await ec2.send(new client_ec2_1.DescribeVolumesCommand({ VolumeIds: [YARN_CACHE_VOLUME] }));
+            const result = await ec2.send(new client_ec2_1.DescribeVolumesCommand({ VolumeIds: [volumeId] }));
             return (((_c = (_b = (_a = result.Volumes) === null || _a === void 0 ? void 0 : _a[0].Attachments) === null || _b === void 0 ? void 0 : _b.find((a) => a.InstanceId === instanceId)) === null || _c === void 0 ? void 0 : _c.State) ===
                 client_ec2_1.VolumeAttachmentState.attached);
         }, chalk_1.default.italic `Volume attaching {yellow pending}. Waiting 3 more seconds...`, 3000);
