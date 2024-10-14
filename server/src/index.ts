@@ -106,7 +106,7 @@ if (process.env.TS_NODE_DEV) {
         const duration = stopwatchEnd(time);
         const length = res.getHeader("content-length");
         logger[statusCode >= 500 ? "error" : "info"](
-          `${ip} ${method} ${url} ${statusCode} ${length}B ${duration}ms`,
+          `${ip} ${method} ${url} ${statusCode} ${length ?? 0}B ${duration}ms`,
           {
             userId: req.context?.trails.userId,
             accessId: req.context?.trails.accessId,

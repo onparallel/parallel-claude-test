@@ -9,7 +9,7 @@ import { JsonSchemaFor } from "../../util/jsonSchema";
 import { MaybeArray, MaybePromise, unMaybeArray } from "../../util/types";
 import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError } from "./errors";
 import { ParseError } from "./params";
-import { Text } from "./responses";
+import { EmptyResponse, Text } from "./responses";
 
 /*
  * We wrap multer files in a class with a custom .toString so that unflatten doesn't rebuild the object.
@@ -222,6 +222,8 @@ const _PathResolver: any = (function () {
               req,
               res,
             })) ?? {}) as any;
+            context.req = req;
+            context.res = res;
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
@@ -256,7 +258,7 @@ const _PathResolver: any = (function () {
             return await resolver(context);
           } catch (error: any) {
             if (controller.signal.aborted) {
-              return;
+              return new EmptyResponse();
             }
             if (error instanceof HttpError) {
               return error;
@@ -329,6 +331,8 @@ export interface RestApiOptions<TContext = {}> {
 }
 
 export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = any> = TContext & {
+  req: Request;
+  res: Response;
   params: TParams;
   query: TQuery;
   body: TBody;

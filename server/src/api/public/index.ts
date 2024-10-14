@@ -2648,8 +2648,9 @@ export function publicApi(container: Container) {
           500: ErrorResponse({ description: "Error generating the file" }),
         },
       },
-      async ({ client, params, query }) => {
+      async ({ client, params, query, req, signal }) => {
         if (query.format === "zip") {
+          req.setTimeout(300_000 + 10_000);
           const _mutation = gql`
             mutation ExportPetitionReplies_createExportRepliesTask(
               $petitionId: GID!
@@ -2668,7 +2669,7 @@ export function publicApi(container: Container) {
                 petitionId: params.petitionId,
               },
             );
-            await waitForTask(client, result.createExportRepliesTask);
+            await waitForTask(client, result.createExportRepliesTask, { signal });
             const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
             if (query.noredirect) {
               return Created({ file: url }, url);
@@ -2679,6 +2680,7 @@ export function publicApi(container: Container) {
             throw error;
           }
         } else if (query.format === "pdf") {
+          req.setTimeout(120_000 + 10_000);
           const _mutation = gql`
             mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
               createPrintPdfTask(petitionId: $petitionId) {
@@ -2690,7 +2692,7 @@ export function publicApi(container: Container) {
           const result = await client.request(ExportPetitionReplies_createPrintPdfTaskDocument, {
             petitionId: params.petitionId,
           });
-          await waitForTask(client, result.createPrintPdfTask);
+          await waitForTask(client, result.createPrintPdfTask, { signal });
           const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
           if (query.noredirect) {
             return Created({ file: url }, url);
@@ -2745,7 +2747,7 @@ export function publicApi(container: Container) {
         },
         tags: ["Parallel Sharing"],
       },
-      async ({ client, params, body }) => {
+      async ({ client, params, body, signal }) => {
         const _usersQuery = gql`
           query SharePetition_usersByEmail($emails: [String!]!) {
             me {
@@ -2823,7 +2825,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task);
+          await waitForTask(client, task, { signal });
         }
 
         const result = await client.request(SharePetition_petitionDocument, {
@@ -2843,7 +2845,7 @@ export function publicApi(container: Container) {
         tags: ["Parallel Sharing"],
         responses: { 204: SuccessResponse() },
       },
-      async ({ client, params }) => {
+      async ({ client, params, signal }) => {
         const _mutation = gql`
           mutation StopSharing_createRemovePetitionPermissionMaybeTask($petitionId: GID!) {
             createRemovePetitionPermissionMaybeTask(petitionIds: [$petitionId], removeAll: true) {
@@ -2863,7 +2865,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task);
+          await waitForTask(client, task, { signal });
         }
 
         return NoContent();
@@ -2884,7 +2886,7 @@ export function publicApi(container: Container) {
         tags: ["Parallel Sharing"],
         responses: { 204: SuccessResponse() },
       },
-      async ({ client, params }) => {
+      async ({ client, params, signal }) => {
         const _mutation = gql`
           mutation RemoveUserPermission_createRemovePetitionPermissionMaybeTask(
             $petitionId: GID!
@@ -2914,7 +2916,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task);
+          await waitForTask(client, task, { signal });
         }
 
         return NoContent();
@@ -2935,7 +2937,7 @@ export function publicApi(container: Container) {
         tags: ["Parallel Sharing"],
         responses: { 204: SuccessResponse() },
       },
-      async ({ client, params }) => {
+      async ({ client, params, signal }) => {
         const _mutation = gql`
           mutation RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTask(
             $petitionId: GID!
@@ -2965,7 +2967,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task);
+          await waitForTask(client, task, { signal });
         }
 
         return NoContent();

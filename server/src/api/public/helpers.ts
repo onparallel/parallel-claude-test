@@ -6,7 +6,7 @@ import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } f
 import { ProfileTypeFieldType } from "../../db/__types";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
-import { waitFor } from "../../util/promises/waitFor";
+import { waitFor, WaitForOptions } from "../../util/promises/waitFor";
 import { renderSlateToText } from "../../util/slate/render";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { isValidDate } from "../../util/time";
@@ -379,7 +379,7 @@ export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(
   };
 }
 
-export async function waitForTask(client: GraphQLClient, task: TaskType) {
+export async function waitForTask(client: GraphQLClient, task: TaskType, options: WaitForOptions) {
   const _query = gql`
     query waitForTask_Task($id: GID!) {
       task(id: $id) {
@@ -388,24 +388,33 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
     }
     ${TaskFragment}
   `;
-  const interval = 1_000;
-  const maxTime = performance.now() + 45_000;
-  while (performance.now() < maxTime) {
+  let interval = 1_000;
+  const start = performance.now();
+  // safety 1h limit just in case
+  const maxTime = start + 60 * 60_000;
+  let now;
+  while ((now = performance.now()) < maxTime) {
     const result = await client.request(waitForTask_TaskDocument, {
       id: task.id,
     });
     switch (result.task.status) {
       case "ENQUEUED":
       case "PROCESSING":
-        await waitFor(interval);
+        // slowly increase interval
+        if (now - start > 30_000) {
+          interval = 3_000;
+        } else if (now - start > 20_000) {
+          interval = 2_000;
+        }
+        await waitFor(interval, options);
         break;
       case "FAILED":
-        throw new InternalError("Failed generating file");
+        throw new InternalError("Failed Task");
       case "COMPLETED":
         return result;
     }
   }
-  throw new InternalError("Timeout while generating file");
+  throw new InternalError("MAX TIMEOUT");
 }
 
 export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType) {

@@ -24,6 +24,12 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   }
 }
 
+export class EmptyResponse implements ResponseWrapper<void> {
+  apply(res: Response) {
+    res.send();
+  }
+}
+
 export class PlainTextResponseWrapper implements ResponseWrapper<string> {
   constructor(
     public readonly status: number,
