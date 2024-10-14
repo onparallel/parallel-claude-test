@@ -647,7 +647,7 @@ function SectionsAndProfilesList({
           </ListItem>
         ))}
       </List>
-      {userCanViewProfiles ? (
+      {userCanViewProfiles && me.hasProfilesAccess ? (
         <>
           <HStack justify="space-between" className="show-on-expand">
             <Text fontSize="sm" fontWeight={500}>
@@ -657,56 +657,58 @@ function SectionsAndProfilesList({
               />
               :
             </Text>
-            <Menu
-              placement={isMobile ? "bottom" : "end-start"}
-              onOpen={() => onToggle(true)}
-              onClose={() => onToggle(false)}
-            >
-              <MenuButton
-                as={IconButtonWithTooltip}
-                size="xs"
-                variant="ghost"
-                icon={<MoreVerticalIcon boxSize={3} />}
-                label={intl.formatMessage({
-                  id: "component.app-layout-nav-bar.view-all-profiles",
-                  defaultMessage: "View all profiles",
-                })}
-              />
-              <Portal>
-                <MenuList padding={0}>
-                  <ScrollShadows
-                    onFocus={(e) => {
-                      smoothScrollIntoView(e.target, {
-                        scrollMode: "if-needed",
-                        behavior: "smooth",
-                      });
-                    }}
-                    minWidth="auto"
-                    maxWidth="280px"
-                    display="flex"
-                    flexDirection="column"
-                    gap={2}
-                    paddingY={4}
-                    paddingX={3}
-                    maxHeight="400px"
-                    overflow="auto"
-                  >
-                    {sortedProfileTypes.map((profileType) => {
-                      const isActive =
-                        pathname === "/app/profiles" && query.type === profileType.id;
-                      return (
-                        <ProfileTypeButton
-                          key={profileType.id}
-                          profileType={profileType}
-                          isActive={isActive}
-                          onTogglePinned={handlePinAndUnpinProfileType.bind(null, profileType)}
-                        />
-                      );
-                    })}
-                  </ScrollShadows>
-                </MenuList>
-              </Portal>
-            </Menu>
+            {sortedProfileTypes.length > 0 ? (
+              <Menu
+                placement={isMobile ? "bottom" : "end-start"}
+                onOpen={() => onToggle(true)}
+                onClose={() => onToggle(false)}
+              >
+                <MenuButton
+                  as={IconButtonWithTooltip}
+                  size="xs"
+                  variant="ghost"
+                  icon={<MoreVerticalIcon boxSize={3} />}
+                  label={intl.formatMessage({
+                    id: "component.app-layout-nav-bar.view-all-profiles",
+                    defaultMessage: "View all profiles",
+                  })}
+                />
+                <Portal>
+                  <MenuList padding={0}>
+                    <ScrollShadows
+                      onFocus={(e) => {
+                        smoothScrollIntoView(e.target, {
+                          scrollMode: "if-needed",
+                          behavior: "smooth",
+                        });
+                      }}
+                      minWidth="auto"
+                      maxWidth="280px"
+                      display="flex"
+                      flexDirection="column"
+                      gap={2}
+                      paddingY={4}
+                      paddingX={3}
+                      maxHeight="400px"
+                      overflow="auto"
+                    >
+                      {sortedProfileTypes.map((profileType) => {
+                        const isActive =
+                          pathname === "/app/profiles" && query.type === profileType.id;
+                        return (
+                          <ProfileTypeButton
+                            key={profileType.id}
+                            profileType={profileType}
+                            isActive={isActive}
+                            onTogglePinned={handlePinAndUnpinProfileType.bind(null, profileType)}
+                          />
+                        );
+                      })}
+                    </ScrollShadows>
+                  </MenuList>
+                </Portal>
+              </Menu>
+            ) : null}
           </HStack>
           <List spacing={2}>
             {me.pinnedProfileTypes.length ? (

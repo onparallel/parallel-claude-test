@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { arg, enumType, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
-import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -12,7 +12,7 @@ import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizer
 export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
     type: "ProfileType",
-    authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+    authorize: authenticate(),
     searchable: true,
     sortableBy: ["createdAt", "name" as never],
     extendArgs: {
@@ -44,6 +44,14 @@ export const profileTypes = queryField((t) => {
         createdAt: "created_at",
         name: "name",
       } as const;
+
+      const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PROFILES");
+      if (!hasFeatureFlag) {
+        return {
+          items: [],
+          totalCount: 0,
+        };
+      }
       return ctx.profiles.getPaginatedProfileTypesForOrg(ctx.user!.org_id, {
         limit,
         offset,
