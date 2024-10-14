@@ -25,7 +25,7 @@ const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
-const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-03d5cc33535174d62"];
+const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"];
 async function main() {
     const { commit: _commit, env, force, terminate, } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
