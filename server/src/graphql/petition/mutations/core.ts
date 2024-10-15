@@ -3381,7 +3381,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         const reply = replies.at(0); // get only 1st reply on non-file fields
         const profileTypeField = profileTypeFields.find(
           (f) => f.id === field.profile_type_field_id!,
-        )!;
+        );
+
+        if (!profileTypeField) {
+          continue;
+        }
+
         const profileFieldValue = profileFieldValues.find(
           (v) => v.profile_type_field_id === field.profile_type_field_id!,
         );
@@ -3464,7 +3469,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       for (const { field, replies } of fileReplies) {
         const profileTypeField = profileTypeFields.find(
           (f) => f.id === field.profile_type_field_id!,
-        )!;
+        );
+
+        if (!profileTypeField) {
+          continue;
+        }
+
         const profileFieldFileValues = profileFieldFiles.filter(
           (v) => v.profile_type_field_id === field.profile_type_field_id!,
         );
@@ -3630,7 +3640,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           );
           const profileTypeField = profileTypeFields.find(
             (ptf) => ptf.id === parseInt(profileTypeFieldId),
-          )!;
+          );
+
+          if (!profileTypeField) {
+            continue;
+          }
+
           const expiration = args.expirations.find(
             (e) => e.profileTypeFieldId === profileTypeField.id,
           );
