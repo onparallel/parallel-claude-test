@@ -617,7 +617,10 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     messageBody: nonNull(stringArg()),
   },
   authorize: authenticatePublicAccess("keycode"),
-  validateArgs: maxLength((args) => args.messageBody, "messageBody", 1000),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    maxLength((args) => args.messageBody, "messageBody", 1000),
+  ),
   resolve: async (_, args, ctx) => {
     const access = ctx.access!;
     const recipient = ctx.contact!;

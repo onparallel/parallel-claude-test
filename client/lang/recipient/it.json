@@ -1050,32 +1050,32 @@
     "context": "example@company.com"
   },
   {
-    "term": "generic.forms.email-label",
+    "term": "generic.forms-email-label",
     "definition": "E-mail",
     "context": "Email"
   },
   {
-    "term": "generic.forms.email-placeholder",
+    "term": "generic.forms-email-placeholder",
     "definition": "nome@esempio.com",
     "context": "name@example.com"
   },
   {
-    "term": "generic.forms.first-name-label",
+    "term": "generic.forms-first-name-label",
     "definition": "Nome",
     "context": "First name"
   },
   {
-    "term": "generic.forms.invalid-email-error",
+    "term": "generic.forms-invalid-email-error",
     "definition": "Per favore, inserisci un'e-mail valida",
     "context": "Please, enter a valid email"
   },
   {
-    "term": "generic.forms.invalid-last-name-error",
+    "term": "generic.forms-invalid-last-name-error",
     "definition": "Per favore, inserisci il cognome",
     "context": "Please, enter the last name"
   },
   {
-    "term": "generic.forms.last-name-label",
+    "term": "generic.forms-last-name-label",
     "definition": "Cognome",
     "context": "Last name"
   },

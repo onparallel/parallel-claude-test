@@ -74,27 +74,27 @@ export function AskContactDetailsDialog({
         <Stack>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+              <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
               type="email"
               data-testid="create-contact-email-input"
               placeholder={intl.formatMessage({
-                id: "generic.forms.email-placeholder",
+                id: "generic.forms-email-placeholder",
                 defaultMessage: "name@example.com",
               })}
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             </FormErrorMessage>
           </FormControl>
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input data-testid="create-contact-first-name-input" {...firstNameRegisterProps} />
             <FormErrorMessage>
@@ -106,7 +106,7 @@ export function AskContactDetailsDialog({
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input data-testid="create-contact-last-name-input" {...register("lastName")} />
           </FormControl>

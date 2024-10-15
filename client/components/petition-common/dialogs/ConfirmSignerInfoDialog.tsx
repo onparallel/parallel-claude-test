@@ -95,7 +95,7 @@ function ConfirmSignerInfoDialog({
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             </FormErrorMessage>
@@ -103,7 +103,7 @@ function ConfirmSignerInfoDialog({
 
           <FormControl isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...firstNameProps} />
             <FormErrorMessage>
@@ -115,12 +115,12 @@ function ConfirmSignerInfoDialog({
           </FormControl>
           <FormControl isInvalid={!!errors.lastName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-last-name-error"
+                id="generic.forms-invalid-last-name-error"
                 defaultMessage="Please, enter the last name"
               />
             </FormErrorMessage>

@@ -159,7 +159,7 @@ function Contact({ contactId }: ContactProps) {
               <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
                 <FormLabel fontWeight="bold">
                   <FormattedMessage
-                    id="generic.forms.first-name-label"
+                    id="generic.forms-first-name-label"
                     defaultMessage="First name"
                   />
                 </FormLabel>
@@ -182,7 +182,7 @@ function Contact({ contactId }: ContactProps) {
               </FormControl>
               <FormControl id="contact-last-name">
                 <FormLabel fontWeight="bold">
-                  <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+                  <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
                 </FormLabel>
                 <ToggleInput {...register("lastName")} isEditing={isEditing} isDisabled={loading}>
                   {contact!.lastName}

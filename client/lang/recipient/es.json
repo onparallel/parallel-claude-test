@@ -1050,32 +1050,32 @@
     "context": "example@company.com"
   },
   {
-    "term": "generic.forms.email-label",
+    "term": "generic.forms-email-label",
     "definition": "",
     "context": "Email"
   },
   {
-    "term": "generic.forms.email-placeholder",
+    "term": "generic.forms-email-placeholder",
     "definition": "",
     "context": "name@example.com"
   },
   {
-    "term": "generic.forms.first-name-label",
+    "term": "generic.forms-first-name-label",
     "definition": "",
     "context": "First name"
   },
   {
-    "term": "generic.forms.invalid-email-error",
+    "term": "generic.forms-invalid-email-error",
     "definition": "",
     "context": "Please, enter a valid email"
   },
   {
-    "term": "generic.forms.invalid-last-name-error",
+    "term": "generic.forms-invalid-last-name-error",
     "definition": "",
     "context": "Please, enter the last name"
   },
   {
-    "term": "generic.forms.last-name-label",
+    "term": "generic.forms-last-name-label",
     "definition": "",
     "context": "Last name"
   },

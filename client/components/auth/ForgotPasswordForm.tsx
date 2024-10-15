@@ -48,7 +48,7 @@ export function ForgotPasswordForm({
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormControl id="email" isInvalid={!!errors.email || isExternalUserError}>
           <FormLabel>
-            <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+            <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
           </FormLabel>
           <Input
             type="email"
@@ -69,7 +69,7 @@ export function ForgotPasswordForm({
               />
             ) : errors.email ? (
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             ) : null}

@@ -88,7 +88,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
       >
         <FormControl id="email" isInvalid={!!errors.email}>
           <FormLabel>
-            <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+            <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
           </FormLabel>
           <Input
             data-testid="email-input"
@@ -104,7 +104,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           />
           <FormErrorMessage>
             <FormattedMessage
-              id="generic.forms.invalid-email-error"
+              id="generic.forms-invalid-email-error"
               defaultMessage="Please, enter a valid email"
             />
           </FormErrorMessage>

@@ -69,18 +69,18 @@ function AddNewSignerDialog({
         <Stack>
           <FormControl isInvalid={!!errors.email}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+              <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
               placeholder={intl.formatMessage({
-                id: "generic.forms.email-placeholder",
+                id: "generic.forms-email-placeholder",
                 defaultMessage: "name@example.com",
               })}
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             </FormErrorMessage>
@@ -88,7 +88,7 @@ function AddNewSignerDialog({
 
           <FormControl isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...firstNameRegisterProps} />
             <FormErrorMessage>
@@ -100,12 +100,12 @@ function AddNewSignerDialog({
           </FormControl>
           <FormControl isInvalid={!!errors.lastName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-last-name-error"
+                id="generic.forms-invalid-last-name-error"
                 defaultMessage="Please, enter the last name"
               />
             </FormErrorMessage>

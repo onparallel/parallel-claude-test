@@ -28611,6 +28611,30 @@ export type useCompletingMessageDialog_PublicPetitionFragment = {
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
 
+export type useDelegateAccessDialog_publicDelegateAccessToContactMutationVariables = Exact<{
+  keycode: Scalars["ID"]["input"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName: Scalars["String"]["input"];
+  messageBody: Scalars["String"]["input"];
+}>;
+
+export type useDelegateAccessDialog_publicDelegateAccessToContactMutation = {
+  publicDelegateAccessToContact: {
+    __typename?: "PublicPetitionAccess";
+    petition: {
+      __typename?: "PublicPetition";
+      id: string;
+      recipients: Array<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName: string;
+        email: string;
+      }>;
+    };
+  };
+};
+
 export type useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   firstName: string;
@@ -29754,30 +29778,6 @@ export type RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMu
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
-
-export type useDelegateAccess_publicDelegateAccessToContactMutationVariables = Exact<{
-  keycode: Scalars["ID"]["input"];
-  email: Scalars["String"]["input"];
-  firstName: Scalars["String"]["input"];
-  lastName: Scalars["String"]["input"];
-  messageBody: Scalars["String"]["input"];
-}>;
-
-export type useDelegateAccess_publicDelegateAccessToContactMutation = {
-  publicDelegateAccessToContact: {
-    __typename?: "PublicPetitionAccess";
-    petition: {
-      __typename?: "PublicPetition";
-      id: string;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName: string;
-        email: string;
-      }>;
-    };
-  };
-};
 
 export type AccountChangeName_UserFragment = {
   __typename?: "User";
@@ -68438,6 +68438,35 @@ export const RecipientViewNewDevice_publicCheckVerificationCodeDocument = gql`
   RecipientViewNewDevice_publicCheckVerificationCodeMutation,
   RecipientViewNewDevice_publicCheckVerificationCodeMutationVariables
 >;
+export const useDelegateAccessDialog_publicDelegateAccessToContactDocument = gql`
+  mutation useDelegateAccessDialog_publicDelegateAccessToContact(
+    $keycode: ID!
+    $email: String!
+    $firstName: String!
+    $lastName: String!
+    $messageBody: String!
+  ) {
+    publicDelegateAccessToContact(
+      keycode: $keycode
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      messageBody: $messageBody
+    ) {
+      petition {
+        id
+        recipients {
+          id
+          fullName
+          email
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  useDelegateAccessDialog_publicDelegateAccessToContactMutation,
+  useDelegateAccessDialog_publicDelegateAccessToContactMutationVariables
+>;
 export const RecipientViewPetitionField_queryDocument = gql`
   query RecipientViewPetitionField_query($keycode: ID!, $fieldId: GID!) {
     publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
@@ -68731,35 +68760,6 @@ export const RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyD
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutation,
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutationVariables
->;
-export const useDelegateAccess_publicDelegateAccessToContactDocument = gql`
-  mutation useDelegateAccess_publicDelegateAccessToContact(
-    $keycode: ID!
-    $email: String!
-    $firstName: String!
-    $lastName: String!
-    $messageBody: String!
-  ) {
-    publicDelegateAccessToContact(
-      keycode: $keycode
-      email: $email
-      firstName: $firstName
-      lastName: $lastName
-      messageBody: $messageBody
-    ) {
-      petition {
-        id
-        recipients {
-          id
-          fullName
-          email
-        }
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  useDelegateAccess_publicDelegateAccessToContactMutation,
-  useDelegateAccess_publicDelegateAccessToContactMutationVariables
 >;
 export const CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument = gql`
   query CreateOrUpdatePetitionEventSubscriptionDialog_petitions(

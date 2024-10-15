@@ -89,18 +89,18 @@ function CreateOrUpdateUserDialog({
         <Stack>
           <FormControl id="create-user-email" isInvalid={!!errors.email} isDisabled={isUpdate}>
             <FormLabel>
-              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+              <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
               placeholder={intl.formatMessage({
-                id: "generic.forms.email-placeholder",
+                id: "generic.forms-email-placeholder",
                 defaultMessage: "name@example.com",
               })}
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             </FormErrorMessage>
@@ -113,7 +113,7 @@ function CreateOrUpdateUserDialog({
               flex="1"
             >
               <FormLabel>
-                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+                <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
               </FormLabel>
               <Input
                 {...register("firstName", {
@@ -135,7 +135,7 @@ function CreateOrUpdateUserDialog({
               flex="1"
             >
               <FormLabel>
-                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+                <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
               </FormLabel>
               <Input
                 {...register("lastName", {
@@ -145,7 +145,7 @@ function CreateOrUpdateUserDialog({
               />
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-last-name-error"
+                  id="generic.forms-invalid-last-name-error"
                   defaultMessage="Please, enter the last name"
                 />
               </FormErrorMessage>

@@ -163,7 +163,7 @@ export function PublicPetitionInitialForm({
 
           <FormControl id="first-name" isInvalid={!!errors.firstName}>
             <FormLabel>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" /> *
+              <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" /> *
             </FormLabel>
             <Input
               isDisabled={isDisabled}
@@ -184,7 +184,7 @@ export function PublicPetitionInitialForm({
           </FormControl>
           <FormControl id="last-name" isInvalid={!!errors.lastName}>
             <FormLabel>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" /> *
+              <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" /> *
             </FormLabel>
             <Input
               isDisabled={isDisabled}
@@ -205,7 +205,7 @@ export function PublicPetitionInitialForm({
           </FormControl>
           <FormControl id="email" isInvalid={!!errors.email}>
             <FormLabel>
-              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" /> *
+              <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" /> *
             </FormLabel>
             <Input
               isDisabled={isDisabled}
@@ -215,7 +215,7 @@ export function PublicPetitionInitialForm({
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-email-error"
+                id="generic.forms-invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
             </FormErrorMessage>

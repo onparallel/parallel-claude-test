@@ -1050,32 +1050,32 @@
     "context": "example@company.com"
   },
   {
-    "term": "generic.forms.email-label",
+    "term": "generic.forms-email-label",
     "definition": "Correu electrònic",
     "context": "Email"
   },
   {
-    "term": "generic.forms.email-placeholder",
+    "term": "generic.forms-email-placeholder",
     "definition": "nom@exemple.com",
     "context": "name@example.com"
   },
   {
-    "term": "generic.forms.first-name-label",
+    "term": "generic.forms-first-name-label",
     "definition": "Nom",
     "context": "First name"
   },
   {
-    "term": "generic.forms.invalid-email-error",
+    "term": "generic.forms-invalid-email-error",
     "definition": "Si us plau, introdueix un correu electrònic vàlid",
     "context": "Please, enter a valid email"
   },
   {
-    "term": "generic.forms.invalid-last-name-error",
+    "term": "generic.forms-invalid-last-name-error",
     "definition": "Si us plau, introdueix el cognom",
     "context": "Please, enter the last name"
   },
   {
-    "term": "generic.forms.last-name-label",
+    "term": "generic.forms-last-name-label",
     "definition": "Cognoms",
     "context": "Last name"
   },

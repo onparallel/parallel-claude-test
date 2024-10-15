@@ -145,7 +145,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
                 />
               ) : (
                 <FormattedMessage
-                  id="generic.forms.invalid-email-error"
+                  id="generic.forms-invalid-email-error"
                   defaultMessage="Please, enter a valid email"
                 />
               )}

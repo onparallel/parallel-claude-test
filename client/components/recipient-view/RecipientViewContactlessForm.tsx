@@ -330,7 +330,7 @@ export function RecipientViewContactlessForm({
               <FormControl id="firstname" isInvalid={!!errors.firstName}>
                 <FormLabel>
                   <FormattedMessage
-                    id="generic.forms.first-name-label"
+                    id="generic.forms-first-name-label"
                     defaultMessage="First name"
                   />
                 </FormLabel>
@@ -344,24 +344,24 @@ export function RecipientViewContactlessForm({
               </FormControl>
               <FormControl id="lastname" isInvalid={!!errors.lastName}>
                 <FormLabel>
-                  <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+                  <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
                 </FormLabel>
                 <Input {...register("lastName", { required: true })} />
                 <FormErrorMessage>
                   <FormattedMessage
-                    id="generic.forms.invalid-last-name-error"
+                    id="generic.forms-invalid-last-name-error"
                     defaultMessage="Please, enter the last name"
                   />
                 </FormErrorMessage>
               </FormControl>
               <FormControl id="email" isInvalid={!!errors.email}>
                 <FormLabel>
-                  <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+                  <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
                 </FormLabel>
                 <Input type="email" {...emailRegisterProps} />
                 <FormErrorMessage>
                   <FormattedMessage
-                    id="generic.forms.invalid-email-error"
+                    id="generic.forms-invalid-email-error"
                     defaultMessage="Please, enter a valid email"
                   />
                 </FormErrorMessage>

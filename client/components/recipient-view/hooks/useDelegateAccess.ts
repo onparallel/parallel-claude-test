@@ -1,7 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
 import { useToast } from "@chakra-ui/react";
 import { useTone } from "@parallel/components/common/ToneProvider";
-import { useDelegateAccess_publicDelegateAccessToContactDocument } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { useDelegateAccessDialog } from "../dialogs/DelegateAccessDialog";
 
@@ -12,9 +10,6 @@ export function useDelegateAccess() {
 
   const toast = useToast();
 
-  const [publicDelegateAccessToContact] = useMutation(
-    useDelegateAccess_publicDelegateAccessToContactDocument,
-  );
   return async function ({
     keycode,
     contactName,
@@ -31,12 +26,7 @@ export function useDelegateAccess() {
         organizationName,
         tone,
       });
-      await publicDelegateAccessToContact({
-        variables: {
-          ...data,
-          keycode,
-        },
-      });
+
       toast({
         title: intl.formatMessage({
           id: "util.recipient-view-delegate-access.toast-header",
@@ -57,32 +47,3 @@ export function useDelegateAccess() {
     } catch {}
   };
 }
-
-const _mutations = [
-  gql`
-    mutation useDelegateAccess_publicDelegateAccessToContact(
-      $keycode: ID!
-      $email: String!
-      $firstName: String!
-      $lastName: String!
-      $messageBody: String!
-    ) {
-      publicDelegateAccessToContact(
-        keycode: $keycode
-        email: $email
-        firstName: $firstName
-        lastName: $lastName
-        messageBody: $messageBody
-      ) {
-        petition {
-          id
-          recipients {
-            id
-            fullName
-            email
-          }
-        }
-      }
-    }
-  `,
-];

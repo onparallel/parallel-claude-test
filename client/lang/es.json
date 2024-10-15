@@ -12360,12 +12360,12 @@
     "context": "This email is already registered"
   },
   {
-    "term": "generic.forms.email-label",
+    "term": "generic.forms-email-label",
     "definition": "Correo electrónico",
     "context": "Email"
   },
   {
-    "term": "generic.forms.email-placeholder",
+    "term": "generic.forms-email-placeholder",
     "definition": "nombre@ejemplo.com",
     "context": "name@example.com"
   },
@@ -12375,7 +12375,7 @@
     "context": "This domain has SSO enabled. Please, contact your administrator to register."
   },
   {
-    "term": "generic.forms.first-name-label",
+    "term": "generic.forms-first-name-label",
     "definition": "Nombre",
     "context": "First name"
   },
@@ -12385,7 +12385,7 @@
     "context": "Folder name"
   },
   {
-    "term": "generic.forms.invalid-email-error",
+    "term": "generic.forms-invalid-email-error",
     "definition": "Por favor, introduzca un correo electrónico válido",
     "context": "Please, enter a valid email"
   },
@@ -12395,7 +12395,7 @@
     "context": "Please, enter the team name"
   },
   {
-    "term": "generic.forms.invalid-last-name-error",
+    "term": "generic.forms-invalid-last-name-error",
     "definition": "Por favor, introduzca el apellido",
     "context": "Please, enter the last name"
   },
@@ -12405,7 +12405,7 @@
     "context": "The verification code is invalid"
   },
   {
-    "term": "generic.forms.last-name-label",
+    "term": "generic.forms-last-name-label",
     "definition": "Apellidos",
     "context": "Last name"
   },

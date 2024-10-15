@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -13,8 +14,13 @@ import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { Tone } from "@parallel/graphql/__types";
+import {
+  Tone,
+  useDelegateAccessDialog_publicDelegateAccessToContactDocument,
+} from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -48,8 +54,9 @@ function DelegateAccessDialog({
     handleSubmit,
     register,
     formState: { errors },
+    setError,
   } = useForm<DelegateAccessDialogData>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       email: "",
       firstName: "",
@@ -73,6 +80,12 @@ function DelegateAccessDialog({
     pattern: EMAIL_REGEX,
   });
 
+  const [publicDelegateAccessToContact] = useMutation(
+    useDelegateAccessDialog_publicDelegateAccessToContactDocument,
+  );
+
+  const showError = useGenericErrorToast();
+
   return (
     <ConfirmDialog
       size="xl"
@@ -82,7 +95,24 @@ function DelegateAccessDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: handleSubmit(props.onResolve),
+          onSubmit: handleSubmit(async (data) => {
+            try {
+              await publicDelegateAccessToContact({
+                variables: {
+                  ...data,
+                  keycode,
+                },
+              });
+
+              props.onResolve();
+            } catch (e) {
+              if (isApolloError(e, "ARG_VALIDATION_ERROR")) {
+                setError("email", { type: "invalid" });
+              } else {
+                showError();
+              }
+            }
+          }),
         },
       }}
       header={
@@ -106,21 +136,21 @@ function DelegateAccessDialog({
           </Box>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
+              <FormattedMessage id="generic.forms-email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
               type="email"
               name="email"
               placeholder={intl.formatMessage({
-                id: "generic.forms.email-placeholder",
+                id: "generic.forms-email-placeholder",
                 defaultMessage: "name@example.com",
               })}
             />
             {errors.email && (
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-email-error"
+                  id="generic.forms-invalid-email-error"
                   defaultMessage="Please, enter a valid email"
                 />
               </FormErrorMessage>
@@ -128,7 +158,7 @@ function DelegateAccessDialog({
           </FormControl>
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...register("firstName", { required: true })} />
             {errors.firstName && (
@@ -142,13 +172,13 @@ function DelegateAccessDialog({
           </FormControl>
           <FormControl id="contact-last-name" isInvalid={!!errors.lastName}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
             {errors.lastName && (
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-last-name-error"
+                  id="generic.forms-invalid-last-name-error"
                   defaultMessage="Please, enter the last name"
                 />
               </FormErrorMessage>
@@ -190,3 +220,32 @@ function DelegateAccessDialog({
 export function useDelegateAccessDialog() {
   return useDialog(DelegateAccessDialog);
 }
+
+const _mutations = [
+  gql`
+    mutation useDelegateAccessDialog_publicDelegateAccessToContact(
+      $keycode: ID!
+      $email: String!
+      $firstName: String!
+      $lastName: String!
+      $messageBody: String!
+    ) {
+      publicDelegateAccessToContact(
+        keycode: $keycode
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
+        messageBody: $messageBody
+      ) {
+        petition {
+          id
+          recipients {
+            id
+            fullName
+            email
+          }
+        }
+      }
+    }
+  `,
+];

@@ -65,7 +65,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
       >
         <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={user.isSsoUser}>
           <FormLabel fontWeight="semibold">
-            <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+            <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
           </FormLabel>
           <Input
             backgroundColor="white"
@@ -81,7 +81,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
         </FormControl>
         <FormControl id="last-name" isInvalid={!!errors.lastName} isDisabled={user.isSsoUser}>
           <FormLabel fontWeight="semibold">
-            <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+            <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
           </FormLabel>
           <Input
             backgroundColor="white"
