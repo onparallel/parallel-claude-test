@@ -40,6 +40,7 @@ const fragments = {
     fragment ProfileTypeSelect_ProfileType on ProfileType {
       id
       name
+      canCreate
     }
   `,
 };
@@ -86,6 +87,7 @@ export interface ProfileTypeSelectProps<
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   isSync?: IsSync;
   defaultOptions?: boolean;
+  showOnlyCreatable?: boolean;
 }
 
 export const ProfileTypeSelect = Object.assign(
@@ -101,6 +103,7 @@ export const ProfileTypeSelect = Object.assign(
       options,
       isMulti,
       placeholder: _placeholder,
+      showOnlyCreatable,
       ...props
     }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
     ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>,
@@ -124,11 +127,12 @@ export const ProfileTypeSelect = Object.assign(
           },
           fetchPolicy: "no-cache",
         });
+        const items = result.data.profileTypes.items;
 
-        return result.data.profileTypes.items as any[];
+        return (showOnlyCreatable ? items.filter((pt) => pt.canCreate) : items) as any[];
       },
       300,
-      [intl.locale],
+      [intl.locale, showOnlyCreatable],
     );
 
     const getProfileTypes = useGetProfileTypes();

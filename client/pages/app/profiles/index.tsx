@@ -305,7 +305,9 @@ function Profiles() {
             <Button
               colorScheme="primary"
               onClick={handleCreateProfile}
-              isDisabled={!userCanCreateProfiles || isNullish(profileType)}
+              isDisabled={
+                !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
+              }
             >
               <FormattedMessage
                 id="component.create-profile-from-profile-type-dialog.create-profile"
@@ -729,6 +731,7 @@ const _fragments = {
         name
         icon
         isPinned
+        canCreate
         ...ProfileTypeReference_ProfileType
       }
       ${ProfileTypeReference.fragments.ProfileType}

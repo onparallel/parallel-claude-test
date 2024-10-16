@@ -16,7 +16,15 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRerender } from "@parallel/utils/useRerender";
 import useMergedRef from "@react-hook/merged-ref";
 import pMap from "p-map";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
+import {
+  ForwardedRef,
+  ReactElement,
+  RefAttributes,
+  forwardRef,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -51,6 +59,7 @@ const fragments = {
       profileType {
         id
         name
+        canCreate
       }
     }
   `,
@@ -130,6 +139,8 @@ export const ProfileSelect = Object.assign(
 
     const apollo = useApolloClient();
 
+    const [hideCreate, setHideCreate] = useState<boolean | undefined>(undefined);
+
     const loadProfiles = useDebouncedAsync(
       async (search: string | null | undefined) => {
         const result = await apollo.query({
@@ -149,10 +160,18 @@ export const ProfileSelect = Object.assign(
 
         const exclude = excludeProfiles ? [...excludeProfiles] : [];
 
-        return result.data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
+        const items = result.data.profiles.items;
+
+        const profiles = items.filter((p) => !exclude.includes(p.id));
+
+        if (hideCreate === undefined) {
+          setHideCreate(profiles.every((p) => !p.profileType.canCreate));
+        }
+
+        return profiles as any[];
       },
       300,
-      [unMaybeArray(profileTypeId ?? []).join(",")],
+      [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],
     );
 
     const getProfiles = useGetProfiles();
@@ -208,8 +227,9 @@ export const ProfileSelect = Object.assign(
         </Text>
       );
     };
+    const hasCreatePermission = useHasPermission("PROFILES:CREATE_PROFILES");
 
-    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES") && canCreateProfiles;
+    const userCanCreateProfiles = hideCreate !== true && hasCreatePermission && canCreateProfiles;
 
     const [key, rerender] = useRerender();
     const showCreateProfileDialog = useCreateProfileDialog();

@@ -176,6 +176,7 @@ function CreateProfileDialog({
                     onChange(v?.id ?? null);
                     setValue("fieldValues", []);
                   }}
+                  showOnlyCreatable
                   {...props}
                 />
               )}

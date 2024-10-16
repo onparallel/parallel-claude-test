@@ -3221,6 +3221,7 @@ export interface NexusGenFieldTypes {
     // field return type
     archivedAt: NexusGenScalars["DateTime"] | null; // DateTime
     archivedBy: NexusGenRootTypes["User"] | null; // User
+    canCreate: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     fields: NexusGenRootTypes["ProfileTypeField"][]; // [ProfileTypeField!]!
     icon: NexusGenEnums["ProfileTypeIcon"]; // ProfileTypeIcon!
@@ -5871,6 +5872,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     archivedAt: "DateTime";
     archivedBy: "User";
+    canCreate: "Boolean";
     createdAt: "DateTime";
     fields: "ProfileTypeField";
     icon: "ProfileTypeIcon";

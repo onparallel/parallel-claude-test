@@ -102,6 +102,20 @@ export const ProfileType = objectType({
         return pinnedProfileTypes.some((p) => p.profile_type_id === o.id);
       },
     });
+    t.nonNull.boolean("canCreate", {
+      resolve: async (o, _, ctx) => {
+        const fieldsIds = (o.profile_name_pattern as (string | number)[]).filter(
+          (v) => typeof v === "number",
+        ) as number[];
+        const permissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+          fieldsIds.map((fieldId) => ({
+            profileTypeFieldId: fieldId,
+            userId: ctx.user!.id,
+          })),
+        );
+        return permissions.every((p) => p === "WRITE");
+      },
+    });
   },
 });
 

@@ -5965,6 +5965,7 @@ type ProfileType implements Timestamps {
   """
   archivedAt: DateTime
   archivedBy: User
+  canCreate: Boolean!
 
   """
   Time when the resource was created.

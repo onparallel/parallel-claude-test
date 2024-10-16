@@ -4800,6 +4800,7 @@ export interface ProfileType extends Timestamps {
   /** Time when the response was created. */
   archivedAt?: Maybe<Scalars["DateTime"]["output"]>;
   archivedBy?: Maybe<User>;
+  canCreate: Scalars["Boolean"]["output"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
@@ -6447,6 +6448,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -6467,6 +6469,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -7297,6 +7300,7 @@ export type ProfileSelect_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -7321,6 +7325,7 @@ export type ProfileSelect_profilesQuery = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     }>;
   };
@@ -7340,6 +7345,7 @@ export type ProfileSelect_profileQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   };
 };
@@ -7362,6 +7368,7 @@ export type ProfileTypeSelect_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  canCreate: boolean;
 };
 
 export type ProfileTypeSelect_profileTypesQueryVariables = Exact<{
@@ -7380,6 +7387,7 @@ export type ProfileTypeSelect_profileTypesQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     }>;
   };
 };
@@ -7393,6 +7401,7 @@ export type ProfileTypeSelect_profileTypeQuery = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -7929,6 +7938,7 @@ export type AdminSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -7949,6 +7959,7 @@ export type AdminSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -7993,6 +8004,7 @@ export type AppLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8013,6 +8025,7 @@ export type AppLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8025,6 +8038,7 @@ export type AppLayoutNavBar_ProfileTypeFragment = {
   name: { [locale in UserLocale]?: string };
   icon: ProfileTypeIcon;
   isPinned: boolean;
+  canCreate: boolean;
   pluralName: { [locale in UserLocale]?: string };
 };
 
@@ -8051,6 +8065,7 @@ export type AppLayoutNavBar_UserFragment = {
     name: { [locale in UserLocale]?: string };
     icon: ProfileTypeIcon;
     isPinned: boolean;
+    canCreate: boolean;
     pluralName: { [locale in UserLocale]?: string };
   }>;
 };
@@ -8092,6 +8107,7 @@ export type AppLayoutNavBar_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8104,6 +8120,7 @@ export type AppLayoutNavBar_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8148,6 +8165,7 @@ export type DevelopersLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8168,6 +8186,7 @@ export type DevelopersLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8241,6 +8260,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8261,6 +8281,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8485,6 +8506,7 @@ export type PetitionLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8505,6 +8527,7 @@ export type PetitionLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8549,6 +8572,7 @@ export type ProfileLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8569,6 +8593,7 @@ export type ProfileLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8830,6 +8855,7 @@ export type ReportsSidebarLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8850,6 +8876,7 @@ export type ReportsSidebarLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8894,6 +8921,7 @@ export type SidebarLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8914,6 +8942,7 @@ export type SidebarLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8959,6 +8988,7 @@ export type UserGroupLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -8979,6 +9009,7 @@ export type UserGroupLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -9086,6 +9117,7 @@ export type UserSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -9106,6 +9138,7 @@ export type UserSettingsLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -10275,6 +10308,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -10295,6 +10329,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -13604,6 +13639,7 @@ export type AssociateProfileToPetitionDialog_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -24121,6 +24157,7 @@ export type ProfileDrawer_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -24281,6 +24318,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -24354,6 +24392,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24392,6 +24431,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmen
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24485,6 +24525,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
               __typename?: "ProfileType";
               id: string;
               name: { [locale in UserLocale]?: string };
+              canCreate: boolean;
             };
           } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24523,6 +24564,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24595,6 +24637,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24633,6 +24676,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24676,6 +24720,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFr
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   } | null;
 };
@@ -24740,6 +24785,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24778,6 +24824,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmen
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   } | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24871,6 +24918,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24909,6 +24957,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -24993,6 +25042,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
               __typename?: "ProfileType";
               id: string;
               name: { [locale in UserLocale]?: string };
+              canCreate: boolean;
             };
           } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25031,6 +25081,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25168,6 +25219,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                       __typename?: "ProfileType";
                       id: string;
                       name: { [locale in UserLocale]?: string };
+                      canCreate: boolean;
                     };
                   } | null;
                   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25206,6 +25258,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                   __typename?: "ProfileType";
                   id: string;
                   name: { [locale in UserLocale]?: string };
+                  canCreate: boolean;
                 };
               } | null;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25294,6 +25347,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                     __typename?: "ProfileType";
                     id: string;
                     name: { [locale in UserLocale]?: string };
+                    canCreate: boolean;
                   };
                 } | null;
                 parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25332,6 +25386,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25461,6 +25516,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -25499,6 +25555,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -26422,6 +26479,7 @@ export type ProfileRelationshipsTable_RelatedProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
   relationships: Array<{
     __typename?: "ProfileRelationship";
@@ -26443,6 +26501,7 @@ export type ProfileRelationshipsTable_ProfileRelationshipFragment = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
     relationships: Array<{
       __typename?: "ProfileRelationship";
@@ -26464,6 +26523,7 @@ export type ProfileRelationshipsTable_ProfileRelationshipFragment = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
     relationships: Array<{
       __typename?: "ProfileRelationship";
@@ -26502,6 +26562,7 @@ export type ProfileRelationshipsTable_ProfileFragment = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
       relationships: Array<{
         __typename?: "ProfileRelationship";
@@ -26523,6 +26584,7 @@ export type ProfileRelationshipsTable_ProfileFragment = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
       relationships: Array<{
         __typename?: "ProfileRelationship";
@@ -26548,6 +26610,7 @@ export type ProfileRelationshipsTable_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -26574,6 +26637,7 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
         relationships: Array<{
           __typename?: "ProfileRelationship";
@@ -26595,6 +26659,7 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
         relationships: Array<{
           __typename?: "ProfileRelationship";
@@ -26620,6 +26685,7 @@ export type ProfileRelationshipsTable_createProfileRelationshipMutation = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   };
 };
@@ -26655,6 +26721,7 @@ export type ProfileRelationshipsTable_profileQuery = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
         relationships: Array<{
           __typename?: "ProfileRelationship";
@@ -26676,6 +26743,7 @@ export type ProfileRelationshipsTable_profileQuery = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
         relationships: Array<{
           __typename?: "ProfileRelationship";
@@ -26701,6 +26769,7 @@ export type ProfileRelationshipsTable_profileQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   };
 };
@@ -27187,6 +27256,7 @@ export type useCreateProfileRelationshipsDialog_ProfileFragment = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    canCreate: boolean;
   };
 };
 
@@ -30362,6 +30432,7 @@ export type Admin_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30382,6 +30453,7 @@ export type Admin_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30446,6 +30518,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30466,6 +30539,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30603,6 +30677,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30623,6 +30698,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30887,6 +30963,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -30907,6 +30984,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31084,6 +31162,7 @@ export type AdminOrganizations_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31104,6 +31183,7 @@ export type AdminOrganizations_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31177,6 +31257,7 @@ export type AdminSupportMethods_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31197,6 +31278,7 @@ export type AdminSupportMethods_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31288,6 +31370,7 @@ export type Alerts_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -31308,6 +31391,7 @@ export type Alerts_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32104,6 +32188,7 @@ export type Contact_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32124,6 +32209,7 @@ export type Contact_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32294,6 +32380,7 @@ export type Contacts_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32314,6 +32401,7 @@ export type Contacts_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32414,6 +32502,7 @@ export type OrganizationBranding_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32434,6 +32523,7 @@ export type OrganizationBranding_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32500,6 +32590,7 @@ export type OrganizationCompliance_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32520,6 +32611,7 @@ export type OrganizationCompliance_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32583,6 +32675,7 @@ export type OrganizationGeneral_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32603,6 +32696,7 @@ export type OrganizationGeneral_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32772,6 +32866,7 @@ export type OrganizationGroup_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32792,6 +32887,7 @@ export type OrganizationGroup_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32876,6 +32972,7 @@ export type PermissionsGroup_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -32896,6 +32993,7 @@ export type PermissionsGroup_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33101,6 +33199,7 @@ export type OrganizationGroups_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33121,6 +33220,7 @@ export type OrganizationGroups_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33167,6 +33267,7 @@ export type OrganizationSettings_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33187,6 +33288,7 @@ export type OrganizationSettings_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33263,6 +33365,7 @@ export type OrganizationIntegrations_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33283,6 +33386,7 @@ export type OrganizationIntegrations_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33397,6 +33501,7 @@ export type IntegrationsSignature_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33417,6 +33522,7 @@ export type IntegrationsSignature_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33607,6 +33713,7 @@ export type OrganizationProfileType_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -33627,6 +33734,7 @@ export type OrganizationProfileType_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34046,6 +34154,7 @@ export type OrganizationProfileTypes_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34066,6 +34175,7 @@ export type OrganizationProfileTypes_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34208,6 +34318,7 @@ export type OrganizationUsage_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34228,6 +34339,7 @@ export type OrganizationUsage_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34394,6 +34506,7 @@ export type OrganizationUsers_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -34414,6 +34527,7 @@ export type OrganizationUsers_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -35693,6 +35807,7 @@ export type PetitionActivity_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -35714,6 +35829,7 @@ export type PetitionActivity_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -37354,6 +37470,7 @@ export type PetitionActivity_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -37375,6 +37492,7 @@ export type PetitionActivity_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -38392,6 +38510,7 @@ export type PetitionCompose_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -38413,6 +38532,7 @@ export type PetitionCompose_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -40571,6 +40691,7 @@ export type PetitionCompose_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -40592,6 +40713,7 @@ export type PetitionCompose_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -41453,6 +41575,7 @@ export type PetitionMessages_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -41473,6 +41596,7 @@ export type PetitionMessages_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -41520,6 +41644,7 @@ export type PetitionMessages_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -41540,6 +41665,7 @@ export type PetitionMessages_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -43066,6 +43192,7 @@ export type PetitionPreview_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -43087,6 +43214,7 @@ export type PetitionPreview_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -45449,6 +45577,7 @@ export type PetitionPreview_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -45476,6 +45605,7 @@ export type PetitionPreview_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -45610,6 +45740,7 @@ export type PetitionReplies_PetitionFragment = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -45648,6 +45779,7 @@ export type PetitionReplies_PetitionFragment = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -45865,6 +45997,7 @@ export type PetitionReplies_PetitionFragment = {
               __typename?: "ProfileType";
               id: string;
               name: { [locale in UserLocale]?: string };
+              canCreate: boolean;
             };
           } | null;
         }>;
@@ -45935,6 +46068,7 @@ export type PetitionReplies_PetitionFragment = {
           __typename?: "ProfileType";
           id: string;
           name: { [locale in UserLocale]?: string };
+          canCreate: boolean;
         };
       } | null;
     }>;
@@ -46059,6 +46193,7 @@ export type PetitionReplies_PetitionFragment = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
     };
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
@@ -46591,6 +46726,7 @@ export type PetitionReplies_closePetitionMutation = {
                   __typename?: "ProfileType";
                   id: string;
                   name: { [locale in UserLocale]?: string };
+                  canCreate: boolean;
                 };
               } | null;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -46629,6 +46765,7 @@ export type PetitionReplies_closePetitionMutation = {
               __typename?: "ProfileType";
               id: string;
               name: { [locale in UserLocale]?: string };
+              canCreate: boolean;
             };
           } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -46846,6 +46983,7 @@ export type PetitionReplies_closePetitionMutation = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
           }>;
@@ -46916,6 +47054,7 @@ export type PetitionReplies_closePetitionMutation = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
       }>;
@@ -47040,6 +47179,7 @@ export type PetitionReplies_closePetitionMutation = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     }>;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
@@ -47345,6 +47485,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                   __typename?: "ProfileType";
                   id: string;
                   name: { [locale in UserLocale]?: string };
+                  canCreate: boolean;
                 };
               } | null;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -47383,6 +47524,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               __typename?: "ProfileType";
               id: string;
               name: { [locale in UserLocale]?: string };
+              canCreate: boolean;
             };
           } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -47600,6 +47742,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
           }>;
@@ -47670,6 +47813,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         } | null;
       }>;
@@ -47794,6 +47938,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         __typename?: "ProfileType";
         id: string;
         name: { [locale in UserLocale]?: string };
+        canCreate: boolean;
       };
     }>;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
@@ -48131,6 +48276,7 @@ export type PetitionReplies_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -48157,6 +48303,7 @@ export type PetitionReplies_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -48297,6 +48444,7 @@ export type PetitionReplies_petitionQuery = {
                       __typename?: "ProfileType";
                       id: string;
                       name: { [locale in UserLocale]?: string };
+                      canCreate: boolean;
                     };
                   } | null;
                   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -48335,6 +48483,7 @@ export type PetitionReplies_petitionQuery = {
                   __typename?: "ProfileType";
                   id: string;
                   name: { [locale in UserLocale]?: string };
+                  canCreate: boolean;
                 };
               } | null;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
@@ -48556,6 +48705,7 @@ export type PetitionReplies_petitionQuery = {
                     __typename?: "ProfileType";
                     id: string;
                     name: { [locale in UserLocale]?: string };
+                    canCreate: boolean;
                   };
                 } | null;
               }>;
@@ -48626,6 +48776,7 @@ export type PetitionReplies_petitionQuery = {
                 __typename?: "ProfileType";
                 id: string;
                 name: { [locale in UserLocale]?: string };
+                canCreate: boolean;
               };
             } | null;
           }>;
@@ -48750,6 +48901,7 @@ export type PetitionReplies_petitionQuery = {
             __typename?: "ProfileType";
             id: string;
             name: { [locale in UserLocale]?: string };
+            canCreate: boolean;
           };
         }>;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
@@ -49250,6 +49402,7 @@ export type Petitions_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -49270,6 +49423,7 @@ export type Petitions_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -49796,6 +49950,7 @@ export type NewPetition_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -49816,6 +49971,7 @@ export type NewPetition_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -49993,6 +50149,7 @@ export type ProfileDetail_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50013,6 +50170,7 @@ export type ProfileDetail_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50093,6 +50251,7 @@ export type Profiles_ProfileTypeFragment = {
   name: { [locale in UserLocale]?: string };
   icon: ProfileTypeIcon;
   isPinned: boolean;
+  canCreate: boolean;
   pluralName: { [locale in UserLocale]?: string };
 };
 
@@ -50190,6 +50349,7 @@ export type Profiles_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50210,6 +50370,7 @@ export type Profiles_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50227,6 +50388,7 @@ export type Profiles_profileTypeQuery = {
     name: { [locale in UserLocale]?: string };
     icon: ProfileTypeIcon;
     isPinned: boolean;
+    canCreate: boolean;
     pluralName: { [locale in UserLocale]?: string };
   };
 };
@@ -50310,6 +50472,7 @@ export type Reports_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50330,6 +50493,7 @@ export type Reports_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50382,6 +50546,7 @@ export type Overview_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50402,6 +50567,7 @@ export type Overview_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50454,6 +50620,7 @@ export type ReportsReplies_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50474,6 +50641,7 @@ export type ReportsReplies_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50526,6 +50694,7 @@ export type ReportsTemplates_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50546,6 +50715,7 @@ export type ReportsTemplates_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50594,6 +50764,7 @@ export type Account_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50614,6 +50785,7 @@ export type Account_QueryFragment = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50701,6 +50873,7 @@ export type Account_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -50721,6 +50894,7 @@ export type Account_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51039,6 +51213,7 @@ export type Subscriptions_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51059,6 +51234,7 @@ export type Subscriptions_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51137,6 +51313,7 @@ export type Tokens_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51157,6 +51334,7 @@ export type Tokens_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51203,6 +51381,7 @@ export type Settings_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51223,6 +51402,7 @@ export type Settings_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51277,6 +51457,7 @@ export type Security_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -51297,6 +51478,7 @@ export type Security_userQuery = {
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
       isPinned: boolean;
+      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
@@ -56425,6 +56607,7 @@ export const AppLayoutNavBar_ProfileTypeFragmentDoc = gql`
     name
     icon
     isPinned
+    canCreate
     ...ProfileTypeReference_ProfileType
   }
   ${ProfileTypeReference_ProfileTypeFragmentDoc}
@@ -56786,6 +56969,7 @@ export const ProfileTypeSelect_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeSelect_ProfileType on ProfileType {
     id
     name
+    canCreate
   }
 ` as unknown as DocumentNode<ProfileTypeSelect_ProfileTypeFragment, unknown>;
 export const UserGroupReference_UserGroupFragmentDoc = gql`
@@ -57583,6 +57767,7 @@ export const ProfileSelect_ProfileFragmentDoc = gql`
     profileType {
       id
       name
+      canCreate
     }
   }
 ` as unknown as DocumentNode<ProfileSelect_ProfileFragment, unknown>;
@@ -64284,6 +64469,7 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
     name
     icon
     isPinned
+    canCreate
     ...ProfileTypeReference_ProfileType
   }
   ${ProfileTypeReference_ProfileTypeFragmentDoc}

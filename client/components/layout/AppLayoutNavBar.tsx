@@ -387,6 +387,7 @@ export const AppLayoutNavBar = Object.assign(
             name
             icon
             isPinned
+            canCreate
             ...ProfileTypeReference_ProfileType
           }
           ${ProfileTypeReference.fragments.ProfileType}
@@ -918,7 +919,10 @@ function CreateMenuButtonSection({
     } catch {}
   }
 
-  if (!me.hasProfilesAccess) {
+  const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+  const pinnedProfileTypes = me.pinnedProfileTypes.filter((pt) => pt.canCreate);
+
+  if (!me.hasProfilesAccess || !userCanCreateProfiles || pinnedProfileTypes.length === 0) {
     return (
       <NakedLink href="/app/petitions/new">
         <Button
@@ -982,7 +986,7 @@ function CreateMenuButtonSection({
             <NakedLink href="/app/petitions/new">
               <MenuItem icon={<PaperPlaneIcon boxSize={4} />}>{untranslated("Parallel")}</MenuItem>
             </NakedLink>
-            {me.pinnedProfileTypes.map((profileType) => {
+            {pinnedProfileTypes.map((profileType) => {
               const icon = getProfileTypeFieldIcon(profileType.icon);
               return (
                 <MenuItem
