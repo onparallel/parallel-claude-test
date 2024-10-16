@@ -34,9 +34,7 @@ function ensureLocalizableUserText(value: any, strict: boolean): LocalizableUser
     );
   }
   if (strict) {
-    const unknownKey = Object.keys(value).find(
-      (key) => !(UserLocaleValues as string[]).includes(key),
-    );
+    const unknownKey = Object.keys(value).find((key) => !UserLocaleValues.includes(key));
     if (isNonNullish(unknownKey)) {
       throw new Error(
         `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
@@ -62,7 +60,7 @@ const parseLocalizableUserText: GraphQLScalarLiteralParser<LocalizableUserText> 
 
     for (const field of ast.fields) {
       const prop = field.name.value;
-      if (!UserLocaleValues.includes(prop as any)) {
+      if (!UserLocaleValues.includes(prop)) {
         throw new Error(`Invalid LocalizableUserText object`);
       }
       if (field.value.kind !== Kind.STRING) {

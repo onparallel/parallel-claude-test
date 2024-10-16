@@ -63,10 +63,7 @@ app
         }
       }
 
-      if (
-        typeof req.query.locale !== "string" ||
-        !ContactLocaleValues.includes(req.query.locale as any)
-      ) {
+      if (typeof req.query.locale !== "string" || !ContactLocaleValues.includes(req.query.locale)) {
         throw new Error(`Unknown ContactLocale ${req.query.locale}`);
       }
       const locale = req.query.locale as ContactLocale;
@@ -109,10 +106,7 @@ app.get("/emails/*", async (req, res, next) => {
       }
     }
     const name = (req.params as any)[0] as string;
-    if (
-      typeof req.query.locale !== "string" ||
-      !ContactLocaleValues.includes(req.query.locale as any)
-    ) {
+    if (typeof req.query.locale !== "string" || !ContactLocaleValues.includes(req.query.locale)) {
       throw new Error(`Unknown ContactLocale ${req.query.locale}`);
     }
     const locale = req.query.locale as ContactLocale;

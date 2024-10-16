@@ -28,7 +28,7 @@ function mapPetitionFieldTypeToProfileTypeFieldType(type: PetitionFieldType): Pr
   if (type === "FILE_UPLOAD") {
     return "FILE";
   }
-  if (!ProfileTypeFieldTypeValues.includes(type as any)) {
+  if (!ProfileTypeFieldTypeValues.includes(type)) {
     throw new Error(`Can't convert type ${type} to ProfileTypeFieldType`);
   }
 

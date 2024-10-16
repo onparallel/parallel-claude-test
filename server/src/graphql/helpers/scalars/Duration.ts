@@ -5,7 +5,7 @@ import { ObjMap } from "graphql/jsutils/ObjMap";
 import { arg, core, scalarType } from "nexus";
 import { isNonNullish } from "remeda";
 
-const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"];
+const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"] as const;
 
 const DURATION_SCHEMA = {
   type: "object",
@@ -36,7 +36,7 @@ function ensureDuration(value: any, strict: boolean): _Duration {
     );
   }
   if (strict) {
-    const unknownKey = Object.keys(value).find((key) => !(KEYS as string[]).includes(key));
+    const unknownKey = Object.keys(value).find((key) => !KEYS.includes(key));
     if (isNonNullish(unknownKey)) {
       throw new Error(
         `Value is not a valid Duration: ${JSON.stringify(value)} has unknown key ${unknownKey}`,
