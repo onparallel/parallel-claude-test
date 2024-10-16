@@ -75,7 +75,7 @@ export interface ConfirmPetitionSignersDialogResult {
 export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   "__typename" | "isPreset"
->;
+> & { isPreset?: boolean | null };
 
 const MAX_SIGNERS_ALLOWED = 40;
 const MAX_FILESIZE = 1024 * 1024 * 10;
@@ -135,9 +135,7 @@ export function ConfirmPetitionSignersDialog(
   const handleContactSelectOnChange =
     (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection | null) => {
       try {
-        const repeatedSigners = [...presetSigners, ...signers].filter(
-          (s) => s.email === contact!.email,
-        );
+        const repeatedSigners = allSigners.filter((s) => s.email === contact!.email);
         onChange([
           ...signers,
           repeatedSigners.length > 0
@@ -261,6 +259,7 @@ export function ConfirmPetitionSignersDialog(
                     email: s.email,
                     firstName: s.firstName,
                     lastName: s.lastName ?? "",
+                    isPreset: s.isPreset,
                   })),
                   ...presetSigners.map((s) => ({
                     contactId: s.contactId,
@@ -498,7 +497,7 @@ export function ConfirmPetitionSignersDialog(
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
-                        isEditable
+                        isEditable={!signer.isPreset}
                         signer={signer}
                         isMe={
                           [signer.email, signer.firstName, signer.lastName].join("") ===

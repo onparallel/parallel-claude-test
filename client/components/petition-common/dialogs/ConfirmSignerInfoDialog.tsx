@@ -1,14 +1,18 @@
 import {
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   Stack,
+  Switch,
   Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -20,11 +24,13 @@ import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 interface ConfirmSignerInfoDialogProps {
   selection: SignerSelectSelection;
   repeatedSigners: { firstName: string; lastName?: string | null }[];
+  allowUpdateFixedSigner?: boolean;
 }
 
 function ConfirmSignerInfoDialog({
   selection,
   repeatedSigners,
+  allowUpdateFixedSigner,
   ...props
 }: DialogProps<ConfirmSignerInfoDialogProps, SignerSelectSelection>) {
   const intl = useIntl();
@@ -38,6 +44,7 @@ function ConfirmSignerInfoDialog({
       email: selection.email,
       firstName: selection.firstName,
       lastName: selection.lastName,
+      isPreset: selection.isPreset ?? false,
     },
   });
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -52,9 +59,7 @@ function ConfirmSignerInfoDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: handleSubmit(({ email, firstName, lastName }) => {
-            props.onResolve({ email, firstName, lastName });
-          }),
+          onSubmit: handleSubmit(props.onResolve),
         },
       }}
       header={
@@ -125,6 +130,29 @@ function ConfirmSignerInfoDialog({
               />
             </FormErrorMessage>
           </FormControl>
+          {allowUpdateFixedSigner && (
+            <FormControl>
+              <HStack alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center">
+                  <FormLabel fontWeight={400} margin="auto">
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.is-preset"
+                      defaultMessage="Required signed"
+                    />
+                  </FormLabel>
+                  <HelpPopover>
+                    <Text fontSize="sm">
+                      <FormattedMessage
+                        id="component.confirm-signer-info-dialog.is-preset-popover"
+                        defaultMessage="Required signers cannot be removed once the parallel is created."
+                      />
+                    </Text>
+                  </HelpPopover>
+                </Flex>
+                <Switch {...register("isPreset")} />
+              </HStack>
+            </FormControl>
+          )}
         </Stack>
       }
       confirm={

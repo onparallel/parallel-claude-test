@@ -45,6 +45,16 @@
     "context": "You already added this email for {signersList}. You can modify the name and add it again."
   },
   {
+    "term": "component.confirm-signer-info-dialog.is-preset",
+    "definition": "Required signed",
+    "context": "Required signed"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.is-preset-popover",
+    "definition": "Required signers cannot be removed once the parallel is created.",
+    "context": "Required signers cannot be removed once the parallel is created."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirm the signer's information",
     "context": "Confirm the signer's information"
@@ -1045,11 +1055,6 @@
     "context": "E.g. {example}"
   },
   {
-    "term": "generic.forms.company-email-placeholder",
-    "definition": "example@company.com",
-    "context": "example@company.com"
-  },
-  {
     "term": "generic.forms-email-label",
     "definition": "Email",
     "context": "Email"
@@ -1078,6 +1083,11 @@
     "term": "generic.forms-last-name-label",
     "definition": "Last name",
     "context": "Last name"
+  },
+  {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "example@company.com",
+    "context": "example@company.com"
   },
   {
     "term": "generic.forms.required-first-name-error",

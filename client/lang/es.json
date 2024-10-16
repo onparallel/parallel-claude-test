@@ -1730,6 +1730,16 @@
     "context": "You already added this email for {signersList}. You can modify the name and add it again."
   },
   {
+    "term": "component.confirm-signer-info-dialog.is-preset",
+    "definition": "Firmante obligatorio",
+    "context": "Required signed"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.is-preset-popover",
+    "definition": "Los firmantes obligatorios no se podrán eliminar una vez creado el parallel.",
+    "context": "Required signers cannot be removed once the parallel is created."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirme los datos del firmante",
     "context": "Confirm the signer's information"
@@ -12365,16 +12375,6 @@
     "context": "E.g. {example}"
   },
   {
-    "term": "generic.forms.company-email-placeholder",
-    "definition": "ejemplo@empresa.com",
-    "context": "example@company.com"
-  },
-  {
-    "term": "generic.forms.email-already-registered-error",
-    "definition": "Este email ya está registrado",
-    "context": "This email is already registered"
-  },
-  {
     "term": "generic.forms-email-label",
     "definition": "Correo electrónico",
     "context": "Email"
@@ -12385,19 +12385,9 @@
     "context": "name@example.com"
   },
   {
-    "term": "generic.forms.email-sso-enabled-error",
-    "definition": "Este dominio tiene SSO habilitado. Por favor, contacta con tu administrador para registrarte.",
-    "context": "This domain has SSO enabled. Please, contact your administrator to register."
-  },
-  {
     "term": "generic.forms-first-name-label",
     "definition": "Nombre",
     "context": "First name"
-  },
-  {
-    "term": "generic.forms.folder-name-label",
-    "definition": "Nombre de la carpeta",
-    "context": "Folder name"
   },
   {
     "term": "generic.forms-invalid-email-error",
@@ -12405,24 +12395,44 @@
     "context": "Please, enter a valid email"
   },
   {
-    "term": "generic.forms.invalid-group-name-error",
-    "definition": "Por favor, introduzca el nombre del equipo",
-    "context": "Please, enter the team name"
-  },
-  {
     "term": "generic.forms-invalid-last-name-error",
     "definition": "Por favor, introduzca el apellido",
     "context": "Please, enter the last name"
   },
   {
-    "term": "generic.forms.invalid-verification-code",
-    "definition": "El código de verificación es inválido",
-    "context": "The verification code is invalid"
-  },
-  {
     "term": "generic.forms-last-name-label",
     "definition": "Apellidos",
     "context": "Last name"
+  },
+  {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "ejemplo@empresa.com",
+    "context": "example@company.com"
+  },
+  {
+    "term": "generic.forms.email-already-registered-error",
+    "definition": "Este email ya está registrado",
+    "context": "This email is already registered"
+  },
+  {
+    "term": "generic.forms.email-sso-enabled-error",
+    "definition": "Este dominio tiene SSO habilitado. Por favor, contacta con tu administrador para registrarte.",
+    "context": "This domain has SSO enabled. Please, contact your administrator to register."
+  },
+  {
+    "term": "generic.forms.folder-name-label",
+    "definition": "Nombre de la carpeta",
+    "context": "Folder name"
+  },
+  {
+    "term": "generic.forms.invalid-group-name-error",
+    "definition": "Por favor, introduzca el nombre del equipo",
+    "context": "Please, enter the team name"
+  },
+  {
+    "term": "generic.forms.invalid-verification-code",
+    "definition": "El código de verificación es inválido",
+    "context": "The verification code is invalid"
   },
   {
     "term": "generic.forms.name-label",

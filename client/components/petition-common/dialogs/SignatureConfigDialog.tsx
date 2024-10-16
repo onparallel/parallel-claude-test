@@ -55,7 +55,7 @@ import {
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isNonNullish, noop, partition, pick } from "remeda";
+import { isNonNullish, noop, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
@@ -72,7 +72,7 @@ interface SignatureConfigFormData {
   title: Maybe<string>;
   allowAdditionalSigners: boolean;
   includePresetSigners: boolean;
-  presetSigners: SignatureConfigInputSigner[];
+  signersInfo: SignatureConfigInputSigner[];
   signingMode: SignatureConfigSigningMode;
   minSigners: number;
   instructions: Maybe<string>;
@@ -94,10 +94,7 @@ export function SignatureConfigDialog({
     petition.signatureConfig ??
     (petition.__typename === "Petition" ? petition.currentSignatureRequest?.signatureConfig : null);
 
-  const [presetSigners, otherSigners] = partition(
-    (signatureConfig?.signers ?? []).filter(isNonNullish),
-    (s) => s.isPreset,
-  );
+  const allSigners = (signatureConfig?.signers ?? []).filter(isNonNullish);
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
     defaultValues: {
@@ -108,8 +105,8 @@ export function SignatureConfigDialog({
       allowAdditionalSigners: petition.isInteractionWithRecipientsEnabled
         ? (signatureConfig?.allowAdditionalSigners ?? false)
         : false,
-      includePresetSigners: presetSigners.length > 0,
-      presetSigners,
+      includePresetSigners: allSigners.length > 0,
+      signersInfo: allSigners,
       signingMode: signatureConfig?.signingMode ?? "PARALLEL",
       minSigners: signatureConfig?.minSigners ?? 1,
       instructions: signatureConfig?.instructions ?? null,
@@ -150,7 +147,7 @@ export function SignatureConfigDialog({
 
   async function handleClickNextStep() {
     if (isLastStep && !(await isSubmitSuccessful(form.handleSubmit))) {
-      form.setError("presetSigners", {});
+      form.setError("signersInfo", {});
       return;
     }
 
@@ -167,10 +164,11 @@ export function SignatureConfigDialog({
         signingMode: data.signingMode,
         minSigners: data.minSigners,
         instructions: data.showInstructions ? data.instructions : null,
-        signersInfo: (data.includePresetSigners
-          ? [...otherSigners, ...data.presetSigners.map((s) => ({ ...s, isPreset: true }))]
-          : otherSigners
-        ).map((s) => pick(s, ["firstName", "lastName", "email", "contactId", "isPreset"])),
+        signersInfo: data.includePresetSigners
+          ? data.signersInfo.map((s) =>
+              pick(s, ["firstName", "lastName", "email", "contactId", "isPreset"]),
+            )
+          : [],
         useCustomDocument: data.useCustomDocument,
       });
     }
@@ -628,7 +626,7 @@ function SignatureConfigDialogBodyStep3({
     clearErrors,
   } = useFormContext<SignatureConfigFormData>();
 
-  const presetSigners = watch("presetSigners");
+  const signersInfo = watch("signersInfo");
   const includePresetSigners = watch("includePresetSigners");
   const signingMode = watch("signingMode");
   const isSequential = signingMode === "SEQUENTIAL";
@@ -645,11 +643,15 @@ function SignatureConfigDialogBodyStep3({
   const handleContactSelectOnChange =
     (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection | null) => {
       try {
-        const repeatedSigners = presetSigners.filter((s) => s.email === contact!.email);
+        const repeatedSigners = signersInfo.filter((s) => s.email === contact!.email);
         onChange([
-          ...presetSigners,
+          ...signersInfo,
           repeatedSigners.length > 0
-            ? await showConfirmSignerInfo({ selection: contact!, repeatedSigners })
+            ? await showConfirmSignerInfo({
+                selection: { ...contact!, isPreset: false },
+                repeatedSigners,
+                allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
+              })
             : contact,
         ]);
       } catch {}
@@ -661,28 +663,29 @@ function SignatureConfigDialogBodyStep3({
     async () => {
       try {
         onChange([
-          ...presetSigners.slice(0, index),
+          ...signersInfo.slice(0, index),
           await showConfirmSignerInfo({
             selection: signer,
             repeatedSigners: [],
+            allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
           }),
-          ...presetSigners.slice(index + 1),
+          ...signersInfo.slice(index + 1),
         ]);
       } catch {}
     };
 
   useEffect(() => {
-    if (presetSigners.length > 0) {
-      clearErrors("presetSigners");
+    if (signersInfo.length > 0) {
+      clearErrors("signersInfo");
     }
-  }, [presetSigners.length]);
+  }, [signersInfo.length]);
 
   const ListElement = isSequential ? OrderedList : UnorderedList;
 
   return (
-    <FormControl id="presetSigners" isInvalid={!!errors.presetSigners}>
-      {presetSigners.length === 0 ? (
-        <Text color={!!errors.presetSigners ? "red.500" : "gray.500"} marginStart={1}>
+    <FormControl id="signersInfo" isInvalid={!!errors.signersInfo}>
+      {signersInfo.length === 0 ? (
+        <Text color={!!errors.signersInfo ? "red.500" : "gray.500"} marginStart={1}>
           <FormattedMessage
             id="component.signature-config-dialog.no-signers-added"
             defaultMessage="You haven't added any signers yet"
@@ -691,7 +694,7 @@ function SignatureConfigDialogBodyStep3({
       ) : null}
 
       <Controller
-        name="presetSigners"
+        name="signersInfo"
         control={control}
         rules={{
           validate: (value: any[]) => !includePresetSigners || value.length > 0,
@@ -709,7 +712,7 @@ function SignatureConfigDialogBodyStep3({
               {signers.map((signer, index) => (
                 <SelectedSignerRow
                   key={index}
-                  isEditable
+                  isEditable={petition.__typename === "PetitionTemplate" || !signer.isPreset}
                   signer={signer}
                   onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                   onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
@@ -741,7 +744,7 @@ function SignatureConfigDialogBodyStep3({
               <SuggestedSigners
                 user={user}
                 petition={petition}
-                currentSigners={presetSigners}
+                currentSigners={signersInfo}
                 onAddSigner={(s) => {
                   onChange([...signers, s]);
                 }}
