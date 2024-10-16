@@ -175,7 +175,7 @@ export function ExpiringPropertyRow({
   const intl = useIntl();
   const alarmSrc = assetsUrl + "/static/emails/icons/time-alarm.png";
   const chevronSrc = assetsUrl + "/static/emails/icons/chevron-right.png";
-  const propertyHref = `${parallelUrl}/${intl.locale}/app/profiles/${property.profileId}?field=${property.profileTypeFieldId}`;
+  const propertyHref = `${parallelUrl}/${intl.locale}/app/profiles/${property.profileId}/general?field=${property.profileTypeFieldId}`;
   const expiryDate = intl.formatDate(new Date(property.expiryDate), {
     dateStyle: "long",
   });

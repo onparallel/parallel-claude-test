@@ -150,7 +150,7 @@ function MonitoredValueRow({ value, assetsUrl, parallelUrl }: MonitoredValueRowP
   const searchIconSrc = assetsUrl + "/static/emails/icons/search.png";
 
   const chevronSrc = assetsUrl + "/static/emails/icons/chevron-right.png";
-  const propertyHref = `${parallelUrl}/${intl.locale}/app/profiles/${value.profileId}?profileTypeField=${value.profileTypeFieldId}`;
+  const propertyHref = `${parallelUrl}/${intl.locale}/app/profiles/${value.profileId}/general?profileTypeField=${value.profileTypeFieldId}`;
 
   const title =
     isNonNullish(value.content.query) && isNullish(value.content.entity)

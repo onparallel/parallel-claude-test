@@ -77,7 +77,7 @@ function Alerts() {
 
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback((row: Alerts_ProfileFieldPropertyFragment, event: any) => {
-    navigate(`/app/profiles/${row.profile.id}?field=${row.field.id}`, event);
+    navigate(`/app/profiles/${row.profile.id}/general?field=${row.field.id}`, event);
   }, []);
 
   return (

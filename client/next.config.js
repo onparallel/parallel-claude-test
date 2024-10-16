@@ -76,6 +76,11 @@ const config = {
         destination: "/petition/:keycode/reminders",
         permanent: true,
       },
+      {
+        source: "/app/profiles/:profileId",
+        destination: "/app/profiles/:profileId/general",
+        permanent: false,
+      },
     ];
   },
   experimental: {

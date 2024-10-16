@@ -4440,36 +4440,6 @@
     "context": "Formulas"
   },
   {
-    "term": "component.more-options-menu-profile.close-profile",
-    "definition": "Close profile",
-    "context": "Close profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.delete-permanently",
-    "definition": "Delete permanently",
-    "context": "Delete permanently"
-  },
-  {
-    "term": "component.more-options-menu-profile.delete-profile",
-    "definition": "Delete profile",
-    "context": "Delete profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.manage-profile-subscriptions",
-    "definition": "Manage subscriptions",
-    "context": "Manage subscriptions"
-  },
-  {
-    "term": "component.more-options-menu-profile.recover-profile",
-    "definition": "Recover profile",
-    "context": "Recover profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.reopen-profile",
-    "definition": "Reopen profile",
-    "context": "Reopen profile"
-  },
-  {
     "term": "component.move-to-folder-dialog.currently-in",
     "definition": "Currently in {folder}",
     "context": "Currently in {folder}"
@@ -7813,6 +7783,51 @@
     "term": "component.profile-form.success-toast-header",
     "definition": "Information imported successfully",
     "context": "Information imported successfully"
+  },
+  {
+    "term": "component.profile-layout.close-profile",
+    "definition": "Close profile",
+    "context": "Close profile"
+  },
+  {
+    "term": "component.profile-layout.delete-permanently",
+    "definition": "Delete permanently",
+    "context": "Delete permanently"
+  },
+  {
+    "term": "component.profile-layout.delete-profile",
+    "definition": "Delete profile",
+    "context": "Delete profile"
+  },
+  {
+    "term": "component.profile-layout.manage-profile-subscriptions",
+    "definition": "Manage subscriptions",
+    "context": "Manage subscriptions"
+  },
+  {
+    "term": "component.profile-layout.recover-profile",
+    "definition": "Recover profile",
+    "context": "Recover profile"
+  },
+  {
+    "term": "component.profile-layout.reopen-profile",
+    "definition": "Reopen profile",
+    "context": "Reopen profile"
+  },
+  {
+    "term": "component.profile-layout.subscribe",
+    "definition": "Subscribe",
+    "context": "Subscribe"
+  },
+  {
+    "term": "component.profile-layout.title",
+    "definition": "Profile details",
+    "context": "Profile details"
+  },
+  {
+    "term": "component.profile-layout.unsubscribe",
+    "definition": "Unsubscribe",
+    "context": "Unsubscribe"
   },
   {
     "term": "component.profile-petitions-table.add-petition",
@@ -15015,6 +15030,11 @@
     "context": "Signature sent"
   },
   {
+    "term": "page.profile-details.general",
+    "definition": "General",
+    "context": "General"
+  },
+  {
     "term": "page.profile-details.hidden-properties-description",
     "definition": "Request permission to see these properties.",
     "context": "Request permission to see these properties."
@@ -15025,6 +15045,11 @@
     "context": "{count, plural, =1 {# property} other{# properties}} changed"
   },
   {
+    "term": "page.profile-details.parallels",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
     "term": "page.profile-details.restricted-properties",
     "definition": "Restricted properties",
     "context": "Restricted properties"
@@ -15033,21 +15058,6 @@
     "term": "page.profile-details.saving-changes",
     "definition": "Saving {count, plural, =1 {# change} other{# changes}}...",
     "context": "Saving {count, plural, =1 {# change} other{# changes}}..."
-  },
-  {
-    "term": "page.profile-details.subscribe",
-    "definition": "Subscribe",
-    "context": "Subscribe"
-  },
-  {
-    "term": "page.profile-details.title",
-    "definition": "Profile details",
-    "context": "Profile details"
-  },
-  {
-    "term": "page.profile-details.unsubscribe",
-    "definition": "Unsubscribe",
-    "context": "Unsubscribe"
   },
   {
     "term": "page.profiles.bin",

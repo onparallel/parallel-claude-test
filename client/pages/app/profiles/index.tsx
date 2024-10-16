@@ -140,7 +140,7 @@ function Profiles() {
         profileTypeName: profileType.name,
       });
       if (hasValues) {
-        navigate(`/app/profiles/${id}`);
+        navigate(`/app/profiles/${id}/general`);
       }
     } catch {}
   };
@@ -165,7 +165,7 @@ function Profiles() {
   };
 
   const handleRowClick = useCallback((row: Profiles_ProfileFragment, event: MouseEvent) => {
-    navigate(`/app/profiles/${row.id}`, event);
+    navigate(`/app/profiles/${row.id}/general`, event);
   }, []);
 
   const showSubscribersDialog = useProfileSubscribersDialog();

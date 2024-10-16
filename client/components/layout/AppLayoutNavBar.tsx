@@ -914,7 +914,7 @@ function CreateMenuButtonSection({
         modalProps: { finalFocusRef: isForceOpen ? buttonRef : emptyRef },
       });
 
-      navigate(`/app/profiles/${profile.id}`);
+      navigate(`/app/profiles/${profile.id}/general`);
     } catch {}
   }
 

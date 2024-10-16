@@ -8511,6 +8511,287 @@ export type PetitionLayout_QueryFragment = {
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
+export type ProfileLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    permissions: Array<string>;
+    isOrgOwner: boolean;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasBackgroundCheck: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
+      iconUrl?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
+export type ProfileLayout_ProfileSubscriptionFragment = {
+  __typename?: "ProfileSubscription";
+  id: string;
+  user: {
+    __typename?: "User";
+    id: string;
+    isMe: boolean;
+    email: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  };
+};
+
+export type ProfileLayout_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  permanentDeletionAt?: string | null;
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      isMe: boolean;
+      email: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    standardType?: ProfileTypeStandardType | null;
+  };
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      type: ProfileTypeFieldType;
+      myPermission: ProfileTypeFieldPermissionType;
+      alias?: string | null;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
+      options: { [key: string]: any };
+    };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id: string;
+      expiryDate?: string | null;
+      file?: {
+        __typename?: "FileUpload";
+        contentType: string;
+        filename: string;
+        isComplete: boolean;
+        size: number;
+      } | null;
+    }> | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+      createdAt: string;
+      expiryDate?: string | null;
+    } | null;
+  }>;
+  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+  relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+};
+
+export type ProfileLayout_subscribeToProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type ProfileLayout_subscribeToProfileMutation = {
+  subscribeToProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+        expiryDate?: string | null;
+      } | null;
+    }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  }>;
+};
+
+export type ProfileLayout_unsubscribeFromProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type ProfileLayout_unsubscribeFromProfileMutation = {
+  unsubscribeFromProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+        expiryDate?: string | null;
+      } | null;
+    }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  }>;
+};
+
 export type ReportsSidebarLayout_QueryFragment = {
   me: {
     __typename?: "User";
@@ -19732,10 +20013,10 @@ export type PreviewPetitionField_PetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
         previewReplies: Array<{
@@ -19826,10 +20107,10 @@ export type PreviewPetitionField_PetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
         previewReplies: Array<{
@@ -19873,10 +20154,10 @@ export type PreviewPetitionField_PetitionFieldFragment = {
     id: string;
     file: {
       __typename?: "FileUpload";
-      filename: string;
       contentType: string;
-      size: number;
+      filename: string;
       isComplete: boolean;
+      size: number;
     };
   }>;
   profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -20031,10 +20312,10 @@ export type PreviewPetitionField_queryQuery = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           previewReplies: Array<{
@@ -20125,10 +20406,10 @@ export type PreviewPetitionField_queryQuery = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           previewReplies: Array<{
@@ -20172,10 +20453,10 @@ export type PreviewPetitionField_queryQuery = {
       id: string;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
     profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -21041,10 +21322,10 @@ export type PreviewPetitionFieldGroup_PetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
         previewReplies: Array<{
@@ -21132,10 +21413,10 @@ export type PreviewPetitionFieldGroup_PetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
         previewReplies: Array<{
@@ -23948,10 +24229,10 @@ export type ProfileDrawer_profileQuery = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         } | null;
       }> | null;
       value?: {
@@ -25586,10 +25867,10 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     expiryDate?: string | null;
     file?: {
       __typename?: "FileUpload";
-      filename: string;
       contentType: string;
-      size: number;
+      filename: string;
       isComplete: boolean;
+      size: number;
     } | null;
   }> | null;
   value?: {
@@ -25633,10 +25914,10 @@ export type ProfileForm_ProfileFragment = {
       expiryDate?: string | null;
       file?: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       } | null;
     }> | null;
     value?: {
@@ -25780,10 +26061,10 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         } | null;
       }> | null;
       value?: {
@@ -25849,10 +26130,10 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         } | null;
       }> | null;
       value?: {
@@ -29012,10 +29293,10 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
       };
@@ -29037,10 +29318,10 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
     id: string;
     file: {
       __typename?: "FileUpload";
-      filename: string;
       contentType: string;
-      size: number;
+      filename: string;
       isComplete: boolean;
+      size: number;
     };
   }>;
 };
@@ -29427,10 +29708,10 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
       };
@@ -29452,10 +29733,10 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment = {
     id: string;
     file: {
       __typename?: "FileUpload";
-      filename: string;
       contentType: string;
-      size: number;
+      filename: string;
       isComplete: boolean;
+      size: number;
     };
   }>;
 };
@@ -37272,10 +37553,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         isUploading: boolean;
         file: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         };
       }>;
     }> | null;
@@ -37363,10 +37644,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       isUploading: boolean;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
   }>;
@@ -37594,10 +37875,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         isUploading: boolean;
         file: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         };
       }>;
     }> | null;
@@ -37685,10 +37966,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       isUploading: boolean;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
   }>;
@@ -40210,10 +40491,10 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
       isUploading: boolean;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
   };
@@ -40499,10 +40780,10 @@ export type PetitionCompose_petitionQuery = {
               isUploading: boolean;
               file: {
                 __typename?: "FileUpload";
-                filename: string;
                 contentType: string;
-                size: number;
+                filename: string;
                 isComplete: boolean;
+                size: number;
               };
             }>;
           }> | null;
@@ -40590,10 +40871,10 @@ export type PetitionCompose_petitionQuery = {
             isUploading: boolean;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
         }>;
@@ -40843,10 +41124,10 @@ export type PetitionCompose_petitionQuery = {
               isUploading: boolean;
               file: {
                 __typename?: "FileUpload";
-                filename: string;
                 contentType: string;
-                size: number;
+                filename: string;
                 isComplete: boolean;
+                size: number;
               };
             }>;
           }> | null;
@@ -40934,10 +41215,10 @@ export type PetitionCompose_petitionQuery = {
             isUploading: boolean;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
         }>;
@@ -42240,10 +42521,10 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       id: string;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
     profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -42701,10 +42982,10 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       id: string;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
     profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -43210,10 +43491,10 @@ export type PetitionPreview_updatePetitionMutation = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -43683,10 +43964,10 @@ export type PetitionPreview_updatePetitionMutation = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -44116,10 +44397,10 @@ export type PetitionPreview_completePetitionMutation = {
         id: string;
         file: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         };
       }>;
       profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -44606,10 +44887,10 @@ export type PetitionPreview_petitionQuery = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -45079,10 +45360,10 @@ export type PetitionPreview_petitionQuery = {
             id: string;
             file: {
               __typename?: "FileUpload";
-              filename: string;
               contentType: string;
-              size: number;
+              filename: string;
               isComplete: boolean;
+              size: number;
             };
           }>;
           profileType?: { __typename?: "ProfileType"; id: string } | null;
@@ -49666,86 +49947,15 @@ export type NewPetition_templateQuery = {
     | null;
 };
 
-export type ProfileDetail_ProfileSubscriptionFragment = {
-  __typename?: "ProfileSubscription";
-  id: string;
-  user: {
-    __typename?: "User";
-    id: string;
-    isMe: boolean;
-    email: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-  };
-};
-
-export type ProfileDetail_ProfileFragment = {
-  __typename?: "Profile";
-  id: string;
-  localizableName: { [locale in UserLocale]?: string };
-  status: ProfileStatus;
-  permanentDeletionAt?: string | null;
-  subscribers: Array<{
-    __typename?: "ProfileSubscription";
-    id: string;
-    user: {
-      __typename?: "User";
-      id: string;
-      isMe: boolean;
-      email: string;
-      fullName?: string | null;
-      avatarUrl?: string | null;
-      initials?: string | null;
-    };
-  }>;
-  profileType: {
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    standardType?: ProfileTypeStandardType | null;
-  };
-  properties: Array<{
-    __typename?: "ProfileFieldProperty";
-    field: {
-      __typename?: "ProfileTypeField";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      position: number;
-      type: ProfileTypeFieldType;
-      myPermission: ProfileTypeFieldPermissionType;
-      alias?: string | null;
-      isExpirable: boolean;
-      expiryAlertAheadTime?: Duration | null;
-      options: { [key: string]: any };
-    };
-    files?: Array<{
-      __typename?: "ProfileFieldFile";
-      id: string;
-      expiryDate?: string | null;
-      file?: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      } | null;
-    }> | null;
-    value?: {
-      __typename?: "ProfileFieldValue";
-      id: string;
-      content?: { [key: string]: any } | null;
-      createdAt: string;
-      expiryDate?: string | null;
-    } | null;
-  }>;
-  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
-  relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
-};
-
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ProfileDetail_userQuery = {
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+    deviceType?: string | null;
+  };
   me: {
     __typename?: "User";
     id: string;
@@ -49785,12 +49995,6 @@ export type ProfileDetail_userQuery = {
       isPinned: boolean;
       pluralName: { [locale in UserLocale]?: string };
     }>;
-  };
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-    deviceType?: string | null;
   };
   realMe: {
     __typename?: "User";
@@ -49864,10 +50068,10 @@ export type ProfileDetail_profileQuery = {
         expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         } | null;
       }> | null;
       value?: {
@@ -49881,146 +50085,6 @@ export type ProfileDetail_profileQuery = {
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
   };
-};
-
-export type ProfileDetail_subscribeToProfileMutationVariables = Exact<{
-  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type ProfileDetail_subscribeToProfileMutation = {
-  subscribeToProfile: Array<{
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    permanentDeletionAt?: string | null;
-    subscribers: Array<{
-      __typename?: "ProfileSubscription";
-      id: string;
-      user: {
-        __typename?: "User";
-        id: string;
-        isMe: boolean;
-        email: string;
-        fullName?: string | null;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
-    }>;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      standardType?: ProfileTypeStandardType | null;
-    };
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        position: number;
-        type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermissionType;
-        alias?: string | null;
-        isExpirable: boolean;
-        expiryAlertAheadTime?: Duration | null;
-        options: { [key: string]: any };
-      };
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        expiryDate?: string | null;
-        file?: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
-        } | null;
-      }> | null;
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-        createdAt: string;
-        expiryDate?: string | null;
-      } | null;
-    }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
-    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
-  }>;
-};
-
-export type ProfileDetail_unsubscribeFromProfileMutationVariables = Exact<{
-  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type ProfileDetail_unsubscribeFromProfileMutation = {
-  unsubscribeFromProfile: Array<{
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    permanentDeletionAt?: string | null;
-    subscribers: Array<{
-      __typename?: "ProfileSubscription";
-      id: string;
-      user: {
-        __typename?: "User";
-        id: string;
-        isMe: boolean;
-        email: string;
-        fullName?: string | null;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
-    }>;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      standardType?: ProfileTypeStandardType | null;
-    };
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        position: number;
-        type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermissionType;
-        alias?: string | null;
-        isExpirable: boolean;
-        expiryAlertAheadTime?: Duration | null;
-        options: { [key: string]: any };
-      };
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        expiryDate?: string | null;
-        file?: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
-        } | null;
-      }> | null;
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-        createdAt: string;
-        expiryDate?: string | null;
-      } | null;
-    }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
-    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
-  }>;
 };
 
 export type Profiles_ProfileTypeFragment = {
@@ -51424,10 +51488,10 @@ export type RecipientView_PublicPetitionAccessFragment = {
         id: string;
         file: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         };
       }>;
     }>;
@@ -51622,10 +51686,10 @@ export type RecipientView_PublicPetitionFragment = {
       id: string;
       file: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
-        size: number;
+        filename: string;
         isComplete: boolean;
+        size: number;
       };
     }>;
   }>;
@@ -51811,10 +51875,10 @@ export type RecipientView_publicCompletePetitionMutation = {
         id: string;
         file: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
-          size: number;
+          filename: string;
           isComplete: boolean;
+          size: number;
         };
       }>;
     }>;
@@ -52014,10 +52078,10 @@ export type RecipientView_accessQuery = {
           id: string;
           file: {
             __typename?: "FileUpload";
-            filename: string;
             contentType: string;
-            size: number;
+            filename: string;
             isComplete: boolean;
+            size: number;
           };
         }>;
       }>;
@@ -56783,6 +56847,223 @@ export const DevelopersLayout_QueryFragmentDoc = gql`
   }
   ${UserSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<DevelopersLayout_QueryFragment, unknown>;
+export const UserListPopover_UserFragmentDoc = gql`
+  fragment UserListPopover_User on User {
+    id
+    fullName
+    ...UserAvatar_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<UserListPopover_UserFragment, unknown>;
+export const UserAvatarList_UserFragmentDoc = gql`
+  fragment UserAvatarList_User on User {
+    id
+    fullName
+    ...UserAvatar_User
+    ...UserListPopover_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+  ${UserListPopover_UserFragmentDoc}
+` as unknown as DocumentNode<UserAvatarList_UserFragment, unknown>;
+export const ProfileSubscribers_UserFragmentDoc = gql`
+  fragment ProfileSubscribers_User on User {
+    id
+    ...UserAvatarList_User
+  }
+  ${UserAvatarList_UserFragmentDoc}
+` as unknown as DocumentNode<ProfileSubscribers_UserFragment, unknown>;
+export const ProfileLayout_QueryFragmentDoc = gql`
+  fragment ProfileLayout_Query on Query {
+    ...AppLayout_Query
+    me {
+      ...ProfileSubscribers_User
+    }
+  }
+  ${AppLayout_QueryFragmentDoc}
+  ${ProfileSubscribers_UserFragmentDoc}
+` as unknown as DocumentNode<ProfileLayout_QueryFragment, unknown>;
+export const ProfileReference_ProfileFragmentDoc = gql`
+  fragment ProfileReference_Profile on Profile {
+    id
+    localizableName
+    status
+  }
+` as unknown as DocumentNode<ProfileReference_ProfileFragment, unknown>;
+export const useImportFromExternalSourceDialog_ProfileTypeFragmentDoc = gql`
+  fragment useImportFromExternalSourceDialog_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useImportFromExternalSourceDialog_ProfileTypeFragment, unknown>;
+export const ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    isExpirable
+    expiryAlertAheadTime
+  }
+` as unknown as DocumentNode<ProfileFormFieldInputGroup_ProfileTypeFieldFragment, unknown>;
+export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+    isExpirable
+    expiryAlertAheadTime
+    options
+    ...ProfileFormFieldInputGroup_ProfileTypeField
+  }
+  ${ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_ProfileTypeFieldFragment, unknown>;
+export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileForm_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    position
+    type
+    myPermission
+    alias
+    ...ProfileFormField_ProfileTypeField
+  }
+  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
+    id
+    expiryDate
+    file {
+      contentType
+      filename
+      isComplete
+      size
+    }
+  }
+` as unknown as DocumentNode<ProfileFieldFileUpload_ProfileFieldFileFragment, unknown>;
+export const ProfileFormField_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
+    ...ProfileFieldFileUpload_ProfileFieldFile
+  }
+  ${ProfileFieldFileUpload_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldFileFragment, unknown>;
+export const ProfileForm_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
+    id
+    ...ProfileFormField_ProfileFieldFile
+  }
+  ${ProfileFormField_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldFileFragment, unknown>;
+export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+  }
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
+export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+    createdAt
+    expiryDate
+    ...ProfileFormField_ProfileFieldValue
+  }
+  ${ProfileFormField_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
+export const ProfileFormField_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfileFormField_ProfileTypeField
+    }
+    files {
+      ...ProfileFormField_ProfileFieldFile
+    }
+    value {
+      ...ProfileFormField_ProfileFieldValue
+    }
+  }
+  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
+  ${ProfileFormField_ProfileFieldFileFragmentDoc}
+  ${ProfileFormField_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_ProfileFieldPropertyFragment, unknown>;
+export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfileForm_ProfileTypeField
+    }
+    files {
+      ...ProfileForm_ProfileFieldFile
+    }
+    value {
+      ...ProfileForm_ProfileFieldValue
+    }
+    ...ProfileFormField_ProfileFieldProperty
+  }
+  ${ProfileForm_ProfileTypeFieldFragmentDoc}
+  ${ProfileForm_ProfileFieldFileFragmentDoc}
+  ${ProfileForm_ProfileFieldValueFragmentDoc}
+  ${ProfileFormField_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
+export const ProfileForm_ProfileFragmentDoc = gql`
+  fragment ProfileForm_Profile on Profile {
+    id
+    status
+    ...ProfileReference_Profile
+    profileType {
+      id
+      name
+      standardType
+      ...useImportFromExternalSourceDialog_ProfileType
+    }
+    properties {
+      ...ProfileForm_ProfileFieldProperty
+    }
+    petitionsTotalCount: petitions {
+      totalCount
+    }
+    relationships {
+      id
+    }
+    permanentDeletionAt
+  }
+  ${ProfileReference_ProfileFragmentDoc}
+  ${useImportFromExternalSourceDialog_ProfileTypeFragmentDoc}
+  ${ProfileForm_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
+export const useProfileSubscribersDialog_UserFragmentDoc = gql`
+  fragment useProfileSubscribersDialog_User on User {
+    id
+    email
+    ...UserAvatar_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<useProfileSubscribersDialog_UserFragment, unknown>;
+export const ProfileLayout_ProfileSubscriptionFragmentDoc = gql`
+  fragment ProfileLayout_ProfileSubscription on ProfileSubscription {
+    id
+    user {
+      id
+      isMe
+      ...ProfileSubscribers_User
+      ...useProfileSubscribersDialog_User
+    }
+  }
+  ${ProfileSubscribers_UserFragmentDoc}
+  ${useProfileSubscribersDialog_UserFragmentDoc}
+` as unknown as DocumentNode<ProfileLayout_ProfileSubscriptionFragment, unknown>;
+export const ProfileLayout_ProfileFragmentDoc = gql`
+  fragment ProfileLayout_Profile on Profile {
+    id
+    localizableName
+    status
+    ...ProfileForm_Profile
+    ...ProfileReference_Profile
+    subscribers {
+      ...ProfileLayout_ProfileSubscription
+    }
+  }
+  ${ProfileForm_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+  ${ProfileLayout_ProfileSubscriptionFragmentDoc}
+` as unknown as DocumentNode<ProfileLayout_ProfileFragment, unknown>;
 export const ReportsSidebarLayout_QueryFragmentDoc = gql`
   fragment ReportsSidebarLayout_Query on Query {
     ...SidebarLayout_Query
@@ -57682,24 +57963,6 @@ export const TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc = gql`
   }
   ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PetitionTemplateFragment, unknown>;
-export const UserListPopover_UserFragmentDoc = gql`
-  fragment UserListPopover_User on User {
-    id
-    fullName
-    ...UserAvatar_User
-  }
-  ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<UserListPopover_UserFragment, unknown>;
-export const UserAvatarList_UserFragmentDoc = gql`
-  fragment UserAvatarList_User on User {
-    id
-    fullName
-    ...UserAvatar_User
-    ...UserListPopover_User
-  }
-  ${UserAvatar_UserFragmentDoc}
-  ${UserListPopover_UserFragmentDoc}
-` as unknown as DocumentNode<UserAvatarList_UserFragment, unknown>;
 export const UserAvatarList_UserGroupFragmentDoc = gql`
   fragment UserAvatarList_UserGroup on UserGroup {
     id
@@ -58387,13 +58650,6 @@ export const PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragmentD
   PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment,
   unknown
 >;
-export const ProfileReference_ProfileFragmentDoc = gql`
-  fragment ProfileReference_Profile on Profile {
-    id
-    localizableName
-    status
-  }
-` as unknown as DocumentNode<ProfileReference_ProfileFragment, unknown>;
 export const useAssociateNewPetitionToProfileDialog_ProfileInnerFragmentDoc = gql`
   fragment useAssociateNewPetitionToProfileDialog_ProfileInner on Profile {
     id
@@ -58817,14 +59073,6 @@ export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleR
     ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment,
     unknown
   >;
-export const useProfileSubscribersDialog_UserFragmentDoc = gql`
-  fragment useProfileSubscribersDialog_User on User {
-    id
-    email
-    ...UserAvatar_User
-  }
-  ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<useProfileSubscribersDialog_UserFragment, unknown>;
 export const useProfileSubscribersDialog_ProfileFragmentDoc = gql`
   fragment useProfileSubscribersDialog_Profile on Profile {
     id
@@ -64030,180 +64278,6 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
-export const useImportFromExternalSourceDialog_ProfileTypeFragmentDoc = gql`
-  fragment useImportFromExternalSourceDialog_ProfileType on ProfileType {
-    id
-    name
-  }
-` as unknown as DocumentNode<useImportFromExternalSourceDialog_ProfileTypeFragment, unknown>;
-export const ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
-    id
-    type
-    isExpirable
-    expiryAlertAheadTime
-  }
-` as unknown as DocumentNode<ProfileFormFieldInputGroup_ProfileTypeFieldFragment, unknown>;
-export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
-    id
-    name
-    type
-    isExpirable
-    expiryAlertAheadTime
-    options
-    ...ProfileFormFieldInputGroup_ProfileTypeField
-  }
-  ${ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileFormField_ProfileTypeFieldFragment, unknown>;
-export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileForm_ProfileTypeField on ProfileTypeField {
-    id
-    name
-    position
-    type
-    myPermission
-    alias
-    ...ProfileFormField_ProfileTypeField
-  }
-  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileTypeFieldFragment, unknown>;
-export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
-    id
-    expiryDate
-    file {
-      contentType
-      filename
-      isComplete
-      size
-    }
-  }
-` as unknown as DocumentNode<ProfileFieldFileUpload_ProfileFieldFileFragment, unknown>;
-export const ProfileFormField_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
-    ...ProfileFieldFileUpload_ProfileFieldFile
-  }
-  ${ProfileFieldFileUpload_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<ProfileFormField_ProfileFieldFileFragment, unknown>;
-export const ProfileForm_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
-    id
-    ...ProfileFormField_ProfileFieldFile
-  }
-  ${ProfileFormField_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldFileFragment, unknown>;
-export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
-    id
-    content
-  }
-` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
-export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
-    id
-    content
-    createdAt
-    expiryDate
-    ...ProfileFormField_ProfileFieldValue
-  }
-  ${ProfileFormField_ProfileFieldValueFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
-export const ProfileFormField_ProfileFieldPropertyFragmentDoc = gql`
-  fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
-    field {
-      ...ProfileFormField_ProfileTypeField
-    }
-    files {
-      ...ProfileFormField_ProfileFieldFile
-    }
-    value {
-      ...ProfileFormField_ProfileFieldValue
-    }
-  }
-  ${ProfileFormField_ProfileTypeFieldFragmentDoc}
-  ${ProfileFormField_ProfileFieldFileFragmentDoc}
-  ${ProfileFormField_ProfileFieldValueFragmentDoc}
-` as unknown as DocumentNode<ProfileFormField_ProfileFieldPropertyFragment, unknown>;
-export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
-    field {
-      ...ProfileForm_ProfileTypeField
-    }
-    files {
-      ...ProfileForm_ProfileFieldFile
-    }
-    value {
-      ...ProfileForm_ProfileFieldValue
-    }
-    ...ProfileFormField_ProfileFieldProperty
-  }
-  ${ProfileForm_ProfileTypeFieldFragmentDoc}
-  ${ProfileForm_ProfileFieldFileFragmentDoc}
-  ${ProfileForm_ProfileFieldValueFragmentDoc}
-  ${ProfileFormField_ProfileFieldPropertyFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
-export const ProfileForm_ProfileFragmentDoc = gql`
-  fragment ProfileForm_Profile on Profile {
-    id
-    status
-    ...ProfileReference_Profile
-    profileType {
-      id
-      name
-      standardType
-      ...useImportFromExternalSourceDialog_ProfileType
-    }
-    properties {
-      ...ProfileForm_ProfileFieldProperty
-    }
-    petitionsTotalCount: petitions {
-      totalCount
-    }
-    relationships {
-      id
-    }
-    permanentDeletionAt
-  }
-  ${ProfileReference_ProfileFragmentDoc}
-  ${useImportFromExternalSourceDialog_ProfileTypeFragmentDoc}
-  ${ProfileForm_ProfileFieldPropertyFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
-export const ProfileSubscribers_UserFragmentDoc = gql`
-  fragment ProfileSubscribers_User on User {
-    id
-    ...UserAvatarList_User
-  }
-  ${UserAvatarList_UserFragmentDoc}
-` as unknown as DocumentNode<ProfileSubscribers_UserFragment, unknown>;
-export const ProfileDetail_ProfileSubscriptionFragmentDoc = gql`
-  fragment ProfileDetail_ProfileSubscription on ProfileSubscription {
-    id
-    user {
-      id
-      isMe
-      ...ProfileSubscribers_User
-      ...useProfileSubscribersDialog_User
-    }
-  }
-  ${ProfileSubscribers_UserFragmentDoc}
-  ${useProfileSubscribersDialog_UserFragmentDoc}
-` as unknown as DocumentNode<ProfileDetail_ProfileSubscriptionFragment, unknown>;
-export const ProfileDetail_ProfileFragmentDoc = gql`
-  fragment ProfileDetail_Profile on Profile {
-    id
-    localizableName
-    status
-    ...ProfileForm_Profile
-    ...ProfileReference_Profile
-    subscribers {
-      ...ProfileDetail_ProfileSubscription
-    }
-  }
-  ${ProfileForm_ProfileFragmentDoc}
-  ${ProfileReference_ProfileFragmentDoc}
-  ${ProfileDetail_ProfileSubscriptionFragmentDoc}
-` as unknown as DocumentNode<ProfileDetail_ProfileFragment, unknown>;
 export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
     id
@@ -65955,6 +66029,28 @@ export const PetitionsHeader_associateProfileToPetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionsHeader_associateProfileToPetitionMutation,
   PetitionsHeader_associateProfileToPetitionMutationVariables
+>;
+export const ProfileLayout_subscribeToProfileDocument = gql`
+  mutation ProfileLayout_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+    subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...ProfileLayout_Profile
+    }
+  }
+  ${ProfileLayout_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileLayout_subscribeToProfileMutation,
+  ProfileLayout_subscribeToProfileMutationVariables
+>;
+export const ProfileLayout_unsubscribeFromProfileDocument = gql`
+  mutation ProfileLayout_unsubscribeFromProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+    unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...ProfileLayout_Profile
+    }
+  }
+  ${ProfileLayout_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileLayout_unsubscribeFromProfileMutation,
+  ProfileLayout_unsubscribeFromProfileMutationVariables
 >;
 export const UserGroupLayout_updateUserGroupDocument = gql`
   mutation UserGroupLayout_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
@@ -70909,48 +71005,23 @@ export const NewPetition_templateDocument = gql`
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
-    ...AppLayout_Query
-    me {
-      ...ProfileSubscribers_User
-    }
+    ...ProfileLayout_Query
     metadata {
       country
       browserName
     }
   }
-  ${AppLayout_QueryFragmentDoc}
-  ${ProfileSubscribers_UserFragmentDoc}
+  ${ProfileLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_userQuery, ProfileDetail_userQueryVariables>;
 export const ProfileDetail_profileDocument = gql`
   query ProfileDetail_profile($profileId: GID!) {
     profile(profileId: $profileId) {
-      ...ProfileDetail_Profile
+      id
+      ...ProfileLayout_Profile
     }
   }
-  ${ProfileDetail_ProfileFragmentDoc}
+  ${ProfileLayout_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_profileQuery, ProfileDetail_profileQueryVariables>;
-export const ProfileDetail_subscribeToProfileDocument = gql`
-  mutation ProfileDetail_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
-    subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
-      ...ProfileDetail_Profile
-    }
-  }
-  ${ProfileDetail_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileDetail_subscribeToProfileMutation,
-  ProfileDetail_subscribeToProfileMutationVariables
->;
-export const ProfileDetail_unsubscribeFromProfileDocument = gql`
-  mutation ProfileDetail_unsubscribeFromProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
-    unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
-      ...ProfileDetail_Profile
-    }
-  }
-  ${ProfileDetail_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileDetail_unsubscribeFromProfileMutation,
-  ProfileDetail_unsubscribeFromProfileMutationVariables
->;
 export const Profiles_userDocument = gql`
   query Profiles_user {
     ...AppLayout_Query

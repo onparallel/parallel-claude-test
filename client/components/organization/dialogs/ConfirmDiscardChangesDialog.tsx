@@ -51,7 +51,9 @@ export function useConfirmDiscardChangesDialog() {
   return useDialog(ConfirmDiscardChangesDialog);
 }
 
-export function useAutoConfirmDiscardChangesDialog(hasChanges: boolean) {
+export function useAutoConfirmDiscardChangesDialog(
+  hasChanges: boolean | ((path: string) => boolean),
+) {
   const showConfirmDiscardChangesDialog = useConfirmDiscardChangesDialog();
   return usePreventNavigation({
     shouldConfirmNavigation: hasChanges,

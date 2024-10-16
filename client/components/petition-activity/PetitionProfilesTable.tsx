@@ -63,7 +63,7 @@ export function PetitionProfilesTable({
     row: PetitionProfilesTableSelection,
     event: MouseEvent,
   ) {
-    navigate(`/app/profiles/${row.id}`, event);
+    navigate(`/app/profiles/${row.id}/general`, event);
   }, []);
 
   return (

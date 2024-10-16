@@ -4440,36 +4440,6 @@
     "context": "Formulas"
   },
   {
-    "term": "component.more-options-menu-profile.close-profile",
-    "definition": "Cerrar perfil",
-    "context": "Close profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.delete-permanently",
-    "definition": "Eliminar permanentemente",
-    "context": "Delete permanently"
-  },
-  {
-    "term": "component.more-options-menu-profile.delete-profile",
-    "definition": "Eliminar perfil",
-    "context": "Delete profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.manage-profile-subscriptions",
-    "definition": "Gestionar suscripciones",
-    "context": "Manage subscriptions"
-  },
-  {
-    "term": "component.more-options-menu-profile.recover-profile",
-    "definition": "Recuperar perfil",
-    "context": "Recover profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.reopen-profile",
-    "definition": "Reabrir perfil",
-    "context": "Reopen profile"
-  },
-  {
     "term": "component.move-to-folder-dialog.currently-in",
     "definition": "Actualmente en {folder}",
     "context": "Currently in {folder}"
@@ -7813,6 +7783,51 @@
     "term": "component.profile-form.success-toast-header",
     "definition": "Información importada correctamente",
     "context": "Information imported successfully"
+  },
+  {
+    "term": "component.profile-layout.close-profile",
+    "definition": "Cerrar perfil",
+    "context": "Close profile"
+  },
+  {
+    "term": "component.profile-layout.delete-permanently",
+    "definition": "Eliminar permanentemente",
+    "context": "Delete permanently"
+  },
+  {
+    "term": "component.profile-layout.delete-profile",
+    "definition": "Eliminar perfil",
+    "context": "Delete profile"
+  },
+  {
+    "term": "component.profile-layout.manage-profile-subscriptions",
+    "definition": "Gestionar suscripciones",
+    "context": "Manage subscriptions"
+  },
+  {
+    "term": "component.profile-layout.recover-profile",
+    "definition": "Recuperar perfil",
+    "context": "Recover profile"
+  },
+  {
+    "term": "component.profile-layout.reopen-profile",
+    "definition": "Reabrir perfil",
+    "context": "Reopen profile"
+  },
+  {
+    "term": "component.profile-layout.subscribe",
+    "definition": "Suscribirme",
+    "context": "Subscribe"
+  },
+  {
+    "term": "component.profile-layout.title",
+    "definition": "Datos del perfil",
+    "context": "Profile details"
+  },
+  {
+    "term": "component.profile-layout.unsubscribe",
+    "definition": "Desuscribirme",
+    "context": "Unsubscribe"
   },
   {
     "term": "component.profile-petitions-table.add-petition",
@@ -15015,6 +15030,11 @@
     "context": "Signature sent"
   },
   {
+    "term": "page.profile-details.general",
+    "definition": "General",
+    "context": "General"
+  },
+  {
     "term": "page.profile-details.hidden-properties-description",
     "definition": "Solicita permiso para ver estas propiedades.",
     "context": "Request permission to see these properties."
@@ -15025,6 +15045,11 @@
     "context": "{count, plural, =1 {# property} other{# properties}} changed"
   },
   {
+    "term": "page.profile-details.parallels",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
     "term": "page.profile-details.restricted-properties",
     "definition": "Propiedades restringidas",
     "context": "Restricted properties"
@@ -15033,21 +15058,6 @@
     "term": "page.profile-details.saving-changes",
     "definition": "Guardando {count, plural, =1 {# cambio} other{# cambios}}...",
     "context": "Saving {count, plural, =1 {# change} other{# changes}}..."
-  },
-  {
-    "term": "page.profile-details.subscribe",
-    "definition": "Suscribirme",
-    "context": "Subscribe"
-  },
-  {
-    "term": "page.profile-details.title",
-    "definition": "Datos del perfil",
-    "context": "Profile details"
-  },
-  {
-    "term": "page.profile-details.unsubscribe",
-    "definition": "Desuscribirme",
-    "context": "Unsubscribe"
   },
   {
     "term": "page.profiles.bin",

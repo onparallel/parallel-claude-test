@@ -35,7 +35,12 @@ export const ProfileReference = Object.assign(
       );
 
       return asLink ? (
-        <Link ref={ref as any} href={`/app/profiles/${profile.id}`} sx={_notDeleted} {...props}>
+        <Link
+          ref={ref as any}
+          href={`/app/profiles/${profile.id}/general`}
+          sx={_notDeleted}
+          {...props}
+        >
           {Content}
         </Link>
       ) : (

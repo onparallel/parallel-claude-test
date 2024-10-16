@@ -47,8 +47,9 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { useRouter } from "next/router";
 import pMap from "p-map";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, partition } from "remeda";
@@ -72,6 +73,7 @@ interface ProfileFormProps {
   onRecover?: () => void;
   onRefetch: () => MaybePromise<void>;
   includeLinkToProfile?: boolean;
+  omitProfileTabNavigation?: boolean;
 }
 
 function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
@@ -121,6 +123,8 @@ export const ProfileForm = Object.assign(
   ) {
     const intl = useIntl();
     const showErrorDialog = useErrorDialog();
+    const router = useRouter();
+    const queryProfileId = router.query.profileId;
     const profileId = profile.id;
 
     const [properties, hiddenProperties] = useMemo(
@@ -145,7 +149,17 @@ export const ProfileForm = Object.assign(
     });
     useEffectSkipFirst(() => reset(buildFormDefaultValue(properties)), [properties]);
 
-    useAutoConfirmDiscardChangesDialog(formState.isDirty);
+    const checkPath = useCallback(
+      (path: string) => {
+        if (queryProfileId === profileId && path.includes(profileId)) {
+          return false;
+        }
+        return formState.isDirty;
+      },
+      [formState.isDirty, queryProfileId, profileId],
+    );
+
+    useAutoConfirmDiscardChangesDialog(checkPath);
 
     const { fields } = useFieldArray({ name: "fields", control });
 
@@ -451,7 +465,7 @@ export const ProfileForm = Object.assign(
               </Badge>
             ) : null}
             {includeLinkToProfile ? (
-              <Link href={`/app/profiles/${profile.id}`} display="flex">
+              <Link href={`/app/profiles/${profile.id}/general`} display="flex">
                 <ExternalLinkIcon fontSize="lg" />
               </Link>
             ) : null}
