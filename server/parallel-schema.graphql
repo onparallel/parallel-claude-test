@@ -808,6 +808,11 @@ enum ImageOptionsResizeFit {
   outside
 }
 
+type ImportProfilesFromFileResult {
+  profileCount: Int!
+  result: Success!
+}
+
 """
 A feature flag name with his value
 """
@@ -1869,6 +1874,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Imports profiles from an excel file
+  """
+  importProfilesFromFile(file: Upload!, profileTypeId: GID!): ImportProfilesFromFileResult!
+
+  """
   Creates a new user in the same organization as the context user if `orgId` is not provided
   """
   inviteUserToOrganization(
@@ -2017,6 +2027,11 @@ type Mutation {
     profileId: GID!
     profileTypeFieldId: GID!
   ): [ProfileFieldFile!]!
+
+  """
+  Generates a download link for an excel model for profile import
+  """
+  profileImportExcelModelDownloadLink(locale: UserLocale!, profileTypeId: GID!): String!
   publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
   """

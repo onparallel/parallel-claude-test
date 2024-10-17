@@ -906,6 +906,11 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
     totalCount: number; // Int!
   };
+  ImportProfilesFromFileResult: {
+    // root type
+    profileCount: number; // Int!
+    result: NexusGenEnums["Success"]; // Success!
+  };
   LandingTemplate: db.Petition;
   LandingTemplateCategorySample: string;
   LandingTemplateField: db.PetitionField;
@@ -1875,6 +1880,11 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
     totalCount: number; // Int!
   };
+  ImportProfilesFromFileResult: {
+    // field return type
+    profileCount: number; // Int!
+    result: NexusGenEnums["Success"]; // Success!
+  };
   LandingTemplate: {
     // field return type
     backgroundColor: string | null; // String
@@ -2066,6 +2076,7 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     importPetitionFromJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    importProfilesFromFile: NexusGenRootTypes["ImportProfilesFromFileResult"]; // ImportProfilesFromFileResult!
     inviteUserToOrganization: NexusGenRootTypes["User"]; // User!
     linkFieldGroupToProfileType: NexusGenRootTypes["PetitionField"]; // PetitionField!
     linkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -2084,6 +2095,7 @@ export interface NexusGenFieldTypes {
     profileExternalSourceSearch: NexusGenRootTypes["ProfileExternalSourceSearchResults"]; // ProfileExternalSourceSearchResults!
     profileFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     profileFieldFileUploadComplete: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
+    profileImportExcelModelDownloadLink: string; // String!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateAndSendPetitionFromPublicLink: NexusGenEnums["Result"]; // Result!
@@ -4526,6 +4538,11 @@ export interface NexusGenFieldTypeNames {
     items: "IOrgIntegration";
     totalCount: "Int";
   };
+  ImportProfilesFromFileResult: {
+    // field return type name
+    profileCount: "Int";
+    result: "Success";
+  };
   LandingTemplate: {
     // field return type name
     backgroundColor: "String";
@@ -4717,6 +4734,7 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFile: "TaskResultFile";
     importPetitionFromJson: "SupportMethodResponse";
+    importProfilesFromFile: "ImportProfilesFromFileResult";
     inviteUserToOrganization: "User";
     linkFieldGroupToProfileType: "PetitionField";
     linkPetitionFieldChildren: "PetitionField";
@@ -4735,6 +4753,7 @@ export interface NexusGenFieldTypeNames {
     profileExternalSourceSearch: "ProfileExternalSourceSearchResults";
     profileFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     profileFieldFileUploadComplete: "ProfileFieldFile";
+    profileImportExcelModelDownloadLink: "String";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateAndSendPetitionFromPublicLink: "Result";
@@ -7398,6 +7417,11 @@ export interface NexusGenArgTypes {
       json: string; // String!
       userId: NexusGenScalars["GID"]; // GID!
     };
+    importProfilesFromFile: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
     inviteUserToOrganization: {
       // args
       email: string; // String!
@@ -7506,6 +7530,11 @@ export interface NexusGenArgTypes {
       profileFieldFileIds: NexusGenScalars["GID"][]; // [GID!]!
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    profileImportExcelModelDownloadLink: {
+      // args
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     publicCheckVerificationCode: {
       // args

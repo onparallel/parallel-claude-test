@@ -4,7 +4,7 @@ import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
 import { difference, isNonNullish, unique } from "remeda";
-import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
+import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql/helpers/scalars/LocalizableUserText";
 import { ProfileTypeField, ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
 
 const SEARCH_FREQUENCY = [

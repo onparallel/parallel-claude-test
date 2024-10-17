@@ -1,6 +1,19 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, Heading, Icon, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Heading,
+  Icon,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { ArchiveIcon, BellIcon, DeleteIcon, PinIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -25,6 +38,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
 import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/profiles/dialogs/CreateProfileFromProfileTypeDialog";
+import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
   ProfileStatus,
@@ -90,6 +104,7 @@ function Profiles() {
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
   const navigate = useHandleNavigation();
+  const showToast = useToast();
 
   const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
   const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
@@ -243,6 +258,30 @@ function Profiles() {
     } catch {}
   };
 
+  const showImportProfilesFromExcelDialog = useImportProfilesFromExcelDialog();
+  const handleImportProfilesFromExcel = async () => {
+    if (isNullish(profileType)) {
+      return;
+    }
+    try {
+      const { count } = await showImportProfilesFromExcelDialog({ profileTypeId: profileType.id });
+
+      showToast({
+        title: intl.formatMessage(
+          {
+            id: "page.profiles.successful-import-toast-title",
+            defaultMessage:
+              "{count, plural, =1{# profile} other{# profiles}} imported successfully!",
+          },
+          { count },
+        ),
+        status: "success",
+      });
+
+      await refetch();
+    } catch {}
+  };
+
   const actions = useProfileListActions({
     canDelete: userCanDeleteProfiles,
     canCloseOpen: userCanCloseOpenProfiles,
@@ -289,11 +328,11 @@ function Profiles() {
               label={
                 profileType?.isPinned
                   ? intl.formatMessage({
-                      id: "component.app-layout-nav-bar.remove-from-menu",
+                      id: "page.profiles.remove-from-menu",
                       defaultMessage: "Remove from menu",
                     })
                   : intl.formatMessage({
-                      id: "component.app-layout-nav-bar.pin-to-menu",
+                      id: "page.profiles.pin-to-menu",
                       defaultMessage: "Pin to menu",
                     })
               }
@@ -302,15 +341,25 @@ function Profiles() {
           </HStack>
           <Spacer minW={4} />
           <Box>
-            <Button
+            <ButtonWithMoreOptions
               colorScheme="primary"
               onClick={handleCreateProfile}
               isDisabled={
                 !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
               }
+              options={
+                <MenuList minWidth={0}>
+                  <MenuItem onClick={handleImportProfilesFromExcel}>
+                    <FormattedMessage
+                      id="page.profiles.import-from-excel"
+                      defaultMessage="Import from Excel"
+                    />
+                  </MenuItem>
+                </MenuList>
+              }
             >
               <FormattedMessage
-                id="component.create-profile-from-profile-type-dialog.create-profile"
+                id="page.profiles.create-profile"
                 defaultMessage="Create {profileTypeName}"
                 values={{
                   profileTypeName: profileType
@@ -325,7 +374,7 @@ function Profiles() {
                     : "",
                 }}
               />
-            </Button>
+            </ButtonWithMoreOptions>
           </Box>
         </Flex>
         <Box flex="1" paddingBottom={16}>

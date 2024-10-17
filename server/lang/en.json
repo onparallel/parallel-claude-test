@@ -915,6 +915,51 @@
     "context": "Follow the link below link to access."
   },
   {
+    "term": "profile-import.data-tab-name",
+    "definition": "Data",
+    "context": "Data"
+  },
+  {
+    "term": "profile-import.field-with-expiry.header",
+    "definition": "{name} expiry date",
+    "context": "{name} expiry date"
+  },
+  {
+    "term": "profile-import.instructions-tab-name",
+    "definition": "Instructions",
+    "context": "Instructions"
+  },
+  {
+    "term": "profile-import.instructions.header",
+    "definition": "Instructions",
+    "context": "Instructions"
+  },
+  {
+    "term": "profile-import.instructions.line-1",
+    "definition": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows.",
+    "context": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows."
+  },
+  {
+    "term": "profile-import.instructions.line-2",
+    "definition": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01",
+    "context": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01"
+  },
+  {
+    "term": "profile-import.instructions.line-3",
+    "definition": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890",
+    "context": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890"
+  },
+  {
+    "term": "profile-import.instructions.line-4",
+    "definition": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR",
+    "context": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR"
+  },
+  {
+    "term": "profile-import.model-file-name",
+    "definition": "model",
+    "context": "model"
+  },
+  {
     "term": "profiles-expiring-properties.showing-active-alerts-count",
     "definition": "Showing {count}/{totalCount} of active alarms",
     "context": "Showing {count}/{totalCount} of active alarms"

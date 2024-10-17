@@ -7,7 +7,7 @@ import {
 
 export function buildProfileUpdatedEventsData(
   profileId: number,
-  fields: { profileTypeFieldId: number; expiryDate?: string | null; alias?: string | null }[],
+  fields: { profileTypeFieldId: number; expiryDate?: string | null; alias: string | null }[],
   currentValues: ProfileFieldValue[],
   previousValues: ProfileFieldValue[],
   user: User,

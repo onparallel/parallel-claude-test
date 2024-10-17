@@ -3875,6 +3875,31 @@
     "context": "Import options from Excel"
   },
   {
+    "term": "component.import-profiles-from-excel-dialog.attach-xlsx",
+    "definition": "Attach an <b>.xlsx file</b> like the one in the model to add your profiles.",
+    "context": "Attach an <b>.xlsx file</b> like the one in the model to add your profiles."
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.download-model",
+    "definition": "Download profile loading model",
+    "context": "Download profile loading model"
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.header",
+    "definition": "Import profiles from Excel",
+    "context": "Import profiles from Excel"
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.import-error-body",
+    "definition": "Please, review your file and make sure it matches the format on the loading model.",
+    "context": "Please, review your file and make sure it matches the format on the loading model."
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.import-error-details",
+    "definition": "We have detected an error in row {row}, column {col}.",
+    "context": "We have detected an error in row {row}, column {col}."
+  },
+  {
     "term": "component.import-replies-dialog.checkbox-overwrite-replies",
     "definition": "Overwrite existing replies",
     "context": "Overwrite existing replies"
@@ -15085,9 +15110,19 @@
     "context": "Closed"
   },
   {
+    "term": "page.profiles.create-profile",
+    "definition": "Create {profileTypeName}",
+    "context": "Create {profileTypeName}"
+  },
+  {
     "term": "page.profiles.delete-permanently",
     "definition": "Delete permanently",
     "context": "Delete permanently"
+  },
+  {
+    "term": "page.profiles.import-from-excel",
+    "definition": "Import from Excel",
+    "context": "Import from Excel"
   },
   {
     "term": "page.profiles.no-closed-profiles",
@@ -15115,14 +15150,29 @@
     "context": "Open"
   },
   {
+    "term": "page.profiles.pin-to-menu",
+    "definition": "Pin to menu",
+    "context": "Pin to menu"
+  },
+  {
     "term": "page.profiles.recover-profile",
     "definition": "Recover {count, plural, =1 {profile} other {profiles}}",
     "context": "Recover {count, plural, =1 {profile} other {profiles}}"
   },
   {
+    "term": "page.profiles.remove-from-menu",
+    "definition": "Remove from menu",
+    "context": "Remove from menu"
+  },
+  {
     "term": "page.profiles.reopen-profile",
     "definition": "Reopen {count, plural, =1 {profile} other {profiles}}",
     "context": "Reopen {count, plural, =1 {profile} other {profiles}}"
+  },
+  {
+    "term": "page.profiles.successful-import-toast-title",
+    "definition": "{count, plural, =1{# profile} other{# profiles}} imported successfully!",
+    "context": "{count, plural, =1{# profile} other{# profiles}} imported successfully!"
   },
   {
     "term": "page.profiles.title",

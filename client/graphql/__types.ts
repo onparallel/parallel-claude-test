@@ -756,6 +756,12 @@ export interface ImageOptionsResize {
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
+export interface ImportProfilesFromFileResult {
+  __typename?: "ImportProfilesFromFileResult";
+  profileCount: Scalars["Int"]["output"];
+  result: Success;
+}
+
 /** A feature flag name with his value */
 export interface InputFeatureFlagNameValue {
   name: FeatureFlag;
@@ -1110,6 +1116,8 @@ export interface Mutation {
   getTaskResultFile: TaskResultFile;
   /** Imports a petition from a JSON file */
   importPetitionFromJson: SupportMethodResponse;
+  /** Imports profiles from an excel file */
+  importProfilesFromFile: ImportProfilesFromFileResult;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
   /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
@@ -1141,6 +1149,8 @@ export interface Mutation {
   /** Generates a download link for a profile field file */
   profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
+  /** Generates a download link for an excel model for profile import */
+  profileImportExcelModelDownloadLink: Scalars["String"]["output"];
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -1984,6 +1994,11 @@ export interface MutationimportPetitionFromJsonArgs {
   userId: Scalars["GID"]["input"];
 }
 
+export interface MutationimportProfilesFromFileArgs {
+  file: Scalars["Upload"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}
+
 export interface MutationinviteUserToOrganizationArgs {
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
@@ -2091,6 +2106,11 @@ export interface MutationprofileFieldFileUploadCompleteArgs {
   profileFieldFileIds: Array<Scalars["GID"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export interface MutationprofileImportExcelModelDownloadLinkArgs {
+  locale: UserLocale;
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationpublicCheckVerificationCodeArgs {
@@ -27539,6 +27559,29 @@ export type useImportFromExternalSourceDialog_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+};
+
+export type ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutationVariables =
+  Exact<{
+    profileTypeId: Scalars["GID"]["input"];
+    locale: UserLocale;
+  }>;
+
+export type ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutation = {
+  profileImportExcelModelDownloadLink: string;
+};
+
+export type ImportProfilesFromExcelDialog_importProfilesFromFileMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  file: Scalars["Upload"]["input"];
+}>;
+
+export type ImportProfilesFromExcelDialog_importProfilesFromFileMutation = {
+  importProfilesFromFile: {
+    __typename?: "ImportProfilesFromFileResult";
+    profileCount: number;
+    result: Success;
+  };
 };
 
 export type useProfileSubscribersDialog_UserFragment = {
@@ -68420,6 +68463,31 @@ export const ImportFromExternalSourceDialog_completeProfileFromExternalSourceDoc
 ` as unknown as DocumentNode<
   ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutation,
   ImportFromExternalSourceDialog_completeProfileFromExternalSourceMutationVariables
+>;
+export const ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDocument = gql`
+  mutation ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLink(
+    $profileTypeId: GID!
+    $locale: UserLocale!
+  ) {
+    profileImportExcelModelDownloadLink(profileTypeId: $profileTypeId, locale: $locale)
+  }
+` as unknown as DocumentNode<
+  ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutation,
+  ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutationVariables
+>;
+export const ImportProfilesFromExcelDialog_importProfilesFromFileDocument = gql`
+  mutation ImportProfilesFromExcelDialog_importProfilesFromFile(
+    $profileTypeId: GID!
+    $file: Upload!
+  ) {
+    importProfilesFromFile(profileTypeId: $profileTypeId, file: $file) {
+      profileCount
+      result
+    }
+  }
+` as unknown as DocumentNode<
+  ImportProfilesFromExcelDialog_importProfilesFromFileMutation,
+  ImportProfilesFromExcelDialog_importProfilesFromFileMutationVariables
 >;
 export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
   mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {

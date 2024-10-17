@@ -9,6 +9,7 @@ import {
   mutationField,
   nonNull,
   nullable,
+  objectType,
   stringArg,
 } from "nexus";
 import pMap from "p-map";
@@ -49,11 +50,14 @@ import {
 } from "../../db/helpers/profileTypeFieldOptions";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
+import { CellData, CellError, UnknownIdError } from "../../services/ProfileImportService";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
+import { withError } from "../../util/promises/withError";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
+import { UnwrapArray } from "../../util/types";
 import { validateProfileFieldValue } from "../../util/validateProfileFieldValue";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
@@ -61,7 +65,9 @@ import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { buildProfileUpdatedEventsData } from "../helpers/buildProfileUpdatedEventsData";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { importFromExcel } from "../helpers/importDataFromExcel";
 import { dateArg } from "../helpers/scalars/DateTime";
+import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateOr } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -69,6 +75,7 @@ import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
+import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
@@ -937,7 +944,6 @@ export const createProfile = mutationField("createProfile", {
 
     const profile = await ctx.profiles.createProfile(
       {
-        name: "",
         localizable_name: { en: "", es: "" },
         org_id: ctx.user!.org_id,
         profile_type_id: args.profileTypeId,
@@ -2445,7 +2451,6 @@ export const completeProfileFromExternalSource = mutationField(
         ? await ctx.profiles.loadProfile(args.profileId)
         : await ctx.profiles.createProfile(
             {
-              name: "",
               localizable_name: { en: "", es: "" },
               org_id: ctx.user!.org_id,
               profile_type_id: args.profileTypeId,
@@ -2529,5 +2534,94 @@ export const unpinProfileType = mutationField("unpinProfileType", {
     assert(profileType, "ProfileType not found");
 
     return profileType;
+  },
+});
+
+export const profileImportExcelModelDownloadLink = mutationField(
+  "profileImportExcelModelDownloadLink",
+  {
+    description: "Generates a download link for an excel model for profile import",
+    type: "String",
+    authorize: authenticateAnd(userHasAccessToProfileType("profileTypeId")),
+    args: {
+      profileTypeId: nonNull(globalIdArg("ProfileType")),
+      locale: nonNull("UserLocale"),
+    },
+    resolve: async (_, { profileTypeId, locale }, ctx) => {
+      return await ctx.profileImport.generateProfileImportExcelModelDownloadUrl(
+        profileTypeId,
+        locale,
+        ctx.user!,
+      );
+    },
+  },
+);
+
+export const importProfilesFromFile = mutationField("importProfilesFromFile", {
+  description: "Imports profiles from an excel file",
+  type: objectType({
+    name: "ImportProfilesFromFileResult",
+    definition(t) {
+      t.nonNull.field("result", { type: "Success" });
+      t.nonNull.int("profileCount");
+    },
+  }),
+  authorize: authenticateAnd(userHasAccessToProfileType("profileTypeId")),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    file: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile(
+    (args) => args.file,
+    {
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      maxSize: 1024 * 1024 * 10,
+    },
+    "file",
+  ),
+  resolve: async (_, args, ctx) => {
+    const file = await args.file;
+
+    const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
+    if (importError || importResult.length < 2) {
+      throw new ApolloError("Invalid file", "INVALID_FILE_ERROR");
+    }
+
+    const data: Record<string, CellData>[] = [];
+    const ids = importResult[1];
+    importResult.slice(2).forEach((row, rowIndex) => {
+      const rowData: UnwrapArray<typeof data> = {};
+      for (let i = 0; i < row.length; i++) {
+        rowData[ids[i]] = { col: i + 1, row: rowIndex + 3, value: row[i] };
+      }
+      data.push(rowData);
+    });
+
+    try {
+      return {
+        result: "SUCCESS",
+        profileCount: await ctx.profileImport.importDataIntoProfiles(
+          args.profileTypeId,
+          data,
+          ctx.user!,
+        ),
+      };
+    } catch (error) {
+      if (error instanceof CellError) {
+        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
+          cell: error.cell,
+        });
+      }
+      if (error instanceof UnknownIdError) {
+        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
+          cell: {
+            col: ids.indexOf(error.id) + 1,
+            row: 2,
+            value: error.id,
+          },
+        });
+      }
+      throw error;
+    }
   },
 });

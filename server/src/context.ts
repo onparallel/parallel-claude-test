@@ -23,12 +23,12 @@ import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
-import { AI_COMPLETION_SERVICE, AiCompletionService } from "./services/AiCompletionService";
+import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
 import {
   BACKGROUND_CHECK_SERVICE,
-  BackgroundCheckService,
+  IBackgroundCheckService,
 } from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import {
@@ -36,10 +36,10 @@ import {
   IDocumentProcessingService,
 } from "./services/DocumentProcessingService";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
-import { ENCRYPTION_SERVICE, EncryptionService } from "./services/EncryptionService";
+import { ENCRYPTION_SERVICE, IEncryptionService } from "./services/EncryptionService";
 import {
   EVENT_SUBSCRIPTION_SERVICE,
-  EventSubscriptionService,
+  IEventSubscriptionService,
 } from "./services/EventSubscriptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
 import { FILE_EXPORT_SERVICE, IFileExportService } from "./services/FileExportService";
@@ -66,14 +66,15 @@ import {
   PETITION_IMPORT_EXPORT_SERVICE,
 } from "./services/PetitionImportExportService";
 import {
+  IPetitionMessageContextService,
   PETITION_MESSAGE_CONTEXT_SERVICE,
-  PetitionMessageContextService,
 } from "./services/PetitionMessageContextService";
 import { IPrinter, PRINTER } from "./services/Printer";
 import {
   IProfileExternalSourcesService,
   PROFILE_EXTERNAL_SOURCE_SERVICE,
 } from "./services/ProfileExternalSourcesService";
+import { IProfileImportService, PROFILE_IMPORT_SERVICE } from "./services/ProfileImportService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
@@ -106,7 +107,7 @@ export class ApiContext {
     @inject(ORG_LIMITS_SERVICE) public readonly orgLimits: IOrgLimitsService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
-    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
+    @inject(ENCRYPTION_SERVICE) public readonly encryption: IEncryptionService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(REDIS) public readonly redis: IRedis,
@@ -114,10 +115,12 @@ export class ApiContext {
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
-    public readonly petitionMessageContext: PetitionMessageContextService,
-    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
-    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
-    @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
+    public readonly petitionMessageContext: IPetitionMessageContextService,
+    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: IAiCompletionService,
+    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
+    @inject(EVENT_SUBSCRIPTION_SERVICE)
+    public readonly eventSubscription: IEventSubscriptionService,
+    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: IProfileImportService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -171,14 +174,15 @@ export class WorkerContext {
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
-    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
+    @inject(ENCRYPTION_SERVICE) public readonly encryption: IEncryptionService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
-    public readonly petitionMessageContext: PetitionMessageContextService,
+    public readonly petitionMessageContext: IPetitionMessageContextService,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
-    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
-    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
-    @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
+    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: IAiCompletionService,
+    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
+    @inject(EVENT_SUBSCRIPTION_SERVICE)
+    public readonly eventSubscription: IEventSubscriptionService,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
     @inject(DOCUMENT_PROCESSING_SERVICE)

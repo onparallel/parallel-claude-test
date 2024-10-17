@@ -78,6 +78,11 @@ import {
   ProfileExternalSourcesService,
 } from "./ProfileExternalSourcesService";
 import {
+  IProfileImportService,
+  PROFILE_IMPORT_SERVICE,
+  ProfileImportService,
+} from "./ProfileImportService";
+import {
   IProfilesSetupService,
   PROFILES_SETUP_SERVICE,
   ProfilesSetupService,
@@ -106,6 +111,7 @@ export const servicesModule = new ContainerModule((bind) => {
     .to(BackgroundCheckService)
     .inSingletonScope();
   bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
+  bind<IProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService).inSingletonScope();
 
   // Request Scope
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);

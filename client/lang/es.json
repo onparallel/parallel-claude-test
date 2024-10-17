@@ -3871,8 +3871,33 @@
   },
   {
     "term": "component.import-options-settings-row.label",
-    "definition": "Importar opciones de Excel",
+    "definition": "Importar opciones desde Excel",
     "context": "Import options from Excel"
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.attach-xlsx",
+    "definition": "Adjunta un <b>archivo .xlsx</b> como el del modelo para añadir tus perfiles.",
+    "context": "Attach an <b>.xlsx file</b> like the one in the model to add your profiles."
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.download-model",
+    "definition": "Descargar modelo de carga",
+    "context": "Download profile loading model"
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.header",
+    "definition": "Importar perfiles desde Excel",
+    "context": "Import profiles from Excel"
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.import-error-body",
+    "definition": "Por favor, revisa tu archivo y asegúrate de que el formato coincide con el del modelo de importación.",
+    "context": "Please, review your file and make sure it matches the format on the loading model."
+  },
+  {
+    "term": "component.import-profiles-from-excel-dialog.import-error-details",
+    "definition": "Hemos detectado algún error en la fila {row}, columna {col}.",
+    "context": "We have detected an error in row {row}, column {col}."
   },
   {
     "term": "component.import-replies-dialog.checkbox-overwrite-replies",
@@ -15085,9 +15110,19 @@
     "context": "Closed"
   },
   {
+    "term": "page.profiles.create-profile",
+    "definition": "Crear {profileTypeName}",
+    "context": "Create {profileTypeName}"
+  },
+  {
     "term": "page.profiles.delete-permanently",
     "definition": "Eliminar permanentemente",
     "context": "Delete permanently"
+  },
+  {
+    "term": "page.profiles.import-from-excel",
+    "definition": "Importar desde Excel",
+    "context": "Import from Excel"
   },
   {
     "term": "page.profiles.no-closed-profiles",
@@ -15115,14 +15150,29 @@
     "context": "Open"
   },
   {
+    "term": "page.profiles.pin-to-menu",
+    "definition": "Fijar en el menú",
+    "context": "Pin to menu"
+  },
+  {
     "term": "page.profiles.recover-profile",
     "definition": "Recuperar {count, plural, =1 {perfil} other {perfiles}}",
     "context": "Recover {count, plural, =1 {profile} other {profiles}}"
   },
   {
+    "term": "page.profiles.remove-from-menu",
+    "definition": "Quitar del menú",
+    "context": "Remove from menu"
+  },
+  {
     "term": "page.profiles.reopen-profile",
     "definition": "Reabrir {count, plural, =1 {perfil} other {perfiles}}",
     "context": "Reopen {count, plural, =1 {profile} other {profiles}}"
+  },
+  {
+    "term": "page.profiles.successful-import-toast-title",
+    "definition": "¡{count, plural, =1 {# perfil} other {# perfiles}} importados con éxito!",
+    "context": "{count, plural, =1{# profile} other{# profiles}} imported successfully!"
   },
   {
     "term": "page.profiles.title",

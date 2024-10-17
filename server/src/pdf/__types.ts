@@ -704,6 +704,11 @@ export type ImageOptionsResize = {
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
+export type ImportProfilesFromFileResult = {
+  profileCount: Scalars["Int"]["output"];
+  result: Success;
+};
+
 /** A feature flag name with his value */
 export type InputFeatureFlagNameValue = {
   name: FeatureFlag;
@@ -1048,6 +1053,8 @@ export type Mutation = {
   getTaskResultFile: TaskResultFile;
   /** Imports a petition from a JSON file */
   importPetitionFromJson: SupportMethodResponse;
+  /** Imports profiles from an excel file */
+  importProfilesFromFile: ImportProfilesFromFileResult;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
   /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
@@ -1079,6 +1086,8 @@ export type Mutation = {
   /** Generates a download link for a profile field file */
   profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
+  /** Generates a download link for an excel model for profile import */
+  profileImportExcelModelDownloadLink: Scalars["String"]["output"];
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -1922,6 +1931,11 @@ export type MutationimportPetitionFromJsonArgs = {
   userId: Scalars["GID"]["input"];
 };
 
+export type MutationimportProfilesFromFileArgs = {
+  file: Scalars["Upload"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+};
+
 export type MutationinviteUserToOrganizationArgs = {
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
@@ -2029,6 +2043,11 @@ export type MutationprofileFieldFileUploadCompleteArgs = {
   profileFieldFileIds: Array<Scalars["GID"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type MutationprofileImportExcelModelDownloadLinkArgs = {
+  locale: UserLocale;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicCheckVerificationCodeArgs = {

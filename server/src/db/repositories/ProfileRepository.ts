@@ -802,12 +802,13 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfile(data: CreateProfile, userId: number) {
+  async createProfile(data: Omit<CreateProfile, "name">, userId: number) {
     return await this.withTransaction(async (t) => {
       const [profile] = await this.insert(
         "profile",
         {
           ...data,
+          name: "", // deprecated
           created_at: this.now(),
           created_by: `User:${userId}`,
         },

@@ -915,6 +915,51 @@
     "context": "Follow the link below link to access."
   },
   {
+    "term": "profile-import.data-tab-name",
+    "definition": "Datos",
+    "context": "Data"
+  },
+  {
+    "term": "profile-import.field-with-expiry.header",
+    "definition": "Caducidad {name}",
+    "context": "{name} expiry date"
+  },
+  {
+    "term": "profile-import.instructions-tab-name",
+    "definition": "Instrucciones",
+    "context": "Instructions"
+  },
+  {
+    "term": "profile-import.instructions.header",
+    "definition": "Instrucciones",
+    "context": "Instructions"
+  },
+  {
+    "term": "profile-import.instructions.line-1",
+    "definition": "- Puedes reordenar columnas o eliminar columnas que no necesites, siempre y cuando no modifiques el contenido de las dos primeras filas.",
+    "context": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows."
+  },
+  {
+    "term": "profile-import.instructions.line-2",
+    "definition": "- Las fechas deben añadirse como texto (con comilla simple) y en formato yyyy-MM-dd",
+    "context": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01"
+  },
+  {
+    "term": "profile-import.instructions.line-3",
+    "definition": "- Los teléfonos deben añadirse con prefijo de código de país y sin espacios. e.g. +34666666666",
+    "context": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890"
+  },
+  {
+    "term": "profile-import.instructions.line-4",
+    "definition": "- Los países deben añadirse como códigos ISO 3166-1 alpha-2. e.g. US, ES, FR",
+    "context": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR"
+  },
+  {
+    "term": "profile-import.model-file-name",
+    "definition": "modelo",
+    "context": "model"
+  },
+  {
     "term": "profiles-expiring-properties.showing-active-alerts-count",
     "definition": "Mostrando {count}/{totalCount} de alarmas activas",
     "context": "Showing {count}/{totalCount} of active alarms"
