@@ -2587,17 +2587,38 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
       throw new ApolloError("Invalid file", "INVALID_FILE_ERROR");
     }
 
+    const profileType = await ctx.profiles.loadProfileType(args.profileTypeId);
+    assert(profileType, "ProfileType not found");
     const data: Record<string, CellData>[] = [];
     const ids = importResult[1];
+
+    const requiredIds = (profileType.profile_name_pattern as (string | number)[])
+      .filter((v) => typeof v === "number")
+      .map((id) => toGlobalId("ProfileTypeField", id));
+
+    let foundEmptyRow = false;
     importResult.slice(2).forEach((row, rowIndex) => {
-      const rowData: UnwrapArray<typeof data> = {};
       if (row.every((r) => !r)) {
-        throw new ApolloError("File can't have empty rows", "INVALID_FILE_ERROR");
+        foundEmptyRow = true;
+      } else {
+        if (foundEmptyRow) {
+          throw new ApolloError("File can't have empty rows", "INVALID_FILE_ERROR");
+        }
+        const rowData: UnwrapArray<typeof data> = {};
+        for (let i = 0; i < row.length; i++) {
+          if (!row[i] && requiredIds.includes(ids[i])) {
+            throw new ApolloError("Missing required field", "INVALID_CELL_ERROR", {
+              cell: {
+                col: i + 1,
+                row: rowIndex + 3,
+                value: "",
+              },
+            });
+          }
+          rowData[ids[i]] = { col: i + 1, row: rowIndex + 3, value: row[i] };
+        }
+        data.push(rowData);
       }
-      for (let i = 0; i < row.length; i++) {
-        rowData[ids[i]] = { col: i + 1, row: rowIndex + 3, value: row[i] };
-      }
-      data.push(rowData);
     });
 
     try {
