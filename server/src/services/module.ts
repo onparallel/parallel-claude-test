@@ -111,7 +111,6 @@ export const servicesModule = new ContainerModule((bind) => {
     .to(BackgroundCheckService)
     .inSingletonScope();
   bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
-  bind<IProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService).inSingletonScope();
 
   // Request Scope
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
@@ -138,4 +137,5 @@ export const servicesModule = new ContainerModule((bind) => {
     ProfileExternalSourcesService,
   );
   bind<IFileExportService>(FILE_EXPORT_SERVICE).to(FileExportService);
+  bind<IProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
 });

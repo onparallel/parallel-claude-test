@@ -2591,6 +2591,9 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
     const ids = importResult[1];
     importResult.slice(2).forEach((row, rowIndex) => {
       const rowData: UnwrapArray<typeof data> = {};
+      if (row.every((r) => !r)) {
+        throw new ApolloError("File can't have empty rows", "INVALID_FILE_ERROR");
+      }
       for (let i = 0; i < row.length; i++) {
         rowData[ids[i]] = { col: i + 1, row: rowIndex + 3, value: row[i] };
       }

@@ -81,7 +81,7 @@ export class ProfileImportService implements IProfileImportService {
       const fieldId = toGlobalId("ProfileTypeField", field.id);
       return [
         { key: fieldId, header: fieldName },
-        field.is_expirable
+        field.is_expirable && !field.options.useReplyAsExpiryDate
           ? {
               key: `${fieldId}-expiry`,
               header: intl.formatMessage(
@@ -104,7 +104,7 @@ export class ProfileImportService implements IProfileImportService {
           return [fieldId, fieldId];
         }),
         ...fields
-          .filter((f) => f.is_expirable)
+          .filter((f) => f.is_expirable && !f.options.useReplyAsExpiryDate)
           .map((field) => {
             const fieldId = `${toGlobalId("ProfileTypeField", field.id)}-expiry`;
             return [fieldId, fieldId];
