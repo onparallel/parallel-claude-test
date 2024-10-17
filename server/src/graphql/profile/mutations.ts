@@ -2596,6 +2596,10 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
       .filter((v) => typeof v === "number")
       .map((id) => toGlobalId("ProfileTypeField", id));
 
+    if (!requiredIds.every((id) => ids.includes(id))) {
+      throw new ApolloError("Missing required column", "INVALID_FILE_ERROR");
+    }
+
     let foundEmptyRow = false;
     importResult.slice(2).forEach((row, rowIndex) => {
       if (row.every((r) => !r)) {
@@ -2606,16 +2610,14 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
         }
         const rowData: UnwrapArray<typeof data> = {};
         for (let i = 0; i < row.length; i++) {
-          if (!row[i] && requiredIds.includes(ids[i])) {
+          const cell = { col: i + 1, row: rowIndex + 3, value: row[i] };
+
+          if (!cell.value && requiredIds.includes(ids[i])) {
             throw new ApolloError("Missing required field", "INVALID_CELL_ERROR", {
-              cell: {
-                col: i + 1,
-                row: rowIndex + 3,
-                value: "",
-              },
+              cell,
             });
           }
-          rowData[ids[i]] = { col: i + 1, row: rowIndex + 3, value: row[i] };
+          rowData[ids[i]] = cell;
         }
         data.push(rowData);
       }
