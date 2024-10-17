@@ -30,6 +30,7 @@ import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-comm
 import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
+  Scalars,
   UserLocale,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment,
@@ -40,7 +41,7 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { getReferencedInBackgroundCheck } from "@parallel/utils/getFieldsReferencedInBackgroundCheck";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
-import { useConstant } from "@parallel/utils/useConstant";
+import { assertType } from "@parallel/utils/types";
 import {
   ExpirationOption,
   durationToExpiration,
@@ -52,7 +53,7 @@ import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, omit, pick } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
 import { ProfileFieldBackgroundCheckSettings } from "../settings/ProfileFieldBackgroundCheckSettings";
@@ -71,15 +72,74 @@ export interface CreateOrUpdateProfileTypeFieldDialogProps {
   disableFieldTypeSelect?: boolean;
 }
 
-export interface CreateOrUpdateProfileTypeFieldDialogData<TType extends ProfileTypeFieldType = any>
-  extends Omit<CreateProfileTypeFieldInput, "expiryAlertAheadTime" | "options"> {
+export interface CreateOrUpdateProfileTypeFieldDialogData {
+  type: ProfileTypeFieldType;
+  alias: string;
   expiryAlertAheadTime: ExpirationOption;
-  options: TType extends "SELECT" | "CHECKBOX"
-    ? ProfileTypeFieldOptions<TType> & {
-        listingType: "STANDARD" | "CUSTOM";
-        values: (ProfileTypeFieldOptions<TType>["values"][number] & { id: string })[];
-      }
-    : ProfileTypeFieldOptions<TType>;
+  isExpirable: boolean;
+  name: Scalars["LocalizableUserText"]["input"];
+  options: {
+    format?: string | null;
+    useReplyAsExpiryDate?: boolean;
+    listingType?: "STANDARD" | "CUSTOM";
+    values?: {
+      id?: string;
+      existing?: boolean;
+      value: string;
+      label: Scalars["LocalizableUserText"]["input"];
+      color?: string;
+      isStandard?: boolean;
+    }[];
+    showOptionsWithColors?: boolean;
+    standardList?: string | null;
+  } & ProfileFieldBackgroundCheckSettings;
+}
+
+function defaultOptions(
+  intl: IntlShape,
+  type: ProfileTypeFieldType,
+  options: any,
+): CreateOrUpdateProfileTypeFieldDialogData["options"] {
+  if (type === "SELECT") {
+    assertType<ProfileTypeFieldOptions<"SELECT">>(options);
+    return {
+      ...options,
+      showOptionsWithColors: options.showOptionsWithColors ?? false,
+      listingType: options.standardList ? "STANDARD" : "CUSTOM",
+      values:
+        options.values?.length && !options.standardList
+          ? options.values.map((option) => ({
+              ...option,
+              id: nanoid(),
+              existing: true,
+            }))
+          : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
+    };
+  } else if (type === "CHECKBOX") {
+    assertType<ProfileTypeFieldOptions<"CHECKBOX">>(options);
+    return {
+      ...options,
+      listingType: options.standardList ? "STANDARD" : "CUSTOM",
+      values:
+        options.values?.length && !options.standardList
+          ? options.values.map((option) => ({
+              ...option,
+              id: nanoid(),
+              existing: true,
+            }))
+          : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
+    };
+  } else if (type === "BACKGROUND_CHECK") {
+    assertType<ProfileTypeFieldOptions<"BACKGROUND_CHECK">>(options);
+    return {
+      hasMonitoring: isNonNullish(options.monitoring),
+      monitoring: options.monitoring ?? {
+        searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
+      },
+    };
+  } else {
+    return options;
+  }
 }
 
 function CreateOrUpdateProfileTypeFieldDialog({
@@ -111,61 +171,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const isDisabled = referencedIn.length > 0;
 
-  const intialOptions = useConstant(() => {
-    if (profileTypeField?.type === "SELECT") {
-      const options = profileTypeField.options as ProfileTypeFieldOptions<"SELECT">;
-
-      return {
-        ...options,
-        showOptionsWithColors: options.showOptionsWithColors ?? false,
-        listingType: options.standardList ? "STANDARD" : "CUSTOM",
-        values:
-          options.values?.length && !options.standardList
-            ? options.values.map((option) => ({
-                ...option,
-                id: nanoid(),
-                existing: true,
-              }))
-            : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
-      };
-    } else if (profileTypeField?.type === "CHECKBOX") {
-      const options = profileTypeField.options as ProfileTypeFieldOptions<"CHECKBOX">;
-      return {
-        ...options,
-        listingType: options.standardList ? "STANDARD" : "CUSTOM",
-        values:
-          options.values?.length && !options.standardList
-            ? options.values.map((option) => ({
-                ...option,
-                id: nanoid(),
-                existing: true,
-              }))
-            : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
-      };
-    } else if (profileTypeField?.type === "BACKGROUND_CHECK") {
-      const options = profileTypeField.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
-      return {
-        hasMonitoring: isNonNullish(options.monitoring),
-        monitoring: options.monitoring ?? {
-          searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
-        },
-      };
-    }
-  }) as CreateOrUpdateProfileTypeFieldDialogData["options"];
-
-  const form = useForm<CreateOrUpdateProfileTypeFieldDialogData<any>>({
+  const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
     mode: "onSubmit",
     defaultValues: {
       name: profileTypeField?.name ?? { [intl.locale]: "" },
       type: profileTypeField?.type ?? "SHORT_TEXT",
       alias: profileTypeField?.alias ?? "",
       isExpirable: profileTypeField?.isExpirable ?? false,
-      options:
-        profileTypeField?.type === "SELECT" ||
-        profileTypeField?.type === "CHECKBOX" ||
-        profileTypeField?.type === "BACKGROUND_CHECK"
-          ? intialOptions
-          : (profileTypeField?.options ?? {}),
+      options: defaultOptions(
+        intl,
+        profileTypeField?.type ?? "SHORT_TEXT",
+        profileTypeField?.options ?? {},
+      ),
       expiryAlertAheadTime:
         isNonNullish(profileTypeField) &&
         profileTypeField.isExpirable &&
@@ -582,7 +599,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       value === "DATE"
                         ? { useReplyAsExpiryDate: true }
                         : value === "SELECT" || value === "CHECKBOX"
-                          ? { values: [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }] }
+                          ? {
+                              values: [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
+                            }
                           : {},
                     );
                     if (value === "SELECT" || value === "CHECKBOX") {

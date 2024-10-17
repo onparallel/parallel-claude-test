@@ -164,7 +164,7 @@ export function ProfileFieldBackgroundCheckSettings({
     control,
     formState: { errors },
     setValue,
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"BACKGROUND_CHECK">>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
   const hasMonitoring = watch("options.hasMonitoring");
   const monitoring = watch("options.monitoring");
   const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
@@ -541,7 +541,7 @@ function SearchFrequencyOptions({
   const {
     control,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"BACKGROUND_CHECK">>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
   const { fields: searchFrequencyOptions, replace } = useFieldArray({
     name: "options.monitoring.searchFrequency.options",

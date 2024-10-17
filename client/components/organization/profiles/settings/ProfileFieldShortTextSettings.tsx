@@ -8,7 +8,7 @@ export function ProfileFieldShortTextSettings({ isDisabled }: { isDisabled?: boo
   const {
     control,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"SHORT_TEXT">>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
   return (
     <FormControl isInvalid={!!errors.options?.format} isDisabled={isDisabled}>

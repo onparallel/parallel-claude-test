@@ -31,7 +31,6 @@ import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
 import { generateExcel } from "@parallel/utils/generateExcel";
 import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
-import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
 import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -47,12 +46,9 @@ import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpd
 
 const DEFAULT_TAG_COLOR = "#E2E8F0";
 
-export type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
-
-export interface SelectOptionValueData extends SelectOptionValue {
-  id: string;
-  existing?: boolean;
-}
+export type SelectOptionValue = UnwrapArray<
+  CreateOrUpdateProfileTypeFieldDialogData["options"]["values"]
+>;
 
 export function ProfileFieldSelectSettings({
   isDisabled,
@@ -72,7 +68,7 @@ export function ProfileFieldSelectSettings({
     setFocus,
     getValues,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"SELECT">>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
   const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
     name: "options.values",
@@ -327,8 +323,8 @@ function ProfileFieldSelectOption({
   isDisabled,
 }: {
   index: number;
-  field: SelectOptionValueData;
-  fields: SelectOptionValueData[];
+  field: SelectOptionValue;
+  fields: SelectOptionValue[];
   onRemove: (index: number) => void;
   canRemoveOption: boolean;
   showOptionsWithColors: boolean;
@@ -343,7 +339,7 @@ function ProfileFieldSelectOption({
     register,
     setValue,
     setFocus,
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData<"SELECT">>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
   const controls = useDragControls();
 
