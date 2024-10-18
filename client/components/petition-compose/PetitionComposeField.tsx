@@ -37,9 +37,9 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { letters } from "@parallel/utils/autoIncremental";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { letters } from "@parallel/utils/generators";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { openNewWindow } from "@parallel/utils/openNewWindow";

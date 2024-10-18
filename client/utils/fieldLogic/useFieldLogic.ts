@@ -13,8 +13,8 @@ import {
 import { useMemo } from "react";
 import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
-import { letters, numbers, romanNumerals } from "../autoIncremental";
 import { completedFieldReplies } from "../completedFieldReplies";
+import { letters, numbers, romanNumerals } from "../generators";
 import { UnwrapArray } from "../types";
 import {
   PetitionFieldLogicCondition,

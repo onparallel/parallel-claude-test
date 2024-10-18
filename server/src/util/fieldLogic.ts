@@ -11,8 +11,8 @@ import type {
   PetitionCustomList,
   PetitionVariable,
 } from "../db/repositories/PetitionRepository";
-import { letters, numbers, romanNumerals } from "./autoIncremental";
 import { completedFieldReplies } from "./completedFieldReplies";
+import { letters, numbers, romanNumerals } from "./generators";
 import { fromGlobalId, toGlobalId } from "./globalId";
 import { Maybe, UnwrapArray } from "./types";
 

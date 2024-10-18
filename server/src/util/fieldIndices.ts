@@ -1,6 +1,6 @@
 import { isNonNullish, zip } from "remeda";
 import { PetitionField } from "../db/__types";
-import { letters, numbers } from "./autoIncremental";
+import { letters, numbers } from "./generators";
 import { UnwrapArray } from "./types";
 
 export type PetitionFieldIndex = string;

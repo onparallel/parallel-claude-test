@@ -48,3 +48,10 @@ export function* romanNumerals() {
     counter++;
   }
 }
+
+export function nth<T>(generator: Generator<T>, index: number) {
+  for (let i = 0; i < index; ++i) {
+    generator.next();
+  }
+  return generator.next().value;
+}

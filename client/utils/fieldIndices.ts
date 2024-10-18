@@ -6,10 +6,10 @@ import {
   useFieldsWithIndices_PetitionBaseFragment,
   useFieldsWithIndices_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
+import { letters, numbers } from "@parallel/utils/generators";
 import { useMemo } from "react";
 import { isNonNullish, zip } from "remeda";
 import { UnwrapArray } from "./types";
-import { letters, numbers } from "@parallel/utils/autoIncremental";
 
 export type PetitionFieldIndex = string;
 

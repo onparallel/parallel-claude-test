@@ -18,6 +18,7 @@ import {
   UserLocale,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { letters, nth } from "@parallel/utils/generators";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
@@ -55,7 +56,7 @@ export function ImportProfilesFromExcelDialog({
                 <FormattedMessage
                   id="component.import-profiles-from-excel-dialog.import-error-details"
                   defaultMessage="We have detected an error in row {row}, column {col}."
-                  values={{ row: cell.row, col: cell.col }}
+                  values={{ row: cell.row, col: nth(letters(), cell.col - 1) }}
                 />
               </Text>
             ) : null}
