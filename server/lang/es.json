@@ -936,8 +936,8 @@
   },
   {
     "term": "profile-import.instructions.line-1",
-    "definition": "- Puedes reordenar columnas o eliminar columnas que no necesites, siempre y cuando no modifiques el contenido de las dos primeras filas.",
-    "context": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows."
+    "definition": "- No modifiques el contenido de las dos primeras filas.",
+    "context": "- Do not modify the content of the top two rows."
   },
   {
     "term": "profile-import.instructions.line-2",

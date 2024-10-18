@@ -38,8 +38,8 @@ export function TaskProgressDialog({
       if (isMounted()) {
         setTask(task);
       }
-    } catch {
-      props.onReject("SERVER_ERROR");
+    } catch (error) {
+      props.onReject(error instanceof Error ? (error.message ?? "SERVER_ERROR") : "SERVER_ERROR");
     }
   }, []);
 

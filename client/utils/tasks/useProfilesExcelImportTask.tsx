@@ -1,0 +1,135 @@
+import { gql, useApolloClient } from "@apollo/client";
+import { Text } from "@chakra-ui/react";
+import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  TaskProgressDialog,
+  useTaskProgressDialog,
+} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useProfilesExcelImportTask_createProfilesExcelImportTaskDocument } from "@parallel/graphql/__types";
+import { useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isNullish } from "remeda";
+import { isApolloError } from "../apollo/isApolloError";
+import { letters, nth } from "../generators";
+import { withError } from "../promises/withError";
+
+interface ErrorCell {
+  row: number;
+  col: number;
+}
+
+export function useProfilesExcelImportTask() {
+  const apollo = useApolloClient();
+  const showError = useErrorDialog();
+
+  const showTaskProgressDialog = useTaskProgressDialog();
+  const intl = useIntl();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const showErrorDialog = useErrorDialog();
+
+  async function showImportErrorDialog(cell?: ErrorCell) {
+    return await withError(
+      showErrorDialog({
+        header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
+        message: (
+          <>
+            {cell ? (
+              <Text marginBottom={2}>
+                <FormattedMessage
+                  id="component.import-profiles-from-excel-dialog.import-error-details"
+                  defaultMessage="We have detected an error in row {row}, column {col}."
+                  values={{ row: cell.row, col: nth(letters(), cell.col - 1) }}
+                />
+              </Text>
+            ) : null}
+            <Text>
+              <FormattedMessage
+                id="component.import-profiles-from-excel-dialog.import-error-body"
+                defaultMessage="Please, review your file and make sure it matches the format on the loading model."
+              />
+            </Text>
+          </>
+        ),
+      }),
+    );
+  }
+
+  return [
+    async (
+      variables: { profileTypeId: string; file: File },
+      { modalProps }: { modalProps?: BaseModalProps } = {},
+    ) => {
+      const [taskError, taskResult] = await withError(async () => {
+        return await showTaskProgressDialog({
+          initTask: async () => {
+            setIsLoading(true);
+            try {
+              const { data } = await apollo.mutate({
+                mutation: useProfilesExcelImportTask_createProfilesExcelImportTaskDocument,
+                variables,
+              });
+
+              if (isNullish(data)) {
+                throw new Error();
+              }
+              return data.createProfilesExcelImportTask;
+            } catch (error) {
+              if (isApolloError(error)) {
+                const code = error.graphQLErrors[0]?.extensions?.code;
+                if (code === "INVALID_FILE_ERROR") {
+                  await withError(showImportErrorDialog());
+                  throw new Error("CANCELLED");
+                }
+                if (code === "INVALID_CELL_ERROR") {
+                  const cell = error.graphQLErrors[0]?.extensions?.cell as ErrorCell;
+                  await withError(showImportErrorDialog(cell));
+                  throw new Error("CANCELLED");
+                }
+              }
+              throw new Error("SERVER_ERROR");
+            }
+          },
+          dialogHeader: intl.formatMessage({
+            id: "component.profiles-excel-import.header",
+            defaultMessage: "Importing profiles...",
+          }),
+          modalProps,
+        });
+      });
+
+      setIsLoading(false);
+
+      if (taskError?.message === "SERVER_ERROR") {
+        await withError(
+          showError({
+            message: intl.formatMessage({
+              id: "generic.unexpected-error-happened",
+              defaultMessage:
+                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+            }),
+          }),
+        );
+      }
+
+      return taskResult?.output;
+    },
+    { loading: isLoading },
+  ] as const;
+}
+
+useProfilesExcelImportTask.mutations = [
+  gql`
+    mutation useProfilesExcelImportTask_createProfilesExcelImportTask(
+      $profileTypeId: GID!
+      $file: Upload!
+    ) {
+      createProfilesExcelImportTask(profileTypeId: $profileTypeId, file: $file) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog.fragments.Task}
+  `,
+];

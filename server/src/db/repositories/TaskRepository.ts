@@ -245,6 +245,7 @@ export type TaskOutput<TName extends TaskName> = {
   };
   PROFILES_EXCEL_IMPORT: {
     success: boolean;
+    count: number;
     error?: any;
   };
 }[TName];

@@ -936,8 +936,8 @@
   },
   {
     "term": "profile-import.instructions.line-1",
-    "definition": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows.",
-    "context": "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows."
+    "definition": "- Do not modify the content of the top two rows.",
+    "context": "- Do not modify the content of the top two rows."
   },
   {
     "term": "profile-import.instructions.line-2",

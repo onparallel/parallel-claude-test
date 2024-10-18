@@ -11,16 +11,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
-  ImportProfilesFromExcelDialog_importProfilesFromFileDocument,
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { letters, nth } from "@parallel/utils/generators";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import { useProfilesExcelImportTask } from "@parallel/utils/tasks/useProfilesExcelImportTask";
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -30,11 +27,6 @@ import { FileSize } from "../../common/FileSize";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 
-interface ErrorCell {
-  row: number;
-  col: number;
-}
-
 export function ImportProfilesFromExcelDialog({
   profileTypeId,
   ...props
@@ -43,63 +35,19 @@ export function ImportProfilesFromExcelDialog({
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
-  const showErrorDialog = useErrorDialog();
-
-  async function showImportErrorDialog(cell?: ErrorCell) {
-    return await withError(
-      showErrorDialog({
-        header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
-        message: (
-          <>
-            {cell ? (
-              <Text marginBottom={2}>
-                <FormattedMessage
-                  id="component.import-profiles-from-excel-dialog.import-error-details"
-                  defaultMessage="We have detected an error in row {row}, column {col}."
-                  values={{ row: cell.row, col: nth(letters(), cell.col - 1) }}
-                />
-              </Text>
-            ) : null}
-            <Text>
-              <FormattedMessage
-                id="component.import-profiles-from-excel-dialog.import-error-body"
-                defaultMessage="Please, review your file and make sure it matches the format on the loading model."
-              />
-            </Text>
-          </>
-        ),
-      }),
-    );
-  }
-
-  const [importProfilesFromFile, { loading: isUploading }] = useMutation(
-    ImportProfilesFromExcelDialog_importProfilesFromFileDocument,
-  );
+  const [profilesExcelImportTask, { loading: isUploading }] = useProfilesExcelImportTask();
 
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);
     } else {
       try {
-        const { data } = await importProfilesFromFile({
-          variables: {
-            profileTypeId,
-            file,
-          },
+        const { count } = await profilesExcelImportTask({
+          profileTypeId,
+          file,
         });
-        props.onResolve({ count: data?.importProfilesFromFile.profileCount ?? 0 });
-      } catch (error) {
-        if (isApolloError(error)) {
-          const code = error.graphQLErrors[0]?.extensions?.code;
-          if (code === "INVALID_FILE_ERROR") {
-            await withError(showImportErrorDialog());
-          }
-          if (code === "INVALID_CELL_ERROR") {
-            const cell = error.graphQLErrors[0]?.extensions?.cell as ErrorCell;
-            await withError(showImportErrorDialog(cell));
-          }
-        }
-      }
+        props.onResolve({ count });
+      } catch {}
     }
   }
 
@@ -206,17 +154,6 @@ ImportProfilesFromExcelDialog.mutations = [
       $locale: UserLocale!
     ) {
       profileImportExcelModelDownloadLink(profileTypeId: $profileTypeId, locale: $locale)
-    }
-  `,
-  gql`
-    mutation ImportProfilesFromExcelDialog_importProfilesFromFile(
-      $profileTypeId: GID!
-      $file: Upload!
-    ) {
-      importProfilesFromFile(profileTypeId: $profileTypeId, file: $file) {
-        profileCount
-        result
-      }
     }
   `,
 ];

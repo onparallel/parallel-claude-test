@@ -8275,6 +8275,11 @@
     "context": "Hi, I would like more information about upgrading my plan to access Profiles and Alerts"
   },
   {
+    "term": "component.profiles-excel-import.header",
+    "definition": "Importando perfiles...",
+    "context": "Importing profiles..."
+  },
+  {
     "term": "component.property-referenced-alert.referenced-in",
     "definition": "Esta propiedad no se puede editar porque está siendo utilizada para el monitoreo continuo de {count, plural, =1{la propiedad} other {las propiedades}} {properties}. Para editarlo, necesitas quitarlo de la configuración.",
     "context": "This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
@@ -15171,8 +15176,8 @@
   },
   {
     "term": "page.profiles.successful-import-toast-title",
-    "definition": "{count, plural, =1 {# perfil será importado} other {# perfiles serán importados}} en breve.",
-    "context": "{count, plural, =1{# profile} other{# profiles}} will be imported shortly."
+    "definition": "¡{count, plural, =1 {# perfil importado} other {# perfiles importados}} con éxito!",
+    "context": "{count, plural, =1{# profile} other{# profiles}} imported successfully!"
   },
   {
     "term": "page.profiles.title",

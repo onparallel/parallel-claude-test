@@ -41,6 +41,7 @@ export interface IProfileImportService {
     profileTypeId: number,
     values: ParsedProfileFieldValue[][],
     user: User,
+    onProgress?: (count: number, total: number) => void,
   ): Promise<void>;
   parseAndValidateExcelData(
     profileTypeId: number,
@@ -154,8 +155,7 @@ export class ProfileImportService implements IProfileImportService {
       [
         intl.formatMessage({
           id: "profile-import.instructions.line-1",
-          defaultMessage:
-            "- You can reorder columns or remove columns that you don't need, as long as you don't modify the content of the top two rows.",
+          defaultMessage: "- Do not modify the content of the top two rows.",
         }),
       ],
       [
@@ -204,7 +204,9 @@ export class ProfileImportService implements IProfileImportService {
     profileTypeId: number,
     values: ParsedProfileFieldValue[][],
     user: User,
+    onProgress?: (count: number, total: number) => void,
   ) {
+    let count = 0;
     for (const profileValues of values) {
       const profile = await this.profiles.createProfile(
         {
@@ -225,6 +227,8 @@ export class ProfileImportService implements IProfileImportService {
         buildProfileUpdatedEventsData(profile.id, profileValues, currentValues, [], user),
         user,
       );
+
+      onProgress?.(++count, values.length);
     }
   }
 
@@ -347,7 +351,11 @@ export class ProfileImportService implements IProfileImportService {
           if (!id) {
             continue;
           }
-          rowData[id] = { col: colIndex + 1, row: rowIndex + 3, value: row[colIndex] ?? null };
+          rowData[id] = {
+            col: colIndex + 1,
+            row: rowIndex + 3,
+            value: row[colIndex]?.trim() ?? null,
+          };
         }
         cellData.push(rowData);
       }

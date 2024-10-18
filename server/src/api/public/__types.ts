@@ -704,11 +704,6 @@ export type ImageOptionsResize = {
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
-export type ImportProfilesFromFileResult = {
-  profileCount: Scalars["Int"]["output"];
-  result: Success;
-};
-
 /** A feature flag name with his value */
 export type InputFeatureFlagNameValue = {
   name: FeatureFlag;
@@ -967,6 +962,8 @@ export type Mutation = {
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
+  /** Creates a task for importing profiles from an excel file */
+  createProfilesExcelImportTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
@@ -1053,8 +1050,6 @@ export type Mutation = {
   getTaskResultFile: TaskResultFile;
   /** Imports a petition from a JSON file */
   importPetitionFromJson: SupportMethodResponse;
-  /** Imports profiles from an excel file */
-  importProfilesFromFile: ImportProfilesFromFileResult;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
   /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
@@ -1716,6 +1711,11 @@ export type MutationcreateProfileTypeFieldArgs = {
   profileTypeId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateProfilesExcelImportTaskArgs = {
+  file: Scalars["Upload"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+};
+
 export type MutationcreatePublicPetitionLinkArgs = {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
@@ -1929,11 +1929,6 @@ export type MutationgetTaskResultFileArgs = {
 export type MutationimportPetitionFromJsonArgs = {
   json: Scalars["String"]["input"];
   userId: Scalars["GID"]["input"];
-};
-
-export type MutationimportProfilesFromFileArgs = {
-  file: Scalars["Upload"]["input"];
-  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationinviteUserToOrganizationArgs = {
@@ -4651,6 +4646,7 @@ export type ProfileType = Timestamps & {
   /** Time when the response was created. */
   archivedAt: Maybe<Scalars["DateTime"]["output"]>;
   archivedBy: Maybe<User>;
+  canCreate: Scalars["Boolean"]["output"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
@@ -5804,6 +5800,7 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
+  | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"

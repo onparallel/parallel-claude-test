@@ -265,18 +265,20 @@ function Profiles() {
     }
     try {
       const { count } = await showImportProfilesFromExcelDialog({ profileTypeId: profileType.id });
-
-      showToast({
-        title: intl.formatMessage(
-          {
-            id: "page.profiles.successful-import-toast-title",
-            defaultMessage:
-              "{count, plural, =1{# profile} other{# profiles}} will be imported shortly.",
-          },
-          { count },
-        ),
-        status: "success",
-      });
+      if (count > 0) {
+        showToast({
+          title: intl.formatMessage(
+            {
+              id: "page.profiles.successful-import-toast-title",
+              defaultMessage:
+                "{count, plural, =1{# profile} other{# profiles}} imported successfully!",
+            },
+            { count },
+          ),
+          status: "success",
+        });
+        await refetch();
+      }
     } catch {}
   };
 

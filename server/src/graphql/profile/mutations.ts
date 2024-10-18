@@ -9,7 +9,6 @@ import {
   mutationField,
   nonNull,
   nullable,
-  objectType,
   stringArg,
 } from "nexus";
 import pMap from "p-map";
@@ -50,11 +49,9 @@ import {
 } from "../../db/helpers/profileTypeFieldOptions";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
-import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileImportService";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
-import { withError } from "../../util/promises/withError";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
 import { validateProfileFieldValue } from "../../util/validateProfileFieldValue";
@@ -64,9 +61,7 @@ import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { buildProfileUpdatedEventsData } from "../helpers/buildProfileUpdatedEventsData";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { importFromExcel } from "../helpers/importDataFromExcel";
 import { dateArg } from "../helpers/scalars/DateTime";
-import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateOr } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -74,7 +69,6 @@ import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
-import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
@@ -2555,96 +2549,3 @@ export const profileImportExcelModelDownloadLink = mutationField(
     },
   },
 );
-
-export const importProfilesFromFile = mutationField("importProfilesFromFile", {
-  description: "Imports profiles from an excel file",
-  type: objectType({
-    name: "ImportProfilesFromFileResult",
-    definition(t) {
-      t.nonNull.field("result", { type: "Success" });
-      t.nonNull.int("profileCount");
-    },
-  }),
-  authorize: authenticateAnd(userHasAccessToProfileType("profileTypeId")),
-  args: {
-    profileTypeId: nonNull(globalIdArg("ProfileType")),
-    file: nonNull(uploadArg()),
-  },
-  validateArgs: validateFile(
-    (args) => args.file,
-    {
-      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      maxSize: 1024 * 1024 * 10,
-    },
-    "file",
-  ),
-  resolve: async (_, args, ctx) => {
-    const file = await args.file;
-
-    const [importError, importData] = await withError(importFromExcel(file.createReadStream()));
-    if (importError) {
-      throw new ApolloError("Invalid file", "INVALID_FILE_ERROR");
-    }
-
-    try {
-      // catch any parsing error before starting the task
-      const data = await ctx.profileImport.parseAndValidateExcelData(
-        args.profileTypeId,
-        importData,
-        ctx.user!.id,
-      );
-
-      // all good, create a temporary file with data and start the task
-      const path = random(16);
-      const uploadResponse = await ctx.storage.temporaryFiles.uploadFile(
-        path,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        file.createReadStream(),
-      );
-      const tmpFile = await ctx.files.createTemporaryFile(
-        {
-          content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          filename: file.filename,
-          path,
-          size: uploadResponse["ContentLength"]?.toString() ?? "0",
-        },
-        `User:${ctx.user!.id}`,
-      );
-      await ctx.tasks.createTask(
-        {
-          name: "PROFILES_EXCEL_IMPORT",
-          input: {
-            profile_type_id: args.profileTypeId,
-            temporary_file_id: tmpFile.id,
-          },
-          user_id: ctx.user!.id,
-        },
-        `User:${ctx.user!.id}`,
-      );
-
-      return {
-        result: RESULT.SUCCESS,
-        profileCount: data.length,
-      };
-    } catch (error) {
-      if (error instanceof InvalidDataError) {
-        throw new ApolloError(error.message, "INVALID_FILE_ERROR");
-      }
-      if (error instanceof CellError) {
-        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
-          cell: error.cell,
-        });
-      }
-      if (error instanceof UnknownIdError) {
-        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
-          cell: {
-            col: importData[1].indexOf(error.id) + 1,
-            row: 2,
-            value: error.id,
-          },
-        });
-      }
-      throw error;
-    }
-  },
-});

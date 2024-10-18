@@ -906,11 +906,6 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
     totalCount: number; // Int!
   };
-  ImportProfilesFromFileResult: {
-    // root type
-    profileCount: number; // Int!
-    result: NexusGenEnums["Success"]; // Success!
-  };
   LandingTemplate: db.Petition;
   LandingTemplateCategorySample: string;
   LandingTemplateField: db.PetitionField;
@@ -1880,11 +1875,6 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
     totalCount: number; // Int!
   };
-  ImportProfilesFromFileResult: {
-    // field return type
-    profileCount: number; // Int!
-    result: NexusGenEnums["Success"]; // Success!
-  };
   LandingTemplate: {
     // field return type
     backgroundColor: string | null; // String
@@ -2034,6 +2024,7 @@ export interface NexusGenFieldTypes {
     createProfileRelationship: NexusGenRootTypes["Profile"]; // Profile!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    createProfilesExcelImportTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
     createRemovePetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
@@ -2076,7 +2067,6 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     importPetitionFromJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    importProfilesFromFile: NexusGenRootTypes["ImportProfilesFromFileResult"]; // ImportProfilesFromFileResult!
     inviteUserToOrganization: NexusGenRootTypes["User"]; // User!
     linkFieldGroupToProfileType: NexusGenRootTypes["PetitionField"]; // PetitionField!
     linkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -4538,11 +4528,6 @@ export interface NexusGenFieldTypeNames {
     items: "IOrgIntegration";
     totalCount: "Int";
   };
-  ImportProfilesFromFileResult: {
-    // field return type name
-    profileCount: "Int";
-    result: "Success";
-  };
   LandingTemplate: {
     // field return type name
     backgroundColor: "String";
@@ -4692,6 +4677,7 @@ export interface NexusGenFieldTypeNames {
     createProfileRelationship: "Profile";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
+    createProfilesExcelImportTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
     createRemovePetitionPermissionMaybeTask: "MaybeTask";
@@ -4734,7 +4720,6 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFile: "TaskResultFile";
     importPetitionFromJson: "SupportMethodResponse";
-    importProfilesFromFile: "ImportProfilesFromFileResult";
     inviteUserToOrganization: "User";
     linkFieldGroupToProfileType: "PetitionField";
     linkPetitionFieldChildren: "PetitionField";
@@ -7202,6 +7187,11 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["CreateProfileTypeFieldInput"]; // CreateProfileTypeFieldInput!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
+    createProfilesExcelImportTask: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
     createPublicPetitionLink: {
       // args
       allowMultiplePetitions: boolean; // Boolean!
@@ -7416,11 +7406,6 @@ export interface NexusGenArgTypes {
       // args
       json: string; // String!
       userId: NexusGenScalars["GID"]; // GID!
-    };
-    importProfilesFromFile: {
-      // args
-      file: NexusGenScalars["Upload"]; // Upload!
-      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     inviteUserToOrganization: {
       // args

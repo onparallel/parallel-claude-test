@@ -756,12 +756,6 @@ export interface ImageOptionsResize {
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
-export interface ImportProfilesFromFileResult {
-  __typename?: "ImportProfilesFromFileResult";
-  profileCount: Scalars["Int"]["output"];
-  result: Success;
-}
-
 /** A feature flag name with his value */
 export interface InputFeatureFlagNameValue {
   name: FeatureFlag;
@@ -1030,6 +1024,8 @@ export interface Mutation {
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
+  /** Creates a task for importing profiles from an excel file */
+  createProfilesExcelImportTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
@@ -1116,8 +1112,6 @@ export interface Mutation {
   getTaskResultFile: TaskResultFile;
   /** Imports a petition from a JSON file */
   importPetitionFromJson: SupportMethodResponse;
-  /** Imports profiles from an excel file */
-  importProfilesFromFile: ImportProfilesFromFileResult;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
   /** Links a FIELD_GROUP field to a profile type, so its replies can be archived into a profile when petition is closed */
@@ -1779,6 +1773,11 @@ export interface MutationcreateProfileTypeFieldArgs {
   profileTypeId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateProfilesExcelImportTaskArgs {
+  file: Scalars["Upload"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreatePublicPetitionLinkArgs {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
@@ -1992,11 +1991,6 @@ export interface MutationgetTaskResultFileArgs {
 export interface MutationimportPetitionFromJsonArgs {
   json: Scalars["String"]["input"];
   userId: Scalars["GID"]["input"];
-}
-
-export interface MutationimportProfilesFromFileArgs {
-  file: Scalars["Upload"]["input"];
-  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationinviteUserToOrganizationArgs {
@@ -6026,6 +6020,7 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
+  | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
@@ -27569,19 +27564,6 @@ export type ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMut
 
 export type ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutation = {
   profileImportExcelModelDownloadLink: string;
-};
-
-export type ImportProfilesFromExcelDialog_importProfilesFromFileMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-  file: Scalars["Upload"]["input"];
-}>;
-
-export type ImportProfilesFromExcelDialog_importProfilesFromFileMutation = {
-  importProfilesFromFile: {
-    __typename?: "ImportProfilesFromFileResult";
-    profileCount: number;
-    result: Success;
-  };
 };
 
 export type useProfileSubscribersDialog_UserFragment = {
@@ -54844,6 +54826,29 @@ export type usePrintPdfTask_taskQuery = {
   task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
+export type useProfilesExcelImportTask_createProfilesExcelImportTaskMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  file: Scalars["Upload"]["input"];
+}>;
+
+export type useProfilesExcelImportTask_createProfilesExcelImportTaskMutation = {
+  createProfilesExcelImportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+  };
+};
+
+export type useProfilesExcelImportTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type useProfilesExcelImportTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
+};
+
 export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
 }>;
@@ -68475,20 +68480,6 @@ export const ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDo
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutation,
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutationVariables
 >;
-export const ImportProfilesFromExcelDialog_importProfilesFromFileDocument = gql`
-  mutation ImportProfilesFromExcelDialog_importProfilesFromFile(
-    $profileTypeId: GID!
-    $file: Upload!
-  ) {
-    importProfilesFromFile(profileTypeId: $profileTypeId, file: $file) {
-      profileCount
-      result
-    }
-  }
-` as unknown as DocumentNode<
-  ImportProfilesFromExcelDialog_importProfilesFromFileMutation,
-  ImportProfilesFromExcelDialog_importProfilesFromFileMutationVariables
->;
 export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
   mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
     subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
@@ -72548,6 +72539,32 @@ export const usePrintPdfTask_taskDocument = gql`
     }
   }
 ` as unknown as DocumentNode<usePrintPdfTask_taskQuery, usePrintPdfTask_taskQueryVariables>;
+export const useProfilesExcelImportTask_createProfilesExcelImportTaskDocument = gql`
+  mutation useProfilesExcelImportTask_createProfilesExcelImportTask(
+    $profileTypeId: GID!
+    $file: Upload!
+  ) {
+    createProfilesExcelImportTask(profileTypeId: $profileTypeId, file: $file) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useProfilesExcelImportTask_createProfilesExcelImportTaskMutation,
+  useProfilesExcelImportTask_createProfilesExcelImportTaskMutationVariables
+>;
+export const useProfilesExcelImportTask_taskDocument = gql`
+  query useProfilesExcelImportTask_task($id: GID!) {
+    task(id: $id) {
+      id
+      status
+      output
+    }
+  }
+` as unknown as DocumentNode<
+  useProfilesExcelImportTask_taskQuery,
+  useProfilesExcelImportTask_taskQueryVariables
+>;
 export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
   mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
     publicCreatePrintPdfTask(keycode: $keycode) {

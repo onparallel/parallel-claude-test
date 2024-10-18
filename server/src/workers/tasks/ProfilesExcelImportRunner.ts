@@ -29,8 +29,15 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
       user.id,
     );
 
-    await this.ctx.profileImport.importDataIntoProfiles(profileTypeId, data, user);
+    await this.ctx.profileImport.importDataIntoProfiles(
+      profileTypeId,
+      data,
+      user,
+      (count, total) => {
+        this.onProgress((count / total) * 100);
+      },
+    );
 
-    return { success: true };
+    return { success: true, count: data.length };
   }
 }
