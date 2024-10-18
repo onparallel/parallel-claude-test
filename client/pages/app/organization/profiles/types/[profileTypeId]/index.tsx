@@ -666,7 +666,7 @@ function DraggableList({
         {selectedCount.current > 0 ? (
           <Box fontWeight="normal">
             <HStack height="38px" paddingX={3} position="relative" top="1px">
-              <Box fontSize="sm">
+              <Box fontSize="sm" whiteSpace="nowrap">
                 <FormattedMessage
                   id="component.table-page.n-selected"
                   defaultMessage="{count} selected"
@@ -811,7 +811,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
             <DragHandleIcon role="presentation" boxSize={3} />
           </Box>
           <ProfileTypeFieldTypeIndicator type={item.type} fieldIndex={index + 1} />
-          <Text as="span" flex="1">
+          <Text as="span" flex="1" noOfLines={1}>
             <LocalizableUserTextRender
               value={item.name}
               default={intl.formatMessage({
@@ -823,7 +823,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
           <MoreOptionsMenuButton
             ref={propertyMoreOptionsRef}
             className="more-opetions-button"
-            alignSelf="end"
+            alignSelf="center"
             size="sm"
             options={
               <MenuList minWidth="160px">
@@ -889,12 +889,7 @@ function useProfileTypeFieldsActions({
       key: "edit",
       onClick: onEditClick,
       leftIcon: <EditIcon />,
-      children: (
-        <FormattedMessage
-          id="component.draggable-list.edit-property"
-          defaultMessage="Edit property"
-        />
-      ),
+      children: <FormattedMessage id="generic.edit" defaultMessage="Edit" />,
     },
     {
       key: "visibility",

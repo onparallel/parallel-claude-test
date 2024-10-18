@@ -148,7 +148,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
           </Stack>
           <Box paddingTop={{ base: 2, lg: 0 }} alignSelf={{ base: "end", lg: "start" }}>
             <Button isDisabled={!isDirty} colorScheme="primary" type="submit">
-              <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+              <FormattedMessage id="generic.save" defaultMessage="Save" />
             </Button>
           </Box>
         </HStack>
