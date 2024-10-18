@@ -507,7 +507,8 @@ export type TaskName =
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "ID_VERIFICATION_SESSION_COMPLETED"
   | "FILE_EXPORT"
-  | "CLOSE_PETITIONS";
+  | "CLOSE_PETITIONS"
+  | "PROFILES_EXCEL_IMPORT";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -527,6 +528,7 @@ export const TaskNameValues = [
   "ID_VERIFICATION_SESSION_COMPLETED",
   "FILE_EXPORT",
   "CLOSE_PETITIONS",
+  "PROFILES_EXCEL_IMPORT",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

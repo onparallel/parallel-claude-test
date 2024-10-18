@@ -17,6 +17,7 @@ import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { ProfileNamePatternUpdatedRunner } from "./tasks/ProfileNamePatternUpdatedRunner";
+import { ProfilesExcelImportRunner } from "./tasks/ProfilesExcelImportRunner";
 import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
@@ -40,6 +41,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   ID_VERIFICATION_SESSION_COMPLETED: IdVerificationSessionCompletedRunner,
   FILE_EXPORT: FileExportRunner,
   CLOSE_PETITIONS: ClosePetitionsRunner,
+  PROFILES_EXCEL_IMPORT: ProfilesExcelImportRunner,
 };
 
 export interface TaskWorkerPayload {

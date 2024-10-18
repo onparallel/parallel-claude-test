@@ -188,6 +188,7 @@ export class WorkerContext {
     @inject(DOCUMENT_PROCESSING_SERVICE)
     public readonly documentProcessing: IDocumentProcessingService,
     @inject(FILE_EXPORT_SERVICE) public readonly fileExport: IFileExportService,
+    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: IProfileImportService,
 
     // Repositories
     public readonly contacts: ContactRepository,

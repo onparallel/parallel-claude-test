@@ -271,14 +271,12 @@ function Profiles() {
           {
             id: "page.profiles.successful-import-toast-title",
             defaultMessage:
-              "{count, plural, =1{# profile} other{# profiles}} imported successfully!",
+              "{count, plural, =1{# profile} other{# profiles}} will be imported shortly.",
           },
           { count },
         ),
         status: "success",
       });
-
-      await refetch();
     } catch {}
   };
 

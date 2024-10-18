@@ -11,7 +11,7 @@ import { toGlobalId } from "../util/globalId";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { isValidDate } from "../util/time";
 import { random } from "../util/token";
-import { Maybe } from "../util/types";
+import { Maybe, UnwrapArray } from "../util/types";
 import { validateProfileFieldValue } from "../util/validateProfileFieldValue";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
@@ -39,9 +39,14 @@ export interface IProfileImportService {
   ): Promise<string>;
   importDataIntoProfiles(
     profileTypeId: number,
-    data: Record<string, CellData>[],
+    values: ParsedProfileFieldValue[][],
     user: User,
-  ): Promise<number>;
+  ): Promise<void>;
+  parseAndValidateExcelData(
+    profileTypeId: number,
+    excelData: string[][],
+    userId: number,
+  ): Promise<ParsedProfileFieldValue[][]>;
 }
 
 @injectable()
@@ -76,7 +81,7 @@ export class ProfileImportService implements IProfileImportService {
 
     const fields = await this.loadImportableFields(profileTypeId, user.id);
 
-    dataTab.columns = fields.flatMap((field) => {
+    dataTab.columns = fields.flatMap(({ field }) => {
       const fieldName = this.localizableText(field.name, locale);
       const fieldId = toGlobalId("ProfileTypeField", field.id);
       return [
@@ -99,13 +104,13 @@ export class ProfileImportService implements IProfileImportService {
     // add IDs row
     dataTab.addRow(
       Object.fromEntries([
-        ...fields.map((field) => {
+        ...fields.map(({ field }) => {
           const fieldId = toGlobalId("ProfileTypeField", field.id);
           return [fieldId, fieldId];
         }),
         ...fields
-          .filter((f) => f.is_expirable && !f.options.useReplyAsExpiryDate)
-          .map((field) => {
+          .filter(({ field }) => field.is_expirable && !field.options.useReplyAsExpiryDate)
+          .map(({ field }) => {
             const fieldId = `${toGlobalId("ProfileTypeField", field.id)}-expiry`;
             return [fieldId, fieldId];
           }),
@@ -197,19 +202,14 @@ export class ProfileImportService implements IProfileImportService {
 
   async importDataIntoProfiles(
     profileTypeId: number,
-    data: Record<string, CellData>[],
+    values: ParsedProfileFieldValue[][],
     user: User,
   ) {
-    const profileType = await this.profiles.loadProfileType(profileTypeId);
-    assert(profileType, "Profile type not found");
-
-    const parsedProfileValues = await this.validateAndParseData(profileTypeId, data, user.id);
-
-    for (const profileValues of parsedProfileValues) {
+    for (const profileValues of values) {
       const profile = await this.profiles.createProfile(
         {
           localizable_name: { en: "" },
-          org_id: profileType.org_id,
+          org_id: user.org_id,
           profile_type_id: profileTypeId,
         },
         user.id,
@@ -226,47 +226,76 @@ export class ProfileImportService implements IProfileImportService {
         user,
       );
     }
-
-    return parsedProfileValues.length;
   }
 
-  private async validateAndParseData(
+  async parseAndValidateExcelData(
     profileTypeId: number,
-    data: Record<string, CellData>[],
+    excelData: string[][],
     userId: number,
   ): Promise<ParsedProfileFieldValue[][]> {
+    // 1st row: property names
+    // 2nd row: property IDs
+    // 3rd+ row: profiles data
+    if (excelData.length < 2) {
+      throw new InvalidDataError("Data must have at least 2 rows");
+    }
+
     const fields = await this.loadImportableFields(profileTypeId, userId);
+
+    const ids = excelData[1];
+    const requiredFieldIds = fields
+      .filter(({ isRequired }) => isRequired)
+      .map(({ field }) => toGlobalId("ProfileTypeField", field.id));
+
+    if (!requiredFieldIds.every((id) => ids.includes(id))) {
+      throw new InvalidDataError("Missing required columns");
+    }
+
+    const parsed = await this.parseExcelData(excelData);
+
     const validIds = fields
-      .flatMap((f) => {
-        const fieldId = toGlobalId("ProfileTypeField", f.id);
-        return [fieldId, f.is_expirable ? `${fieldId}-expiry` : null];
+      .flatMap(({ field }) => {
+        const fieldId = toGlobalId("ProfileTypeField", field.id);
+        return [
+          fieldId,
+          field.is_expirable && !field.options.useReplyAsExpiryDate ? `${fieldId}-expiry` : null,
+        ];
       })
       .filter(isNonNullish);
 
     const createData: ParsedProfileFieldValue[][] = [];
-    for (const contentById of data) {
+    for (const contentById of parsed) {
       const profileValues: ParsedProfileFieldValue[] = [];
       for (const [id, cell] of Object.entries(contentById)) {
         if (!validIds.includes(id)) {
           throw new UnknownIdError(id);
         }
 
-        const field = fields.find((f) => {
-          const fieldId = toGlobalId("ProfileTypeField", f.id);
-          return [fieldId, f.is_expirable ? `${fieldId}-expiry` : null]
-            .filter(isNonNullish)
-            .includes(id);
-        });
-        assert(field, `Field not found for ID: ${id}`);
-
-        const expiryId = `${toGlobalId("ProfileTypeField", field.id)}-expiry`;
-
-        // ignore empty cells and "expiry" values
-        if (cell.value === "" || (field.is_expirable && id === expiryId)) {
+        // if its an "expiry" column, skip it
+        if (id.endsWith("-expiry")) {
           continue;
         }
 
-        const content = { value: field.type === "NUMBER" ? parseFloat(cell.value) : cell.value };
+        const found = fields.find(({ field }) => toGlobalId("ProfileTypeField", field.id) === id);
+        assert(found, `Field not found for ID: ${id}`);
+
+        const { isRequired, field } = found;
+        if (isRequired && !cell.value) {
+          throw new CellError(cell, "Required field is empty");
+        }
+        // if its an optional field and its empty, skip it
+        if (!cell.value) {
+          continue;
+        }
+
+        const content = {
+          value:
+            field.type === "NUMBER"
+              ? parseFloat(cell.value)
+              : field.type === "CHECKBOX"
+                ? cell.value.split(/(?<!\\),/).map((x) => x.trim())
+                : cell.value,
+        };
         try {
           await validateProfileFieldValue(field, content);
         } catch (error) {
@@ -277,7 +306,7 @@ export class ProfileImportService implements IProfileImportService {
           field.is_expirable && field.type === "DATE" && field.options.useReplyAsExpiryDate
             ? cell
             : field.is_expirable
-              ? contentById[expiryId]
+              ? contentById[`${toGlobalId("ProfileTypeField", field.id)}-expiry`]
               : null;
         if (expiryCell && expiryCell.value !== "" && !isValidDate(expiryCell.value)) {
           throw new CellError(expiryCell, "Invalid date format");
@@ -297,17 +326,56 @@ export class ProfileImportService implements IProfileImportService {
     return createData;
   }
 
+  private async parseExcelData(data: string[][]) {
+    const ids = data[1];
+
+    const dataRows = data.slice(2);
+    const cellData: Record<string, CellData>[] = [];
+
+    let foundEmptyRow = false;
+    for (let rowIndex = 0; rowIndex < dataRows.length; rowIndex++) {
+      const row = dataRows[rowIndex];
+      if (row.every((r) => !r)) {
+        foundEmptyRow = true;
+      } else {
+        if (foundEmptyRow) {
+          throw new InvalidDataError("Empty row found");
+        }
+        const rowData: UnwrapArray<typeof cellData> = {};
+        for (let colIndex = 0; colIndex < ids.length; colIndex++) {
+          const id = ids[colIndex];
+          if (!id) {
+            continue;
+          }
+          rowData[id] = { col: colIndex + 1, row: rowIndex + 3, value: row[colIndex] ?? null };
+        }
+        cellData.push(rowData);
+      }
+    }
+    return cellData;
+  }
+
   private async loadImportableFields(profileTypeId: number, userId: number) {
+    const profileType = await this.profiles.loadProfileType(profileTypeId);
+    assert(profileType, "Profile type not found");
     const fields = await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
     const permissions = await this.profiles.loadProfileTypeFieldUserEffectivePermission(
       fields.map((f) => ({ profileTypeFieldId: f.id, userId })),
     );
+
+    const requiredFieldIds = (profileType.profile_name_pattern as (string | number)[]).filter(
+      (v) => typeof v === "number",
+    );
+
     return zip(fields, permissions)
       .filter(
         ([f, permission]) =>
           isAtLeast(permission, "WRITE") && this.AVAILABLE_TYPES.includes(f.type),
       )
-      .map(([f]) => f);
+      .map(([field]) => ({
+        isRequired: requiredFieldIds.includes(field.id),
+        field,
+      }));
   }
 
   private async generateDownloadLink(
@@ -345,5 +413,12 @@ export class CellError extends Error {
 export class UnknownIdError extends Error {
   constructor(public id: string) {
     super(`Unknown ID: ${id}`);
+  }
+}
+
+export class InvalidDataError extends Error {
+  public code = "INVALID_DATA_ERROR";
+  constructor(message: string) {
+    super(message);
   }
 }

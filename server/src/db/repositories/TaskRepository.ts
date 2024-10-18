@@ -94,6 +94,10 @@ export type TaskInput<TName extends TaskName> = {
   CLOSE_PETITIONS: {
     template_id: number;
   };
+  PROFILES_EXCEL_IMPORT: {
+    profile_type_id: number;
+    temporary_file_id: number;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -236,6 +240,10 @@ export type TaskOutput<TName extends TaskName> = {
     window_url: string;
   };
   CLOSE_PETITIONS: {
+    success: boolean;
+    error?: any;
+  };
+  PROFILES_EXCEL_IMPORT: {
     success: boolean;
     error?: any;
   };

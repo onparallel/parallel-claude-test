@@ -50,14 +50,13 @@ import {
 } from "../../db/helpers/profileTypeFieldOptions";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
-import { CellData, CellError, UnknownIdError } from "../../services/ProfileImportService";
+import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileImportService";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { withError } from "../../util/promises/withError";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
-import { UnwrapArray } from "../../util/types";
 import { validateProfileFieldValue } from "../../util/validateProfileFieldValue";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
@@ -2582,57 +2581,55 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 
-    const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
-    if (importError || importResult.length < 2) {
+    const [importError, importData] = await withError(importFromExcel(file.createReadStream()));
+    if (importError) {
       throw new ApolloError("Invalid file", "INVALID_FILE_ERROR");
     }
 
-    const profileType = await ctx.profiles.loadProfileType(args.profileTypeId);
-    assert(profileType, "ProfileType not found");
-    const data: Record<string, CellData>[] = [];
-    const ids = importResult[1];
-
-    const requiredIds = (profileType.profile_name_pattern as (string | number)[])
-      .filter((v) => typeof v === "number")
-      .map((id) => toGlobalId("ProfileTypeField", id));
-
-    if (!requiredIds.every((id) => ids.includes(id))) {
-      throw new ApolloError("Missing required column", "INVALID_FILE_ERROR");
-    }
-
-    let foundEmptyRow = false;
-    importResult.slice(2).forEach((row, rowIndex) => {
-      if (row.every((r) => !r)) {
-        foundEmptyRow = true;
-      } else {
-        if (foundEmptyRow) {
-          throw new ApolloError("File can't have empty rows", "INVALID_FILE_ERROR");
-        }
-        const rowData: UnwrapArray<typeof data> = {};
-        for (let i = 0; i < row.length; i++) {
-          const cell = { col: i + 1, row: rowIndex + 3, value: row[i] };
-
-          if (!cell.value && requiredIds.includes(ids[i])) {
-            throw new ApolloError("Missing required field", "INVALID_CELL_ERROR", {
-              cell,
-            });
-          }
-          rowData[ids[i]] = cell;
-        }
-        data.push(rowData);
-      }
-    });
-
     try {
+      // catch any parsing error before starting the task
+      const data = await ctx.profileImport.parseAndValidateExcelData(
+        args.profileTypeId,
+        importData,
+        ctx.user!.id,
+      );
+
+      // all good, create a temporary file with data and start the task
+      const path = random(16);
+      const uploadResponse = await ctx.storage.temporaryFiles.uploadFile(
+        path,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        file.createReadStream(),
+      );
+      const tmpFile = await ctx.files.createTemporaryFile(
+        {
+          content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          filename: file.filename,
+          path,
+          size: uploadResponse["ContentLength"]?.toString() ?? "0",
+        },
+        `User:${ctx.user!.id}`,
+      );
+      await ctx.tasks.createTask(
+        {
+          name: "PROFILES_EXCEL_IMPORT",
+          input: {
+            profile_type_id: args.profileTypeId,
+            temporary_file_id: tmpFile.id,
+          },
+          user_id: ctx.user!.id,
+        },
+        `User:${ctx.user!.id}`,
+      );
+
       return {
-        result: "SUCCESS",
-        profileCount: await ctx.profileImport.importDataIntoProfiles(
-          args.profileTypeId,
-          data,
-          ctx.user!,
-        ),
+        result: RESULT.SUCCESS,
+        profileCount: data.length,
       };
     } catch (error) {
+      if (error instanceof InvalidDataError) {
+        throw new ApolloError(error.message, "INVALID_FILE_ERROR");
+      }
       if (error instanceof CellError) {
         throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
           cell: error.cell,
@@ -2641,7 +2638,7 @@ export const importProfilesFromFile = mutationField("importProfilesFromFile", {
       if (error instanceof UnknownIdError) {
         throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
           cell: {
-            col: ids.indexOf(error.id) + 1,
+            col: importData[1].indexOf(error.id) + 1,
             row: 2,
             value: error.id,
           },

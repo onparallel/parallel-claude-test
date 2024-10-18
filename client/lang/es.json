@@ -15171,8 +15171,8 @@
   },
   {
     "term": "page.profiles.successful-import-toast-title",
-    "definition": "¡{count, plural, =1 {# perfil} other {# perfiles}} importados con éxito!",
-    "context": "{count, plural, =1{# profile} other{# profiles}} imported successfully!"
+    "definition": "{count, plural, =1 {# perfil será importado} other {# perfiles serán importados}} en breve.",
+    "context": "{count, plural, =1{# profile} other{# profiles}} will be imported shortly."
   },
   {
     "term": "page.profiles.title",
