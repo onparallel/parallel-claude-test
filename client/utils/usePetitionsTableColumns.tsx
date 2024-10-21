@@ -494,7 +494,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             }}
           />
         ) : (
-          <Text textStyle="hint">
+          <Text textStyle="hint" whiteSpace="nowrap">
             <FormattedMessage
               id="component.petitions-table-columns.no-activity"
               defaultMessage="No activity yet"
@@ -528,7 +528,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             }}
           />
         ) : (
-          <Text textStyle="hint">
+          <Text textStyle="hint" whiteSpace="nowrap">
             <FormattedMessage
               id="component.petitions-table-columns.no-activity"
               defaultMessage="No activity yet"
