@@ -167,6 +167,11 @@ export interface NexusGenInputs {
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
   };
+  EditProfileTypeProcessInput: {
+    // input type
+    processName?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
+    templateIds?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
   FileUploadInput: {
     // input type
     contentType: string; // String!
@@ -1220,6 +1225,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     totalCount: number; // Int!
   };
+  ProfileTypeProcess: db.ProfileTypeProcess;
   ProfileUpdatedEvent: profileEvents.ProfileUpdatedEvent;
   PublicAccessVerification: {
     // root type
@@ -2024,6 +2030,7 @@ export interface NexusGenFieldTypes {
     createProfileRelationship: NexusGenRootTypes["Profile"]; // Profile!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    createProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
     createProfilesExcelImportTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
@@ -2061,6 +2068,7 @@ export interface NexusGenFieldTypes {
     disassociatePetitionFromProfile: NexusGenEnums["Success"]; // Success!
     disassociateProfileFromPetition: NexusGenEnums["Success"]; // Success!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    editProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
     enableAutomaticNumberingOnPetitionFields: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2112,6 +2120,7 @@ export interface NexusGenFieldTypes {
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     removeProfileRelationship: NexusGenEnums["Success"]; // Success!
+    removeProfileTypeProcess: NexusGenRootTypes["ProfileType"]; // ProfileType!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -2187,6 +2196,7 @@ export interface NexusGenFieldTypes {
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     updateProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     updateProfileTypeFieldPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    updateProfileTypeProcessPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updatePublicTemplateVisibility: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -3230,6 +3240,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isPinned: boolean; // Boolean!
     isStandard: boolean; // Boolean!
+    keyProcesses: NexusGenRootTypes["ProfileTypeProcess"][]; // [ProfileTypeProcess!]!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     pluralName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     profileNamePattern: string; // String!
@@ -3264,6 +3275,14 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     totalCount: number; // Int!
+  };
+  ProfileTypeProcess: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    latestPetition: NexusGenRootTypes["Petition"] | null; // Petition
+    name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+    position: number; // Int!
+    templates: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
   };
   ProfileUpdatedEvent: {
     // field return type
@@ -4677,6 +4696,7 @@ export interface NexusGenFieldTypeNames {
     createProfileRelationship: "Profile";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
+    createProfileTypeProcess: "ProfileTypeProcess";
     createProfilesExcelImportTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
@@ -4714,6 +4734,7 @@ export interface NexusGenFieldTypeNames {
     disassociatePetitionFromProfile: "Success";
     disassociateProfileFromPetition: "Success";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
+    editProfileTypeProcess: "ProfileTypeProcess";
     enableAutomaticNumberingOnPetitionFields: "PetitionBase";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
@@ -4765,6 +4786,7 @@ export interface NexusGenFieldTypeNames {
     reactivateAccesses: "PetitionAccess";
     removePetitionPassword: "SupportMethodResponse";
     removeProfileRelationship: "Success";
+    removeProfileTypeProcess: "ProfileType";
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
     reopenPetition: "Petition";
@@ -4840,6 +4862,7 @@ export interface NexusGenFieldTypeNames {
     updateProfileTypeField: "ProfileTypeField";
     updateProfileTypeFieldPermission: "ProfileTypeField";
     updateProfileTypeFieldPositions: "ProfileType";
+    updateProfileTypeProcessPositions: "ProfileType";
     updatePublicPetitionLink: "PublicPetitionLink";
     updatePublicTemplateVisibility: "SupportMethodResponse";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
@@ -5883,6 +5906,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isPinned: "Boolean";
     isStandard: "Boolean";
+    keyProcesses: "ProfileTypeProcess";
     name: "LocalizableUserText";
     pluralName: "LocalizableUserText";
     profileNamePattern: "String";
@@ -5917,6 +5941,14 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "ProfileType";
     totalCount: "Int";
+  };
+  ProfileTypeProcess: {
+    // field return type name
+    id: "GID";
+    latestPetition: "Petition";
+    name: "LocalizableUserText";
+    position: "Int";
+    templates: "PetitionTemplate";
   };
   ProfileUpdatedEvent: {
     // field return type name
@@ -7187,6 +7219,12 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["CreateProfileTypeFieldInput"]; // CreateProfileTypeFieldInput!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
+    createProfileTypeProcess: {
+      // args
+      processName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+      templateIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     createProfilesExcelImportTask: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
@@ -7378,6 +7416,11 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    editProfileTypeProcess: {
+      // args
+      data: NexusGenInputs["EditProfileTypeProcessInput"]; // EditProfileTypeProcessInput!
+      profileTypeProcessId: NexusGenScalars["GID"]; // GID!
     };
     enableAutomaticNumberingOnPetitionFields: {
       // args
@@ -7673,6 +7716,10 @@ export interface NexusGenArgTypes {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
       profileRelationshipIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    removeProfileTypeProcess: {
+      // args
+      profileTypeProcessId: NexusGenScalars["GID"]; // GID!
     };
     removeUsersFromGroup: {
       // args
@@ -8111,6 +8158,11 @@ export interface NexusGenArgTypes {
       // args
       profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileTypeProcessPositions: {
+      // args
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+      profileTypeProcessIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     updatePublicPetitionLink: {
       // args

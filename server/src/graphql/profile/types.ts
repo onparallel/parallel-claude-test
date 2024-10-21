@@ -102,6 +102,12 @@ export const ProfileType = objectType({
         return pinnedProfileTypes.some((p) => p.profile_type_id === o.id);
       },
     });
+    t.nonNull.list.nonNull.field("keyProcesses", {
+      type: "ProfileTypeProcess",
+      resolve: async (o, _, ctx) => {
+        return await ctx.profiles.loadProfileTypeProcessesByProfileTypeId(o.id);
+      },
+    });
     t.nonNull.boolean("canCreate", {
       resolve: async (o, _, ctx) => {
         const fieldsIds = (o.profile_name_pattern as (string | number)[]).filter(
@@ -617,6 +623,28 @@ export const ProfileRelationship = objectType({
       type: "ProfileRelationshipType",
       resolve: async (o, _, ctx) => {
         return (await ctx.profiles.loadProfileRelationshipType(o.profile_relationship_type_id))!;
+      },
+    });
+  },
+});
+
+export const ProfileTypeProcess = objectType({
+  name: "ProfileTypeProcess",
+  definition(t) {
+    t.nonNull.globalId("id");
+    t.nonNull.localizableUserText("name", { resolve: (o) => o.process_name });
+    t.nonNull.int("position");
+    t.nonNull.list.nonNull.field("templates", {
+      type: "PetitionTemplate",
+      resolve: async (o, _, ctx) => await ctx.profiles.loadTemplatesByProfileTypeProcessId(o.id),
+    });
+    t.nullable.field("latestPetition", {
+      type: "Petition",
+      resolve: async (o, _, ctx) => {
+        if (isNullish(o.latest_petition_id)) {
+          return null;
+        }
+        return await ctx.petitions.loadPetition(o.latest_petition_id);
       },
     });
   },

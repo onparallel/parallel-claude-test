@@ -36,7 +36,9 @@ import {
   CreateProfileRelationshipTypeAllowedProfileType,
   CreateProfileType,
   CreateProfileTypeField,
+  CreateProfileTypeProcess,
   Organization,
+  Petition,
   Profile,
   ProfileEvent,
   ProfileEventType,
@@ -51,6 +53,7 @@ import {
   ProfileTypeFieldPermission,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
+  ProfileTypeProcess,
   ProfileTypeStandardType,
   User,
   UserLocale,
@@ -2715,5 +2718,164 @@ export class ProfileRepository extends BaseRepository {
     await this.from("user_profile_type_pinned", t)
       .whereIn("profile_type_id", profileTypeIds)
       .delete();
+  }
+
+  readonly loadProfileTypeProcess = this.buildLoadBy("profile_type_process", "id", (q) =>
+    q.whereNull("deleted_at"),
+  );
+
+  readonly loadProfileTypeProcessesByProfileTypeId = this.buildLoadMultipleBy(
+    "profile_type_process",
+    "profile_type_id",
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
+  );
+
+  readonly loadTemplatesByProfileTypeProcessId = this.buildLoader<number, Petition[]>(
+    async (keys) => {
+      const rows = await this.from("profile_type_process_template")
+        .join("petition", "profile_type_process_template.template_id", "petition.id")
+        .whereNull("petition.deleted_at")
+        .whereIn("profile_type_process_template.profile_type_process_id", keys)
+        .orderBy("profile_type_process_template.created_at", "asc")
+        .select("petition.*", "profile_type_process_id");
+
+      const byProfileTypeProcessId = groupBy(rows, (r) => r.profile_type_process_id);
+      return keys.map((key) => byProfileTypeProcessId[key] ?? []);
+    },
+  );
+
+  async orgHasAccessToProfileTypeProcesses(profileTypeProcessIds: number[], orgId: number) {
+    const profileTypes = await this.raw<ProfileType>(
+      /* sql */ `
+      select pt.*
+      from profile_type_process ptp
+      join profile_type pt on ptp.profile_type_id = pt.id
+      where ptp.id in ?
+        and pt.org_id = ?
+        and ptp.deleted_at is null
+        and pt.deleted_at is null
+      `,
+      [this.sqlIn(profileTypeProcessIds), orgId],
+    );
+
+    return profileTypes.every(isNonNullish);
+  }
+
+  async createProfileTypeProcess(
+    data: Omit<CreateProfileTypeProcess, "position">,
+    createdBy: string,
+  ) {
+    const [{ max }] = await this.from("profile_type_process")
+      .where({ profile_type_id: data.profile_type_id, deleted_at: null })
+      .max("position");
+
+    if (max === 2) {
+      throw new Error("MAX_PROCESS_LIMIT_REACHED");
+    }
+
+    const [profileTypeProcess] = await this.from("profile_type_process").insert(
+      {
+        ...data,
+        position: max === null ? 0 : max + 1,
+        created_by: createdBy,
+      },
+      "*",
+    );
+
+    return profileTypeProcess;
+  }
+
+  async deleteProfileTypeProcessTemplates(profileTypeProcessId: number) {
+    await this.from("profile_type_process_template")
+      .where("profile_type_process_id", profileTypeProcessId)
+      .delete();
+  }
+
+  async assignTemplatesToProfileTypeProcess(
+    processId: number,
+    templateIds: number[],
+    createdBy: string,
+  ) {
+    if (templateIds.length === 0) {
+      return [];
+    }
+    return await this.from("profile_type_process_template").insert(
+      templateIds.map((templateId) => ({
+        profile_type_process_id: processId,
+        template_id: templateId,
+        created_by: createdBy,
+      })),
+      "*",
+    );
+  }
+
+  async editProfileTypeProcess(
+    profileTypeProcessId: number,
+    data: Partial<ProfileTypeProcess>,
+    updatedBy: string,
+  ) {
+    const [profileTypeProcess] = await this.from("profile_type_process")
+      .where("id", profileTypeProcessId)
+      .whereNull("deleted_at")
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*",
+      );
+
+    return profileTypeProcess;
+  }
+
+  async removeProfileTypeProcess(profileTypeProcessId: number, removedBy: string) {
+    await this.from("profile_type_process_template")
+      .where("profile_type_process_id", profileTypeProcessId)
+      .delete();
+
+    const [profileTypeProcess] = await this.from("profile_type_process")
+      .where("id", profileTypeProcessId)
+      .whereNull("deleted_at")
+      .update({ deleted_at: this.now(), deleted_by: removedBy }, "*");
+
+    await this.from("profile_type_process")
+      .where("profile_type_id", profileTypeProcess.profile_type_id)
+      .where("position", ">", profileTypeProcess.position)
+      .whereNull("deleted_at")
+      .update({
+        position: this.knex.raw("position - 1"),
+        updated_at: this.now(),
+        updated_by: removedBy,
+      });
+
+    return profileTypeProcess;
+  }
+
+  async updateProfileTypeProcessPositions(
+    profileTypeId: number,
+    profileTypeProcessIds: number[],
+    updatedBy: string,
+  ) {
+    await this.raw(
+      /* sql */ `
+        update profile_type_process as ptp set
+          position = t.position,
+          updated_at = NOW(),
+          updated_by = ?
+        from (?) as t (id, position)
+        where t.id = ptp.id
+        and ptp.profile_type_id = ?
+        and ptp.position != t.position;
+      `,
+      [
+        updatedBy,
+        this.sqlValues(
+          profileTypeProcessIds.map((id, i) => [id, i]),
+          ["int", "int"],
+        ),
+        profileTypeId,
+      ],
+    );
   }
 }

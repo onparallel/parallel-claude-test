@@ -572,6 +572,11 @@ export interface DowJonesKycEntitySearchResultPerson extends DowJonesKycEntitySe
 
 export type DowJonesKycEntityType = "Entity" | "Person";
 
+export interface EditProfileTypeProcessInput {
+  processName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  templateIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
@@ -611,6 +616,7 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
   | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
@@ -1024,6 +1030,8 @@ export interface Mutation {
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
+  /** Creates and associates a key process on a profile type */
+  createProfileTypeProcess: ProfileTypeProcess;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
   /** Creates a public link from a user's template */
@@ -1100,6 +1108,7 @@ export interface Mutation {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
+  editProfileTypeProcess: ProfileTypeProcess;
   /** sets automatic numbering on all petition HEADINGs */
   enableAutomaticNumberingOnPetitionFields: PetitionBase;
   /** Generates a download link for a file reply. */
@@ -1198,6 +1207,7 @@ export interface Mutation {
   removePetitionPassword: SupportMethodResponse;
   /** Disassociates two profiles with a relationship. */
   removeProfileRelationship: Success;
+  removeProfileTypeProcess: ProfileType;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Renames a folder. */
@@ -1341,6 +1351,7 @@ export interface Mutation {
   /** Updates the default permission for a profile type field for a set of users and/or user groups. */
   updateProfileTypeFieldPermission: ProfileTypeField;
   updateProfileTypeFieldPositions: ProfileType;
+  updateProfileTypeProcessPositions: ProfileType;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
   /** Updates template_public from template */
@@ -1773,6 +1784,12 @@ export interface MutationcreateProfileTypeFieldArgs {
   profileTypeId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateProfileTypeProcessArgs {
+  processName: Scalars["LocalizableUserText"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+  templateIds: Array<Scalars["GID"]["input"]>;
+}
+
 export interface MutationcreateProfilesExcelImportTaskArgs {
   file: Scalars["Upload"]["input"];
   profileTypeId: Scalars["GID"]["input"];
@@ -1963,6 +1980,11 @@ export interface MutationdisassociateProfileFromPetitionArgs {
 export interface MutationdynamicSelectFieldFileDownloadLinkArgs {
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationeditProfileTypeProcessArgs {
+  data: EditProfileTypeProcessInput;
+  profileTypeProcessId: Scalars["GID"]["input"];
 }
 
 export interface MutationenableAutomaticNumberingOnPetitionFieldsArgs {
@@ -2258,6 +2280,10 @@ export interface MutationremovePetitionPasswordArgs {
 export interface MutationremoveProfileRelationshipArgs {
   profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationremoveProfileTypeProcessArgs {
+  profileTypeProcessId: Scalars["GID"]["input"];
 }
 
 export interface MutationremoveUsersFromGroupArgs {
@@ -2696,6 +2722,11 @@ export interface MutationupdateProfileTypeFieldPermissionArgs {
 export interface MutationupdateProfileTypeFieldPositionsArgs {
   profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileTypeProcessPositionsArgs {
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeProcessIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationupdatePublicPetitionLinkArgs {
@@ -4822,6 +4853,7 @@ export interface ProfileType extends Timestamps {
   id: Scalars["GID"]["output"];
   isPinned: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
+  keyProcesses: Array<ProfileTypeProcess>;
   name: Scalars["LocalizableUserText"]["output"];
   pluralName: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
@@ -4899,6 +4931,15 @@ export interface ProfileTypePagination {
   items: Array<ProfileType>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
+}
+
+export interface ProfileTypeProcess {
+  __typename?: "ProfileTypeProcess";
+  id: Scalars["GID"]["output"];
+  latestPetition?: Maybe<Petition>;
+  name: Scalars["LocalizableUserText"]["output"];
+  position: Scalars["Int"]["output"];
+  templates: Array<PetitionTemplate>;
 }
 
 export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
@@ -10359,6 +10400,14 @@ export type ProfileTypeSettings_ProfileTypeFieldFragment = {
   defaultPermission: ProfileTypeFieldPermissionType;
 };
 
+export type ProfileTypeSettings_ProfileTypeProcessFragment = {
+  __typename?: "ProfileTypeProcess";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  position: number;
+  templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+};
+
 export type ProfileTypeSettings_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -10372,6 +10421,69 @@ export type ProfileTypeSettings_ProfileTypeFragment = {
     type: ProfileTypeFieldType;
     defaultPermission: ProfileTypeFieldPermissionType;
   }>;
+  keyProcesses: Array<{
+    __typename?: "ProfileTypeProcess";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+    templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+  }>;
+};
+
+export type ProfileTypeSettings_createProfileTypeProcessMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  processName: Scalars["LocalizableUserText"]["input"];
+  templateIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type ProfileTypeSettings_createProfileTypeProcessMutation = {
+  createProfileTypeProcess: {
+    __typename?: "ProfileTypeProcess";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+    templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+  };
+};
+
+export type ProfileTypeSettings_editProfileTypeProcessMutationVariables = Exact<{
+  profileTypeProcessId: Scalars["GID"]["input"];
+  data: EditProfileTypeProcessInput;
+}>;
+
+export type ProfileTypeSettings_editProfileTypeProcessMutation = {
+  editProfileTypeProcess: {
+    __typename?: "ProfileTypeProcess";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+    templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+  };
+};
+
+export type ProfileTypeSettings_removeProfileTypeProcessMutationVariables = Exact<{
+  profileTypeProcessId: Scalars["GID"]["input"];
+}>;
+
+export type ProfileTypeSettings_removeProfileTypeProcessMutation = {
+  removeProfileTypeProcess: {
+    __typename?: "ProfileType";
+    id: string;
+    keyProcesses: Array<{ __typename?: "ProfileTypeProcess"; id: string }>;
+  };
+};
+
+export type ProfileTypeSettings_updateProfileTypeProcessPositionsMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeProcessIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type ProfileTypeSettings_updateProfileTypeProcessPositionsMutation = {
+  updateProfileTypeProcessPositions: {
+    __typename?: "ProfileType";
+    id: string;
+    keyProcesses: Array<{ __typename?: "ProfileTypeProcess"; id: string; position: number }>;
+  };
 };
 
 export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
@@ -33640,6 +33752,13 @@ export type OrganizationProfileType_ProfileTypeFragment = {
           };
     }>;
   }>;
+  keyProcesses: Array<{
+    __typename?: "ProfileTypeProcess";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+    templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+  }>;
 };
 
 export type OrganizationProfileType_profileTypeQueryVariables = Exact<{
@@ -33695,6 +33814,13 @@ export type OrganizationProfileType_profileTypeQuery = {
             };
       }>;
     }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+    }>;
   };
 };
 
@@ -33715,6 +33841,7 @@ export type OrganizationProfileType_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -33863,6 +33990,13 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
             };
       }>;
     }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+    }>;
   };
 };
 
@@ -33921,6 +34055,13 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
             };
       }>;
     }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
+    }>;
   };
 };
 
@@ -33977,6 +34118,13 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
               groupInitials: string;
             };
       }>;
+    }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
     }>;
   };
 };
@@ -34082,6 +34230,13 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
               groupInitials: string;
             };
       }>;
+    }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
     }>;
   };
 };
@@ -34279,6 +34434,13 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
               groupInitials: string;
             };
       }>;
+    }>;
+    keyProcesses: Array<{
+      __typename?: "ProfileTypeProcess";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      templates: Array<{ __typename?: "PetitionTemplate"; id: string }>;
     }>;
   };
 };
@@ -54841,14 +55003,6 @@ export type useProfilesExcelImportTask_createProfilesExcelImportTaskMutation = {
   };
 };
 
-export type useProfilesExcelImportTask_taskQueryVariables = Exact<{
-  id: Scalars["GID"]["input"];
-}>;
-
-export type useProfilesExcelImportTask_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
-};
-
 export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
 }>;
@@ -60144,6 +60298,16 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
   ${useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragmentDoc}
   ${getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFieldFragment, unknown>;
+export const ProfileTypeSettings_ProfileTypeProcessFragmentDoc = gql`
+  fragment ProfileTypeSettings_ProfileTypeProcess on ProfileTypeProcess {
+    id
+    name
+    position
+    templates {
+      id
+    }
+  }
+` as unknown as DocumentNode<ProfileTypeSettings_ProfileTypeProcessFragment, unknown>;
 export const ProfileTypeSettings_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileType on ProfileType {
     id
@@ -60153,8 +60317,13 @@ export const ProfileTypeSettings_ProfileTypeFragmentDoc = gql`
     }
     isStandard
     profileNamePattern
+    keyProcesses {
+      id
+      ...ProfileTypeSettings_ProfileTypeProcess
+    }
   }
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfileTypeSettings_ProfileTypeProcessFragmentDoc}
 ` as unknown as DocumentNode<ProfileTypeSettings_ProfileTypeFragment, unknown>;
 export const useArchiveProfileType_ProfileTypeFragmentDoc = gql`
   fragment useArchiveProfileType_ProfileType on ProfileType {
@@ -66468,6 +66637,72 @@ export const useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument =
   useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutation,
   useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutationVariables
 >;
+export const ProfileTypeSettings_createProfileTypeProcessDocument = gql`
+  mutation ProfileTypeSettings_createProfileTypeProcess(
+    $profileTypeId: GID!
+    $processName: LocalizableUserText!
+    $templateIds: [GID!]!
+  ) {
+    createProfileTypeProcess(
+      profileTypeId: $profileTypeId
+      processName: $processName
+      templateIds: $templateIds
+    ) {
+      ...ProfileTypeSettings_ProfileTypeProcess
+    }
+  }
+  ${ProfileTypeSettings_ProfileTypeProcessFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileTypeSettings_createProfileTypeProcessMutation,
+  ProfileTypeSettings_createProfileTypeProcessMutationVariables
+>;
+export const ProfileTypeSettings_editProfileTypeProcessDocument = gql`
+  mutation ProfileTypeSettings_editProfileTypeProcess(
+    $profileTypeProcessId: GID!
+    $data: EditProfileTypeProcessInput!
+  ) {
+    editProfileTypeProcess(profileTypeProcessId: $profileTypeProcessId, data: $data) {
+      ...ProfileTypeSettings_ProfileTypeProcess
+    }
+  }
+  ${ProfileTypeSettings_ProfileTypeProcessFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileTypeSettings_editProfileTypeProcessMutation,
+  ProfileTypeSettings_editProfileTypeProcessMutationVariables
+>;
+export const ProfileTypeSettings_removeProfileTypeProcessDocument = gql`
+  mutation ProfileTypeSettings_removeProfileTypeProcess($profileTypeProcessId: GID!) {
+    removeProfileTypeProcess(profileTypeProcessId: $profileTypeProcessId) {
+      id
+      keyProcesses {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileTypeSettings_removeProfileTypeProcessMutation,
+  ProfileTypeSettings_removeProfileTypeProcessMutationVariables
+>;
+export const ProfileTypeSettings_updateProfileTypeProcessPositionsDocument = gql`
+  mutation ProfileTypeSettings_updateProfileTypeProcessPositions(
+    $profileTypeId: GID!
+    $profileTypeProcessIds: [GID!]!
+  ) {
+    updateProfileTypeProcessPositions(
+      profileTypeId: $profileTypeId
+      profileTypeProcessIds: $profileTypeProcessIds
+    ) {
+      id
+      keyProcesses {
+        id
+        position
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileTypeSettings_updateProfileTypeProcessPositionsMutation,
+  ProfileTypeSettings_updateProfileTypeProcessPositionsMutationVariables
+>;
 export const useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument = gql`
   mutation useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeField(
     $profileTypeId: GID!
@@ -69974,6 +70209,10 @@ export const OrganizationProfileType_profileTypeDocument = gql`
 export const OrganizationProfileType_userDocument = gql`
   query OrganizationProfileType_user {
     ...OrganizationSettingsLayout_Query
+    me {
+      id
+      hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
+    }
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
@@ -72552,18 +72791,6 @@ export const useProfilesExcelImportTask_createProfilesExcelImportTaskDocument = 
 ` as unknown as DocumentNode<
   useProfilesExcelImportTask_createProfilesExcelImportTaskMutation,
   useProfilesExcelImportTask_createProfilesExcelImportTaskMutationVariables
->;
-export const useProfilesExcelImportTask_taskDocument = gql`
-  query useProfilesExcelImportTask_task($id: GID!) {
-    task(id: $id) {
-      id
-      status
-      output
-    }
-  }
-` as unknown as DocumentNode<
-  useProfilesExcelImportTask_taskQuery,
-  useProfilesExcelImportTask_taskQueryVariables
 >;
 export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
   mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {

@@ -1585,11 +1585,6 @@
     "context": "Remove from team"
   },
   {
-    "term": "component.confirm-remove-petition-permission-dialog.confirm-button",
-    "definition": "Sí, quitar",
-    "context": "Yes, remove"
-  },
-  {
     "term": "component.confirm-remove-petition-permission-dialog.header",
     "definition": "Dejar de compartir",
     "context": "Stop sharing"
@@ -1628,6 +1623,16 @@
     "term": "component.confirm-remove-profile-relationships-dialog.header",
     "definition": "Quitar {count, plural, =1{asociación} other {# asociaciones}}",
     "context": "Remove {count, plural, =1{association} other {# associations}}"
+  },
+  {
+    "term": "component.confirm-remove-profile-type-key-process-dialog.body",
+    "definition": "No se borrará ningún parallel ni asociación, solo dejarán de destacarse en el perfil.",
+    "context": "No parallel or association will be deleted, they will only no longer be highlighted in the profile."
+  },
+  {
+    "term": "component.confirm-remove-profile-type-key-process-dialog.header",
+    "definition": "¿Quieres quitar este proceso principal?",
+    "context": "Do you want to remove this main process?"
   },
   {
     "term": "component.confirm-resend-completed-notification.confirm-button",
@@ -2158,6 +2163,31 @@
     "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
     "definition": "Eliminar fechas de caducidad",
     "context": "Remove expiration dates"
+  },
+  {
+    "term": "component.create-or-update-profile-type-key-process-dialog.body-text",
+    "definition": "El último parallel creado desde las plantillas seleccionadas se destacará en la vista del perfil.",
+    "context": "The last parallel created from the selected templates will be highlighted in the profile view."
+  },
+  {
+    "term": "component.create-or-update-profile-type-key-process-dialog.header",
+    "definition": "Proceso principal",
+    "context": "Key processs"
+  },
+  {
+    "term": "component.create-or-update-profile-type-key-process-dialog.process-name",
+    "definition": "Nombre del proceso",
+    "context": "Process name"
+  },
+  {
+    "term": "component.create-or-update-profile-type-key-process-dialog.templates-error-message",
+    "definition": "Selecciona mínimo una plantilla",
+    "context": "Select at least one template"
+  },
+  {
+    "term": "component.create-or-update-profile-type-key-process-dialog.templates-label",
+    "definition": "Plantillas",
+    "context": "Templates"
   },
   {
     "term": "component.create-or-update-property-dialog.add-option-button",
@@ -3633,11 +3663,6 @@
     "term": "component.file-icon.zip-file",
     "definition": "Archivo ZIP",
     "context": "Zip file"
-  },
-  {
-    "term": "component.folder-card.number-of-templates",
-    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
-    "context": "{count, plural, =1 {# template} other {# templates}}"
   },
   {
     "term": "component.generate-new-token-dialog.api-key-label",
@@ -8185,9 +8210,34 @@
     "context": "Please add a property to the name"
   },
   {
+    "term": "component.profile-type-settings.drag-process-aria-label",
+    "definition": "Arrastrar para ordenar este proceso",
+    "context": "Drag to sort this process"
+  },
+  {
+    "term": "component.profile-type-settings.max-key-processes-popover",
+    "definition": "Has alcanzado el número máximo de procesos principales. Quita alguno para añadir más.",
+    "context": "You have reached the maximum number of key processes. Remove some to add more."
+  },
+  {
     "term": "component.profile-type-settings.name-of-each-profile-help",
     "definition": "Especifique cómo se generará el nombre de los perfiles de tipo <b>{ProfileTypeName}</b>. Si lo cambia, se actualizarán los perfiles existentes de este tipo.",
     "context": "Specify how the name of the profiles of type <b>{ProfileTypeName}</b> will be generated. If you change it, existing profiles of this type will be updated."
+  },
+  {
+    "term": "component.profile-type-settings.no-processes-text",
+    "definition": "No hay procesos principales",
+    "context": "There are no key processes yet"
+  },
+  {
+    "term": "component.profile-type-settings.processes-heading",
+    "definition": "Procesos principales {count}/{max}",
+    "context": "Key processes {count}/{max}"
+  },
+  {
+    "term": "component.profile-type-settings.processes-heading-popover",
+    "definition": "Indica los procesos principales que deba tener asociados cada perfil. Por ejemplo: KYC, contrato, etc.",
+    "context": "Indicate the key processes that will be associated with each profile. For example: KYC, contract, etc."
   },
   {
     "term": "component.profile-type-settings.profile-name-pattern",
@@ -10073,11 +10123,6 @@
     "term": "component.settings-row-alias.reference-invalid-error-begin-letter",
     "definition": "Las referencias deben empezar por una letra",
     "context": "References must begin with a letter"
-  },
-  {
-    "term": "component.settings-row-button.edit-settings",
-    "definition": "Editar configuración",
-    "context": "Edit settings"
   },
   {
     "term": "component.settings-row-button.remove-setting",
@@ -12035,6 +12080,11 @@
     "context": "Confirm password"
   },
   {
+    "term": "generic.confirm-remove-button",
+    "definition": "Sí, quitar",
+    "context": "Yes, remove"
+  },
+  {
     "term": "generic.confirm-send",
     "definition": "Si, enviar",
     "context": "Yes, send"
@@ -12258,6 +12308,11 @@
     "term": "generic.edit-name",
     "definition": "Editar nombre",
     "context": "Edit name"
+  },
+  {
+    "term": "generic.edit-settings",
+    "definition": "Editar configuración",
+    "context": "Edit settings"
   },
   {
     "term": "generic.edited-indicator",
@@ -12843,6 +12898,11 @@
     "term": "generic.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
+  },
+  {
+    "term": "generic.number-of-templates",
+    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
+    "context": "{count, plural, =1 {# template} other {# templates}}"
   },
   {
     "term": "generic.ok",

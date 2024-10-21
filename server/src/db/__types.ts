@@ -65,7 +65,8 @@ export type FeatureFlagName =
   | "BACKGROUND_CHECK"
   | "CREATE_PROFILE_TYPE"
   | "PDF_EXPORT_V2"
-  | "SHOW_CONTACTS_BUTTON";
+  | "SHOW_CONTACTS_BUTTON"
+  | "KEY_PROCESSES";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -100,6 +101,7 @@ export const FeatureFlagNameValues = [
   "CREATE_PROFILE_TYPE",
   "PDF_EXPORT_V2",
   "SHOW_CONTACTS_BUTTON",
+  "KEY_PROCESSES",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -670,6 +672,8 @@ export interface TableTypes {
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
   profile_type_field_permission: ProfileTypeFieldPermission;
+  profile_type_process: ProfileTypeProcess;
+  profile_type_process_template: ProfileTypeProcessTemplate;
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
   public_petition_link_prefill_data: PublicPetitionLinkPrefillData;
@@ -740,6 +744,8 @@ export interface TableCreateTypes {
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
   profile_type_field_permission: CreateProfileTypeFieldPermission;
+  profile_type_process: CreateProfileTypeProcess;
+  profile_type_process_template: CreateProfileTypeProcessTemplate;
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
   public_petition_link_prefill_data: CreatePublicPetitionLinkPrefillData;
@@ -810,6 +816,8 @@ export interface TablePrimaryKeys {
   profile_type: "id";
   profile_type_field: "id";
   profile_type_field_permission: "id";
+  profile_type_process: "id";
+  profile_type_process_template: "id";
   public_file_upload: "id";
   public_petition_link: "id";
   public_petition_link_prefill_data: "id";
@@ -2123,6 +2131,45 @@ export type CreateProfileTypeFieldPermission = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface ProfileTypeProcess {
+  id: number; // int4
+  profile_type_id: number; // int4
+  process_name: any; // jsonb
+  position: number; // int4
+  latest_petition_id: Maybe<number>; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileTypeProcess = PartialProps<
+  Omit<ProfileTypeProcess, "id">,
+  | "process_name"
+  | "latest_petition_id"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface ProfileTypeProcessTemplate {
+  id: number; // int4
+  profile_type_process_id: number; // int4
+  template_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileTypeProcessTemplate = PartialProps<
+  Omit<ProfileTypeProcessTemplate, "id">,
+  "created_at" | "created_by"
 >;
 
 export interface PublicFileUpload {

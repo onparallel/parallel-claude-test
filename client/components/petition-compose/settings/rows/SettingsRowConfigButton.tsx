@@ -27,7 +27,7 @@ export function SettingsRowConfigButton({
             isDisabled={props.isDisabled}
             icon={<SettingsIcon />}
             label={intl.formatMessage({
-              id: "component.settings-row-button.edit-settings",
+              id: "generic.edit-settings",
               defaultMessage: "Edit settings",
             })}
             placement="bottom-start"

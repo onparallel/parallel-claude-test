@@ -600,6 +600,11 @@ enum DowJonesKycEntityType {
 
 scalar Duration
 
+input EditProfileTypeProcessInput {
+  processName: LocalizableUserText
+  templateIds: [GID!]
+}
+
 """
 The effective permission for a petition and user
 """
@@ -644,6 +649,7 @@ enum FeatureFlag {
   EXPORT_CUATRECASAS
   GHOST_LOGIN
   HIDE_RECIPIENT_VIEW_CONTENTS
+  KEY_PROCESSES
   ON_BEHALF_OF
   PDF_EXPORT_V2
   PERMISSION_MANAGEMENT
@@ -1576,6 +1582,15 @@ type Mutation {
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
   """
+  Creates and associates a key process on a profile type
+  """
+  createProfileTypeProcess(
+    processName: LocalizableUserText!
+    profileTypeId: GID!
+    templateIds: [GID!]!
+  ): ProfileTypeProcess!
+
+  """
   Creates a task for importing profiles from an excel file
   """
   createProfilesExcelImportTask(file: Upload!, profileTypeId: GID!): Task!
@@ -1819,6 +1834,10 @@ type Mutation {
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
   """
   dynamicSelectFieldFileDownloadLink(fieldId: GID!, petitionId: GID!): FileUploadDownloadLinkResult!
+  editProfileTypeProcess(
+    data: EditProfileTypeProcessInput!
+    profileTypeProcessId: GID!
+  ): ProfileTypeProcess!
 
   """
   sets automatic numbering on all petition HEADINGs
@@ -2248,6 +2267,7 @@ type Mutation {
   Disassociates two profiles with a relationship.
   """
   removeProfileRelationship(profileId: GID!, profileRelationshipIds: [GID!]!): Success!
+  removeProfileTypeProcess(profileTypeProcessId: GID!): ProfileType!
 
   """
   Removes users from a user group
@@ -2883,6 +2903,10 @@ type Mutation {
     profileTypeId: GID!
   ): ProfileTypeField!
   updateProfileTypeFieldPositions(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
+  updateProfileTypeProcessPositions(
+    profileTypeId: GID!
+    profileTypeProcessIds: [GID!]!
+  ): ProfileType!
 
   """
   Updates the info and permissions of a public link
@@ -5986,6 +6010,7 @@ type ProfileType implements Timestamps {
   id: GID!
   isPinned: Boolean!
   isStandard: Boolean!
+  keyProcesses: [ProfileTypeProcess!]!
   name: LocalizableUserText!
   pluralName: LocalizableUserText!
   profileNamePattern: String!
@@ -6074,6 +6099,14 @@ type ProfileTypePagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type ProfileTypeProcess {
+  id: GID!
+  latestPetition: Petition
+  name: LocalizableUserText!
+  position: Int!
+  templates: [PetitionTemplate!]!
 }
 
 enum ProfileTypeStandardType {

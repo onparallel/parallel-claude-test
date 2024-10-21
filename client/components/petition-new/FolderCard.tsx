@@ -43,7 +43,7 @@ export const FolderCard = Object.assign(
         <Spacer />
         <Text>
           <FormattedMessage
-            id="component.folder-card.number-of-templates"
+            id="generic.number-of-templates"
             defaultMessage="{count, plural, =1 {# template} other {# templates}}"
             values={{ count: folder.petitionCount }}
           />

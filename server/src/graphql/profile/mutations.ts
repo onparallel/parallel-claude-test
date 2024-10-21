@@ -33,6 +33,7 @@ import {
   ProfileFieldFile,
   ProfileFieldValue,
   ProfileTypeField,
+  ProfileTypeProcess,
 } from "../../db/__types";
 import {
   ProfileFieldExpiryUpdatedEvent,
@@ -66,6 +67,7 @@ import { validateAnd, validateOr } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { uniqueValues } from "../helpers/validators/uniqueValues";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
@@ -74,6 +76,7 @@ import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
   petitionIsNotAnonymized,
   petitionsAreNotPublicTemplates,
+  petitionsAreOfTypeTemplate,
   repliesBelongsToPetition,
   replyIsForFieldOfType,
   userHasAccessToPetitions,
@@ -98,13 +101,16 @@ import {
   profileTypeIsArchived,
   profileTypeIsNotStandard,
   profileTypeIsStandard,
+  profileTypeProcessBelongsToProfileType,
   profilesCanBeAssociated,
   relationshipBelongsToProfile,
   userCanOverwriteProfileFields,
+  userHasAccessToEditProfileTypeProcessInput,
   userHasAccessToExternalSourceEntity,
   userHasAccessToProfile,
   userHasAccessToProfileRelationshipsInput,
   userHasAccessToProfileType,
+  userHasAccessToProfileTypeProcess,
   userHasPermissionOnProfileTypeField,
 } from "./authorizers";
 import {
@@ -2529,6 +2535,159 @@ export const unpinProfileType = mutationField("unpinProfileType", {
     return profileType;
   },
 });
+
+export const createProfileTypeProcess = mutationField("createProfileTypeProcess", {
+  description: "Creates and associates a key process on a profile type",
+  type: nonNull("ProfileTypeProcess"),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    processName: nonNull("LocalizableUserText"),
+    templateIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+  },
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    userHasAccessToProfileType("profileTypeId"),
+    userHasAccessToPetitions("templateIds"),
+    petitionsAreOfTypeTemplate("templateIds"),
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.templateIds, "templateIds"),
+    uniqueValues((args) => args.templateIds, "templateIds"),
+  ),
+  resolve: async (_, args, ctx) => {
+    try {
+      const profileTypeProcess = await ctx.profiles.createProfileTypeProcess(
+        { process_name: args.processName, profile_type_id: args.profileTypeId },
+        `User:${ctx.user!.id}`,
+      );
+
+      await ctx.profiles.assignTemplatesToProfileTypeProcess(
+        profileTypeProcess.id,
+        args.templateIds,
+        `User:${ctx.user!.id}`,
+      );
+
+      return profileTypeProcess;
+    } catch (error) {
+      if (error instanceof Error && error.message === "MAX_PROCESS_LIMIT_REACHED") {
+        throw new ForbiddenError("You can't create more than 3 key processes on a profile type");
+      }
+
+      throw error;
+    }
+  },
+});
+
+export const editProfileTypeProcess = mutationField("editProfileTypeProcess", {
+  type: nonNull("ProfileTypeProcess"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    userHasAccessToProfileTypeProcess("profileTypeProcessId"),
+    userHasAccessToEditProfileTypeProcessInput("data"),
+  ),
+  args: {
+    profileTypeProcessId: nonNull(globalIdArg("ProfileTypeProcess")),
+    data: nonNull(
+      inputObjectType({
+        name: "EditProfileTypeProcessInput",
+        definition(t) {
+          t.nullable.localizableUserText("processName");
+          t.nullable.list.nonNull.globalId("templateIds", { prefixName: "Petition" });
+        },
+      }),
+    ),
+  },
+  validateArgs: validateAnd(
+    notEmptyObject((args) => args.data, "data"),
+    notEmptyArray((args) => args.data.templateIds, "data.templateIds"),
+    uniqueValues((args) => args.data.templateIds, "data.templateIds"),
+  ),
+  resolve: async (_, args, ctx) => {
+    const data: Partial<ProfileTypeProcess> = {};
+
+    if (isNonNullish(args.data.processName)) {
+      data.process_name = args.data.processName;
+    }
+
+    if (isNonNullish(args.data.templateIds)) {
+      await ctx.profiles.deleteProfileTypeProcessTemplates(args.profileTypeProcessId);
+      await ctx.profiles.assignTemplatesToProfileTypeProcess(
+        args.profileTypeProcessId,
+        args.data.templateIds,
+        `User:${ctx.user!.id}`,
+      );
+    }
+
+    return await ctx.profiles.editProfileTypeProcess(
+      args.profileTypeProcessId,
+      data,
+      `User:${ctx.user!.id}`,
+    );
+  },
+});
+
+export const removeProfileTypeProcess = mutationField("removeProfileTypeProcess", {
+  type: "ProfileType",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    userHasAccessToProfileTypeProcess("profileTypeProcessId"),
+  ),
+  args: {
+    profileTypeProcessId: nonNull(globalIdArg("ProfileTypeProcess")),
+  },
+  resolve: async (_, { profileTypeProcessId }, ctx) => {
+    const process = await ctx.profiles.removeProfileTypeProcess(
+      profileTypeProcessId,
+      `User:${ctx.user!.id}`,
+    );
+
+    return (await ctx.profiles.loadProfileType(process.profile_type_id))!;
+  },
+});
+
+export const updateProfileTypeProcessPositions = mutationField(
+  "updateProfileTypeProcessPositions",
+  {
+    type: "ProfileType",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+      userHasAccessToProfileType("profileTypeId"),
+      profileTypeProcessBelongsToProfileType("profileTypeProcessIds", "profileTypeId"),
+    ),
+    args: {
+      profileTypeId: nonNull(globalIdArg("ProfileType")),
+      profileTypeProcessIds: nonNull(list(nonNull(globalIdArg("ProfileTypeProcess")))),
+    },
+    resolve: async (_, args, ctx) => {
+      const processes = await ctx.profiles.loadProfileTypeProcessesByProfileTypeId(
+        args.profileTypeId,
+      );
+
+      const currentOrder = processes.map((p) => p.id);
+
+      if (
+        currentOrder.length !== unique(args.profileTypeProcessIds).length ||
+        currentOrder.some((p) => !args.profileTypeProcessIds.includes(p))
+      ) {
+        throw new ForbiddenError("Invalid profileTypeProcessIds");
+      }
+
+      await ctx.profiles.updateProfileTypeProcessPositions(
+        args.profileTypeId,
+        args.profileTypeProcessIds,
+        `User:${ctx.user!.id}`,
+      );
+
+      ctx.profiles.loadProfileTypeProcessesByProfileTypeId.dataloader.clear(args.profileTypeId);
+
+      return (await ctx.profiles.loadProfileType(args.profileTypeId))!;
+    },
+  },
+);
 
 export const profileImportExcelModelDownloadLink = mutationField(
   "profileImportExcelModelDownloadLink",

@@ -692,3 +692,73 @@ export function userCanOverwriteProfileFields<
     return true;
   };
 }
+
+export function userHasAccessToProfileTypeProcess<
+  TypeName extends string,
+  FieldName extends string,
+  TProcessIdArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(processIdArg: TProcessIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const processIds = unMaybeArray(args[processIdArg] as unknown as MaybeArray<number>);
+    const hasAccess = await ctx.profiles.orgHasAccessToProfileTypeProcesses(
+      processIds,
+      ctx.user!.org_id,
+    );
+
+    if (!hasAccess) {
+      throw new ForbiddenError("User does not have access to profile type process");
+    }
+
+    return true;
+  };
+}
+
+export function userHasAccessToEditProfileTypeProcessInput<
+  TypeName extends string,
+  FieldName extends string,
+  TInputArg extends Arg<TypeName, FieldName, NexusGenInputs["EditProfileTypeProcessInput"]>,
+>(dataArg: TInputArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const data = args[dataArg] as unknown as NexusGenInputs["EditProfileTypeProcessInput"];
+    const templateIds = data.templateIds;
+
+    if (templateIds) {
+      const hasAccess = await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, templateIds);
+      if (!hasAccess) {
+        throw new ForbiddenError("User does not have access to the provided templates");
+      }
+
+      const petitions = await ctx.petitions.loadPetition(templateIds);
+      if (petitions.some((p) => isNullish(p) || !p.is_template)) {
+        throw new ForbiddenError("One or more of the provided templates are not templates");
+      }
+    }
+
+    return true;
+  };
+}
+
+export function profileTypeProcessBelongsToProfileType<
+  TypeName extends string,
+  FieldName extends string,
+  TProcessIdArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  processIdArg: TProcessIdArg,
+  profileTypeIdArg: TProfileTypeIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const processIds = unMaybeArray(args[processIdArg] as unknown as MaybeArray<number>);
+    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+
+    const processes = await ctx.profiles.loadProfileTypeProcess(processIds);
+    const processesBelongToProfileType = processes.every(
+      (p) => isNonNullish(p) && p.profile_type_id === profileTypeId,
+    );
+    if (!processesBelongToProfileType) {
+      throw new ForbiddenError("Profile type process does not belong to profile type");
+    }
+
+    return true;
+  };
+}

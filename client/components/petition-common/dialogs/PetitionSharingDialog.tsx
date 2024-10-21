@@ -833,10 +833,7 @@ function ConfirmRemovePetitionPermissionDialog({
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.confirm-remove-petition-permission-dialog.confirm-button"
-            defaultMessage="Yes, remove"
-          />
+          <FormattedMessage id="generic.confirm-remove-button" defaultMessage="Yes, remove" />
         </Button>
       }
       {...props}
