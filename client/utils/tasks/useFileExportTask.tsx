@@ -64,7 +64,9 @@ export function useFileExportTask() {
       return data!.fileExportLog.id;
       */
 
-      const [error] = await withError(openNewWindow(finishedTask.output.windowUrl));
+      const [error] = await withError(
+        openNewWindow(finishedTask.output.windowUrl, { popup: true }),
+      );
       if (error && !isWindowBlockedError(error)) {
         await withError(
           showError({

@@ -39,13 +39,13 @@ const FILE_SCHEMA = {
   },
 } as const;
 
-interface ImanageFileExportContext {
+interface IManageFileExportContext {
   clientId: string;
 }
 
 @injectable()
 export class IManageFileExportIntegration
-  extends WebhookIntegration<"FILE_EXPORT", "IMANAGE", ImanageFileExportContext>
+  extends WebhookIntegration<"FILE_EXPORT", "IMANAGE", IManageFileExportContext>
   implements IFileExportIntegration
 {
   protected override type = "FILE_EXPORT" as const;
@@ -261,6 +261,7 @@ export class IManageFileExportIntegration
             log.json_export.map((f) => ({
               id: f.id,
               status: f.status,
+              url: f.url ?? null,
               filename: f.filename,
               temporaryUrl: f.temporary_url,
             })),
