@@ -2878,4 +2878,16 @@ export class ProfileRepository extends BaseRepository {
       ],
     );
   }
+
+  async associatePetitionToProfileTypeProcess(
+    processId: number,
+    petitionId: number,
+    updatedBy: string,
+  ) {
+    await this.from("profile_type_process").where("id", processId).whereNull("deleted_at").update({
+      latest_petition_id: petitionId,
+      updated_at: this.now(),
+      updated_by: updatedBy,
+    });
+  }
 }

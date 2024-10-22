@@ -123,6 +123,7 @@ import {
 } from "../../organization/authorizers";
 import {
   profileHasSameProfileTypeAsField,
+  profileHasSameProfileTypeAsProcess,
   profileHasStatus,
   profileIsNotAnonymized,
   profileTypeFieldBelongsToPetitionFieldProfileType,
@@ -130,6 +131,7 @@ import {
   profileTypeIsArchived,
   userHasAccessToProfile,
   userHasAccessToProfileType,
+  userHasAccessToProfileTypeProcess,
   userHasPermissionOnProfileTypeField,
 } from "../../profile/authorizers";
 import { contextUserHasPermission } from "../../users/authorizers";
@@ -3928,6 +3930,13 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
       "petitionFieldId",
       "prefill",
     ),
+    ifArgDefined(
+      "profileTypeProcessId",
+      and(
+        userHasAccessToProfileTypeProcess("profileTypeProcessId" as never),
+        profileHasSameProfileTypeAsProcess("profileId", "profileTypeProcessId" as never),
+      ),
+    ),
   ),
   args: {
     profileId: nonNull(
@@ -3966,6 +3975,11 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         ),
       ),
     ),
+    profileTypeProcessId: nullable(
+      globalIdArg("ProfileTypeProcess", {
+        description: "Provide if you want to link the parallel with a profile type process",
+      }),
+    ),
   },
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.createPetitionFromId(
@@ -4002,6 +4016,14 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         },
       })),
     );
+
+    if (args.profileTypeProcessId) {
+      await ctx.profiles.associatePetitionToProfileTypeProcess(
+        args.profileTypeProcessId,
+        petition.id,
+        `User:${ctx.user!.id}`,
+      );
+    }
 
     if (args.prefill.length === 0) {
       // nothing to prefill, early return

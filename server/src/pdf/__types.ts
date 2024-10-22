@@ -531,6 +531,11 @@ export type DowJonesKycEntitySearchResultPerson = DowJonesKycEntitySearchResult 
 
 export type DowJonesKycEntityType = "Entity" | "Person";
 
+export type EditProfileTypeProcessInput = {
+  processName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  templateIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
   /** wether user is subscribed or not to emails and alerts of the petition */
@@ -568,6 +573,7 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
   | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
@@ -962,6 +968,8 @@ export type Mutation = {
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
+  /** Creates and associates a key process on a profile type */
+  createProfileTypeProcess: ProfileTypeProcess;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
   /** Creates a public link from a user's template */
@@ -1038,6 +1046,7 @@ export type Mutation = {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
+  editProfileTypeProcess: ProfileTypeProcess;
   /** sets automatic numbering on all petition HEADINGs */
   enableAutomaticNumberingOnPetitionFields: PetitionBase;
   /** Generates a download link for a file reply. */
@@ -1136,6 +1145,7 @@ export type Mutation = {
   removePetitionPassword: SupportMethodResponse;
   /** Disassociates two profiles with a relationship. */
   removeProfileRelationship: Success;
+  removeProfileTypeProcess: ProfileType;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Renames a folder. */
@@ -1279,6 +1289,7 @@ export type Mutation = {
   /** Updates the default permission for a profile type field for a set of users and/or user groups. */
   updateProfileTypeFieldPermission: ProfileTypeField;
   updateProfileTypeFieldPositions: ProfileType;
+  updateProfileTypeProcessPositions: ProfileType;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
   /** Updates template_public from template */
@@ -1341,6 +1352,7 @@ export type MutationarchiveProfileTypeArgs = {
 export type MutationassociateProfileToPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
+  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationbulkCreateContactsArgs = {
@@ -1644,6 +1656,7 @@ export type MutationcreatePetitionFromProfileArgs = {
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   prefill: Array<CreatePetitionFromProfilePrefillInput>;
   profileId: Scalars["GID"]["input"];
+  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
   templateId: Scalars["GID"]["input"];
 };
 
@@ -1709,6 +1722,12 @@ export type MutationcreateProfileTypeArgs = {
 export type MutationcreateProfileTypeFieldArgs = {
   data: CreateProfileTypeFieldInput;
   profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateProfileTypeProcessArgs = {
+  processName: Scalars["LocalizableUserText"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+  templateIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationcreateProfilesExcelImportTaskArgs = {
@@ -1901,6 +1920,11 @@ export type MutationdisassociateProfileFromPetitionArgs = {
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationeditProfileTypeProcessArgs = {
+  data: EditProfileTypeProcessInput;
+  profileTypeProcessId: Scalars["GID"]["input"];
 };
 
 export type MutationenableAutomaticNumberingOnPetitionFieldsArgs = {
@@ -2196,6 +2220,10 @@ export type MutationremovePetitionPasswordArgs = {
 export type MutationremoveProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationremoveProfileTypeProcessArgs = {
+  profileTypeProcessId: Scalars["GID"]["input"];
 };
 
 export type MutationremoveUsersFromGroupArgs = {
@@ -2634,6 +2662,11 @@ export type MutationupdateProfileTypeFieldPermissionArgs = {
 export type MutationupdateProfileTypeFieldPositionsArgs = {
   profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileTypeProcessPositionsArgs = {
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeProcessIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationupdatePublicPetitionLinkArgs = {
@@ -3238,10 +3271,14 @@ export type PetitionBaseMini = {
   id: Scalars["GID"]["output"];
   /** Whether the template is publicly available or not */
   isPublicTemplate: Maybe<Scalars["Boolean"]["output"]>;
+  lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  latestSignatureStatus: Maybe<PetitionLatestSignatureStatus>;
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]["output"]>;
+  /** The status of the petition. */
+  status: Maybe<PetitionStatus>;
 };
 
 export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
@@ -3663,6 +3700,15 @@ export type PetitionFolder = {
   /** The name petitions in the folder. */
   petitionCount: Scalars["Int"]["output"];
 };
+
+export type PetitionLatestSignatureStatus =
+  | "CANCELLED"
+  | "CANCELLED_BY_USER"
+  | "CANCELLING"
+  | "COMPLETED"
+  | "ENQUEUED"
+  | "PROCESSED"
+  | "PROCESSING";
 
 export type PetitionListView = {
   data: PetitionListViewData;
@@ -4201,6 +4247,7 @@ export type PetitionVariableResult = {
 };
 
 export type Profile = Timestamps & {
+  associatedPetitions: PetitionPagination;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   /** The events for the profile. */
@@ -4209,6 +4256,7 @@ export type Profile = Timestamps & {
   localizableName: Scalars["LocalizableUserText"]["output"];
   name: Scalars["String"]["output"];
   permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** @deprecated use associatedPetitions instead */
   petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
@@ -4217,6 +4265,12 @@ export type Profile = Timestamps & {
   subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+};
+
+export type ProfileassociatedPetitionsArgs = {
+  filters?: InputMaybe<ProfileAssociatedPetitionFilter>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ProfileeventsArgs = {
@@ -4253,6 +4307,10 @@ export type ProfileAssociatedEvent = PetitionEvent & {
   profile: Maybe<Profile>;
   type: PetitionEventType;
   user: Maybe<User>;
+};
+
+export type ProfileAssociatedPetitionFilter = {
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type ProfileClosedEvent = ProfileEvent & {
@@ -4654,6 +4712,7 @@ export type ProfileType = Timestamps & {
   id: Scalars["GID"]["output"];
   isPinned: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
+  keyProcesses: Array<ProfileTypeProcess>;
   name: Scalars["LocalizableUserText"]["output"];
   pluralName: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
@@ -4728,6 +4787,14 @@ export type ProfileTypePagination = {
   items: Array<ProfileType>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
+};
+
+export type ProfileTypeProcess = {
+  id: Scalars["GID"]["output"];
+  latestPetition: Maybe<PetitionBaseMini>;
+  name: Scalars["LocalizableUserText"]["output"];
+  position: Scalars["Int"]["output"];
+  templates: Array<PetitionTemplate>;
 };
 
 export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";

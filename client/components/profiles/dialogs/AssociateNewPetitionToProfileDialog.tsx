@@ -33,6 +33,7 @@ import {
   useAssociateNewPetitionToProfileDialog_PetitionBaseFragment,
   useAssociateNewPetitionToProfileDialog_ProfileFragment,
   useAssociateNewPetitionToProfileDialog_ProfileInnerFragment,
+  useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment,
   useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   useAssociateNewPetitionToProfileDialog_petitionDocument,
 } from "@parallel/graphql/__types";
@@ -51,6 +52,7 @@ type PetitionFieldSelection = UnwrapArray<
 
 interface AssociateNewPetitionToProfileDialogProps {
   profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+  keyProcess?: useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment;
 }
 
 interface AssociateNewPetitionToProfileDialogData {
@@ -62,6 +64,7 @@ interface AssociateNewPetitionToProfileDialogData {
 
 function AssociateNewPetitionToProfileDialog({
   profile,
+  keyProcess,
   ...props
 }: DialogProps<AssociateNewPetitionToProfileDialogProps, {}>) {
   const goToPetition = useGoToPetition();
@@ -264,6 +267,7 @@ function AssociateNewPetitionToProfileDialog({
                   templateId: data.templateId,
                   prefill,
                   petitionFieldId: data.fillWithProfileData ? groupId : undefined,
+                  profileTypeProcessId: keyProcess?.id,
                 },
               });
 
@@ -306,6 +310,7 @@ function AssociateNewPetitionToProfileDialog({
               key="step1"
               ref={selectRef}
               showCheckbox={isNonNullish(template) && (!omitStep2 || !omitStep3)}
+              keyProcess={keyProcess}
             />
           ) : currentStep === 1 ? (
             omitStep2 ? (
@@ -365,7 +370,13 @@ export function useAssociateNewPetitionToProfileDialog() {
 }
 
 const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetitionToProfileStep1(
-  { showCheckbox }: { showCheckbox?: boolean },
+  {
+    showCheckbox,
+    keyProcess,
+  }: {
+    showCheckbox?: boolean;
+    keyProcess?: useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment;
+  },
   ref: ForwardedRef<PetitionSelectInstance<false>>,
 ) {
   const {
@@ -373,6 +384,8 @@ const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetit
     register,
     formState: { errors },
   } = useFormContext<AssociateNewPetitionToProfileDialogData>();
+
+  const useFixedOptions = isNonNullish(keyProcess);
 
   return (
     <Stack>
@@ -390,7 +403,9 @@ const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetit
           render={({ field: { value, onChange } }) => (
             <PetitionSelect
               ref={ref}
-              defaultOptions
+              isSync={useFixedOptions}
+              defaultOptions={!useFixedOptions}
+              options={useFixedOptions ? keyProcess!.templates : undefined}
               type="TEMPLATE"
               value={value}
               onChange={(v) => {
@@ -729,6 +744,17 @@ useAssociateNewPetitionToProfileDialog.fragments = {
       }
     `;
   },
+  get ProfileTypeProcess() {
+    return gql`
+      fragment useAssociateNewPetitionToProfileDialog_ProfileTypeProcess on ProfileTypeProcess {
+        id
+        templates {
+          id
+          name
+        }
+      }
+    `;
+  },
   get Profile() {
     return gql`
       fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
@@ -794,12 +820,14 @@ const _mutations = [
       $templateId: GID!
       $prefill: [CreatePetitionFromProfilePrefillInput!]!
       $petitionFieldId: GID
+      $profileTypeProcessId: GID
     ) {
       createPetitionFromProfile(
         profileId: $profileId
         templateId: $templateId
         prefill: $prefill
         petitionFieldId: $petitionFieldId
+        profileTypeProcessId: $profileTypeProcessId
       ) {
         id
       }

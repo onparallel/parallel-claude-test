@@ -259,6 +259,10 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  ProfileAssociatedPetitionFilter: {
+    // input type
+    fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
   ProfileExternalSourceConflictResolution: {
     // input type
     action: NexusGenEnums["ProfileExternalSourceConflictResolutionAction"]; // ProfileExternalSourceConflictResolutionAction!
@@ -497,6 +501,14 @@ export interface NexusGenEnums {
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
+  PetitionLatestSignatureStatus:
+    | "CANCELLED"
+    | "CANCELLED_BY_USER"
+    | "CANCELLING"
+    | "COMPLETED"
+    | "ENQUEUED"
+    | "PROCESSED"
+    | "PROCESSING";
   PetitionListViewColumn:
     | "createdAt"
     | "fromTemplateId"
@@ -2431,8 +2443,11 @@ export interface NexusGenFieldTypes {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
     isPublicTemplate: boolean | null; // Boolean
+    lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    latestSignatureStatus: NexusGenEnums["PetitionLatestSignatureStatus"] | null; // PetitionLatestSignatureStatus
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
+    status: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
   };
   PetitionBaseOrFolderPagination: {
     // field return type
@@ -2941,6 +2956,7 @@ export interface NexusGenFieldTypes {
   };
   Profile: {
     // field return type
+    associatedPetitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     events: NexusGenRootTypes["ProfileEventPagination"]; // ProfileEventPagination!
     id: NexusGenScalars["GID"]; // GID!
@@ -3279,7 +3295,7 @@ export interface NexusGenFieldTypes {
   ProfileTypeProcess: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
-    latestPetition: NexusGenRootTypes["Petition"] | null; // Petition
+    latestPetition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     position: number; // Int!
     templates: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
@@ -5097,8 +5113,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "GID";
     isPublicTemplate: "Boolean";
+    lastActivityAt: "DateTime";
+    latestSignatureStatus: "PetitionLatestSignatureStatus";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
+    status: "PetitionStatus";
   };
   PetitionBaseOrFolderPagination: {
     // field return type name
@@ -5607,6 +5626,7 @@ export interface NexusGenFieldTypeNames {
   };
   Profile: {
     // field return type name
+    associatedPetitions: "PetitionPagination";
     createdAt: "DateTime";
     events: "ProfileEventPagination";
     id: "GID";
@@ -5945,7 +5965,7 @@ export interface NexusGenFieldTypeNames {
   ProfileTypeProcess: {
     // field return type name
     id: "GID";
-    latestPetition: "Petition";
+    latestPetition: "PetitionBaseMini";
     name: "LocalizableUserText";
     position: "Int";
     templates: "PetitionTemplate";
@@ -6850,6 +6870,7 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeProcessId?: NexusGenScalars["GID"] | null; // GID
     };
     bulkCreateContacts: {
       // args
@@ -7153,6 +7174,7 @@ export interface NexusGenArgTypes {
       petitionFieldId?: NexusGenScalars["GID"] | null; // GID
       prefill: NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]; // [CreatePetitionFromProfilePrefillInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeProcessId?: NexusGenScalars["GID"] | null; // GID
       templateId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionListView: {
@@ -8322,6 +8344,12 @@ export interface NexusGenArgTypes {
     };
   };
   Profile: {
+    associatedPetitions: {
+      // args
+      filters?: NexusGenInputs["ProfileAssociatedPetitionFilter"] | null; // ProfileAssociatedPetitionFilter
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
     events: {
       // args
       limit?: number | null; // Int

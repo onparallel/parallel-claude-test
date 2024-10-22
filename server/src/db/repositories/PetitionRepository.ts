@@ -927,6 +927,79 @@ export class PetitionRepository extends BaseRepository {
     };
   }
 
+  getPaginatedPetitionsByProfileId(
+    orgId: number,
+    profileId: number,
+    opts: {
+      filters?: Pick<PetitionFilter, "fromTemplateId"> | null;
+    } & PageOpts,
+  ): Pagination<Petition> {
+    const { filters } = opts;
+
+    const builders: Knex.QueryCallbackWithArgs[] = [
+      (q) =>
+        q
+          .joinRaw(
+            /* sql */ `join petition_profile pp3 on pp3.petition_id = p.id and pp3.profile_id = ?`,
+            [profileId],
+          )
+          .where("p.org_id", orgId)
+          .whereNull("p.deleted_at")
+          .whereNull("p.anonymized_at")
+          .where("p.is_template", false),
+    ];
+
+    if (filters?.fromTemplateId && filters.fromTemplateId.length > 0) {
+      builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
+    }
+
+    const countPromise = LazyPromise.from(async () => {
+      const [[{ count: totalCount }]] = await Promise.all([
+        this.knex
+          .with(
+            "ps",
+            this.knex
+              .fromRaw("petition as p")
+              .modify(function (q) {
+                builders.forEach((b) => b.call(this, q));
+              })
+              .select(this.knex.raw(/* sql */ `distinct p.id`)),
+          )
+          .from("ps")
+          .select<[{ count: number }]>(this.count()),
+      ]);
+      return { totalCount };
+    });
+
+    return {
+      totalCount: LazyPromise.from(async () => {
+        const { totalCount } = await countPromise;
+        return totalCount;
+      }),
+      items: LazyPromise.from(async () => {
+        const { totalCount } = await countPromise;
+        if (totalCount === 0) {
+          return [];
+        }
+
+        const petitionsQuery = this.knex
+          .fromRaw("petition as p")
+          .modify(function (q) {
+            builders.forEach((b) => b.call(this, q));
+            q.orderBy("p.id", "desc");
+          })
+          .select("p.*");
+
+        const items: Petition[] = await petitionsQuery
+          .clone()
+          .offset(opts.offset ?? 0)
+          .limit(opts.limit ?? 0);
+
+        return items;
+      }),
+    };
+  }
+
   readonly loadAllFieldsByPetitionId = this.buildLoadMultipleBy(
     "petition_field",
     "petition_id",

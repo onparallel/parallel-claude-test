@@ -762,3 +762,29 @@ export function profileTypeProcessBelongsToProfileType<
     return true;
   };
 }
+
+export function profileHasSameProfileTypeAsProcess<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TProfileTypeProcessIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  profileIdArg: TProfileIdArg,
+  processIdArg: TProfileTypeProcessIdArg,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
+    const processId = args[processIdArg] as unknown as number;
+
+    const [profile, process] = await Promise.all([
+      ctx.profiles.loadProfile(profileId),
+      ctx.profiles.loadProfileTypeProcess(processId),
+    ]);
+
+    return (
+      isNonNullish(profile) &&
+      isNonNullish(process) &&
+      process.profile_type_id === profile.profile_type_id
+    );
+  };
+}

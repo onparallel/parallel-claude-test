@@ -142,6 +142,8 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile").delete();
     await mocks.knex.from("petition_field").update("profile_type_id", null);
     await mocks.knex.from("user_profile_type_pinned").delete();
+    await mocks.knex.from("profile_type_process_template").delete();
+    await mocks.knex.from("profile_type_process").delete();
     await mocks.knex.from("profile_type").delete();
 
     profileTypes = await mocks.createRandomProfileTypes(
@@ -7047,7 +7049,7 @@ describe("GraphQL/Profiles", () => {
                     }
                   }
                 }
-                petitions(limit: 10) {
+                associatedPetitions(limit: 10) {
                   items {
                     id
                   }
@@ -7091,7 +7093,10 @@ describe("GraphQL/Profiles", () => {
               },
             ],
           },
-          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petition.id) }],
+            totalCount: 1,
+          },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -7173,7 +7178,7 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions(limit: 10) {
+                associatedPetitions(limit: 10) {
                   items {
                     id
                   }
@@ -7210,7 +7215,7 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions(limit: 10) {
+                associatedPetitions(limit: 10) {
                   items {
                     id
                   }
@@ -7243,7 +7248,7 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions(limit: 10) {
+                associatedPetitions(limit: 10) {
                   items {
                     id
                   }
@@ -7269,7 +7274,10 @@ describe("GraphQL/Profiles", () => {
       expect(linkData?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
-          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petition.id) }],
+            totalCount: 1,
+          },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -7296,7 +7304,7 @@ describe("GraphQL/Profiles", () => {
           query ($profileId: GID!) {
             profile(profileId: $profileId) {
               id
-              petitions(limit: 10) {
+              associatedPetitions(limit: 10) {
                 items {
                   id
                 }
@@ -7313,7 +7321,7 @@ describe("GraphQL/Profiles", () => {
       expect(queryErrors).toBeUndefined();
       expect(queryData?.profile).toEqual({
         id: toGlobalId("Profile", profile.id),
-        petitions: { items: [], totalCount: 0 },
+        associatedPetitions: { items: [], totalCount: 0 },
       });
 
       const petitionProfile = await mocks.knex
@@ -7334,7 +7342,7 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions(limit: 10) {
+                associatedPetitions(limit: 10) {
                   items {
                     id
                   }
@@ -7360,7 +7368,10 @@ describe("GraphQL/Profiles", () => {
       expect(linkData?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
-          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petition.id) }],
+            totalCount: 1,
+          },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -7418,6 +7429,100 @@ describe("GraphQL/Profiles", () => {
         .select("*");
 
       expect(petitionProfile).toHaveLength(0);
+    });
+
+    it("associates the petition with a profile type process", async () => {
+      const [process] = await mocks.knex.from("profile_type_process").insert(
+        {
+          profile_type_id: profileTypes[0].id,
+          process_name: { en: "KYC" },
+          position: 0,
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!, $profileTypeProcessId: GID) {
+            associateProfileToPetition(
+              petitionId: $petitionId
+              profileId: $profileId
+              profileTypeProcessId: $profileTypeProcessId
+            ) {
+              profile {
+                id
+                profileType {
+                  id
+                  keyProcesses {
+                    id
+                    latestPetition {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeProcessId: toGlobalId("ProfileTypeProcess", process.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+          profileType: {
+            id: toGlobalId("ProfileType", profileTypes[0].id),
+            keyProcesses: [
+              {
+                id: toGlobalId("ProfileTypeProcess", process.id),
+                latestPetition: {
+                  id: toGlobalId("Petition", petition.id),
+                },
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it("sends error if profile type process does not have same profile type as profile", async () => {
+      const [process] = await mocks.knex.from("profile_type_process").insert(
+        {
+          profile_type_id: profileTypes[1].id,
+          process_name: { en: "KYC" },
+          position: 0,
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!, $profileTypeProcessId: GID) {
+            associateProfileToPetition(
+              petitionId: $petitionId
+              profileId: $profileId
+              profileTypeProcessId: $profileTypeProcessId
+            ) {
+              profile {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeProcessId: toGlobalId("ProfileTypeProcess", process.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -7501,7 +7606,7 @@ describe("GraphQL/Profiles", () => {
                   }
                 }
               }
-              petitions(limit: 10) {
+              associatedPetitions(limit: 10) {
                 items {
                   id
                 }
@@ -7551,7 +7656,10 @@ describe("GraphQL/Profiles", () => {
               },
             ],
           },
-          petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petitions[0].id) }],
+            totalCount: 1,
+          },
         },
       });
     });
@@ -7620,7 +7728,7 @@ describe("GraphQL/Profiles", () => {
                   }
                 }
               }
-              petitions(limit: 10) {
+              associatedPetitions(limit: 10) {
                 items {
                   id
                 }
@@ -7670,7 +7778,10 @@ describe("GraphQL/Profiles", () => {
               },
             ],
           },
-          petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petitions[0].id) }],
+            totalCount: 1,
+          },
         },
       });
     });

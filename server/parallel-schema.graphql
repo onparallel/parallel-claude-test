@@ -1013,7 +1013,11 @@ type Mutation {
   """
   Associates a profile to a petition
   """
-  associateProfileToPetition(petitionId: GID!, profileId: GID!): PetitionProfile!
+  associateProfileToPetition(
+    petitionId: GID!
+    profileId: GID!
+    profileTypeProcessId: GID
+  ): PetitionProfile!
 
   """
   Load contacts from an excel file, creating the ones not found on database
@@ -1507,6 +1511,11 @@ type Mutation {
     Main profile to obtain the information from
     """
     profileId: GID!
+
+    """
+    Provide if you want to link the parallel with a profile type process
+    """
+    profileTypeProcessId: GID
 
     """
     Template that will be used to create the petition
@@ -3904,6 +3913,8 @@ type PetitionBaseMini {
   Whether the template is publicly available or not
   """
   isPublicTemplate: Boolean
+  lastActivityAt: DateTime
+  latestSignatureStatus: PetitionLatestSignatureStatus
 
   """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
@@ -3914,6 +3925,11 @@ type PetitionBaseMini {
   The name of the petition.
   """
   name: String
+
+  """
+  The status of the petition.
+  """
+  status: PetitionStatus
 }
 
 union PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate
@@ -4596,6 +4612,16 @@ type PetitionFolder {
   The name petitions in the folder.
   """
   petitionCount: Int!
+}
+
+enum PetitionLatestSignatureStatus {
+  CANCELLED
+  CANCELLED_BY_USER
+  CANCELLING
+  COMPLETED
+  ENQUEUED
+  PROCESSED
+  PROCESSING
 }
 
 type PetitionListView {
@@ -5464,6 +5490,20 @@ type PetitionVariableResult {
 }
 
 type Profile implements Timestamps {
+  associatedPetitions(
+    filters: ProfileAssociatedPetitionFilter
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionPagination!
+
   """
   Time when the resource was created.
   """
@@ -5497,7 +5537,7 @@ type Profile implements Timestamps {
     Number of elements to skip from the list.
     """
     offset: Int
-  ): PetitionPagination!
+  ): PetitionPagination! @deprecated(reason: "use associatedPetitions instead")
   profileType: ProfileType!
   properties(filter: [ProfileFieldPropertyFilter!]): [ProfileFieldProperty!]!
   relationships(filter: [ProfileRelationshipFilter!]): [ProfileRelationship!]!
@@ -5526,6 +5566,10 @@ type ProfileAssociatedEvent implements PetitionEvent {
   profile: Profile
   type: PetitionEventType!
   user: User
+}
+
+input ProfileAssociatedPetitionFilter {
+  fromTemplateId: [GID!]
 }
 
 type ProfileClosedEvent implements ProfileEvent {
@@ -6103,7 +6147,7 @@ type ProfileTypePagination {
 
 type ProfileTypeProcess {
   id: GID!
-  latestPetition: Petition
+  latestPetition: PetitionBaseMini
   name: LocalizableUserText!
   position: Int!
   templates: [PetitionTemplate!]!

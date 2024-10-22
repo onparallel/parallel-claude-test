@@ -2390,11 +2390,6 @@
     "context": "Filter events from profiles created from a specific profile type (Optional)."
   },
   {
-    "term": "component.create-profile-from-profile-type-dialog.create-profile",
-    "definition": "Crear {profileTypeName}",
-    "context": "Create {profileTypeName}"
-  },
-  {
     "term": "component.create-profile-relationships-dialog.add-profile",
     "definition": "Añadir perfil",
     "context": "Add profile"
@@ -7845,6 +7840,41 @@
     "context": "Information imported successfully"
   },
   {
+    "term": "component.profile-key-process.associate-existing",
+    "definition": "Asociar existente",
+    "context": "Associate existing"
+  },
+  {
+    "term": "component.profile-key-process.last-activity-parallel",
+    "definition": "Última actividad: {timeAgo}",
+    "context": "Last activity: {timeAgo}"
+  },
+  {
+    "term": "component.profile-key-process.no-access-parallel",
+    "definition": "No tienes acceso a este parallel",
+    "context": "You don't have access to this parallel"
+  },
+  {
+    "term": "component.profile-key-process.no-associated-parallels",
+    "definition": "No hay parallels asociados",
+    "context": "No associated parallels"
+  },
+  {
+    "term": "component.profile-key-process.view-others",
+    "definition": "Ver otros",
+    "context": "View others"
+  },
+  {
+    "term": "component.profile-key-processes.add-process-button",
+    "definition": "Añadir proceso",
+    "context": "Add process"
+  },
+  {
+    "term": "component.profile-key-processes.placeholder",
+    "definition": "Destaca procesos principales de este perfil",
+    "context": "Highlight main processes of this profile"
+  },
+  {
     "term": "component.profile-layout.close-profile",
     "definition": "Cerrar perfil",
     "context": "Close profile"
@@ -12125,6 +12155,11 @@
     "context": "Create folder"
   },
   {
+    "term": "generic.create-name",
+    "definition": "Crear {name}",
+    "context": "Create {name}"
+  },
+  {
     "term": "generic.create-petition",
     "definition": "Crear parallel",
     "context": "Create parallel"
@@ -15175,11 +15210,6 @@
     "context": "Closed"
   },
   {
-    "term": "page.profiles.create-profile",
-    "definition": "Crear {profileTypeName}",
-    "context": "Create {profileTypeName}"
-  },
-  {
     "term": "page.profiles.delete-permanently",
     "definition": "Eliminar permanentemente",
     "context": "Delete permanently"
@@ -16160,32 +16190,32 @@
     "context": "Preview file. ⇧ + click to download"
   },
   {
-    "term": "petition-signature-status-label.cancelled",
+    "term": "util.use-petition-signatrue-status-labels.cancelled",
     "definition": "Firma cancelada",
     "context": "eSignature cancelled"
   },
   {
-    "term": "petition-signature-status-label.completed",
+    "term": "util.use-petition-signatrue-status-labels.completed",
     "definition": "Firma completada",
     "context": "eSignature completed"
   },
   {
-    "term": "petition-signature-status-label.no-signature",
+    "term": "util.use-petition-signatrue-status-labels.no-signature",
     "definition": "Sin firma",
     "context": "Without eSignature"
   },
   {
-    "term": "petition-signature-status-label.not-started",
+    "term": "util.use-petition-signatrue-status-labels.not-started",
     "definition": "Firma sin iniciar",
     "context": "eSignature not started"
   },
   {
-    "term": "petition-signature-status-label.pending-start",
+    "term": "util.use-petition-signatrue-status-labels.pending-start",
     "definition": "Pendiente de inicio",
     "context": "Pending start"
   },
   {
-    "term": "petition-signature-status-label.processing",
+    "term": "util.use-petition-signatrue-status-labels.processing",
     "definition": "Esperando firma",
     "context": "Waiting for signature"
   },

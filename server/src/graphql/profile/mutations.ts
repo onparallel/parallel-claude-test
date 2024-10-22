@@ -90,6 +90,7 @@ import {
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
+  profileHasSameProfileTypeAsProcess,
   profileHasStatus,
   profileIsAssociatedToPetition,
   profileIsNotAnonymized,
@@ -1734,12 +1735,20 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     profileHasStatus("profileId", ["OPEN", "CLOSED"]),
+    ifArgDefined(
+      "profileTypeProcessId",
+      and(
+        userHasAccessToProfileTypeProcess("profileTypeProcessId" as never),
+        profileHasSameProfileTypeAsProcess("profileId", "profileTypeProcessId" as never),
+      ),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     profileId: nonNull(globalIdArg("Profile")),
+    profileTypeProcessId: nullable(globalIdArg("ProfileTypeProcess")),
   },
-  resolve: async (_, { petitionId, profileId }, ctx) => {
+  resolve: async (_, { petitionId, profileId, profileTypeProcessId }, ctx) => {
     try {
       const [petitionProfile] = await ctx.profiles.associateProfilesToPetition(
         profileId,
@@ -1764,6 +1773,14 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
           petition_id: petitionId,
         },
       });
+
+      if (profileTypeProcessId) {
+        await ctx.profiles.associatePetitionToProfileTypeProcess(
+          profileTypeProcessId,
+          petitionId,
+          `User:${ctx.user!.id}`,
+        );
+      }
 
       return petitionProfile;
     } catch (e) {

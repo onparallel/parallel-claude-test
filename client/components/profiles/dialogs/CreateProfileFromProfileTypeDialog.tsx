@@ -126,10 +126,10 @@ function CreateProfileFromProfileTypeDialog({
       }}
       header={
         <FormattedMessage
-          id="component.create-profile-from-profile-type-dialog.create-profile"
-          defaultMessage="Create {profileTypeName}"
+          id="generic.create-name"
+          defaultMessage="Create {name}"
           values={{
-            profileTypeName: localizableUserTextRender({
+            name: localizableUserTextRender({
               value: profileTypeName,
               intl,
               default: intl.formatMessage({

@@ -268,19 +268,30 @@ export const Profile = objectType({
         return await ctx.profiles.loadProfileSubscribers(root.id);
       },
     });
+    /** @deprecated */
     t.paginationField("petitions", {
+      deprecation: "use associatedPetitions instead",
       type: "Petition",
-      resolve: (o, { offset, limit }, ctx) => {
-        return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
+      resolve: () => {
+        return { totalCount: 0, items: [] };
+      },
+    });
+    t.paginationField("associatedPetitions", {
+      type: "Petition",
+      extendArgs: {
+        filters: inputObjectType({
+          name: "ProfileAssociatedPetitionFilter",
+          definition(t) {
+            t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
+          },
+        }).asArg(),
+      },
+      resolve: (o, { offset, limit, filters }, ctx) => {
+        return ctx.petitions.getPaginatedPetitionsByProfileId(ctx.user!.org_id, o.id, {
           offset,
           limit,
-          filters: {
-            type: "PETITION",
-            path: null,
-            profileIds: [o.id],
-          },
-          sortBy: [{ field: "createdAt", order: "desc" }],
-        }) as any;
+          filters,
+        });
       },
     });
     t.field("status", {
@@ -639,7 +650,7 @@ export const ProfileTypeProcess = objectType({
       resolve: async (o, _, ctx) => await ctx.profiles.loadTemplatesByProfileTypeProcessId(o.id),
     });
     t.nullable.field("latestPetition", {
-      type: "Petition",
+      type: "PetitionBaseMini",
       resolve: async (o, _, ctx) => {
         if (isNullish(o.latest_petition_id)) {
           return null;

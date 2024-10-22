@@ -6,6 +6,7 @@ import {
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
+  PetitionSignatureStatusValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
@@ -431,6 +432,21 @@ export const PetitionBaseMini = objectType({
         const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
         return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;
       },
+    });
+    t.nullable.field("status", {
+      type: "PetitionStatus",
+      description: "The status of the petition.",
+      resolve: (o) => o.status,
+    });
+    t.nullable.field("latestSignatureStatus", {
+      type: enumType({
+        name: "PetitionLatestSignatureStatus",
+        members: [...PetitionSignatureStatusValues, "CANCELLED_BY_USER"],
+      }),
+      resolve: (o) => o.latest_signature_status as any,
+    });
+    t.nullable.datetime("lastActivityAt", {
+      resolve: (o) => o.last_activity_at,
     });
   },
 });

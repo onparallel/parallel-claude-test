@@ -48,6 +48,7 @@ export type PaginationFieldConfig<
   FieldName extends string,
   ItemType extends core.GetGen<"allOutputTypes"> | core.AllNexusOutputTypeDefs,
 > = {
+  deprecation?: string;
   type: ItemType;
 
   /**

@@ -359,10 +359,10 @@ function Profiles() {
               }
             >
               <FormattedMessage
-                id="page.profiles.create-profile"
-                defaultMessage="Create {profileTypeName}"
+                id="generic.create-name"
+                defaultMessage="Create {name}"
                 values={{
-                  profileTypeName: profileType
+                  name: profileType
                     ? localizableUserTextRender({
                         value: profileType.name,
                         intl,

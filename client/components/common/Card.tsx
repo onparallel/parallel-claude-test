@@ -71,10 +71,20 @@ export interface CardHeaderProps {
   rightAction?: ReactNode;
   omitDivider?: boolean;
   leftIcon?: ReactNode;
+  headingMinWidth?: HeadingProps["minWidth"];
 }
 
 export const CardHeader = chakraForwardRef<"header", CardHeaderProps>(function CardHeader(
-  { headingLevel, headingSize, rightAction, omitDivider, leftIcon, children, ...props },
+  {
+    headingLevel,
+    headingSize,
+    headingMinWidth,
+    rightAction,
+    omitDivider,
+    leftIcon,
+    children,
+    ...props
+  },
   ref,
 ) {
   return (
@@ -94,6 +104,7 @@ export const CardHeader = chakraForwardRef<"header", CardHeaderProps>(function C
           size={headingSize ?? "sm"}
           overflowWrap="anywhere"
           paddingY={3}
+          minWidth={headingMinWidth}
         >
           {children}
         </Heading>

@@ -28,7 +28,7 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { integer, useQueryState, values } from "@parallel/utils/queryState";
+import { integer, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
@@ -50,6 +50,7 @@ import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetition
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
+  fromTemplateId: string().list(),
 };
 
 export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
@@ -59,11 +60,14 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       profileId,
       offset: state.items * (state.page - 1),
       limit: state.items,
+      filters: {
+        fromTemplateId: state.fromTemplateId,
+      },
     },
     fetchPolicy: "cache-and-network",
   });
   const profile = data?.profile;
-  const petitions = profile?.petitions;
+  const petitions = profile?.associatedPetitions;
   const profileIsDeleted = profile?.status === "DELETION_SCHEDULED";
 
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(petitions?.items, "id");
@@ -290,8 +294,8 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           defaultMessage: "Parallel name",
         }),
         cellProps: {
-          width: "35%",
-          minWidth: "220px",
+          maxWidth: 0,
+          minWidth: "200px",
         },
         CellContent: ({ row: { name } }) => (
           <OverflownText textStyle={name ? undefined : "hint"}>
@@ -444,9 +448,6 @@ const _mutations = [
       associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
         profile {
           ...ProfilePetitionsTable_Profile
-          petitionsTotalCount: petitions {
-            totalCount
-          }
         }
       }
     }
@@ -464,7 +465,12 @@ const _mutations = [
 
 const _queries = [
   gql`
-    query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
+    query ProfilePetitionsTable_petitions(
+      $profileId: GID!
+      $offset: Int!
+      $limit: Int!
+      $filters: ProfileAssociatedPetitionFilter
+    ) {
       profile(profileId: $profileId) {
         ...ProfilePetitionsTable_Profile
         petitions(offset: $offset, limit: $limit) {
@@ -473,7 +479,11 @@ const _queries = [
           }
           totalCount
         }
-        petitionsTotalCount: petitions {
+
+        associatedPetitions(offset: $offset, limit: $limit, filters: $filters) {
+          items {
+            ...ProfilePetitionsTable_Petition
+          }
           totalCount
         }
       }
