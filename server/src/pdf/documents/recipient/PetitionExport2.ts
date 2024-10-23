@@ -706,7 +706,12 @@ function fieldDescription(
             ? [...mdTable({ token: t as Tokens.Table }), ...trailingNewLines({ raw: t.raw })]
             : t.type === "space"
               ? times((t.raw.match(/\n/g)?.length ?? 1) - 2, () => "#linebreak()")
-              : `#text(${JSON.stringify(JSON.stringify(t))})`,
+              : t.type === "hr"
+                ? [
+                    '#line(length: 100%, stroke: 1pt + rgb("#e2e8f0"))',
+                    ...trailingNewLines({ raw: t.raw }),
+                  ]
+                : `#text(${JSON.stringify(JSON.stringify(t))})`,
   );
 }
 
