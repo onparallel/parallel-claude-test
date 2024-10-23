@@ -424,7 +424,8 @@ function ConditionPredicate({
           isNonNullish(referencedField) &&
           !isFileTypeField(referencedField.type) &&
           referencedField.type !== "DYNAMIC_SELECT" &&
-          referencedField.type !== "BACKGROUND_CHECK"
+          referencedField.type !== "BACKGROUND_CHECK" &&
+          referencedField.type !== "FIELD_GROUP"
         ) {
           options.push(
             {

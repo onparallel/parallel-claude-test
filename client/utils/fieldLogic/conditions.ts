@@ -43,7 +43,8 @@ export function defaultFieldConditionValue<
   if (
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
-    field.type === "BACKGROUND_CHECK"
+    field.type === "BACKGROUND_CHECK" ||
+    field.type === "FIELD_GROUP"
   ) {
     return 0;
   } else if (field.type === "SELECT") {
