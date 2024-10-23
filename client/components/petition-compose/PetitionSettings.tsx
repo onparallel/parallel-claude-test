@@ -86,13 +86,13 @@ import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,
 } from "./dialogs/CompliancePeriodDialog";
+import { useConfigureAutomaticNumberingDialog } from "./dialogs/ConfigureAutomaticNumberingDialog";
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
-import { useConfigureAutomaticNumberingDialog } from "./dialogs/ConfigureAutomaticNumberingDialog";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -952,7 +952,7 @@ function _PetitionSettings({
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
           isDisabled={
-            petition.isAnonymized || petition.isAnonymized || myEffectivePermission === "READ"
+            petition.isAnonymized || petition.isRestricted || myEffectivePermission === "READ"
           }
           label={
             <FormattedMessage
@@ -971,6 +971,9 @@ function _PetitionSettings({
             value={petition.deadline ? new Date(petition.deadline) : null}
             onChange={(value) =>
               withError(onUpdatePetition({ deadline: value?.toISOString() ?? null }))
+            }
+            isDisabled={
+              petition.isAnonymized || petition.isRestricted || myEffectivePermission === "READ"
             }
           />
         </SettingsRow>
@@ -1266,9 +1269,11 @@ export const PetitionSettings = Object.assign(
 function DeadlineInput({
   value,
   onChange,
+  isDisabled,
 }: {
   value?: Maybe<Date>;
   onChange: (value: Maybe<Date>) => void;
+  isDisabled?: boolean;
 }) {
   const intl = useIntl();
   const showPetitionDeadlineDialog = usePetitionDeadlineDialog();
@@ -1311,7 +1316,7 @@ function DeadlineInput({
       />
       {value ? (
         <InputRightElement>
-          <CloseButton isClear onClick={() => onChange(null)} />
+          <CloseButton isClear onClick={() => onChange(null)} isDisabled={isDisabled} />
         </InputRightElement>
       ) : (
         <InputRightElement pointerEvents="none">
