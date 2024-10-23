@@ -653,8 +653,8 @@ function SectionsAndProfilesList({
       </List>
       {userCanViewProfiles ? (
         <>
-          <HStack justify="space-between" className="show-on-expand">
-            <Text fontSize="sm" fontWeight={500}>
+          <HStack spacing={0} className="show-on-expand">
+            <Text fontSize="sm" fontWeight={500} flex="1">
               <FormattedMessage
                 id="component.app-layout-nav-bar.profiles"
                 defaultMessage="Profiles"
