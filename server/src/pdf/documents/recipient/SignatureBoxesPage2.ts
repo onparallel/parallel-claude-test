@@ -49,8 +49,8 @@ function SignatureBoxesPage2({ petition }: SignatureBoxesPageProps, intl: IntlSh
     #show link: underline
     #show link: set text(fill: rgb("#5650de"))
     `,
-    ...(petition.__typename === "Petition" && isNonNullish(petition.signatureConfig)
-      ? documentSignatures(petition.signatureConfig, {
+    ...(petition.__typename === "Petition" && isNonNullish(petition.currentSignatureRequest)
+      ? documentSignatures(petition.currentSignatureRequest.signatureConfig, {
           intl,
           theme,
           templateId: petition.fromTemplate?.id,
@@ -72,8 +72,10 @@ SignatureBoxesPage2.fragments = {
           fromTemplate {
             id
           }
-          signatureConfig {
-            ...documentSignatures_SignatureConfig
+          currentSignatureRequest {
+            signatureConfig {
+              ...documentSignatures_SignatureConfig
+            }
           }
         }
         __typename

@@ -7003,9 +7003,11 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
   id: string;
   name: string | null;
   fromTemplate: { id: string } | null;
-  signatureConfig: {
-    timezone: string;
-    signers: Array<{ fullName: string; email: string } | null>;
+  currentSignatureRequest: {
+    signatureConfig: {
+      timezone: string;
+      signers: Array<{ fullName: string; email: string } | null>;
+    };
   } | null;
   fields: Array<{
     id: string;
@@ -7425,9 +7427,11 @@ export type PetitionExport2_petitionQuery = {
         id: string;
         name: string | null;
         fromTemplate: { id: string } | null;
-        signatureConfig: {
-          timezone: string;
-          signers: Array<{ fullName: string; email: string } | null>;
+        currentSignatureRequest: {
+          signatureConfig: {
+            timezone: string;
+            signers: Array<{ fullName: string; email: string } | null>;
+          };
         } | null;
         fields: Array<{
           id: string;
@@ -7729,9 +7733,11 @@ export type SignatureBoxesPage_petitionQuery = {
 export type SignatureBoxesPage2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   fromTemplate: { id: string } | null;
-  signatureConfig: {
-    timezone: string;
-    signers: Array<{ fullName: string; email: string } | null>;
+  currentSignatureRequest: {
+    signatureConfig: {
+      timezone: string;
+      signers: Array<{ fullName: string; email: string } | null>;
+    };
   } | null;
   selectedDocumentTheme: { data: { [key: string]: any } };
 };
@@ -7754,9 +7760,11 @@ export type SignatureBoxesPage2_petitionQuery = {
     | {
         __typename: "Petition";
         fromTemplate: { id: string } | null;
-        signatureConfig: {
-          timezone: string;
-          signers: Array<{ fullName: string; email: string } | null>;
+        currentSignatureRequest: {
+          signatureConfig: {
+            timezone: string;
+            signers: Array<{ fullName: string; email: string } | null>;
+          };
         } | null;
         selectedDocumentTheme: { data: { [key: string]: any } };
       }
@@ -8187,8 +8195,10 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
       fromTemplate {
         id
       }
-      signatureConfig {
-        ...documentSignatures_SignatureConfig
+      currentSignatureRequest {
+        signatureConfig {
+          ...documentSignatures_SignatureConfig
+        }
       }
     }
     ...LiquidScopeProvider_PetitionBase
@@ -8233,8 +8243,10 @@ export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
       fromTemplate {
         id
       }
-      signatureConfig {
-        ...documentSignatures_SignatureConfig
+      currentSignatureRequest {
+        signatureConfig {
+          ...documentSignatures_SignatureConfig
+        }
       }
     }
     __typename

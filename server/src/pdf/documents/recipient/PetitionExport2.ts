@@ -359,8 +359,8 @@ function PetitionExport2(
     "]",
     ...(showSignatureBoxes &&
     petition.__typename === "Petition" &&
-    isNonNullish(petition.signatureConfig)
-      ? documentSignatures(petition.signatureConfig, {
+    isNonNullish(petition.currentSignatureRequest)
+      ? documentSignatures(petition.currentSignatureRequest.signatureConfig, {
           intl,
           theme,
           templateId: petition.fromTemplate?.id,
@@ -904,8 +904,10 @@ PetitionExport2.fragments = {
           fromTemplate {
             id
           }
-          signatureConfig {
-            ...documentSignatures_SignatureConfig
+          currentSignatureRequest {
+            signatureConfig {
+              ...documentSignatures_SignatureConfig
+            }
           }
         }
         ...LiquidScopeProvider_PetitionBase
