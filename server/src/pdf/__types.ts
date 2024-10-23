@@ -7695,9 +7695,11 @@ export type PetitionExport2_petitionQuery = {
 export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   fromTemplate: { id: string } | null;
-  signatureConfig: {
-    timezone: string;
-    signers: Array<{ fullName: string; email: string } | null>;
+  currentSignatureRequest: {
+    signatureConfig: {
+      timezone: string;
+      signers: Array<{ fullName: string; email: string } | null>;
+    };
   } | null;
   selectedDocumentTheme: { data: { [key: string]: any } };
 };
@@ -7720,9 +7722,11 @@ export type SignatureBoxesPage_petitionQuery = {
     | {
         __typename: "Petition";
         fromTemplate: { id: string } | null;
-        signatureConfig: {
-          timezone: string;
-          signers: Array<{ fullName: string; email: string } | null>;
+        currentSignatureRequest: {
+          signatureConfig: {
+            timezone: string;
+            signers: Array<{ fullName: string; email: string } | null>;
+          };
         } | null;
         selectedDocumentTheme: { data: { [key: string]: any } };
       }
@@ -8226,13 +8230,15 @@ export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
       fromTemplate {
         id
       }
-      signatureConfig {
-        ...SignaturesBlock_SignatureConfig
+      currentSignatureRequest {
+        signatureConfig {
+          ...documentSignatures_SignatureConfig
+        }
       }
     }
     __typename
   }
-  ${SignaturesBlock_SignatureConfigFragmentDoc}
+  ${documentSignatures_SignatureConfigFragmentDoc}
 ` as unknown as DocumentNode<SignatureBoxesPage_PetitionBaseFragment, unknown>;
 export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
   fragment SignatureBoxesPage2_PetitionBase on PetitionBase {

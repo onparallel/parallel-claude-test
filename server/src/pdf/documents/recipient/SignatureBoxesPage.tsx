@@ -35,9 +35,9 @@ export default function SignatureBoxesPage({ petition }: SignatureBoxesPageProps
       <ThemeProvider theme={theme}>
         <Document>
           <Page style={styles.page}>
-            {petition.__typename === "Petition" && petition.signatureConfig ? (
+            {petition.__typename === "Petition" && petition.currentSignatureRequest ? (
               <SignaturesBlock
-                signatureConfig={petition.signatureConfig}
+                signatureConfig={petition.currentSignatureRequest.signatureConfig}
                 templateId={petition.fromTemplate?.id ?? null}
               />
             ) : null}
@@ -59,8 +59,10 @@ SignatureBoxesPage.fragments = {
           fromTemplate {
             id
           }
-          signatureConfig {
-            ...SignaturesBlock_SignatureConfig
+          currentSignatureRequest {
+            signatureConfig {
+              ...documentSignatures_SignatureConfig
+            }
           }
         }
         __typename
