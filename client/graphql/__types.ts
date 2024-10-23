@@ -7451,6 +7451,19 @@ export type ProfileSelect_profileQuery = {
   };
 };
 
+export type ProfileSelect_ProfileTypesQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  filter?: InputMaybe<ProfileTypeFilter>;
+}>;
+
+export type ProfileSelect_ProfileTypesQuery = {
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    items: Array<{ __typename?: "ProfileType"; id: string; canCreate: boolean }>;
+  };
+};
+
 export type ProfileTypeFieldSelect_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
@@ -66579,6 +66592,19 @@ export const ProfileSelect_profileDocument = gql`
   }
   ${ProfileSelect_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileSelect_profileQuery, ProfileSelect_profileQueryVariables>;
+export const ProfileSelect_ProfileTypesDocument = gql`
+  query ProfileSelect_ProfileTypes($offset: Int, $limit: Int, $filter: ProfileTypeFilter) {
+    profileTypes(offset: $offset, limit: $limit, filter: $filter) {
+      items {
+        id
+        canCreate
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileSelect_ProfileTypesQuery,
+  ProfileSelect_ProfileTypesQueryVariables
+>;
 export const ProfileTypeSelect_profileTypesDocument = gql`
   query ProfileTypeSelect_profileTypes(
     $offset: Int

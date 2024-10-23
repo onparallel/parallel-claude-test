@@ -1,8 +1,9 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useQuery } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import {
   ProfileSelect_ProfileFragment,
   ProfileSelect_ProfileFragmentDoc,
+  ProfileSelect_ProfileTypesDocument,
   ProfileSelect_profileDocument,
   ProfileSelect_profilesDocument,
 } from "@parallel/graphql/__types";
@@ -16,15 +17,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRerender } from "@parallel/utils/useRerender";
 import useMergedRef from "@react-hook/merged-ref";
 import pMap from "p-map";
-import {
-  ForwardedRef,
-  ReactElement,
-  RefAttributes,
-  forwardRef,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -91,6 +84,16 @@ const _queries = [
     }
     ${fragments.Profile}
   `,
+  gql`
+    query ProfileSelect_ProfileTypes($offset: Int, $limit: Int, $filter: ProfileTypeFilter) {
+      profileTypes(offset: $offset, limit: $limit, filter: $filter) {
+        items {
+          id
+          canCreate
+        }
+      }
+    }
+  `,
 ];
 
 export interface ProfileSelectProps<
@@ -139,7 +142,22 @@ export const ProfileSelect = Object.assign(
 
     const apollo = useApolloClient();
 
-    const [hideCreate, setHideCreate] = useState<boolean | undefined>(undefined);
+    const { data } = useQuery(ProfileSelect_ProfileTypesDocument, {
+      variables: {
+        limit: 100,
+        offset: 0,
+        filter: isNonNullish(profileTypeId)
+          ? {
+              profileTypeId: unMaybeArray(profileTypeId),
+            }
+          : undefined,
+      },
+      skip: !canCreateProfiles,
+    });
+
+    const hideCreate = isNonNullish(data)
+      ? data.profileTypes.items.every((profileType) => !profileType.canCreate)
+      : false;
 
     const loadProfiles = useDebouncedAsync(
       async (search: string | null | undefined) => {
@@ -162,13 +180,7 @@ export const ProfileSelect = Object.assign(
 
         const items = result.data.profiles.items;
 
-        const profiles = items.filter((p) => !exclude.includes(p.id));
-
-        if (hideCreate === undefined) {
-          setHideCreate(profiles.every((p) => !p.profileType.canCreate));
-        }
-
-        return profiles as any[];
+        return items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
       [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],
