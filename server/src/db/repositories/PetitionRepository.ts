@@ -2922,7 +2922,7 @@ export class PetitionRepository extends BaseRepository {
     const properties = await this.from("petition")
       .whereIn("id", petitionIds)
       .whereNull("deleted_at")
-      .select(["id", "variables", "custom_lists", "automatic_numbering_config"]);
+      .select(["id", "variables", "custom_lists", "automatic_numbering_config", "metadata"]);
 
     const propertiesByPetitionId = indexBy(properties, (p) => p.id);
 
@@ -2932,6 +2932,7 @@ export class PetitionRepository extends BaseRepository {
         variables: petitionProperties?.variables ?? [],
         custom_lists: petitionProperties?.custom_lists ?? [],
         automatic_numbering_config: petitionProperties?.automatic_numbering_config ?? null,
+        metadata: petitionProperties?.metadata ?? {},
       };
     });
   }
@@ -3013,6 +3014,7 @@ export class PetitionRepository extends BaseRepository {
           variables: petition.variables,
           custom_lists: petition.custom_lists,
           automatic_numbering_config: petition.automatic_numbering_config,
+          metadata: petition.metadata,
         };
       },
     );

@@ -11,6 +11,7 @@ import {
   IntegrationRepository,
 } from "../../../db/repositories/IntegrationRepository";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../../../services/EncryptionService";
+import { FileExport } from "../../../services/FileExportService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { JsonSchemaFor } from "../../../util/jsonSchema";
@@ -247,6 +248,58 @@ export class IManageFileExportIntegration
   }
 
   private fetchFileExportJson(): RequestHandler {
+    function mapFileExport(f: FileExport) {
+      function calculateStatus({ status, url, metadata }: FileExport) {
+        if (status !== "WAITING") {
+          return { status, url };
+        }
+
+        // files in WAITING status may have an iManage URL if they were previously exported
+        // so if we find the FILE_EXPORT_IMANAGE_URL in metadata, we can return it
+        switch (metadata.type) {
+          case "Petition":
+          case "PetitionFieldReply":
+            if (isNonNullish(metadata.metadata.FILE_EXPORT_IMANAGE_URL)) {
+              return { status: "OK", url: metadata.metadata.FILE_EXPORT_IMANAGE_URL as string };
+            }
+            if (metadata.metadata.FILE_EXPORT_IMANAGE_URL === null) {
+              return { status: "NOK", url: null };
+            }
+            break;
+          case "PetitionSignatureRequest":
+            if (metadata.documentType === "signed-document") {
+              if (isNonNullish(metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL)) {
+                return {
+                  status: "OK",
+                  url: metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL as string,
+                };
+              }
+              if (metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL === null) {
+                return { status: "NOK", url: null };
+              }
+            } else if (metadata.documentType === "audit-trail") {
+              if (isNonNullish(metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL)) {
+                return {
+                  status: "OK",
+                  url: metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL as string,
+                };
+              }
+              if (metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL === null) {
+                return { status: "NOK", url: null };
+              }
+            }
+            break;
+        }
+
+        return { status: "WAITING", url: null };
+      }
+      return {
+        id: f.id,
+        filename: f.filename,
+        temporaryUrl: f.temporary_url,
+        ...calculateStatus(f),
+      };
+    }
     return async (req, res, next) => {
       try {
         this.logger.info("Fetching file export JSON...");
@@ -256,18 +309,7 @@ export class IManageFileExportIntegration
           throw new RequestError(403, "Invalid file export log ID");
         }
 
-        return res
-          .json(
-            log.json_export.map((f) => ({
-              id: f.id,
-              status: f.status,
-              url: f.url ?? null,
-              filename: f.filename,
-              temporaryUrl: f.temporary_url,
-            })),
-          )
-          .status(200)
-          .end();
+        return res.json(log.json_export.map(mapFileExport)).status(200).end();
       } catch (error) {
         next(error);
       }

@@ -34,15 +34,17 @@ interface GetPetitionFilesOptions {
   onProgress?: (value: number) => void;
 }
 
-type FileExportMetadata =
+export type FileExportMetadata =
   | {
       id: number;
       type: "PetitionFieldReply" | "Petition";
+      metadata: any;
     }
   | {
       id: number;
       type: "PetitionSignatureRequest";
       documentType: "signed-document" | "audit-trail";
+      metadata: any;
     };
 
 export type FileExport = {
@@ -304,7 +306,7 @@ export class FileExportService implements IFileExportService {
                 context.storage.fileUploads,
                 file.path,
                 resolveFileName(field, options.pattern, file.filename),
-                { type: "PetitionFieldReply", id: reply.id },
+                { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
               );
               options.onProgress?.(++processedFiles / totalFiles);
             }
@@ -329,7 +331,7 @@ export class FileExportService implements IFileExportService {
                 options.pattern,
                 `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
               ),
-              { type: "PetitionFieldReply", id: reply.id },
+              { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
             );
             options.onProgress?.(++processedFiles / totalFiles);
           }
@@ -365,6 +367,7 @@ export class FileExportService implements IFileExportService {
         return await processFile(this.storage.temporaryFiles, path, filename, {
           type: "Petition",
           id: petitionId,
+          metadata: composedPetition.metadata,
         });
       });
       options.onProgress?.(++processedFiles / totalFiles);
@@ -387,6 +390,7 @@ export class FileExportService implements IFileExportService {
               type: "PetitionSignatureRequest",
               documentType: "signed-document",
               id: latestPetitionSignature.id,
+              metadata: latestPetitionSignature.metadata,
             },
           );
           options.onProgress?.(++processedFiles / totalFiles);
@@ -404,6 +408,7 @@ export class FileExportService implements IFileExportService {
             type: "PetitionSignatureRequest",
             documentType: "audit-trail",
             id: latestPetitionSignature.id,
+            metadata: latestPetitionSignature.metadata,
           });
           options.onProgress?.(++processedFiles / totalFiles);
         }
