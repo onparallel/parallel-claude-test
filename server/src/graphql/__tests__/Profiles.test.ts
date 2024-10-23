@@ -7808,7 +7808,7 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("updateProfileTypeFieldPermission", () => {
+  describe("updateProfileTypeFieldPermissions", () => {
     let user: User;
     let userGroup: UserGroup;
     let userApiKey: string;
@@ -7825,13 +7825,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -7841,7 +7841,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
           data: [{ userId: toGlobalId("User", user.id), permission: "WRITE" }],
           defaultPermission: "READ",
         },
@@ -7945,13 +7945,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -7961,7 +7961,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
           defaultPermission: "HIDDEN",
           data: [{ userGroupId: toGlobalId("UserGroup", userGroup.id), permission: "READ" }],
         },
@@ -8071,13 +8071,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -8087,7 +8087,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
           data: [{ userId: toGlobalId("User", user.id), permission: "READ" }],
           defaultPermission: "READ",
         },
@@ -8197,13 +8197,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -8213,7 +8213,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[3].id)],
           data: [{ userGroupId: toGlobalId("UserGroup", userGroup.id), permission: "WRITE" }],
           defaultPermission: "READ",
         },
@@ -8317,13 +8317,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -8333,7 +8333,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
           data: [{ userId: toGlobalId("User", user.id), permission: "HIDDEN" }],
           defaultPermission: "READ",
         },
@@ -8436,13 +8436,13 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
@@ -8452,7 +8452,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
           defaultPermission: "HIDDEN",
           data: [],
         },
@@ -8472,38 +8472,42 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation (
             $profileTypeId: GID!
-            $profileTypeFieldId: GID!
+            $profileTypeFieldIds: [GID!]!
             $defaultPermission: ProfileTypeFieldPermissionType!
-            $data: [UpdateProfileTypeFieldPermissionInput!]!
+            $data: [UpdateProfileTypeFieldPermissionsInput!]!
           ) {
-            updateProfileTypeFieldPermission(
+            updateProfileTypeFieldPermissions(
               profileTypeId: $profileTypeId
-              profileTypeFieldId: $profileTypeFieldId
+              profileTypeFieldIds: $profileTypeFieldIds
               defaultPermission: $defaultPermission
               data: $data
             ) {
               id
-              defaultPermission
-              myPermission
-              permissions {
-                __typename
+              fields {
+                defaultPermission
+                myPermission
+                permissions {
+                  __typename
+                }
               }
             }
           }
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
           data: [],
           defaultPermission: "WRITE",
         },
       );
       expect(errors).toBeUndefined();
-      expect(data?.updateProfileTypeFieldPermission).toEqual({
-        id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
-        permissions: [],
-        defaultPermission: "WRITE",
-        myPermission: "WRITE",
+      expect(data?.updateProfileTypeFieldPermissions).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        fields: profileType0Fields.map(() => ({
+          permissions: [],
+          defaultPermission: "WRITE",
+          myPermission: "WRITE",
+        })),
       });
     });
   });

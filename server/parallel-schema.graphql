@@ -2910,7 +2910,17 @@ type Mutation {
     defaultPermission: ProfileTypeFieldPermissionType
     profileTypeFieldId: GID!
     profileTypeId: GID!
-  ): ProfileTypeField!
+  ): ProfileTypeField! @deprecated(reason: "use updateProfileTypeFieldPermissions")
+
+  """
+  Updates the default permission for a list of profile type fields and a set of users and/or user groups.
+  """
+  updateProfileTypeFieldPermissions(
+    data: [UpdateProfileTypeFieldPermissionsInput!]!
+    defaultPermission: ProfileTypeFieldPermissionType
+    profileTypeFieldIds: [GID!]!
+    profileTypeId: GID!
+  ): ProfileType!
   updateProfileTypeFieldPositions(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
   updateProfileTypeProcessPositions(
     profileTypeId: GID!
@@ -7956,6 +7966,12 @@ input UpdateProfileTypeFieldInput {
 }
 
 input UpdateProfileTypeFieldPermissionInput {
+  permission: ProfileTypeFieldPermissionType!
+  userGroupId: GID
+  userId: GID
+}
+
+input UpdateProfileTypeFieldPermissionsInput {
   permission: ProfileTypeFieldPermissionType!
   userGroupId: GID
   userId: GID

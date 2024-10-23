@@ -65,7 +65,7 @@ import {
   OrganizationProfileType_profileTypeDocument,
   OrganizationProfileType_updateProfileTypeDocument,
   OrganizationProfileType_updateProfileTypeFieldDocument,
-  OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
+  OrganizationProfileType_updateProfileTypeFieldPermissionsDocument,
   OrganizationProfileType_updateProfileTypeFieldPositionsDocument,
   OrganizationProfileType_userDocument,
   ProfileTypeIcon,
@@ -309,8 +309,8 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   };
 
   const showProfileTypeFieldPermissionDialog = useProfileTypeFieldPermissionDialog();
-  const [updateProfileTypeFieldPermission] = useMutation(
-    OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
+  const [updateProfileTypeFieldPermissions] = useMutation(
+    OrganizationProfileType_updateProfileTypeFieldPermissionsDocument,
   );
   const handleConfigureVisibility = async (
     rows: OrganizationProfileType_ProfileTypeFieldFragment[],
@@ -318,15 +318,15 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   ) => {
     try {
       const { defaultPermission, permissions: data } = await showProfileTypeFieldPermissionDialog({
-        profileTypeField: rows[0],
+        profileTypeFields: rows,
         userId: me.id,
         modalProps: { finalFocusRef },
       });
 
-      await updateProfileTypeFieldPermission({
+      await updateProfileTypeFieldPermissions({
         variables: {
           profileTypeId,
-          profileTypeFieldId: rows[0].id,
+          profileTypeFieldIds: rows.map((r) => r.id),
           defaultPermission,
           data,
         },
@@ -399,7 +399,6 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       handleConfigureVisibility(profileType.fields.filter((f) => selectedIds.includes(f.id))),
     onEditClick: () =>
       handleEditProperty(profileType.fields.filter((f) => selectedIds.includes(f.id))),
-    visibilityIsDisabled: selectedIds.length !== 1,
     hideDeleteButton: selectedRows.every((row) => row.isStandard),
     disableDeleteButton: selectedRows.some((row) => row.isStandard),
   });
@@ -874,14 +873,12 @@ function useProfileTypeFieldsActions({
   onEditClick,
   onConfigureVisibilityClick,
   onDeleteClick,
-  visibilityIsDisabled,
   hideDeleteButton,
   disableDeleteButton,
 }: {
   onEditClick: () => void;
   onConfigureVisibilityClick: () => void;
   onDeleteClick: () => void;
-  visibilityIsDisabled: boolean;
   hideDeleteButton: boolean;
   disableDeleteButton: boolean;
 }) {
@@ -899,7 +896,6 @@ function useProfileTypeFieldsActions({
       children: (
         <FormattedMessage id="component.draggable-list.visiblity" defaultMessage="Visibility" />
       ),
-      isDisabled: visibilityIsDisabled,
     },
     ...(hideDeleteButton
       ? []
@@ -1028,19 +1024,22 @@ const _queries = [
 
 const _mutations = [
   gql`
-    mutation OrganizationProfileType_updateProfileTypeFieldPermission(
+    mutation OrganizationProfileType_updateProfileTypeFieldPermissions(
       $profileTypeId: GID!
-      $profileTypeFieldId: GID!
+      $profileTypeFieldIds: [GID!]!
       $defaultPermission: ProfileTypeFieldPermissionType
-      $data: [UpdateProfileTypeFieldPermissionInput!]!
+      $data: [UpdateProfileTypeFieldPermissionsInput!]!
     ) {
-      updateProfileTypeFieldPermission(
+      updateProfileTypeFieldPermissions(
         profileTypeId: $profileTypeId
-        profileTypeFieldId: $profileTypeFieldId
+        profileTypeFieldIds: $profileTypeFieldIds
         defaultPermission: $defaultPermission
         data: $data
       ) {
-        ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+        id
+        fields {
+          ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+        }
       }
     }
     ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}

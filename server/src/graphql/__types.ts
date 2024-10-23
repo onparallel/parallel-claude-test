@@ -428,6 +428,12 @@ export interface NexusGenInputs {
     userGroupId?: NexusGenScalars["GID"] | null; // GID
     userId?: NexusGenScalars["GID"] | null; // GID
   };
+  UpdateProfileTypeFieldPermissionsInput: {
+    // input type
+    permission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
+    userGroupId?: NexusGenScalars["GID"] | null; // GID
+    userId?: NexusGenScalars["GID"] | null; // GID
+  };
   UpdateProfileTypeFieldSelectOptionsSubstitution: {
     // input type
     new?: string | null; // String
@@ -2207,6 +2213,7 @@ export interface NexusGenFieldTypes {
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     updateProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    updateProfileTypeFieldPermissions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeFieldPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeProcessPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
@@ -4877,6 +4884,7 @@ export interface NexusGenFieldTypeNames {
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
     updateProfileTypeFieldPermission: "ProfileTypeField";
+    updateProfileTypeFieldPermissions: "ProfileType";
     updateProfileTypeFieldPositions: "ProfileType";
     updateProfileTypeProcessPositions: "ProfileType";
     updatePublicPetitionLink: "PublicPetitionLink";
@@ -8174,6 +8182,13 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdateProfileTypeFieldPermissionInput"][]; // [UpdateProfileTypeFieldPermissionInput!]!
       defaultPermission?: NexusGenEnums["ProfileTypeFieldPermissionType"] | null; // ProfileTypeFieldPermissionType
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileTypeFieldPermissions: {
+      // args
+      data: NexusGenInputs["UpdateProfileTypeFieldPermissionsInput"][]; // [UpdateProfileTypeFieldPermissionsInput!]!
+      defaultPermission?: NexusGenEnums["ProfileTypeFieldPermissionType"] | null; // ProfileTypeFieldPermissionType
+      profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     updateProfileTypeFieldPositions: {

@@ -8136,8 +8136,13 @@
   },
   {
     "term": "component.profile-type-field-permission-dialog.header",
-    "definition": "Quién puede ver esta propiedad",
-    "context": "Who can see this property"
+    "definition": "Quién puede ver {count, plural, =1{esta propiedad} other {estas propiedades}}",
+    "context": "Who can see {count, plural, =1{this property} other {these properties}}"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.multiple-fields-selected-warning",
+    "definition": "Los permisos se sobrescribirán en todas las propiedades seleccionadas.",
+    "context": "Permissions will be overwritten on all selected properties."
   },
   {
     "term": "component.profile-type-field-permission-dialog.permissions-conflict-popover",
@@ -16190,36 +16195,6 @@
     "context": "Preview file. ⇧ + click to download"
   },
   {
-    "term": "util.use-petition-signatrue-status-labels.cancelled",
-    "definition": "Firma cancelada",
-    "context": "eSignature cancelled"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.completed",
-    "definition": "Firma completada",
-    "context": "eSignature completed"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.no-signature",
-    "definition": "Sin firma",
-    "context": "Without eSignature"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.not-started",
-    "definition": "Firma sin iniciar",
-    "context": "eSignature not started"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.pending-start",
-    "definition": "Pendiente de inicio",
-    "context": "Pending start"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.processing",
-    "definition": "Esperando firma",
-    "context": "Waiting for signature"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Añadir destinatario",
     "context": "Add recipient"
@@ -17483,6 +17458,36 @@
     "term": "util.use-petition-message-placeholder-options.user-last-name",
     "definition": "Mi apellido",
     "context": "My last name"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.cancelled",
+    "definition": "Firma cancelada",
+    "context": "eSignature cancelled"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.completed",
+    "definition": "Firma completada",
+    "context": "eSignature completed"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.no-signature",
+    "definition": "Sin firma",
+    "context": "Without eSignature"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.not-started",
+    "definition": "Firma sin iniciar",
+    "context": "eSignature not started"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.pending-start",
+    "definition": "Pendiente de inicio",
+    "context": "Pending start"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.processing",
+    "definition": "Esperando firma",
+    "context": "Waiting for signature"
   },
   {
     "term": "util.use-short-text-formats.email",

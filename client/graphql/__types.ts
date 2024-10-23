@@ -1348,8 +1348,13 @@ export interface Mutation {
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
-  /** Updates the default permission for a profile type field for a set of users and/or user groups. */
+  /**
+   * Updates the default permission for a profile type field for a set of users and/or user groups.
+   * @deprecated use updateProfileTypeFieldPermissions
+   */
   updateProfileTypeFieldPermission: ProfileTypeField;
+  /** Updates the default permission for a list of profile type fields and a set of users and/or user groups. */
+  updateProfileTypeFieldPermissions: ProfileType;
   updateProfileTypeFieldPositions: ProfileType;
   updateProfileTypeProcessPositions: ProfileType;
   /** Updates the info and permissions of a public link */
@@ -2718,6 +2723,13 @@ export interface MutationupdateProfileTypeFieldPermissionArgs {
   data: Array<UpdateProfileTypeFieldPermissionInput>;
   defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
   profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileTypeFieldPermissionsArgs {
+  data: Array<UpdateProfileTypeFieldPermissionsInput>;
+  defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 }
 
@@ -6252,6 +6264,12 @@ export interface UpdateProfileTypeFieldInput {
 }
 
 export interface UpdateProfileTypeFieldPermissionInput {
+  permission: ProfileTypeFieldPermissionType;
+  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
+  userId?: InputMaybe<Scalars["GID"]["input"]>;
+}
+
+export interface UpdateProfileTypeFieldPermissionsInput {
   permission: ProfileTypeFieldPermissionType;
   userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
   userId?: InputMaybe<Scalars["GID"]["input"]>;
@@ -34134,42 +34152,46 @@ export type OrganizationProfileType_userQuery = {
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
-export type OrganizationProfileType_updateProfileTypeFieldPermissionMutationVariables = Exact<{
+export type OrganizationProfileType_updateProfileTypeFieldPermissionsMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
-  data: Array<UpdateProfileTypeFieldPermissionInput> | UpdateProfileTypeFieldPermissionInput;
+  data: Array<UpdateProfileTypeFieldPermissionsInput> | UpdateProfileTypeFieldPermissionsInput;
 }>;
 
-export type OrganizationProfileType_updateProfileTypeFieldPermissionMutation = {
-  updateProfileTypeFieldPermission: {
-    __typename?: "ProfileTypeField";
+export type OrganizationProfileType_updateProfileTypeFieldPermissionsMutation = {
+  updateProfileTypeFieldPermissions: {
+    __typename?: "ProfileType";
     id: string;
-    myPermission: ProfileTypeFieldPermissionType;
-    defaultPermission: ProfileTypeFieldPermissionType;
-    isUsedInProfileName: boolean;
-    permissions: Array<{
-      __typename?: "ProfileTypeFieldPermission";
+    fields: Array<{
+      __typename?: "ProfileTypeField";
       id: string;
-      permission: ProfileTypeFieldPermissionType;
-      target:
-        | {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            email: string;
-            avatarUrl?: string | null;
-            initials?: string | null;
-          }
-        | {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            memberCount: number;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-            groupInitials: string;
-          };
+      myPermission: ProfileTypeFieldPermissionType;
+      defaultPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -70591,26 +70613,29 @@ export const OrganizationProfileType_userDocument = gql`
   OrganizationProfileType_userQuery,
   OrganizationProfileType_userQueryVariables
 >;
-export const OrganizationProfileType_updateProfileTypeFieldPermissionDocument = gql`
-  mutation OrganizationProfileType_updateProfileTypeFieldPermission(
+export const OrganizationProfileType_updateProfileTypeFieldPermissionsDocument = gql`
+  mutation OrganizationProfileType_updateProfileTypeFieldPermissions(
     $profileTypeId: GID!
-    $profileTypeFieldId: GID!
+    $profileTypeFieldIds: [GID!]!
     $defaultPermission: ProfileTypeFieldPermissionType
-    $data: [UpdateProfileTypeFieldPermissionInput!]!
+    $data: [UpdateProfileTypeFieldPermissionsInput!]!
   ) {
-    updateProfileTypeFieldPermission(
+    updateProfileTypeFieldPermissions(
       profileTypeId: $profileTypeId
-      profileTypeFieldId: $profileTypeFieldId
+      profileTypeFieldIds: $profileTypeFieldIds
       defaultPermission: $defaultPermission
       data: $data
     ) {
-      ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+      id
+      fields {
+        ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+      }
     }
   }
   ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  OrganizationProfileType_updateProfileTypeFieldPermissionMutation,
-  OrganizationProfileType_updateProfileTypeFieldPermissionMutationVariables
+  OrganizationProfileType_updateProfileTypeFieldPermissionsMutation,
+  OrganizationProfileType_updateProfileTypeFieldPermissionsMutationVariables
 >;
 export const OrganizationProfileType_updateProfileTypeDocument = gql`
   mutation OrganizationProfileType_updateProfileType(

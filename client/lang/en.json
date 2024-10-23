@@ -8136,8 +8136,13 @@
   },
   {
     "term": "component.profile-type-field-permission-dialog.header",
-    "definition": "Who can see this property",
-    "context": "Who can see this property"
+    "definition": "Who can see {count, plural, =1{this property} other {these properties}}",
+    "context": "Who can see {count, plural, =1{this property} other {these properties}}"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.multiple-fields-selected-warning",
+    "definition": "Permissions will be overwritten on all selected properties.",
+    "context": "Permissions will be overwritten on all selected properties."
   },
   {
     "term": "component.profile-type-field-permission-dialog.permissions-conflict-popover",
@@ -16190,36 +16195,6 @@
     "context": "Preview file. ⇧ + click to download"
   },
   {
-    "term": "util.use-petition-signatrue-status-labels.cancelled",
-    "definition": "eSignature cancelled",
-    "context": "eSignature cancelled"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.completed",
-    "definition": "eSignature completed",
-    "context": "eSignature completed"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.no-signature",
-    "definition": "Without eSignature",
-    "context": "Without eSignature"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.not-started",
-    "definition": "eSignature not started",
-    "context": "eSignature not started"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.pending-start",
-    "definition": "Pending start",
-    "context": "Pending start"
-  },
-  {
-    "term": "util.use-petition-signatrue-status-labels.processing",
-    "definition": "Waiting for signature",
-    "context": "Waiting for signature"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Add recipient",
     "context": "Add recipient"
@@ -17483,6 +17458,36 @@
     "term": "util.use-petition-message-placeholder-options.user-last-name",
     "definition": "My last name",
     "context": "My last name"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.cancelled",
+    "definition": "eSignature cancelled",
+    "context": "eSignature cancelled"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.completed",
+    "definition": "eSignature completed",
+    "context": "eSignature completed"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.no-signature",
+    "definition": "Without eSignature",
+    "context": "Without eSignature"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.not-started",
+    "definition": "eSignature not started",
+    "context": "eSignature not started"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.pending-start",
+    "definition": "Pending start",
+    "context": "Pending start"
+  },
+  {
+    "term": "util.use-petition-signatrue-status-labels.processing",
+    "definition": "Waiting for signature",
+    "context": "Waiting for signature"
   },
   {
     "term": "util.use-short-text-formats.email",

@@ -32,6 +32,7 @@ import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMe
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import {
+  ProfileTypeField,
   ProfileTypeFieldPermissionType,
   UpdateProfileTypeFieldPermissionInput,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment,
@@ -62,6 +63,12 @@ function isAtLeast(p1: ProfileTypeFieldPermissionType, p2: ProfileTypeFieldPermi
   );
 }
 
+function findMinPermission(p: Pick<ProfileTypeField, "defaultPermission">[]) {
+  return p.reduce((min, p) => {
+    return isAtLeast(p.defaultPermission, min) ? min : p.defaultPermission;
+  }, "WRITE" as ProfileTypeFieldPermissionType);
+}
+
 interface ProfileTypeFieldPermissionDialogData {
   permissionType: ProfileTypeFieldPermissionType;
   defaultPermission: ProfileTypeFieldPermissionType;
@@ -78,12 +85,12 @@ export function useProfileTypeFieldPermissionDialog() {
 }
 
 export function ProfileTypeFieldPermissionDialog({
-  profileTypeField,
+  profileTypeFields,
   userId,
   ...props
 }: DialogProps<
   {
-    profileTypeField: useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment;
+    profileTypeFields: useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment[];
     userId: string;
   },
   ProfileTypeFieldPermissionDialogResult
@@ -93,8 +100,8 @@ export function ProfileTypeFieldPermissionDialog({
       mode: "onChange",
       defaultValues: {
         permissionType: "WRITE",
-        defaultPermission: profileTypeField.defaultPermission,
-        permissions: profileTypeField.permissions,
+        defaultPermission: findMinPermission(profileTypeFields),
+        permissions: profileTypeFields.length === 1 ? profileTypeFields[0].permissions : [],
       },
     },
   );
@@ -107,7 +114,7 @@ export function ProfileTypeFieldPermissionDialog({
     fields: permissions,
   } = useFieldArray({ name: "permissions", control });
 
-  const isUsedInProfileName = profileTypeField.isUsedInProfileName;
+  const isUsedInProfileName = profileTypeFields.some((f) => f.isUsedInProfileName);
 
   const usersRef =
     useRef<
@@ -183,7 +190,8 @@ export function ProfileTypeFieldPermissionDialog({
       header={
         <FormattedMessage
           id="component.profile-type-field-permission-dialog.header"
-          defaultMessage="Who can see this property"
+          defaultMessage="Who can see {count, plural, =1{this property} other {these properties}}"
+          values={{ count: profileTypeFields.length }}
         />
       }
       body={
@@ -195,6 +203,17 @@ export function ProfileTypeFieldPermissionDialog({
                 <FormattedMessage
                   id="component.profile-type-field-permission-dialog.used-in-profile-name-warning"
                   defaultMessage="Properties used in the name cannot be hidden."
+                />
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {profileTypeFields.length > 1 ? (
+            <Alert status="info" marginBottom={2} rounded="md">
+              <AlertIcon />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.profile-type-field-permission-dialog.multiple-fields-selected-warning"
+                  defaultMessage="Permissions will be overwritten on all selected properties."
                 />
               </AlertDescription>
             </Alert>

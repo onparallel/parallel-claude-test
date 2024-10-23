@@ -1286,8 +1286,13 @@ export type Mutation = {
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
-  /** Updates the default permission for a profile type field for a set of users and/or user groups. */
+  /**
+   * Updates the default permission for a profile type field for a set of users and/or user groups.
+   * @deprecated use updateProfileTypeFieldPermissions
+   */
   updateProfileTypeFieldPermission: ProfileTypeField;
+  /** Updates the default permission for a list of profile type fields and a set of users and/or user groups. */
+  updateProfileTypeFieldPermissions: ProfileType;
   updateProfileTypeFieldPositions: ProfileType;
   updateProfileTypeProcessPositions: ProfileType;
   /** Updates the info and permissions of a public link */
@@ -2656,6 +2661,13 @@ export type MutationupdateProfileTypeFieldPermissionArgs = {
   data: Array<UpdateProfileTypeFieldPermissionInput>;
   defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
   profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileTypeFieldPermissionsArgs = {
+  data: Array<UpdateProfileTypeFieldPermissionsInput>;
+  defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
 };
 
@@ -6029,6 +6041,12 @@ export type UpdateProfileTypeFieldInput = {
 };
 
 export type UpdateProfileTypeFieldPermissionInput = {
+  permission: ProfileTypeFieldPermissionType;
+  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
+  userId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
+export type UpdateProfileTypeFieldPermissionsInput = {
   permission: ProfileTypeFieldPermissionType;
   userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
   userId?: InputMaybe<Scalars["GID"]["input"]>;

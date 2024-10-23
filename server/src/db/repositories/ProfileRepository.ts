@@ -50,7 +50,6 @@ import {
   ProfileStatus,
   ProfileType,
   ProfileTypeField,
-  ProfileTypeFieldPermission,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
   ProfileTypeProcess,
@@ -460,13 +459,14 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async updateProfileTypeField(
-    id: number,
+    id: MaybeArray<number>,
     data: Partial<Omit<CreateProfileTypeField, "position">>,
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    const [profileTypeField] = await this.from("profile_type_field", t)
-      .where("id", id)
+    const ids = unMaybeArray(id);
+    return await this.from("profile_type_field", t)
+      .whereIn("id", ids)
       .whereNull("deleted_at")
       .update(
         {
@@ -479,8 +479,6 @@ export class ProfileRepository extends BaseRepository {
         },
         "*",
       );
-
-    return profileTypeField;
   }
 
   async deleteProfileTypeFields(
@@ -1742,16 +1740,15 @@ export class ProfileRepository extends BaseRepository {
   );
 
   async resetProfileTypeFieldPermission(
-    profileTypeFieldId: number,
+    id: MaybeArray<number>,
     data: { userId?: number; userGroupId?: number; permission: ProfileTypeFieldPermissionType }[],
     updatedBy: string,
   ) {
+    const ids = unMaybeArray(id);
     if (data.length === 0) {
       await this.from("profile_type_field_permission")
-        .where({
-          profile_type_field_id: profileTypeFieldId,
-          deleted_at: null,
-        })
+        .whereIn("profile_type_field_id", ids)
+        .whereNull("deleted_at")
         .update({
           deleted_at: this.now(),
           deleted_by: updatedBy,
@@ -1764,7 +1761,8 @@ export class ProfileRepository extends BaseRepository {
     await this.withTransaction(async (t) => {
       // remove every permission that is not in the data
       await this.from("profile_type_field_permission", t)
-        .where({ profile_type_field_id: profileTypeFieldId, deleted_at: null })
+        .whereIn("profile_type_field_id", ids)
+        .whereNull("deleted_at")
         .where((q) => {
           q.where((q2) => {
             q2.whereNotNull("user_group_id").and.whereNotIn(
@@ -1784,7 +1782,7 @@ export class ProfileRepository extends BaseRepository {
         });
 
       if (byUserId.length > 0) {
-        await this.raw<ProfileTypeFieldPermission>(
+        await this.raw(
           /* sql */ `
         ?
         on conflict (profile_type_field_id, user_id) where deleted_at is null
@@ -1808,13 +1806,15 @@ export class ProfileRepository extends BaseRepository {
       `,
           [
             this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
-              byUserId.map((d) => ({
-                profile_type_field_id: profileTypeFieldId,
-                user_id: d.userId!,
-                permission: d.permission,
-                created_by: updatedBy,
-                updated_by: updatedBy,
-              })),
+              ids.flatMap((profileTypeFieldId) =>
+                byUserId.map((d) => ({
+                  profile_type_field_id: profileTypeFieldId,
+                  user_id: d.userId!,
+                  permission: d.permission,
+                  created_by: updatedBy,
+                  updated_by: updatedBy,
+                })),
+              ),
             ),
             updatedBy,
           ],
@@ -1823,7 +1823,7 @@ export class ProfileRepository extends BaseRepository {
       }
 
       if (byUserGroupId.length > 0) {
-        await this.raw<ProfileTypeFieldPermission>(
+        await this.raw(
           /* sql */ `
       ?
       on conflict (profile_type_field_id, user_group_id) where deleted_at is null
@@ -1847,13 +1847,15 @@ export class ProfileRepository extends BaseRepository {
     `,
           [
             this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
-              byUserGroupId.map((d) => ({
-                profile_type_field_id: profileTypeFieldId,
-                user_group_id: d.userGroupId!,
-                permission: d.permission,
-                created_by: updatedBy,
-                updated_by: updatedBy,
-              })),
+              ids.flatMap((profileTypeFieldId) =>
+                byUserGroupId.map((d) => ({
+                  profile_type_field_id: profileTypeFieldId,
+                  user_group_id: d.userGroupId!,
+                  permission: d.permission,
+                  created_by: updatedBy,
+                  updated_by: updatedBy,
+                })),
+              ),
             ),
             updatedBy,
           ],

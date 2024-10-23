@@ -648,7 +648,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
               );
             }
           }
-          const updatedProfileTypeField = await ctx.profiles.updateProfileTypeField(
+          const [updatedProfileTypeField] = await ctx.profiles.updateProfileTypeField(
             args.profileTypeFieldId,
             updateData,
             `User:${ctx.user!.id}`,
@@ -695,7 +695,9 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
   },
 });
 
+/** @deprecated */
 export const updateProfileTypeFieldPermission = mutationField("updateProfileTypeFieldPermission", {
+  deprecation: `use updateProfileTypeFieldPermissions`,
   description:
     "Updates the default permission for a profile type field for a set of users and/or user groups.",
   type: "ProfileTypeField",
@@ -752,6 +754,71 @@ export const updateProfileTypeFieldPermission = mutationField("updateProfileType
     return (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId, { refresh: true }))!;
   },
 });
+
+export const updateProfileTypeFieldPermissions = mutationField(
+  "updateProfileTypeFieldPermissions",
+  {
+    description:
+      "Updates the default permission for a list of profile type fields and a set of users and/or user groups.",
+    type: "ProfileType",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+      userHasAccessToProfileType("profileTypeId"),
+      profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
+      userHasAccessToUserAndUserGroups("data"),
+    ),
+    args: {
+      profileTypeId: nonNull(globalIdArg("ProfileType")),
+      profileTypeFieldIds: nonNull(list(nonNull(globalIdArg("ProfileTypeField")))),
+      defaultPermission: "ProfileTypeFieldPermissionType",
+      data: nonNull(
+        list(
+          nonNull(
+            inputObjectType({
+              name: "UpdateProfileTypeFieldPermissionsInput",
+              definition(t) {
+                t.globalId("userId", { prefixName: "User" });
+                t.globalId("userGroupId", { prefixName: "UserGroup" });
+                t.nonNull.field("permission", { type: "ProfileTypeFieldPermissionType" });
+              },
+            }),
+          ),
+        ),
+      ),
+    },
+    resolve: async (_, args, ctx) => {
+      const profileType = await ctx.profiles.loadProfileType(args.profileTypeId);
+      assert(profileType, "Profile type not found");
+      if (args.defaultPermission === "HIDDEN") {
+        const patternFieldIds = (profileType.profile_name_pattern as (string | number)[]).filter(
+          (v) => typeof v === "number",
+        );
+        if (patternFieldIds.some((id) => args.profileTypeFieldIds.includes(id))) {
+          throw new ApolloError(
+            "Cannot set this field to HIDDEN because it is being used as part of the profile name",
+            "PROFILE_TYPE_FIELD_IS_PART_OF_PROFILE_NAME",
+          );
+        }
+      }
+      if (isNonNullish(args.defaultPermission)) {
+        await ctx.profiles.updateProfileTypeField(
+          args.profileTypeFieldIds,
+          { permission: args.defaultPermission },
+          `User:${ctx.user!.id}`,
+        );
+      }
+
+      await ctx.profiles.resetProfileTypeFieldPermission(
+        args.profileTypeFieldIds,
+        args.data as any,
+        `User:${ctx.user!.id}`,
+      );
+
+      return profileType;
+    },
+  },
+);
 
 export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
   type: "ProfileType",
