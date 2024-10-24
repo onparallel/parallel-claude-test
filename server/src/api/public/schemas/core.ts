@@ -395,14 +395,14 @@ const _PetitionField = {
   },
 } as const;
 
-const _PetitionFieldComment = {
+const _PetitionComment = {
   title: "PetitionFieldComment",
   type: "object",
   required: ["id", "content", "author", "mentions", "createdAt"],
   properties: {
     id: {
       type: "string",
-      description: "The ID of the parallel field comment",
+      description: "The ID of the parallel comment",
       example: toGlobalId("PetitionFieldComment", 100),
     },
     content: {
@@ -1206,8 +1206,8 @@ export const UpdatePetitionField = schema({
 const _Tag = { type: "string", example: ["kyc", "priority"] } as const;
 
 export const PetitionField = schema(_PetitionField);
-export const PetitionFieldComment = schema(_PetitionFieldComment);
-export const ListOfPetitionFieldComments = ListOf(_PetitionFieldComment);
+export const PetitionComment = schema(_PetitionComment);
+export const ListOfPetitionComments = ListOf(_PetitionComment);
 export const PaginatedTags = schema(_PaginationOf(_Tag));
 export const PaginatedPetitions = schema(_PaginationOf(_Petition));
 export const PaginatedUsers = schema(_PaginationOf(_User));

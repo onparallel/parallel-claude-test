@@ -4,11 +4,12 @@ import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } from "remeda";
 import { ProfileTypeFieldType } from "../../db/__types";
+import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor, WaitForOptions } from "../../util/promises/waitFor";
 import { renderSlateToText } from "../../util/slate/render";
-import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
+import { emptyRTEValue, fromPlainText, fromPlainTextWithMentions } from "../../util/slate/utils";
 import { isValidDate } from "../../util/time";
 import { Maybe, unMaybeArray, UnwrapArray } from "../../util/types";
 import { FormDataFile, RestParameter } from "../rest/core";
@@ -30,6 +31,9 @@ import {
   EventSubscriptionFragment,
   getTags_tagsByNameDocument,
   getTaskResultFileUrl_getTaskResultFileDocument,
+  parsePetitionCommentBody_getUsersOrGroupsDocument,
+  parsePetitionCommentBody_userGroupsDocument,
+  parsePetitionCommentBody_usersByEmailDocument,
   PetitionFieldCommentFragment,
   PetitionFieldFragment,
   PetitionFieldReplyFragment,
@@ -883,5 +887,121 @@ export function parseProfileTypeFieldInput<
           content.value,
       content.expiryDate,
     ] as [T, { value: string | number | FormDataFile[] | null } | undefined, string | undefined];
+  });
+}
+
+export async function parsePetitionCommentContent(client: GraphQLClient, content: string) {
+  const _queries = gql`
+    query parsePetitionCommentBody_usersByEmail($search: String!) {
+      me {
+        organization {
+          usersByEmail(emails: [$search], limit: 1, offset: 0) {
+            items {
+              id
+              fullName
+            }
+          }
+        }
+      }
+    }
+    query parsePetitionCommentBody_userGroups($search: String!) {
+      userGroups(search: $search, limit: 1, offset: 0) {
+        items {
+          id
+          name
+          localizableName
+        }
+      }
+    }
+    query parsePetitionCommentBody_getUsersOrGroups($ids: [ID!]!) {
+      getUsersOrGroups(ids: $ids) {
+        __typename
+        ... on User {
+          id
+          fullName
+        }
+        ... on UserGroup {
+          id
+          name
+          localizableName
+        }
+      }
+    }
+  `;
+
+  return await fromPlainTextWithMentions(content, async (mention) => {
+    try {
+      if (mention.startsWith("@[id:")) {
+        const {
+          getUsersOrGroups: [data],
+        } = await client.request(parsePetitionCommentBody_getUsersOrGroupsDocument, {
+          ids: [mention.slice(5, -1)],
+        });
+
+        return {
+          id: data.id,
+          name:
+            data.__typename === "User"
+              ? (data.fullName ?? "")
+              : data.name || data.localizableName["en"] || data.localizableName["es"] || "",
+        };
+      } else if (mention.startsWith("@[group:")) {
+        const search = mention.slice(8, -1);
+        const {
+          userGroups: {
+            items: [firstGroup],
+          },
+        } = await client.request(parsePetitionCommentBody_userGroupsDocument, {
+          search,
+        });
+
+        if (!firstGroup) {
+          throw new Error();
+        }
+
+        const name = [
+          firstGroup.name,
+          firstGroup.localizableName["en"],
+          firstGroup.localizableName["es"],
+        ].filter(isNonNullish);
+
+        if (name.every((name) => name.toLowerCase() !== search.toLowerCase())) {
+          throw new Error(); // group name must fully match search term, case-insensitive
+        }
+        return {
+          id: firstGroup.id,
+          name: name.find((n) => n !== "") ?? "",
+        };
+      } else if (mention.startsWith("@[email:")) {
+        const email = mention.slice(8, -1);
+        if (!email.match(EMAIL_REGEX)) {
+          throw new Error();
+        }
+        const {
+          me: {
+            organization: {
+              usersByEmail: {
+                items: [firstUser],
+              },
+            },
+          },
+        } = await client.request(parsePetitionCommentBody_usersByEmailDocument, {
+          search: email,
+        });
+
+        if (!firstUser) {
+          throw new Error();
+        }
+
+        return {
+          id: firstUser.id,
+          name: firstUser.fullName || "",
+        };
+      } else {
+        throw new Error();
+      }
+    } catch {
+      throw new BadRequestError(`${mention} is not a valid mention`);
+    }
   });
 }

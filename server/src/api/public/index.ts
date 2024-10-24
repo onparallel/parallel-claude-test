@@ -14,7 +14,6 @@ import { IRedis, REDIS } from "../../services/Redis";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { removePasswordFromPdf } from "../../util/pdf";
-import { fromPlainTextWithMentions } from "../../util/slate/utils";
 import { titleize } from "../../util/strings";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { FormDataFile, RestApi, RestParameter } from "../rest/core";
@@ -77,6 +76,7 @@ import {
   GetMe_userDocument,
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
+  GetPetitionComments_petitionCommentsDocument,
   GetPetitionEvents_PetitionEventsDocument,
   GetPetitionFieldComments_petitionDocument,
   GetPetitionFieldComments_petitionFieldCommentsDocument,
@@ -107,11 +107,9 @@ import {
   RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskDocument,
   RemoveUserPermission_createRemovePetitionPermissionMaybeTaskDocument,
   ReopenPetition_reopenPetitionDocument,
+  SendPetitionComment_createPetitionCommentDocument,
   SendPetitionFieldComment_createPetitionCommentDocument,
-  SendPetitionFieldComment_getUsersOrGroupsDocument,
   SendPetitionFieldComment_petitionDocument,
-  SendPetitionFieldComment_userGroupsDocument,
-  SendPetitionFieldComment_usersByEmailDocument,
   SharePetition_createAddPetitionPermissionMaybeTaskDocument,
   SharePetition_petitionDocument,
   SharePetition_usersByEmailDocument,
@@ -191,6 +189,7 @@ import {
   mapSubscription,
   mapTemplate,
   paginationParams,
+  parsePetitionCommentContent,
   parseProfileTypeFieldInput,
   resolveContacts,
   sortByParam,
@@ -214,8 +213,8 @@ import {
   FileDownload,
   ListOfPermissions,
   ListOfPetitionAccesses,
+  ListOfPetitionComments,
   ListOfPetitionEvents,
-  ListOfPetitionFieldComments,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileEvents,
   ListOfProfileRelationships,
@@ -232,9 +231,9 @@ import {
   PaginatedUsers,
   Petition,
   PetitionAccess,
+  PetitionComment,
   PetitionCustomProperties,
   PetitionField,
-  PetitionFieldComment,
   PetitionFieldReply,
   Profile,
   ProfileSubscriptionInput,
@@ -1852,7 +1851,7 @@ export function publicApi(container: Container) {
           summary: `Get ${type}s on a petition field`,
           description: `Returns a list of ${type}s on the specified petition field`,
           responses: {
-            200: SuccessResponse(ListOfPetitionFieldComments),
+            200: SuccessResponse(ListOfPetitionComments),
           },
           tags: ["Parallel comments and notes"],
         },
@@ -1915,7 +1914,7 @@ export function publicApi(container: Container) {
           body: JsonBody(CreatePetitionComment),
 
           responses: {
-            200: SuccessResponse(PetitionFieldComment),
+            200: SuccessResponse(PetitionComment),
             400: ErrorResponse({ description: "Invalid request body" }),
           },
           tags: ["Parallel comments and notes"],
@@ -1927,41 +1926,6 @@ export function publicApi(container: Container) {
                 fields {
                   id
                   fromPetitionFieldId
-                }
-              }
-            }
-            query SendPetitionFieldComment_usersByEmail($search: String!) {
-              me {
-                organization {
-                  usersByEmail(emails: [$search], limit: 1, offset: 0) {
-                    items {
-                      id
-                      fullName
-                    }
-                  }
-                }
-              }
-            }
-            query SendPetitionFieldComment_userGroups($search: String!) {
-              userGroups(search: $search, limit: 1, offset: 0) {
-                items {
-                  id
-                  name
-                  localizableName
-                }
-              }
-            }
-            query SendPetitionFieldComment_getUsersOrGroups($ids: [ID!]!) {
-              getUsersOrGroups(ids: $ids) {
-                __typename
-                ... on User {
-                  id
-                  fullName
-                }
-                ... on UserGroup {
-                  id
-                  name
-                  localizableName
                 }
               }
             }
@@ -2003,87 +1967,113 @@ export function publicApi(container: Container) {
             throw new BadRequestError("Field not found");
           }
 
-          const slateComment = await fromPlainTextWithMentions(body.content, async (mention) => {
-            try {
-              if (mention.startsWith("@[id:")) {
-                const {
-                  getUsersOrGroups: [data],
-                } = await client.request(SendPetitionFieldComment_getUsersOrGroupsDocument, {
-                  ids: [mention.slice(5, -1)],
-                });
-
-                return {
-                  id: data.id,
-                  name:
-                    data.__typename === "User"
-                      ? (data.fullName ?? "")
-                      : data.name || data.localizableName["en"] || data.localizableName["es"] || "",
-                };
-              } else if (mention.startsWith("@[group:")) {
-                const search = mention.slice(8, -1);
-                const {
-                  userGroups: {
-                    items: [firstGroup],
-                  },
-                } = await client.request(SendPetitionFieldComment_userGroupsDocument, {
-                  search,
-                });
-
-                if (!firstGroup) {
-                  throw new Error();
-                }
-
-                const name = [
-                  firstGroup.name,
-                  firstGroup.localizableName["en"],
-                  firstGroup.localizableName["es"],
-                ].filter(isNonNullish);
-
-                if (name.every((name) => name.toLowerCase() !== search.toLowerCase())) {
-                  throw new Error(); // group name must fully match search term, case-insensitive
-                }
-                return {
-                  id: firstGroup.id,
-                  name: name.find((n) => n !== "") ?? "",
-                };
-              } else if (mention.startsWith("@[email:")) {
-                const email = mention.slice(8, -1);
-                if (!email.match(EMAIL_REGEX)) {
-                  throw new Error();
-                }
-                const {
-                  me: {
-                    organization: {
-                      usersByEmail: {
-                        items: [firstUser],
-                      },
-                    },
-                  },
-                } = await client.request(SendPetitionFieldComment_usersByEmailDocument, {
-                  search: email,
-                });
-
-                if (!firstUser) {
-                  throw new Error();
-                }
-
-                return {
-                  id: firstUser.id,
-                  name: firstUser.fullName || "",
-                };
-              } else {
-                throw new Error();
-              }
-            } catch {
-              throw new BadRequestError(`${mention} is not a valid mention`);
-            }
-          });
+          const slateComment = await parsePetitionCommentContent(client, body.content);
 
           const { createPetitionComment } = await client.request(
             SendPetitionFieldComment_createPetitionCommentDocument,
             {
               petitionId: params.petitionId,
               petitionFieldId: field.id,
+              isInternal: type === "note",
+              content: slateComment,
+              sharePetition: body.sharePermission !== undefined,
+              sharePetitionPermission: body.sharePermission,
+              sharePetitionSubscribed: body.subscribe,
+            },
+          );
+
+          return Ok(mapPetitionFieldComment(createPetitionComment));
+        },
+      );
+
+    api
+      .path(`/petitions/:petitionId/${type}s`, {
+        params: { petitionId },
+      })
+      .get(
+        {
+          operationId: `GetPetition${titleize(type)}s`,
+          summary: `Get general ${type}s on a petition`,
+          description: `Returns a list of general ${type}s on the specified petition`,
+          responses: {
+            200: SuccessResponse(ListOfPetitionComments),
+          },
+          tags: ["Parallel comments and notes"],
+        },
+        async ({ client, params }) => {
+          const _query = gql`
+            query GetPetitionComments_petitionComments($petitionId: GID!) {
+              petition(id: $petitionId) {
+                ... on Petition {
+                  generalComments {
+                    ...PetitionFieldComment
+                  }
+                }
+                __typename
+              }
+            }
+            ${PetitionFieldCommentFragment}
+          `;
+
+          const response = await client.request(GetPetitionComments_petitionCommentsDocument, {
+            petitionId: params.petitionId,
+          });
+
+          if (response.petition?.__typename === "PetitionTemplate") {
+            return Ok([]);
+          }
+
+          return Ok(
+            (response.petition?.generalComments ?? [])
+              .filter((c) => c.isInternal === (type === "note"))
+              .map(mapPetitionFieldComment),
+          );
+        },
+      )
+      .post(
+        {
+          operationId: `SendPetition${titleize(type)}`,
+          summary: `Send a general ${type} to a petition`,
+          description: `Send a general ${type} to the specified petition`,
+          body: JsonBody(CreatePetitionComment),
+
+          responses: {
+            200: SuccessResponse(PetitionComment),
+            400: ErrorResponse({ description: "Invalid request body" }),
+          },
+          tags: ["Parallel comments and notes"],
+        },
+        async ({ client, params, body }) => {
+          const _queries = gql`
+            mutation SendPetitionComment_createPetitionComment(
+              $petitionId: GID!
+              $content: JSON!
+              $isInternal: Boolean!
+              $sharePetition: Boolean
+              $sharePetitionPermission: PetitionPermissionTypeRW
+              $sharePetitionSubscribed: Boolean
+            ) {
+              createPetitionComment(
+                petitionId: $petitionId
+                content: $content
+                isInternal: $isInternal
+                sharePetition: $sharePetition
+                sharePetitionPermission: $sharePetitionPermission
+                sharePetitionSubscribed: $sharePetitionSubscribed
+                throwOnNoPermission: false
+              ) {
+                ...PetitionFieldComment
+              }
+            }
+            ${PetitionFieldCommentFragment}
+          `;
+
+          const slateComment = await parsePetitionCommentContent(client, body.content);
+
+          const { createPetitionComment } = await client.request(
+            SendPetitionComment_createPetitionCommentDocument,
+            {
+              petitionId: params.petitionId,
               isInternal: type === "note",
               content: slateComment,
               sharePetition: body.sharePermission !== undefined,

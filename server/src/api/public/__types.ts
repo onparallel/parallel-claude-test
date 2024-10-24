@@ -6889,6 +6889,44 @@ export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
 
 export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
 
+export type parsePetitionCommentBody_usersByEmailQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+}>;
+
+export type parsePetitionCommentBody_usersByEmailQuery = {
+  me: { organization: { usersByEmail: { items: Array<{ id: string; fullName: string | null }> } } };
+};
+
+export type parsePetitionCommentBody_userGroupsQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+}>;
+
+export type parsePetitionCommentBody_userGroupsQuery = {
+  userGroups: {
+    items: Array<{
+      id: string;
+      name: string;
+      localizableName: { [locale in UserLocale]?: string };
+    }>;
+  };
+};
+
+export type parsePetitionCommentBody_getUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type parsePetitionCommentBody_getUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
+    | { __typename: "User"; id: string; fullName: string | null }
+    | {
+        __typename: "UserGroup";
+        id: string;
+        name: string;
+        localizableName: { [locale in UserLocale]?: string };
+      }
+  >;
+};
+
 export type GetMe_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMe_userQuery = {
@@ -8501,44 +8539,6 @@ export type SendPetitionFieldComment_petitionQuery = {
     | null;
 };
 
-export type SendPetitionFieldComment_usersByEmailQueryVariables = Exact<{
-  search: Scalars["String"]["input"];
-}>;
-
-export type SendPetitionFieldComment_usersByEmailQuery = {
-  me: { organization: { usersByEmail: { items: Array<{ id: string; fullName: string | null }> } } };
-};
-
-export type SendPetitionFieldComment_userGroupsQueryVariables = Exact<{
-  search: Scalars["String"]["input"];
-}>;
-
-export type SendPetitionFieldComment_userGroupsQuery = {
-  userGroups: {
-    items: Array<{
-      id: string;
-      name: string;
-      localizableName: { [locale in UserLocale]?: string };
-    }>;
-  };
-};
-
-export type SendPetitionFieldComment_getUsersOrGroupsQueryVariables = Exact<{
-  ids: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
-}>;
-
-export type SendPetitionFieldComment_getUsersOrGroupsQuery = {
-  getUsersOrGroups: Array<
-    | { __typename: "User"; id: string; fullName: string | null }
-    | {
-        __typename: "UserGroup";
-        id: string;
-        name: string;
-        localizableName: { [locale in UserLocale]?: string };
-      }
-  >;
-};
-
 export type SendPetitionFieldComment_createPetitionCommentMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
@@ -8550,6 +8550,85 @@ export type SendPetitionFieldComment_createPetitionCommentMutationVariables = Ex
 }>;
 
 export type SendPetitionFieldComment_createPetitionCommentMutation = {
+  createPetitionComment: {
+    id: string;
+    content: any | null;
+    isInternal: boolean;
+    createdAt: string;
+    author:
+      | {
+          __typename: "PetitionAccess";
+          contact: { id: string; email: string; fullName: string } | null;
+        }
+      | { __typename: "User"; id: string; email: string; fullName: string | null }
+      | null;
+    mentions: Array<
+      | {
+          __typename: "PetitionFieldCommentUserGroupMention";
+          userGroup: {
+            id: string;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+          } | null;
+        }
+      | {
+          __typename: "PetitionFieldCommentUserMention";
+          user: { id: string; email: string; fullName: string | null } | null;
+        }
+    >;
+  };
+};
+
+export type GetPetitionComments_petitionCommentsQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type GetPetitionComments_petitionCommentsQuery = {
+  petition:
+    | {
+        __typename: "Petition";
+        generalComments: Array<{
+          id: string;
+          content: any | null;
+          isInternal: boolean;
+          createdAt: string;
+          author:
+            | {
+                __typename: "PetitionAccess";
+                contact: { id: string; email: string; fullName: string } | null;
+              }
+            | { __typename: "User"; id: string; email: string; fullName: string | null }
+            | null;
+          mentions: Array<
+            | {
+                __typename: "PetitionFieldCommentUserGroupMention";
+                userGroup: {
+                  id: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                } | null;
+              }
+            | {
+                __typename: "PetitionFieldCommentUserMention";
+                user: { id: string; email: string; fullName: string | null } | null;
+              }
+          >;
+        }>;
+      }
+    | { __typename: "PetitionTemplate" }
+    | null;
+};
+
+export type SendPetitionComment_createPetitionCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  content: Scalars["JSON"]["input"];
+  isInternal: Scalars["Boolean"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type SendPetitionComment_createPetitionCommentMutation = {
   createPetitionComment: {
     id: string;
     content: any | null;
@@ -11503,6 +11582,56 @@ export const CreatePetitionRecipients_createContactDocument = gql`
   CreatePetitionRecipients_createContactMutation,
   CreatePetitionRecipients_createContactMutationVariables
 >;
+export const parsePetitionCommentBody_usersByEmailDocument = gql`
+  query parsePetitionCommentBody_usersByEmail($search: String!) {
+    me {
+      organization {
+        usersByEmail(emails: [$search], limit: 1, offset: 0) {
+          items {
+            id
+            fullName
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  parsePetitionCommentBody_usersByEmailQuery,
+  parsePetitionCommentBody_usersByEmailQueryVariables
+>;
+export const parsePetitionCommentBody_userGroupsDocument = gql`
+  query parsePetitionCommentBody_userGroups($search: String!) {
+    userGroups(search: $search, limit: 1, offset: 0) {
+      items {
+        id
+        name
+        localizableName
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  parsePetitionCommentBody_userGroupsQuery,
+  parsePetitionCommentBody_userGroupsQueryVariables
+>;
+export const parsePetitionCommentBody_getUsersOrGroupsDocument = gql`
+  query parsePetitionCommentBody_getUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      __typename
+      ... on User {
+        id
+        fullName
+      }
+      ... on UserGroup {
+        id
+        name
+        localizableName
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  parsePetitionCommentBody_getUsersOrGroupsQuery,
+  parsePetitionCommentBody_getUsersOrGroupsQueryVariables
+>;
 export const GetMe_userDocument = gql`
   query GetMe_user {
     me {
@@ -11992,56 +12121,6 @@ export const SendPetitionFieldComment_petitionDocument = gql`
   SendPetitionFieldComment_petitionQuery,
   SendPetitionFieldComment_petitionQueryVariables
 >;
-export const SendPetitionFieldComment_usersByEmailDocument = gql`
-  query SendPetitionFieldComment_usersByEmail($search: String!) {
-    me {
-      organization {
-        usersByEmail(emails: [$search], limit: 1, offset: 0) {
-          items {
-            id
-            fullName
-          }
-        }
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  SendPetitionFieldComment_usersByEmailQuery,
-  SendPetitionFieldComment_usersByEmailQueryVariables
->;
-export const SendPetitionFieldComment_userGroupsDocument = gql`
-  query SendPetitionFieldComment_userGroups($search: String!) {
-    userGroups(search: $search, limit: 1, offset: 0) {
-      items {
-        id
-        name
-        localizableName
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  SendPetitionFieldComment_userGroupsQuery,
-  SendPetitionFieldComment_userGroupsQueryVariables
->;
-export const SendPetitionFieldComment_getUsersOrGroupsDocument = gql`
-  query SendPetitionFieldComment_getUsersOrGroups($ids: [ID!]!) {
-    getUsersOrGroups(ids: $ids) {
-      __typename
-      ... on User {
-        id
-        fullName
-      }
-      ... on UserGroup {
-        id
-        name
-        localizableName
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  SendPetitionFieldComment_getUsersOrGroupsQuery,
-  SendPetitionFieldComment_getUsersOrGroupsQueryVariables
->;
 export const SendPetitionFieldComment_createPetitionCommentDocument = gql`
   mutation SendPetitionFieldComment_createPetitionComment(
     $petitionId: GID!
@@ -12069,6 +12148,48 @@ export const SendPetitionFieldComment_createPetitionCommentDocument = gql`
 ` as unknown as DocumentNode<
   SendPetitionFieldComment_createPetitionCommentMutation,
   SendPetitionFieldComment_createPetitionCommentMutationVariables
+>;
+export const GetPetitionComments_petitionCommentsDocument = gql`
+  query GetPetitionComments_petitionComments($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ... on Petition {
+        generalComments {
+          ...PetitionFieldComment
+        }
+      }
+      __typename
+    }
+  }
+  ${PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionComments_petitionCommentsQuery,
+  GetPetitionComments_petitionCommentsQueryVariables
+>;
+export const SendPetitionComment_createPetitionCommentDocument = gql`
+  mutation SendPetitionComment_createPetitionComment(
+    $petitionId: GID!
+    $content: JSON!
+    $isInternal: Boolean!
+    $sharePetition: Boolean
+    $sharePetitionPermission: PetitionPermissionTypeRW
+    $sharePetitionSubscribed: Boolean
+  ) {
+    createPetitionComment(
+      petitionId: $petitionId
+      content: $content
+      isInternal: $isInternal
+      sharePetition: $sharePetition
+      sharePetitionPermission: $sharePetitionPermission
+      sharePetitionSubscribed: $sharePetitionSubscribed
+      throwOnNoPermission: false
+    ) {
+      ...PetitionFieldComment
+    }
+  }
+  ${PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  SendPetitionComment_createPetitionCommentMutation,
+  SendPetitionComment_createPetitionCommentMutationVariables
 >;
 export const DeleteReply_deletePetitionReplyDocument = gql`
   mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
