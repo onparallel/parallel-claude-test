@@ -133,6 +133,7 @@ export const PetitionUserNotification = Object.assign(
           </NakedLink>
           <Text
             data-testid="notification-text"
+            fontWeight={isRead ? "normal" : "medium"}
             noOfLines={3}
             paddingX={4}
             paddingBottom={1}
