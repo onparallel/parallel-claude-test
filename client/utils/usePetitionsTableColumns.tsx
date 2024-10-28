@@ -405,7 +405,11 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             whiteSpace="nowrap"
           >
             {isNonNullish(lastReminderDate) ? (
-              <DateTime value={lastReminderDate} format={FORMATS.MMMdd} whiteSpace="nowrap" />
+              <DateTime
+                value={lastReminderDate}
+                format={{ day: "numeric", month: "long" }}
+                whiteSpace="nowrap"
+              />
             ) : (
               <Text as="span" textStyle="hint">
                 <FormattedMessage
