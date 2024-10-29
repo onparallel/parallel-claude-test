@@ -1040,10 +1040,18 @@ export type Mutation = {
   deleteTag: Result;
   /** Deletes a group */
   deleteUserGroup: Result;
-  /** Disassociates a petition from a profile */
+  /**
+   * Disassociates a petition from a profile
+   * @deprecated use disassociateProfilesFromPetitions
+   */
   disassociatePetitionFromProfile: Success;
-  /** Disassociates a profile from a petition */
+  /**
+   * Disassociates a profile from a petition
+   * @deprecated use disassociateProfilesFromPetitions
+   */
   disassociateProfileFromPetition: Success;
+  /** Disassociates a petition from a profile */
+  disassociateProfilesFromPetitions: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   editProfileTypeProcess: ProfileTypeProcess;
@@ -1919,6 +1927,11 @@ export type MutationdisassociatePetitionFromProfileArgs = {
 
 export type MutationdisassociateProfileFromPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdisassociateProfilesFromPetitionsArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
   profileIds: Array<Scalars["GID"]["input"]>;
 };
 
@@ -3279,12 +3292,12 @@ export type PetitionBase = {
 };
 
 export type PetitionBaseMini = {
+  currentSignatureRequest: Maybe<PetitionSignatureRequestMini>;
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
   /** Whether the template is publicly available or not */
   isPublicTemplate: Maybe<Scalars["Boolean"]["output"]>;
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
-  latestSignatureStatus: Maybe<PetitionLatestSignatureStatus>;
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -3713,15 +3726,6 @@ export type PetitionFolder = {
   petitionCount: Scalars["Int"]["output"];
 };
 
-export type PetitionLatestSignatureStatus =
-  | "CANCELLED"
-  | "CANCELLED_BY_USER"
-  | "CANCELLING"
-  | "COMPLETED"
-  | "ENQUEUED"
-  | "PROCESSED"
-  | "PROCESSING";
-
 export type PetitionListView = {
   data: PetitionListViewData;
   id: Scalars["GID"]["output"];
@@ -4001,6 +4005,12 @@ export type PetitionSignatureRequest = Timestamps & {
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+};
+
+export type PetitionSignatureRequestMini = {
+  id: Scalars["GID"]["output"];
+  /** The status of the petition signature. */
+  status: PetitionSignatureRequestStatus;
 };
 
 export type PetitionSignatureRequestSignerStatus = {
@@ -4807,6 +4817,10 @@ export type ProfileTypeProcess = {
   name: Scalars["LocalizableUserText"]["output"];
   position: Scalars["Int"]["output"];
   templates: Array<PetitionTemplate>;
+};
+
+export type ProfileTypeProcesslatestPetitionArgs = {
+  profileId: Scalars["GID"]["input"];
 };
 
 export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
@@ -9132,14 +9146,14 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
   };
 };
 
-export type DisassociateProfileFromPetition_disassociateProfileFromPetitionMutationVariables =
+export type DisassociateProfileFromPetition_disassociateProfilesFromPetitionsMutationVariables =
   Exact<{
-    petitionId: Scalars["GID"]["input"];
+    petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
     profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   }>;
 
-export type DisassociateProfileFromPetition_disassociateProfileFromPetitionMutation = {
-  disassociateProfileFromPetition: Success;
+export type DisassociateProfileFromPetition_disassociateProfilesFromPetitionsMutation = {
+  disassociateProfilesFromPetitions: Success;
 };
 
 export type GetTemplates_templatesQueryVariables = Exact<{
@@ -12485,16 +12499,16 @@ export const AssociatePetitionToProfile_associateProfileToPetitionDocument = gql
   AssociatePetitionToProfile_associateProfileToPetitionMutation,
   AssociatePetitionToProfile_associateProfileToPetitionMutationVariables
 >;
-export const DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument = gql`
-  mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
-    $petitionId: GID!
+export const DisassociateProfileFromPetition_disassociateProfilesFromPetitionsDocument = gql`
+  mutation DisassociateProfileFromPetition_disassociateProfilesFromPetitions(
+    $petitionIds: [GID!]!
     $profileIds: [GID!]!
   ) {
-    disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
+    disassociateProfilesFromPetitions(profileIds: $profileIds, petitionIds: $petitionIds)
   }
 ` as unknown as DocumentNode<
-  DisassociateProfileFromPetition_disassociateProfileFromPetitionMutation,
-  DisassociateProfileFromPetition_disassociateProfileFromPetitionMutationVariables
+  DisassociateProfileFromPetition_disassociateProfilesFromPetitionsMutation,
+  DisassociateProfileFromPetition_disassociateProfilesFromPetitionsMutationVariables
 >;
 export const GetTemplates_templatesDocument = gql`
   query GetTemplates_templates(

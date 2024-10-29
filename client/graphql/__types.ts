@@ -1102,10 +1102,18 @@ export interface Mutation {
   deleteTag: Result;
   /** Deletes a group */
   deleteUserGroup: Result;
-  /** Disassociates a petition from a profile */
+  /**
+   * Disassociates a petition from a profile
+   * @deprecated use disassociateProfilesFromPetitions
+   */
   disassociatePetitionFromProfile: Success;
-  /** Disassociates a profile from a petition */
+  /**
+   * Disassociates a profile from a petition
+   * @deprecated use disassociateProfilesFromPetitions
+   */
   disassociateProfileFromPetition: Success;
+  /** Disassociates a petition from a profile */
+  disassociateProfilesFromPetitions: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   editProfileTypeProcess: ProfileTypeProcess;
@@ -1981,6 +1989,11 @@ export interface MutationdisassociatePetitionFromProfileArgs {
 
 export interface MutationdisassociateProfileFromPetitionArgs {
   petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationdisassociateProfilesFromPetitionsArgs {
+  petitionIds: Array<Scalars["GID"]["input"]>;
   profileIds: Array<Scalars["GID"]["input"]>;
 }
 
@@ -3360,12 +3373,12 @@ export interface PetitionBase {
 
 export interface PetitionBaseMini {
   __typename?: "PetitionBaseMini";
+  currentSignatureRequest?: Maybe<PetitionSignatureRequestMini>;
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
   /** Whether the template is publicly available or not */
   isPublicTemplate?: Maybe<Scalars["Boolean"]["output"]>;
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
-  latestSignatureStatus?: Maybe<PetitionLatestSignatureStatus>;
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -3820,15 +3833,6 @@ export interface PetitionFolder {
   petitionCount: Scalars["Int"]["output"];
 }
 
-export type PetitionLatestSignatureStatus =
-  | "CANCELLED"
-  | "CANCELLED_BY_USER"
-  | "CANCELLING"
-  | "COMPLETED"
-  | "ENQUEUED"
-  | "PROCESSED"
-  | "PROCESSING";
-
 export interface PetitionListView {
   __typename?: "PetitionListView";
   data: PetitionListViewData;
@@ -4126,6 +4130,13 @@ export interface PetitionSignatureRequest extends Timestamps {
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+}
+
+export interface PetitionSignatureRequestMini {
+  __typename?: "PetitionSignatureRequestMini";
+  id: Scalars["GID"]["output"];
+  /** The status of the petition signature. */
+  status: PetitionSignatureRequestStatus;
 }
 
 export interface PetitionSignatureRequestSignerStatus {
@@ -4979,6 +4990,10 @@ export interface ProfileTypeProcess {
   name: Scalars["LocalizableUserText"]["output"];
   position: Scalars["Int"]["output"];
   templates: Array<PetitionTemplate>;
+}
+
+export interface ProfileTypeProcesslatestPetitionArgs {
+  profileId: Scalars["GID"]["input"];
 }
 
 export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
@@ -26423,8 +26438,12 @@ export type ProfileKeyProcesses_PetitionBaseMiniFragment = {
   id: string;
   name?: string | null;
   status?: PetitionStatus | null;
-  latestSignatureStatus?: PetitionLatestSignatureStatus | null;
   lastActivityAt?: string | null;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequestMini";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  } | null;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -26441,14 +26460,33 @@ export type ProfileKeyProcesses_ProfileTypeProcessFragment = {
     id: string;
     name?: string | null;
     status?: PetitionStatus | null;
-    latestSignatureStatus?: PetitionLatestSignatureStatus | null;
     lastActivityAt?: string | null;
+    currentSignatureRequest?: {
+      __typename?: "PetitionSignatureRequestMini";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+    } | null;
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
       permissionType: PetitionPermissionType;
     } | null;
   } | null;
-  templates: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+  templates: Array<{
+    __typename?: "PetitionTemplate";
+    id: string;
+    name?: string | null;
+    fields: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      isLinkedToProfileType: boolean;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    }>;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  }>;
 };
 
 export type ProfileKeyProcesses_ProfileFragment = {
@@ -26469,19 +26507,42 @@ export type ProfileKeyProcesses_ProfileFragment = {
         id: string;
         name?: string | null;
         status?: PetitionStatus | null;
-        latestSignatureStatus?: PetitionLatestSignatureStatus | null;
         lastActivityAt?: string | null;
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequestMini";
+          id: string;
+          status: PetitionSignatureRequestStatus;
+        } | null;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
       } | null;
-      templates: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+      templates: Array<{
+        __typename?: "PetitionTemplate";
+        id: string;
+        name?: string | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          isLinkedToProfileType: boolean;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
+        }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+      }>;
     }>;
   };
   associatedPetitions: {
     __typename?: "PetitionPagination";
-    items: Array<{ __typename?: "Petition"; id: string }>;
+    items: Array<{
+      __typename?: "Petition";
+      id: string;
+      fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+    }>;
   };
   relationships: Array<{
     __typename?: "ProfileRelationship";
@@ -26529,19 +26590,42 @@ export type ProfileKeyProcesses_associateProfileToPetitionMutation = {
             id: string;
             name?: string | null;
             status?: PetitionStatus | null;
-            latestSignatureStatus?: PetitionLatestSignatureStatus | null;
             lastActivityAt?: string | null;
+            currentSignatureRequest?: {
+              __typename?: "PetitionSignatureRequestMini";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+            } | null;
             myEffectivePermission?: {
               __typename?: "EffectivePetitionUserPermission";
               permissionType: PetitionPermissionType;
             } | null;
           } | null;
-          templates: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+          templates: Array<{
+            __typename?: "PetitionTemplate";
+            id: string;
+            name?: string | null;
+            fields: Array<{
+              __typename?: "PetitionField";
+              id: string;
+              type: PetitionFieldType;
+              isLinkedToProfileType: boolean;
+              profileType?: { __typename?: "ProfileType"; id: string } | null;
+            }>;
+            myEffectivePermission?: {
+              __typename?: "EffectivePetitionUserPermission";
+              permissionType: PetitionPermissionType;
+            } | null;
+          }>;
         }>;
       };
       associatedPetitions: {
         __typename?: "PetitionPagination";
-        items: Array<{ __typename?: "Petition"; id: string }>;
+        items: Array<{
+          __typename?: "Petition";
+          id: string;
+          fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+        }>;
       };
       relationships: Array<{
         __typename?: "ProfileRelationship";
@@ -26566,6 +26650,18 @@ export type ProfileKeyProcesses_associateProfileToPetitionMutation = {
       }>;
     };
   };
+};
+
+export type ProfileKeyProcesses_createPetitionFromProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  templateId: Scalars["GID"]["input"];
+  prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
+  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type ProfileKeyProcesses_createPetitionFromProfileMutation = {
+  createPetitionFromProfile: { __typename?: "Petition"; id: string };
 };
 
 export type ProfilePetitionsTable_ProfileFragment = {
@@ -26617,6 +26713,16 @@ export type ProfilePetitionsTable_PetitionFragment = {
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
+  fromTemplate?: {
+    __typename?: "PetitionBaseMini";
+    id: string;
+    name?: string | null;
+    isPublicTemplate?: boolean | null;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  } | null;
   progress: {
     __typename?: "PetitionProgress";
     external: {
@@ -26695,13 +26801,13 @@ export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
   };
 };
 
-export type ProfilePetitionsTable_disassociatePetitionFromProfileMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
+export type ProfilePetitionsTable_disassociateProfilesFromPetitionsMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type ProfilePetitionsTable_disassociatePetitionFromProfileMutation = {
-  disassociatePetitionFromProfile: Success;
+export type ProfilePetitionsTable_disassociateProfilesFromPetitionsMutation = {
+  disassociateProfilesFromPetitions: Success;
 };
 
 export type ProfilePetitionsTable_petitionsQueryVariables = Exact<{
@@ -26740,64 +26846,16 @@ export type ProfilePetitionsTable_petitionsQuery = {
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
           reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
         }>;
-        progress: {
-          __typename?: "PetitionProgress";
-          external: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          internal: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-        };
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
+        fromTemplate?: {
+          __typename?: "PetitionBaseMini";
           id: string;
-          status: PetitionSignatureRequestStatus;
-          cancelReason?: string | null;
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          review: boolean;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            environment: SignatureOrgIntegrationEnvironment;
+          name?: string | null;
+          isPublicTemplate?: boolean | null;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
           } | null;
         } | null;
-      }>;
-    };
-    associatedPetitions: {
-      __typename?: "PetitionPagination";
-      totalCount: number;
-      items: Array<{
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        status: PetitionStatus;
-        createdAt: string;
-        sentAt?: string | null;
-        isAnonymized: boolean;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        } | null;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          nextReminderAt?: string | null;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-          reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-        }>;
         progress: {
           __typename?: "PetitionProgress";
           external: {
@@ -27280,7 +27338,15 @@ export type useAssociateNewPetitionToProfileDialog_ProfileInnerFragment = {
 export type useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment = {
   __typename?: "ProfileTypeProcess";
   id: string;
-  templates: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+  templates: Array<{
+    __typename?: "PetitionTemplate";
+    id: string;
+    name?: string | null;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  }>;
 };
 
 export type useAssociateNewPetitionToProfileDialog_ProfileFragment = {
@@ -36628,13 +36694,13 @@ export type PetitionActivity_associateProfileToPetitionMutation = {
   };
 };
 
-export type PetitionActivity_disassociateProfileFromPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
+export type PetitionActivity_disassociateProfilesFromPetitionsMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type PetitionActivity_disassociateProfileFromPetitionMutation = {
-  disassociateProfileFromPetition: Success;
+export type PetitionActivity_disassociateProfilesFromPetitionsMutation = {
+  disassociateProfilesFromPetitions: Success;
 };
 
 export type PetitionActivity_eventsQueryVariables = Exact<{
@@ -50679,19 +50745,42 @@ export type ProfileDetail_profileQuery = {
           id: string;
           name?: string | null;
           status?: PetitionStatus | null;
-          latestSignatureStatus?: PetitionLatestSignatureStatus | null;
           lastActivityAt?: string | null;
+          currentSignatureRequest?: {
+            __typename?: "PetitionSignatureRequestMini";
+            id: string;
+            status: PetitionSignatureRequestStatus;
+          } | null;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
           } | null;
         } | null;
-        templates: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+        templates: Array<{
+          __typename?: "PetitionTemplate";
+          id: string;
+          name?: string | null;
+          fields: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            isLinkedToProfileType: boolean;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
+          }>;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
+        }>;
       }>;
     };
     associatedPetitions: {
       __typename?: "PetitionPagination";
-      items: Array<{ __typename?: "Petition"; id: string }>;
+      items: Array<{
+        __typename?: "Petition";
+        id: string;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+      }>;
     };
     properties: Array<{
       __typename?: "ProfileFieldProperty";
@@ -57722,7 +57811,7 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     properties {
       ...ProfileForm_ProfileFieldProperty
     }
-    petitionsTotalCount: petitions {
+    petitionsTotalCount: associatedPetitions {
       totalCount
     }
     relationships {
@@ -59362,7 +59451,10 @@ export const ProfileKeyProcesses_PetitionBaseMiniFragmentDoc = gql`
     id
     name
     status
-    latestSignatureStatus
+    currentSignatureRequest {
+      id
+      status
+    }
     myEffectivePermission {
       permissionType
     }
@@ -59375,6 +59467,9 @@ export const useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragmentDo
     templates {
       id
       name
+      myEffectivePermission {
+        permissionType
+      }
     }
   }
 ` as unknown as DocumentNode<
@@ -59386,11 +59481,19 @@ export const ProfileKeyProcesses_ProfileTypeProcessFragmentDoc = gql`
     id
     name
     position
-    latestPetition {
+    latestPetition(profileId: $profileId) {
       ...ProfileKeyProcesses_PetitionBaseMini
     }
     templates {
       id
+      fields {
+        id
+        type
+        isLinkedToProfileType
+        profileType {
+          id
+        }
+      }
     }
     ...useAssociateNewPetitionToProfileDialog_ProfileTypeProcess
   }
@@ -59451,6 +59554,9 @@ export const ProfileKeyProcesses_ProfileFragmentDoc = gql`
     associatedPetitions(offset: 0, limit: 100) {
       items {
         id
+        fromTemplate {
+          id
+        }
       }
     }
     ...useAssociateNewPetitionToProfileDialog_Profile
@@ -59557,6 +59663,14 @@ export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
     ...PetitionStatusCellContent_Petition
     ...PetitionSignatureCellContent_Petition
     isAnonymized
+    fromTemplate {
+      id
+      name
+      myEffectivePermission {
+        permissionType
+      }
+      isPublicTemplate
+    }
   }
   ${ContactReference_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
@@ -68812,6 +68926,28 @@ export const ProfileKeyProcesses_associateProfileToPetitionDocument = gql`
   ProfileKeyProcesses_associateProfileToPetitionMutation,
   ProfileKeyProcesses_associateProfileToPetitionMutationVariables
 >;
+export const ProfileKeyProcesses_createPetitionFromProfileDocument = gql`
+  mutation ProfileKeyProcesses_createPetitionFromProfile(
+    $profileId: GID!
+    $templateId: GID!
+    $prefill: [CreatePetitionFromProfilePrefillInput!]!
+    $profileTypeProcessId: GID
+    $petitionFieldId: GID
+  ) {
+    createPetitionFromProfile(
+      profileId: $profileId
+      templateId: $templateId
+      prefill: $prefill
+      profileTypeProcessId: $profileTypeProcessId
+      petitionFieldId: $petitionFieldId
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileKeyProcesses_createPetitionFromProfileMutation,
+  ProfileKeyProcesses_createPetitionFromProfileMutationVariables
+>;
 export const ProfilePetitionsTable_associateProfileToPetitionDocument = gql`
   mutation ProfilePetitionsTable_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
     associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
@@ -68825,16 +68961,16 @@ export const ProfilePetitionsTable_associateProfileToPetitionDocument = gql`
   ProfilePetitionsTable_associateProfileToPetitionMutation,
   ProfilePetitionsTable_associateProfileToPetitionMutationVariables
 >;
-export const ProfilePetitionsTable_disassociatePetitionFromProfileDocument = gql`
-  mutation ProfilePetitionsTable_disassociatePetitionFromProfile(
-    $profileId: GID!
+export const ProfilePetitionsTable_disassociateProfilesFromPetitionsDocument = gql`
+  mutation ProfilePetitionsTable_disassociateProfilesFromPetitions(
+    $profileIds: [GID!]!
     $petitionIds: [GID!]!
   ) {
-    disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+    disassociateProfilesFromPetitions(profileIds: $profileIds, petitionIds: $petitionIds)
   }
 ` as unknown as DocumentNode<
-  ProfilePetitionsTable_disassociatePetitionFromProfileMutation,
-  ProfilePetitionsTable_disassociatePetitionFromProfileMutationVariables
+  ProfilePetitionsTable_disassociateProfilesFromPetitionsMutation,
+  ProfilePetitionsTable_disassociateProfilesFromPetitionsMutationVariables
 >;
 export const ProfilePetitionsTable_petitionsDocument = gql`
   query ProfilePetitionsTable_petitions(
@@ -68845,13 +68981,7 @@ export const ProfilePetitionsTable_petitionsDocument = gql`
   ) {
     profile(profileId: $profileId) {
       ...ProfilePetitionsTable_Profile
-      petitions(offset: $offset, limit: $limit) {
-        items {
-          ...ProfilePetitionsTable_Petition
-        }
-        totalCount
-      }
-      associatedPetitions(offset: $offset, limit: $limit, filters: $filters) {
+      petitions: associatedPetitions(offset: $offset, limit: $limit, filters: $filters) {
         items {
           ...ProfilePetitionsTable_Petition
         }
@@ -71049,16 +71179,16 @@ export const PetitionActivity_associateProfileToPetitionDocument = gql`
   PetitionActivity_associateProfileToPetitionMutation,
   PetitionActivity_associateProfileToPetitionMutationVariables
 >;
-export const PetitionActivity_disassociateProfileFromPetitionDocument = gql`
-  mutation PetitionActivity_disassociateProfileFromPetition(
-    $petitionId: GID!
+export const PetitionActivity_disassociateProfilesFromPetitionsDocument = gql`
+  mutation PetitionActivity_disassociateProfilesFromPetitions(
+    $petitionIds: [GID!]!
     $profileIds: [GID!]!
   ) {
-    disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+    disassociateProfilesFromPetitions(petitionIds: $petitionIds, profileIds: $profileIds)
   }
 ` as unknown as DocumentNode<
-  PetitionActivity_disassociateProfileFromPetitionMutation,
-  PetitionActivity_disassociateProfileFromPetitionMutationVariables
+  PetitionActivity_disassociateProfilesFromPetitionsMutation,
+  PetitionActivity_disassociateProfilesFromPetitionsMutationVariables
 >;
 export const PetitionActivity_eventsDocument = gql`
   query PetitionActivity_events($id: GID!, $offset: Int!, $limit: Int!) {

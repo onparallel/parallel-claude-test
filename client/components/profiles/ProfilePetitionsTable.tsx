@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, CloseIconSmall } from "@parallel/chakra/icons";
+import { ChevronDownIcon, CloseIconSmall, LockClosedIcon } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link, NormalLink } from "@parallel/components/common/Link";
@@ -21,7 +21,7 @@ import {
   ProfilePetitionsTable_PetitionFragment,
   ProfilePetitionsTable_ProfileFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
-  ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
+  ProfilePetitionsTable_disassociateProfilesFromPetitionsDocument,
   ProfilePetitionsTable_petitionsDocument,
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
@@ -29,11 +29,12 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { integer, string, useQueryState, values } from "@parallel/utils/queryState";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish, isNullish, noop, pick } from "remeda";
 import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -41,9 +42,12 @@ import { PetitionSignatureCellContent } from "../common/PetitionSignatureCellCon
 import { PetitionStatusCellContent } from "../common/PetitionStatusCellContent";
 import { ProfileReference } from "../common/ProfileReference";
 import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
+import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
+import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDisassociateProfileDialog";
+import { PetitionTemplateFilter } from "../petition-list/filters/template/PetitionTemplateFilter";
 import { useAssociateNewPetitionToProfileDialog } from "./dialogs/AssociateNewPetitionToProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
 
@@ -54,6 +58,7 @@ const QUERY_STATE = {
 };
 
 export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
+  const showErrorToast = useGenericErrorToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE, { prefix: "p_" });
   const { data, loading, refetch } = useQuery(ProfilePetitionsTable_petitionsDocument, {
     variables: {
@@ -67,7 +72,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     fetchPolicy: "cache-and-network",
   });
   const profile = data?.profile;
-  const petitions = profile?.associatedPetitions;
+  const petitions = profile?.petitions;
   const profileIsDeleted = profile?.status === "DELETION_SCHEDULED";
 
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(petitions?.items, "id");
@@ -92,8 +97,8 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     } catch {}
   };
   const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
-  const [disassociatePetitionFromProfile] = useMutation(
-    ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
+  const [disassociateProfilesFromPetitions] = useMutation(
+    ProfilePetitionsTable_disassociateProfilesFromPetitionsDocument,
   );
   const columns = useProfilePetitionsTableColumns();
 
@@ -105,8 +110,8 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
         selectedPetitions: selectedRows.length,
       });
 
-      await disassociatePetitionFromProfile({
-        variables: { profileId, petitionIds: selectedIds },
+      await disassociateProfilesFromPetitions({
+        variables: { profileIds: [profileId], petitionIds: selectedIds },
       });
       await refetch();
     } catch {}
@@ -117,18 +122,20 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
     row: ProfilePetitionsTable_PetitionFragment,
     event: MouseEvent,
   ) {
-    goToPetition(
-      row.id,
-      (
-        {
-          DRAFT: "preview",
-          PENDING: "replies",
-          COMPLETED: "replies",
-          CLOSED: "replies",
-        } as const
-      )[row.status],
-      { event },
-    );
+    if (isNonNullish(row.myEffectivePermission)) {
+      goToPetition(
+        row.id,
+        (
+          {
+            DRAFT: "preview",
+            PENDING: "replies",
+            COMPLETED: "replies",
+            CLOSED: "replies",
+          } as const
+        )[row.status],
+        { event },
+      );
+    }
   }, []);
 
   const actions = useProfilePetitionsActions({
@@ -140,11 +147,16 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   const handleCreateNewPetition = async () => {
     try {
       if (isNonNullish(profile)) {
-        await showAssociateNewPetitionToProfileDialog({
+        const petitionId = await showAssociateNewPetitionToProfileDialog({
           profile,
         });
+        goToPetition(petitionId, "preview");
       }
-    } catch {}
+    } catch (error) {
+      if (isDialogError(error) && error.message === "ERROR") {
+        showErrorToast();
+      }
+    }
   };
 
   const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
@@ -159,10 +171,23 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       loading={loading}
       columns={columns}
       rows={petitions?.items}
+      rowProps={(row) => {
+        if (isNullish(row.myEffectivePermission)) {
+          return {
+            cursor: "not-allowed",
+          };
+        } else {
+          return {};
+        }
+      }}
       onRowClick={handleRowClick}
       page={state.page}
       pageSize={state.items}
       totalCount={petitions?.totalCount}
+      filter={pick(state, ["fromTemplateId"])}
+      onFilterChange={(key, value) => {
+        setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
+      }}
       onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
       onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
       onSortChange={noop}
@@ -282,7 +307,11 @@ function useProfilePetitionsActions({
   ];
 }
 
-function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_PetitionFragment>[] {
+function useProfilePetitionsTableColumns(): TableColumn<
+  ProfilePetitionsTable_PetitionFragment,
+  any,
+  any
+>[] {
   const intl = useIntl();
   const goToContact = useGoToContact();
   return useMemo(
@@ -297,16 +326,43 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           maxWidth: 0,
           minWidth: "200px",
         },
-        CellContent: ({ row: { name } }) => (
-          <OverflownText textStyle={name ? undefined : "hint"}>
-            {name
-              ? name
-              : intl.formatMessage({
-                  id: "generic.unnamed-parallel",
-                  defaultMessage: "Unnamed parallel",
-                })}
-          </OverflownText>
-        ),
+        CellContent: ({ row: { name, myEffectivePermission } }) => {
+          if (isNullish(myEffectivePermission)) {
+            return (
+              <HStack>
+                <SmallPopover
+                  content={
+                    <FormattedMessage
+                      id="component.profile-petitions-table.no-access-to-petition"
+                      defaultMessage="You do not have access to this parallel. Contact an administrator in your organization if you need access."
+                    />
+                  }
+                >
+                  <LockClosedIcon />
+                </SmallPopover>
+                <OverflownText textStyle={name ? undefined : "hint"}>
+                  {name
+                    ? name
+                    : intl.formatMessage({
+                        id: "generic.unnamed-parallel",
+                        defaultMessage: "Unnamed parallel",
+                      })}
+                </OverflownText>
+              </HStack>
+            );
+          } else {
+            return (
+              <OverflownText textStyle={name ? undefined : "hint"}>
+                {name
+                  ? name
+                  : intl.formatMessage({
+                      id: "generic.unnamed-parallel",
+                      defaultMessage: "Unnamed parallel",
+                    })}
+              </OverflownText>
+            );
+          }
+        },
       },
       {
         key: "recipient",
@@ -394,6 +450,64 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
             </Text>
           ),
       },
+      {
+        key: "fromTemplateId",
+        label: (intl) =>
+          intl.formatMessage({
+            id: "generic.template",
+            defaultMessage: "Template",
+          }),
+        cellProps: {
+          maxWidth: 0,
+          minWidth: "200px",
+          whiteSpace: "nowrap",
+        },
+        isFilterable: true,
+        Filter: PetitionTemplateFilter,
+        CellContent: ({ row }) => {
+          if (row.__typename === "Petition") {
+            return isNonNullish(row.fromTemplate) ? (
+              isNonNullish(row.fromTemplate.myEffectivePermission) ||
+              row.fromTemplate.isPublicTemplate ? (
+                <OverflownText
+                  display="block"
+                  as={Link}
+                  href={`/app/petitions/new?${new URLSearchParams({
+                    template: row.fromTemplate.id,
+                    ...(row.fromTemplate.isPublicTemplate &&
+                    row.fromTemplate.myEffectivePermission === null
+                      ? { public: "true" }
+                      : {}),
+                  })}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {row.fromTemplate.name ? (
+                    row.fromTemplate.name
+                  ) : (
+                    <Text as="span" fontStyle="italic">
+                      <FormattedMessage
+                        id="generic.unnamed-template"
+                        defaultMessage="Unnamed template"
+                      />
+                    </Text>
+                  )}
+                </OverflownText>
+              ) : row.fromTemplate.name ? (
+                <OverflownText>{row.fromTemplate.name}</OverflownText>
+              ) : (
+                <Text as="span" textStyle="hint">
+                  <FormattedMessage
+                    id="generic.unnamed-template"
+                    defaultMessage="Unnamed template"
+                  />
+                </Text>
+              )
+            ) : null;
+          } else {
+            return null;
+          }
+        },
+      },
     ],
     [intl.locale],
   );
@@ -435,6 +549,14 @@ const _fragments = {
       ...PetitionStatusCellContent_Petition
       ...PetitionSignatureCellContent_Petition
       isAnonymized
+      fromTemplate {
+        id
+        name
+        myEffectivePermission {
+          permissionType
+        }
+        isPublicTemplate
+      }
     }
     ${ContactReference.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
@@ -454,11 +576,11 @@ const _mutations = [
     ${_fragments.Profile}
   `,
   gql`
-    mutation ProfilePetitionsTable_disassociatePetitionFromProfile(
-      $profileId: GID!
+    mutation ProfilePetitionsTable_disassociateProfilesFromPetitions(
+      $profileIds: [GID!]!
       $petitionIds: [GID!]!
     ) {
-      disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+      disassociateProfilesFromPetitions(profileIds: $profileIds, petitionIds: $petitionIds)
     }
   `,
 ];
@@ -473,14 +595,7 @@ const _queries = [
     ) {
       profile(profileId: $profileId) {
         ...ProfilePetitionsTable_Profile
-        petitions(offset: $offset, limit: $limit) {
-          items {
-            ...ProfilePetitionsTable_Petition
-          }
-          totalCount
-        }
-
-        associatedPetitions(offset: $offset, limit: $limit, filters: $filters) {
+        petitions: associatedPetitions(offset: $offset, limit: $limit, filters: $filters) {
           items {
             ...ProfilePetitionsTable_Petition
           }

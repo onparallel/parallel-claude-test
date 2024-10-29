@@ -6,7 +6,6 @@ import {
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
-  PetitionSignatureStatusValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
@@ -438,12 +437,11 @@ export const PetitionBaseMini = objectType({
       description: "The status of the petition.",
       resolve: (o) => o.status,
     });
-    t.nullable.field("latestSignatureStatus", {
-      type: enumType({
-        name: "PetitionLatestSignatureStatus",
-        members: [...PetitionSignatureStatusValues, "CANCELLED_BY_USER"],
-      }),
-      resolve: (o) => o.latest_signature_status as any,
+    t.nullable.field("currentSignatureRequest", {
+      type: "PetitionSignatureRequestMini",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
+      },
     });
     t.nullable.datetime("lastActivityAt", {
       resolve: (o) => o.last_activity_at,

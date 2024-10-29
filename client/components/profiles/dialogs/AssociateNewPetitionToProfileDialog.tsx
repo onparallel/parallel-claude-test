@@ -1,5 +1,8 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -17,11 +20,13 @@ import {
   Th,
   Thead,
   Tr,
-  useCounter,
 } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  useWizardDialog,
+  WizardStepDialogProps,
+} from "@parallel/components/common/dialogs/WizardDialog";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
@@ -30,19 +35,17 @@ import { ScrollTableContainer } from "@parallel/components/common/ScrollTableCon
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   CreatePetitionFromProfilePrefillInput,
+  useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   useAssociateNewPetitionToProfileDialog_PetitionBaseFragment,
+  useAssociateNewPetitionToProfileDialog_petitionDocument,
   useAssociateNewPetitionToProfileDialog_ProfileFragment,
   useAssociateNewPetitionToProfileDialog_ProfileInnerFragment,
   useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment,
-  useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
-  useAssociateNewPetitionToProfileDialog_petitionDocument,
 } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
-import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { ForwardedRef, forwardRef, useEffect, useMemo, useRef } from "react";
-import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { useMemo, useRef } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, uniqueBy } from "remeda";
 
@@ -50,39 +53,193 @@ type PetitionFieldSelection = UnwrapArray<
   Assert<useAssociateNewPetitionToProfileDialog_PetitionBaseFragment["fields"]>
 >;
 
-interface AssociateNewPetitionToProfileDialogProps {
-  profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
-  keyProcess?: useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment;
-}
+type AssociateNewPetitionToProfileDialogSteps = {
+  SELECT_TEMPLATE: {
+    profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+    keyProcess?: useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment;
+    selectedTemplateId?: string;
+  };
+  SELECT_FIELD_GROUP: {
+    profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+    template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
+    profileTypeProcessId?: string;
+    selectedGroupId?: string;
+  };
+  PREFILL_FIELD_GROUPS: {
+    profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+    template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
+    groupId: string;
+    profileTypeProcessId?: string;
+  };
+};
 
-interface AssociateNewPetitionToProfileDialogData {
-  templateId: string | null;
-  fillWithProfileData: boolean;
-  groupId?: string;
-  prefill: CreatePetitionFromProfilePrefillInput[];
-}
-
-function AssociateNewPetitionToProfileDialog({
+const calculateCompatibleFieldGroups = ({
   profile,
+  template,
+}: {
+  profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+  template?: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment | null;
+}) => {
+  if (!template) return [];
+
+  const allFieldGroups =
+    template.fields.filter(
+      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
+    ) ?? [];
+
+  return allFieldGroups.filter((f) => f.profileType?.id === profile.profileType.id);
+};
+
+const calculateRelatedFieldGroupsWithCompatibleProfiles = ({
+  profile,
+  template,
+  compatibleFieldGroups,
+  groupId,
+}: {
+  profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
+  template?: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment | null;
+  compatibleFieldGroups: PetitionFieldSelection[];
+  groupId?: string;
+}): [PetitionFieldSelection, useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[]][] => {
+  if (!template || !compatibleFieldGroups.length) return [];
+
+  const allFieldGroups =
+    template.fields.filter(
+      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
+    ) ?? [];
+
+  const selectedGroup = groupId
+    ? compatibleFieldGroups.find((f) => f.id === groupId)
+    : compatibleFieldGroups[0];
+  const selectedGroupId = selectedGroup?.id;
+
+  // Filter the compatible relationships that the template has configured with the selected group, by default the first one.
+  const templateRelationships = template.fieldRelationships.filter(
+    (r) =>
+      selectedGroupId === r.rightSidePetitionField.id ||
+      selectedGroupId === r.leftSidePetitionField.id,
+  );
+
+  const relatedFieldGroupsWithCompatibleProfiles =
+    profile.relationships.length === 0
+      ? isNonNullish(selectedGroup)
+        ? ([[selectedGroup, [profile]]] as [
+            PetitionFieldSelection,
+            useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+          ][])
+        : []
+      : (allFieldGroups
+          .map((f) => {
+            const profiles = uniqueBy(
+              [
+                ...(selectedGroupId === f.id ? [profile] : []),
+                // filter the available relationships in the profile to suggest the "prefill" in step 3
+                ...profile.relationships
+                  .filter((pr) =>
+                    templateRelationships
+                      .filter(
+                        // relationships of the same type
+                        (tr) =>
+                          tr.relationshipTypeWithDirection.profileRelationshipType.id ===
+                          pr.relationshipType.id,
+                      )
+                      .some((tr) => {
+                        let [leftId, rightId] = [
+                          tr.leftSidePetitionField.id,
+                          tr.rightSidePetitionField.id,
+                        ];
+                        if (tr.relationshipTypeWithDirection.profileRelationshipType.isReciprocal) {
+                          return (
+                            (leftId === selectedGroupId && rightId === f.id) ||
+                            (leftId === f.id && rightId === selectedGroupId)
+                          );
+                        }
+                        if (pr.rightSideProfile.id === profile.id) {
+                          [leftId, rightId] = [rightId, leftId];
+                        }
+                        if (tr.relationshipTypeWithDirection.direction === "RIGHT_LEFT") {
+                          [leftId, rightId] = [rightId, leftId];
+                        }
+                        return leftId === selectedGroupId && rightId === f.id;
+                      }),
+                  )
+                  .map((r) =>
+                    r.leftSideProfile.id === profile.id ? r.rightSideProfile : r.leftSideProfile,
+                  ),
+              ],
+              (p) => p.id,
+            );
+
+            const filteredProfiles = profiles.filter((p) => p.profileType.id === f.profileType?.id);
+
+            return filteredProfiles.length > 0 ? [f, filteredProfiles] : null;
+          })
+          .filter(isNonNullish) as [
+          PetitionFieldSelection,
+          useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+        ][]);
+
+  return relatedFieldGroupsWithCompatibleProfiles;
+};
+
+const generatePrefillData = (
+  relatedFieldGroupsWithCompatibleProfiles: [
+    PetitionFieldSelection,
+    useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+  ][],
+  selectedGroupId: string,
+): CreatePetitionFromProfilePrefillInput[] => {
+  return relatedFieldGroupsWithCompatibleProfiles
+    .map(([field, profiles]: [any, any[]]) => ({
+      petitionFieldId: field.id,
+      profileIds: !field.multiple ? [profiles[0]?.id] : profiles.map((p) => p.id),
+    }))
+    .sort((a, b) =>
+      a.petitionFieldId === selectedGroupId ? -1 : b.petitionFieldId === selectedGroupId ? 1 : 0,
+    );
+};
+
+/* 
+  Dialog that is called from the related parallels table in the profile or from the key process cards.
+  It has a maximum of 3 steps
+  Step 1 "SELECT_TEMPLATE" - select the template to create the parallel, 
+        depending on the template group fields and user options all the following steps can be omitted or not
+  Step 2 "SELECT_FIELD_GROUP" - only if you have more than one compatible group to choose from
+  Step 3 "PREFILL_FIELD_GROUPS" - only if you have more than one group compatible with the current profile relationships
+        and have the same relationship in the template.
+*/
+
+function AssociateNewPetitionToProfileDialogSelectTemplate({
   keyProcess,
+  profile,
+  selectedTemplateId,
+  onStep,
+  fromStep,
   ...props
-}: DialogProps<AssociateNewPetitionToProfileDialogProps, {}>) {
-  const goToPetition = useGoToPetition();
-  const showGenericErrorToast = useGenericErrorToast();
-  const form = useForm<AssociateNewPetitionToProfileDialogData>({
-    defaultValues: { templateId: null, fillWithProfileData: true, prefill: [] },
+}: WizardStepDialogProps<AssociateNewPetitionToProfileDialogSteps, "SELECT_TEMPLATE", string>) {
+  const focusRef = useRef<PetitionSelectInstance<false>>(null);
+  const { handleSubmit, control, register, formState, watch } = useForm<{
+    templateId: string | null;
+    fillWithProfileData: boolean;
+  }>({
+    mode: "onSubmit",
+    defaultValues: {
+      templateId:
+        selectedTemplateId ??
+        (isNonNullish(keyProcess) && keyProcess.templates.length === 1
+          ? keyProcess.templates[0].id
+          : null),
+      fillWithProfileData: true,
+    },
   });
-
-  const { handleSubmit, trigger, watch, setValue, control } = form;
-
-  const { replace } = useFieldArray({
-    control,
-    name: "prefill",
-  });
-
+  const { errors } = formState;
   const templateId = watch("templateId");
-  const fillWithProfileData = watch("fillWithProfileData");
-  const groupId = watch("groupId");
+
+  const isFromKeyProcess = isNonNullish(keyProcess);
+
+  const keyProcessTemplates = isFromKeyProcess
+    ? keyProcess.templates.filter((t) => isNonNullish(t.myEffectivePermission))
+    : [];
 
   const { loading, data } = useQuery(useAssociateNewPetitionToProfileDialog_petitionDocument, {
     variables: { id: templateId! },
@@ -91,150 +248,10 @@ function AssociateNewPetitionToProfileDialog({
 
   const template = data?.petition;
 
-  const { fieldsWithCompatibleProfiles = [], compatibleFieldGroups = [] } = useMemo(() => {
-    if (!template) return {};
-
-    const allFieldGroups =
-      template.fields.filter(
-        (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
-      ) ?? [];
-
-    // Filter the groups of fields compatible with the profile to suggest in step 2.
-    const compatibleFieldGroups = allFieldGroups.filter(
-      (f) => f.profileType?.id === profile.profileType.id,
-    );
-
-    const selectedGroup = groupId
-      ? compatibleFieldGroups.find((f) => f.id === groupId)
-      : compatibleFieldGroups[0];
-    const selectedGroupId = selectedGroup?.id;
-
-    // Filter the compatible relationships that the template has configured with the selected group, by default the first one.
-    const templateRelationships = template.fieldRelationships.filter(
-      (r) =>
-        selectedGroupId === r.rightSidePetitionField.id ||
-        selectedGroupId === r.leftSidePetitionField.id,
-    );
-
-    const fieldsWithCompatibleProfiles =
-      profile.relationships.length === 0
-        ? isNonNullish(selectedGroup)
-          ? ([[selectedGroup, [profile]]] as [
-              PetitionFieldSelection,
-              useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
-            ][])
-          : undefined
-        : (allFieldGroups
-            .map((f) => {
-              const profiles = uniqueBy(
-                [
-                  ...(selectedGroupId === f.id ? [profile] : []),
-                  // filter the available relationships in the profile to suggest the "prefill" in step 3
-                  ...profile.relationships
-                    .filter((pr) =>
-                      templateRelationships
-                        .filter(
-                          // relationships of the same type
-                          (tr) =>
-                            tr.relationshipTypeWithDirection.profileRelationshipType.id ===
-                            pr.relationshipType.id,
-                        )
-                        .some((tr) => {
-                          let [leftId, rightId] = [
-                            tr.leftSidePetitionField.id,
-                            tr.rightSidePetitionField.id,
-                          ];
-                          if (
-                            tr.relationshipTypeWithDirection.profileRelationshipType.isReciprocal
-                          ) {
-                            return (
-                              (leftId === selectedGroupId && rightId === f.id) ||
-                              (leftId === f.id && rightId === selectedGroupId)
-                            );
-                          }
-                          if (pr.rightSideProfile.id === profile.id) {
-                            [leftId, rightId] = [rightId, leftId];
-                          }
-                          if (tr.relationshipTypeWithDirection.direction === "RIGHT_LEFT") {
-                            [leftId, rightId] = [rightId, leftId];
-                          }
-                          return leftId === selectedGroupId && rightId === f.id;
-                        }),
-                    )
-                    .map((r) =>
-                      r.leftSideProfile.id === profile.id ? r.rightSideProfile : r.leftSideProfile,
-                    ),
-                ],
-                (p) => p.id,
-              );
-
-              const filteredProfiles = profiles.filter(
-                (p) => p.profileType.id === f.profileType?.id,
-              );
-
-              return filteredProfiles.length > 0 ? [f, filteredProfiles] : null;
-            })
-            .filter(isNonNullish) as [
-            PetitionFieldSelection,
-            useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
-          ][]);
-
-    return { fieldsWithCompatibleProfiles, compatibleFieldGroups };
-  }, [template, profile, groupId]);
-
-  const compatibleFieldGroupsIds = compatibleFieldGroups.map((f) => f.id);
-
-  const omitStep2 = compatibleFieldGroupsIds.length < 2;
-  const omitStep3 = fieldsWithCompatibleProfiles.length < 2;
-
-  let maxSteps = 2;
-  if (!fillWithProfileData) maxSteps = 0;
-  else {
-    if (omitStep2) --maxSteps;
-    if (omitStep3) --maxSteps;
-  }
-
-  const {
-    valueAsNumber: currentStep,
-    isAtMax: isLastStep,
-    increment: nextStep,
-    decrement: previousStep,
-  } = useCounter({ min: 0, max: maxSteps, defaultValue: 0 });
-
-  const selectRef = useRef<PetitionSelectInstance<false>>(null);
-  const selectedGroupId = groupId ?? compatibleFieldGroupsIds[0];
-  useEffect(() => {
-    replace(
-      fieldsWithCompatibleProfiles
-        .map(([field, profiles]) => {
-          const isRadio = !field.multiple;
-
-          return {
-            petitionFieldId: field.id,
-            profileIds: isRadio ? [profiles[0]?.id] : profiles.map((p) => p.id),
-          };
-        })
-        .sort((fieldA, fieldB) =>
-          fieldA.petitionFieldId === selectedGroupId
-            ? -1
-            : fieldB.petitionFieldId === selectedGroupId
-              ? 1
-              : 0,
-        ),
-    );
-  }, [templateId, selectedGroupId]);
-
-  const handleNextClick = async () => {
-    if (currentStep === 0 && !(await trigger("templateId"))) return;
-    if (currentStep === 1 && !(await trigger("groupId"))) return;
-    if (currentStep === 0) setValue("groupId", compatibleFieldGroupsIds[0]);
-    nextStep();
-  };
-
-  const handlePreviousClick = () => {
-    if (!omitStep2 && currentStep === 1) setValue("groupId", undefined);
-    previousStep();
-  };
+  const compatibleFieldGroups = useMemo(
+    () => calculateCompatibleFieldGroups({ profile, template }),
+    [template, profile],
+  );
 
   const [createPetitionFromProfile, { loading: creatingPetition }] = useMutation(
     useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
@@ -242,445 +259,573 @@ function AssociateNewPetitionToProfileDialog({
 
   return (
     <ConfirmDialog
-      closeOnEsc={true}
-      closeOnOverlayClick={false}
-      hasCloseButton={true}
-      initialFocusRef={selectRef}
-      size={currentStep === 0 ? "md" : currentStep === 1 ? "xl" : "3xl"}
-      content={
-        {
+      size="lg"
+      content={{
+        containerProps: {
           as: "form",
-          onSubmit: handleSubmit(async (data) => {
-            if (isNullish(data.templateId)) return;
+          onSubmit: handleSubmit(async ({ fillWithProfileData, templateId }) => {
+            const groupId = compatibleFieldGroups[0]?.id;
 
-            const groupId = data.groupId ?? compatibleFieldGroupsIds[0];
+            const relatedFieldGroupsWithCompatibleProfiles =
+              calculateRelatedFieldGroupsWithCompatibleProfiles({
+                template,
+                profile,
+                compatibleFieldGroups,
+                groupId,
+              });
 
-            const prefill =
-              data.fillWithProfileData && groupId
-                ? data.prefill.filter((p) => p.profileIds.length > 0)
+            const hasMultipleCompatibleGroupsOrFieldsWithProfiles =
+              compatibleFieldGroups.length > 1 ||
+              relatedFieldGroupsWithCompatibleProfiles.length > 1;
+            // If do not have multiple compatible group fields and compatible relationships we can calculate the prefill and omit the following steps.
+            if (!hasMultipleCompatibleGroupsOrFieldsWithProfiles || !fillWithProfileData) {
+              const prefill = fillWithProfileData
+                ? generatePrefillData(relatedFieldGroupsWithCompatibleProfiles, groupId)
                 : [];
-
-            try {
               const res = await createPetitionFromProfile({
                 variables: {
                   profileId: profile.id,
-                  templateId: data.templateId,
+                  templateId: templateId!,
                   prefill,
-                  petitionFieldId: data.fillWithProfileData ? groupId : undefined,
+                  petitionFieldId: fillWithProfileData ? groupId : undefined,
                   profileTypeProcessId: keyProcess?.id,
                 },
               });
 
               if (isNonNullish(res?.data)) {
-                goToPetition(res.data.createPetitionFromProfile.id, "preview");
+                props.onResolve(res.data.createPetitionFromProfile.id);
               } else {
-                throw new Error("No data in createPetitionFromProfile mutation response");
+                props.onReject("ERROR");
               }
-
-              props.onResolve({});
-            } catch {
-              showGenericErrorToast();
+            } else {
+              // we omit SELECT_FIELD_GROUP step and jump to the final if do not have multiple compatible group fields
+              if (compatibleFieldGroups.length === 1) {
+                onStep(
+                  "PREFILL_FIELD_GROUPS",
+                  {
+                    profile,
+                    template: template!,
+                    groupId,
+                    profileTypeProcessId: keyProcess?.id,
+                  },
+                  { selectedTemplateId: template!.id },
+                );
+              } else {
+                onStep(
+                  "SELECT_FIELD_GROUP",
+                  {
+                    profile,
+                    template: template!,
+                    profileTypeProcessId: keyProcess?.id,
+                  },
+                  { selectedTemplateId: template!.id },
+                );
+              }
             }
           }),
-        } as any
-      }
-      {...props}
+        },
+      }}
+      initialFocusRef={focusRef}
+      hasCloseButton
       header={
-        currentStep === 0 ? (
-          <FormattedMessage
-            id="component.associate-new-petition-to-profile-dialog.header-1"
-            defaultMessage="New parallel"
-          />
-        ) : currentStep === 1 && !omitStep2 ? (
-          <FormattedMessage
-            id="component.associate-new-petition-to-profile-dialog.header-2"
-            defaultMessage="Prefill groups"
-          />
-        ) : (
-          <FormattedMessage
-            id="component.associate-new-petition-to-profile-dialog.header-3"
-            defaultMessage="Include relationships"
-          />
-        )
+        <FormattedMessage
+          id="component.associate-new-petition-to-profile-dialog.header-1"
+          defaultMessage="New parallel"
+        />
       }
       body={
-        <FormProvider {...form}>
-          {currentStep === 0 || isNullish(template) ? (
-            <AssociateNewPetitionToProfileStep1
-              key="step1"
-              ref={selectRef}
-              showCheckbox={isNonNullish(template) && (!omitStep2 || !omitStep3)}
-              keyProcess={keyProcess}
-            />
-          ) : currentStep === 1 ? (
-            omitStep2 ? (
-              <AssociateNewPetitionToProfileStep3
-                key="step3"
-                profile={profile}
-                template={template}
-                fieldsWithCompatibleProfiles={fieldsWithCompatibleProfiles}
+        <Stack>
+          {isFromKeyProcess && keyProcessTemplates.length === 0 ? (
+            <Alert status="warning" rounded="md">
+              <AlertIcon />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.associate-new-petition-to-profile-dialog.no-access-to-process-templates"
+                  defaultMessage="You don't have access to these templates. Request it to the owner of the organization to create parallels."
+                />
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <FormControl isInvalid={!!errors.templateId}>
+            <FormLabel fontWeight={400}>
+              <FormattedMessage
+                id="component.associate-new-petition-to-profile-dialog.template-label"
+                defaultMessage="Template"
               />
-            ) : (
-              <AssociateNewPetitionToProfileStep2
-                key="step2"
-                profile={profile}
-                template={template}
-                compatibleFieldGroupsIds={compatibleFieldGroupsIds}
-              />
-            )
-          ) : (
-            <AssociateNewPetitionToProfileStep3
-              key="step3"
-              profile={profile}
-              template={template}
-              fieldsWithCompatibleProfiles={fieldsWithCompatibleProfiles}
+            </FormLabel>
+            <Controller
+              name="templateId"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <PetitionSelect
+                  ref={focusRef}
+                  isDisabled={isFromKeyProcess && keyProcessTemplates.length === 0}
+                  isSync={isFromKeyProcess}
+                  defaultOptions={!isFromKeyProcess}
+                  options={isFromKeyProcess ? keyProcessTemplates : undefined}
+                  type="TEMPLATE"
+                  value={value}
+                  onChange={(v) => {
+                    onChange(v?.id ?? null);
+                  }}
+                />
+              )}
             />
-          )}
-        </FormProvider>
+            <FormErrorMessage>
+              <FormattedMessage
+                id="component.associate-new-petition-to-profile-dialog.template-error"
+                defaultMessage="Please, select a template"
+              />
+            </FormErrorMessage>
+          </FormControl>
+
+          {compatibleFieldGroups.length ? (
+            <FormControl>
+              <Checkbox {...register("fillWithProfileData")} colorScheme="primary">
+                <FormattedMessage
+                  id="component.associate-new-petition-to-profile-dialog.prefill-checkbox-label"
+                  defaultMessage="Prefill with profile information and relationships"
+                />
+              </Checkbox>
+            </FormControl>
+          ) : null}
+        </Stack>
       }
       confirm={
-        isLastStep ? (
-          <Button
-            key="accept"
-            colorScheme="primary"
-            type="submit"
-            isLoading={loading || creatingPetition}
-          >
-            <FormattedMessage id="generic.accept" defaultMessage="Accept" />
-          </Button>
-        ) : (
-          <Button key="next" colorScheme="primary" onClick={handleNextClick} isLoading={loading}>
-            <FormattedMessage id="generic.next-button" defaultMessage="Next" />
-          </Button>
-        )
+        <Button
+          type="submit"
+          colorScheme="primary"
+          isLoading={loading || creatingPetition}
+          isDisabled={!formState.isValid || (isFromKeyProcess && keyProcessTemplates.length === 0)}
+        >
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
       }
-      cancel={
-        currentStep !== 0 ? (
-          <Button onClick={handlePreviousClick}>
-            <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-          </Button>
-        ) : null
-      }
+      {...props}
     />
   );
 }
 
-export function useAssociateNewPetitionToProfileDialog() {
-  return useDialog(AssociateNewPetitionToProfileDialog);
-}
-
-const AssociateNewPetitionToProfileStep1 = forwardRef(function AssociateNewPetitionToProfileStep1(
-  {
-    showCheckbox,
-    keyProcess,
-  }: {
-    showCheckbox?: boolean;
-    keyProcess?: useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment;
-  },
-  ref: ForwardedRef<PetitionSelectInstance<false>>,
-) {
-  const {
-    control,
-    register,
-    formState: { errors },
-  } = useFormContext<AssociateNewPetitionToProfileDialogData>();
-
-  const useFixedOptions = isNonNullish(keyProcess);
-
-  return (
-    <Stack>
-      <FormControl isInvalid={!!errors.templateId}>
-        <FormLabel fontWeight={400}>
-          <FormattedMessage
-            id="component.associate-new-petition-to-profile-dialog.template-label"
-            defaultMessage="Template"
-          />
-        </FormLabel>
-        <Controller
-          name="templateId"
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { value, onChange } }) => (
-            <PetitionSelect
-              ref={ref}
-              isSync={useFixedOptions}
-              defaultOptions={!useFixedOptions}
-              options={useFixedOptions ? keyProcess!.templates : undefined}
-              type="TEMPLATE"
-              value={value}
-              onChange={(v) => {
-                onChange(v?.id ?? null);
-              }}
-            />
-          )}
-        />
-        <FormErrorMessage>
-          <FormattedMessage
-            id="component.associate-new-petition-to-profile-dialog.template-error"
-            defaultMessage="Please, select a template"
-          />
-        </FormErrorMessage>
-      </FormControl>
-
-      {showCheckbox ? (
-        <FormControl>
-          <Checkbox
-            {...register("fillWithProfileData")}
-            colorScheme="primary"
-            alignItems={"flex-start"}
-            sx={{ "span:first-of-type": { marginTop: 1 } }}
-          >
-            <FormattedMessage
-              id="component.associate-new-petition-to-profile-dialog.prefill-checkbox-label"
-              defaultMessage="Prefill with profile information and relationships"
-            />
-          </Checkbox>
-        </FormControl>
-      ) : null}
-    </Stack>
-  );
-});
-
-function AssociateNewPetitionToProfileStep2({
-  profile,
+function AssociateNewPetitionToProfileDialogSelectFieldGroup({
   template,
-  compatibleFieldGroupsIds,
-}: {
-  profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
-  template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
-  compatibleFieldGroupsIds: string[];
-}) {
+  profile,
+  profileTypeProcessId,
+  selectedGroupId,
+  onStep,
+  onBack,
+  ...props
+}: WizardStepDialogProps<AssociateNewPetitionToProfileDialogSteps, "SELECT_FIELD_GROUP", string>) {
   const intl = useIntl();
+
+  const compatibleFieldGroups = useMemo(
+    () => calculateCompatibleFieldGroups({ profile, template }),
+    [template, profile],
+  );
+
+  const { handleSubmit, control, formState } = useForm<{
+    groupId?: string;
+  }>({
+    mode: "onSubmit",
+    defaultValues: {
+      groupId: selectedGroupId ?? compatibleFieldGroups[0]?.id,
+    },
+  });
+  const { errors } = formState;
+
   const fieldsWithIndices = useFieldsWithIndices(template);
+
+  const compatibleFieldGroupsIds = compatibleFieldGroups.map((f) => f.id);
 
   const filteredFieldsWithIndices = useMemo(() => {
     return fieldsWithIndices.filter(([f]) => compatibleFieldGroupsIds.includes(f.id));
   }, [fieldsWithIndices, compatibleFieldGroupsIds.join(",")]);
 
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<AssociateNewPetitionToProfileDialogData>();
+  const [createPetitionFromProfile, { loading: creatingPetition }] = useMutation(
+    useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
+  );
 
   return (
-    <Stack>
-      <Text>
+    <ConfirmDialog
+      size="xl"
+      content={{
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ groupId }) => {
+            const relatedFieldGroupsWithCompatibleProfiles =
+              calculateRelatedFieldGroupsWithCompatibleProfiles({
+                template,
+                profile,
+                compatibleFieldGroups,
+                groupId,
+              });
+
+            // If there are no multiple groups compatible with the profile relationships, the step is skipped and the parallel is created.
+            if (relatedFieldGroupsWithCompatibleProfiles.length < 2) {
+              const prefill = generatePrefillData(
+                relatedFieldGroupsWithCompatibleProfiles,
+                groupId!,
+              );
+
+              const res = await createPetitionFromProfile({
+                variables: {
+                  profileId: profile.id,
+                  templateId: template.id,
+                  prefill,
+                  petitionFieldId: groupId,
+                  profileTypeProcessId,
+                },
+              });
+
+              if (isNonNullish(res?.data)) {
+                props.onResolve(res.data.createPetitionFromProfile.id);
+              } else {
+                props.onReject("ERROR");
+              }
+            } else {
+              onStep(
+                "PREFILL_FIELD_GROUPS",
+                {
+                  groupId: groupId!,
+                  profile,
+                  template,
+                  profileTypeProcessId,
+                },
+                { selectedGroupId: groupId },
+              );
+            }
+          }),
+        },
+      }}
+      hasCloseButton
+      header={
         <FormattedMessage
-          id="component.associate-new-petition-to-profile-dialog.select-group-label"
-          defaultMessage="Select in which group you want to pre-fill the profile information:"
+          id="component.associate-new-petition-to-profile-dialog.header-2"
+          defaultMessage="Prefill groups"
         />
-      </Text>
-      <FormControl isInvalid={!!errors.groupId}>
-        <FormLabel>
-          <Text as="span" fontSize="md">
-            <LocalizableUserTextRender
-              default={intl.formatMessage({
-                id: "generic.unnamed-profile",
-                defaultMessage: "Unnamed profile",
-              })}
-              value={profile.localizableName}
+      }
+      body={
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.associate-new-petition-to-profile-dialog.select-group-label"
+              defaultMessage="Select in which group you want to pre-fill the profile information:"
             />
           </Text>
-          &nbsp;
-          <Text as="span" fontSize="sm" fontWeight="normal">
-            <LocalizableUserTextRender
-              default={intl.formatMessage({
-                id: "generic.unnamed-profile-type",
-                defaultMessage: "Unnamed profile type",
-              })}
-              value={profile.profileType.name}
+          <FormControl isInvalid={!!errors.groupId}>
+            <FormLabel>
+              <Text as="span" fontSize="md">
+                <LocalizableUserTextRender
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile",
+                    defaultMessage: "Unnamed profile",
+                  })}
+                  value={profile.localizableName}
+                />
+              </Text>
+              &nbsp;
+              <Text as="span" fontSize="sm" fontWeight="normal">
+                <LocalizableUserTextRender
+                  default={intl.formatMessage({
+                    id: "generic.unnamed-profile-type",
+                    defaultMessage: "Unnamed profile type",
+                  })}
+                  value={profile.profileType.name}
+                />
+              </Text>
+            </FormLabel>
+            <Controller
+              name="groupId"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup
+                  as={Stack}
+                  spacing={2}
+                  onChange={(value) => onChange(value as string)}
+                  value={value}
+                  colorScheme="primary"
+                >
+                  {filteredFieldsWithIndices.map(([field, fieldIndex]) => (
+                    <Radio key={field.id} value={field.id}>
+                      <HStack>
+                        <PetitionFieldTypeIndicator
+                          as="span"
+                          type={field.type}
+                          fieldIndex={fieldIndex}
+                        />
+                        <OverflownText>
+                          {field.options?.groupName || (
+                            <PetitionFieldReference field={field} as="span" />
+                          )}
+                        </OverflownText>
+                      </HStack>
+                    </Radio>
+                  ))}
+                </RadioGroup>
+              )}
             />
-          </Text>
-        </FormLabel>
-        <Controller
-          name="groupId"
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { onChange, value } }) => (
-            <RadioGroup
-              as={Stack}
-              spacing={2}
-              onChange={(value) => onChange(value as string)}
-              value={value}
-              colorScheme="primary"
-            >
-              {filteredFieldsWithIndices.map(([field, fieldIndex]) => (
-                <Radio key={field.id} value={field.id}>
-                  <HStack>
-                    <PetitionFieldTypeIndicator
-                      as="span"
-                      type={field.type}
-                      fieldIndex={fieldIndex}
-                    />
-                    <OverflownText>
-                      {field.options?.groupName || (
-                        <PetitionFieldReference field={field} as="span" />
-                      )}
-                    </OverflownText>
-                  </HStack>
-                </Radio>
-              ))}
-            </RadioGroup>
-          )}
-        />
-      </FormControl>
-    </Stack>
+          </FormControl>
+        </Stack>
+      }
+      cancel={
+        <Button onClick={() => onBack()}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+      }
+      confirm={
+        <Button
+          type="submit"
+          colorScheme="primary"
+          isDisabled={!formState.isValid}
+          isLoading={creatingPetition}
+        >
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
+      {...props}
+    />
   );
 }
 
-function AssociateNewPetitionToProfileStep3({
+function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
   profile,
-  fieldsWithCompatibleProfiles,
   template,
-}: {
-  profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
-  fieldsWithCompatibleProfiles: [
-    PetitionFieldSelection,
-    useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
-  ][];
-  template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
-}) {
+  groupId,
+  profileTypeProcessId,
+  onStep,
+  onBack,
+  ...props
+}: WizardStepDialogProps<
+  AssociateNewPetitionToProfileDialogSteps,
+  "PREFILL_FIELD_GROUPS",
+  string
+>) {
   const intl = useIntl();
-  const fieldsWithIndices = useFieldsWithIndices(template);
 
-  const { control, watch } = useFormContext<AssociateNewPetitionToProfileDialogData>();
+  const compatibleFieldGroups = useMemo(
+    () => calculateCompatibleFieldGroups({ profile, template }),
+    [template, profile],
+  );
+
+  const relatedFieldGroupsWithCompatibleProfiles = useMemo(
+    () =>
+      calculateRelatedFieldGroupsWithCompatibleProfiles({
+        template,
+        profile,
+        compatibleFieldGroups,
+        groupId,
+      }),
+    [template, profile, groupId],
+  );
+
+  const { handleSubmit, control } = useForm<{
+    prefill: CreatePetitionFromProfilePrefillInput[];
+  }>({
+    mode: "onSubmit",
+    defaultValues: {
+      prefill: generatePrefillData(relatedFieldGroupsWithCompatibleProfiles, groupId),
+    },
+  });
+
   const { fields } = useFieldArray({
     control,
     name: "prefill",
   });
 
-  const groupId = watch("groupId");
+  const fieldsWithIndices = useFieldsWithIndices(template);
+
+  const [createPetitionFromProfile, { loading: creatingPetition }] = useMutation(
+    useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
+  );
 
   return (
-    <Stack>
-      <Text>
+    <ConfirmDialog
+      size="3xl"
+      content={{
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async ({ prefill }) => {
+            const res = await createPetitionFromProfile({
+              variables: {
+                profileId: profile.id,
+                templateId: template.id,
+                prefill,
+                petitionFieldId: groupId,
+                profileTypeProcessId,
+              },
+            });
+
+            if (isNonNullish(res?.data)) {
+              props.onResolve(res.data.createPetitionFromProfile.id);
+            } else {
+              props.onReject("ERROR");
+            }
+          }),
+        },
+      }}
+      hasCloseButton
+      header={
         <FormattedMessage
-          id="component.associate-new-petition-to-profile-dialog.relationships-label"
-          defaultMessage="Select the profile relationships you want to include in the {templateName} parallel."
-          values={{
-            templateName: template.name ? (
-              <b>{template.name}</b>
-            ) : (
-              <i>
-                {intl.formatMessage({
-                  id: "generic.unnamed-template",
-                  defaultMessage: "Unnamed template",
-                })}
-              </i>
-            ),
-          }}
+          id="component.associate-new-petition-to-profile-dialog.header-3"
+          defaultMessage="Include relationships"
         />
-      </Text>
-      <ScrollTableContainer maxHeight="350px">
-        <Table variant="parallel">
-          <Thead>
-            <Tr position="sticky" top={0} zIndex={1}>
-              <Th>
-                <FormattedMessage
-                  id="component.associate-new-petition-to-profile-dialog.table-header-group"
-                  defaultMessage="Group"
-                />
-              </Th>
-              <Th>
-                <FormattedMessage
-                  id="component.associate-new-petition-to-profile-dialog.table-header-profile"
-                  defaultMessage="Profile"
-                />
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {fields.map((item, index) => {
-              const [field, profiles] = fieldsWithCompatibleProfiles.find(
-                ([field]) => field.id === item.petitionFieldId,
-              ) as [
-                PetitionFieldSelection,
-                useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
-              ];
-
-              const isRadioButton = !field.multiple;
-              const [_, fieldIndex] = fieldsWithIndices.find(([f]) => f.id === field.id)!;
-
-              if (isNullish(field) || isNullish(profiles)) return null;
-
-              return (
-                <Tr key={item.id}>
-                  <Td>
-                    <HStack>
-                      <PetitionFieldTypeIndicator
-                        as="span"
-                        type={field.type}
-                        fieldIndex={fieldIndex}
-                      />
-                      <OverflownText>
-                        {field.options?.groupName || (
-                          <PetitionFieldReference field={field} as="span" />
-                        )}
-                      </OverflownText>
-                    </HStack>
-                  </Td>
-                  <Td>
-                    <Controller
-                      name={`prefill.${index}.profileIds` as const}
-                      control={control}
-                      render={({ field: { onChange, value } }) => {
-                        return (
-                          <CheckboxGroup
-                            key={item.id}
-                            colorScheme="primary"
-                            value={value}
-                            onChange={isRadioButton ? undefined : onChange}
-                          >
-                            <Stack>
-                              {profiles.map((compatibleProfile) => {
-                                const isDefaultChecked =
-                                  compatibleProfile.id === profile.id && groupId === field.id;
-
-                                const isDisabled = isRadioButton && index === 0;
-
-                                return (
-                                  <Checkbox
-                                    key={compatibleProfile.id + field.id}
-                                    value={compatibleProfile.id}
-                                    isDisabled={isDefaultChecked || isDisabled}
-                                    onChange={
-                                      isRadioButton
-                                        ? (e) => onChange(e.target.checked ? [e.target.value] : [])
-                                        : undefined
-                                    }
-                                    {...(isRadioButton
-                                      ? {
-                                          icon:
-                                            isDisabled && !isDefaultChecked ? undefined : (
-                                              <RadioButtonSelected />
-                                            ),
-                                          variant: "radio",
-                                        }
-                                      : {})}
-                                  >
-                                    <LocalizableUserTextRender
-                                      default={intl.formatMessage({
-                                        id: "generic.unnamed-profile",
-                                        defaultMessage: "Unnamed profile",
-                                      })}
-                                      value={compatibleProfile.localizableName}
-                                    />
-                                  </Checkbox>
-                                );
-                              })}
-                            </Stack>
-                          </CheckboxGroup>
-                        );
-                      }}
+      }
+      body={
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.associate-new-petition-to-profile-dialog.relationships-label"
+              defaultMessage="Select the profile relationships you want to include in the {templateName} parallel."
+              values={{
+                templateName: template.name ? (
+                  <b>{template.name}</b>
+                ) : (
+                  <i>
+                    {intl.formatMessage({
+                      id: "generic.unnamed-template",
+                      defaultMessage: "Unnamed template",
+                    })}
+                  </i>
+                ),
+              }}
+            />
+          </Text>
+          <ScrollTableContainer maxHeight="350px">
+            <Table variant="parallel">
+              <Thead>
+                <Tr position="sticky" top={0} zIndex={1}>
+                  <Th>
+                    <FormattedMessage
+                      id="component.associate-new-petition-to-profile-dialog.table-header-group"
+                      defaultMessage="Group"
                     />
-                  </Td>
+                  </Th>
+                  <Th>
+                    <FormattedMessage
+                      id="component.associate-new-petition-to-profile-dialog.table-header-profile"
+                      defaultMessage="Profile"
+                    />
+                  </Th>
                 </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-      </ScrollTableContainer>
-    </Stack>
+              </Thead>
+              <Tbody>
+                {fields.map((item, index) => {
+                  const [field, profiles] = relatedFieldGroupsWithCompatibleProfiles.find(
+                    ([field]) => field.id === item.petitionFieldId,
+                  ) as [
+                    PetitionFieldSelection,
+                    useAssociateNewPetitionToProfileDialog_ProfileInnerFragment[],
+                  ];
+
+                  const isRadioButton = !field.multiple;
+                  const [_, fieldIndex] = fieldsWithIndices.find(([f]) => f.id === field.id)!;
+
+                  if (isNullish(field) || isNullish(profiles)) return null;
+
+                  return (
+                    <Tr key={item.id}>
+                      <Td>
+                        <HStack>
+                          <PetitionFieldTypeIndicator
+                            as="span"
+                            type={field.type}
+                            fieldIndex={fieldIndex}
+                          />
+                          <OverflownText>
+                            {field.options?.groupName || (
+                              <PetitionFieldReference field={field} as="span" />
+                            )}
+                          </OverflownText>
+                        </HStack>
+                      </Td>
+                      <Td>
+                        <Controller
+                          name={`prefill.${index}.profileIds` as const}
+                          control={control}
+                          render={({ field: { onChange, value } }) => {
+                            return (
+                              <CheckboxGroup
+                                key={item.id}
+                                colorScheme="primary"
+                                value={value}
+                                onChange={isRadioButton ? undefined : onChange}
+                              >
+                                <Stack>
+                                  {profiles.map((compatibleProfile) => {
+                                    const isDefaultChecked =
+                                      compatibleProfile.id === profile.id && groupId === field.id;
+
+                                    const isDisabled = isRadioButton && index === 0;
+
+                                    return (
+                                      <Checkbox
+                                        key={compatibleProfile.id + field.id}
+                                        value={compatibleProfile.id}
+                                        isDisabled={isDefaultChecked || isDisabled}
+                                        onChange={
+                                          isRadioButton
+                                            ? (e) =>
+                                                onChange(e.target.checked ? [e.target.value] : [])
+                                            : undefined
+                                        }
+                                        {...(isRadioButton
+                                          ? {
+                                              icon:
+                                                isDisabled && !isDefaultChecked ? undefined : (
+                                                  <RadioButtonSelected />
+                                                ),
+                                              variant: "radio",
+                                            }
+                                          : {})}
+                                      >
+                                        <LocalizableUserTextRender
+                                          default={intl.formatMessage({
+                                            id: "generic.unnamed-profile",
+                                            defaultMessage: "Unnamed profile",
+                                          })}
+                                          value={compatibleProfile.localizableName}
+                                        />
+                                      </Checkbox>
+                                    );
+                                  })}
+                                </Stack>
+                              </CheckboxGroup>
+                            );
+                          }}
+                        />
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </ScrollTableContainer>
+        </Stack>
+      }
+      cancel={
+        <Button onClick={() => onBack()}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+      }
+      confirm={
+        <Button colorScheme="primary" type="submit" isLoading={creatingPetition}>
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+export function useAssociateNewPetitionToProfileDialog() {
+  return useWizardDialog(
+    {
+      SELECT_TEMPLATE: AssociateNewPetitionToProfileDialogSelectTemplate,
+      SELECT_FIELD_GROUP: AssociateNewPetitionToProfileDialogSelectFieldGroup,
+      PREFILL_FIELD_GROUPS: AssociateNewPetitionToProfileDialogPrefillFieldGroups,
+    },
+    "SELECT_TEMPLATE",
   );
 }
 
@@ -751,6 +896,9 @@ useAssociateNewPetitionToProfileDialog.fragments = {
         templates {
           id
           name
+          myEffectivePermission {
+            permissionType
+          }
         }
       }
     `;

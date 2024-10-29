@@ -425,6 +425,11 @@
     "context": "Include relationships"
   },
   {
+    "term": "component.associate-new-petition-to-profile-dialog.no-access-to-process-templates",
+    "definition": "You don't have access to these templates. Request it to the owner of the organization to create parallels.",
+    "context": "You don't have access to these templates. Request it to the owner of the organization to create parallels."
+  },
+  {
     "term": "component.associate-new-petition-to-profile-dialog.prefill-checkbox-label",
     "definition": "Prefill with profile information and relationships",
     "context": "Prefill with profile information and relationships"
@@ -7938,6 +7943,11 @@
     "term": "component.profile-petitions-table.new-parallel",
     "definition": "New parallel",
     "context": "New parallel"
+  },
+  {
+    "term": "component.profile-petitions-table.no-access-to-petition",
+    "definition": "You do not have access to this parallel. Contact an administrator in your organization if you need access.",
+    "context": "You do not have access to this parallel. Contact an administrator in your organization if you need access."
   },
   {
     "term": "component.profile-petitions-table.no-petitions",

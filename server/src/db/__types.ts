@@ -1735,11 +1735,12 @@ export interface PetitionProfile {
   profile_id: number; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
+  profile_type_process_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionProfile = PartialProps<
   Omit<PetitionProfile, "id">,
-  "created_at" | "created_by"
+  "created_at" | "created_by" | "profile_type_process_id"
 >;
 
 export interface PetitionReminder {
@@ -2138,6 +2139,9 @@ export interface ProfileTypeProcess {
   profile_type_id: number; // int4
   process_name: any; // jsonb
   position: number; // int4
+  /**
+   * @deprecated
+   */
   latest_petition_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar

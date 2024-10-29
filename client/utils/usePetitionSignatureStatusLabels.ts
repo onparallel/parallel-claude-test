@@ -1,12 +1,12 @@
 import {
-  PetitionLatestSignatureStatus,
+  PetitionSignatureRequestStatus,
   PetitionSignatureStatusFilter,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export function usePetitionSignatureStatusLabels(): Record<
-  PetitionSignatureStatusFilter | PetitionLatestSignatureStatus,
+  PetitionSignatureStatusFilter | PetitionSignatureRequestStatus,
   string
 > {
   const intl = useIntl();
@@ -45,10 +45,6 @@ export function usePetitionSignatureStatusLabels(): Record<
         defaultMessage: "eSignature cancelled",
       }),
       CANCELLED: intl.formatMessage({
-        id: "util.use-petition-signatrue-status-labels.cancelled",
-        defaultMessage: "eSignature cancelled",
-      }),
-      CANCELLED_BY_USER: intl.formatMessage({
         id: "util.use-petition-signatrue-status-labels.cancelled",
         defaultMessage: "eSignature cancelled",
       }),

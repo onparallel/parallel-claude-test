@@ -676,7 +676,7 @@ export const ProfileForm = Object.assign(
             properties {
               ...ProfileForm_ProfileFieldProperty
             }
-            petitionsTotalCount: petitions {
+            petitionsTotalCount: associatedPetitions {
               totalCount
             }
             relationships {

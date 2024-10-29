@@ -8,6 +8,7 @@ import { FormattedMessage } from "react-intl";
 
 interface AssociatePetitionToProfileDialogProps {
   excludePetitions?: string[];
+  fromTemplateId?: string[];
 }
 
 interface AssociatePetitionToProfileDialogData {
@@ -16,6 +17,7 @@ interface AssociatePetitionToProfileDialogData {
 
 function AssociatePetitionToProfileDialog({
   excludePetitions,
+  fromTemplateId,
   ...props
 }: DialogProps<AssociatePetitionToProfileDialogProps, string>) {
   const {
@@ -64,6 +66,7 @@ function AssociatePetitionToProfileDialog({
                 <PetitionSelect
                   ref={selectRef}
                   defaultOptions
+                  fromTemplateId={fromTemplateId}
                   excludePetitions={excludePetitions}
                   permissionTypes={["OWNER", "WRITE"]}
                   value={value}

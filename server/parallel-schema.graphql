@@ -1833,11 +1833,18 @@ type Mutation {
   Disassociates a petition from a profile
   """
   disassociatePetitionFromProfile(petitionIds: [GID!]!, profileId: GID!): Success!
+    @deprecated(reason: "use disassociateProfilesFromPetitions")
 
   """
   Disassociates a profile from a petition
   """
   disassociateProfileFromPetition(petitionId: GID!, profileIds: [GID!]!): Success!
+    @deprecated(reason: "use disassociateProfilesFromPetitions")
+
+  """
+  Disassociates a petition from a profile
+  """
+  disassociateProfilesFromPetitions(petitionIds: [GID!]!, profileIds: [GID!]!): Success!
 
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
@@ -3914,6 +3921,8 @@ interface PetitionBase {
 }
 
 type PetitionBaseMini {
+  currentSignatureRequest: PetitionSignatureRequestMini
+
   """
   The ID of the petition or template.
   """
@@ -3924,7 +3933,6 @@ type PetitionBaseMini {
   """
   isPublicTemplate: Boolean
   lastActivityAt: DateTime
-  latestSignatureStatus: PetitionLatestSignatureStatus
 
   """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
@@ -4624,16 +4632,6 @@ type PetitionFolder {
   petitionCount: Int!
 }
 
-enum PetitionLatestSignatureStatus {
-  CANCELLED
-  CANCELLED_BY_USER
-  CANCELLING
-  COMPLETED
-  ENQUEUED
-  PROCESSED
-  PROCESSING
-}
-
 type PetitionListView {
   data: PetitionListViewData!
   id: GID!
@@ -5060,6 +5058,15 @@ type PetitionSignatureRequest implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type PetitionSignatureRequestMini {
+  id: GID!
+
+  """
+  The status of the petition signature.
+  """
+  status: PetitionSignatureRequestStatus!
 }
 
 type PetitionSignatureRequestSignerStatus {
@@ -6157,7 +6164,7 @@ type ProfileTypePagination {
 
 type ProfileTypeProcess {
   id: GID!
-  latestPetition: PetitionBaseMini
+  latestPetition(profileId: GID!): PetitionBaseMini
   name: LocalizableUserText!
   position: Int!
   templates: [PetitionTemplate!]!

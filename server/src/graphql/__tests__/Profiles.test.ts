@@ -7455,7 +7455,7 @@ describe("GraphQL/Profiles", () => {
                   id
                   keyProcesses {
                     id
-                    latestPetition {
+                    latestPetition(profileId: $profileId) {
                       id
                     }
                   }
@@ -7526,7 +7526,7 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe('"disassociateProfileFromPetition", "disassociatePetitionFromProfile"', () => {
+  describe("disassociateProfilesFromPetitions", () => {
     let petitions: Petition[];
     let profiles: Profile[];
 
@@ -7562,18 +7562,18 @@ describe("GraphQL/Profiles", () => {
     it("disassociate profile from petition", async () => {
       const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $profileIds: [GID!]!) {
-            disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+          mutation ($petitionIds: [GID!]!, $profileIds: [GID!]!) {
+            disassociateProfilesFromPetitions(petitionIds: $petitionIds, profileIds: $profileIds)
           }
         `,
         {
-          petitionId: toGlobalId("Petition", petitions[1].id),
+          petitionIds: [toGlobalId("Petition", petitions[1].id)],
           profileIds: [toGlobalId("Profile", profiles[0].id)],
         },
       );
 
       expect(unlinkErrors).toBeUndefined();
-      expect(unlinkData?.disassociateProfileFromPetition).toEqual("SUCCESS");
+      expect(unlinkData?.disassociateProfilesFromPetitions).toEqual("SUCCESS");
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -7667,12 +7667,12 @@ describe("GraphQL/Profiles", () => {
     it("sends error when not all profiles are associated", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $profileIds: [GID!]!) {
-            disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+          mutation ($petitionIds: [GID!]!, $profileIds: [GID!]!) {
+            disassociateProfilesFromPetitions(petitionIds: $petitionIds, profileIds: $profileIds)
           }
         `,
         {
-          petitionId: toGlobalId("Petition", petitions[0].id),
+          petitionIds: [toGlobalId("Petition", petitions[0].id)],
           profileIds: [toGlobalId("Profile", profiles[1].id)],
         },
       );
@@ -7681,120 +7681,15 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("disassociate petition from profile", async () => {
-      const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
-        gql`
-          mutation ($profileId: GID!, $petitionIds: [GID!]!) {
-            disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
-          }
-        `,
-        {
-          profileId: toGlobalId("Profile", profiles[0].id),
-          petitionIds: [toGlobalId("Petition", petitions[1].id)],
-        },
-      );
-
-      expect(unlinkErrors).toBeUndefined();
-      expect(unlinkData?.disassociatePetitionFromProfile).toEqual("SUCCESS");
-
-      const { errors: queryErrors, data: queryData } = await testClient.execute(
-        gql`
-          query ($petitionId: GID!, $profileId: GID!) {
-            petition(id: $petitionId) {
-              id
-              ... on Petition {
-                events(limit: 10, offset: 0) {
-                  items {
-                    type
-                    data
-                  }
-                  totalCount
-                }
-                profiles {
-                  id
-                }
-              }
-            }
-            profile(profileId: $profileId) {
-              id
-              events(limit: 100, offset: 0) {
-                totalCount
-                items {
-                  type
-                  ... on PetitionDisassociatedEvent {
-                    user {
-                      id
-                    }
-                  }
-                }
-              }
-              associatedPetitions(limit: 10) {
-                items {
-                  id
-                }
-                totalCount
-              }
-            }
-          }
-        `,
-        {
-          petitionId: toGlobalId("Petition", petitions[1].id),
-          profileId: toGlobalId("Profile", profiles[0].id),
-        },
-      );
-
-      expect(queryErrors).toBeUndefined();
-      expect(queryData).toEqual({
-        petition: {
-          id: toGlobalId("Petition", petitions[1].id),
-          profiles: [
-            { id: toGlobalId("Profile", profiles[1].id) },
-            { id: toGlobalId("Profile", profiles[2].id) },
-          ],
-          events: {
-            items: [
-              {
-                type: "PROFILE_DISASSOCIATED",
-                data: {
-                  userId: toGlobalId("User", sessionUser.id),
-                  petitionAccessId: null,
-                  profileId: toGlobalId("Profile", profiles[0].id),
-                },
-              },
-            ],
-            totalCount: 1,
-          },
-        },
-        profile: {
-          id: toGlobalId("Profile", profiles[0].id),
-          events: {
-            totalCount: 1,
-            items: [
-              {
-                type: "PETITION_DISASSOCIATED",
-                user: {
-                  id: toGlobalId("User", sessionUser.id),
-                },
-              },
-            ],
-          },
-          associatedPetitions: {
-            items: [{ id: toGlobalId("Petition", petitions[0].id) }],
-            totalCount: 1,
-          },
-        },
-      });
-    });
-
     it("sends error when not all petitions are associated", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileId: GID!, $petitionIds: [GID!]!) {
-            disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+          mutation ($profileIds: [GID!]!, $petitionIds: [GID!]!) {
+            disassociateProfilesFromPetitions(profileIds: $profileIds, petitionIds: $petitionIds)
           }
         `,
         {
-          profileId: toGlobalId("Profile", profiles[0].id),
+          profileIds: [toGlobalId("Profile", profiles[0].id)],
           petitionIds: [
             toGlobalId("Petition", petitions[0].id),
             toGlobalId("Petition", petitions[1].id),

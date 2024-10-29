@@ -55,6 +55,8 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   onPageChange,
   pageSizeOptions = [10, 25, 50],
   color,
+  rowProps,
+  headProps,
   ...props
 }: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
   const intl = useIntl();
@@ -196,6 +198,8 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}
             onSortChange={onSortChange}
+            rowProps={rowProps}
+            headProps={headProps}
           />
         </ScrollTableContainer>
         {body ? (

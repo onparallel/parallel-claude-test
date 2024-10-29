@@ -241,7 +241,7 @@ describe("GraphQL/Petitions", () => {
     await testClient.stop();
   });
 
-  describe("Queries", () => {
+  describe("petitions", () => {
     it("fetches all user petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -734,6 +734,74 @@ describe("GraphQL/Petitions", () => {
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("filters petitions by profileTypeProcessId", async () => {
+      const templates = await mocks.createRandomTemplates(organization.id, sessionUser.id, 2);
+      const [sameOrgTemplate] = await mocks.createRandomTemplates(
+        organization.id,
+        sameOrgUser.id,
+        1,
+      );
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      const [profileTypeProcess] = await mocks.knex.from("profile_type_process").insert(
+        {
+          profile_type_id: profileType.id,
+          process_name: { en: "KYC" },
+          position: 0,
+        },
+        "*",
+      );
+      await mocks.knex.from("profile_type_process_template").insert(
+        [...templates, sameOrgTemplate].map((template) => ({
+          template_id: template.id,
+          profile_type_process_id: profileTypeProcess.id,
+        })),
+      );
+
+      await mocks.createRandomPetitions(organization.id, sameOrgUser.id, 1, () => ({
+        from_template_id: templates[0].id,
+      }));
+
+      const petitions = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        4,
+        (i) => ({ from_template_id: templates[i]?.id ?? null }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int, $filters: PetitionFilter) {
+            petitions(limit: $limit, offset: $offset, filters: $filters) {
+              totalCount
+              items {
+                ... on Petition {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          limit: 100,
+          offset: 0,
+          filters: {
+            fromTemplateId: [...templates, sameOrgTemplate].map((t) =>
+              toGlobalId("Petition", t.id),
+            ),
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitions).toEqual({
+        totalCount: 2,
+        items: [
+          { id: toGlobalId("Petition", petitions[0].id) },
+          { id: toGlobalId("Petition", petitions[1].id) },
+        ],
+      });
     });
   });
 

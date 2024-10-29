@@ -157,3 +157,15 @@ export const PetitionSignatureRequest = objectType({
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });
+
+export const PetitionSignatureRequestMini = objectType({
+  name: "PetitionSignatureRequestMini",
+  sourceType: "db.PetitionSignatureRequest",
+  definition(t) {
+    t.globalId("id");
+    t.field("status", {
+      type: "PetitionSignatureRequestStatus",
+      description: "The status of the petition signature.",
+    });
+  },
+});

@@ -79,11 +79,10 @@ export const petitionsQuery = queryField((t) => {
       async (_, args, ctx, info) => {
         const fromTemplateId = args.filters?.fromTemplateId;
         if (isNonNullish(fromTemplateId)) {
-          const hasAccess = await ctx.petitions.userHasAccessToPetitions(
-            ctx.user!.id,
-            fromTemplateId,
-          );
-          if (!hasAccess) {
+          // just check that the templates belong to same org as user
+          // as users can filter by templateIds without having permissions on them
+          const petitions = await ctx.petitions.loadPetition(fromTemplateId);
+          if (!petitions.every((p) => p && p.is_template && p.org_id === ctx.user!.org_id)) {
             throw new ArgValidationError(info, "filters.fromTemplateId", "Invalid template ID");
           }
         }

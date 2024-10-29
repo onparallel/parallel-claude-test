@@ -507,14 +507,6 @@ export interface NexusGenEnums {
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
-  PetitionLatestSignatureStatus:
-    | "CANCELLED"
-    | "CANCELLED_BY_USER"
-    | "CANCELLING"
-    | "COMPLETED"
-    | "ENQUEUED"
-    | "PROCESSED"
-    | "PROCESSING";
   PetitionListViewColumn:
     | "createdAt"
     | "fromTemplateId"
@@ -1108,6 +1100,7 @@ export interface NexusGenObjects {
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSharingInfo: number[];
   PetitionSignatureRequest: db.PetitionSignatureRequest;
+  PetitionSignatureRequestMini: db.PetitionSignatureRequest;
   PetitionSignatureRequestSignerStatus: {
     firstName: string;
     lastName: string;
@@ -2085,6 +2078,7 @@ export interface NexusGenFieldTypes {
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
     disassociatePetitionFromProfile: NexusGenEnums["Success"]; // Success!
     disassociateProfileFromPetition: NexusGenEnums["Success"]; // Success!
+    disassociateProfilesFromPetitions: NexusGenEnums["Success"]; // Success!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     editProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
     enableAutomaticNumberingOnPetitionFields: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2448,10 +2442,10 @@ export interface NexusGenFieldTypes {
   };
   PetitionBaseMini: {
     // field return type
+    currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequestMini"] | null; // PetitionSignatureRequestMini
     id: NexusGenScalars["GID"]; // GID!
     isPublicTemplate: boolean | null; // Boolean
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
-    latestSignatureStatus: NexusGenEnums["PetitionLatestSignatureStatus"] | null; // PetitionLatestSignatureStatus
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     status: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
@@ -2833,6 +2827,11 @@ export interface NexusGenFieldTypes {
     signerStatus: NexusGenRootTypes["PetitionSignatureRequestSignerStatus"][]; // [PetitionSignatureRequestSignerStatus!]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PetitionSignatureRequestMini: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type
@@ -4756,6 +4755,7 @@ export interface NexusGenFieldTypeNames {
     deleteUserGroup: "Result";
     disassociatePetitionFromProfile: "Success";
     disassociateProfileFromPetition: "Success";
+    disassociateProfilesFromPetitions: "Success";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     editProfileTypeProcess: "ProfileTypeProcess";
     enableAutomaticNumberingOnPetitionFields: "PetitionBase";
@@ -5119,10 +5119,10 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionBaseMini: {
     // field return type name
+    currentSignatureRequest: "PetitionSignatureRequestMini";
     id: "GID";
     isPublicTemplate: "Boolean";
     lastActivityAt: "DateTime";
-    latestSignatureStatus: "PetitionLatestSignatureStatus";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     status: "PetitionStatus";
@@ -5504,6 +5504,11 @@ export interface NexusGenFieldTypeNames {
     signerStatus: "PetitionSignatureRequestSignerStatus";
     status: "PetitionSignatureRequestStatus";
     updatedAt: "DateTime";
+  };
+  PetitionSignatureRequestMini: {
+    // field return type name
+    id: "GID";
+    status: "PetitionSignatureRequestStatus";
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type name
@@ -7442,6 +7447,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    disassociateProfilesFromPetitions: {
+      // args
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      profileIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     dynamicSelectFieldFileDownloadLink: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -8394,6 +8404,12 @@ export interface NexusGenArgTypes {
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
       profileId?: NexusGenScalars["GID"] | null; // GID
       profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+  };
+  ProfileTypeProcess: {
+    latestPetition: {
+      // args
+      profileId: NexusGenScalars["GID"]; // GID!
     };
   };
   PublicOrganization: {

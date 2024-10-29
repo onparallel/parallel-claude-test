@@ -27,6 +27,7 @@ import {
   range,
   sumBy,
   unique,
+  uniqueBy,
   zip,
   zipWith,
 } from "remeda";
@@ -3699,10 +3700,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       try {
         await ctx.profiles.associateProfilesToPetition(
-          profile!.id,
-          args.petitionId,
+          [{ petition_id: args.petitionId, profile_id: profile!.id }],
           `User:${ctx.user!.id}`,
         );
+
         await ctx.petitions.createEvent({
           type: "PROFILE_ASSOCIATED",
           petition_id: args.petitionId,
@@ -3989,8 +3990,23 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     );
 
     const associations = await ctx.profiles.associateProfilesToPetition(
-      unique([args.profileId, ...args.prefill.flatMap((p) => p.profileIds)]),
-      petition.id,
+      uniqueBy(
+        [
+          {
+            profile_id: args.profileId,
+            petition_id: petition.id,
+            // only link process of main profile
+            profile_type_process_id: args.profileTypeProcessId ?? null,
+          },
+          ...args.prefill.flatMap((p) =>
+            p.profileIds.map((profileId) => ({
+              profile_id: profileId,
+              petition_id: petition.id,
+            })),
+          ),
+        ],
+        (p) => p.profile_id,
+      ),
       `User:${ctx.user!.id}`,
     );
 
@@ -4016,14 +4032,6 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         },
       })),
     );
-
-    if (args.profileTypeProcessId) {
-      await ctx.profiles.associatePetitionToProfileTypeProcess(
-        args.profileTypeProcessId,
-        petition.id,
-        `User:${ctx.user!.id}`,
-      );
-    }
 
     if (args.prefill.length === 0) {
       // nothing to prefill, early return
@@ -4237,8 +4245,7 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
 
     try {
       await ctx.profiles.associateProfilesToPetition(
-        args.profileId,
-        args.petitionId,
+        [{ profile_id: args.profileId, petition_id: args.petitionId }],
         `User:${ctx.user!.id}`,
       );
 

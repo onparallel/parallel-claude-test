@@ -29,6 +29,7 @@ import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, Replace, unMaybeArray } from "../../util/types";
 import {
+  CreatePetitionProfile,
   CreateProfile,
   CreateProfileExternalSourceEntity,
   CreateProfileRelationship,
@@ -39,6 +40,7 @@ import {
   CreateProfileTypeProcess,
   Organization,
   Petition,
+  PetitionProfile,
   Profile,
   ProfileEvent,
   ProfileEventType,
@@ -1631,35 +1633,30 @@ export class ProfileRepository extends BaseRepository {
     },
   );
 
-  async associateProfilesToPetition(
-    profileId: MaybeArray<number>,
-    petitionId: number,
-    createdBy: string,
-  ) {
-    const profileIds = unMaybeArray(profileId);
-    if (profileIds.length === 0) {
+  async associateProfilesToPetition(data: CreatePetitionProfile[], createdBy: string) {
+    if (data.length === 0) {
       return [];
     }
 
     return await this.from("petition_profile").insert(
-      profileIds.map((profileId) => ({
-        petition_id: petitionId,
-        profile_id: profileId,
-        created_at: this.now(),
-        created_by: createdBy,
-      })),
+      data.map((d) => ({ ...d, created_at: this.now(), created_by: createdBy })),
       "*",
     );
   }
 
-  async disassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {
+  async disassociateProfileFromPetition(
+    petitionIds: number[],
+    profileIds: number[],
+    updatedBy: string,
+  ) {
     if (profileIds.length === 0) {
       throw new Error("expected profileIds to be non-empty");
     }
     if (petitionIds.length === 0) {
       throw new Error("expected petitionIds to be non-empty");
     }
-    return await this.from("petition_profile")
+
+    await this.from("petition_profile")
       .whereIn("petition_id", petitionIds)
       .whereIn("profile_id", profileIds)
       .delete();
@@ -2881,15 +2878,29 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async associatePetitionToProfileTypeProcess(
-    processId: number,
-    petitionId: number,
-    updatedBy: string,
-  ) {
-    await this.from("profile_type_process").where("id", processId).whereNull("deleted_at").update({
-      latest_petition_id: petitionId,
-      updated_at: this.now(),
-      updated_by: updatedBy,
-    });
-  }
+  readonly loadLatestPetitionByProfileIdProcessId = this.buildLoader<
+    {
+      profileId: number;
+      processId: number;
+    },
+    Petition | null,
+    string
+  >(
+    async (keys, t) => {
+      const values: (PetitionProfile & Petition)[] = await this.from("petition_profile", t)
+        .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_process_id", unique(keys.map((k) => k.processId)))
+        .whereNotNull("profile_type_process_id")
+        .join("petition", "petition_profile.petition_id", "petition.id")
+        .whereNull("petition.deleted_at")
+        .select("petition.*", "profile_id", "profile_type_process_id")
+        .orderBy("created_at", "desc");
+
+      const byKey = groupBy(values, keyBuilder(["profile_id", "profile_type_process_id"]));
+      return keys
+        .map(keyBuilder(["profileId", "processId"]))
+        .map((key) => (byKey[key] ?? []).at(0) ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["profileId", "processId"]) },
+  );
 }

@@ -3,15 +3,20 @@ import { Button, Center, Flex, HStack, Image, Stack, Text } from "@chakra-ui/rea
 import { AddIcon, LockClosedIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import {
   ProfileKeyProcesses_associateProfileToPetitionDocument,
+  ProfileKeyProcesses_createPetitionFromProfileDocument,
   ProfileKeyProcesses_ProfileFragment,
   ProfileKeyProcesses_ProfileTypeProcessFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
+import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link, NakedLink } from "../common/Link";
 import {
@@ -32,32 +37,82 @@ export function ProfileKeyProcesses({ profile }: { profile: ProfileKeyProcesses_
   const profileTypeId = profile.profileType.id;
   const keyProcesses = profile.profileType.keyProcesses;
 
+  const goToPetition = useGoToPetition();
+  const showErrorToast = useGenericErrorToast();
+
   const [associateProfileToPetition] = useMutation(
     ProfileKeyProcesses_associateProfileToPetitionDocument,
   );
   const showAssociatePetitionToProfileDialog = useAssociatePetitionToProfileDialog();
-  const handleAssociate = async (profileTypeProcessId: string) => {
+  const handleAssociate = async (keyProcess: ProfileKeyProcesses_ProfileTypeProcessFragment) => {
     try {
       const petitionId = await showAssociatePetitionToProfileDialog({
         excludePetitions: profile.associatedPetitions.items.map((petition) => petition.id),
+        fromTemplateId: keyProcess.templates.map((t) => t.id),
       });
 
       await associateProfileToPetition({
-        variables: { petitionId, profileId: profile.id, profileTypeProcessId },
+        variables: { petitionId, profileId: profile.id, profileTypeProcessId: keyProcess.id },
       });
     } catch {}
   };
 
+  const [createPetitionFromProfile] = useMutation(
+    ProfileKeyProcesses_createPetitionFromProfileDocument,
+  );
   const showAssociateNewPetitionToProfileDialog = useAssociateNewPetitionToProfileDialog();
   const handleCreateNewPetition = async (
     keyProcess: ProfileKeyProcesses_ProfileTypeProcessFragment,
   ) => {
     try {
-      await showAssociateNewPetitionToProfileDialog({
-        profile,
-        keyProcess,
+      const template = keyProcess.templates[0];
+
+      if (keyProcess.templates.length !== 1 || !template.myEffectivePermission) {
+        const petitionId = await showAssociateNewPetitionToProfileDialog({
+          profile,
+          keyProcess,
+        });
+        goToPetition(petitionId, "preview");
+        return;
+      }
+
+      const compatibleFieldGroups = template.fields.filter(
+        (f) =>
+          f.type === "FIELD_GROUP" &&
+          f.isLinkedToProfileType &&
+          f.profileType?.id === profile.profileType.id,
+      );
+
+      if (compatibleFieldGroups.length) {
+        const petitionId = await showAssociateNewPetitionToProfileDialog({
+          profile,
+          keyProcess,
+        });
+        goToPetition(petitionId, "preview");
+        return;
+      }
+
+      const { data } = await createPetitionFromProfile({
+        variables: {
+          profileTypeProcessId: keyProcess.id,
+          profileId: profile.id,
+          templateId: template.id,
+          petitionFieldId: compatibleFieldGroups[0]?.id,
+          prefill: compatibleFieldGroups.map((field) => ({
+            petitionFieldId: field.id,
+            profileIds: [profile.id],
+          })),
+        },
       });
-    } catch {}
+
+      if (data?.createPetitionFromProfile?.id) {
+        goToPetition(data.createPetitionFromProfile.id, "preview");
+      }
+    } catch (error) {
+      if (isDialogError(error) && error.message === "ERROR") {
+        showErrorToast();
+      }
+    }
   };
 
   return (
@@ -72,9 +127,9 @@ export function ProfileKeyProcesses({ profile }: { profile: ProfileKeyProcesses_
               <KeyProcessCard
                 key={id}
                 keyProcess={keyProcess}
-                profileId={profile.id}
+                profile={profile}
                 onAssociate={() => {
-                  handleAssociate(keyProcess.id);
+                  handleAssociate(keyProcess);
                 }}
                 onCreate={() => {
                   handleCreateNewPetition(keyProcess);
@@ -101,7 +156,10 @@ ProfileKeyProcesses.fragments = {
         id
         name
         status
-        latestSignatureStatus
+        currentSignatureRequest {
+          id
+          status
+        }
         myEffectivePermission {
           permissionType
         }
@@ -115,11 +173,19 @@ ProfileKeyProcesses.fragments = {
         id
         name
         position
-        latestPetition {
+        latestPetition(profileId: $profileId) {
           ...ProfileKeyProcesses_PetitionBaseMini
         }
         templates {
           id
+          fields {
+            id
+            type
+            isLinkedToProfileType
+            profileType {
+              id
+            }
+          }
         }
         ...useAssociateNewPetitionToProfileDialog_ProfileTypeProcess
       }
@@ -140,6 +206,9 @@ ProfileKeyProcesses.fragments = {
         associatedPetitions(offset: 0, limit: 100) {
           items {
             id
+            fromTemplate {
+              id
+            }
           }
         }
         ...useAssociateNewPetitionToProfileDialog_Profile
@@ -170,24 +239,51 @@ const _mutations = [
     }
     ${ProfileKeyProcesses.fragments.Profile}
   `,
+  gql`
+    mutation ProfileKeyProcesses_createPetitionFromProfile(
+      $profileId: GID!
+      $templateId: GID!
+      $prefill: [CreatePetitionFromProfilePrefillInput!]!
+      $profileTypeProcessId: GID
+      $petitionFieldId: GID
+    ) {
+      createPetitionFromProfile(
+        profileId: $profileId
+        templateId: $templateId
+        prefill: $prefill
+        profileTypeProcessId: $profileTypeProcessId
+        petitionFieldId: $petitionFieldId
+      ) {
+        id
+      }
+    }
+  `,
 ];
 
 function KeyProcessCard({
   keyProcess,
-  profileId,
+  profile,
   onCreate,
   onAssociate,
 }: {
   keyProcess: ProfileKeyProcesses_ProfileTypeProcessFragment;
-  profileId: string;
+  profile: ProfileKeyProcesses_ProfileFragment;
   onCreate: () => void;
   onAssociate: () => void;
 }) {
   const intl = useIntl();
-  const { name, latestPetition } = keyProcess;
+  const profileId = profile.id;
+  const { name, latestPetition, templates } = keyProcess;
 
-  // TODO Handle all permission cases
-  const showAsociateExisting = true;
+  const showViewOthers = useMemo(() => {
+    const associatedTemplateIds = unique(
+      profile.associatedPetitions.items
+        .filter((p) => isNonNullish(p.fromTemplate) && p.id !== latestPetition?.id)
+        .map((petition) => petition.fromTemplate!.id),
+    );
+
+    return keyProcess.templates.some((template) => associatedTemplateIds.includes(template.id));
+  }, [profile.id, keyProcess.id]);
 
   const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
   const userHasAccessToPetition = isNonNullish(
@@ -214,15 +310,19 @@ function KeyProcessCard({
         rightAction={
           isNonNullish(latestPetition) ? (
             <HStack>
-              {/* TODO redirect with filter once implemented in table */}
-              <NakedLink href={`/app/profiles/${profileId}/parallels`}>
-                <Button as="a" variant="outline" size="sm" fontSize="md" fontWeight={500}>
-                  <FormattedMessage
-                    id="component.profile-key-process.view-others"
-                    defaultMessage="View others"
-                  />
-                </Button>
-              </NakedLink>
+              {showViewOthers ? (
+                <NakedLink
+                  href={`/app/profiles/${profileId}/parallels?${new URLSearchParams({ p_fromTemplateId: templates.map((t) => t.id).join(",") })}`}
+                >
+                  <Button as="a" variant="outline" size="sm" fontSize="md" fontWeight={500}>
+                    <FormattedMessage
+                      id="component.profile-key-process.view-others"
+                      defaultMessage="View others"
+                    />
+                  </Button>
+                </NakedLink>
+              ) : null}
+
               <IconButtonWithTooltip
                 size="sm"
                 icon={<AddIcon />}
@@ -253,6 +353,7 @@ function KeyProcessCard({
           <Stack flex="1">
             {userHasAccessToPetition ? (
               <Link
+                width="fit-content"
                 noOfLines={2}
                 href={`/app/petitions/${latestPetition.id}/preview`}
                 fontWeight={500}
@@ -269,8 +370,10 @@ function KeyProcessCard({
               {isNonNullish(latestPetition.status) ? (
                 <PetitionStatusLabel status={latestPetition.status} fontSize="md" />
               ) : null}
-              {isNonNullish(latestPetition.latestSignatureStatus) ? (
-                <PetitionSignatureStatusLabel status={latestPetition.latestSignatureStatus} />
+              {isNonNullish(latestPetition.currentSignatureRequest) ? (
+                <PetitionSignatureStatusLabel
+                  status={latestPetition.currentSignatureRequest.status}
+                />
               ) : null}
             </HStack>
           </Stack>
@@ -342,14 +445,12 @@ function KeyProcessCard({
                 />
               </OverflownText>
             </Button>
-            {showAsociateExisting ? (
-              <Button variant="link" size="sm" fontSize="md" fontWeight={500} onClick={onAssociate}>
-                <FormattedMessage
-                  id="component.profile-key-process.associate-existing"
-                  defaultMessage="Associate existing"
-                />
-              </Button>
-            ) : null}
+            <Button variant="link" size="sm" fontSize="md" fontWeight={500} onClick={onAssociate}>
+              <FormattedMessage
+                id="component.profile-key-process.associate-existing"
+                defaultMessage="Associate existing"
+              />
+            </Button>
           </HStack>
         </Center>
       )}

@@ -5688,7 +5688,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                   id
                   keyProcesses {
                     id
-                    latestPetition {
+                    latestPetition(profileId: $profileId) {
                       id
                     }
                   }
@@ -5750,7 +5750,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                   id
                   keyProcesses {
                     id
-                    latestPetition {
+                    latestPetition(profileId: $profileId) {
                       id
                     }
                   }

@@ -94,6 +94,7 @@ export interface PetitionSelectProps<
   isSync?: IsSync;
   defaultOptions?: boolean;
   permissionTypes?: PetitionPermissionType[];
+  fromTemplateId?: string[];
   noOfLines?: number;
 }
 
@@ -112,6 +113,7 @@ export const PetitionSelect = Object.assign(
       placeholder: _placeholder,
       excludePetitions,
       permissionTypes,
+      fromTemplateId,
       ...props
     }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
     ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>,
@@ -132,6 +134,7 @@ export const PetitionSelect = Object.assign(
             filters: {
               type,
               permissionTypes,
+              fromTemplateId,
             },
             search,
             sortBy: "lastUsedAt_DESC",
@@ -148,7 +151,7 @@ export const PetitionSelect = Object.assign(
         ) as any[];
       },
       300,
-      [excludePetitions?.join(",")],
+      [excludePetitions?.join(","), fromTemplateId?.join(",")],
     );
 
     const getPetitions = useGetPetitions();

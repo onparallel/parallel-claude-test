@@ -58,7 +58,7 @@ import {
   DeleteProfileRelationship_removeProfileRelationshipDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
-  DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
+  DisassociateProfileFromPetition_disassociateProfilesFromPetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadProfileFieldFile_profileDocument,
   DownloadProfileFieldFile_profileFieldFileDownloadLinkDocument,
@@ -3464,20 +3464,20 @@ export function publicApi(container: Container) {
       },
       async ({ client, params }) => {
         const _mutation = gql`
-          mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
-            $petitionId: GID!
+          mutation DisassociateProfileFromPetition_disassociateProfilesFromPetitions(
+            $petitionIds: [GID!]!
             $profileIds: [GID!]!
           ) {
-            disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
+            disassociateProfilesFromPetitions(profileIds: $profileIds, petitionIds: $petitionIds)
           }
         `;
 
         try {
           await client.request(
-            DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
+            DisassociateProfileFromPetition_disassociateProfilesFromPetitionsDocument,
             {
               profileIds: [params.profileId],
-              petitionId: params.petitionId,
+              petitionIds: [params.petitionId],
             },
           );
           return NoContent();

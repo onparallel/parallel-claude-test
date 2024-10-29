@@ -12,6 +12,9 @@ import {
 } from "../../db/__types";
 import { mapProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { toGlobalId } from "../../util/globalId";
+import { authenticateAnd } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasAccessToProfile } from "./authorizers";
 
 export const ProfileTypeStandardType = enumType({
   name: "ProfileTypeStandardType",
@@ -651,11 +654,13 @@ export const ProfileTypeProcess = objectType({
     });
     t.nullable.field("latestPetition", {
       type: "PetitionBaseMini",
-      resolve: async (o, _, ctx) => {
-        if (isNullish(o.latest_petition_id)) {
-          return null;
-        }
-        return await ctx.petitions.loadPetition(o.latest_petition_id);
+      authorize: authenticateAnd(userHasAccessToProfile("profileId")),
+      args: { profileId: nonNull(globalIdArg("Profile")) },
+      resolve: async (root, args, ctx) => {
+        return await ctx.profiles.loadLatestPetitionByProfileIdProcessId({
+          processId: root.id,
+          profileId: args.profileId,
+        });
       },
     });
   },

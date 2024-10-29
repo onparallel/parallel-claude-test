@@ -723,14 +723,10 @@ export function userHasAccessToEditProfileTypeProcessInput<
     const templateIds = data.templateIds;
 
     if (templateIds) {
-      const hasAccess = await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, templateIds);
-      if (!hasAccess) {
-        throw new ForbiddenError("User does not have access to the provided templates");
-      }
-
+      // no need to have a READ permission on the templates
       const petitions = await ctx.petitions.loadPetition(templateIds);
-      if (petitions.some((p) => isNullish(p) || !p.is_template)) {
-        throw new ForbiddenError("One or more of the provided templates are not templates");
+      if (petitions.some((p) => isNullish(p) || !p.is_template || p.org_id !== ctx.user!.org_id)) {
+        throw new ForbiddenError("User does not have access to the provided templates");
       }
     }
 

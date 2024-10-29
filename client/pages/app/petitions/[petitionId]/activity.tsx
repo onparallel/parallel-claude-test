@@ -38,7 +38,7 @@ import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_associateProfileToPetitionDocument,
   PetitionActivity_deactivateAccessesDocument,
-  PetitionActivity_disassociateProfileFromPetitionDocument,
+  PetitionActivity_disassociateProfilesFromPetitionsDocument,
   PetitionActivity_eventsDocument,
   PetitionActivity_petitionDocument,
   PetitionActivity_reactivateAccessesDocument,
@@ -407,8 +407,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   };
 
   const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
-  const [disassociateProfileFromPetition] = useMutation(
-    PetitionActivity_disassociateProfileFromPetitionDocument,
+  const [disassociateProfilesFromPetitions] = useMutation(
+    PetitionActivity_disassociateProfilesFromPetitionsDocument,
   );
   const handleDisassociateProfileFromPetition = async (profileIds: string[]) => {
     try {
@@ -424,8 +424,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           ),
         selectedProfiles: profileIds.length,
       });
-      await disassociateProfileFromPetition({
-        variables: { petitionId, profileIds },
+      await disassociateProfilesFromPetitions({
+        variables: { petitionIds: [petitionId], profileIds },
       });
       refetch();
     } catch {}
@@ -638,11 +638,11 @@ PetitionActivity.mutations = [
         }
       }
     }
-    mutation PetitionActivity_disassociateProfileFromPetition(
-      $petitionId: GID!
+    mutation PetitionActivity_disassociateProfilesFromPetitions(
+      $petitionIds: [GID!]!
       $profileIds: [GID!]!
     ) {
-      disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+      disassociateProfilesFromPetitions(petitionIds: $petitionIds, profileIds: $profileIds)
     }
   `,
 ];
