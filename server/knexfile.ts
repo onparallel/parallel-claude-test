@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require("dotenv").config({
   path: process.env.NODE_ENV === "test" ? ".test.env" : ".env",
@@ -33,6 +35,12 @@ export const staging = {
     user: "parallel_ops",
     password: process.env.DB_PASSWORD,
     port: 5432,
+    ssl: {
+      rejectUnauthorized: true,
+      // downloaded from https://truststore.pki.rds.amazonaws.com/eu-central-1/eu-central-1-bundle.pem
+      // more info in https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html
+      ca: readFileSync(__dirname + "/eu-central-1-bundle.pem").toString(),
+    },
   },
   migrations: {
     directory: "migrations",
@@ -53,6 +61,12 @@ export const production = {
     user: "parallel_ops",
     password: process.env.DB_PASSWORD,
     port: 5432,
+    ssl: {
+      rejectUnauthorized: true,
+      // downloaded from https://truststore.pki.rds.amazonaws.com/eu-central-1/eu-central-1-bundle.pem
+      // more info in https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html
+      ca: readFileSync(__dirname + "/eu-central-1-bundle.pem").toString(),
+    },
   },
   migrations: {
     directory: "migrations",
