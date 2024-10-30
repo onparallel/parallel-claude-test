@@ -42,7 +42,7 @@ import {
   PETITIONS_COLUMNS,
   PetitionsTableColumn,
 } from "@parallel/utils/usePetitionsTableColumns";
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, omit, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -111,6 +111,8 @@ export function PetitionListHeader({
     }));
   };
 
+  const saveViewRef = useRef<HTMLButtonElement>(null);
+
   const isViewDirty = useMemo(() => {
     if (state.type === "TEMPLATE") {
       return false;
@@ -165,6 +167,7 @@ export function PetitionListHeader({
             defaultMessage="Create view"
           />
         ),
+        modalProps: { finalFocusRef: saveViewRef },
       });
       const { data } = await createPetitionListView({
         variables: {
@@ -221,7 +224,9 @@ export function PetitionListHeader({
           ]),
         ).some(isNonNullish)
       ) {
-        const action = await showConfirmChangeViewAllDialog();
+        const action = await showConfirmChangeViewAllDialog({
+          modalProps: { finalFocusRef: saveViewRef },
+        });
         if (action === "CREATE_NEW_VIEW") {
           handleSaveAsNewViewClick();
           return;
@@ -374,7 +379,7 @@ export function PetitionListHeader({
               })}
             />
             <Menu placement="bottom-end">
-              <SaveViewMenuButton isDirty={isViewDirty} />
+              <SaveViewMenuButton ref={saveViewRef} isDirty={isViewDirty} />
               <Portal>
                 <MenuList minWidth="160px">
                   <MenuItem isDisabled={!isViewDirty} onClick={handleSaveCurrentViewClick}>
