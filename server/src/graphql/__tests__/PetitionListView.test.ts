@@ -11,7 +11,8 @@ describe("GraphQL/PetitionListView", () => {
   let testClient: TestClient;
   let mocks: Mocks;
 
-  let defaultView: PetitionListView;
+  let customView: PetitionListView;
+  let allView: PetitionListView;
   let organization: Organization;
   let user: User;
 
@@ -22,31 +23,51 @@ describe("GraphQL/PetitionListView", () => {
 
     ({ user, organization } = await mocks.createSessionUserAndOrganization());
 
-    [defaultView] = await mocks.knex.from("petition_list_view").insert(
-      {
-        is_default: true,
-        user_id: user.id,
-        data: {
-          status: ["CLOSED"],
-          signature: ["COMPLETED"],
-          sharedWith: {
-            filters: [
-              {
-                operator: "SHARED_WITH",
-                value: toGlobalId("User", user.id),
-              },
-            ],
-            operator: "AND",
+    [allView, customView] = await mocks.knex.from("petition_list_view").insert(
+      [
+        {
+          is_default: false,
+          user_id: user.id,
+          data: {
+            path: "/",
+            sort: null,
+            tags: null,
+            search: null,
+            status: null,
+            searchIn: "EVERYWHERE",
+            signature: null,
+            sharedWith: null,
+            fromTemplateId: null,
           },
-          path: "/",
-          search: null,
-          searchIn: "EVERYWHERE",
-          fromTemplateId: null,
-          sort: { field: "sentAt", direction: "ASC" },
+          name: "All",
+          position: 0,
+          type: "ALL",
         },
-        name: "my default view",
-        position: 0,
-      },
+        {
+          is_default: true,
+          user_id: user.id,
+          data: {
+            status: ["CLOSED"],
+            signature: ["COMPLETED"],
+            sharedWith: {
+              filters: [
+                {
+                  operator: "SHARED_WITH",
+                  value: toGlobalId("User", user.id),
+                },
+              ],
+              operator: "AND",
+            },
+            path: "/",
+            search: null,
+            searchIn: "EVERYWHERE",
+            fromTemplateId: null,
+            sort: { field: "sentAt", direction: "ASC" },
+          },
+          name: "my default view",
+          position: 1,
+        },
+      ],
       "*",
     );
   });
@@ -56,7 +77,10 @@ describe("GraphQL/PetitionListView", () => {
   });
 
   afterEach(async () => {
-    await mocks.knex.from("petition_list_view").whereNot("id", defaultView.id).delete();
+    await mocks.knex
+      .from("petition_list_view")
+      .whereNotIn("id", [customView.id, allView.id])
+      .delete();
   });
 
   describe("queries", () => {
@@ -101,7 +125,22 @@ describe("GraphQL/PetitionListView", () => {
           id: toGlobalId("User", user.id),
           petitionListViews: [
             {
-              id: toGlobalId("PetitionListView", defaultView.id),
+              id: toGlobalId("PetitionListView", allView.id),
+              isDefault: false,
+              data: {
+                status: null,
+                signature: null,
+                fromTemplateId: null,
+                path: "/",
+                search: null,
+                searchIn: "EVERYWHERE",
+                sharedWith: null,
+                tagsFilters: null,
+                sort: null,
+              },
+            },
+            {
+              id: toGlobalId("PetitionListView", customView.id),
               isDefault: true,
               data: {
                 status: ["CLOSED"],
@@ -217,7 +256,8 @@ describe("GraphQL/PetitionListView", () => {
         },
         user: {
           petitionListViews: [
-            { id: toGlobalId("PetitionListView", defaultView.id), isDefault: true },
+            { id: toGlobalId("PetitionListView", allView.id), isDefault: false },
+            { id: toGlobalId("PetitionListView", customView.id), isDefault: true },
             { id: data!.createPetitionListView.id, isDefault: false },
           ],
         },
@@ -226,7 +266,7 @@ describe("GraphQL/PetitionListView", () => {
   });
 
   describe("updatePetitionListView", () => {
-    it("updates a petition list view", async () => {
+    it("updates a custom petition list view", async () => {
       const [tag] = await mocks.createRandomTags(organization.id, 1);
       const { errors, data } = await testClient.execute(
         gql`
@@ -264,7 +304,7 @@ describe("GraphQL/PetitionListView", () => {
           }
         `,
         {
-          petitionListViewId: toGlobalId("PetitionListView", defaultView.id),
+          petitionListViewId: toGlobalId("PetitionListView", customView.id),
           name: "updated name",
           data: {
             fromTemplateId: null,
@@ -290,7 +330,7 @@ describe("GraphQL/PetitionListView", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.updatePetitionListView).toEqual({
-        id: toGlobalId("PetitionListView", defaultView.id),
+        id: toGlobalId("PetitionListView", customView.id),
         name: "updated name",
         data: {
           status: null,
@@ -306,6 +346,93 @@ describe("GraphQL/PetitionListView", () => {
           },
           sharedWith: null,
           sort: null,
+        },
+      });
+    });
+
+    it("sends error if trying to update the name of an ALL type view", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionListViewId: GID!, $name: String) {
+            updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name) {
+              id
+            }
+          }
+        `,
+        {
+          petitionListViewId: toGlobalId("PetitionListView", allView.id),
+          name: "updated name",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to update filters of an ALL type view", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionListViewId: GID!, $data: PetitionListViewDataInput) {
+            updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionListViewId: toGlobalId("PetitionListView", allView.id),
+          data: {
+            fromTemplateId: null,
+            path: "/",
+            search: null,
+            searchIn: "EVERYWHERE",
+            sharedWith: null,
+            signature: null,
+            status: null,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("updates columns and sorting of an ALL type view", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionListViewId: GID!, $data: PetitionListViewDataInput) {
+            updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+              id
+              data {
+                sort {
+                  field
+                  direction
+                }
+                columns
+              }
+            }
+          }
+        `,
+        {
+          petitionListViewId: toGlobalId("PetitionListView", allView.id),
+          data: {
+            columns: ["name", "recipients", "reminders", "sentAt"],
+            sort: {
+              field: "lastActivityAt",
+              direction: "ASC",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionListView).toEqual({
+        id: toGlobalId("PetitionListView", allView.id),
+        data: {
+          sort: {
+            field: "lastActivityAt",
+            direction: "ASC",
+          },
+          columns: ["name", "recipients", "reminders", "sentAt"],
         },
       });
     });
@@ -362,7 +489,8 @@ describe("GraphQL/PetitionListView", () => {
       expect(data?.markPetitionListViewAsDefault).toEqual({
         id: toGlobalId("User", user.id),
         petitionListViews: [
-          { id: toGlobalId("PetitionListView", defaultView.id), isDefault: false },
+          { id: toGlobalId("PetitionListView", allView.id), isDefault: false },
+          { id: toGlobalId("PetitionListView", customView.id), isDefault: false },
           { id: secondViewGID, isDefault: true },
         ],
       });
@@ -388,7 +516,8 @@ describe("GraphQL/PetitionListView", () => {
       expect(data?.markPetitionListViewAsDefault).toEqual({
         id: toGlobalId("User", user.id),
         petitionListViews: [
-          { id: toGlobalId("PetitionListView", defaultView.id), isDefault: false },
+          { id: toGlobalId("PetitionListView", allView.id), isDefault: false },
+          { id: toGlobalId("PetitionListView", customView.id), isDefault: false },
           { id: secondViewGID, isDefault: false },
         ],
       });
@@ -430,14 +559,19 @@ describe("GraphQL/PetitionListView", () => {
           }
         `,
         {
-          ids: [secondViewGID, toGlobalId("PetitionListView", defaultView.id)],
+          ids: [
+            toGlobalId("PetitionListView", allView.id),
+            secondViewGID,
+            toGlobalId("PetitionListView", customView.id),
+          ],
         },
       );
       expect(errors).toBeUndefined();
       expect(data?.reorderPetitionListViews).toEqual({
         petitionListViews: [
+          { id: toGlobalId("PetitionListView", allView.id) },
           { id: secondViewGID },
-          { id: toGlobalId("PetitionListView", defaultView.id) },
+          { id: toGlobalId("PetitionListView", customView.id) },
         ],
       });
     });
@@ -475,13 +609,37 @@ describe("GraphQL/PetitionListView", () => {
           }
         `,
         {
-          id: toGlobalId("PetitionListView", defaultView.id),
+          id: toGlobalId("PetitionListView", customView.id),
         },
       );
       expect(errors).toBeUndefined();
       expect(data?.deletePetitionListView).toEqual({
-        petitionListViews: [],
+        petitionListViews: [
+          {
+            id: toGlobalId("PetitionListView", allView.id),
+          },
+        ],
       });
+    });
+
+    it("sends error if trying to delete an ALL type view", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!) {
+            deletePetitionListView(id: $id) {
+              petitionListViews {
+                id
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("PetitionListView", allView.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });

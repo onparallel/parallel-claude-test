@@ -4628,6 +4628,7 @@ type PetitionListView {
   id: GID!
   isDefault: Boolean!
   name: String!
+  type: PetitionListViewType!
   user: User!
 }
 
@@ -4718,6 +4719,11 @@ enum PetitionListViewSortField {
 input PetitionListViewSortInput {
   direction: PetitionListViewSortDirection!
   field: PetitionListViewSortField!
+}
+
+enum PetitionListViewType {
+  ALL
+  CUSTOM
 }
 
 """

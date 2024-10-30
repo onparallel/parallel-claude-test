@@ -967,7 +967,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
           buildStateUrl(
             QUERY_STATE,
             {
-              view: defaultView.id,
+              view: defaultView.type === "ALL" ? "ALL" : defaultView.id,
               ...omit(defaultView.data, ["__typename"]),
               ...tagsFiltersOrNothing,
             },
@@ -976,10 +976,15 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
           ),
         );
       } else {
+        const allView = views.find((v) => v.type === "ALL");
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,
-            { view: "ALL", ...tagsFiltersOrNothing },
+            {
+              view: "ALL",
+              ...(allView ? omit(allView.data, ["__typename"]) : {}),
+              ...tagsFiltersOrNothing,
+            },
             pathname,
             omit(query, ["tags"]),
           ),

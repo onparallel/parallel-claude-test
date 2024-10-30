@@ -1,6 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { unique } from "remeda";
-import { Maybe } from "../../util/types";
+import { PetitionListViewType } from "../../db/__types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToPetitionListView<
@@ -30,5 +31,17 @@ export function validPetitionListViewReorder<
     const ids = args[idsArg] as unknown as number[];
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     return userViews.length === unique(ids).length && userViews.every((v) => ids.includes(v.id));
+  };
+}
+
+export function petitionListViewHasType<
+  TypeName extends string,
+  FieldName extends string,
+  TArgIds extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(idsArg: TArgIds, type: PetitionListViewType): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const ids = unMaybeArray(args[idsArg] as unknown as MaybeArray<number>);
+    const userViews = await ctx.views.loadPetitionListView(ids);
+    return userViews.every((v) => v?.type === type);
   };
 }

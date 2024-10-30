@@ -1110,6 +1110,26 @@
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
   },
   {
+    "term": "component.confirm-change-view-all-dialog.body",
+    "definition": "¿Qué es lo que quieres hacer?",
+    "context": "What do you want to do?"
+  },
+  {
+    "term": "component.confirm-change-view-all-dialog.header",
+    "definition": "La vista \"{name}\" no puede incluir filtros",
+    "context": "The \"{name}\" view cannot include filters"
+  },
+  {
+    "term": "component.confirm-change-view-all-dialog.keep-all-option",
+    "definition": "Conservar todo y guardarlo en una nueva vista.",
+    "context": "Keep everything and save it in a new view."
+  },
+  {
+    "term": "component.confirm-change-view-all-dialog.omit-filters-option",
+    "definition": "Guardar solo cambios en las columnas en la vista actual.",
+    "context": "Save only changes to columns in the current view."
+  },
+  {
     "term": "component.confirm-close-archive-reply-into-profile-dialog.body",
     "definition": "Tienes perfiles seleccionados sin guardar. Si no guardas ahora podrás volver desde el botón de Asociar perfiles. ¿Quieres continuar sin guardar?",
     "context": "You have selected profiles without saving. If you don't save now you can go back from the Associate profiles button. Do you want to continue without saving?"
@@ -11955,11 +11975,6 @@
     "context": "After"
   },
   {
-    "term": "generic.all",
-    "definition": "Todo",
-    "context": "All"
-  },
-  {
     "term": "generic.all-categories",
     "definition": "Todas las categorías",
     "context": "All categories"
@@ -11977,6 +11992,11 @@
   {
     "term": "generic.all-types",
     "definition": "Todos",
+    "context": "All"
+  },
+  {
+    "term": "generic.all-view",
+    "definition": "Todo",
     "context": "All"
   },
   {

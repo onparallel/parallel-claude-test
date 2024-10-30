@@ -15,6 +15,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import {
+  PetitionListViewType,
   ViewTabs_createPetitionListViewDocument,
   ViewTabs_deletePetitionListViewDocument,
   ViewTabs_markPetitionListViewAsDefaultDocument,
@@ -49,22 +50,18 @@ export const ViewTabs = Object.assign(
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();
 
+    const allView = views.find((v) => v.type === "ALL");
+
     const showAskViewNameDialog = useAskViewNameDialog();
     const handleViewChange = async (viewId: string) => {
-      if (viewId !== "ALL") {
-        const view = views.find((v) => v.id === viewId);
-        if (isNonNullish(view)) {
-          onStateChange({
-            view: view.id,
-            ...omit(view.data, ["__typename"]),
-          });
-        }
-      } else {
-        onStateChange({ view: "ALL" });
+      const view = views.find((v) => v.id === viewId);
+      if (isNonNullish(view)) {
+        onStateChange({
+          view: view.type === "ALL" ? "ALL" : view.id,
+          ...omit(view.data, ["__typename"]),
+        });
       }
     };
-
-    const hasDefaultView = views.some((v) => v.isDefault);
 
     const [updatePetitionListView] = useMutation(ViewTabs_updatePetitionListViewDocument);
     const createRenameViewClickHandler =
@@ -158,7 +155,7 @@ export const ViewTabs = Object.assign(
       (view: ViewTabs_PetitionListViewFragment) => async () => {
         try {
           await markPetitionListViewAsDefault({
-            variables: { petitionListViewId: view.id === "ALL" ? null : view.id },
+            variables: { petitionListViewId: view.id },
           });
           toast({
             isClosable: true,
@@ -184,7 +181,7 @@ export const ViewTabs = Object.assign(
         await showConfirmDeleteViewDialog({ name: view.name });
         await deletePetitionListView({ variables: { id: view.id } });
         const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
-        handleViewChange(defaultView ? defaultView.id : "ALL");
+        handleViewChange(defaultView ? defaultView.id : (allView?.id ?? "ALL"));
       } catch (error) {
         if (isDialogError(error)) {
           return;
@@ -215,6 +212,11 @@ export const ViewTabs = Object.assign(
       }
     };
 
+    const handleReorderViews = (newOrder: string[]) => {
+      // as "ALL" view is fixed in first position and cannot be moved, we need to manually add it to the new order
+      setViewIds([allView?.id, ...newOrder].filter(isNonNullish));
+    };
+
     return (
       <>
         <Flex
@@ -235,7 +237,7 @@ export const ViewTabs = Object.assign(
             ref={ref}
             variant="enclosed"
             name="view"
-            value={state.view!}
+            value={state.view === "ALL" ? (allView?.id ?? state.view) : state.view!}
             onChange={handleViewChange}
             flex={1}
             minWidth={0}
@@ -244,11 +246,11 @@ export const ViewTabs = Object.assign(
             position="relative"
           >
             <Flex
-              as={Reorder.Group}
+              as={Reorder.Group<string>}
               layoutScroll
               axis="x"
               values={views.map((v) => v.id)}
-              onReorder={setViewIds as any}
+              onReorder={handleReorderViews}
               marginTop="-1px"
               flex={1}
               minWidth={MIN_TAB_WIDTH * (views.length + 1)}
@@ -265,44 +267,23 @@ export const ViewTabs = Object.assign(
               }}
               backgroundColor="gray.50"
             >
-              {[
-                {
-                  id: "ALL",
-                  name: intl.formatMessage({
-                    id: "generic.all",
-                    defaultMessage: "All",
-                  }),
-                  data: {
-                    fromTemplateId: null,
-                    path: "/",
-                    search: null,
-                    searchIn: "EVERYWHERE",
-                    sharedWith: null,
-                    signature: null,
-                    status: null,
-                    tagsFilters: null,
-                    sort: { field: "sentAt", direction: "DESC" },
-                  },
-                  isDefault: hasDefaultView ? false : true,
-                } as ViewTabs_PetitionListViewFragment,
-                ...viewIds.map((id) => views.find((v) => v.id === id)!),
-              ].map(
-                (view) =>
-                  view && (
-                    <ViewTab
-                      key={view.id}
-                      view={view}
-                      isActive={state.view === view.id}
-                      draggedViewId={draggedViewId}
-                      onRenameView={createRenameViewClickHandler(view)}
-                      onCloneView={createCloneViewClickHandler(view)}
-                      onMarkViewAsDefault={createMarkViewAsDefaultClickHandler(view)}
-                      onDeleteView={createDeleteViewClickHandler(view)}
-                      onDragStart={createDragStartHandler(view)}
-                      onDragEnd={createDragEndHandler(view)}
-                    />
-                  ),
-              )}
+              {viewIds
+                .map((id) => views.find((v) => v.id === id)!)
+                .filter(isNonNullish)
+                .map((view) => (
+                  <ViewTab
+                    key={view.id}
+                    view={view}
+                    isActive={view.id === (state.view === "ALL" ? allView?.id : state.view)}
+                    draggedViewId={draggedViewId}
+                    onRenameView={createRenameViewClickHandler(view)}
+                    onCloneView={createCloneViewClickHandler(view)}
+                    onMarkViewAsDefault={createMarkViewAsDefaultClickHandler(view)}
+                    onDeleteView={createDeleteViewClickHandler(view)}
+                    onDragStart={createDragStartHandler(view)}
+                    onDragEnd={createDragEndHandler(view)}
+                  />
+                ))}
             </Flex>
           </RadioTabList>
         </Flex>
@@ -351,6 +332,7 @@ export const ViewTabs = Object.assign(
               ...ViewTabs_PetitionListViewData
             }
             isDefault
+            type
           }
           ${this.PetitionListViewData}
         `;
@@ -440,6 +422,7 @@ interface ViewTabProps {
   view: {
     id: string;
     name: string;
+    type: PetitionListViewType;
     isDefault?: boolean;
   };
   isActive?: boolean;
@@ -466,7 +449,7 @@ export function ViewTab({
   const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   return (
     <Flex
-      {...((view.id === "ALL"
+      {...((view.type === "ALL"
         ? { as: "li" }
         : {
             as: Reorder.Item,
@@ -495,7 +478,11 @@ export function ViewTab({
         backgroundClip="padding-box"
       >
         <Box flex={1} isTruncated>
-          {view.name}
+          {view.type === "ALL" ? (
+            <FormattedMessage id="generic.all-view" defaultMessage="All" />
+          ) : (
+            view.name
+          )}
         </Box>
         <Square size={6}>
           {isActive ? (
@@ -506,7 +493,7 @@ export function ViewTab({
               options={
                 <MenuList minWidth="160px">
                   <MenuItem
-                    isDisabled={view.id === "ALL"}
+                    isDisabled={view.type === "ALL"}
                     icon={<EditIcon boxSize={4} display="block" />}
                     onClick={() => onRenameView(moreOptionsButtonRef)}
                   >
@@ -536,7 +523,7 @@ export function ViewTab({
                   </MenuItem>
                   <MenuDivider />
                   <MenuItem
-                    isDisabled={view.id === "ALL"}
+                    isDisabled={view.type === "ALL"}
                     color="red.600"
                     icon={<DeleteIcon boxSize={4} display="block" />}
                     onClick={onDeleteView}

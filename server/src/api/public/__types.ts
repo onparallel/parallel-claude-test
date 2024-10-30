@@ -3729,6 +3729,7 @@ export type PetitionListView = {
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
+  type: PetitionListViewType;
   user: User;
 };
 
@@ -3812,6 +3813,8 @@ export type PetitionListViewSortInput = {
   direction: PetitionListViewSortDirection;
   field: PetitionListViewSortField;
 };
+
+export type PetitionListViewType = "ALL" | "CUSTOM";
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";

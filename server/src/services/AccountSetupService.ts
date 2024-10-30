@@ -5,6 +5,7 @@ import {
   CreateUser,
   CreateUserData,
   Organization,
+  PetitionListViewType,
   User,
   UserGroupPermissionName,
 } from "../db/__types";
@@ -77,10 +78,19 @@ export class AccountSetupService implements IAccountSetupService {
         [
           [
             intl.formatMessage({
+              id: "default-petition-list-views.all",
+              defaultMessage: "All",
+            }),
+            { ...defaultView },
+            "ALL",
+          ],
+          [
+            intl.formatMessage({
               id: "default-petition-list-views.ongoing",
               defaultMessage: "Ongoing",
             }),
             { ...defaultView, status: ["COMPLETED", "PENDING"] },
+            "CUSTOM",
           ],
           [
             intl.formatMessage({
@@ -88,6 +98,7 @@ export class AccountSetupService implements IAccountSetupService {
               defaultMessage: "Closed",
             }),
             { ...defaultView, status: ["CLOSED"] },
+            "CUSTOM",
           ],
           [
             intl.formatMessage({
@@ -95,15 +106,16 @@ export class AccountSetupService implements IAccountSetupService {
               defaultMessage: "Draft",
             }),
             { ...defaultView, status: ["DRAFT"] },
+            "CUSTOM",
           ],
-        ] as [string, any][]
-      ).map(([name, data], index) => ({
+        ] as [string, any, PetitionListViewType][]
+      ).map(([name, data, type], index) => ({
         user_id: user.id,
         name,
         data,
         position: index,
         is_default: false,
-
+        type,
         updated_by: `User:${user.id}`,
       })),
       `User:${user.id}`,

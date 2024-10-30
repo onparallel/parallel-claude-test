@@ -528,6 +528,7 @@ export interface NexusGenEnums {
     | "lastRecipientActivityAt"
     | "name"
     | "sentAt";
+  PetitionListViewType: db.PetitionListViewType;
   PetitionLocale: db.ContactLocale;
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
@@ -2683,6 +2684,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isDefault: boolean; // Boolean!
     name: string; // String!
+    type: NexusGenEnums["PetitionListViewType"]; // PetitionListViewType!
     user: NexusGenRootTypes["User"]; // User!
   };
   PetitionListViewData: {
@@ -5360,6 +5362,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isDefault: "Boolean";
     name: "String";
+    type: "PetitionListViewType";
     user: "User";
   };
   PetitionListViewData: {

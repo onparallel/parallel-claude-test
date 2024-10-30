@@ -1,9 +1,13 @@
 import { list, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { isNonNullish, maxBy } from "remeda";
+import { firstBy, isNonNullish } from "remeda";
 import { PetitionListView } from "../../db/__types";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { userHasAccessToPetitionListView, validPetitionListViewReorder } from "./authorizers";
+import {
+  petitionListViewHasType,
+  userHasAccessToPetitionListView,
+  validPetitionListViewReorder,
+} from "./authorizers";
 import { validPetitionListViewData } from "./validations";
 
 export const createPetitionListView = mutationField("createPetitionListView", {
@@ -17,7 +21,7 @@ export const createPetitionListView = mutationField("createPetitionListView", {
   validateArgs: validPetitionListViewData((args) => args.data, "data"),
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
-    const maxPosition = maxBy(userViews, (v) => v.position)?.position ?? -1;
+    const maxPosition = firstBy(userViews, [(v) => v.position, "desc"])?.position ?? -1;
     const [view] = await ctx.views.createPetitionListView(
       {
         name: args.name,
@@ -35,7 +39,22 @@ export const createPetitionListView = mutationField("createPetitionListView", {
 export const updatePetitionListView = mutationField("updatePetitionListView", {
   description: "Updates a petition list view",
   type: "PetitionListView",
-  authorize: authenticateAnd(userHasAccessToPetitionListView("petitionListViewId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitionListView("petitionListViewId"),
+    ifArgDefined(
+      (args) =>
+        args.name ??
+        args.data?.fromTemplateId ??
+        args.data?.path ??
+        args.data?.search ??
+        args.data?.searchIn ??
+        args.data?.sharedWith ??
+        args.data?.signature ??
+        args.data?.status ??
+        args.data?.tagsFilters,
+      petitionListViewHasType("petitionListViewId", "CUSTOM"),
+    ),
+  ),
   args: {
     petitionListViewId: nonNull(globalIdArg("PetitionListView")),
     name: nullable(stringArg()),
@@ -48,7 +67,18 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
       data.name = args.name;
     }
     if (args.data !== undefined) {
-      data.data = args.data;
+      data.data = {
+        fromTemplateId: args.data?.fromTemplateId ?? null,
+        path: args.data?.path ?? "/",
+        search: args.data?.search ?? null,
+        searchIn: args.data?.searchIn ?? "EVERYWHERE",
+        sharedWith: args.data?.sharedWith ?? null,
+        signature: args.data?.signature ?? null,
+        status: args.data?.status ?? null,
+        tagsFilters: args.data?.tagsFilters ?? null,
+        sort: args.data?.sort ?? null,
+        columns: args.data?.columns ?? null,
+      };
     }
     return await ctx.views.updatePetitionListView(args.petitionListViewId, data, ctx.user!);
   },
@@ -85,7 +115,10 @@ export const reorderPetitionListViews = mutationField("reorderPetitionListViews"
 export const deletePetitionListView = mutationField("deletePetitionListView", {
   description: "Deletes a petition list view of the user",
   type: "User",
-  authorize: authenticateAnd(userHasAccessToPetitionListView("id")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitionListView("id"),
+    petitionListViewHasType("id", "CUSTOM"),
+  ),
   args: {
     id: nonNull(globalIdArg("PetitionListView")),
   },

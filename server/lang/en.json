@@ -160,6 +160,11 @@
     "context": "Why we use Parallel?"
   },
   {
+    "term": "default-petition-list-views.all",
+    "definition": "All",
+    "context": "All"
+  },
+  {
     "term": "default-petition-list-views.closed",
     "definition": "Closed",
     "context": "Closed"

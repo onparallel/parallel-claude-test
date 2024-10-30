@@ -3837,6 +3837,7 @@ export interface PetitionListView {
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
+  type: PetitionListViewType;
   user: User;
 }
 
@@ -3926,6 +3927,8 @@ export interface PetitionListViewSortInput {
   direction: PetitionListViewSortDirection;
   field: PetitionListViewSortField;
 }
+
+export type PetitionListViewType = "ALL" | "CUSTOM";
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";
@@ -18987,6 +18990,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
   id: string;
   name: string;
   isDefault: boolean;
+  type: PetitionListViewType;
   data: {
     __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
@@ -19033,6 +19037,7 @@ export type PetitionListHeader_createPetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
+    type: PetitionListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -19086,6 +19091,7 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
+    type: PetitionListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -19166,6 +19172,7 @@ export type ViewTabs_PetitionListViewFragment = {
   id: string;
   name: string;
   isDefault: boolean;
+  type: PetitionListViewType;
   data: {
     __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
@@ -19242,6 +19249,7 @@ export type ViewTabs_createPetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
+    type: PetitionListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -19295,6 +19303,7 @@ export type ViewTabs_updatePetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
+    type: PetitionListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -49612,6 +49621,7 @@ export type Petitions_UserFragment = {
     id: string;
     name: string;
     isDefault: boolean;
+    type: PetitionListViewType;
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
@@ -49888,6 +49898,7 @@ export type Petitions_userQuery = {
       id: string;
       name: string;
       isDefault: boolean;
+      type: PetitionListViewType;
       data: {
         __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
@@ -64935,6 +64946,7 @@ export const ViewTabs_PetitionListViewFragmentDoc = gql`
       ...ViewTabs_PetitionListViewData
     }
     isDefault
+    type
   }
   ${ViewTabs_PetitionListViewDataFragmentDoc}
 ` as unknown as DocumentNode<ViewTabs_PetitionListViewFragment, unknown>;
@@ -64970,6 +64982,7 @@ export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
       columns
     }
     isDefault
+    type
   }
 ` as unknown as DocumentNode<PetitionListHeader_PetitionListViewFragment, unknown>;
 export const Petitions_UserFragmentDoc = gql`

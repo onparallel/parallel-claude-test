@@ -1139,6 +1139,29 @@ describe("GraphQL/Users", () => {
                   name
                 }
               }
+              petitionListViews {
+                id
+                name
+                type
+                isDefault
+                data {
+                  status
+                  signature
+                  fromTemplateId
+                  path
+                  search
+                  searchIn
+                  sharedWith {
+                    __typename
+                  }
+                  tagsFilters {
+                    __typename
+                  }
+                  sort {
+                    __typename
+                  }
+                }
+              }
               organization {
                 name
                 integrations(limit: 10, offset: 0) {
@@ -1258,6 +1281,76 @@ describe("GraphQL/Users", () => {
                   "TEAMS:LIST_TEAMS",
                 ].map((name) => ({ effect: "GRANT", name })),
               ),
+            },
+          ],
+          petitionListViews: [
+            {
+              id: expect.any(String),
+              name: "All",
+              type: "ALL",
+              isDefault: false,
+              data: {
+                status: null,
+                signature: null,
+                fromTemplateId: null,
+                path: "/",
+                search: null,
+                searchIn: "EVERYWHERE",
+                sharedWith: null,
+                tagsFilters: null,
+                sort: null,
+              },
+            },
+            {
+              id: expect.any(String),
+              name: "Ongoing",
+              type: "CUSTOM",
+              isDefault: false,
+              data: {
+                status: ["COMPLETED", "PENDING"],
+                signature: null,
+                fromTemplateId: null,
+                path: "/",
+                search: null,
+                searchIn: "EVERYWHERE",
+                sharedWith: null,
+                tagsFilters: null,
+                sort: null,
+              },
+            },
+            {
+              id: expect.any(String),
+              name: "Closed",
+              type: "CUSTOM",
+              isDefault: false,
+              data: {
+                status: ["CLOSED"],
+                signature: null,
+                fromTemplateId: null,
+                path: "/",
+                search: null,
+                searchIn: "EVERYWHERE",
+                sharedWith: null,
+                tagsFilters: null,
+                sort: null,
+              },
+            },
+            {
+              id: expect.any(String),
+              name: "Draft",
+              type: "CUSTOM",
+              isDefault: false,
+              data: {
+                status: ["DRAFT"],
+                signature: null,
+                fromTemplateId: null,
+                path: "/",
+                search: null,
+                searchIn: "EVERYWHERE",
+                sharedWith: null,
+                tagsFilters: null,
+                sort: null,
+              },
             },
           ],
           organization: {

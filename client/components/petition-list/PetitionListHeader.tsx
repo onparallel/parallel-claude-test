@@ -42,7 +42,7 @@ import {
   PETITIONS_COLUMNS,
   PetitionsTableColumn,
 } from "@parallel/utils/usePetitionsTableColumns";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, omit, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -52,6 +52,7 @@ import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
 import { useColumnVisibilityDialog } from "../common/dialogs/ColumnVisibilityDialog";
 import { isDialogError } from "../common/dialogs/DialogProvider";
+import { useConfirmChangeViewAllDialog } from "../petition-compose/dialogs/ConfirmChangeViewAllDialog";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
 import { removeInvalidSharedWithFilterLines } from "./filters/shared-with/PetitionListSharedWithFilter";
 import { removeInvalidTagFilterLines } from "./filters/tags/PetitionListTagFilter";
@@ -75,6 +76,10 @@ export function PetitionListHeader({
   const [search, setSearch] = useState(state.search ?? "");
 
   const showGenericErrorToast = useGenericErrorToast();
+
+  useEffect(() => {
+    setSearch(state.search);
+  }, [state.view]);
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (search) =>
@@ -110,25 +115,22 @@ export function PetitionListHeader({
     if (state.type === "TEMPLATE") {
       return false;
     }
-    const currentView = state.view === "ALL" ? null : views.find((v) => v.id === state.view)!;
+    const currentView = views.find((v) =>
+      state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+    );
 
-    if (!currentView && state.view !== "ALL") return;
+    if (!currentView) return false;
+
+    if (currentView.type === "ALL") {
+      // "ALL" view can only update columns and sortBy
+      return !viewsAreEqual(
+        pick(currentView.data, ["sort", "columns"]),
+        pick(state, ["sort", "columns"]),
+      );
+    }
 
     return !viewsAreEqual(
-      state.view === "ALL"
-        ? {
-            status: null,
-            tagsFilters: null,
-            sharedWith: null,
-            signature: null,
-            fromTemplateId: null,
-            search: null,
-            searchIn: "EVERYWHERE",
-            path: "/",
-            sort: null,
-            columns: null,
-          }
-        : currentView!.data,
+      currentView!.data,
       pick(state, [
         "status",
         "tagsFilters",
@@ -198,35 +200,67 @@ export function PetitionListHeader({
     }
   };
 
+  const showConfirmChangeViewAllDialog = useConfirmChangeViewAllDialog();
   const [updatePetitionListView] = useMutation(PetitionListHeader_updatePetitionListViewDocument);
   const handleSaveCurrentViewClick = async () => {
     try {
-      if (state.view === "ALL") {
-        return;
+      // If the view to save is ALL and has some filter applied, show the dialog
+      // to choose whether to save and ignore the filters or switch to create a new VIEW.
+      if (
+        state.view === "ALL" &&
+        Object.values(
+          pick(state, [
+            "sharedWith",
+            "status",
+            "tagsFilters",
+            "signature",
+            "fromTemplateId",
+            "search",
+            "searchIn",
+            "path",
+          ]),
+        ).some(isNonNullish)
+      ) {
+        const action = await showConfirmChangeViewAllDialog();
+        if (action === "CREATE_NEW_VIEW") {
+          handleSaveAsNewViewClick();
+          return;
+        }
       }
-      const view = views.find((v) => v.id === state.view)!;
+
+      const view = views.find((v) =>
+        state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+      )!;
+
       await updatePetitionListView({
         variables: {
           petitionListViewId: view.id,
-          name: view.name,
+          ...(view.type === "ALL" ? {} : { name: view.name }),
           data: {
-            tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
-            sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
-            ...pick(state, [
-              "status",
-              "signature",
-              "fromTemplateId",
-              "search",
-              "searchIn",
-              "path",
-              "sort",
-              "columns",
-            ]),
+            ...(view.type === "ALL"
+              ? // "ALL" view can only update columns and sort
+                pick(state, ["sort", "columns"])
+              : {
+                  tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
+                  sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+                  ...pick(state, [
+                    "status",
+                    "signature",
+                    "fromTemplateId",
+                    "search",
+                    "searchIn",
+                    "path",
+                    "sort",
+                    "columns",
+                  ]),
+                }),
           } as PetitionListViewDataInput,
         },
       });
     } catch (error) {
-      showGenericErrorToast(error);
+      if (!isDialogError(error)) {
+        showGenericErrorToast(error);
+      }
     }
   };
 
@@ -343,7 +377,7 @@ export function PetitionListHeader({
               <SaveViewMenuButton isDirty={isViewDirty} />
               <Portal>
                 <MenuList minWidth="160px">
-                  <MenuItem isDisabled={state.view === "ALL"} onClick={handleSaveCurrentViewClick}>
+                  <MenuItem isDisabled={!isViewDirty} onClick={handleSaveCurrentViewClick}>
                     <FormattedMessage
                       id="component.petition-list-header.save-current-view"
                       defaultMessage="Save current view"
@@ -391,6 +425,7 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
           defaultMessage: "Save view",
         })}
         isDisabled={!isSmallScreen}
+        placement="bottom-start"
       >
         <Button
           {...buttonProps}
@@ -463,6 +498,7 @@ PetitionListHeader.fragments = {
         columns
       }
       isDefault
+      type
     }
   `,
 };
@@ -505,7 +541,7 @@ const _mutations = [
   `,
 ];
 
-function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
+function viewsAreEqual(view1: Partial<PetitionListViewData>, view2: Partial<PetitionListViewData>) {
   return (
     isDeepEqual(
       omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters"]),

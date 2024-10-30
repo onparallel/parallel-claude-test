@@ -220,6 +220,28 @@ export async function seed(knex: Knex): Promise<any> {
           created_by: `User:${ownerId}`,
           updated_by: `User:${ownerId}`,
         });
+
+      await knex("petition_list_view").insert(
+        users.map((user) => ({
+          is_default: false,
+          type: "ALL",
+          name: "All",
+          user_id: user.id,
+          position: 0,
+          data: {
+            path: "/",
+            sort: null,
+            tags: null,
+            search: null,
+            status: null,
+            searchIn: "EVERYWHERE",
+            signature: null,
+            sharedWith: null,
+            fromTemplateId: null,
+          },
+        })),
+      );
+
       await knex("organization_usage_limit").insert([
         {
           org_id: orgId,

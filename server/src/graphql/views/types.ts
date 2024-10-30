@@ -1,4 +1,5 @@
 import { enumType, inputObjectType, objectType } from "nexus";
+import { PetitionListViewTypeValues } from "../../db/__types";
 
 export const PetitionListView = objectType({
   name: "PetitionListView",
@@ -10,6 +11,9 @@ export const PetitionListView = objectType({
     t.field("user", {
       type: "User",
       resolve: async (o, _, ctx) => (await ctx.users.loadUser(o.user_id))!,
+    });
+    t.field("type", {
+      type: enumType({ name: "PetitionListViewType", members: PetitionListViewTypeValues }),
     });
   },
 });
