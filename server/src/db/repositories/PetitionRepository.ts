@@ -505,6 +505,7 @@ export class PetitionRepository extends BaseRepository {
       search?: string | null;
       searchByNameOnly?: boolean;
       excludeAnonymized?: boolean;
+      excludePublicTemplates?: boolean;
       sortBy?: SortBy<
         | "name"
         | "lastUsedAt"
@@ -728,6 +729,10 @@ export class PetitionRepository extends BaseRepository {
       builders.push((q) => {
         q.whereNull("p.anonymized_at");
       });
+    }
+
+    if (opts.excludePublicTemplates) {
+      builders.push((q) => q.where("template_public", false));
     }
 
     const countPromise = LazyPromise.from(async () => {

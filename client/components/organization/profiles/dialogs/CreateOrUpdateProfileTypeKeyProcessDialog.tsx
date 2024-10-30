@@ -123,6 +123,7 @@ function CreateOrUpdateProfileTypeKeyProcessDialog({
                   isMulti
                   type="TEMPLATE"
                   value={value}
+                  excludePublicTemplates
                   onChange={(v) => {
                     const templateIds = v?.map((p) => p.id) ?? [];
                     onChange(templateIds);

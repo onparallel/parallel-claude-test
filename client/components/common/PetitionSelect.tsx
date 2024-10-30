@@ -55,6 +55,7 @@ const _queries = [
       $search: String
       $filters: PetitionFilter
       $sortBy: [QueryPetitions_OrderBy!]
+      $excludePublicTemplates: Boolean
     ) {
       petitions(
         offset: $offset
@@ -64,6 +65,7 @@ const _queries = [
         sortBy: $sortBy
         searchByNameOnly: true
         excludeAnonymized: true
+        excludePublicTemplates: $excludePublicTemplates
       ) {
         items {
           ...PetitionSelect_PetitionBase
@@ -91,6 +93,7 @@ export interface PetitionSelectProps<
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   type?: "PETITION" | "TEMPLATE";
   excludePetitions?: string[];
+  excludePublicTemplates?: boolean;
   isSync?: IsSync;
   defaultOptions?: boolean;
   permissionTypes?: PetitionPermissionType[];
@@ -112,6 +115,7 @@ export const PetitionSelect = Object.assign(
       isMulti,
       placeholder: _placeholder,
       excludePetitions,
+      excludePublicTemplates,
       permissionTypes,
       fromTemplateId,
       ...props
@@ -136,6 +140,7 @@ export const PetitionSelect = Object.assign(
               permissionTypes,
               fromTemplateId,
             },
+            excludePublicTemplates,
             search,
             sortBy: "lastUsedAt_DESC",
           },

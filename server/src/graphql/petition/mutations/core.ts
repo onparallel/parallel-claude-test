@@ -124,7 +124,6 @@ import {
 } from "../../organization/authorizers";
 import {
   profileHasSameProfileTypeAsField,
-  profileHasSameProfileTypeAsProcess,
   profileHasStatus,
   profileIsNotAnonymized,
   profileTypeFieldBelongsToPetitionFieldProfileType,
@@ -132,7 +131,6 @@ import {
   profileTypeIsArchived,
   userHasAccessToProfile,
   userHasAccessToProfileType,
-  userHasAccessToProfileTypeProcess,
   userHasPermissionOnProfileTypeField,
 } from "../../profile/authorizers";
 import { contextUserHasPermission } from "../../users/authorizers";
@@ -3931,13 +3929,6 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
       "petitionFieldId",
       "prefill",
     ),
-    ifArgDefined(
-      "profileTypeProcessId",
-      and(
-        userHasAccessToProfileTypeProcess("profileTypeProcessId" as never),
-        profileHasSameProfileTypeAsProcess("profileId", "profileTypeProcessId" as never),
-      ),
-    ),
   ),
   args: {
     profileId: nonNull(
@@ -3976,11 +3967,6 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         ),
       ),
     ),
-    profileTypeProcessId: nullable(
-      globalIdArg("ProfileTypeProcess", {
-        description: "Provide if you want to link the parallel with a profile type process",
-      }),
-    ),
   },
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.createPetitionFromId(
@@ -3995,8 +3981,6 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
           {
             profile_id: args.profileId,
             petition_id: petition.id,
-            // only link process of main profile
-            profile_type_process_id: args.profileTypeProcessId ?? null,
           },
           ...args.prefill.flatMap((p) =>
             p.profileIds.map((profileId) => ({

@@ -6883,7 +6883,6 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       profileId: NexusGenScalars["GID"]; // GID!
-      profileTypeProcessId?: NexusGenScalars["GID"] | null; // GID
     };
     bulkCreateContacts: {
       // args
@@ -7187,7 +7186,6 @@ export interface NexusGenArgTypes {
       petitionFieldId?: NexusGenScalars["GID"] | null; // GID
       prefill: NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]; // [CreatePetitionFromProfilePrefillInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
-      profileTypeProcessId?: NexusGenScalars["GID"] | null; // GID
       templateId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionListView: {
@@ -8563,6 +8561,7 @@ export interface NexusGenArgTypes {
     petitions: {
       // args
       excludeAnonymized?: boolean | null; // Boolean
+      excludePublicTemplates?: boolean | null; // Boolean
       filters?: NexusGenInputs["PetitionFilter"] | null; // PetitionFilter
       limit?: number | null; // Int
       offset?: number | null; // Int

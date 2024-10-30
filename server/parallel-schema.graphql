@@ -1013,11 +1013,7 @@ type Mutation {
   """
   Associates a profile to a petition
   """
-  associateProfileToPetition(
-    petitionId: GID!
-    profileId: GID!
-    profileTypeProcessId: GID
-  ): PetitionProfile!
+  associateProfileToPetition(petitionId: GID!, profileId: GID!): PetitionProfile!
 
   """
   Load contacts from an excel file, creating the ones not found on database
@@ -1511,11 +1507,6 @@ type Mutation {
     Main profile to obtain the information from
     """
     profileId: GID!
-
-    """
-    Provide if you want to link the parallel with a profile type process
-    """
-    profileTypeProcessId: GID
 
     """
     Template that will be used to create the petition
@@ -7018,6 +7009,11 @@ type Query {
     Exclude anonymized petitions from result
     """
     excludeAnonymized: Boolean
+
+    """
+    Exclude public templates from result
+    """
+    excludePublicTemplates: Boolean
     filters: PetitionFilter
 
     """

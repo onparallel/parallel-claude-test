@@ -52,7 +52,7 @@ export function ProfileKeyProcesses({ profile }: { profile: ProfileKeyProcesses_
       });
 
       await associateProfileToPetition({
-        variables: { petitionId, profileId: profile.id, profileTypeProcessId: keyProcess.id },
+        variables: { petitionId, profileId: profile.id },
       });
     } catch {}
   };
@@ -94,7 +94,6 @@ export function ProfileKeyProcesses({ profile }: { profile: ProfileKeyProcesses_
 
       const { data } = await createPetitionFromProfile({
         variables: {
-          profileTypeProcessId: keyProcess.id,
           profileId: profile.id,
           templateId: template.id,
           petitionFieldId: compatibleFieldGroups[0]?.id,
@@ -222,16 +221,8 @@ ProfileKeyProcesses.fragments = {
 
 const _mutations = [
   gql`
-    mutation ProfileKeyProcesses_associateProfileToPetition(
-      $petitionId: GID!
-      $profileId: GID!
-      $profileTypeProcessId: GID
-    ) {
-      associateProfileToPetition(
-        petitionId: $petitionId
-        profileId: $profileId
-        profileTypeProcessId: $profileTypeProcessId
-      ) {
+    mutation ProfileKeyProcesses_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+      associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
         profile {
           ...ProfileKeyProcesses_Profile
         }
@@ -244,14 +235,12 @@ const _mutations = [
       $profileId: GID!
       $templateId: GID!
       $prefill: [CreatePetitionFromProfilePrefillInput!]!
-      $profileTypeProcessId: GID
       $petitionFieldId: GID
     ) {
       createPetitionFromProfile(
         profileId: $profileId
         templateId: $templateId
         prefill: $prefill
-        profileTypeProcessId: $profileTypeProcessId
         petitionFieldId: $petitionFieldId
       ) {
         id

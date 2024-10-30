@@ -63,6 +63,9 @@ export const petitionsQuery = queryField((t) => {
       excludeAnonymized: booleanArg({
         description: "Exclude anonymized petitions from result",
       }),
+      excludePublicTemplates: booleanArg({
+        description: "Exclude public templates from result",
+      }),
     },
     searchable: true,
     sortableBy: [
@@ -90,7 +93,16 @@ export const petitionsQuery = queryField((t) => {
     ),
     resolve: async (
       _,
-      { offset, limit, search, sortBy, filters, searchByNameOnly, excludeAnonymized },
+      {
+        offset,
+        limit,
+        search,
+        sortBy,
+        filters,
+        searchByNameOnly,
+        excludeAnonymized,
+        excludePublicTemplates,
+      },
       ctx,
     ) => {
       if (isNonNullish(limit) && limit > 100) {
@@ -107,6 +119,7 @@ export const petitionsQuery = queryField((t) => {
         limit,
         searchByNameOnly: searchByNameOnly ?? false,
         excludeAnonymized: excludeAnonymized ?? false,
+        excludePublicTemplates: excludePublicTemplates ?? false,
       });
     },
   });

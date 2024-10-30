@@ -725,7 +725,12 @@ export function userHasAccessToEditProfileTypeProcessInput<
     if (templateIds) {
       // no need to have a READ permission on the templates
       const petitions = await ctx.petitions.loadPetition(templateIds);
-      if (petitions.some((p) => isNullish(p) || !p.is_template || p.org_id !== ctx.user!.org_id)) {
+      if (
+        petitions.some(
+          (p) =>
+            isNullish(p) || !p.is_template || p.template_public || p.org_id !== ctx.user!.org_id,
+        )
+      ) {
         throw new ForbiddenError("User does not have access to the provided templates");
       }
     }
@@ -756,31 +761,5 @@ export function profileTypeProcessBelongsToProfileType<
     }
 
     return true;
-  };
-}
-
-export function profileHasSameProfileTypeAsProcess<
-  TypeName extends string,
-  FieldName extends string,
-  TProfileIdArg extends Arg<TypeName, FieldName, number>,
-  TProfileTypeProcessIdArg extends Arg<TypeName, FieldName, number>,
->(
-  profileIdArg: TProfileIdArg,
-  processIdArg: TProfileTypeProcessIdArg,
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const processId = args[processIdArg] as unknown as number;
-
-    const [profile, process] = await Promise.all([
-      ctx.profiles.loadProfile(profileId),
-      ctx.profiles.loadProfileTypeProcess(processId),
-    ]);
-
-    return (
-      isNonNullish(profile) &&
-      isNonNullish(process) &&
-      process.profile_type_id === profile.profile_type_id
-    );
   };
 }

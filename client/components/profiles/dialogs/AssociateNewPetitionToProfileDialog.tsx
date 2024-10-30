@@ -62,14 +62,12 @@ type AssociateNewPetitionToProfileDialogSteps = {
   SELECT_FIELD_GROUP: {
     profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
     template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
-    profileTypeProcessId?: string;
     selectedGroupId?: string;
   };
   PREFILL_FIELD_GROUPS: {
     profile: useAssociateNewPetitionToProfileDialog_ProfileFragment;
     template: useAssociateNewPetitionToProfileDialog_PetitionBaseFragment;
     groupId: string;
-    profileTypeProcessId?: string;
   };
 };
 
@@ -276,7 +274,9 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
 
             const hasMultipleCompatibleGroupsOrFieldsWithProfiles =
               compatibleFieldGroups.length > 1 ||
-              relatedFieldGroupsWithCompatibleProfiles.length > 1;
+              relatedFieldGroupsWithCompatibleProfiles.length > 1 ||
+              relatedFieldGroupsWithCompatibleProfiles[0]?.[1]?.length > 1;
+
             // If do not have multiple compatible group fields and compatible relationships we can calculate the prefill and omit the following steps.
             if (!hasMultipleCompatibleGroupsOrFieldsWithProfiles || !fillWithProfileData) {
               const prefill = fillWithProfileData
@@ -288,7 +288,6 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
                   templateId: templateId!,
                   prefill,
                   petitionFieldId: fillWithProfileData ? groupId : undefined,
-                  profileTypeProcessId: keyProcess?.id,
                 },
               });
 
@@ -306,7 +305,6 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
                     profile,
                     template: template!,
                     groupId,
-                    profileTypeProcessId: keyProcess?.id,
                   },
                   { selectedTemplateId: template!.id },
                 );
@@ -316,7 +314,6 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
                   {
                     profile,
                     template: template!,
-                    profileTypeProcessId: keyProcess?.id,
                   },
                   { selectedTemplateId: template!.id },
                 );
@@ -410,7 +407,6 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
 function AssociateNewPetitionToProfileDialogSelectFieldGroup({
   template,
   profile,
-  profileTypeProcessId,
   selectedGroupId,
   onStep,
   onBack,
@@ -461,7 +457,10 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
               });
 
             // If there are no multiple groups compatible with the profile relationships, the step is skipped and the parallel is created.
-            if (relatedFieldGroupsWithCompatibleProfiles.length < 2) {
+            if (
+              relatedFieldGroupsWithCompatibleProfiles.length === 1 &&
+              relatedFieldGroupsWithCompatibleProfiles[0]?.[1]?.length === 1
+            ) {
               const prefill = generatePrefillData(
                 relatedFieldGroupsWithCompatibleProfiles,
                 groupId!,
@@ -473,7 +472,6 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
                   templateId: template.id,
                   prefill,
                   petitionFieldId: groupId,
-                  profileTypeProcessId,
                 },
               });
 
@@ -489,7 +487,6 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
                   groupId: groupId!,
                   profile,
                   template,
-                  profileTypeProcessId,
                 },
                 { selectedGroupId: groupId },
               );
@@ -592,7 +589,6 @@ function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
   profile,
   template,
   groupId,
-  profileTypeProcessId,
   onStep,
   onBack,
   ...props
@@ -652,7 +648,6 @@ function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
                 templateId: template.id,
                 prefill,
                 petitionFieldId: groupId,
-                profileTypeProcessId,
               },
             });
 
@@ -968,14 +963,12 @@ const _mutations = [
       $templateId: GID!
       $prefill: [CreatePetitionFromProfilePrefillInput!]!
       $petitionFieldId: GID
-      $profileTypeProcessId: GID
     ) {
       createPetitionFromProfile(
         profileId: $profileId
         templateId: $templateId
         prefill: $prefill
         petitionFieldId: $petitionFieldId
-        profileTypeProcessId: $profileTypeProcessId
       ) {
         id
       }

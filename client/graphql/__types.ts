@@ -1427,7 +1427,6 @@ export interface MutationarchiveProfileTypeArgs {
 export interface MutationassociateProfileToPetitionArgs {
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
 }
 
 export interface MutationbulkCreateContactsArgs {
@@ -1731,7 +1730,6 @@ export interface MutationcreatePetitionFromProfileArgs {
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   prefill: Array<CreatePetitionFromProfilePrefillInput>;
   profileId: Scalars["GID"]["input"];
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
   templateId: Scalars["GID"]["input"];
 }
 
@@ -5586,6 +5584,7 @@ export interface QuerypetitionInformationArgs {
 
 export interface QuerypetitionsArgs {
   excludeAnonymized?: InputMaybe<Scalars["Boolean"]["input"]>;
+  excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -7221,6 +7220,7 @@ export type PetitionSelect_petitionsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type PetitionSelect_petitionsQuery = {
@@ -26566,7 +26566,6 @@ export type ProfileKeyProcesses_ProfileFragment = {
 export type ProfileKeyProcesses_associateProfileToPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type ProfileKeyProcesses_associateProfileToPetitionMutation = {
@@ -26656,7 +26655,6 @@ export type ProfileKeyProcesses_createPetitionFromProfileMutationVariables = Exa
   profileId: Scalars["GID"]["input"];
   templateId: Scalars["GID"]["input"];
   prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
@@ -27515,7 +27513,6 @@ export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMuta
     templateId: Scalars["GID"]["input"];
     prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
     petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
-    profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
   }>;
 
 export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutation = {
@@ -66627,6 +66624,7 @@ export const PetitionSelect_petitionsDocument = gql`
     $search: String
     $filters: PetitionFilter
     $sortBy: [QueryPetitions_OrderBy!]
+    $excludePublicTemplates: Boolean
   ) {
     petitions(
       offset: $offset
@@ -66636,6 +66634,7 @@ export const PetitionSelect_petitionsDocument = gql`
       sortBy: $sortBy
       searchByNameOnly: true
       excludeAnonymized: true
+      excludePublicTemplates: $excludePublicTemplates
     ) {
       items {
         ...PetitionSelect_PetitionBase
@@ -68906,16 +68905,8 @@ export const ProfileForm_deleteProfileFieldFileDocument = gql`
   ProfileForm_deleteProfileFieldFileMutationVariables
 >;
 export const ProfileKeyProcesses_associateProfileToPetitionDocument = gql`
-  mutation ProfileKeyProcesses_associateProfileToPetition(
-    $petitionId: GID!
-    $profileId: GID!
-    $profileTypeProcessId: GID
-  ) {
-    associateProfileToPetition(
-      petitionId: $petitionId
-      profileId: $profileId
-      profileTypeProcessId: $profileTypeProcessId
-    ) {
+  mutation ProfileKeyProcesses_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+    associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
       profile {
         ...ProfileKeyProcesses_Profile
       }
@@ -68931,14 +68922,12 @@ export const ProfileKeyProcesses_createPetitionFromProfileDocument = gql`
     $profileId: GID!
     $templateId: GID!
     $prefill: [CreatePetitionFromProfilePrefillInput!]!
-    $profileTypeProcessId: GID
     $petitionFieldId: GID
   ) {
     createPetitionFromProfile(
       profileId: $profileId
       templateId: $templateId
       prefill: $prefill
-      profileTypeProcessId: $profileTypeProcessId
       petitionFieldId: $petitionFieldId
     ) {
       id
@@ -69066,14 +69055,12 @@ export const useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDoc
     $templateId: GID!
     $prefill: [CreatePetitionFromProfilePrefillInput!]!
     $petitionFieldId: GID
-    $profileTypeProcessId: GID
   ) {
     createPetitionFromProfile(
       profileId: $profileId
       templateId: $templateId
       prefill: $prefill
       petitionFieldId: $petitionFieldId
-      profileTypeProcessId: $profileTypeProcessId
     ) {
       id
     }

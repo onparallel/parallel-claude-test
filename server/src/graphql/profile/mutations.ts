@@ -90,7 +90,6 @@ import {
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
-  profileHasSameProfileTypeAsProcess,
   profileHasStatus,
   profileIsAssociatedToPetition,
   profileIsNotAnonymized,
@@ -1802,27 +1801,18 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     profileHasStatus("profileId", ["OPEN", "CLOSED"]),
-    ifArgDefined(
-      "profileTypeProcessId",
-      and(
-        userHasAccessToProfileTypeProcess("profileTypeProcessId" as never),
-        profileHasSameProfileTypeAsProcess("profileId", "profileTypeProcessId" as never),
-      ),
-    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     profileId: nonNull(globalIdArg("Profile")),
-    profileTypeProcessId: nullable(globalIdArg("ProfileTypeProcess")),
   },
-  resolve: async (_, { petitionId, profileId, profileTypeProcessId }, ctx) => {
+  resolve: async (_, { petitionId, profileId }, ctx) => {
     try {
       const [petitionProfile] = await ctx.profiles.associateProfilesToPetition(
         [
           {
             profile_id: profileId,
             petition_id: petitionId,
-            profile_type_process_id: profileTypeProcessId ?? null,
           },
         ],
         `User:${ctx.user!.id}`,
@@ -2705,6 +2695,7 @@ export const createProfileTypeProcess = mutationField("createProfileTypeProcess"
     userHasAccessToProfileType("profileTypeId"),
     userHasAccessToPetitions("templateIds"),
     petitionsAreOfTypeTemplate("templateIds"),
+    petitionsAreNotPublicTemplates("templateIds"),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.templateIds, "templateIds"),

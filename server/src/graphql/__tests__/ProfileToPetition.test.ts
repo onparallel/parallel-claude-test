@@ -51,7 +51,6 @@ describe("GraphQL/Profiles to Petitions", () => {
     let contract: ProfileType;
 
     let individualProcess: ProfileTypeProcess;
-    let legalEntityProcess: ProfileTypeProcess;
 
     let individualIdx: Record<string, ProfileTypeField>;
     let legalEntityIdx: Record<string, ProfileTypeField>;
@@ -107,15 +106,6 @@ describe("GraphQL/Profiles to Petitions", () => {
           deleted_at: null,
         })
         .select("*");
-
-      [legalEntityProcess] = await mocks.knex.from("profile_type_process").insert(
-        {
-          position: 0,
-          profile_type_id: legalEntity.id,
-          process_name: { en: "Companies" },
-        },
-        "*",
-      );
 
       [contract] = await mocks.knex
         .from("profile_type")
@@ -5664,22 +5654,26 @@ describe("GraphQL/Profiles to Petitions", () => {
         .update({ permission: "WRITE" });
     });
 
-    it("associates petition to profile type process when passing arg", async () => {
+    it("associates petition to process when creating it with a template of the process", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, individual.id, 1);
+
+      await mocks.knex
+        .from("profile_type_process_template")
+        .insert({ profile_type_process_id: individualProcess.id, template_id: template.id });
+
       const { data, errors } = await testClient.execute(
         gql`
           mutation (
             $templateId: GID!
             $profileId: GID!
-            $petitionFieldId: GID
             $prefill: [CreatePetitionFromProfilePrefillInput!]!
-            $profileTypeProcessId: GID
           ) {
             createPetitionFromProfile(
               templateId: $templateId
-              petitionFieldId: $petitionFieldId
               profileId: $profileId
               prefill: $prefill
-              profileTypeProcessId: $profileTypeProcessId
             ) {
               id
               profiles {
@@ -5699,10 +5693,8 @@ describe("GraphQL/Profiles to Petitions", () => {
         `,
         {
           templateId: toGlobalId("Petition", template.id),
-          profileId: toGlobalId("Profile", mainProfile.id),
-          petitionFieldId: null,
+          profileId: toGlobalId("Profile", profile.id),
           prefill: [],
-          profileTypeProcessId: toGlobalId("ProfileTypeProcess", individualProcess.id),
         },
       );
 
@@ -5711,65 +5703,21 @@ describe("GraphQL/Profiles to Petitions", () => {
         id: expect.any(String),
         profiles: [
           {
-            id: toGlobalId("Profile", mainProfile.id),
+            id: toGlobalId("Profile", profile.id),
             profileType: {
               id: toGlobalId("ProfileType", individual.id),
               keyProcesses: [
                 {
                   id: toGlobalId("ProfileTypeProcess", individualProcess.id),
-                  latestPetition: { id: data?.createPetitionFromProfile.id },
+                  latestPetition: {
+                    id: data.createPetitionFromProfile.id,
+                  },
                 },
               ],
             },
           },
         ],
       });
-    });
-
-    it("sends error if process does not belong to same profile type as profile", async () => {
-      const { data, errors } = await testClient.execute(
-        gql`
-          mutation (
-            $templateId: GID!
-            $profileId: GID!
-            $petitionFieldId: GID
-            $prefill: [CreatePetitionFromProfilePrefillInput!]!
-            $profileTypeProcessId: GID
-          ) {
-            createPetitionFromProfile(
-              templateId: $templateId
-              petitionFieldId: $petitionFieldId
-              profileId: $profileId
-              prefill: $prefill
-              profileTypeProcessId: $profileTypeProcessId
-            ) {
-              id
-              profiles {
-                id
-                profileType {
-                  id
-                  keyProcesses {
-                    id
-                    latestPetition(profileId: $profileId) {
-                      id
-                    }
-                  }
-                }
-              }
-            }
-          }
-        `,
-        {
-          templateId: toGlobalId("Petition", template.id),
-          profileId: toGlobalId("Profile", mainProfile.id),
-          petitionFieldId: null,
-          prefill: [],
-          profileTypeProcessId: toGlobalId("ProfileTypeProcess", legalEntityProcess.id),
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
     });
   });
 

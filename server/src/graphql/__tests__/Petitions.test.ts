@@ -736,7 +736,7 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("filters petitions by profileTypeProcessId", async () => {
+    it("filters petitions by profileTypeProcess templates", async () => {
       const templates = await mocks.createRandomTemplates(organization.id, sessionUser.id, 2);
       const [sameOrgTemplate] = await mocks.createRandomTemplates(
         organization.id,

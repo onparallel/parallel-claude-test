@@ -1365,7 +1365,6 @@ export type MutationarchiveProfileTypeArgs = {
 export type MutationassociateProfileToPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationbulkCreateContactsArgs = {
@@ -1669,7 +1668,6 @@ export type MutationcreatePetitionFromProfileArgs = {
   petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   prefill: Array<CreatePetitionFromProfilePrefillInput>;
   profileId: Scalars["GID"]["input"];
-  profileTypeProcessId?: InputMaybe<Scalars["GID"]["input"]>;
   templateId: Scalars["GID"]["input"];
 };
 
@@ -5389,6 +5387,7 @@ export type QuerypetitionInformationArgs = {
 
 export type QuerypetitionsArgs = {
   excludeAnonymized?: InputMaybe<Scalars["Boolean"]["input"]>;
+  excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;

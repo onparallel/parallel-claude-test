@@ -40,7 +40,6 @@ import {
   CreateProfileTypeProcess,
   Organization,
   Petition,
-  PetitionProfile,
   Profile,
   ProfileEvent,
   ProfileEventType,
@@ -2887,16 +2886,22 @@ export class ProfileRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const values: (PetitionProfile & Petition)[] = await this.from("petition_profile", t)
-        .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
-        .whereIn("profile_type_process_id", unique(keys.map((k) => k.processId)))
-        .whereNotNull("profile_type_process_id")
-        .join("petition", "petition_profile.petition_id", "petition.id")
-        .whereNull("petition.deleted_at")
-        .select("petition.*", "profile_id", "profile_type_process_id")
-        .orderBy("created_at", "desc");
+      const rows = await this.raw<
+        Petition & { profile_id: number; profile_type_process_id: number }
+      >(
+        /* sql */ `
+          select pp.profile_id, ptpt.profile_type_process_id, p.* from petition p 
+          join profile_type_process_template ptpt on ptpt.template_id = p.from_template_id and ptpt.profile_type_process_id in ?
+          join petition_profile pp on pp.petition_id = p.id and pp.profile_id in ?
+          where p.deleted_at is null
+          and p.is_template = false
+          order by p.created_at desc;
+        `,
+        [this.sqlIn(keys.map((k) => k.processId)), this.sqlIn(keys.map((k) => k.profileId))],
+        t,
+      );
 
-      const byKey = groupBy(values, keyBuilder(["profile_id", "profile_type_process_id"]));
+      const byKey = groupBy(rows, keyBuilder(["profile_id", "profile_type_process_id"]));
       return keys
         .map(keyBuilder(["profileId", "processId"]))
         .map((key) => (byKey[key] ?? []).at(0) ?? null);
