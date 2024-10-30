@@ -13,7 +13,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
 import { isDialogError } from "../common/dialogs/DialogProvider";
@@ -346,11 +346,16 @@ function KeyProcessCard({
                 noOfLines={2}
                 href={`/app/petitions/${latestPetition.id}/preview`}
                 fontWeight={500}
+                textStyle={isNullish(latestPetition?.name) ? "hint" : undefined}
               >
                 {parallelName}
               </Link>
             ) : (
-              <Text noOfLines={2} fontWeight={500}>
+              <Text
+                noOfLines={2}
+                fontWeight={500}
+                textStyle={isNullish(latestPetition?.name) ? "hint" : undefined}
+              >
                 {parallelName}
               </Text>
             )}
