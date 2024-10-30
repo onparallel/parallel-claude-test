@@ -6458,6 +6458,7 @@ export type PetitionFragment = {
   locale: PetitionLocale;
   createdAt: string;
   customProperties: { [key: string]: any };
+  isAnonymized: boolean;
   fromTemplate: { id: string } | null;
   recipients?: Array<{
     recipientUrl: string | null;
@@ -6996,6 +6997,7 @@ export type GetPetitions_petitionsQuery = {
           locale: PetitionLocale;
           createdAt: string;
           customProperties: { [key: string]: any };
+          isAnonymized: boolean;
           fromTemplate: { id: string } | null;
           recipients?: Array<{
             recipientUrl: string | null;
@@ -7139,6 +7141,7 @@ export type CreatePetition_petitionMutation = {
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
+        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -7279,6 +7282,7 @@ export type GetPetition_petitionQuery = {
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
+        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -7454,6 +7458,7 @@ export type UpdatePetition_updatePetitionMutation = {
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
+        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -7600,6 +7605,7 @@ export type ClosePetition_closePetitionMutation = {
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
+    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -7738,6 +7744,7 @@ export type ReopenPetition_reopenPetitionMutation = {
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
+    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -7893,6 +7900,7 @@ export type TagPetition_tagPetitionMutation = {
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
+        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -8102,6 +8110,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       locale: PetitionLocale;
       createdAt: string;
       customProperties: { [key: string]: any };
+      isAnonymized: boolean;
       fromTemplate: { id: string } | null;
       recipients?: Array<{
         recipientUrl: string | null;
@@ -10901,6 +10910,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
+    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -11293,6 +11303,7 @@ export const PetitionFragmentDoc = gql`
     owner @include(if: $includeOwner) {
       ...User
     }
+    isAnonymized
   }
   ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}

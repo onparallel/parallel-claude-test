@@ -352,7 +352,13 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
 export function mapPetition<
   T extends Pick<
     PetitionFragment,
-    "fromTemplate" | "tags" | "fields" | "replies" | "signatureConfig" | "signatures"
+    | "fromTemplate"
+    | "tags"
+    | "fields"
+    | "replies"
+    | "signatureConfig"
+    | "signatures"
+    | "isAnonymized"
   >,
 >(petition: T) {
   return pipe(

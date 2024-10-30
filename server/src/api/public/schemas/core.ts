@@ -789,7 +789,16 @@ const _Petition = {
   title: "Petition",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "status", "deadline", "locale", "createdAt", "customProperties"],
+  required: [
+    "id",
+    "name",
+    "status",
+    "deadline",
+    "locale",
+    "createdAt",
+    "customProperties",
+    "isAnonymized",
+  ],
   properties: {
     id: {
       description: "The ID of the parallel",
@@ -920,6 +929,12 @@ const _Petition = {
       description:
         "If parameter `include` contains `owner`, this will be the owner of the parallel.",
       ..._User,
+    },
+    isAnonymized: {
+      type: "boolean",
+      description:
+        "`true` if this parallel was anonymized by compliance rules defined on the organization, `false` otherwise.",
+      example: false,
     },
   },
 } as const;

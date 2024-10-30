@@ -218,6 +218,7 @@ export const PetitionFragment = gql`
     owner @include(if: $includeOwner) {
       ...User
     }
+    isAnonymized
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
