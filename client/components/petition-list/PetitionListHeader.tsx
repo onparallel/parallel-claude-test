@@ -78,7 +78,7 @@ export function PetitionListHeader({
   const showGenericErrorToast = useGenericErrorToast();
 
   useEffect(() => {
-    setSearch(state.search);
+    setSearch(state.search ?? "");
   }, [state.view]);
 
   const debouncedOnSearchChange = useDebouncedCallback(
