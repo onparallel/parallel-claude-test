@@ -198,6 +198,7 @@ export function ReportsTemplates() {
                   defaultMessage: "Select a template...",
                 })}
                 isDisabled={status === "LOADING"}
+                noOfLines={2}
               />
             </Box>
           </HStack>
