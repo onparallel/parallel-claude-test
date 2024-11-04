@@ -26,11 +26,14 @@ sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
 echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
 
+curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v4.1.0.tar.gz
+mkdir release
+tar -xf release.tar.gz --directory release --strip-components 1
+rm release.tar.gz
+
 mkdir -p yente
 mv .env yente/
-pushd yente
-wget https://raw.githubusercontent.com/opensanctions/yente/main/docker-compose.yml
-popd
+cp release/docker-compose.yml yente/
 
 sudo cp yente.service /etc/systemd/system/
 
