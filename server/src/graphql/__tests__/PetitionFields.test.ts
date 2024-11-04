@@ -5076,6 +5076,42 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error if petition is CLOSED", async () => {
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "CLOSED");
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              replies {
+                id
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[2].id),
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field2Replies[0].id)],
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("approveOrRejectPetitionFieldReplies", () => {
@@ -5270,6 +5306,29 @@ describe("GraphQL/Petition Fields", () => {
           },
         ],
       });
+    });
+
+    it("sends error if petition is CLOSED", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "CLOSED",
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 2);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $status: PetitionFieldReplyStatus!) {
+            approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          status: "REJECTED",
+        },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 

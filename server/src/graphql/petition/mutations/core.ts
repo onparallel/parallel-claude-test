@@ -1749,7 +1749,10 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
   {
     description: "Updates the status of a PENDING petition field replies to APPROVED or REJECTED",
     type: "Petition",
-    authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      not(petitionHasStatus("petitionId", "CLOSED")),
+    ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
@@ -1775,6 +1778,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
     replyStatusCanBeUpdated("petitionFieldId"),
     not(fieldHasType("petitionFieldId", "FIELD_GROUP")),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1791,13 +1795,14 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     );
 
     if (args.status === "REJECTED") {
-      const petition = await ctx.petitions.loadPetition.raw(args.petitionId);
+      const petition = await ctx.petitions.loadPetition(args.petitionId);
       if (petition?.status === "COMPLETED") {
         await ctx.petitions.updatePetition(
           args.petitionId,
           { status: "PENDING" },
           `User:${ctx.user!.id}`,
         );
+        ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
       }
     }
 

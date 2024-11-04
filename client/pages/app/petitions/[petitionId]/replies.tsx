@@ -892,7 +892,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onUpdateReplyStatus={(fieldId, replyId, status) =>
                         handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
                       }
-                      isDisabled={myEffectivePermission === "READ"}
+                      isDisabled={myEffectivePermission === "READ" || petition.status === "CLOSED"}
                       filter={filter}
                       fieldLogic={x.fieldLogic!}
                     />
