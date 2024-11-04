@@ -76,14 +76,7 @@ export class AccountSetupService implements IAccountSetupService {
     await this.views.createPetitionListView(
       (
         [
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.all",
-              defaultMessage: "All",
-            }),
-            { ...defaultView },
-            "ALL",
-          ],
+          ["ALL", { ...defaultView }, "ALL"],
           [
             intl.formatMessage({
               id: "default-petition-list-views.ongoing",

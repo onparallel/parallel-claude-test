@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
     insert into petition_list_view (user_id, name, data, position, is_default, type)
     select 
       u.id,
-      (case ud.preferred_locale when 'es' then 'Todo' else 'All' end),
+      'ALL',
       jsonb_build_object(
         'fromTemplateId', null,
         'path', '/',
@@ -29,7 +29,8 @@ export async function up(knex: Knex): Promise<void> {
       0,
       false,
       'ALL'
-    FROM "user" u left join user_data ud on ud.id = u.user_data_id where u.deleted_at is null and ud.deleted_at is null;  
+    FROM "user" u
+    where u.deleted_at is null;
   `);
 }
 

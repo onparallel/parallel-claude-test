@@ -39,7 +39,7 @@ describe("GraphQL/PetitionListView", () => {
             sharedWith: null,
             fromTemplateId: null,
           },
-          name: "All",
+          name: "ALL",
           position: 0,
           type: "ALL",
         },

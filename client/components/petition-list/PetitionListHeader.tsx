@@ -154,7 +154,10 @@ export function PetitionListHeader({
     try {
       const currentView = state.view === "ALL" ? null : views.find((v) => v.id === state.view)!;
       const name = await showAskViewNameDialog({
-        name: currentView?.name,
+        name:
+          currentView?.type === "ALL"
+            ? intl.formatMessage({ id: "generic.all-view", defaultMessage: "All" })
+            : currentView?.name,
         header: (
           <FormattedMessage
             id="component.petition-list-header.save-as-new-view-header"

@@ -1286,7 +1286,7 @@ describe("GraphQL/Users", () => {
           petitionListViews: [
             {
               id: expect.any(String),
-              name: "All",
+              name: "ALL",
               type: "ALL",
               isDefault: false,
               data: {

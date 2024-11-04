@@ -225,7 +225,7 @@ export async function seed(knex: Knex): Promise<any> {
         users.map((user) => ({
           is_default: false,
           type: "ALL",
-          name: "All",
+          name: "ALL",
           user_id: user.id,
           position: 0,
           data: {

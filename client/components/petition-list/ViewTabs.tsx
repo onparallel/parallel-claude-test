@@ -68,7 +68,10 @@ export const ViewTabs = Object.assign(
       (view: ViewTabs_PetitionListViewFragment) => async (finalFocusRef?: RefObject<Focusable>) => {
         try {
           const name = await showAskViewNameDialog({
-            name: view.name,
+            name:
+              view.type === "ALL"
+                ? intl.formatMessage({ id: "generic.all-view", defaultMessage: "All" })
+                : view.name,
             header: (
               <FormattedMessage
                 id="component.view-tabs.rename-view-header"
@@ -101,7 +104,10 @@ export const ViewTabs = Object.assign(
       (view: ViewTabs_PetitionListViewFragment) => async (finalFocusRef?: RefObject<Focusable>) => {
         try {
           const name = await showAskViewNameDialog({
-            name: view.name,
+            name:
+              view.type === "ALL"
+                ? intl.formatMessage({ id: "generic.all-view", defaultMessage: "All" })
+                : view.name,
             header: (
               <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
             ),
