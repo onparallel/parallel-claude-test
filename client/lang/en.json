@@ -10540,6 +10540,11 @@
     "context": "List of non-EU countries"
   },
   {
+    "term": "component.standard-list-select.sic",
+    "definition": "SIC codes",
+    "context": "SIC codes"
+  },
+  {
     "term": "component.subscribed-notifications-icon.label",
     "definition": "Subscribed to notifications",
     "context": "Subscribed to notifications"

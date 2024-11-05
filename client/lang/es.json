@@ -10526,7 +10526,7 @@
   },
   {
     "term": "component.standard-list-select.nace",
-    "definition": "Código NACE",
+    "definition": "Códigos NACE",
     "context": "NACE codes"
   },
   {
@@ -10538,6 +10538,11 @@
     "term": "component.standard-list-select.non-eu-countries-iso",
     "definition": "Listado de países no UE",
     "context": "List of non-EU countries"
+  },
+  {
+    "term": "component.standard-list-select.sic",
+    "definition": "Códigos SIC",
+    "context": "SIC codes"
   },
   {
     "term": "component.subscribed-notifications-icon.label",

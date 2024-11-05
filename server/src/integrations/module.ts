@@ -21,6 +21,10 @@ import {
 } from "./id-verification/bankflip/BankflipIdVerificationIntegration";
 import { IProfileExternalSourceIntegration } from "./profile-external-source/ProfileExternalSourceIntegration";
 import {
+  COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+  CompaniesHouseProfileExternalSourceIntegration,
+} from "./profile-external-source/companies-house/CompaniesHouseProfileExternalSourceIntegration";
+import {
   EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
   EInformaProfileExternalSourceIntegration,
 } from "./profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
@@ -55,6 +59,9 @@ export const integrationsModule = new ContainerModule((bind) => {
 
   bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
     EInformaProfileExternalSourceIntegration,
+  );
+  bind<IProfileExternalSourceIntegration>(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
+    CompaniesHouseProfileExternalSourceIntegration,
   );
 
   bind<IFileExportIntegration>(IMANAGE_FILE_EXPORT_INTEGRATION).to(IManageFileExportIntegration);

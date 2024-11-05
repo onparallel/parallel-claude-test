@@ -21,6 +21,10 @@ import {
   BankflipIdVerificationIntegration,
 } from "../integrations/id-verification/bankflip/BankflipIdVerificationIntegration";
 import {
+  COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
+  CompaniesHouseProfileExternalSourceIntegration,
+} from "../integrations/profile-external-source/companies-house/CompaniesHouseProfileExternalSourceIntegration";
+import {
   EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION,
   EInformaProfileExternalSourceIntegration,
 } from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
@@ -92,6 +96,21 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"FILE_EXPORT", "IMANAGE">>;
+  createCompaniesHouseProfileExternalSourceIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE">>;
+  updateCompaniesHouseProfileExternalSourceIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
 }
 
 @injectable()
@@ -106,6 +125,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     private bankflipDocumentProcessingIntegration: BankflipDocumentProcessingIntegration,
     @inject(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     private eInformaProfileExternalSourceIntegration: EInformaProfileExternalSourceIntegration,
+    @inject(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    private companiesHouseProfileExternalSourceIntegration: CompaniesHouseProfileExternalSourceIntegration,
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION)
     private iManageFileExportIntegration: IManageFileExportIntegration,
   ) {}
@@ -230,5 +251,40 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"FILE_EXPORT", "IMANAGE">> {
     return await this.iManageFileExportIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async createCompaniesHouseProfileExternalSourceIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE">> {
+    await this.companiesHouseProfileExternalSourceIntegration.testApiKey(
+      data.settings.CREDENTIALS.API_KEY,
+    );
+    return await this.companiesHouseProfileExternalSourceIntegration.createOrgIntegration(
+      data,
+      createdBy,
+      t,
+    );
+  }
+
+  async updateCompaniesHouseProfileExternalSourceIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void> {
+    await this.companiesHouseProfileExternalSourceIntegration.testApiKey(
+      data.settings.CREDENTIALS.API_KEY,
+    );
+    await this.companiesHouseProfileExternalSourceIntegration.updateOrgIntegration(
+      integrationId,
+      data,
+      t,
+    );
   }
 }

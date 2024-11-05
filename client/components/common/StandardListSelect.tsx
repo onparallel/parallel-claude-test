@@ -41,6 +41,11 @@ const STANDARD_LISTS = {
       id: "component.standard-list-select.cnae",
       defaultMessage: "CNAE codes",
     }),
+  SIC: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.sic",
+      defaultMessage: "SIC codes",
+    }),
 } satisfies Record<string, (intl: IntlShape) => string>;
 
 type StandardListType = keyof typeof STANDARD_LISTS;

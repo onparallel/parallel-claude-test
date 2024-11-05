@@ -561,6 +561,7 @@ export class EInformaProfileExternalSourceIntegration
                 }
               : {}),
             p_date_of_incorporation: { value: entity.fechaConstitucion },
+            p_country_of_incorporation: { value: "ES" },
           }),
           async ([alias, content]) => await isValidContent(alias, content),
           { concurrency: 1 },

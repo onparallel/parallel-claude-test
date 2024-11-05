@@ -1221,6 +1221,18 @@ type Mutation {
   createBulkPetitionSendTask(templateId: GID!, temporaryFileId: GID!): Task!
 
   """
+  Creates a new Companies House Profile External Source integration on the provided organization, or updates it if the organization already has one.
+  """
+  createCompaniesHouseProfileExternalSourceIntegration(
+    apiKey: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
+
+  """
   Create a contact.
   """
   createContact(
@@ -2537,6 +2549,17 @@ type Mutation {
   """
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
   updateBackgroundCheckEntity(entityId: String, token: String!): Success!
+  updateCompaniesHouseCustomProperties(
+    """
+    {[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea
+    """
+    json: String!
+
+    """
+    e.g. yw7RQt2cQ4XDHdrbtL3
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
 
   """
   Updates a contact.

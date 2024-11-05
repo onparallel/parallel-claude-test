@@ -515,6 +515,31 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
+    "term": "integration.companies-house-search-params-city.label",
+    "definition": "Ciudad",
+    "context": "City"
+  },
+  {
+    "term": "integration.companies-house-search-params-company-search.legal-entity-label",
+    "definition": "Denominación social o Tax ID",
+    "context": "Company name or Tax ID"
+  },
+  {
+    "term": "integration.companies-house-search-results-city.label",
+    "definition": "Ciudad",
+    "context": "City"
+  },
+  {
+    "term": "integration.companies-house-search-results-company-name.label",
+    "definition": "Denominación social",
+    "context": "Company name"
+  },
+  {
+    "term": "integration.companies-house-search-results-tax-id.label",
+    "definition": "Tax ID",
+    "context": "Tax ID"
+  },
+  {
     "term": "integration.einforma-search-params-company-search.individual-label",
     "definition": "Nombre o NIF",
     "context": "Name or tax ID"

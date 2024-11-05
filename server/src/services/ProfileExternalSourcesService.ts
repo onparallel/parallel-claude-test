@@ -4,6 +4,7 @@ import { assert } from "ts-essentials";
 import { ProfileType, ProfileTypeField, User, UserLocale } from "../db/__types";
 import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
+import { COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../integrations/profile-external-source/companies-house/CompaniesHouseProfileExternalSourceIntegration";
 import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import {
   IProfileExternalSourceIntegration,
@@ -50,9 +51,11 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     eInformaIntegration: IProfileExternalSourceIntegration,
+    @inject(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    companiesHouseIntegration: IProfileExternalSourceIntegration,
     @inject(LOGGER) private logger: ILogger,
   ) {
-    this.availableIntegrations = [eInformaIntegration];
+    this.availableIntegrations = [eInformaIntegration, companiesHouseIntegration];
   }
 
   private async getIntegration(integrationId: number) {

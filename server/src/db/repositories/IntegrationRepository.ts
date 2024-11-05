@@ -22,7 +22,7 @@ interface IntegrationProviders {
   AI_COMPLETION: "AZURE_OPEN_AI";
   ID_VERIFICATION: "BANKFLIP";
   DOCUMENT_PROCESSING: "BANKFLIP";
-  PROFILE_EXTERNAL_SOURCE: "EINFORMA";
+  PROFILE_EXTERNAL_SOURCE: "EINFORMA" | "COMPANIES_HOUSE";
   FILE_EXPORT: "IMANAGE";
 }
 
@@ -79,6 +79,13 @@ interface EInformaProfileExternalSourceSettings {
   CUSTOM_PROPERTIES_MAP?: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
 }
 
+interface CompaniesHouseProfileExternalSourceSettings {
+  CREDENTIALS: {
+    API_KEY: string;
+  };
+  CUSTOM_PROPERTIES_MAP?: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
+}
+
 interface IManageFileExportSettings {
   CREDENTIALS: {};
   CLIENT_ID: string;
@@ -116,6 +123,7 @@ export type IntegrationSettings<
   PROFILE_EXTERNAL_SOURCE: TProvider extends IntegrationProviders["PROFILE_EXTERNAL_SOURCE"]
     ? {
         EINFORMA: EInformaProfileExternalSourceSettings;
+        COMPANIES_HOUSE: CompaniesHouseProfileExternalSourceSettings;
       }[TProvider]
     : never;
   FILE_EXPORT: TProvider extends IntegrationProviders["FILE_EXPORT"]

@@ -2005,6 +2005,7 @@ export interface NexusGenFieldTypes {
     createBankflipDocumentProcessingIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBankflipIdVerificationIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
+    createCompaniesHouseProfileExternalSourceIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createCustomSignatureDocumentUploadLink: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2171,6 +2172,7 @@ export interface NexusGenFieldTypes {
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
+    updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -4683,6 +4685,7 @@ export interface NexusGenFieldTypeNames {
     createBankflipDocumentProcessingIntegration: "SupportMethodResponse";
     createBankflipIdVerificationIntegration: "SupportMethodResponse";
     createBulkPetitionSendTask: "Task";
+    createCompaniesHouseProfileExternalSourceIntegration: "SupportMethodResponse";
     createContact: "Contact";
     createContactlessPetitionAccess: "PetitionAccess";
     createCustomSignatureDocumentUploadLink: "JSONObject";
@@ -4849,6 +4852,7 @@ export interface NexusGenFieldTypeNames {
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
+    updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
     updateEinformaCustomProperties: "SupportMethodResponse";
     updateFeatureFlag: "SupportMethodResponse";
@@ -7026,6 +7030,11 @@ export interface NexusGenArgTypes {
       templateId: NexusGenScalars["GID"]; // GID!
       temporaryFileId: NexusGenScalars["GID"]; // GID!
     };
+    createCompaniesHouseProfileExternalSourceIntegration: {
+      // args
+      apiKey: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
+    };
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
@@ -7962,6 +7971,11 @@ export interface NexusGenArgTypes {
       // args
       entityId?: string | null; // String
       token: string; // String!
+    };
+    updateCompaniesHouseCustomProperties: {
+      // args
+      json: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateContact: {
       // args

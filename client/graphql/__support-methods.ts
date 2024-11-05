@@ -245,6 +245,47 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createCompaniesHouseProfileExternalSourceIntegration",
+      description:
+        "Creates a new Companies House Profile External Source integration on the provided organization, or updates it if the organization already has one.",
+      args: [
+        {
+          name: "apiKey",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "e.g. yw7RQt2cQ4XDHdrbtL3",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "createEInformaProfileExternalSourceIntegration",
       description:
         "Creates a new eInforma Profile External Source integration on the provided organization, or updates it if the organization already has one.",
@@ -784,6 +825,47 @@ export const supportMethods: {
         {
           name: "userId",
           description: "Global ID of the new owner",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
+      name: "updateCompaniesHouseCustomProperties",
+      description: null,
+      args: [
+        {
+          name: "json",
+          description:
+            "{[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "e.g. yw7RQt2cQ4XDHdrbtL3",
           type: {
             kind: "NON_NULL",
             name: null,

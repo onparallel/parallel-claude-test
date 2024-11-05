@@ -49,6 +49,7 @@ export const IOrgIntegration = interfaceType({
           DOCUSIGN: "docusign.png",
           SIGNATURIT: "signaturit.png",
           EINFORMA: "einforma.png",
+          COMPANIES_HOUSE: "companies-house.png",
         }[root.provider];
         return isNonNullish(asset)
           ? await ctx.images.getAssetImageUrl(`static/logos/${asset}`, args.options as any)

@@ -2388,6 +2388,9 @@ export const profileExternalSourceSearch = mutationField("profileExternalSourceS
         if (error.status === 400) {
           throw new ApolloError(error.message, "BAD_REQUEST");
         }
+        if (error.status === 401) {
+          throw new ApolloError(error.message, "UNAUTHORIZED");
+        }
         if (error.status === 402) {
           // Payment required: trying to search entity by id on a FREE eInforma plan
           throw new ApolloError(error.message, "PAYMENT_REQUIRED");
@@ -2453,6 +2456,9 @@ export const profileExternalSourceDetails = mutationField("profileExternalSource
       if (error instanceof ProfileExternalSourceRequestError) {
         if (error.status === 400) {
           throw new ApolloError(error.message, "BAD_REQUEST");
+        }
+        if (error.status === 401) {
+          throw new ApolloError(error.message, "UNAUTHORIZED");
         }
         if (error.status === 402) {
           // Payment required: trying to search entity by id on a FREE eInforma plan

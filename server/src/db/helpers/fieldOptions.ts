@@ -174,7 +174,16 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "NACE", "CNAE", null],
+        enum: [
+          "COUNTRIES",
+          "EU_COUNTRIES",
+          "NON_EU_COUNTRIES",
+          "CURRENCIES",
+          "NACE",
+          "CNAE",
+          "SIC",
+          null,
+        ],
       },
     },
   },
@@ -260,7 +269,16 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "NACE", "CNAE", null],
+        enum: [
+          "COUNTRIES",
+          "EU_COUNTRIES",
+          "NON_EU_COUNTRIES",
+          "CURRENCIES",
+          "NACE",
+          "CNAE",
+          "SIC",
+          null,
+        ],
       },
     },
   },
@@ -661,6 +679,14 @@ export async function selectOptionsValuesAndLabels(
           join(__dirname, `../../../data/cnae/cnae_${locale === "en" ? "en" : "es"}.json`)
         )
       ).default;
+      const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
+      return {
+        values: keys,
+        labels: keys.map((code) => `${code} - ${codes[code]}`),
+      };
+    }
+    case "SIC": {
+      const codes = (await import(join(__dirname, `../../../data/sic/sic_en.json`))).default;
       const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
       return {
         values: keys,

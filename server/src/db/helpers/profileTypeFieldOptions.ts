@@ -94,7 +94,16 @@ const SCHEMAS = {
       showOptionsWithColors: { type: ["boolean", "null"] },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "CNAE", "NACE", null],
+        enum: [
+          "COUNTRIES",
+          "EU_COUNTRIES",
+          "NON_EU_COUNTRIES",
+          "CURRENCIES",
+          "CNAE",
+          "NACE",
+          "SIC",
+          null,
+        ],
       },
     },
   },
@@ -118,7 +127,16 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", "CURRENCIES", "CNAE", "NACE", null],
+        enum: [
+          "COUNTRIES",
+          "EU_COUNTRIES",
+          "NON_EU_COUNTRIES",
+          "CURRENCIES",
+          "CNAE",
+          "NACE",
+          "SIC",
+          null,
+        ],
       },
     },
   },
@@ -403,6 +421,16 @@ export async function profileTypeFieldSelectValues(
       }
       case "NACE": {
         const nace = (await import(join(__dirname, `../../../data/nace/nace_en.json`))).default;
+        return Object.keys(nace)
+          .sort((a, b) => a.localeCompare(b))
+          .map((code) => ({
+            value: code,
+            label: { en: `${code} - ${nace[code]}` } as Record<UserLocale, string>,
+            isStandard: true,
+          }));
+      }
+      case "SIC": {
+        const nace = (await import(join(__dirname, `../../../data/sic/sic_en.json`))).default;
         return Object.keys(nace)
           .sort((a, b) => a.localeCompare(b))
           .map((code) => ({

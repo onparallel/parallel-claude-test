@@ -891,6 +891,8 @@ export type Mutation = {
   createBankflipIdVerificationIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
+  /** Creates a new Companies House Profile External Source integration on the provided organization, or updates it if the organization already has one. */
+  createCompaniesHouseProfileExternalSourceIntegration: SupportMethodResponse;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a contactless petition access */
@@ -1221,6 +1223,7 @@ export type Mutation = {
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   updateBackgroundCheckEntity: Success;
+  updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
   updateEinformaCustomProperties: SupportMethodResponse;
@@ -1504,6 +1507,11 @@ export type MutationcreateBankflipIdVerificationIntegrationArgs = {
 export type MutationcreateBulkPetitionSendTaskArgs = {
   templateId: Scalars["GID"]["input"];
   temporaryFileId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateCompaniesHouseProfileExternalSourceIntegrationArgs = {
+  apiKey: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateContactArgs = {
@@ -2441,6 +2449,11 @@ export type MutationuntagPetitionArgs = {
 export type MutationupdateBackgroundCheckEntityArgs = {
   entityId?: InputMaybe<Scalars["String"]["input"]>;
   token: Scalars["String"]["input"];
+};
+
+export type MutationupdateCompaniesHouseCustomPropertiesArgs = {
+  json: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateContactArgs = {
