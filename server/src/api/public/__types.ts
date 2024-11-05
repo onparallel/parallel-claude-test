@@ -6838,6 +6838,7 @@ export type PetitionFieldCommentFragment = {
   content: any | null;
   isInternal: boolean;
   createdAt: string;
+  isAnonymized: boolean;
   author:
     | {
         __typename: "PetitionAccess";
@@ -8528,6 +8529,7 @@ export type GetPetitionFieldComments_petitionFieldCommentsQuery = {
       content: any | null;
       isInternal: boolean;
       createdAt: string;
+      isAnonymized: boolean;
       author:
         | {
             __typename: "PetitionAccess";
@@ -8580,6 +8582,7 @@ export type SendPetitionFieldComment_createPetitionCommentMutation = {
     content: any | null;
     isInternal: boolean;
     createdAt: string;
+    isAnonymized: boolean;
     author:
       | {
           __typename: "PetitionAccess";
@@ -8617,6 +8620,7 @@ export type GetPetitionComments_petitionCommentsQuery = {
           content: any | null;
           isInternal: boolean;
           createdAt: string;
+          isAnonymized: boolean;
           author:
             | {
                 __typename: "PetitionAccess";
@@ -8659,6 +8663,7 @@ export type SendPetitionComment_createPetitionCommentMutation = {
     content: any | null;
     isInternal: boolean;
     createdAt: string;
+    isAnonymized: boolean;
     author:
       | {
           __typename: "PetitionAccess";
@@ -11514,6 +11519,7 @@ export const PetitionFieldCommentFragmentDoc = gql`
     content
     isInternal
     createdAt
+    isAnonymized
     author {
       __typename
       ... on User {

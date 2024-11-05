@@ -7102,16 +7102,11 @@ export class PetitionRepository extends BaseRepository {
       { concurrency: 1, chunkSize: 200 },
     );
 
-    const comments = await pMapChunk(
-      fieldIds,
-      async (fieldIdsChunk) =>
-        await this.from("petition_field_comment")
-          .where("petition_id", petitionId)
-          .whereIn("petition_field_id", fieldIdsChunk)
-          .whereNull("anonymized_at")
-          .select("id"),
-      { concurrency: 1, chunkSize: 200 },
-    );
+    // field and general comments on the petition are included here
+    const comments = await this.from("petition_field_comment")
+      .where("petition_id", petitionId)
+      .whereNull("anonymized_at")
+      .select("id");
 
     await this.withTransaction(async (t) => {
       const [petition] = await this.updatePetition(
@@ -7133,7 +7128,7 @@ export class PetitionRepository extends BaseRepository {
         ),
         this.anonymizePetitionEvents(petitionId, t),
         this.anonymizePetitionFieldReplies(replies, t),
-        this.anonymizePetitionFieldComments(
+        this.anonymizePetitionComments(
           comments.map((c) => c.id),
           t,
         ),
@@ -7240,7 +7235,7 @@ export class PetitionRepository extends BaseRepository {
     await this.files.deleteFileUpload(fileUploadIds, "AnonymizerWorker", t);
   }
 
-  async anonymizePetitionFieldComments(ids: MaybeArray<number>, t?: Knex.Transaction) {
+  async anonymizePetitionComments(ids: MaybeArray<number>, t?: Knex.Transaction) {
     const commentIds = unMaybeArray(ids);
     if (commentIds.length === 0) return;
 

@@ -398,7 +398,7 @@ const _PetitionField = {
 const _PetitionComment = {
   title: "PetitionFieldComment",
   type: "object",
-  required: ["id", "content", "author", "mentions", "createdAt"],
+  required: ["id", "content", "author", "mentions", "createdAt", "isAnonymized"],
   properties: {
     id: {
       type: "string",
@@ -406,8 +406,9 @@ const _PetitionComment = {
       example: toGlobalId("PetitionFieldComment", 100),
     },
     content: {
-      type: "string",
-      description: "The content of the comment in plain text",
+      type: ["string", "null"],
+      description:
+        "The content of the comment in plain text, or `null` if the comment was anonymized by compliance rules.",
       example: `This is a comment for @[John Doe|id:${toGlobalId("User", 42)}]`,
     },
     author: {
@@ -491,6 +492,12 @@ const _PetitionComment = {
       format: "date-time",
       description: "Creation date of the comment",
       example: new Date(2020, 2, 15).toISOString(),
+    },
+    isAnonymized: {
+      type: "boolean",
+      description:
+        "`true` if this comment was anonymized by compliance rules defined on the organization, `false` otherwise.",
+      example: false,
     },
   },
 } as const;

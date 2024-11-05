@@ -25,7 +25,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   const commentIds = await ctx.petitions.getDeletedPetitionFieldCommentIdsToAnonymize(DAYS);
   ctx.logger.debug(`Anonymizing ${commentIds.length} deleted comments`);
   if (commentIds.length > 0) {
-    await ctx.petitions.anonymizePetitionFieldComments(commentIds);
+    await ctx.petitions.anonymizePetitionComments(commentIds);
   }
 
   // anonymizes contacts deleted more than `anonymizeAfterDays` days ago

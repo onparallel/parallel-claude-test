@@ -781,12 +781,15 @@ export async function resolveContacts(
 export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
   return {
     id: comment.id,
-    content: renderSlateToText(comment.content, {
-      override: {
-        // escape pipe character in mentions
-        mention: (node) => `@[${node.children![0].text?.replace(/\|/g, "\\|")}|id:${node.mention}]`,
-      },
-    }),
+    content: comment.isAnonymized
+      ? null
+      : renderSlateToText(comment.content, {
+          override: {
+            // escape pipe character in mentions
+            mention: (node) =>
+              `@[${node.children![0].text?.replace(/\|/g, "\\|")}|id:${node.mention}]`,
+          },
+        }),
     author:
       comment.author?.__typename === "User"
         ? { type: "USER" as const, ...omit(comment.author, ["__typename"]) }
@@ -817,6 +820,7 @@ export function mapPetitionFieldComment(comment: PetitionFieldCommentFragment) {
             : null,
       ) ?? [],
     createdAt: comment.createdAt,
+    isAnonymized: comment.isAnonymized,
   };
 }
 

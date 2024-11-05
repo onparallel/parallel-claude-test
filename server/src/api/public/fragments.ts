@@ -434,6 +434,7 @@ export const PetitionFieldCommentFragment = gql`
     content
     isInternal
     createdAt
+    isAnonymized
     author {
       __typename
       ... on User {
