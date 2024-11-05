@@ -212,6 +212,7 @@ export function PetitionListHeader({
     try {
       // If the view to save is ALL and has some filter applied, show the dialog
       // to choose whether to save and ignore the filters or switch to create a new VIEW.
+
       if (
         state.view === "ALL" &&
         Object.values(
@@ -222,8 +223,6 @@ export function PetitionListHeader({
             "signature",
             "fromTemplateId",
             "search",
-            "searchIn",
-            "path",
           ]),
         ).some(isNonNullish)
       ) {
