@@ -3,12 +3,7 @@ import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Readable } from "stream";
-import {
-  ProfileExternalSourceEntity,
-  ProfileTypeStandardType,
-  User,
-  UserLocale,
-} from "../src/db/__types";
+import { ProfileTypeStandardType, User, UserLocale } from "../src/db/__types";
 import { EnhancedOrgIntegration } from "../src/db/repositories/IntegrationRepository";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
@@ -21,7 +16,6 @@ import {
 import {
   IProfileExternalSourceIntegration,
   ProfileExternalSourceRequestError,
-  ProfileExternalSourceSearchSingleResult,
 } from "../src/integrations/profile-external-source/ProfileExternalSourceIntegration";
 import {
   EInformaProfileExternalSourceIntegration,
@@ -403,56 +397,41 @@ export class MockEInformaProfileExternalSourceIntegration
     integrationId: number,
     standardType: ProfileTypeStandardType,
     externalId: string,
-    onStoreEntity: (entity: any) => Promise<ProfileExternalSourceEntity>,
-  ): Promise<ProfileExternalSourceSearchSingleResult> {
+  ) {
     if (!this.STANDARD_TYPES.includes(standardType)) {
       throw new ProfileExternalSourceRequestError(400, "BAD_REQUEST");
     }
 
     if (externalId === "Y1234567A") {
       return {
-        type: "FOUND",
-        entity: {
-          id: 1,
-          integration_id: integrationId,
-          data: {},
-          parsed_data: {
-            p_first_name: { value: "Mike" },
-            p_last_name: { value: "Ross" },
-            p_email: { value: "mike@onparallel.com" },
-            p_address: { value: "Fake St. 123" },
-            p_city: { value: "Barcelona" },
-            p_tax_id: { value: "Y1234567A" },
-            p_occupation: { value: "Lawyer" },
-          },
-          created_at: new Date(),
-          standard_type: "INDIVIDUAL",
-          created_by_user_id: 1,
-          created_by: "User:1",
+        type: "FOUND" as const,
+        rawResponse: {
+          identificativo: "Y1234567A",
+          denominacion: "Mike Ross",
+          email: "mike@onparallel.com",
+          cargoPrincipal: "Lawyer",
+          domicilioSocial: "Fake St. 123",
+          localidad: "08025 Barcelona (Barcelona)",
         },
       };
     } else if (externalId === "B67505586") {
       return {
-        type: "FOUND",
-        entity: {
-          id: 2,
-          integration_id: integrationId,
-          data: {},
-          parsed_data: {
-            p_entity_name: { value: "Parallel Solutions SL" },
-            p_trade_name: { value: "Parallel" },
-            p_tax_id: { value: "B67505586" },
-            p_city: { value: "Barcelona" },
-            p_date_of_incorporation: { value: "2020-01-01" },
-          },
-          created_at: new Date(),
-          standard_type: "LEGAL_ENTITY",
-          created_by_user_id: 1,
-          created_by: "User:1",
+        type: "FOUND" as const,
+        rawResponse: {
+          identificativo: "B67505586",
+          denominacion: "Parallel Solutions S.L.",
+          domicilioSocial: "Fake St. 123",
+          localidad: "08025 Barcelona (Barcelona)",
+          fechaConstitucion: "2020-01-01",
         },
       };
     } else {
       throw new ProfileExternalSourceRequestError(404, "NOT_FOUND");
     }
+  }
+
+  protected override async parseFullName(value: string) {
+    const [firstName, lastName] = value.split(" ");
+    return { firstName, lastName };
   }
 }

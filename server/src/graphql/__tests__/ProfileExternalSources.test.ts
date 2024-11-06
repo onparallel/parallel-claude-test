@@ -230,14 +230,14 @@ describe("Profile External Sources", () => {
         expect(data).toEqual({
           profileExternalSourceSearch: {
             __typename: "ProfileExternalSourceSearchSingleResult",
-            id: toGlobalId("ProfileExternalSourceEntity", 1),
+            id: expect.any(String),
             data: [
               {
                 profileTypeField: {
                   alias: "p_first_name",
                 },
                 content: {
-                  value: "Mike",
+                  value: "MIKE",
                 },
               },
               {
@@ -245,7 +245,7 @@ describe("Profile External Sources", () => {
                   alias: "p_last_name",
                 },
                 content: {
-                  value: "Ross",
+                  value: "ROSS",
                 },
               },
               {
@@ -261,7 +261,7 @@ describe("Profile External Sources", () => {
                   alias: "p_address",
                 },
                 content: {
-                  value: "Fake St. 123",
+                  value: "Fake St. 123 08025 Barcelona (Barcelona)",
                 },
               },
               {
@@ -270,6 +270,14 @@ describe("Profile External Sources", () => {
                 },
                 content: {
                   value: "Barcelona",
+                },
+              },
+              {
+                profileTypeField: {
+                  alias: "p_zip",
+                },
+                content: {
+                  value: "08025",
                 },
               },
               {
@@ -429,22 +437,14 @@ describe("Profile External Sources", () => {
         expect(data).toEqual({
           profileExternalSourceSearch: {
             __typename: "ProfileExternalSourceSearchSingleResult",
-            id: toGlobalId("ProfileExternalSourceEntity", 2),
+            id: expect.any(String),
             data: [
               {
                 profileTypeField: {
                   alias: "p_entity_name",
                 },
                 content: {
-                  value: "Parallel Solutions SL",
-                },
-              },
-              {
-                profileTypeField: {
-                  alias: "p_trade_name",
-                },
-                content: {
-                  value: "Parallel",
+                  value: "Parallel Solutions S.L.",
                 },
               },
               {
@@ -457,10 +457,34 @@ describe("Profile External Sources", () => {
               },
               {
                 profileTypeField: {
+                  alias: "p_registered_address",
+                },
+                content: {
+                  value: "Fake St. 123 08025 Barcelona (Barcelona)",
+                },
+              },
+              {
+                profileTypeField: {
                   alias: "p_city",
                 },
                 content: {
                   value: "Barcelona",
+                },
+              },
+              {
+                profileTypeField: {
+                  alias: "p_zip",
+                },
+                content: {
+                  value: "08025",
+                },
+              },
+              {
+                profileTypeField: {
+                  alias: "p_country_of_incorporation",
+                },
+                content: {
+                  value: "ES",
                 },
               },
               {
@@ -526,22 +550,14 @@ describe("Profile External Sources", () => {
         expect(data).toEqual({
           profileExternalSourceSearch: {
             __typename: "ProfileExternalSourceSearchSingleResult",
-            id: toGlobalId("ProfileExternalSourceEntity", 2),
+            id: expect.any(String),
             data: [
               {
                 profileTypeField: {
                   alias: "p_entity_name",
                 },
                 content: {
-                  value: "Parallel Solutions SL",
-                },
-              },
-              {
-                profileTypeField: {
-                  alias: "p_trade_name",
-                },
-                content: {
-                  value: "Parallel",
+                  value: "Parallel Solutions S.L.",
                 },
               },
               {
@@ -552,9 +568,31 @@ describe("Profile External Sources", () => {
               },
               {
                 profileTypeField: {
+                  alias: "p_registered_address",
+                },
+                content: {
+                  value: "Fake St. 123 08025 Barcelona (Barcelona)",
+                },
+              },
+              {
+                profileTypeField: {
                   alias: "p_city",
                 },
                 content: null,
+              },
+              {
+                profileTypeField: {
+                  alias: "p_zip",
+                },
+                content: { value: "08025" },
+              },
+              {
+                profileTypeField: {
+                  alias: "p_country_of_incorporation",
+                },
+                content: {
+                  value: "ES",
+                },
               },
               {
                 profileTypeField: {
@@ -649,14 +687,14 @@ describe("Profile External Sources", () => {
 
         expect(errors).toBeUndefined();
         expect(data?.profileExternalSourceDetails).toEqual({
-          id: toGlobalId("ProfileExternalSourceEntity", 1),
+          id: expect.any(String),
           data: [
             {
               profileTypeField: {
                 alias: "p_first_name",
               },
               content: {
-                value: "Mike",
+                value: "MIKE",
               },
             },
             {
@@ -664,7 +702,7 @@ describe("Profile External Sources", () => {
                 alias: "p_last_name",
               },
               content: {
-                value: "Ross",
+                value: "ROSS",
               },
             },
             {
@@ -680,7 +718,7 @@ describe("Profile External Sources", () => {
                 alias: "p_address",
               },
               content: {
-                value: "Fake St. 123",
+                value: "Fake St. 123 08025 Barcelona (Barcelona)",
               },
             },
             {
@@ -689,6 +727,14 @@ describe("Profile External Sources", () => {
               },
               content: {
                 value: "Barcelona",
+              },
+            },
+            {
+              profileTypeField: {
+                alias: "p_zip",
+              },
+              content: {
+                value: "08025",
               },
             },
             {
@@ -739,22 +785,14 @@ describe("Profile External Sources", () => {
 
         expect(errors).toBeUndefined();
         expect(data?.profileExternalSourceDetails).toEqual({
-          id: toGlobalId("ProfileExternalSourceEntity", 2),
+          id: expect.any(String),
           data: [
             {
               profileTypeField: {
                 alias: "p_entity_name",
               },
               content: {
-                value: "Parallel Solutions SL",
-              },
-            },
-            {
-              profileTypeField: {
-                alias: "p_trade_name",
-              },
-              content: {
-                value: "Parallel",
+                value: "Parallel Solutions S.L.",
               },
             },
             {
@@ -767,10 +805,34 @@ describe("Profile External Sources", () => {
             },
             {
               profileTypeField: {
+                alias: "p_registered_address",
+              },
+              content: {
+                value: "Fake St. 123 08025 Barcelona (Barcelona)",
+              },
+            },
+            {
+              profileTypeField: {
                 alias: "p_city",
               },
               content: {
                 value: "Barcelona",
+              },
+            },
+            {
+              profileTypeField: {
+                alias: "p_zip",
+              },
+              content: {
+                value: "08025",
+              },
+            },
+            {
+              profileTypeField: {
+                alias: "p_country_of_incorporation",
+              },
+              content: {
+                value: "ES",
               },
             },
             {
@@ -859,22 +921,14 @@ describe("Profile External Sources", () => {
 
         expect(errors).toBeUndefined();
         expect(data?.profileExternalSourceDetails).toEqual({
-          id: toGlobalId("ProfileExternalSourceEntity", 2),
+          id: expect.any(String),
           data: [
             {
               profileTypeField: {
                 alias: "p_entity_name",
               },
               content: {
-                value: "Parallel Solutions SL",
-              },
-            },
-            {
-              profileTypeField: {
-                alias: "p_trade_name",
-              },
-              content: {
-                value: "Parallel",
+                value: "Parallel Solutions S.L.",
               },
             },
             {
@@ -885,9 +939,29 @@ describe("Profile External Sources", () => {
             },
             {
               profileTypeField: {
+                alias: "p_registered_address",
+              },
+              content: {
+                value: "Fake St. 123 08025 Barcelona (Barcelona)",
+              },
+            },
+            {
+              profileTypeField: {
                 alias: "p_city",
               },
               content: null,
+            },
+            {
+              profileTypeField: {
+                alias: "p_zip",
+              },
+              content: { value: "08025" },
+            },
+            {
+              profileTypeField: {
+                alias: "p_country_of_incorporation",
+              },
+              content: { value: "ES" },
             },
             {
               profileTypeField: {
@@ -1006,7 +1080,7 @@ describe("Profile External Sources", () => {
               standard_type: "LEGAL_ENTITY",
               data: {},
               parsed_data: {
-                p_entity_name: { value: "Parallel Solutions SL" },
+                p_entity_name: { value: "Parallel Solutions S.L." },
                 p_trade_name: { value: "Parallel" },
                 p_tax_id: { value: "B67505586" },
                 p_city: { value: "Barcelona" },

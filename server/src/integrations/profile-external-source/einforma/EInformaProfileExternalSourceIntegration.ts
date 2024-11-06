@@ -1,13 +1,8 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import { outdent } from "outdent";
-import { filter, isNonNullish, isNullish, map, pick, pipe } from "remeda";
-import {
-  ProfileExternalSourceEntity,
-  ProfileTypeField,
-  ProfileTypeStandardType,
-  UserLocale,
-} from "../../../db/__types";
+import { isNonNullish, pick } from "remeda";
+import { ProfileTypeField, ProfileTypeStandardType, UserLocale } from "../../../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
@@ -25,11 +20,10 @@ import { never } from "../../../util/never";
 import { pFilter } from "../../../util/promises/pFilter";
 import { retry, StopRetryError } from "../../../util/retry";
 import { capitalize } from "../../../util/strings";
-import { GenericIntegration } from "../../helpers/GenericIntegration";
 import {
   IProfileExternalSourceIntegration,
+  ProfileExternalSourceIntegration,
   ProfileExternalSourceRequestError,
-  ProfileExternalSourceSearchResults,
 } from "../ProfileExternalSourceIntegration";
 
 export const EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION = Symbol.for(
@@ -81,7 +75,7 @@ type EInformaIntegrationContext = {
 
 @injectable()
 export class EInformaProfileExternalSourceIntegration
-  extends GenericIntegration<"PROFILE_EXTERNAL_SOURCE", "EINFORMA", EInformaIntegrationContext>
+  extends ProfileExternalSourceIntegration<"EINFORMA", EInformaIntegrationContext>
   implements IProfileExternalSourceIntegration
 {
   protected override type = "PROFILE_EXTERNAL_SOURCE" as const;
@@ -91,7 +85,7 @@ export class EInformaProfileExternalSourceIntegration
 
   public STANDARD_TYPES: ProfileTypeStandardType[] = ["LEGAL_ENTITY", "INDIVIDUAL"];
   public PROVIDER_NAME: string;
-  public AVAILABLE_EXTRA_PROPERTIES: Partial<
+  protected override readonly AVAILABLE_EXTRA_PROPERTIES: Partial<
     Record<
       ProfileTypeStandardType,
       { key: string; property: Pick<ProfileTypeField, "type" | "options"> }[]
@@ -127,10 +121,10 @@ export class EInformaProfileExternalSourceIntegration
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(REDIS) private redis: IRedis,
-    @inject(LOGGER) private logger: ILogger,
+    @inject(LOGGER) protected override logger: ILogger,
     @inject(AI_ASSISTANT_SERVICE) private aiAssistant: AiAssistantService,
   ) {
-    super(encryption, integrations);
+    super(encryption, integrations, logger);
     this.PROVIDER_NAME = this.provider;
   }
 
@@ -266,8 +260,7 @@ export class EInformaProfileExternalSourceIntegration
     standardType: ProfileTypeStandardType,
     locale: UserLocale,
     search: Record<string, string>,
-    onStoreEntity: (entity: EInformaEntityByIdResponse) => Promise<ProfileExternalSourceEntity>,
-  ): Promise<ProfileExternalSourceSearchResults> {
+  ) {
     this.validateSearchParams(search);
 
     const NIF_REGEX = /^([PQRSNW]\d{7}[A-Z]|[ABCDEFGHJUV]\d{8})$/;
@@ -277,12 +270,7 @@ export class EInformaProfileExternalSourceIntegration
       NIF_REGEX.test(search.companySearch) ||
       (DNI_REGEX.test(search.companySearch) && standardType === "INDIVIDUAL")
     ) {
-      return await this.entityDetails(
-        integrationId,
-        standardType,
-        search.companySearch,
-        onStoreEntity,
-      );
+      return await this.entityDetails(integrationId, standardType, search.companySearch);
     }
 
     return await this.entitySearchByName(integrationId, standardType, locale, search);
@@ -478,7 +466,6 @@ export class EInformaProfileExternalSourceIntegration
     integrationId: number,
     standardType: ProfileTypeStandardType,
     externalId: string,
-    onStoreEntity: (entity: EInformaEntityByIdResponse) => Promise<ProfileExternalSourceEntity>,
   ) {
     this.validateStandardType(standardType);
 
@@ -496,7 +483,7 @@ export class EInformaProfileExternalSourceIntegration
 
     return {
       type: "FOUND" as const,
-      entity: await onStoreEntity(response),
+      rawResponse: response,
     };
   }
 
@@ -504,7 +491,7 @@ export class EInformaProfileExternalSourceIntegration
     standardType: ProfileTypeStandardType,
     entity: EInformaEntityByIdResponse,
     isValidContent: (alias: string, content: any) => Promise<boolean>,
-  ): Promise<Record<string, any>> {
+  ) {
     this.validateStandardType(standardType);
 
     if (standardType === "INDIVIDUAL") {
@@ -572,87 +559,28 @@ export class EInformaProfileExternalSourceIntegration
     }
   }
 
-  public async buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
-    integrationId: number,
-    profileTypeId: number,
-    standardType: ProfileTypeStandardType,
-    entity: EInformaEntityByIdResponse,
-    isPropertyCompatible: (
-      profileTypFieldId: number,
-      property: Pick<ProfileTypeField, "type" | "options">,
-    ) => boolean,
-    isValidContent: (profileTypeFieldId: number, content: any) => Promise<boolean>,
-  ) {
-    return await this.withExpirableAccessToken(
-      integrationId,
-      async (_, { customPropertiesMap }) => {
-        const customProperties = customPropertiesMap[profileTypeId];
-        if (!customProperties) {
-          return {};
-        }
-
-        return Object.fromEntries(
-          (
-            await pFilter<[number, any]>(
-              pipe(
-                Object.entries(customProperties),
-                filter(([_profileTypeFieldId, key]) => {
-                  // make sure the key is valid
-                  if (!(key in entity) || isNullish((entity as any)[key])) {
-                    this.logger.warn(`Custom property ${key} not found in entity. Skipping...`);
-                    return false;
-                  }
-
-                  // make sure the key is available for the standard type
-                  const profileTypeAvailableKeys =
-                    this.AVAILABLE_EXTRA_PROPERTIES[standardType]?.map(({ key }) => key) ?? [];
-                  if (!profileTypeAvailableKeys.includes(key)) {
-                    this.logger.warn(
-                      `Custom property ${key} not available for ${standardType} standard type. Skipping...`,
-                    );
-                    return false;
-                  }
-
-                  // make sure profileTypeFieldId is compatible with the property defined in the customPropertiesMap
-                  const property = this.AVAILABLE_EXTRA_PROPERTIES[standardType]!.find(
-                    (p) => p.key === key,
-                  )!.property;
-
-                  if (!isPropertyCompatible(parseInt(_profileTypeFieldId, 10), property)) {
-                    this.logger.warn(
-                      `Custom property ${key} is not compatible with the field type. Skipping...`,
-                    );
-                    return false;
-                  }
-
-                  return true;
-                }),
-                map(([profileTypeFieldId, key]) => {
-                  const id = parseInt(profileTypeFieldId, 10);
-                  // some entity keys need previous formatting based on the type and options of its related properties
-                  switch (key) {
-                    case "cnae":
-                      // "cnae" is mapped to a SELECT field of standardList:CNAE
-                      return [id, { value: entity["cnae"]!.slice(0, 4) }];
-                    case "web":
-                    case "nombreComercial":
-                      // "web" and "nombreComercial" are mapped to a SHORT_TEXT field
-                      // here we need only the first value
-                      return [id, { value: entity[key]![0] }];
-
-                    default:
-                      return [id, { value: entity[key as keyof EInformaEntityByIdResponse]! }];
-                  }
-                }),
-              ),
-              async ([profileTypeFieldId, content]) =>
-                await isValidContent(profileTypeFieldId, content),
-              { concurrency: 1 },
-            )
-          ).map(([profileTypeFieldId, content]) => [`_.${profileTypeFieldId}`, content]),
-        );
-      },
-    );
+  protected override mapExtraProperty(entity: EInformaEntityByIdResponse, key: string) {
+    switch (key) {
+      case "cnae":
+        // "cnae" is mapped to a SELECT field of standardList:CNAE
+        return { value: entity["cnae"]!.slice(0, 4) };
+      case "web":
+      case "nombreComercial":
+        // "web" and "nombreComercial" are mapped to a SHORT_TEXT field
+        // here we need only the first value
+        return { value: entity[key]![0] };
+      case "fechaUltimoBalance":
+      case "situacion":
+      case "capitalSocial":
+      case "ventas":
+      case "anioVentas":
+      case "empleados":
+      case "fechaConstitucion":
+        return { value: entity[key as keyof EInformaEntityByIdResponse] };
+      default:
+        this.logger.warn(`Unknown custom property key: ${key}`);
+        return { value: null };
+    }
   }
 
   private formatPhoneNumber(phoneNumber: number) {
@@ -679,7 +607,7 @@ export class EInformaProfileExternalSourceIntegration
     }
   }
 
-  private async parseFullName(fullName: string) {
+  protected async parseFullName(fullName: string) {
     return await this.aiAssistant.getJsonCompletion(
       "gpt-4o-mini",
       [

@@ -759,7 +759,10 @@ function ImportFromExternalSourceDialogUpdateProfile({
                     (p) => p.field.id === field.id,
                   )!.value;
                   const isSameContent =
-                    isNonNullish(content) && content.value === currentValue?.content?.value;
+                    isNonNullish(content) &&
+                    // for CHECKBOX contents value is an array of strings
+                    content.value?.toString() === currentValue?.content?.value?.toString();
+
                   const canWriteValue = field.myPermission === "WRITE";
                   const canReadValue = field.myPermission !== "HIDDEN";
                   return (

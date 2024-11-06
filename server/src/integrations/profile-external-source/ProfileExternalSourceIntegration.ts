@@ -1,10 +1,13 @@
+import { filter, map, pipe } from "remeda";
+import { ProfileTypeField, ProfileTypeStandardType, UserLocale } from "../../db/__types";
 import {
-  ProfileExternalSourceEntity,
-  ProfileTypeField,
-  ProfileTypeFieldType,
-  ProfileTypeStandardType,
-  UserLocale,
-} from "../../db/__types";
+  IntegrationProvider,
+  IntegrationRepository,
+} from "../../db/repositories/IntegrationRepository";
+import { EncryptionService } from "../../services/EncryptionService";
+import { ILogger } from "../../services/Logger";
+import { pFilter } from "../../util/promises/pFilter";
+import { GenericIntegration } from "../helpers/GenericIntegration";
 
 export interface ProfileExternalSourceSearchParamDefinition {
   type: "TEXT" | "SELECT";
@@ -17,12 +20,12 @@ export interface ProfileExternalSourceSearchParamDefinition {
   minLength?: number;
 }
 
-export interface ProfileExternalSourceSearchSingleResult {
+interface ProfileExternalSourceSearchSingleResult {
   type: "FOUND";
-  entity: ProfileExternalSourceEntity;
+  rawResponse: any;
 }
 
-interface ProfileExternalSourceSearchMultipleResults {
+export interface ProfileExternalSourceSearchMultipleResults {
   type: "MULTIPLE_RESULTS";
   totalCount: number;
   /**
@@ -54,19 +57,13 @@ interface ProfileExternalSourceSearchMultipleResults {
   };
 }
 
-export type ProfileExternalSourceSearchResults =
+type ProfileExternalSourceSearchResults =
   | ProfileExternalSourceSearchSingleResult
   | ProfileExternalSourceSearchMultipleResults;
 
 export interface IProfileExternalSourceIntegration {
   STANDARD_TYPES: ProfileTypeStandardType[];
   PROVIDER_NAME: string;
-  AVAILABLE_EXTRA_PROPERTIES: Partial<
-    Record<
-      ProfileTypeStandardType,
-      { key: string; property: { type: ProfileTypeFieldType; options?: any } }[]
-    >
-  >;
 
   getSearchParamsDefinition(
     standardType: ProfileTypeStandardType,
@@ -79,14 +76,12 @@ export interface IProfileExternalSourceIntegration {
     standardType: ProfileTypeStandardType,
     locale: UserLocale,
     searchParams: Record<string, string>,
-    onStoreEntity: (entity: any) => Promise<ProfileExternalSourceEntity>,
   ): Promise<ProfileExternalSourceSearchResults>;
 
   entityDetails(
     integrationId: number,
     standardType: ProfileTypeStandardType,
     externalId: string,
-    onStoreEntity: (entity: any) => Promise<ProfileExternalSourceEntity>,
   ): Promise<ProfileExternalSourceSearchSingleResult>;
 
   buildProfileTypeFieldValueContentsByAlias(
@@ -114,5 +109,92 @@ export class ProfileExternalSourceRequestError extends Error {
     message?: string,
   ) {
     super(message);
+  }
+}
+
+export abstract class ProfileExternalSourceIntegration<
+  TProvider extends IntegrationProvider<"PROFILE_EXTERNAL_SOURCE">,
+  TContext extends {
+    customPropertiesMap: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
+  } = {
+    customPropertiesMap: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
+  },
+> extends GenericIntegration<"PROFILE_EXTERNAL_SOURCE", TProvider, TContext> {
+  constructor(
+    encryption: EncryptionService,
+    integrations: IntegrationRepository,
+    protected logger: ILogger,
+  ) {
+    super(encryption, integrations);
+  }
+
+  protected abstract readonly AVAILABLE_EXTRA_PROPERTIES: Partial<
+    Record<
+      ProfileTypeStandardType,
+      { key: string; property: Pick<ProfileTypeField, "type" | "options"> }[]
+    >
+  >;
+
+  protected abstract mapExtraProperty(entity: any, key: string): any;
+
+  public async buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+    integrationId: number,
+    profileTypeId: number,
+    standardType: ProfileTypeStandardType,
+    entity: any,
+    isPropertyCompatible: (
+      profileTypFieldId: number,
+      property: Pick<ProfileTypeField, "type" | "options">,
+    ) => boolean,
+    isValidContent: (profileTypeFieldId: number, content: any) => Promise<boolean>,
+  ) {
+    return await this.withCredentials(integrationId, async (_, { customPropertiesMap }) => {
+      const customProperties = customPropertiesMap[profileTypeId];
+      if (!customProperties) {
+        return {};
+      }
+
+      return Object.fromEntries(
+        (
+          await pFilter<[number, any]>(
+            pipe(
+              Object.entries(customProperties),
+              filter(([_profileTypeFieldId, key]) => {
+                // make sure the key is available for the standard type
+                const profileTypeAvailableKeys =
+                  this.AVAILABLE_EXTRA_PROPERTIES[standardType]?.map(({ key }) => key) ?? [];
+                if (!profileTypeAvailableKeys.includes(key)) {
+                  this.logger.warn(
+                    `Custom property ${key} not available for ${standardType} standard type. Skipping...`,
+                  );
+                  return false;
+                }
+
+                // make sure profileTypeFieldId is compatible with the property defined in the customPropertiesMap
+                const property = this.AVAILABLE_EXTRA_PROPERTIES[standardType]!.find(
+                  (p) => p.key === key,
+                )!.property;
+
+                if (!isPropertyCompatible(parseInt(_profileTypeFieldId, 10), property)) {
+                  this.logger.warn(
+                    `Custom property ${key} is not compatible with the field type. Skipping...`,
+                  );
+                  return false;
+                }
+
+                return true;
+              }),
+              map(([profileTypeFieldId, key]) => [
+                parseInt(profileTypeFieldId, 10),
+                this.mapExtraProperty(entity, key),
+              ]),
+            ),
+            async ([profileTypeFieldId, content]) =>
+              await isValidContent(profileTypeFieldId, content),
+            { concurrency: 1 },
+          )
+        ).map(([profileTypeFieldId, content]) => [`_.${profileTypeFieldId}`, content]),
+      );
+    });
   }
 }

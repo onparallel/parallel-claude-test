@@ -1,11 +1,6 @@
 import { inject, injectable } from "inversify";
-import { filter, isNonNullish, isNullish, map, pipe } from "remeda";
-import {
-  ProfileExternalSourceEntity,
-  ProfileTypeField,
-  ProfileTypeStandardType,
-  UserLocale,
-} from "../../../db/__types";
+import { isNonNullish } from "remeda";
+import { ProfileTypeField, ProfileTypeStandardType, UserLocale } from "../../../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
@@ -15,13 +10,10 @@ import { FETCH_SERVICE, IFetchService } from "../../../services/FetchService";
 import { I18N_SERVICE, II18nService } from "../../../services/I18nService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { pFilter } from "../../../util/promises/pFilter";
-import { GenericIntegration } from "../../helpers/GenericIntegration";
 import {
   IProfileExternalSourceIntegration,
+  ProfileExternalSourceIntegration,
   ProfileExternalSourceRequestError,
-  ProfileExternalSourceSearchParamDefinition,
-  ProfileExternalSourceSearchResults,
-  ProfileExternalSourceSearchSingleResult,
 } from "../ProfileExternalSourceIntegration";
 
 export const COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION = Symbol.for(
@@ -73,17 +65,9 @@ interface CompaniesHouseEntityByIdResponse {
   type?: string;
 }
 
-type CompaniesHouseIntegrationContext = {
-  customPropertiesMap: { [profileTypeId: number]: { [profileTypeFieldId: number]: string } };
-};
-
 @injectable()
 export class CompaniesHouseProfileExternalSourceIntegration
-  extends GenericIntegration<
-    "PROFILE_EXTERNAL_SOURCE",
-    "COMPANIES_HOUSE",
-    CompaniesHouseIntegrationContext
-  >
+  extends ProfileExternalSourceIntegration<"COMPANIES_HOUSE">
   implements IProfileExternalSourceIntegration
 {
   protected override type = "PROFILE_EXTERNAL_SOURCE" as const;
@@ -93,7 +77,8 @@ export class CompaniesHouseProfileExternalSourceIntegration
 
   public STANDARD_TYPES: ProfileTypeStandardType[] = ["LEGAL_ENTITY"];
   public PROVIDER_NAME: string = "COMPANIES_HOUSE";
-  public AVAILABLE_EXTRA_PROPERTIES: Partial<
+
+  protected override readonly AVAILABLE_EXTRA_PROPERTIES: Partial<
     Record<
       ProfileTypeStandardType,
       { key: string; property: Pick<ProfileTypeField, "type" | "options"> }[]
@@ -101,6 +86,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
   > = {
     LEGAL_ENTITY: [
       { key: "sic_codes", property: { type: "CHECKBOX", options: { standardList: "SIC" } } },
+      { key: "sic_code", property: { type: "SELECT", options: { standardList: "SIC" } } },
     ],
   };
 
@@ -109,9 +95,9 @@ export class CompaniesHouseProfileExternalSourceIntegration
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(LOGGER) private logger: ILogger,
+    @inject(LOGGER) protected override logger: ILogger,
   ) {
-    super(encryption, integrations);
+    super(encryption, integrations, logger);
     this.PROVIDER_NAME = this.provider;
   }
 
@@ -128,7 +114,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
 
   protected override getContext(
     integration: EnhancedOrgIntegration<"PROFILE_EXTERNAL_SOURCE", "COMPANIES_HOUSE", false>,
-  ): CompaniesHouseIntegrationContext {
+  ) {
     return {
       customPropertiesMap: integration.settings.CUSTOM_PROPERTIES_MAP ?? {},
     };
@@ -188,7 +174,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
     standardType: ProfileTypeStandardType,
     locale: UserLocale,
     defaultValues: Record<string, string>,
-  ): Promise<ProfileExternalSourceSearchParamDefinition[]> {
+  ) {
     if (!this.STANDARD_TYPES.includes(standardType)) {
       // don't throw error, as this method is called inside a gql type resolver,
       // and we don't want to break the whole request if one provider falls here.
@@ -249,21 +235,13 @@ export class CompaniesHouseProfileExternalSourceIntegration
     standardType: ProfileTypeStandardType,
     locale: UserLocale,
     search: Record<string, string>,
-    onStoreEntity: (
-      entity: CompaniesHouseEntityByIdResponse,
-    ) => Promise<ProfileExternalSourceEntity>,
-  ): Promise<ProfileExternalSourceSearchResults> {
+  ) {
     this.validateSearchParams(search);
     this.validateStandardType(standardType);
 
     const TAX_ID_REGEX = /^[0-9]{8}$/;
     if (TAX_ID_REGEX.test(search.companySearch)) {
-      return await this.entityDetails(
-        integrationId,
-        standardType,
-        search.companySearch,
-        onStoreEntity,
-      );
+      return await this.entityDetails(integrationId, standardType, search.companySearch);
     }
 
     const response = await this.withCredentials(
@@ -322,10 +300,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
     integrationId: number,
     standardType: ProfileTypeStandardType,
     externalId: string,
-    onStoreEntity: (
-      entity: CompaniesHouseEntityByIdResponse,
-    ) => Promise<ProfileExternalSourceEntity>,
-  ): Promise<ProfileExternalSourceSearchSingleResult> {
+  ) {
     this.validateStandardType(standardType);
 
     const response = await this.withCredentials(
@@ -340,7 +315,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
 
     return {
       type: "FOUND" as const,
-      entity: await onStoreEntity(response),
+      rawResponse: response,
     };
   }
 
@@ -348,7 +323,7 @@ export class CompaniesHouseProfileExternalSourceIntegration
     standardType: ProfileTypeStandardType,
     entity: CompaniesHouseEntityByIdResponse,
     isValidContent: (alias: string, content: any) => Promise<boolean>,
-  ): Promise<Record<string, any>> {
+  ) {
     this.validateStandardType(standardType);
     return Object.fromEntries(
       await pFilter(
@@ -375,77 +350,17 @@ export class CompaniesHouseProfileExternalSourceIntegration
     );
   }
 
-  public async buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
-    integrationId: number,
-    profileTypeId: number,
-    standardType: ProfileTypeStandardType,
-    entity: CompaniesHouseEntityByIdResponse,
-    isPropertyCompatible: (
-      profileTypFieldId: number,
-      property: Pick<ProfileTypeField, "type" | "options">,
-    ) => boolean,
-    isValidContent: (profileTypeFieldId: number, content: any) => Promise<boolean>,
-  ) {
-    return await this.withCredentials(integrationId, async (_, { customPropertiesMap }) => {
-      const customProperties = customPropertiesMap[profileTypeId];
-      if (!customProperties) {
-        return {};
-      }
-
-      return Object.fromEntries(
-        (
-          await pFilter<[number, any]>(
-            pipe(
-              Object.entries(customProperties),
-              filter(([_profileTypeFieldId, key]) => {
-                // make sure the key is valid
-                if (!(key in entity) || isNullish((entity as any)[key])) {
-                  this.logger.warn(`Custom property ${key} not found in entity. Skipping...`);
-                  return false;
-                }
-
-                // make sure the key is available for the standard type
-                const profileTypeAvailableKeys =
-                  this.AVAILABLE_EXTRA_PROPERTIES[standardType]?.map(({ key }) => key) ?? [];
-                if (!profileTypeAvailableKeys.includes(key)) {
-                  this.logger.warn(
-                    `Custom property ${key} not available for ${standardType} standard type. Skipping...`,
-                  );
-                  return false;
-                }
-
-                // make sure profileTypeFieldId is compatible with the property defined in the customPropertiesMap
-                const property = this.AVAILABLE_EXTRA_PROPERTIES[standardType]!.find(
-                  (p) => p.key === key,
-                )!.property;
-
-                if (!isPropertyCompatible(parseInt(_profileTypeFieldId, 10), property)) {
-                  this.logger.warn(
-                    `Custom property ${key} is not compatible with the field type. Skipping...`,
-                  );
-                  return false;
-                }
-
-                return true;
-              }),
-              map(([profileTypeFieldId, key]) => {
-                const id = parseInt(profileTypeFieldId, 10);
-                // some entity keys need previous formatting based on the type and options of its related properties
-                switch (key) {
-                  case "sic_codes":
-                    // "sic_codes" is mapped to a CHECKBOX field of standardList:SIC
-                    return [id, { value: entity.sic_codes }];
-                  default:
-                    return [id, { value: entity[key as keyof CompaniesHouseEntityByIdResponse]! }];
-                }
-              }),
-            ),
-            async ([profileTypeFieldId, content]) =>
-              await isValidContent(profileTypeFieldId, content),
-            { concurrency: 1 },
-          )
-        ).map(([profileTypeFieldId, content]) => [`_.${profileTypeFieldId}`, content]),
-      );
-    });
+  protected override mapExtraProperty(entity: CompaniesHouseEntityByIdResponse, key: string) {
+    switch (key) {
+      case "sic_codes":
+        // "sic_codes" is mapped to a CHECKBOX field of standardList:SIC
+        return { value: entity.sic_codes };
+      case "sic_code":
+        // "sic_code" is mapped to a SELECT field of standardList:SIC
+        return { value: entity.sic_codes?.[0] };
+      default:
+        this.logger.warn(`Unknown custom property key: ${key}`);
+        return { value: null };
+    }
   }
 }

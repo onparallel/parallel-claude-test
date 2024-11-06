@@ -1,22 +1,36 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { ProfileType, ProfileTypeField, User, UserLocale } from "../db/__types";
+import {
+  ProfileExternalSourceEntity,
+  ProfileType,
+  ProfileTypeField,
+  User,
+  UserLocale,
+} from "../db/__types";
 import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../integrations/profile-external-source/companies-house/CompaniesHouseProfileExternalSourceIntegration";
 import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import {
   IProfileExternalSourceIntegration,
+  ProfileExternalSourceSearchMultipleResults,
   ProfileExternalSourceSearchParamDefinition,
-  ProfileExternalSourceSearchResults,
-  ProfileExternalSourceSearchSingleResult,
 } from "../integrations/profile-external-source/ProfileExternalSourceIntegration";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { validateProfileFieldValue } from "../util/validateProfileFieldValue";
 import { ILogger, LOGGER } from "./Logger";
 
 export const PROFILE_EXTERNAL_SOURCE_SERVICE = Symbol.for("PROFILE_EXTERNAL_SOURCE_SERVICE");
+
+interface ProfileExternalSourceSearchSingleResult {
+  type: "FOUND";
+  entity: ProfileExternalSourceEntity;
+}
+
+type ProfileExternalSourceSearchResults =
+  | ProfileExternalSourceSearchSingleResult
+  | ProfileExternalSourceSearchMultipleResults;
 
 export interface IProfileExternalSourcesService {
   getAvailableProfileTypesByIntegrationId(integrationId: number): Promise<ProfileType[]>;
@@ -203,29 +217,33 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     const profileTypeFields =
       await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
 
-    return await provider.entitySearch(
+    const result = await provider.entitySearch(
       integrationId,
       profileType.standard_type,
       locale,
       search,
-      async (data) =>
-        await this.profiles.createProfileExternalSourceEntity(
+    );
+
+    if (result.type === "FOUND") {
+      return {
+        type: "FOUND" as const,
+        entity: await this.profiles.createProfileExternalSourceEntity(
           {
             integration_id: integrationId,
             created_by_user_id: user.id,
             standard_type: profileType.standard_type!,
-            data,
+            data: result.rawResponse,
             parsed_data: {
               ...(await provider.buildProfileTypeFieldValueContentsByAlias(
                 profileType.standard_type!,
-                data,
+                result.rawResponse,
                 this.isValidContentByAlias(profileTypeFields),
               )),
               ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
                 integrationId,
                 profileTypeId,
                 profileType.standard_type!,
-                data,
+                result.rawResponse,
                 this.isPropertyCompatible(profileTypeFields),
                 this.isValidContentById(profileTypeFields),
               )),
@@ -233,7 +251,10 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
           },
           `User:${user.id}`,
         ),
-    );
+      };
+    }
+
+    return result;
   }
 
   async entityDetails(
@@ -251,35 +272,38 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     const profileTypeFields =
       await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
 
-    return await provider.entityDetails(
+    const result = await provider.entityDetails(
       integrationId,
       profileType.standard_type!,
       externalId,
-      async (data) =>
-        await this.profiles.createProfileExternalSourceEntity(
-          {
-            integration_id: integrationId,
-            created_by_user_id: user.id,
-            standard_type: profileType.standard_type!,
-            data,
-            parsed_data: {
-              ...(await provider.buildProfileTypeFieldValueContentsByAlias(
-                profileType.standard_type!,
-                data,
-                this.isValidContentByAlias(profileTypeFields),
-              )),
-              ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
-                integrationId,
-                profileTypeId,
-                profileType.standard_type!,
-                data,
-                this.isPropertyCompatible(profileTypeFields),
-                this.isValidContentById(profileTypeFields),
-              )),
-            },
-          },
-          `User:${user.id}`,
-        ),
     );
+
+    return {
+      type: "FOUND" as const,
+      entity: await this.profiles.createProfileExternalSourceEntity(
+        {
+          integration_id: integrationId,
+          created_by_user_id: user.id,
+          standard_type: profileType.standard_type!,
+          data: result.rawResponse,
+          parsed_data: {
+            ...(await provider.buildProfileTypeFieldValueContentsByAlias(
+              profileType.standard_type!,
+              result.rawResponse,
+              this.isValidContentByAlias(profileTypeFields),
+            )),
+            ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
+              integrationId,
+              profileTypeId,
+              profileType.standard_type!,
+              result.rawResponse,
+              this.isPropertyCompatible(profileTypeFields),
+              this.isValidContentById(profileTypeFields),
+            )),
+          },
+        },
+        `User:${user.id}`,
+      ),
+    };
   }
 }
