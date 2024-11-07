@@ -87,23 +87,73 @@ describe("repositories/ContactRepository", () => {
     });
 
     it("anonymizes passed contacts", async () => {
-      expect(
-        contacts.every((c) => c.email !== "" && c.first_name !== "" && c.last_name !== ""),
-      ).toEqual(true);
+      expect(contacts).toMatchObject([
+        {
+          email: expect.any(String),
+          first_name: expect.any(String),
+          last_name: expect.any(String),
+          deleted_at: expect.any(Date),
+        },
+        {
+          email: expect.any(String),
+          first_name: expect.any(String),
+          last_name: expect.any(String),
+          deleted_at: expect.any(Date),
+        },
+        {
+          email: expect.any(String),
+          first_name: expect.any(String),
+          last_name: expect.any(String),
+          deleted_at: expect.any(Date),
+        },
+        {
+          email: expect.any(String),
+          first_name: expect.any(String),
+          last_name: expect.any(String),
+          deleted_at: expect.any(Date),
+        },
+      ]);
 
       await c.anonymizeDeletedContacts(0);
 
-      const contactsAfter = await knex.from("contact").whereIn(
-        "id",
-        contacts.map((c) => c.id),
-      );
+      const contactsAfter = await knex
+        .from("contact")
+        .whereIn(
+          "id",
+          contacts.map((c) => c.id),
+        )
+        .select("*");
 
-      expect(
-        contactsAfter.every(
-          (c) =>
-            c.anonymized_at !== null && c.email === "" && c.first_name === "" && c.last_name === "",
-        ),
-      ).toEqual(true);
+      expect(contactsAfter).toMatchObject([
+        {
+          email: "",
+          first_name: "",
+          last_name: "",
+          deleted_at: expect.any(Date),
+          anonymized_at: expect.any(Date),
+        },
+        {
+          email: "",
+          first_name: "",
+          last_name: "",
+          deleted_at: expect.any(Date),
+          anonymized_at: expect.any(Date),
+        },
+        {
+          email: "",
+          first_name: "",
+          last_name: "",
+          deleted_at: expect.any(Date),
+          anonymized_at: expect.any(Date),
+        },
+        {
+          email: "",
+          first_name: "",
+          last_name: "",
+          deleted_at: expect.any(Date),
+          anonymized_at: expect.any(Date),
+        },
+      ]);
     });
   });
 });

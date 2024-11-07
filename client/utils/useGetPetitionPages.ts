@@ -5,7 +5,8 @@ import {
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { zip } from "remeda";
-import { FieldLogic, useFieldLogic } from "./fieldLogic/useFieldLogic";
+import { FieldLogic } from "./fieldLogic/types";
+import { useFieldLogic } from "./fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion, UnwrapArray } from "./types";
 
 type PetitionSelection =

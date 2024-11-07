@@ -11,7 +11,7 @@ import {
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";

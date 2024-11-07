@@ -479,6 +479,12 @@ export const ProfileTypeStandardTypeValues = [
   "CONTRACT",
 ] as ProfileTypeStandardType[];
 
+export type StandardListDefinitionListType = "COUNTRIES";
+
+export const StandardListDefinitionListTypeValues = [
+  "COUNTRIES",
+] as StandardListDefinitionListType[];
+
 export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN"
@@ -681,6 +687,7 @@ export interface TableTypes {
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
   public_petition_link_prefill_data: PublicPetitionLinkPrefillData;
+  standard_list_definition: StandardListDefinition;
   system_event: SystemEvent;
   tag: Tag;
   task: Task;
@@ -753,6 +760,7 @@ export interface TableCreateTypes {
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
   public_petition_link_prefill_data: CreatePublicPetitionLinkPrefillData;
+  standard_list_definition: CreateStandardListDefinition;
   system_event: CreateSystemEvent;
   tag: CreateTag;
   task: CreateTask;
@@ -825,6 +833,7 @@ export interface TablePrimaryKeys {
   public_file_upload: "id";
   public_petition_link: "id";
   public_petition_link_prefill_data: "id";
+  standard_list_definition: "id";
   system_event: "id";
   tag: "id";
   task: "id";
@@ -1337,6 +1346,7 @@ export interface Petition {
   enable_review_flow: boolean; // bool
   enable_document_generation: boolean; // bool
   automatic_numbering_config: Maybe<any>; // jsonb
+  standard_list_definition_override: any; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -1394,6 +1404,7 @@ export type CreatePetition = PartialProps<
   | "enable_review_flow"
   | "enable_document_generation"
   | "automatic_numbering_config"
+  | "standard_list_definition_override"
 >;
 
 export interface PetitionAccess {
@@ -2238,6 +2249,36 @@ export interface PublicPetitionLinkPrefillData {
 export type CreatePublicPetitionLinkPrefillData = PartialProps<
   Omit<PublicPetitionLinkPrefillData, "id">,
   "data" | "path" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface StandardListDefinition {
+  id: number; // int4
+  title: any; // jsonb
+  list_name: string; // varchar
+  list_version: string; // date
+  version_format: any; // jsonb
+  list_type: StandardListDefinitionListType; // standard_list_definition_list_type
+  values: any; // jsonb
+  source_name: string; // varchar
+  source_url: Maybe<string>; // varchar
+  version_url: Maybe<string>; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateStandardListDefinition = PartialProps<
+  Omit<StandardListDefinition, "id">,
+  | "title"
+  | "version_format"
+  | "values"
+  | "source_url"
+  | "version_url"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
 >;
 
 export interface SystemEvent {

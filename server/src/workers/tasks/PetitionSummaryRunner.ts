@@ -1,3 +1,4 @@
+import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
 import {
   identity,
@@ -10,24 +11,18 @@ import {
   unique,
   zip,
 } from "remeda";
-import { Petition, PetitionFieldType } from "../../db/__types";
+import { Petition, PetitionField, PetitionFieldType } from "../../db/__types";
+import {
+  DateLiquidValue,
+  DateTimeLiquidValue,
+  WithLabelLiquidValue,
+} from "../../pdf/utils/liquid/LiquidValue";
 import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
-import {
-  evaluateFieldLogic,
-  PetitionFieldLogicCondition,
-  PetitionFieldMath,
-  PetitionFieldMathOperation,
-  PetitionFieldVisibility,
-} from "../../util/fieldLogic";
+import { evaluateFieldLogic, FieldLogicResult } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { createLiquid } from "../../util/liquid";
-import {
-  buildPetitionFieldsLiquidScope,
-  buildPetitionVariablesLiquidScope,
-} from "../../util/liquidScope";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
@@ -127,55 +122,6 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       size?: string;
     }[] = [];
 
-    const petitionFieldsScope = buildPetitionFieldsLiquidScope(
-      {
-        id: toGlobalId("Petition", petition.id),
-        fields: composedPetition.fields
-          .filter((f) => f.type !== "BACKGROUND_CHECK")
-          .map((f) => ({
-            ...pick(f, ["type", "multiple", "alias", "options"]),
-            id: toGlobalId("PetitionField", f.id),
-            visibility: this.mapFieldVisibility(f.visibility),
-            math: this.mapFieldMath(f.math),
-            children:
-              f.children
-                ?.filter((c) => c.type !== "BACKGROUND_CHECK")
-                .map((c) => ({
-                  ...pick(c, ["type", "multiple", "alias", "options"]),
-                  id: toGlobalId("PetitionField", c.id),
-                  visibility: this.mapFieldVisibility(c.visibility),
-                  math: this.mapFieldMath(c.math),
-                  parent: { id: toGlobalId("PetitionField", f.id) },
-                  replies: c.replies.map((r) => ({
-                    content: r.content,
-                    anonymized_at: r.anonymized_at,
-                  })),
-                })) ?? undefined,
-            replies: f.replies.map((r) => ({
-              content: r.content,
-              anonymized_at: r.anonymized_at,
-              children: r.children
-                ? r.children
-                    .filter((c) => c.field.type !== "BACKGROUND_CHECK")
-                    .map((c) => ({
-                      field: {
-                        id: toGlobalId("PetitionField", c.field.id),
-                        ...pick(c.field, ["type", "multiple", "alias", "options"]),
-                        visibility: this.mapFieldVisibility(c.field.visibility),
-                        math: this.mapFieldMath(c.field.math),
-                      },
-                      replies: c.replies,
-                    }))
-                : null,
-            })),
-          })),
-        variables: composedPetition.variables,
-        custom_lists: composedPetition.custom_lists,
-        automatic_numbering_config: composedPetition.automatic_numbering_config,
-      },
-      intl,
-    );
-
     function replyContent(type: PetitionFieldType, content: any) {
       if (isFileTypeField(type)) {
         // keep references of file_upload_id to retrieve file uploads later and update this object
@@ -186,9 +132,65 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       return content;
     }
 
-    const liquid = createLiquid();
+    // ############################
+    // # ALIASED FIELDS SCOPE  ####
+    // ############################
+    const fieldsWithIndices = getFieldsWithIndices(composedPetition.fields);
     const fieldLogic = evaluateFieldLogic(composedPetition);
-    const fieldsInfoScope = zip(getFieldsWithIndices(composedPetition.fields), fieldLogic)
+    const zippedFields = zip(fieldsWithIndices, fieldLogic);
+
+    const petitionFieldsScope: Record<string, any> = { petitionId: petition.id, _: {} };
+    for (const [[field, fieldIndex, childrenFieldIndices], logic] of zippedFields) {
+      const replies = field.replies;
+      let values: any[];
+      if (field.type === "FIELD_GROUP") {
+        values = replies.map((r) => {
+          const reply: Record<string, any> = { _: {} };
+          for (const [{ field, replies: _replies }, fieldIndex] of zip(
+            r.children!,
+            childrenFieldIndices!,
+          )) {
+            const values = _replies.map((r) => this.getReplyValue(field, r.content, intl));
+            petitionFieldsScope._[fieldIndex] = (petitionFieldsScope._[fieldIndex] ?? []).concat(
+              values,
+            );
+            if (isNonNullish(field.alias)) {
+              petitionFieldsScope[field.alias] = petitionFieldsScope._[fieldIndex];
+            }
+            const value = field.multiple ? values : values?.[0];
+            if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
+              reply._[fieldIndex] = value;
+              if (isNonNullish(field.alias)) {
+                reply[field.alias] = value;
+              }
+            }
+          }
+          return reply;
+        });
+      } else {
+        values = replies.map((r) => this.getReplyValue(field, r.content, intl));
+      }
+      const value = field.multiple ? values : values?.[0];
+      if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
+        petitionFieldsScope._[fieldIndex] = value;
+        if (isNonNullish(field.alias)) {
+          petitionFieldsScope[field.alias] = value;
+        }
+      }
+
+      if (field.type === "HEADING") {
+        petitionFieldsScope._[fieldIndex] = logic.headerNumber;
+        if (isNonNullish(field.alias)) {
+          petitionFieldsScope[field.alias] = logic.headerNumber;
+        }
+      }
+    }
+
+    // ############################
+    // # ARRAY OF FIELDS SCOPE  ###
+    // ############################
+    const liquid = createLiquid();
+    const fieldsInfoScope = zippedFields
       .filter(([[field], { isVisible }]) => isVisible && field.type !== "BACKGROUND_CHECK") // don't include BACKGROUND_CHECK fields in summary scope
       .map(([[field, index, childrenFieldIndexes], logic]) => ({
         title: field.title,
@@ -197,7 +199,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
               field.description,
               {
                 ...petitionFieldsScope,
-                ...buildPetitionVariablesLiquidScope(logic),
+                ...this.buildPetitionVariablesLiquidScope(logic),
               },
               { globals: { intl } },
             )
@@ -220,7 +222,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                             field.description,
                             {
                               ...petitionFieldsScope,
-                              ...buildPetitionVariablesLiquidScope(logic),
+                              ...this.buildPetitionVariablesLiquidScope(logic),
                             },
                             { globals: { intl } },
                           )
@@ -282,56 +284,67 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     };
   }
 
-  private mapCondition(
-    c: PetitionFieldLogicCondition<number>,
-  ): PetitionFieldLogicCondition<string> {
-    return {
-      operator: c.operator,
-      value: c.value,
-      ...("fieldId" in c
-        ? {
-            modifier: c.modifier,
-            fieldId: toGlobalId("PetitionField", c.fieldId),
-            column: c.column,
-          }
-        : { variableName: c.variableName }),
-    };
-  }
-
-  private mapOperation(o: PetitionFieldMathOperation<number>): PetitionFieldMathOperation<string> {
-    return {
-      variable: o.variable,
-      operator: o.operator,
-      operand:
-        o.operand.type === "FIELD"
-          ? { type: "FIELD", fieldId: toGlobalId("PetitionField", o.operand.fieldId) }
-          : o.operand,
-    };
-  }
-
-  private mapFieldVisibility(
-    v: PetitionFieldVisibility<number> | null,
-  ): PetitionFieldVisibility<string> | null {
-    if (!v) {
-      return null;
+  private getReplyValue(
+    field: Pick<PetitionField, "type" | "options">,
+    content: any,
+    intl: IntlShape,
+  ) {
+    switch (field.type) {
+      case "DATE":
+        return new DateLiquidValue(intl, content);
+      case "DATE_TIME":
+        return new DateTimeLiquidValue(intl, content);
+      case "SELECT":
+        // in case of standard SELECT lists, this options will already have it correctly filled, as it comes from a graphql query
+        const options = field.options as { labels?: string[]; values: string[] };
+        if (isNonNullish(options.labels)) {
+          const label =
+            zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
+          return new WithLabelLiquidValue(intl, content, label);
+        } else {
+          return content.value;
+        }
+      case "CHECKBOX": {
+        const options = field.options as { labels?: string[]; values: string[] };
+        if (isNonNullish(options.labels)) {
+          return (content.value ?? []).map((value: string) => {
+            const label =
+              zip(options.labels!, options.values).find(([, v]) => v === value)?.[0] ?? "";
+            return new WithLabelLiquidValue(intl, { value }, label);
+          });
+        } else {
+          return content.value;
+        }
+      }
+      default:
+        return content.value;
     }
-    return {
-      type: v.type,
-      operator: v.operator,
-      conditions: v.conditions.map((c) => this.mapCondition(c)),
-    };
   }
 
-  private mapFieldMath(
-    math: PetitionFieldMath<number>[] | null,
-  ): PetitionFieldMath<string>[] | null {
-    if (!math) {
-      return null;
-    }
-    return math.map((m) => ({
-      operator: m.operator,
-      conditions: m.conditions.map((c) => this.mapCondition(c)),
-      operations: m.operations.map((o) => this.mapOperation(o)),
-    }));
+  private buildPetitionVariablesLiquidScope(logic: FieldLogicResult) {
+    return Object.fromEntries(
+      Object.keys(logic.finalVariables).map((key) => [
+        key,
+        new PetitionVariableDrop(
+          logic.finalVariables[key],
+          logic.currentVariables[key],
+          logic.previousVariables[key],
+        ),
+      ]),
+    );
+  }
+}
+
+class PetitionVariableDrop extends Drop {
+  constructor(
+    public final: number,
+    public after: number,
+    public before: number,
+  ) {
+    super();
+  }
+
+  public override valueOf() {
+    return this.final;
   }
 }

@@ -2,7 +2,9 @@ import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { parseStandardListDefinitionsData } from "../../../seeds/utils/helpers";
 import { UserGroupPermissionName } from "../../db/__types";
+import { toBytes } from "../../util/fileSize";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
@@ -10,6 +12,7 @@ import { RESULT } from "../helpers/Result";
 import { and } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { importFromExcel } from "../helpers/importDataFromExcel";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { validEmail } from "../helpers/validators/validEmail";
@@ -1240,6 +1243,50 @@ export const closePetitionsFromTemplate = mutationField("closePetitionsFromTempl
       return {
         result: RESULT.SUCCESS,
         message: "Petitions will start closing now. Please wait 1 minute.",
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
+
+export const updateStandardListDefinitions = mutationField("updateStandardListDefinitions", {
+  type: "SupportMethodResponse",
+  description: "Updates the standard list definitions with values defined in excel file",
+  authorize: superAdminAccess(),
+  args: {
+    file: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile(
+    (args) => args.file,
+    {
+      contentType: [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/csv",
+      ],
+      maxSize: toBytes(10, "MB"),
+    },
+    "file",
+  ),
+
+  resolve: async (_, args, ctx) => {
+    try {
+      const file = await args.file;
+      const data = await importFromExcel(file.createReadStream());
+      const lists = parseStandardListDefinitionsData(data);
+
+      const result = await ctx.petitions.upsertStandardListDefinitions(
+        lists,
+        `User:${ctx.user!.id}`,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `${result.length} lists created or updated succesfully`,
       };
     } catch (error) {
       return {

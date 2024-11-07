@@ -1,6 +1,7 @@
 import type { FileUpload } from "graphql-upload/Upload.js";
 import type { Duration } from "date-fns";
 import type { LocalizableUserText } from "./helpers/scalars/LocalizableUserText";
+import type { Replace } from "../util/types";
 import type * as db from "./../db/__types";
 import type * as notifications from "./../db/notifications";
 import type * as petitionEvents from "./../db/events/PetitionEvent";
@@ -625,6 +626,7 @@ export interface NexusGenEnums {
   SignatureConfigSigningMode: "PARALLEL" | "SEQUENTIAL";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "DOCUSIGN" | "SIGNATURIT";
+  StandardListDefinitionListType: db.StandardListDefinitionListType;
   Success: "SUCCESS";
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
@@ -1348,6 +1350,20 @@ export interface NexusGenObjects {
   SignatureOrgIntegration: db.OrgIntegration;
   SignatureReminderEvent: petitionEvents.SignatureReminderEvent;
   SignatureStartedEvent: petitionEvents.SignatureStartedEvent;
+  StandardListDefinition: Replace<
+    db.StandardListDefinition,
+    {
+      list_version: string | null;
+      values: { key: string; prefix?: string; suffix?: string; label?: string }[];
+    }
+  >;
+  StandardListDefinitionValue: {
+    // root type
+    key: string; // String!
+    label?: string | null; // String
+    prefix?: string | null; // String
+    suffix?: string | null; // String
+  };
   SupportMethodResponse: {
     // root type
     message?: string | null; // String
@@ -2216,6 +2232,7 @@ export interface NexusGenFieldTypes {
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updatePublicTemplateVisibility: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
+    updateStandardListDefinitions: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
     updateTemplateDefaultPermissions: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     updateTemplateDocumentTheme: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2373,6 +2390,7 @@ export interface NexusGenFieldTypes {
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][]; // [PetitionSignatureRequest!]!
     skipForwardSecurity: boolean; // Boolean!
+    standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     summaryConfig: NexusGenScalars["JSONObject"] | null; // JSONObject
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
@@ -2920,6 +2938,7 @@ export interface NexusGenFieldTypes {
     selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
+    standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3382,6 +3401,7 @@ export interface NexusGenFieldTypes {
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signatureConfig: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
+    standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     tone: NexusGenEnums["Tone"]; // Tone!
     unreadGeneralCommentCount: number; // Int!
@@ -3587,6 +3607,7 @@ export interface NexusGenFieldTypes {
     publicTemplateCategories: string[]; // [String!]!
     realMe: NexusGenRootTypes["User"]; // User!
     remindersOptOut: NexusGenRootTypes["PublicRemindersOptOut"] | null; // PublicRemindersOptOut
+    standardListDefinition: NexusGenRootTypes["StandardListDefinition"]; // StandardListDefinition!
     subscriptions: NexusGenRootTypes["EventSubscription"][]; // [EventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     tagsByName: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -3803,6 +3824,26 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  StandardListDefinition: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    listName: string; // String!
+    listType: NexusGenEnums["StandardListDefinitionListType"]; // StandardListDefinitionListType!
+    listVersion: NexusGenScalars["Date"] | null; // Date
+    source: string; // String!
+    sourceUrl: string | null; // String
+    title: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+    values: NexusGenRootTypes["StandardListDefinitionValue"][]; // [StandardListDefinitionValue!]!
+    versionFormat: NexusGenScalars["JSONObject"]; // JSONObject!
+    versionUrl: string | null; // String
+  };
+  StandardListDefinitionValue: {
+    // field return type
+    key: string; // String!
+    label: string | null; // String
+    prefix: string | null; // String
+    suffix: string | null; // String
   };
   SupportMethodResponse: {
     // field return type
@@ -4088,6 +4129,7 @@ export interface NexusGenFieldTypes {
     selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
+    standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -4896,6 +4938,7 @@ export interface NexusGenFieldTypeNames {
     updatePublicPetitionLink: "PublicPetitionLink";
     updatePublicTemplateVisibility: "SupportMethodResponse";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
+    updateStandardListDefinitions: "SupportMethodResponse";
     updateTag: "Tag";
     updateTemplateDefaultPermissions: "PetitionTemplate";
     updateTemplateDocumentTheme: "PetitionBase";
@@ -5053,6 +5096,7 @@ export interface NexusGenFieldTypeNames {
     signatureConfig: "SignatureConfig";
     signatureRequests: "PetitionSignatureRequest";
     skipForwardSecurity: "Boolean";
+    standardListDefinitions: "StandardListDefinition";
     status: "PetitionStatus";
     summaryConfig: "JSONObject";
     tags: "Tag";
@@ -5600,6 +5644,7 @@ export interface NexusGenFieldTypeNames {
     selectedDocumentTheme: "OrganizationTheme";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
+    standardListDefinitions: "StandardListDefinition";
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
@@ -6062,6 +6107,7 @@ export interface NexusGenFieldTypeNames {
     recipients: "PublicContact";
     signatureConfig: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
+    standardListDefinitions: "StandardListDefinition";
     status: "PetitionStatus";
     tone: "Tone";
     unreadGeneralCommentCount: "Int";
@@ -6267,6 +6313,7 @@ export interface NexusGenFieldTypeNames {
     publicTemplateCategories: "String";
     realMe: "User";
     remindersOptOut: "PublicRemindersOptOut";
+    standardListDefinition: "StandardListDefinition";
     subscriptions: "EventSubscription";
     tags: "TagPagination";
     tagsByName: "TagPagination";
@@ -6483,6 +6530,26 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     signature: "PetitionSignatureRequest";
     type: "PetitionEventType";
+  };
+  StandardListDefinition: {
+    // field return type name
+    id: "GID";
+    listName: "String";
+    listType: "StandardListDefinitionListType";
+    listVersion: "Date";
+    source: "String";
+    sourceUrl: "String";
+    title: "LocalizableUserText";
+    values: "StandardListDefinitionValue";
+    versionFormat: "JSONObject";
+    versionUrl: "String";
+  };
+  StandardListDefinitionValue: {
+    // field return type name
+    key: "String";
+    label: "String";
+    prefix: "String";
+    suffix: "String";
   };
   SupportMethodResponse: {
     // field return type name
@@ -6768,6 +6835,7 @@ export interface NexusGenFieldTypeNames {
     selectedDocumentTheme: "OrganizationTheme";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
+    standardListDefinitions: "StandardListDefinition";
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
@@ -8247,6 +8315,10 @@ export interface NexusGenArgTypes {
       metadata: NexusGenScalars["JSONObject"]; // JSONObject!
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
     };
+    updateStandardListDefinitions: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+    };
     updateTag: {
       // args
       data: NexusGenInputs["UpdateTagInput"]; // UpdateTagInput!
@@ -8657,6 +8729,11 @@ export interface NexusGenArgTypes {
     remindersOptOut: {
       // args
       keycode: string; // ID!
+    };
+    standardListDefinition: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
     };
     tags: {
       // args

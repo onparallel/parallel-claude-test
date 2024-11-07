@@ -31,7 +31,6 @@ describe("petitionIsCompleted", () => {
                 type: "SHORT_TEXT",
                 options: {},
                 optional: false,
-                parent: { id: 3425 },
                 replies: [
                   {
                     content: { value: "AA" },
@@ -50,7 +49,6 @@ describe("petitionIsCompleted", () => {
                 replies: [],
                 visibility: null,
                 math: null,
-                parent: { id: 3425 },
               },
             ],
             replies: [
@@ -89,7 +87,9 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       }),
     ).toBeTrue();
   });
@@ -177,9 +177,6 @@ describe("petitionIsCompleted", () => {
                 visibility: null,
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3425,
-                },
                 replies: [
                   {
                     content: {
@@ -212,16 +209,15 @@ describe("petitionIsCompleted", () => {
                 },
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3425,
-                },
                 replies: [],
               },
             ],
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       }),
     ).toBeTrue();
   });
@@ -357,9 +353,6 @@ describe("petitionIsCompleted", () => {
                 visibility: null,
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3425,
-                },
                 replies: [
                   {
                     content: {
@@ -398,9 +391,6 @@ describe("petitionIsCompleted", () => {
                 },
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3425,
-                },
                 replies: [
                   {
                     content: {
@@ -444,7 +434,9 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       }),
     ).toBeTrue();
   });
@@ -622,9 +614,6 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [
                     {
                       content: {
@@ -669,9 +658,6 @@ describe("petitionIsCompleted", () => {
                   },
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [
                     {
                       content: {
@@ -704,7 +690,9 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
-          custom_lists: [],
+          customLists: [],
+          automaticNumberingConfig: null,
+          standardListDefinitions: [],
         },
         true,
       ),
@@ -884,9 +872,6 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [
                     {
                       content: {
@@ -931,9 +916,6 @@ describe("petitionIsCompleted", () => {
                   },
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [
                     {
                       content: {
@@ -966,7 +948,9 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
-          custom_lists: [],
+          customLists: [],
+          automaticNumberingConfig: null,
+          standardListDefinitions: [],
         },
         false,
       ),
@@ -1015,9 +999,6 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [],
                 },
                 {
@@ -1032,9 +1013,6 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [],
                 },
               ],
@@ -1068,7 +1046,9 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
-          custom_lists: [],
+          customLists: [],
+          automaticNumberingConfig: null,
+          standardListDefinitions: [],
         },
         true,
       ),
@@ -1159,9 +1139,6 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [
                     {
                       content: {
@@ -1183,16 +1160,15 @@ describe("petitionIsCompleted", () => {
                   visibility: null,
                   math: null,
                   optional: false,
-                  parent: {
-                    id: 3425,
-                  },
                   replies: [],
                 },
               ],
             },
           ],
           variables: [],
-          custom_lists: [],
+          customLists: [],
+          automaticNumberingConfig: null,
+          standardListDefinitions: [],
         },
         true,
       ),
@@ -1244,7 +1220,9 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       }),
     ).toBeFalse();
   });
@@ -1345,9 +1323,6 @@ describe("petitionIsCompleted", () => {
                 visibility: null,
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3448,
-                },
                 replies: [
                   {
                     content: {
@@ -1369,9 +1344,6 @@ describe("petitionIsCompleted", () => {
                 visibility: null,
                 math: null,
                 optional: false,
-                parent: {
-                  id: 3448,
-                },
                 replies: [
                   {
                     content: {
@@ -1385,8 +1357,80 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       }),
     ).toBeFalse();
+  });
+
+  it("should be completed if IS_IN_LIST condition hides an incomplete field", () => {
+    expect(
+      petitionIsCompleted({
+        fields: [
+          {
+            id: 3280,
+            is_internal: false,
+            type: "HEADING",
+            options: {
+              hasPageBreak: false,
+            },
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
+          },
+          {
+            id: 3425,
+            is_internal: false,
+            type: "SELECT",
+            options: {
+              standardList: "COUNTRIES",
+              values: [],
+            },
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [
+              {
+                content: { value: "AR" },
+                anonymized_at: null,
+              },
+            ],
+          },
+          {
+            id: 3445,
+            is_internal: false,
+            type: "SHORT_TEXT",
+            options: {},
+            visibility: {
+              type: "HIDE",
+              operator: "AND",
+              conditions: [
+                {
+                  value: "GAFI_BLACKLIST",
+                  fieldId: 3425,
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                },
+              ],
+            },
+            math: null,
+            optional: false,
+            replies: [],
+          },
+        ],
+        variables: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [
+          {
+            listName: "GAFI_BLACKLIST",
+            values: [{ key: "AR" }, { key: "BR" }, { key: "UY" }],
+          },
+        ],
+      }),
+    ).toBeTrue();
   });
 });

@@ -1,8 +1,8 @@
 import { PropsWithChildren, useContext, useMemo } from "react";
 import { isNullish } from "remeda";
 import { FieldLogicResult } from "../../../util/fieldLogic";
-import { buildPetitionVariablesLiquidScope } from "../../../util/liquidScope";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
+import { buildPetitionVariablesLiquidScope } from "./liquidScope";
 
 export function LiquidPetitionVariableProvider({
   logic,

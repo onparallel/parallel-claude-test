@@ -2500,6 +2500,11 @@
     "context": "Individual"
   },
   {
+    "term": "component.custom-list-details.options-included",
+    "definition": "Opciones incluidas:",
+    "context": "Options included:"
+  },
+  {
     "term": "component.date-range-picker-button.clear-range",
     "definition": "Vaciar rango de fechas",
     "context": "Clear date range"
@@ -5835,6 +5840,11 @@
     "context": "Add condition"
   },
   {
+    "term": "component.petition-field-logic-condition-editor.view-list-content",
+    "definition": "Ver contenido de la lista",
+    "context": "View list contents"
+  },
+  {
     "term": "component.petition-field-logic-condition-subject-select.group-fields",
     "definition": "Campos",
     "context": "Fields"
@@ -6050,9 +6060,19 @@
     "context": "all"
   },
   {
+    "term": "component.petition-field-visibility-editor.all-is-in-list-select",
+    "definition": "todas están en la lista",
+    "context": "all are in list"
+  },
+  {
     "term": "component.petition-field-visibility-editor.any",
     "definition": "alguna",
     "context": "any"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.any-is-in-list-select",
+    "definition": "alguna está en la lista",
+    "context": "any is in list"
   },
   {
     "term": "component.petition-field-visibility-editor.contain-choice",
@@ -6128,6 +6148,11 @@
     "term": "component.petition-field-visibility-editor.none",
     "definition": "ninguna",
     "context": "none"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.none-is-in-list-select",
+    "definition": "ninguna está en la lista",
+    "context": "none is in list"
   },
   {
     "term": "component.petition-field-visibility-editor.not-contain-choice",
@@ -10505,6 +10530,26 @@
     "context": "What would you like to do with them?"
   },
   {
+    "term": "component.standard-list-details-dialog.alternative-text",
+    "definition": "Los parallels creados a partir de esta plantilla conservarán la versión vigente en ese momento.",
+    "context": "Parallels created from this template will retain the version currently in force."
+  },
+  {
+    "term": "component.standard-list-details-dialog.list-version",
+    "definition": "Versión del listado: {version}",
+    "context": "List version: {version}"
+  },
+  {
+    "term": "component.standard-list-details-dialog.options-included",
+    "definition": "Opciones incluidas:",
+    "context": "Options included:"
+  },
+  {
+    "term": "component.standard-list-details-dialog.source",
+    "definition": "Fuente: {source}",
+    "context": "Source: {source}"
+  },
+  {
     "term": "component.standard-list-select.cnae",
     "definition": "Códigos CNAE",
     "context": "CNAE codes"
@@ -12498,6 +12543,11 @@
     "term": "generic.first-child-visibility-conditions-error",
     "definition": "El primer campo de un grupo no puede tener condiciones.",
     "context": "You cannot set conditions for the first field in a group."
+  },
+  {
+    "term": "generic.flag-of",
+    "definition": "Bandera de {country}",
+    "context": "Flag of {country}"
   },
   {
     "term": "generic.folder",

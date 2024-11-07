@@ -1,10 +1,10 @@
 import ReactPDF, { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, pick, sortBy, sumBy, times, zip } from "remeda";
+import { isNonNullish, isNullish, sortBy, sumBy, times, zip } from "remeda";
 import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { FORMATS, prettifyTimezone } from "../../../util/dates";
-import { FieldLogicResult, evaluateFieldLogic } from "../../../util/fieldLogic";
+import { FieldLogicResult } from "../../../util/fieldLogic";
 import { fileSize } from "../../../util/fileSize";
 import { formatNumberWithPrefix } from "../../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -12,9 +12,9 @@ import { titleize } from "../../../util/strings";
 import { MaybeArray, UnwrapArray } from "../../../util/types";
 import {
   PetitionExport_PetitionBaseFragment,
+  PetitionExport_petitionDocument,
   PetitionExport_PetitionFieldFragment,
   PetitionExport_PetitionFieldReplyFragment,
-  PetitionExport_petitionDocument,
 } from "../../__types";
 import { FieldActivity } from "../../components/FieldActivity";
 import { FieldDescription } from "../../components/FieldDescription";
@@ -22,6 +22,7 @@ import { NetDocumentsExternalLink } from "../../components/NetDocumentsExternalL
 import { SignaturesBlock } from "../../components/SignaturesBlock";
 import { ThemeProvider } from "../../utils/ThemeProvider";
 import { cleanupText } from "../../utils/cleanupText";
+import { evaluateFieldLogic } from "../../utils/fieldLogic";
 import { LiquidProvider } from "../../utils/liquid/LiquidContext";
 import { LiquidPetitionVariableProvider } from "../../utils/liquid/LiquidPetitionVariableProvider";
 import { LiquidScopeProvider } from "../../utils/liquid/LiquidScopeProvider";
@@ -535,39 +536,7 @@ function approxTextHeight(text: string) {
 function groupFieldsByPages<T extends PetitionExport_PetitionBaseFragment>(
   petition: T,
 ): { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] {
-  const fieldLogic = evaluateFieldLogic({
-    fields: petition.fields.map((field) => ({
-      ...pick(field, ["id", "type", "options", "math", "visibility"]),
-      replies: field.replies.map((reply) => ({
-        content: reply.content,
-        anonymized_at: reply.isAnonymized ? new Date() : null,
-        children:
-          reply.children?.map((child) => ({
-            field: pick(child.field, ["id"]),
-            replies: child.replies.map((r) => ({
-              content: r.content,
-              anonymized_at: r.isAnonymized ? new Date() : null,
-            })),
-          })) ?? null,
-      })),
-      children:
-        field.children?.map((child) => ({
-          ...pick(child, ["id", "type", "options", "math", "visibility", "parent"]),
-          replies: child.replies.map((reply) => ({
-            content: reply.content,
-            anonymized_at: reply.isAnonymized ? new Date() : null,
-          })),
-        })) ?? null,
-    })),
-    variables: petition.variables.map((v) => ({
-      name: v.name,
-      default_value: v.defaultValue,
-    })),
-    custom_lists: petition.customLists,
-    automatic_numbering_config: petition.automaticNumberingConfig
-      ? { numbering_type: petition.automaticNumberingConfig.numberingType }
-      : null,
-  });
+  const fieldLogic = evaluateFieldLogic(petition);
 
   const pages: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] = [];
   let page: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[] = [];
@@ -672,7 +641,6 @@ PetitionExport.fragments = {
         showActivityInPdf
         visibility
         math
-        options
         multiple
       }
     `;

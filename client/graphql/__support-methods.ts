@@ -1129,6 +1129,34 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updateStandardListDefinitions",
+      description: "Updates the standard list definitions with values defined in excel file",
+      args: [
+        {
+          name: "file",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Upload", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "uploadUserAvatar",
       description: "Uploads a user avatar image",
       args: [

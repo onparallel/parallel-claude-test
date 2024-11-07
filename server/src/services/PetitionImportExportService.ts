@@ -300,7 +300,11 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     for (const field of allJsonFields) {
       validateFieldOptions(field.type, field.options);
-      await validateFieldLogic(field, allJsonFields, variables);
+      await validateFieldLogic(field, allJsonFields, {
+        variables,
+        customLists: json.customLists,
+        standardListDefinitions: [],
+      });
     }
 
     return await this.petitions.withTransaction(async (t) => {
@@ -380,7 +384,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
           // update math conditions after creating the field in DB, as they may reference themselves
           if (isNonNullish(field.math)) {
-            const updatedMath = (field.math as PetitionFieldMath[]).map((math) => ({
+            const updatedMath = field.math.map((math) => ({
               ...math,
               conditions: math.conditions.map((c) => {
                 if ("fieldId" in c) {

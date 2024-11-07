@@ -1,147 +1,27 @@
 /**
- * Similar code is also on /client/utils/fieldLogic/fieldLogic.ts
+ * Similar code is also on /server/src/utils/fieldLogic.ts
  * Don't forget to update it as well!
  */
 
-import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe, zip } from "remeda";
+import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionFieldType } from "../db/__types";
-import { completedFieldReplies } from "./completedFieldReplies";
-import { letters, numbers, romanNumerals } from "./generators";
-import { UnwrapArray } from "./types";
+import { PetitionFieldType } from "../../db/__types";
 
-export interface PetitionFieldLogic {
-  visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
-}
-export interface PetitionFieldVisibility {
-  type: PetitionFieldVisibilityType;
-  operator: PetitionFieldLogicConditionLogicalJoin;
-  conditions: PetitionFieldLogicCondition[];
-}
-
-export type PetitionFieldVisibilityType = "SHOW" | "HIDE";
-
-export type PetitionFieldLogicConditionLogicalJoin = "AND" | "OR";
-
-export type PetitionFieldLogicCondition =
-  | PetitionFieldLogicFieldCondition
-  | PetitionFieldLogicVariableCondition;
-
-interface PetitionFieldLogicFieldCondition extends PetitionFieldLogicConditionBase {
-  modifier: PetitionFieldLogicConditionMultipleValueModifier;
-  fieldId: number;
-  column?: number;
-}
-
-export interface PetitionFieldLogicVariableCondition extends PetitionFieldLogicConditionBase {
-  variableName: string;
-}
-
-interface PetitionFieldLogicConditionBase {
-  operator: PetitionFieldLogicConditionOperator;
-  value: string | string[] | number | null;
-}
-
-export type PetitionFieldLogicConditionMultipleValueModifier =
-  | "ANY"
-  | "ALL"
-  | "NONE"
-  | "NUMBER_OF_REPLIES";
-
-type PetitionFieldLogicConditionListOperator =
-  | "IS_IN_LIST"
-  | "NOT_IS_IN_LIST"
-  | "ALL_IS_IN_LIST"
-  | "ANY_IS_IN_LIST"
-  | "NONE_IS_IN_LIST";
-
-function isFieldLogicConditionListOperator(
-  operator: PetitionFieldLogicConditionOperator,
-): operator is PetitionFieldLogicConditionListOperator {
-  return [
-    "IS_IN_LIST",
-    "NOT_IS_IN_LIST",
-    "ALL_IS_IN_LIST",
-    "ANY_IS_IN_LIST",
-    "NONE_IS_IN_LIST",
-  ].includes(operator);
-}
-
-export type PetitionFieldLogicConditionOperator =
-  | "EQUAL"
-  | "NOT_EQUAL"
-  | "START_WITH"
-  | "END_WITH"
-  | "CONTAIN"
-  | "NOT_CONTAIN"
-  | "IS_ONE_OF"
-  | "NOT_IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL"
-  | "NUMBER_OF_SUBREPLIES"
-  | PetitionFieldLogicConditionListOperator;
-
-export interface PetitionFieldMath {
-  operator: PetitionFieldLogicConditionLogicalJoin;
-  conditions: PetitionFieldLogicCondition[];
-  operations: PetitionFieldMathOperation[];
-}
-
-type PetitionFieldMathOperand =
-  | { type: "NUMBER"; value: number }
-  | { type: "FIELD"; fieldId: number }
-  | { type: "VARIABLE"; name: string };
-
-export type PetitionFieldMathOperator =
-  | "ASSIGNATION"
-  | "ADDITION"
-  | "SUBSTRACTION"
-  | "MULTIPLICATION"
-  | "DIVISION";
-
-export interface PetitionFieldMathOperation {
-  variable: string;
-  operand: PetitionFieldMathOperand;
-  operator: PetitionFieldMathOperator;
-}
-
-interface FieldLogic {
-  isVisible: boolean;
-  headerNumber?: string | null;
-  previousVariables: Record<string, number>;
-  currentVariables: Record<string, number>;
-  finalVariables: Record<string, number>;
-}
-
-export interface FieldLogicResult extends FieldLogic {
-  groupChildrenLogic?: FieldLogicChildLogicResult[][];
-}
-
-interface FieldLogicChildLogicResult extends FieldLogic {}
-
-interface FieldLogicPetitionFieldReplyInner {
-  content: any;
-  anonymized_at: Date | null;
-}
-
-interface FieldLogicPetitionFieldInner {
-  id: number;
-  type: PetitionFieldType;
-  options: any;
-  visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
-}
-interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
-  children?:
-    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
-    | null;
-  replies: (FieldLogicPetitionFieldReplyInner & {
-    children?: { field: { id: number }; replies: FieldLogicPetitionFieldReplyInner[] }[] | null;
-  })[];
-}
+import {
+  FieldLogicResult,
+  PetitionFieldLogicConditionOperator,
+  PetitionFieldLogicVariableCondition,
+} from "../../util/fieldLogic";
+import { letters, numbers, romanNumerals } from "../../util/generators";
+import { UnwrapArray } from "../../util/types";
+import {
+  PetitionFieldLogicCondition,
+  PetitionFieldLogicFieldCondition,
+  PetitionFieldMath,
+  PetitionFieldMathOperand,
+  PetitionFieldMathOperation,
+  PetitionFieldVisibility,
+} from "./types";
 
 export interface FieldLogicPetitionInput {
   variables: { name: string; defaultValue: number }[];
@@ -151,120 +31,26 @@ export interface FieldLogicPetitionInput {
   fields: FieldLogicPetitionFieldInput[];
 }
 
-export function mapFieldLogic<
-  TIn extends number | string,
-  TOut extends number | string = TIn extends number ? string : number,
->(
-  field: { visibility?: PetitionFieldVisibility | null; math?: PetitionFieldMath[] | null },
-  idMapper: (id: TIn) => TOut,
-) {
-  const lists = new Set<string>();
-  return {
-    field: {
-      visibility: field.visibility
-        ? mapFieldVisibility(field.visibility, idMapper, (listName) => lists.add(listName))
-        : null,
-      math: field.math
-        ? mapFieldMath(field.math, idMapper, (listName) => lists.add(listName))
-        : null,
-    },
-    referencedLists: Array.from(lists),
-  };
+interface FieldLogicPetitionFieldReplyInner {
+  id: string;
+  content: any;
+  isAnonymized: boolean;
 }
 
-function mapFieldVisibility<
-  TIn extends number | string,
-  TOut extends number | string = TIn extends number ? string : number,
->(
-  visibility: PetitionFieldVisibility,
-  idMapper: (fieldId: TIn) => TOut,
-  onStandardListReferenced: (listName: string) => void,
-) {
-  return {
-    ...visibility,
-    conditions: visibility.conditions.map((c) =>
-      mapFieldLogicCondition(c, idMapper, onStandardListReferenced),
-    ),
-  };
+interface FieldLogicPetitionFieldInner {
+  id: string;
+  type: PetitionFieldType;
+  options: any;
+  visibility: any | null;
+  math: any[] | null;
 }
-
-function mapFieldMath<
-  TIn extends number | string,
-  TOut extends number | string = TIn extends number ? string : number,
->(
-  math: PetitionFieldMath[],
-  idMapper: (fieldId: TIn) => TOut,
-  onStandardListReferenced: (listName: string) => void,
-) {
-  return math.map((m) => ({
-    ...m,
-    conditions: m.conditions.map((c) =>
-      mapFieldLogicCondition(c, idMapper, onStandardListReferenced),
-    ),
-    operations: m.operations.map((op) => mapFieldMathOperation(op, idMapper)),
-  }));
-}
-
-/** maps fieldIds inside logic condition from globalId to number and vice-versa */
-function mapFieldLogicCondition<
-  TIn extends number | string,
-  TOut extends number | string = TIn extends number ? string : number,
->(
-  c: PetitionFieldLogicCondition,
-  idMapper: (fieldId: TIn) => TOut,
-  onStandardListReferenced: (listName: string) => void,
-) {
-  if (isFieldLogicConditionListOperator(c.operator) && typeof c.value === "string") {
-    onStandardListReferenced(c.value);
-  }
-
-  if ("fieldId" in c) {
-    return {
-      ...c,
-      fieldId: idMapper(c.fieldId as TIn),
-    };
-  } else {
-    return c;
-  }
-}
-
-/** maps fieldIds inside math operation from globalId to number and vice-versa */
-function mapFieldMathOperation<
-  TIn extends number | string,
-  TOut extends number | string = TIn extends number ? string : number,
->(op: PetitionFieldMathOperation, idMapper: (fieldId: TIn) => TOut) {
-  function mapFieldMathOperand(operand: PetitionFieldMathOperand) {
-    if (operand.type === "FIELD") {
-      return {
-        ...operand,
-        fieldId: idMapper(operand.fieldId as TIn),
-      };
-    } else {
-      return operand;
-    }
-  }
-
-  return {
-    ...op,
-    operand: mapFieldMathOperand(op.operand),
-  };
-}
-
-export function applyFieldVisibility<T extends FieldLogicPetitionInput>(petition: T): T["fields"] {
-  return zip(petition.fields, evaluateFieldLogic(petition))
-    .filter(([, { isVisible }]) => isVisible)
-    .map(([field, { groupChildrenLogic }]) => ({
-      ...field,
-      replies: field.replies.map((r, groupIndex) => ({
-        ...r,
-        children:
-          field.type === "FIELD_GROUP"
-            ? r.children!.filter(
-                (_, childReplyIndex) => groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible,
-              )
-            : undefined,
-      })),
-    }));
+interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+  children?:
+    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | null;
+  replies: (FieldLogicPetitionFieldReplyInner & {
+    children?: { field: { id: string }; replies: FieldLogicPetitionFieldReplyInner[] }[] | null;
+  })[];
 }
 
 export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogicResult[] {
@@ -690,4 +476,37 @@ function applyMathOperation(
     result = NaN;
   }
   currentVariables[operation.variable] = result;
+}
+
+interface PartialField {
+  type: PetitionFieldType;
+  options: any;
+  replies: { content: any; isAnonymized: boolean }[];
+}
+
+// ALERT: Same logic in completedFieldReplies in client side
+/** returns the field replies that are fully completed */
+function completedFieldReplies(field: PartialField) {
+  if (field.replies.every((r) => r.isAnonymized)) {
+    return field.replies;
+  }
+  switch (field.type) {
+    case "DYNAMIC_SELECT":
+      return field.replies.filter((reply) =>
+        reply.content.value.every(([, value]: [string, string | null]) => !!value),
+      );
+    case "CHECKBOX":
+      return field.replies.filter((reply) => {
+        if (field.options.limit.type === "EXACT") {
+          return reply.content.value.length === field.options.limit.max;
+        } else {
+          return reply.content.value.length >= field.options.limit.min;
+        }
+      });
+    case "FIELD_GROUP":
+      // we don't verify that every field of a FIELD_GROUP reply is completed
+      return field.replies;
+    default:
+      return field.replies;
+  }
 }

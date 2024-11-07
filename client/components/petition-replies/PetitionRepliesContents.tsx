@@ -17,7 +17,7 @@ import {
   SignatureOrgIntegrationEnvironment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
 import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";

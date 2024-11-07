@@ -1,7 +1,7 @@
 import { Drop } from "liquidjs";
 import { PropsWithChildren, useContext, useMemo } from "react";
 import { isNullish } from "remeda";
-import { FieldLogic } from "../fieldLogic/useFieldLogic";
+import { FieldLogic } from "../fieldLogic/types";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
 
 export function LiquidPetitionVariableProvider({

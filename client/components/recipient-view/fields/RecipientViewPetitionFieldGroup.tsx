@@ -30,7 +30,7 @@ import {
   RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldGroup_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";

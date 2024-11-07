@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { filterPetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { zip } from "remeda";
 import { PetitionFieldIndex } from "./fieldIndices";
-import { FieldLogic } from "./fieldLogic/useFieldLogic";
+import { FieldLogic } from "./fieldLogic/types";
 import { isFileTypeField } from "./isFileTypeField";
 
 export type PetitionFieldFilterType =

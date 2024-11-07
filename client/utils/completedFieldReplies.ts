@@ -8,7 +8,7 @@ import {
   completedFieldReplies_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { isNonNullish, zip } from "remeda";
-import { FieldLogicResult } from "./fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "./fieldLogic/types";
 import { ArrayUnionToUnion } from "./types";
 
 type PetitionFieldSelection =

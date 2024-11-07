@@ -1,20 +1,21 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { findLast, isNonNullish, isNullish, minBy, pick } from "remeda";
+import { assert } from "ts-essentials";
 import {
   ContactLocaleValues,
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
+  StandardListDefinitionListTypeValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import {
+  mapFieldLogic,
   PetitionFieldMath,
   PetitionFieldVisibility,
-  mapFieldLogicCondition,
-  mapFieldMathOperation,
 } from "../../../util/fieldLogic";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
@@ -401,6 +402,21 @@ export const PetitionBase = interfaceType({
       description: "The automatic numbering settings of the petition.",
       resolve: async (o) => {
         return o.automatic_numbering_config;
+      },
+    });
+    t.nonNull.list.nonNull.field("standardListDefinitions", {
+      type: "StandardListDefinition",
+      description: "Lists every available standard list to be used in field logic conditions",
+      resolve: async (o, _, ctx) => {
+        const definitions = await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(
+          o.id,
+        );
+
+        if (o.is_template) {
+          return definitions.map((d) => ({ ...d, list_version: null }));
+        }
+
+        return definitions;
       },
     });
   },
@@ -831,11 +847,14 @@ export const PetitionField = objectType({
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
         if (isNonNullish(o.visibility)) {
+          // map numeric IDs to GlobalId
           const visibility = o.visibility as PetitionFieldVisibility;
-          return {
-            ...visibility,
-            conditions: visibility.conditions.map((c) => mapFieldLogicCondition(c)),
-          };
+          return (
+            mapFieldLogic<number>({ visibility }, (fieldId) => {
+              assert(typeof fieldId === "number", "Expected fieldId to be a number");
+              return toGlobalId("PetitionField", fieldId);
+            }).field.visibility ?? null
+          );
         }
 
         return null;
@@ -845,12 +864,14 @@ export const PetitionField = objectType({
       description: "A JSON object representing the math to be performed on the field",
       resolve: (o) => {
         if (isNonNullish(o.math)) {
+          // map numeric IDs to GlobalId
           const math = o.math as PetitionFieldMath[];
-          return math.map((m) => ({
-            ...m,
-            conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
-            operations: m.operations.map((op) => mapFieldMathOperation(op)),
-          }));
+          return (
+            mapFieldLogic<number>({ math }, (fieldId) => {
+              assert(typeof fieldId === "number", "Expected fieldId to be a number");
+              return toGlobalId("PetitionField", fieldId);
+            }).field.math ?? null
+          );
         }
 
         return null;
@@ -1590,4 +1611,44 @@ export const PetitionFieldGroupRelationship = objectType({
       }),
     });
   },
+});
+
+export const StandardListDefinitionListType = enumType({
+  name: "StandardListDefinitionListType",
+  members: StandardListDefinitionListTypeValues,
+});
+
+export const StandardListDefinition = objectType({
+  name: "StandardListDefinition",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "StandardListDefinition" });
+    t.nonNull.localizableUserText("title", { resolve: (o) => o.title });
+    t.nonNull.string("listName", { resolve: (o) => o.list_name });
+    t.nullable.date("listVersion", { resolve: (o) => o.list_version });
+    t.nonNull.jsonObject("versionFormat", { resolve: (o) => o.version_format });
+    t.nonNull.field("listType", {
+      type: "StandardListDefinitionListType",
+      resolve: (o) => o.list_type,
+    });
+    t.nonNull.list.nonNull.field("values", {
+      type: objectType({
+        name: "StandardListDefinitionValue",
+        definition(t) {
+          t.nonNull.string("key");
+          t.nullable.string("label");
+          t.nullable.string("prefix");
+          t.nullable.string("suffix");
+        },
+      }),
+    });
+    t.nonNull.string("source", { resolve: (o) => o.source_name });
+    t.nullable.string("sourceUrl", { resolve: (o) => o.source_url });
+    t.nullable.string("versionUrl", { resolve: (o) => o.version_url });
+  },
+  sourceType: /* ts */ `
+    Replace<db.StandardListDefinition, {
+      list_version: string | null;
+      values: { key: string; prefix?: string; suffix?: string, label?: string }[];
+    }>
+  `,
 });

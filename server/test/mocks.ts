@@ -227,6 +227,7 @@ export class MockDowJonesClient implements IDowJonesClient {
 
 @injectable()
 export class MockBackgroundCheckService implements IBackgroundCheckService {
+  constructor() {}
   async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
     if (query.type === "PERSON") {
       return {

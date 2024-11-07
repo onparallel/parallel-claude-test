@@ -16,6 +16,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
+import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwriteOptionsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
 import { SettingsRow } from "../rows/SettingsRow";
@@ -127,8 +128,19 @@ export function PetitionComposeCheckboxSettings({
       },
     });
   };
-  const handleFieldEdit = (data: UpdatePetitionFieldInput) => {
-    onFieldEdit(field.id, data);
+
+  const showConfirmOverwriteOptionsDialog = useConfirmOverwriteOptionsDialog();
+
+  const handleFieldEdit = async (data: UpdatePetitionFieldInput) => {
+    try {
+      if (
+        field.options.values.length &&
+        field.options?.standardList !== data.options?.standardList
+      ) {
+        await showConfirmOverwriteOptionsDialog();
+      }
+      onFieldEdit(field.id, data);
+    } catch {}
   };
 
   const selectedStandardList = field.options?.standardList;

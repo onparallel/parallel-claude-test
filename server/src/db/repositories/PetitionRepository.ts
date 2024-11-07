@@ -31,12 +31,7 @@ import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
-import {
-  PetitionFieldMath,
-  PetitionFieldVisibility,
-  applyFieldVisibility,
-  evaluateFieldLogic,
-} from "../../util/fieldLogic";
+import { applyFieldVisibility, evaluateFieldLogic, mapFieldLogic } from "../../util/fieldLogic";
 import { fieldReplyContent } from "../../util/fieldReplyContent";
 import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -75,6 +70,7 @@ import {
   CreatePetitionSignatureRequest,
   CreatePublicPetitionLink,
   CreatePublicPetitionLinkPrefillData,
+  CreateStandardListDefinition,
   OrgIntegration,
   Petition,
   PetitionAccess,
@@ -97,6 +93,7 @@ import {
   PetitionUserNotificationType,
   ProfileRelationshipTypeDirection,
   PublicPetitionLink,
+  StandardListDefinition,
   TemplateDefaultPermission,
   User,
 } from "../__types";
@@ -129,29 +126,6 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
-
-interface ComposedPetitionField extends PetitionField {
-  children: Maybe<
-    (PetitionField & {
-      parent: Maybe<PetitionField>;
-      replies: PetitionFieldReply[]; // children replies NOT GROUPED
-    })[]
-  >;
-  replies: (PetitionFieldReply & {
-    children: Maybe<
-      {
-        field: PetitionField;
-        replies: PetitionFieldReply[]; // children replies grouped by parentReplyId
-      }[]
-    >;
-  })[];
-}
-
-export interface ComposedPetition {
-  fields: ComposedPetitionField[];
-  variables: PetitionVariable[];
-  custom_lists: PetitionCustomList[];
-}
 
 export interface PetitionVariable {
   name: string;
@@ -1622,7 +1596,10 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async createPetition(
-    data: Omit<TableCreateTypes["petition"], "org_id" | "document_organization_theme_id">,
+    data: Omit<
+      TableCreateTypes["petition"],
+      "org_id" | "document_organization_theme_id" | "standard_list_definition_override"
+    >,
     user: User,
     skipFields?: boolean,
     t?: Knex.Transaction,
@@ -1645,6 +1622,7 @@ export class PetitionRepository extends BaseRepository {
           status: data.is_template ? null : (data.status ?? "DRAFT"),
           variables: this.json(data.variables ?? []),
           custom_lists: this.json(data.custom_lists ?? []),
+          standard_list_definition_override: this.json([]),
           ...omit(data, ["status", "variables", "custom_lists"]),
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
@@ -1848,7 +1826,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   private validateFieldReorder(
-    allFields: PetitionField[],
+    allFields: TableTypes["petition_field"][],
     fieldIds: number[],
     parentFieldId: Maybe<number> = null,
   ) {
@@ -1903,7 +1881,7 @@ export class PetitionRepository extends BaseRepository {
         (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
       )) {
         if (isNonNullish(field.visibility)) {
-          for (const condition of (field.visibility as PetitionFieldVisibility).conditions) {
+          for (const condition of field.visibility.conditions) {
             if ("fieldId" in condition) {
               const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
               validateReferencingFieldsPositions(field, referencedField, reorderedFields);
@@ -1912,7 +1890,7 @@ export class PetitionRepository extends BaseRepository {
         }
 
         if (isNonNullish(field.math)) {
-          for (const math of field.math as PetitionFieldMath[]) {
+          for (const math of field.math) {
             for (const condition of math.conditions) {
               if ("fieldId" in condition) {
                 const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
@@ -2117,7 +2095,7 @@ export class PetitionRepository extends BaseRepository {
     // if so, we need to update the cloned field math to reference to the cloned field id instead of the original field id
     const clonedFieldsForMathUpdate = clonedFields
       .filter(({ originalFieldId, cloned }) =>
-        (cloned.math as PetitionFieldMath[] | null)?.some(
+        cloned.math?.some(
           (m) =>
             m.conditions.some((c) => "fieldId" in c && c.fieldId === originalFieldId) ||
             m.operations.some(
@@ -2127,32 +2105,9 @@ export class PetitionRepository extends BaseRepository {
       )
       .map(({ originalFieldId, cloned }) => ({
         id: cloned.id,
-        math: (cloned.math as PetitionFieldMath[]).map((m) => ({
-          ...m,
-          conditions: m.conditions.map((c) => {
-            if ("fieldId" in c && c.fieldId === originalFieldId) {
-              return {
-                ...c,
-                fieldId: cloned.id,
-              };
-            } else {
-              return c;
-            }
-          }),
-          operations: m.operations.map((op) => {
-            if (op.operand.type === "FIELD" && op.operand.fieldId === originalFieldId) {
-              return {
-                ...op,
-                operand: {
-                  ...op.operand,
-                  fieldId: cloned.id,
-                },
-              };
-            } else {
-              return op;
-            }
-          }),
-        })),
+        math: mapFieldLogic({ math: cloned.math ?? null }, (fieldId) =>
+          fieldId === originalFieldId ? cloned.id : fieldId,
+        ).field.math,
       }));
 
     if (clonedFieldsForMathUpdate.length > 0) {
@@ -2923,7 +2878,7 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => fieldsByPetition[id] ?? []);
   }
 
-  async getComposedPetitionProperties(petitionIds: number[]) {
+  private async getComposedPetitionProperties(petitionIds: number[]) {
     const properties = await this.from("petition")
       .whereIn("id", petitionIds)
       .whereNull("deleted_at")
@@ -2931,12 +2886,29 @@ export class PetitionRepository extends BaseRepository {
 
     const propertiesByPetitionId = indexBy(properties, (p) => p.id);
 
+    const standardLists = zip(
+      petitionIds,
+      await this.loadResolvedStandardListDefinitionsByPetitionId(petitionIds),
+    );
+
     return petitionIds.map((id) => {
       const petitionProperties = propertiesByPetitionId[id];
       return {
-        variables: petitionProperties?.variables ?? [],
-        custom_lists: petitionProperties?.custom_lists ?? [],
-        automatic_numbering_config: petitionProperties?.automatic_numbering_config ?? null,
+        id,
+        variables: (petitionProperties?.variables ?? []).map((v) => ({
+          name: v.name,
+          defaultValue: v.default_value,
+        })),
+        customLists: petitionProperties?.custom_lists ?? [],
+        automaticNumberingConfig: petitionProperties?.automatic_numbering_config
+          ? { numberingType: petitionProperties.automatic_numbering_config.numbering_type }
+          : null,
+        standardListDefinitions: (
+          standardLists.find(([petitionId]) => petitionId === id)?.[1] ?? []
+        ).map((l) => ({
+          listName: l.list_name,
+          values: l.values,
+        })),
         metadata: petitionProperties?.metadata ?? {},
       };
     });
@@ -2983,6 +2955,14 @@ export class PetitionRepository extends BaseRepository {
         );
 
         return {
+          ...pick(petition, [
+            "id",
+            "variables",
+            "customLists",
+            "automaticNumberingConfig",
+            "standardListDefinitions",
+            "metadata",
+          ]),
           fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
             const fieldChildren =
               field.type === "FIELD_GROUP"
@@ -3016,10 +2996,6 @@ export class PetitionRepository extends BaseRepository {
               replies: fieldReplies,
             };
           }),
-          variables: petition.variables,
-          custom_lists: petition.custom_lists,
-          automatic_numbering_config: petition.automatic_numbering_config,
-          metadata: petition.metadata,
         };
       },
     );
@@ -3193,6 +3169,7 @@ export class PetitionRepository extends BaseRepository {
             sourcePetition.org_id === owner.org_id
               ? sourcePetition.summary_config
               : null,
+          standard_list_definition_override: this.json([]), // will be updated later
           ...data,
         },
         t,
@@ -3253,7 +3230,7 @@ export class PetitionRepository extends BaseRepository {
         ],
       );
 
-      const clonedFields = await this.raw<PetitionField & { from_id: number }>(
+      const clonedFields = await this.raw<TableTypes["petition_field"] & { from_id: number }>(
         /* sql */ `
         with all_petition_fields as (
           select *
@@ -3428,6 +3405,7 @@ export class PetitionRepository extends BaseRepository {
         (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
       );
       if (fieldLogicUpdate.length > 0) {
+        const allReferencedLists: string[] = [];
         // update visibility conditions and math on cloned fields
         await this.raw<PetitionField>(
           /* sql */ `
@@ -3441,60 +3419,24 @@ export class PetitionRepository extends BaseRepository {
           [
             this.sqlValues(
               fieldLogicUpdate.map((field) => {
-                const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
-                const math = field.math as Maybe<PetitionFieldMath[]>;
+                const {
+                  field: { visibility, math },
+                  referencedLists,
+                  // map field visibility and math field IDs into new IDs
+                } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
 
-                return [
-                  field.id,
-                  visibility
-                    ? JSON.stringify({
-                        ...visibility,
-                        conditions: visibility.conditions.map((condition) => {
-                          if ("fieldId" in condition) {
-                            return {
-                              ...condition,
-                              fieldId: newFieldIds[condition.fieldId],
-                            };
-                          } else {
-                            return condition;
-                          }
-                        }),
-                      })
-                    : null,
-                  math
-                    ? JSON.stringify(
-                        math.map((m) => ({
-                          ...m,
-                          operations: m.operations.map((op) => ({
-                            ...op,
-                            operand:
-                              op.operand.type === "FIELD"
-                                ? {
-                                    ...op.operand,
-                                    fieldId: newFieldIds[op.operand.fieldId],
-                                  }
-                                : op.operand,
-                          })),
-                          conditions: m.conditions.map((condition) => {
-                            if ("fieldId" in condition) {
-                              return {
-                                ...condition,
-                                fieldId: newFieldIds[condition.fieldId],
-                              };
-                            } else {
-                              return condition;
-                            }
-                          }),
-                        })),
-                      )
-                    : null,
-                ];
+                allReferencedLists.push(...referencedLists);
+                return [field.id, this.json(visibility), this.json(math)];
               }),
               ["int", "jsonb", "jsonb"],
             ),
           ],
           t,
         );
+
+        if (!cloned.is_template && allReferencedLists.length > 0) {
+          await this.updateStandardListDefinitionOverride(cloned.id, unique(allReferencedLists), t);
+        }
       }
 
       const backgroundCheckFieldsUpdate = clonedFields.filter(
@@ -8932,5 +8874,139 @@ export class PetitionRepository extends BaseRepository {
       .select("id");
 
     return petitions.map((p) => p.id);
+  }
+
+  readonly loadStandardListDefinition = this.buildLoadBy("standard_list_definition", "id");
+
+  readonly loadLatestStandardListDefinitionByName = this.buildLoadBy(
+    "standard_list_definition",
+    "list_name",
+    (q) => q.orderBy("list_version", "desc"),
+  );
+
+  /**
+   * gets definitions for every standard list having in account version overrides defined on the petition
+   */
+  readonly loadResolvedStandardListDefinitionsByPetitionId = this.buildLoader<
+    number,
+    StandardListDefinition[]
+  >(async (ids, t) => {
+    const definitions = await this.raw<StandardListDefinition & { _rank: string }>(
+      /* sql */ `
+      select *, rank() over (partition by list_name order by list_version desc) _rank
+      from standard_list_definition  
+    `,
+      undefined,
+      t,
+    );
+    const petitions = await this.from("petition", t)
+      .whereIn("id", ids)
+      .whereNull("deleted_at")
+      .select(["id", "is_template", "standard_list_definition_override"]);
+
+    return ids.map((id) => {
+      const petition = petitions.find((p) => p.id === id);
+      if (!petition) {
+        return [];
+      }
+      // on templates, always return latest version of each list
+      if (petition.is_template) {
+        return definitions.filter((f) => f._rank === "1");
+      }
+
+      // on petitions, check the overrides
+      return Object.entries(groupBy(definitions, (d) => d.list_name))
+        .map(([listName, definitionVersions]) => {
+          const override = petition.standard_list_definition_override.find(
+            (o) => o.list_name === listName,
+          );
+
+          if (override) {
+            return definitionVersions.find((v) => v.list_version === override.list_version) ?? null;
+          }
+
+          return definitionVersions.find((v) => v._rank === "1") ?? null;
+        })
+        .filter(isNonNullish);
+    });
+  });
+
+  async upsertStandardListDefinitions(data: CreateStandardListDefinition[], createdBy: string) {
+    return await this.raw<StandardListDefinition>(
+      /* sql */ `
+      ? on conflict (list_name, list_version) 
+        do update set
+        title = EXCLUDED.title,
+        values = EXCLUDED.values,
+        source_name = EXCLUDED.source_name,
+        source_url = EXCLUDED.source_url,
+        version_url = EXCLUDED.version_url,
+        version_format = EXCLUDED.version_format,
+        updated_at = now(),
+        updated_by = ?
+      returning *;`,
+      [
+        this.from("standard_list_definition").insert(
+          data.map((d) => ({
+            ...d,
+            version_format: this.json(d.version_format),
+            values: this.json(d.values),
+            created_by: createdBy,
+          })),
+        ),
+        createdBy,
+      ],
+    );
+  }
+
+  async updateStandardListDefinitionOverride(
+    petitionId: number,
+    listNames: string[],
+    t?: Knex.Transaction,
+  ) {
+    if (listNames.length === 0) {
+      return;
+    }
+    const [petition] = await this.from("petition", t)
+      .where("id", petitionId)
+      .whereNull("deleted_at")
+      .select(["is_template", "standard_list_definition_override"]);
+
+    if (petition.is_template) {
+      return;
+    }
+
+    const data = await this.from("standard_list_definition", t)
+      .whereIn("list_name", listNames)
+      .select(["list_name", "list_version"])
+      .orderBy("list_version", "asc");
+
+    const latestByListName = indexBy(data, (d) => d.list_name);
+
+    await this.from("petition", t)
+      .where("id", petitionId)
+      .whereNull("deleted_at")
+      .where("is_template", false)
+      .update({
+        standard_list_definition_override: this.json(
+          unique([
+            ...petition.standard_list_definition_override.map((l) => l.list_name),
+            ...listNames,
+          ]).map((name) => {
+            const usedList = petition.standard_list_definition_override.find(
+              (d) => d.list_name === name,
+            );
+            if (usedList) {
+              return usedList;
+            }
+            const latest = latestByListName[name];
+            assert(latest, `Standard list definition ${name} not found`);
+            return {
+              list_name: name,
+              list_version: latest.list_version,
+            };
+          }),
+        ),
+      });
   }
 }

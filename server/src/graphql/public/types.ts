@@ -1,15 +1,12 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isNonNullish, isNullish, pick } from "remeda";
+import { assert } from "ts-essentials";
 import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../util/BrandTheme";
-import {
-  PetitionFieldMath,
-  PetitionFieldVisibility,
-  mapFieldLogicCondition,
-  mapFieldMathOperation,
-} from "../../util/fieldLogic";
+import { mapFieldLogic, PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -337,6 +334,21 @@ export const PublicPetition = objectType({
         return root.automatic_numbering_config;
       },
     });
+    t.nonNull.list.nonNull.field("standardListDefinitions", {
+      type: "StandardListDefinition",
+      description: "Lists every available standard list to be used in field logic conditions",
+      resolve: async (o, _, ctx) => {
+        const definitions = await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(
+          o.id,
+        );
+
+        if (o.is_template) {
+          return definitions.map((d) => ({ ...d, list_version: null }));
+        }
+
+        return definitions;
+      },
+    });
   },
 });
 
@@ -473,11 +485,14 @@ export const PublicPetitionField = objectType({
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
         if (isNonNullish(o.visibility)) {
+          // map numeric IDs to GlobalId
           const visibility = o.visibility as PetitionFieldVisibility;
-          return {
-            ...visibility,
-            conditions: visibility.conditions.map((c) => mapFieldLogicCondition(c)),
-          };
+          return (
+            mapFieldLogic<number>({ visibility }, (fieldId) => {
+              assert(typeof fieldId === "number", "Expected fieldId to be a number");
+              return toGlobalId("PetitionField", fieldId);
+            }).field.visibility ?? null
+          );
         }
 
         return null;
@@ -487,12 +502,14 @@ export const PublicPetitionField = objectType({
       description: "A JSON object representing the math to be performed on the field",
       resolve: (o) => {
         if (isNonNullish(o.math)) {
+          // map numeric IDs to GlobalId
           const math = o.math as PetitionFieldMath[];
-          return math.map((m) => ({
-            ...m,
-            conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
-            operations: m.operations.map((op) => mapFieldMathOperation(op)),
-          }));
+          return (
+            mapFieldLogic<number>({ math }, (fieldId) => {
+              assert(typeof fieldId === "number", "Expected fieldId to be a number");
+              return toGlobalId("PetitionField", fieldId);
+            }).field.math ?? null
+          );
         }
 
         return null;

@@ -10,6 +10,9 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { InfoCircleIcon } from "@parallel/chakra/icons";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import {
   toSimpleSelectOption,
   useSimpleSelectOptions,
@@ -22,6 +25,7 @@ import {
   PetitionFieldLogicConditionMultipleValueModifier,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldLogic/types";
+import { isCompatibleListType } from "@parallel/utils/isCompatibleListType";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { never } from "@parallel/utils/never";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
@@ -41,8 +45,10 @@ import { assert } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { NumeralInput } from "../../common/NumeralInput";
 import { SimpleOption, SimpleSelect } from "../../common/SimpleSelect";
+import { useCustomListDetailsDialog } from "../dialogs/CustomListDetailsDialog";
+import { useStandardListDetailsDialog } from "../dialogs/StandardListDetailsDialog";
 import { PetitionFieldLogicConditionSubjectSelect } from "./PetitionFieldLogicConditionSubjectSelect";
-import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
+import { PetitionFieldSelection, usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 
 export function PetitionFieldLogicConditionEditor({
   condition,
@@ -181,7 +187,7 @@ function ConditionMultipleValueModifier({
   );
 
   return isReadOnly ? (
-    <>{options.find((o) => o.value === condition.modifier)!.label} </>
+    <>{options.find((o) => o.value === condition.modifier)?.label} </>
   ) : (
     <SimpleSelect
       size="sm"
@@ -232,6 +238,7 @@ function ConditionMultipleValueModifier({
 interface ConditionPredicateProps extends ValueProps<PetitionFieldLogicCondition, false> {
   showErrors?: boolean;
   isReadOnly?: boolean;
+  referencedField?: PetitionFieldSelection;
 }
 
 function ConditionPredicate({
@@ -244,6 +251,7 @@ function ConditionPredicate({
     fieldsWithIndices,
     fieldWithIndex: [field],
     customLists,
+    standardListDefinitions,
   } = usePetitionFieldLogicContext();
   const isFieldCondition = "fieldId" in condition;
   const isVariableCondition = "variableName" in condition;
@@ -255,6 +263,14 @@ function ConditionPredicate({
     ? referencedField.multiple ||
       (isNonNullish(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
     : false;
+
+  const filteredStandardListDefinitions = ["CHECKBOX", "SELECT"].includes(
+    referencedField?.type ?? "",
+  )
+    ? standardListDefinitions.filter(({ listType }) =>
+        isCompatibleListType(listType, referencedField?.options?.standardList),
+      )
+    : [];
   const options = useSimpleSelectOptions(
     (intl) => {
       const options: SimpleOption<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
@@ -349,6 +365,31 @@ function ConditionPredicate({
               value: "NUMBER_OF_SUBREPLIES",
             },
           );
+          if (isReadOnly || filteredStandardListDefinitions.length > 0) {
+            options.push(
+              {
+                label: intl.formatMessage({
+                  id: "component.petition-field-visibility-editor.all-is-in-list-select",
+                  defaultMessage: "all are in list",
+                }),
+                value: "ALL_IS_IN_LIST",
+              },
+              {
+                label: intl.formatMessage({
+                  id: "component.petition-field-visibility-editor.any-is-in-list-select",
+                  defaultMessage: "any is in list",
+                }),
+                value: "ANY_IS_IN_LIST",
+              },
+              {
+                label: intl.formatMessage({
+                  id: "component.petition-field-visibility-editor.none-is-in-list-select",
+                  defaultMessage: "none is in list",
+                }),
+                value: "NONE_IS_IN_LIST",
+              },
+            );
+          }
         } else if (
           referencedField.type === "SELECT" ||
           (referencedField.type === "DYNAMIC_SELECT" && "column" in condition)
@@ -395,7 +436,7 @@ function ConditionPredicate({
               value: "NOT_IS_ONE_OF",
             },
           );
-          if (customLists.length > 0) {
+          if (isReadOnly || customLists.length > 0 || filteredStandardListDefinitions.length > 0) {
             options.push(
               {
                 label: intl.formatMessage(
@@ -513,7 +554,7 @@ function ConditionPredicate({
       }
       return options;
     },
-    [referencedField, isMultipleValue, condition, referencedVariable],
+    [referencedField, isMultipleValue, condition, referencedVariable, isReadOnly],
   );
   const operator =
     isFieldCondition && !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES"
@@ -554,25 +595,40 @@ function ConditionPredicate({
     } else if (
       isFieldCondition &&
       isNonNullish(referencedField) &&
-      ["SELECT", "DYNAMIC_SELECT"].includes(referencedField.type) &&
+      ["SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(referencedField.type) &&
       condition.modifier !== "NUMBER_OF_REPLIES"
     ) {
       assert("fieldId" in condition);
+      const listOperators = [
+        "IS_IN_LIST",
+        "NOT_IS_IN_LIST",
+        "ANY_IS_IN_LIST",
+        "ALL_IS_IN_LIST",
+        "NONE_IS_IN_LIST",
+      ];
+      const equalityOperators = ["EQUAL", "NOT_EQUAL"];
+      const multiSelectOperators = ["IS_ONE_OF", "NOT_IS_ONE_OF"];
+
       const value =
-        ["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(condition.operator) &&
-        !["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(operator)
+        listOperators.includes(condition.operator) && !listOperators.includes(operator)
           ? null
           : condition.value;
+
+      const listName =
+        listOperators.includes(condition.operator) && listOperators.includes(operator)
+          ? value
+          : (customLists?.[0]?.name ?? standardListDefinitions?.[0]?.listName ?? null);
+
       onChange({
         ...condition,
         operator,
         value:
-          ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(value)
+          equalityOperators.includes(operator) && Array.isArray(value)
             ? (value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column))
-            : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) && typeof value === "string"
+            : multiSelectOperators.includes(operator) && typeof value === "string"
               ? [value]
-              : ["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(operator)
-                ? (customLists?.[0]?.name ?? null)
+              : listOperators.includes(operator)
+                ? listName
                 : value,
       });
     } else if (
@@ -582,6 +638,8 @@ function ConditionPredicate({
     ) {
       // override existing "has replies/does not have replies"
       const defaultValue = defaultFieldConditionValue(referencedField, condition.column);
+      const firstListName =
+        customLists?.[0]?.name ?? standardListDefinitions?.[0]?.listName ?? null;
       onChange({
         ...condition,
         operator,
@@ -590,7 +648,15 @@ function ConditionPredicate({
           ? isNonNullish(defaultValue) && typeof defaultValue === "string"
             ? [defaultValue]
             : null
-          : defaultValue,
+          : [
+                "IS_IN_LIST",
+                "NOT_IS_IN_LIST",
+                "ANY_IS_IN_LIST",
+                "ALL_IS_IN_LIST",
+                "NONE_IS_IN_LIST",
+              ].includes(operator)
+            ? firstListName
+            : defaultValue,
       });
     } else {
       onChange({
@@ -602,7 +668,7 @@ function ConditionPredicate({
 
   return isFieldCondition && !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES" ? (
     isReadOnly ? (
-      <Box as="span">{options.find((o) => o.value === operator)!.label}</Box>
+      <Box as="span">{options.find((o) => o.value === operator)?.label}</Box>
     ) : (
       <Box flex="1" minWidth="0">
         <SimpleSelect
@@ -631,7 +697,7 @@ function ConditionPredicate({
     <>
       {isReadOnly ? (
         <>
-          <Box as="span">{options.find((o) => o.value === operator)!.label}</Box>{" "}
+          <Box as="span">{options.find((o) => o.value === operator)?.label}</Box>{" "}
         </>
       ) : (
         <SimpleSelect
@@ -672,12 +738,19 @@ function ConditionPredicate({
             isReadOnly={isReadOnly}
             showErrors={showErrors}
           />
-        ) : condition.operator === "IS_IN_LIST" || condition.operator === "NOT_IS_IN_LIST" ? (
+        ) : [
+            "IS_IN_LIST",
+            "NOT_IS_IN_LIST",
+            "ALL_IS_IN_LIST",
+            "ANY_IS_IN_LIST",
+            "NONE_IS_IN_LIST",
+          ].includes(condition.operator) ? (
           <ConditionPredicateListSelect
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
             showErrors={showErrors}
+            referencedField={referencedField}
           />
         ) : referencedField.type === "CHECKBOX" ||
           referencedField.type === "SELECT" ||
@@ -990,14 +1063,46 @@ function ConditionPredicateValueSelect({
   const isMultiCondition =
     condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
 
-  return isReadOnly ? (
-    isNonNullish(condition.value) &&
-    (Array.isArray(condition.value) ? condition.value.length > 0 : true) ? (
+  if (!isReadOnly) {
+    return (
+      <SimpleSelect
+        size="sm"
+        options={options}
+        isReadOnly={isReadOnly}
+        isInvalid={showErrors && condition.value === null}
+        isMulti={isMultiCondition}
+        value={condition.value as string | string[] | null}
+        onChange={(value) => onChange({ ...condition, value: value })}
+        filterOption={createFilter({
+          // this improves search performance on long lists
+          ignoreAccents: options.length > 1000 ? false : true,
+        })}
+        placeholder={intl.formatMessage({
+          id: "generic.select-an-option",
+          defaultMessage: "Select an option",
+        })}
+        components={options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}}
+        singleLineOptions={options.length > 100}
+        styles={{
+          valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }),
+          option: (styles) => ({
+            ...styles,
+            WebkitLineClamp: "3",
+            padding: "4px 8px",
+          }),
+        }}
+      />
+    );
+  } else {
+    const conditionOptions = options.filter(({ value }) => {
+      return unMaybeArray(condition.value as string | string[]).includes(value);
+    });
+    return isNonNullish(condition.value) && conditionOptions.length > 0 ? (
       <FormattedList
-        value={unMaybeArray(condition.value as string | string[]).map((value, index) => (
+        value={conditionOptions.map(({ label }, index) => (
           <Box as="span" key={index} fontStyle="italic">
             {'"'}
-            {value}
+            {label}
             {'"'}
           </Box>
         ))}
@@ -1007,36 +1112,8 @@ function ConditionPredicateValueSelect({
       <Box as="span" textStyle="hint">
         <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
       </Box>
-    )
-  ) : (
-    <SimpleSelect
-      size="sm"
-      options={options}
-      isReadOnly={isReadOnly}
-      isInvalid={showErrors && condition.value === null}
-      isMulti={isMultiCondition}
-      value={condition.value as string | string[] | null}
-      onChange={(value) => onChange({ ...condition, value: value })}
-      filterOption={createFilter({
-        // this improves search performance on long lists
-        ignoreAccents: options.length > 1000 ? false : true,
-      })}
-      placeholder={intl.formatMessage({
-        id: "generic.select-an-option",
-        defaultMessage: "Select an option",
-      })}
-      components={options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}}
-      singleLineOptions={options.length > 100}
-      styles={{
-        valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }),
-        option: (styles) => ({
-          ...styles,
-          WebkitLineClamp: "3",
-          padding: "4px 8px",
-        }),
-      }}
-    />
-  );
+    );
+  }
 }
 
 function ConditionPredicateValueString({
@@ -1093,40 +1170,100 @@ function ConditionPredicateListSelect({
   value: condition,
   onChange,
   isReadOnly,
+  referencedField,
 }: ConditionPredicateProps) {
   const intl = useIntl();
-  const { customLists } = usePetitionFieldLogicContext();
+  const { customLists, standardListDefinitions, isTemplate } = usePetitionFieldLogicContext();
 
-  const options = useMemo(() => {
-    return customLists.map(({ name }) => toSimpleSelectOption(name)!);
-  }, [customLists]);
+  const options = useSimpleSelectOptions(() => {
+    const customListsOptions = customLists.map(({ name }) => ({
+      value: name,
+      label: name,
+    }));
 
-  return isReadOnly ? (
-    isNonNullish(condition.value) ? (
+    const standardListsOptions = standardListDefinitions
+      .filter(
+        ({ listType }) =>
+          isReadOnly || isCompatibleListType(listType, referencedField?.options?.standardList),
+      )
+      .map(({ title, listName, listVersion, versionFormat }) => ({
+        value: listName,
+        label: isNonNullish(listVersion)
+          ? `${localizableUserTextRender({ intl, value: title, default: "" })} (${intl.formatDate(listVersion, versionFormat)})`
+          : localizableUserTextRender({ intl, value: title, default: "" }),
+      }));
+
+    return customListsOptions.concat(standardListsOptions);
+  }, [customLists, standardListDefinitions]);
+
+  const selectedStandardList = standardListDefinitions.find(
+    ({ listName }) => condition.value === listName,
+  );
+
+  const selectedCustomList = customLists.find((list) => list.name === condition.value);
+
+  const showCustomListDetailsDialog = useCustomListDetailsDialog();
+  const showStandardListDetailsDialog = useStandardListDetailsDialog();
+  const handleViewListDetails = async () => {
+    try {
+      if (isNonNullish(selectedStandardList)) {
+        await showStandardListDetailsDialog({
+          standardListId: selectedStandardList.id,
+          isTemplate,
+        });
+      } else if (isNonNullish(selectedCustomList)) {
+        await showCustomListDetailsDialog({ customList: selectedCustomList });
+      }
+    } catch {}
+  };
+
+  if (!isReadOnly) {
+    return (
+      <HStack>
+        <Box flex="1">
+          <SimpleSelect
+            size="sm"
+            options={options}
+            onChange={(value) => onChange({ ...condition, value })}
+            value={condition.value as string | null}
+            isReadOnly={isReadOnly}
+            isInvalid={showErrors && condition.value === null}
+            styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
+            isSearchable={false}
+            placeholder={intl.formatMessage({
+              id: "generic.select-an-option",
+              defaultMessage: "Select an option",
+            })}
+          />
+        </Box>
+
+        {isNonNullish(selectedStandardList) || isNonNullish(selectedCustomList) ? (
+          <IconButtonWithTooltip
+            size="xs"
+            variant="ghost"
+            icon={<InfoCircleIcon boxSize={4} />}
+            onClick={handleViewListDetails}
+            label={intl.formatMessage({
+              id: "component.petition-field-logic-condition-editor.view-list-content",
+              defaultMessage: "View list contents",
+            })}
+          />
+        ) : null}
+      </HStack>
+    );
+  } else {
+    const conditionOption = options.find(({ value }) => value === condition.value);
+
+    return isNonNullish(condition.value) ? (
       <Box as="span" fontStyle="italic">
         {'"'}
-        {condition.value}
+        {conditionOption?.label ?? condition.value}
         {'"'}
       </Box>
     ) : (
       <Box as="span" textStyle="hint">
         <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
       </Box>
-    )
-  ) : (
-    <SimpleSelect
-      size="sm"
-      options={options}
-      onChange={(value) => onChange({ ...condition, value })}
-      value={condition.value as string | null}
-      isReadOnly={isReadOnly}
-      isInvalid={showErrors && condition.value === null}
-      styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
-      isSearchable={false}
-      placeholder={intl.formatMessage({
-        id: "generic.select-an-option",
-        defaultMessage: "Select an option",
-      })}
-    />
-  );
+    );
+  }
 }

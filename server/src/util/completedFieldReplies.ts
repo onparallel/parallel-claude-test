@@ -1,7 +1,9 @@
-import { PetitionField, PetitionFieldReply } from "../db/__types";
+import { PetitionFieldType } from "../db/__types";
 
-interface PartialField extends Pick<PetitionField, "type" | "options"> {
-  replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
+interface PartialField {
+  type: PetitionFieldType;
+  options: any;
+  replies: { content: any; anonymized_at: Date | null }[];
 }
 
 // ALERT: Same logic in completedFieldReplies in client side

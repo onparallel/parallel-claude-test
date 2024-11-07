@@ -48,7 +48,10 @@ export type PetitionFieldLogicConditionOperator =
   | "LESS_THAN_OR_EQUAL"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL"
-  | "NUMBER_OF_SUBREPLIES";
+  | "NUMBER_OF_SUBREPLIES"
+  | "ANY_IS_IN_LIST"
+  | "ALL_IS_IN_LIST"
+  | "NONE_IS_IN_LIST";
 
 export type PseudoPetitionFieldVisibilityConditionOperator =
   | PetitionFieldLogicConditionOperator
@@ -78,3 +81,17 @@ export interface PetitionFieldMathOperation {
   operand: PetitionFieldMathOperand;
   operator: PetitionFieldMathOperator;
 }
+
+export interface FieldLogic {
+  isVisible: boolean;
+  headerNumber?: string | null;
+  previousVariables: Record<string, number>;
+  currentVariables: Record<string, number>;
+  finalVariables: Record<string, number>;
+}
+
+export interface FieldLogicResult extends FieldLogic {
+  groupChildrenLogic?: FieldLogicChildLogicResult[][];
+}
+
+interface FieldLogicChildLogicResult extends FieldLogic {}

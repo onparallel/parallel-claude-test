@@ -1,60 +1,15 @@
 import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
 import { isNonNullish, zip } from "remeda";
-import { PetitionField, PetitionFieldReply } from "../db/__types";
-import type {
-  AutomaticNumberingConfig,
-  PetitionCustomList,
-  PetitionVariable,
-} from "../db/repositories/PetitionRepository";
-import {
-  DateLiquidValue,
-  DateTimeLiquidValue,
-  WithLabelLiquidValue,
-} from "../pdf/utils/liquid/LiquidValue";
-import { getFieldsWithIndices } from "./fieldIndices";
-import { evaluateFieldLogic, FieldLogicResult } from "./fieldLogic";
-import { isFileTypeField } from "./isFileTypeField";
-import { Maybe } from "./types";
-
-interface InnerPetitionFieldLiquidScope
-  extends Pick<PetitionField, "type" | "multiple" | "alias" | "options" | "visibility" | "math"> {
-  id: string;
-}
-
-interface InnerPetitionFieldReplyLiquidScope
-  extends Pick<PetitionFieldReply, "content" | "anonymized_at"> {}
-
-interface PetitionFieldLiquidScope extends InnerPetitionFieldLiquidScope {
-  children?: Maybe<
-    (InnerPetitionFieldLiquidScope & {
-      parent?: Maybe<Pick<InnerPetitionFieldLiquidScope, "id">>;
-      replies: InnerPetitionFieldReplyLiquidScope[];
-    })[]
-  >;
-  replies: (InnerPetitionFieldReplyLiquidScope & {
-    children?: Maybe<
-      {
-        field: Pick<
-          InnerPetitionFieldLiquidScope,
-          "id" | "type" | "multiple" | "alias" | "options"
-        >;
-        replies: InnerPetitionFieldReplyLiquidScope[];
-      }[]
-    >;
-  })[];
-}
-
-interface PetitionLiquidScope {
-  id: string;
-  fields: PetitionFieldLiquidScope[];
-  variables: PetitionVariable[];
-  custom_lists: PetitionCustomList[];
-  automatic_numbering_config: AutomaticNumberingConfig | null;
-}
+import { PetitionFieldType } from "../../../db/__types";
+import { getFieldsWithIndices } from "../../../util/fieldIndices";
+import { FieldLogicResult } from "../../../util/fieldLogic";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { evaluateFieldLogic } from "../fieldLogic";
+import { DateLiquidValue, DateTimeLiquidValue, WithLabelLiquidValue } from "./LiquidValue";
 
 function getReplyValue(
-  field: Pick<PetitionField, "type" | "options">,
+  field: { type: PetitionFieldType; options: any },
   content: any,
   intl: IntlShape,
 ) {
@@ -90,7 +45,48 @@ function getReplyValue(
   }
 }
 
-export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, intl: IntlShape) {
+interface FieldLogicPetitionFieldReplyInner {
+  id: string;
+  content: any;
+  isAnonymized: boolean;
+}
+
+interface FieldLogicPetitionFieldInner {
+  id: string;
+  type: PetitionFieldType;
+  options: any;
+  visibility: any | null;
+  math: any[] | null;
+  alias: string | null;
+  multiple: boolean;
+}
+interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+  children?:
+    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | null;
+  replies: (FieldLogicPetitionFieldReplyInner & {
+    children?:
+      | {
+          field: Pick<
+            FieldLogicPetitionFieldInner,
+            "id" | "type" | "options" | "alias" | "multiple"
+          >;
+          replies: FieldLogicPetitionFieldReplyInner[];
+        }[]
+      | null;
+  })[];
+}
+
+interface FieldLogicPetitionInput {
+  id: string;
+  variables: { name: string; defaultValue: number }[];
+  customLists: { name: string; values: string[] }[];
+  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
+  standardListDefinitions: { listName: string; values: { key: string }[] }[];
+  fields: FieldLogicPetitionFieldInput[];
+}
+
+export function buildPetitionFieldsLiquidScope(petition: FieldLogicPetitionInput, intl: IntlShape) {
   const fieldsWithIndices = getFieldsWithIndices(petition.fields);
   const fieldLogic = evaluateFieldLogic(petition);
   const scope: Record<string, any> = { petitionId: petition.id, _: {} };

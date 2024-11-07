@@ -68,6 +68,18 @@ describe("GraphQL/Petition Fields", () => {
       { name: "PROFILES:CREATE_PROFILES", effect: "GRANT" },
     ]);
     await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
+
+    await mocks.knex.from("standard_list_definition").insert([
+      {
+        title: { en: "GAFI Blacklist" },
+        list_name: "GAFI_BLACKLIST",
+        list_version: "2024-06-01",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([{ key: "AR" }, { key: "BR" }, { key: "UY" }]),
+        source_name: "GAFI",
+        created_by: `User:1`,
+      },
+    ]);
   });
 
   afterAll(async () => {
@@ -4269,6 +4281,206 @@ describe("GraphQL/Petition Fields", () => {
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
       }
+    });
+
+    it("adds an IS_IN_LIST visibility condition with a standard list definition", async () => {
+      const [selectField, textField] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        2,
+        (i) => ({
+          type: ["SELECT", "TEXT"][i] as PetitionFieldType,
+          options: i === 0 ? { standardList: "COUNTRIES", values: [] } : {},
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              visibility
+              math
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", textField.id),
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: toGlobalId("PetitionField", selectField.id),
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                  value: "GAFI_BLACKLIST",
+                },
+              ],
+            },
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: toGlobalId("PetitionField", selectField.id),
+                    modifier: "ANY",
+                    operator: "IS_IN_LIST",
+                    value: "GAFI_BLACKLIST",
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ADDITION",
+                    operand: {
+                      type: "NUMBER",
+                      value: 100,
+                    },
+                    variable: "score",
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionField).toEqual({
+        id: toGlobalId("PetitionField", textField.id),
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: toGlobalId("PetitionField", selectField.id),
+              modifier: "ANY",
+              operator: "IS_IN_LIST",
+              value: "GAFI_BLACKLIST",
+            },
+          ],
+        },
+        math: [
+          {
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: toGlobalId("PetitionField", selectField.id),
+                modifier: "ANY",
+                operator: "IS_IN_LIST",
+                value: "GAFI_BLACKLIST",
+              },
+            ],
+            operations: [
+              {
+                operator: "ADDITION",
+                operand: {
+                  type: "NUMBER",
+                  value: 100,
+                },
+                variable: "score",
+              },
+            ],
+          },
+        ],
+      });
+
+      const [dbPetition] = await mocks.knex
+        .from("petition")
+        .where("id", userPetition.id)
+        .select(["standard_list_definition_override"]);
+
+      expect(dbPetition).toEqual({
+        standard_list_definition_override: [
+          { list_name: "GAFI_BLACKLIST", list_version: "2024-06-01" },
+        ],
+      });
+    });
+
+    it("sends error if list name is unknown on an IS_IN_LIST condition", async () => {
+      const [selectField, textField] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        2,
+        (i) => ({
+          type: ["SELECT", "TEXT"][i] as PetitionFieldType,
+          options: i === 0 ? { standardList: "COUNTRIES", values: [] } : {},
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", textField.id),
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: toGlobalId("PetitionField", selectField.id),
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                  value: "UNKNOWN_STANDARD_LIST",
+                },
+              ],
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        message: "Assertion Error: Can't find list UNKNOWN_STANDARD_LIST referenced in condition 0",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if standard list definition type does not match field standardList", async () => {
+      const [selectField, textField] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        2,
+        (i) => ({
+          type: ["SELECT", "TEXT"][i] as PetitionFieldType,
+          options: i === 0 ? { standardList: "CURRENCIES", values: [] } : {},
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", textField.id),
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: toGlobalId("PetitionField", selectField.id),
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                  value: "GAFI_BLACKLIST",
+                },
+              ],
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        message: "Assertion Error: Can't reference standard list of type COUNTRIES in condition 0",
+      });
+      expect(data).toBeNull();
     });
   });
 

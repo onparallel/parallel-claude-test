@@ -14,7 +14,7 @@ import {
   RecipientViewPetitionField_queryDocument,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";

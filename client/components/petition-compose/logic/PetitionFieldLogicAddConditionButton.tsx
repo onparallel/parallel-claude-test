@@ -32,7 +32,15 @@ export const PetitionFieldLogicAddConditionButton = chakraForwardRef<
           "fieldId" in last &&
           ((referencedField.type === "CHECKBOX" && last.modifier !== "NUMBER_OF_REPLIES") ||
             (referencedField.type === "SELECT" &&
-              !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator) &&
+              ![
+                "IS_ONE_OF",
+                "NOT_IS_ONE_OF",
+                "IS_IN_LIST",
+                "NOT_IS_IN_LIST",
+                "ANY_IS_IN_LIST",
+                "ALL_IS_IN_LIST",
+                "NONE_IS_IN_LIST",
+              ].includes(last.operator) &&
               last.modifier !== "NUMBER_OF_REPLIES"))
         ) {
           // if the previous condition is of type SELECT or CHECKBOX try to get the next value

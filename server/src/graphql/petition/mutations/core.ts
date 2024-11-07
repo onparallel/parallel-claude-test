@@ -54,13 +54,7 @@ import {
 } from "../../../db/helpers/petitionProfileMapper";
 import { chunkWhile } from "../../../util/arrays";
 import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgroundCheck";
-import {
-  PetitionFieldMath,
-  PetitionFieldVisibility,
-  applyFieldVisibility,
-  mapFieldLogicCondition,
-  mapFieldMathOperation,
-} from "../../../util/fieldLogic";
+import { applyFieldVisibility, mapFieldLogic } from "../../../util/fieldLogic";
 import { toBytes } from "../../../util/fileSize";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -105,7 +99,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
-import { validFieldMath, validFieldVisibility } from "../../helpers/validators/validFieldLogic";
+import { validateFieldLogicInput } from "../../helpers/validators/validFieldLogic";
 import { validFolderId } from "../../helpers/validators/validFolderId";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
@@ -1305,17 +1299,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     maxLength((args) => args.data.title, "data.title", 500),
     maxLength((args) => args.data.alias, "data.alias", 100),
     validateRegex((args) => args.data.alias, "data.alias", FIELD_REFERENCE_REGEX),
-    validFieldVisibility(
+    validateFieldLogicInput(
       (args) => args.petitionId,
       (args) => args.fieldId,
-      (args) => args.data.visibility as any,
-      "data.visibility",
-    ),
-    validFieldMath(
-      (args) => args.petitionId,
-      (args) => args.fieldId,
-      (args) => args.data.math as any,
-      "data.math",
+      (args) => ({
+        visibility: args.data.visibility as any,
+        math: args.data.math as any,
+      }),
+      "data.visibility,data.math",
     ),
   ),
   resolve: async (_, args, ctx, info) => {
@@ -1440,25 +1431,25 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       }
     }
 
-    if (visibility !== undefined) {
-      data.visibility =
-        visibility === null
-          ? null
-          : {
-              ...visibility,
-              conditions: (visibility as PetitionFieldVisibility<string>).conditions.map((c) =>
-                mapFieldLogicCondition(c),
-              ),
-            };
-    }
+    if (visibility !== undefined || math !== undefined) {
+      // convert GIDs to numeric for storing in DB
+      const fieldLogic = mapFieldLogic<string>({ visibility, math } as any, (fieldId) => {
+        assert(typeof fieldId === "string", "Expected fieldId to be a string");
+        return fromGlobalId(fieldId, "PetitionField").id;
+      });
 
-    if (math !== undefined) {
-      data.math =
-        (math as PetitionFieldMath<string>[] | null)?.map((m) => ({
-          ...m,
-          conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
-          operations: m.operations.map((op) => mapFieldMathOperation(op)),
-        })) ?? null;
+      await ctx.petitions.updateStandardListDefinitionOverride(
+        args.petitionId,
+        fieldLogic.referencedLists,
+      );
+
+      if (visibility !== undefined) {
+        data.visibility = fieldLogic.field.visibility;
+      }
+
+      if (math !== undefined) {
+        data.math = fieldLogic.field.math;
+      }
     }
 
     if (isNonNullish(hasCommentsEnabled)) {

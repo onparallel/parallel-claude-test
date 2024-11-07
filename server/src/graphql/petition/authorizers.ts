@@ -13,7 +13,6 @@ import {
   PetitionPermissionType,
   PetitionStatus,
 } from "../../db/__types";
-import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
@@ -989,23 +988,19 @@ export function fieldIsNotBeingReferencedByAnotherFieldLogic<
       (f) =>
         (isNullish(f.parent_petition_field_id) ||
           !targetFields.map((f) => f.id).includes(f.parent_petition_field_id)) && // filter children of target fields
-        ((isNonNullish(f.visibility) &&
-          (f.visibility as PetitionFieldVisibility).conditions.some(
-            (c) => "fieldId" in c && fieldIds.includes(c.fieldId),
-          )) ||
-          (isNonNullish(f.math) &&
-            (f.math as PetitionFieldMath[]).some(
-              (math) =>
-                math.conditions.some(
-                  (c) => "fieldId" in c && fieldIds.includes(c.fieldId) && c.fieldId !== f.id,
-                ) ||
-                math.operations.some(
-                  (op) =>
-                    op.operand.type === "FIELD" &&
-                    fieldIds.includes(op.operand.fieldId) &&
-                    op.operand.fieldId !== f.id,
-                ),
-            ))),
+        (f.visibility?.conditions.some((c) => "fieldId" in c && fieldIds.includes(c.fieldId)) ||
+          f.math?.some(
+            (math) =>
+              math.conditions.some(
+                (c) => "fieldId" in c && fieldIds.includes(c.fieldId) && c.fieldId !== f.id,
+              ) ||
+              math.operations.some(
+                (op) =>
+                  op.operand.type === "FIELD" &&
+                  fieldIds.includes(op.operand.fieldId) &&
+                  op.operand.fieldId !== f.id,
+              ),
+          )),
     );
 
     if (referencingFields.length > 0) {

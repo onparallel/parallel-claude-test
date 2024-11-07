@@ -124,9 +124,16 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
           return `_${o.id}`;
         } else if (o.__typename === "PublicPetitionAccess") {
           return o.keycode as string;
-        } else {
-          return o.id as string;
+        } else if (o.__typename === "StandardListDefinition") {
+          // when working on templates, listVersion will be null as we always want the latest version available at the moment
+          // if the list details dialog is opened, a query will be made to obtain details of the list, including latest list version
+          // in this case, we don't want to overwrite the cache with the latest version as we are still working on a template
+          // so, separate cache entries are created for each specific list version of the same definition
+          if ("listVersion" in o && o.listVersion === null) {
+            return `_${o.id}`;
+          }
         }
+        return o.id as string;
       },
       possibleTypes: fragmentMatcher.possibleTypes,
       typePolicies: {

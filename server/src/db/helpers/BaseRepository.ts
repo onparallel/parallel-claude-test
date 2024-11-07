@@ -6,6 +6,7 @@ import PostgresInterval from "postgres-interval";
 import { groupBy, indexBy, isNonNullish, times } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { FileExport } from "../../services/FileExportService";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { hashString } from "../../util/token";
@@ -28,6 +29,10 @@ export interface TableTypes
   extends Replace<
     db.TableTypes,
     {
+      petition_field: Replace<
+        db.PetitionField,
+        { visibility: PetitionFieldVisibility | null; math: PetitionFieldMath[] | null }
+      >;
       petition_event: PetitionEvent;
       petition_user_notification: PetitionUserNotification;
       system_event: SystemEvent;
@@ -40,6 +45,10 @@ export interface TableTypes
           variables: PetitionVariable[];
           custom_lists: PetitionCustomList[] | null;
           automatic_numbering_config: AutomaticNumberingConfig | null;
+          standard_list_definition_override: Pick<
+            db.StandardListDefinition,
+            "list_name" | "list_version"
+          >[];
         }
       >;
       petition_signature_request: Replace<
@@ -54,6 +63,13 @@ export interface TableTypes
       profile_type: Replace<db.ProfileType, { name: LocalizableUserText }>;
       profile_type_field: Replace<db.ProfileTypeField, { name: LocalizableUserText }>;
       file_export_log: Replace<db.FileExportLog, { json_export: FileExport[] }>;
+      standard_list_definition: Replace<
+        db.StandardListDefinition,
+        {
+          title: LocalizableUserText;
+          values: { key: string; prefix?: string; suffix?: string }[];
+        }
+      >;
     }
   > {}
 

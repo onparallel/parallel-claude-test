@@ -1311,6 +1311,8 @@ export type Mutation = {
   /** Updates template_public from template */
   updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
+  /** Updates the standard list definitions with values defined in excel file */
+  updateStandardListDefinitions: SupportMethodResponse;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
   /** Updates the template default permissions */
@@ -2726,6 +2728,10 @@ export type MutationupdateSignatureRequestMetadataArgs = {
   petitionSignatureRequestId: Scalars["GID"]["input"];
 };
 
+export type MutationupdateStandardListDefinitionsArgs = {
+  file: Scalars["Upload"]["input"];
+};
+
 export type MutationupdateTagArgs = {
   data: UpdateTagInput;
   id: Scalars["GID"]["input"];
@@ -3107,6 +3113,8 @@ export type Petition = PetitionBase & {
   signatureRequests: Array<PetitionSignatureRequest>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** The summary configuration for the petition. */
@@ -3292,6 +3300,8 @@ export type PetitionBase = {
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -4197,6 +4207,8 @@ export type PetitionTemplate = PetitionBase & {
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -4949,6 +4961,8 @@ export type PublicPetition = Timestamps & {
   /** The signature config of the petition */
   signatureConfig: Maybe<PublicSignatureConfig>;
   signatureStatus: Maybe<PublicSignatureStatus>;
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** The preferred tone of organization. */
@@ -5247,6 +5261,7 @@ export type Query = {
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut: Maybe<PublicRemindersOptOut>;
+  standardListDefinition: StandardListDefinition;
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
@@ -5482,6 +5497,11 @@ export type QuerypublicTaskArgs = {
 
 export type QueryremindersOptOutArgs = {
   keycode: Scalars["ID"]["input"];
+};
+
+export type QuerystandardListDefinitionArgs = {
+  id: Scalars["GID"]["input"];
+  locale: UserLocale;
 };
 
 export type QuerytagsArgs = {
@@ -5859,6 +5879,28 @@ export type SignatureStartedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
+};
+
+export type StandardListDefinition = {
+  id: Scalars["GID"]["output"];
+  listName: Scalars["String"]["output"];
+  listType: StandardListDefinitionListType;
+  listVersion: Maybe<Scalars["Date"]["output"]>;
+  source: Scalars["String"]["output"];
+  sourceUrl: Maybe<Scalars["String"]["output"]>;
+  title: Scalars["LocalizableUserText"]["output"];
+  values: Array<StandardListDefinitionValue>;
+  versionFormat: Scalars["JSONObject"]["output"];
+  versionUrl: Maybe<Scalars["String"]["output"]>;
+};
+
+export type StandardListDefinitionListType = "COUNTRIES";
+
+export type StandardListDefinitionValue = {
+  key: Scalars["String"]["output"];
+  label: Maybe<Scalars["String"]["output"]>;
+  prefix: Maybe<Scalars["String"]["output"]>;
+  suffix: Maybe<Scalars["String"]["output"]>;
 };
 
 /** Represents a successful execution. */

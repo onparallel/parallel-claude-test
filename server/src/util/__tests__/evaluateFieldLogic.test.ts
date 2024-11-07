@@ -23,7 +23,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -61,7 +63,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -99,7 +103,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -140,7 +146,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -182,7 +190,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
@@ -225,7 +235,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
@@ -269,7 +281,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
@@ -329,7 +343,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -388,7 +404,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -437,7 +455,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -505,7 +525,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true, true].map((isVisible) => ({ isVisible })));
@@ -569,7 +591,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -633,7 +657,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -716,7 +742,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true, false, false].map((isVisible) => ({ isVisible })));
@@ -780,7 +808,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -846,7 +876,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -910,7 +942,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -976,7 +1010,9 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -1023,10 +1059,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", default_value: 0 },
-          { name: "price", default_value: 50 },
+          { name: "score", defaultValue: 0 },
+          { name: "price", defaultValue: 50 },
         ],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1083,8 +1121,10 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", default_value: 100 }],
-        custom_lists: [],
+        variables: [{ name: "score", defaultValue: 100 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1153,9 +1193,6 @@ describe("evaluateFieldLogic", () => {
                 options: {},
                 visibility: null,
                 math: null,
-                parent: {
-                  id: 1,
-                },
                 replies: [{ content: { value: "aaaa" }, anonymized_at: null }],
               },
               {
@@ -1180,16 +1217,15 @@ describe("evaluateFieldLogic", () => {
                   ],
                 },
                 math: null,
-                parent: {
-                  id: 1,
-                },
                 replies: [],
               },
             ],
           },
         ],
-        variables: [{ name: "score", default_value: 100 }],
-        custom_lists: [],
+        variables: [{ name: "score", defaultValue: 100 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1358,11 +1394,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", default_value: 0 },
-          { name: "price", default_value: 50 },
+          { name: "score", defaultValue: 0 },
+          { name: "price", defaultValue: 50 },
         ],
-        custom_lists: [],
-        automatic_numbering_config: { numbering_type: "NUMBERS" },
+        customLists: [],
+        automaticNumberingConfig: { numberingType: "NUMBERS" },
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1564,11 +1601,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", default_value: 0 },
-          { name: "price", default_value: 50 },
+          { name: "score", defaultValue: 0 },
+          { name: "price", defaultValue: 50 },
         ],
-        custom_lists: [],
-        automatic_numbering_config: { numbering_type: "LETTERS" },
+        customLists: [],
+        automaticNumberingConfig: { numberingType: "LETTERS" },
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1770,11 +1808,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", default_value: 0 },
-          { name: "price", default_value: 50 },
+          { name: "score", defaultValue: 0 },
+          { name: "price", defaultValue: 50 },
         ],
-        custom_lists: [],
-        automatic_numbering_config: { numbering_type: "ROMAN_NUMERALS" },
+        customLists: [],
+        automaticNumberingConfig: { numberingType: "ROMAN_NUMERALS" },
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1850,6 +1889,126 @@ describe("evaluateFieldLogic", () => {
         },
       ]);
     });
+
+    it("show when field value is in standard list", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "SELECT",
+            options: {
+              standardList: "COUNTRIES",
+              values: [],
+            },
+            visibility: null,
+            math: null,
+            replies: [{ content: { value: "AR" }, anonymized_at: null }],
+          },
+          {
+            id: 2,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: 1,
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                  value: "GAFI_BLACKLIST",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [
+          { listName: "GAFI_BLACKLIST", values: [{ key: "AR" }, { key: "BR" }, { key: "UY" }] },
+        ],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: {},
+          currentVariables: {},
+          finalVariables: {},
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: {},
+          currentVariables: {},
+          finalVariables: {},
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("does not show when field value is not in standard list", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "SELECT",
+            options: {
+              standardList: "COUNTRIES",
+              values: [],
+            },
+            visibility: null,
+            math: null,
+            replies: [{ content: { value: "ES" }, anonymized_at: null }],
+          },
+          {
+            id: 2,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: 1,
+                  modifier: "ANY",
+                  operator: "IS_IN_LIST",
+                  value: "GAFI_BLACKLIST",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [
+          { listName: "GAFI_BLACKLIST", values: [{ key: "AR" }, { key: "BR" }, { key: "UY" }] },
+        ],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: {},
+          currentVariables: {},
+          finalVariables: {},
+          headerNumber: null,
+        },
+        {
+          isVisible: false,
+          previousVariables: {},
+          currentVariables: {},
+          finalVariables: {},
+          headerNumber: null,
+        },
+      ]);
+    });
   });
 
   describe("field math", () => {
@@ -1895,8 +2054,10 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "total", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "total", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -1959,8 +2120,10 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "total", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "total", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2016,10 +2179,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "total", default_value: 10 },
-          { name: "score", default_value: 100 },
+          { name: "total", defaultValue: 10 },
+          { name: "score", defaultValue: 100 },
         ],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2105,8 +2270,10 @@ describe("evaluateFieldLogic", () => {
             ],
           },
         ],
-        variables: [{ name: "price", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "price", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2175,10 +2342,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", default_value: 0 },
-          { name: "price", default_value: 1.5 },
+          { name: "score", defaultValue: 0 },
+          { name: "price", defaultValue: 1.5 },
         ],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2230,8 +2399,10 @@ describe("evaluateFieldLogic", () => {
             replies: [{ content: { value: 0 }, anonymized_at: null }],
           },
         ],
-        variables: [{ name: "score", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "score", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2293,8 +2464,10 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "score", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2391,9 +2564,6 @@ describe("evaluateFieldLogic", () => {
                 math: null,
                 options: {},
                 replies: [{ content: { value: 300 }, anonymized_at: null }],
-                parent: {
-                  id: 2,
-                },
               },
             ],
           },
@@ -2442,10 +2612,12 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "total", default_value: 0 },
-          { name: "score", default_value: 1 },
+          { name: "total", defaultValue: 0 },
+          { name: "score", defaultValue: 1 },
         ],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2605,9 +2777,6 @@ describe("evaluateFieldLogic", () => {
                   { content: { value: 20 }, anonymized_at: null },
                   { content: { value: 200 }, anonymized_at: null },
                 ],
-                parent: {
-                  id: 1,
-                },
               },
               {
                 id: 3,
@@ -2622,9 +2791,6 @@ describe("evaluateFieldLogic", () => {
                   { content: { value: "No" }, anonymized_at: null },
                   { content: { value: "Si" }, anonymized_at: null },
                 ],
-                parent: {
-                  id: 1,
-                },
               },
               {
                 id: 4,
@@ -2661,9 +2827,6 @@ describe("evaluateFieldLogic", () => {
                   { content: { value: 4 }, anonymized_at: null },
                   { content: { value: 400 }, anonymized_at: null },
                 ],
-                parent: {
-                  id: 1,
-                },
               },
               {
                 id: 5,
@@ -2678,9 +2841,6 @@ describe("evaluateFieldLogic", () => {
                   { content: { value: "Si" }, anonymized_at: null },
                   { content: { value: "Si" }, anonymized_at: null },
                 ],
-                parent: {
-                  id: 1,
-                },
               },
               {
                 id: 6,
@@ -2717,15 +2877,14 @@ describe("evaluateFieldLogic", () => {
                   { content: { value: 6 }, anonymized_at: null },
                   { content: { value: 60 }, anonymized_at: null },
                 ],
-                parent: {
-                  id: 1,
-                },
               },
             ],
           },
         ],
-        variables: [{ name: "edad", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "edad", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -2875,9 +3034,6 @@ describe("evaluateFieldLogic", () => {
                 options: {},
                 math: null,
                 visibility: null,
-                parent: {
-                  id: 1,
-                },
                 replies: [
                   { content: { value: "hello" }, anonymized_at: null },
                   { content: { value: "goodbye" }, anonymized_at: null },
@@ -2928,19 +3084,18 @@ describe("evaluateFieldLogic", () => {
                   },
                 ],
                 visibility: null,
-                parent: {
-                  id: 3,
-                },
                 replies: [],
               },
             ],
           },
         ],
         variables: [
-          { name: "score", default_value: 1 },
-          { name: "price", default_value: 2 },
+          { name: "score", defaultValue: 1 },
+          { name: "price", defaultValue: 2 },
         ],
-        custom_lists: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -3005,9 +3160,6 @@ describe("evaluateFieldLogic", () => {
                 math: null,
                 visibility: null,
                 options: { values: ["A", "B", "C"] },
-                parent: {
-                  id: 1,
-                },
                 replies: [
                   { content: { value: "B" }, anonymized_at: null },
                   { content: { value: "C" }, anonymized_at: null },
@@ -3089,8 +3241,10 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", default_value: 0 }],
-        custom_lists: [],
+        variables: [{ name: "score", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
       });
 
       expect(fields).toEqual([
@@ -3124,6 +3278,74 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { score: 0 },
           currentVariables: { score: 5000 },
           finalVariables: { score: 5000 },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("math operation with IS_IN_LIST condition", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "SELECT",
+            options: { standardList: "COUNTRIES", values: [] },
+            replies: [{ content: { value: "AR" }, anonymized_at: null }],
+            visibility: null,
+            math: null,
+          },
+          {
+            id: 2,
+            type: "NUMBER",
+            options: {},
+            replies: [],
+            visibility: null,
+            math: [
+              {
+                operator: "OR",
+                conditions: [
+                  {
+                    fieldId: 1,
+                    modifier: "ANY",
+                    operator: "IS_IN_LIST",
+                    value: "GAFI_BLACKLIST",
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ADDITION",
+                    operand: {
+                      type: "NUMBER",
+                      value: 99999,
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        variables: [{ name: "risk", defaultValue: 0 }],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [
+          { listName: "GAFI_BLACKLIST", values: [{ key: "AR" }, { key: "BR" }, { key: "UY" }] },
+        ],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { risk: 0 },
+          currentVariables: { risk: 0 },
+          finalVariables: { risk: 99999 },
+          headerNumber: null,
+        },
+        {
+          isVisible: true,
+          previousVariables: { risk: 0 },
+          currentVariables: { risk: 99999 },
+          finalVariables: { risk: 99999 },
           headerNumber: null,
         },
       ]);

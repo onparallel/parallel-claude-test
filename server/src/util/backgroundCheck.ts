@@ -1,9 +1,45 @@
 import { isNonNullish, isNullish } from "remeda";
-import { PetitionField, PetitionFieldReply } from "../db/__types";
-import { ComposedPetition } from "../db/repositories/PetitionRepository";
+import {
+  PetitionField,
+  PetitionFieldReply,
+  PetitionFieldReplyStatus,
+  PetitionFieldType,
+} from "../db/__types";
 import { EntitySearchRequest } from "../services/background-check-clients/BackgroundCheckClient";
-import { applyFieldVisibility } from "./fieldLogic";
+import { applyFieldVisibility, PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic";
 import { toGlobalId } from "./globalId";
+
+interface FieldLogicPetitionFieldReplyInner {
+  id: number;
+  content: any;
+  status: PetitionFieldReplyStatus;
+  parent_petition_field_reply_id: number | null;
+  anonymized_at: Date | null;
+}
+
+interface FieldLogicPetitionFieldInner {
+  id: number;
+  type: PetitionFieldType;
+  options: any;
+  visibility: PetitionFieldVisibility | null;
+  math: PetitionFieldMath[] | null;
+}
+interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+  children?:
+    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | null;
+  replies: (FieldLogicPetitionFieldReplyInner & {
+    children?: { field: { id: number }; replies: FieldLogicPetitionFieldReplyInner[] }[] | null;
+  })[];
+}
+
+interface FieldLogicPetitionInput {
+  variables: { name: string; defaultValue: number }[];
+  customLists: { name: string; values: string[] }[];
+  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
+  standardListDefinitions: { listName: string; values: { key: string }[] }[];
+  fields: FieldLogicPetitionFieldInput[];
+}
 
 export function backgroundCheckFieldReplyUrl(
   parallelUrl: string,
@@ -33,7 +69,9 @@ export function backgroundCheckFieldReplyUrl(
  * This looks for BACKGROUND_CHECK fields that have autoSearchConfig with at least the "name" field replied and no entity stored
  * and builds the search query for each one in order to automatically trigger a background check search when the petition is completed.
  */
-export function buildAutomatedBackgroundCheckFieldQueries(composedPetition: ComposedPetition): {
+export function buildAutomatedBackgroundCheckFieldQueries(
+  composedPetition: FieldLogicPetitionInput,
+): {
   petitionFieldId: number;
   parentPetitionFieldReplyId: number | null;
   petitionFieldReplyId: number | null;

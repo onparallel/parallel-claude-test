@@ -21,14 +21,18 @@ type ChildOf<T extends { children?: any[] | null }> = UnwrapArray<
   Exclude<T["children"], null | undefined>
 >;
 
-type PetitionFieldSelection =
+export type PetitionFieldSelection =
   | FieldOf<PetitionFieldLogicContext_PetitionBaseFragment>
   | ChildOf<FieldOf<PetitionFieldLogicContext_PetitionBaseFragment>>;
 
 interface UsePetitionFieldLogicContext
-  extends Pick<PetitionFieldLogicContext_PetitionBaseFragment, "variables" | "customLists"> {
+  extends Pick<
+    PetitionFieldLogicContext_PetitionBaseFragment,
+    "variables" | "customLists" | "standardListDefinitions"
+  > {
   fieldWithIndex: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex];
   fieldsWithIndices: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex][];
+  isTemplate: boolean;
 }
 
 const _PetitionFieldLogicContext = createContext<UsePetitionFieldLogicContext | undefined>(
@@ -49,7 +53,8 @@ export function PetitionFieldLogicContext({
       fieldsWithIndices: fieldsWithIndices
         .slice(0, includeSelf ? fieldIndex + 1 : fieldIndex)
         .filter(([f]) => !f.isReadOnly),
-      ...pick(petition, ["variables", "customLists"]),
+      ...pick(petition, ["variables", "customLists", "standardListDefinitions"]),
+      isTemplate: petition.__typename === "PetitionTemplate",
     };
   }, [fieldsWithIndices, petition.variables]);
 
@@ -64,6 +69,7 @@ PetitionFieldLogicContext.fragments = {
   get PetitionBase() {
     return gql`
       fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
+        id
         fields {
           ...PetitionFieldLogicContext_PetitionField
           parent {
@@ -83,6 +89,14 @@ PetitionFieldLogicContext.fragments = {
         customLists {
           name
           values
+        }
+        standardListDefinitions {
+          id
+          listName
+          listType
+          title
+          listVersion
+          versionFormat
         }
         ...useAllFieldsWithIndices_PetitionBase
       }

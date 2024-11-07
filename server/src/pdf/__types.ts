@@ -1311,6 +1311,8 @@ export type Mutation = {
   /** Updates template_public from template */
   updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
+  /** Updates the standard list definitions with values defined in excel file */
+  updateStandardListDefinitions: SupportMethodResponse;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
   /** Updates the template default permissions */
@@ -2726,6 +2728,10 @@ export type MutationupdateSignatureRequestMetadataArgs = {
   petitionSignatureRequestId: Scalars["GID"]["input"];
 };
 
+export type MutationupdateStandardListDefinitionsArgs = {
+  file: Scalars["Upload"]["input"];
+};
+
 export type MutationupdateTagArgs = {
   data: UpdateTagInput;
   id: Scalars["GID"]["input"];
@@ -3107,6 +3113,8 @@ export type Petition = PetitionBase & {
   signatureRequests: Array<PetitionSignatureRequest>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** The summary configuration for the petition. */
@@ -3292,6 +3300,8 @@ export type PetitionBase = {
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -4197,6 +4207,8 @@ export type PetitionTemplate = PetitionBase & {
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"]["output"];
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -4949,6 +4961,8 @@ export type PublicPetition = Timestamps & {
   /** The signature config of the petition */
   signatureConfig: Maybe<PublicSignatureConfig>;
   signatureStatus: Maybe<PublicSignatureStatus>;
+  /** Lists every available standard list to be used in field logic conditions */
+  standardListDefinitions: Array<StandardListDefinition>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** The preferred tone of organization. */
@@ -5247,6 +5261,7 @@ export type Query = {
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut: Maybe<PublicRemindersOptOut>;
+  standardListDefinition: StandardListDefinition;
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
@@ -5482,6 +5497,11 @@ export type QuerypublicTaskArgs = {
 
 export type QueryremindersOptOutArgs = {
   keycode: Scalars["ID"]["input"];
+};
+
+export type QuerystandardListDefinitionArgs = {
+  id: Scalars["GID"]["input"];
+  locale: UserLocale;
 };
 
 export type QuerytagsArgs = {
@@ -5859,6 +5879,28 @@ export type SignatureStartedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
+};
+
+export type StandardListDefinition = {
+  id: Scalars["GID"]["output"];
+  listName: Scalars["String"]["output"];
+  listType: StandardListDefinitionListType;
+  listVersion: Maybe<Scalars["Date"]["output"]>;
+  source: Scalars["String"]["output"];
+  sourceUrl: Maybe<Scalars["String"]["output"]>;
+  title: Scalars["LocalizableUserText"]["output"];
+  values: Array<StandardListDefinitionValue>;
+  versionFormat: Scalars["JSONObject"]["output"];
+  versionUrl: Maybe<Scalars["String"]["output"]>;
+};
+
+export type StandardListDefinitionListType = "COUNTRIES";
+
+export type StandardListDefinitionValue = {
+  key: Scalars["String"]["output"];
+  label: Maybe<Scalars["String"]["output"]>;
+  prefix: Maybe<Scalars["String"]["output"]>;
+  suffix: Maybe<Scalars["String"]["output"]>;
 };
 
 /** Represents a successful execution. */
@@ -6357,9 +6399,9 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     showInPdf: boolean;
     showActivityInPdf: boolean;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
-      id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string | null;
@@ -6466,6 +6508,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
@@ -6485,9 +6528,9 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
     showInPdf: boolean;
     showActivityInPdf: boolean;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
-      id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string | null;
@@ -6594,6 +6637,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type PetitionExport_PetitionBaseFragment =
@@ -6775,9 +6819,9 @@ export type PetitionExport_petitionQuery = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           replies: Array<{
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string | null;
@@ -6890,6 +6934,7 @@ export type PetitionExport_petitionQuery = {
         variables: Array<{ name: string; defaultValue: number }>;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
       }
     | {
         __typename: "PetitionTemplate";
@@ -6908,9 +6953,9 @@ export type PetitionExport_petitionQuery = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           replies: Array<{
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string | null;
@@ -7023,6 +7068,7 @@ export type PetitionExport_petitionQuery = {
         variables: Array<{ name: string; defaultValue: number }>;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
       }
     | null;
 };
@@ -7052,14 +7098,13 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
     showActivityInPdf: boolean;
     requireApproval: boolean;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
-      id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string | null;
       lastReviewedAt: string | null;
-      is_anonymized: boolean;
       children: Array<{
         field: {
           id: string;
@@ -7093,9 +7138,9 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
               status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
+              isAnonymized: boolean;
               repliedAt: string | null;
               lastReviewedAt: string | null;
-              is_anonymized: boolean;
               repliedBy:
                 | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                 | { __typename: "User"; fullName: string | null }
@@ -7105,14 +7150,13 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
           }> | null;
         };
         replies: Array<{
-          content: { [key: string]: any };
-          isAnonymized: boolean;
           id: string;
           status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
           metadata: { [key: string]: any };
+          isAnonymized: boolean;
           repliedAt: string | null;
           lastReviewedAt: string | null;
-          is_anonymized: boolean;
           repliedBy:
             | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
             | { __typename: "User"; fullName: string | null }
@@ -7140,14 +7184,13 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
       showActivityInPdf: boolean;
       requireApproval: boolean;
       replies: Array<{
-        content: { [key: string]: any };
-        isAnonymized: boolean;
         id: string;
         status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
         metadata: { [key: string]: any };
+        isAnonymized: boolean;
         repliedAt: string | null;
         lastReviewedAt: string | null;
-        is_anonymized: boolean;
         repliedBy:
           | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
           | { __typename: "User"; fullName: string | null }
@@ -7163,6 +7206,7 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
@@ -7183,14 +7227,13 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
     showActivityInPdf: boolean;
     requireApproval: boolean;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
-      id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string | null;
       lastReviewedAt: string | null;
-      is_anonymized: boolean;
       children: Array<{
         field: {
           id: string;
@@ -7224,9 +7267,9 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
               status: PetitionFieldReplyStatus;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
+              isAnonymized: boolean;
               repliedAt: string | null;
               lastReviewedAt: string | null;
-              is_anonymized: boolean;
               repliedBy:
                 | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                 | { __typename: "User"; fullName: string | null }
@@ -7236,14 +7279,13 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
           }> | null;
         };
         replies: Array<{
-          content: { [key: string]: any };
-          isAnonymized: boolean;
           id: string;
           status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
           metadata: { [key: string]: any };
+          isAnonymized: boolean;
           repliedAt: string | null;
           lastReviewedAt: string | null;
-          is_anonymized: boolean;
           repliedBy:
             | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
             | { __typename: "User"; fullName: string | null }
@@ -7271,14 +7313,13 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
       showActivityInPdf: boolean;
       requireApproval: boolean;
       replies: Array<{
-        content: { [key: string]: any };
-        isAnonymized: boolean;
         id: string;
         status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
         metadata: { [key: string]: any };
+        isAnonymized: boolean;
         repliedAt: string | null;
         lastReviewedAt: string | null;
-        is_anonymized: boolean;
         repliedBy:
           | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
           | { __typename: "User"; fullName: string | null }
@@ -7294,6 +7335,7 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type PetitionExport2_PetitionBaseFragment =
@@ -7319,9 +7361,9 @@ export type PetitionExport2_PetitionFieldReplyInnerFragment = {
   status: PetitionFieldReplyStatus;
   content: { [key: string]: any };
   metadata: { [key: string]: any };
+  isAnonymized: boolean;
   repliedAt: string | null;
   lastReviewedAt: string | null;
-  is_anonymized: boolean;
   repliedBy:
     | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
     | { __typename: "User"; fullName: string | null }
@@ -7360,9 +7402,9 @@ export type PetitionExport2_PetitionFieldFragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       metadata: { [key: string]: any };
+      isAnonymized: boolean;
       repliedAt: string | null;
       lastReviewedAt: string | null;
-      is_anonymized: boolean;
       repliedBy:
         | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
         | { __typename: "User"; fullName: string | null }
@@ -7377,9 +7419,9 @@ export type PetitionExport2_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   content: { [key: string]: any };
   metadata: { [key: string]: any };
+  isAnonymized: boolean;
   repliedAt: string | null;
   lastReviewedAt: string | null;
-  is_anonymized: boolean;
   children: Array<{
     field: {
       id: string;
@@ -7412,9 +7454,9 @@ export type PetitionExport2_PetitionFieldReplyFragment = {
           status: PetitionFieldReplyStatus;
           content: { [key: string]: any };
           metadata: { [key: string]: any };
+          isAnonymized: boolean;
           repliedAt: string | null;
           lastReviewedAt: string | null;
-          is_anonymized: boolean;
           repliedBy:
             | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
             | { __typename: "User"; fullName: string | null }
@@ -7428,9 +7470,9 @@ export type PetitionExport2_PetitionFieldReplyFragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       metadata: { [key: string]: any };
+      isAnonymized: boolean;
       repliedAt: string | null;
       lastReviewedAt: string | null;
-      is_anonymized: boolean;
       repliedBy:
         | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
         | { __typename: "User"; fullName: string | null }
@@ -7476,14 +7518,13 @@ export type PetitionExport2_petitionQuery = {
           showActivityInPdf: boolean;
           requireApproval: boolean;
           replies: Array<{
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string | null;
             lastReviewedAt: string | null;
-            is_anonymized: boolean;
             children: Array<{
               field: {
                 id: string;
@@ -7517,9 +7558,9 @@ export type PetitionExport2_petitionQuery = {
                     status: PetitionFieldReplyStatus;
                     content: { [key: string]: any };
                     metadata: { [key: string]: any };
+                    isAnonymized: boolean;
                     repliedAt: string | null;
                     lastReviewedAt: string | null;
-                    is_anonymized: boolean;
                     repliedBy:
                       | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                       | { __typename: "User"; fullName: string | null }
@@ -7529,14 +7570,13 @@ export type PetitionExport2_petitionQuery = {
                 }> | null;
               };
               replies: Array<{
-                content: { [key: string]: any };
-                isAnonymized: boolean;
                 id: string;
                 status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
                 metadata: { [key: string]: any };
+                isAnonymized: boolean;
                 repliedAt: string | null;
                 lastReviewedAt: string | null;
-                is_anonymized: boolean;
                 repliedBy:
                   | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                   | { __typename: "User"; fullName: string | null }
@@ -7564,14 +7604,13 @@ export type PetitionExport2_petitionQuery = {
             showActivityInPdf: boolean;
             requireApproval: boolean;
             replies: Array<{
-              content: { [key: string]: any };
-              isAnonymized: boolean;
               id: string;
               status: PetitionFieldReplyStatus;
+              content: { [key: string]: any };
               metadata: { [key: string]: any };
+              isAnonymized: boolean;
               repliedAt: string | null;
               lastReviewedAt: string | null;
-              is_anonymized: boolean;
               repliedBy:
                 | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                 | { __typename: "User"; fullName: string | null }
@@ -7587,6 +7626,7 @@ export type PetitionExport2_petitionQuery = {
         variables: Array<{ name: string; defaultValue: number }>;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
       }
     | {
         __typename: "PetitionTemplate";
@@ -7606,14 +7646,13 @@ export type PetitionExport2_petitionQuery = {
           showActivityInPdf: boolean;
           requireApproval: boolean;
           replies: Array<{
+            id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
-            id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string | null;
             lastReviewedAt: string | null;
-            is_anonymized: boolean;
             children: Array<{
               field: {
                 id: string;
@@ -7647,9 +7686,9 @@ export type PetitionExport2_petitionQuery = {
                     status: PetitionFieldReplyStatus;
                     content: { [key: string]: any };
                     metadata: { [key: string]: any };
+                    isAnonymized: boolean;
                     repliedAt: string | null;
                     lastReviewedAt: string | null;
-                    is_anonymized: boolean;
                     repliedBy:
                       | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                       | { __typename: "User"; fullName: string | null }
@@ -7659,14 +7698,13 @@ export type PetitionExport2_petitionQuery = {
                 }> | null;
               };
               replies: Array<{
-                content: { [key: string]: any };
-                isAnonymized: boolean;
                 id: string;
                 status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
                 metadata: { [key: string]: any };
+                isAnonymized: boolean;
                 repliedAt: string | null;
                 lastReviewedAt: string | null;
-                is_anonymized: boolean;
                 repliedBy:
                   | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                   | { __typename: "User"; fullName: string | null }
@@ -7694,14 +7732,13 @@ export type PetitionExport2_petitionQuery = {
             showActivityInPdf: boolean;
             requireApproval: boolean;
             replies: Array<{
-              content: { [key: string]: any };
-              isAnonymized: boolean;
               id: string;
               status: PetitionFieldReplyStatus;
+              content: { [key: string]: any };
               metadata: { [key: string]: any };
+              isAnonymized: boolean;
               repliedAt: string | null;
               lastReviewedAt: string | null;
-              is_anonymized: boolean;
               repliedBy:
                 | { __typename: "PetitionAccess"; contact: { fullName: string } | null }
                 | { __typename: "User"; fullName: string | null }
@@ -7717,6 +7754,7 @@ export type PetitionExport2_petitionQuery = {
         variables: Array<{ name: string; defaultValue: number }>;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
       }
     | null;
 };
@@ -7828,9 +7866,10 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
       options: { [key: string]: any };
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
-      replies: Array<{ content: { [key: string]: any }; isAnonymized: boolean }>;
+      replies: Array<{ id: string; content: { [key: string]: any }; isAnonymized: boolean }>;
     }> | null;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children: Array<{
@@ -7843,13 +7882,14 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
           visibility: { [key: string]: any } | null;
           math: Array<{ [key: string]: any }> | null;
         };
-        replies: Array<{ content: { [key: string]: any }; isAnonymized: boolean }>;
+        replies: Array<{ id: string; content: { [key: string]: any }; isAnonymized: boolean }>;
       }> | null;
     }>;
   }>;
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
@@ -7870,9 +7910,10 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
       options: { [key: string]: any };
       visibility: { [key: string]: any } | null;
       math: Array<{ [key: string]: any }> | null;
-      replies: Array<{ content: { [key: string]: any }; isAnonymized: boolean }>;
+      replies: Array<{ id: string; content: { [key: string]: any }; isAnonymized: boolean }>;
     }> | null;
     replies: Array<{
+      id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
       children: Array<{
@@ -7885,13 +7926,14 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
           visibility: { [key: string]: any } | null;
           math: Array<{ [key: string]: any }> | null;
         };
-        replies: Array<{ content: { [key: string]: any }; isAnonymized: boolean }>;
+        replies: Array<{ id: string; content: { [key: string]: any }; isAnonymized: boolean }>;
       }> | null;
     }>;
   }>;
   variables: Array<{ name: string; defaultValue: number }>;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
+  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
 export type LiquidScopeProvider_PetitionBaseFragment =
@@ -7908,6 +7950,12 @@ export type LiquidScopeProvider_PetitionFieldFragment = {
   math: Array<{ [key: string]: any }> | null;
 };
 
+export type LiquidScopeProvider_PetitionFieldReplyFragment = {
+  id: string;
+  content: { [key: string]: any };
+  isAnonymized: boolean;
+};
+
 export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
   fragment PetitionExport_PetitionFieldInner on PetitionField {
     id
@@ -7919,7 +7967,6 @@ export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
     showActivityInPdf
     visibility
     math
-    options
     multiple
   }
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldInnerFragment, unknown>;
@@ -8035,6 +8082,13 @@ export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
     math
   }
 ` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
+export const LiquidScopeProvider_PetitionFieldReplyFragmentDoc = gql`
+  fragment LiquidScopeProvider_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    isAnonymized
+  }
+` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldReplyFragment, unknown>;
 export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
   fragment LiquidScopeProvider_PetitionBase on PetitionBase {
     id
@@ -8043,20 +8097,17 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
       children {
         ...LiquidScopeProvider_PetitionField
         replies {
-          content
-          isAnonymized
+          ...LiquidScopeProvider_PetitionFieldReply
         }
       }
       replies {
-        content
-        isAnonymized
+        ...LiquidScopeProvider_PetitionFieldReply
         children {
           field {
             ...LiquidScopeProvider_PetitionField
           }
           replies {
-            content
-            isAnonymized
+            ...LiquidScopeProvider_PetitionFieldReply
           }
         }
       }
@@ -8072,8 +8123,15 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
     automaticNumberingConfig {
       numberingType
     }
+    standardListDefinitions {
+      listName
+      values {
+        key
+      }
+    }
   }
   ${LiquidScopeProvider_PetitionFieldFragmentDoc}
+  ${LiquidScopeProvider_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<LiquidScopeProvider_PetitionBaseFragment, unknown>;
 export const PetitionExport_PetitionBaseFragmentDoc = gql`
   fragment PetitionExport_PetitionBase on PetitionBase {
@@ -8132,7 +8190,6 @@ export const PetitionExport2_PetitionFieldInnerFragmentDoc = gql`
     showActivityInPdf
     visibility
     math
-    options
     multiple
     requireApproval
   }
@@ -8143,7 +8200,7 @@ export const PetitionExport2_PetitionFieldReplyInnerFragmentDoc = gql`
     status
     content
     metadata
-    is_anonymized: isAnonymized
+    isAnonymized
     status
     repliedBy {
       __typename
@@ -8235,14 +8292,6 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
       }
     }
     ...LiquidScopeProvider_PetitionBase
-    variables {
-      name
-      defaultValue
-    }
-    customLists {
-      name
-      values
-    }
     __typename
   }
   ${PetitionExport2_PetitionFieldFragmentDoc}

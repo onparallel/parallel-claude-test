@@ -10,7 +10,9 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { countBy, isNonNullish, sort, unique } from "remeda";
+import { countBy, isNonNullish, sort, unique, zip } from "remeda";
+import { assert } from "ts-essentials";
+import { selectOptionsValuesAndLabels } from "../../db/helpers/fieldOptions";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -21,7 +23,7 @@ import {
   ifArgEquals,
   or,
 } from "../helpers/authorize";
-import { ArgValidationError } from "../helpers/errors";
+import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";
@@ -432,5 +434,37 @@ export const petitionFolders = queryField("petitionFolders", {
         .filter((p) => p !== "/"),
     );
     return sort(fullPaths, (a, b) => a.localeCompare(b));
+  },
+});
+
+export const standardListDefinition = queryField("standardListDefinition", {
+  type: "StandardListDefinition",
+  authorize: authenticate(),
+  args: {
+    id: nonNull(globalIdArg("StandardListDefinition")),
+    locale: nonNull("UserLocale"),
+  },
+  resolve: async (_, { id, locale }, ctx) => {
+    const standardListDefinition = await ctx.petitions.loadStandardListDefinition(id);
+    if (!standardListDefinition) {
+      throw new ForbiddenError("Not found");
+    }
+
+    const { values, labels } = await selectOptionsValuesAndLabels(
+      { standardList: standardListDefinition.list_type, values: [] },
+      locale,
+    );
+
+    assert(isNonNullish(labels), "Labels must be defined");
+    const valuesAndLabels = zip(values, labels);
+
+    return {
+      ...standardListDefinition,
+      values: standardListDefinition.values.map((v) => ({
+        ...v,
+        // labels are not defined on standard_list_definition table, so we need to map them here
+        label: valuesAndLabels.find(([value]) => value === v.key)?.[1],
+      })),
+    };
   },
 });

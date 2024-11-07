@@ -2982,6 +2982,11 @@ type Mutation {
   ): PetitionSignatureRequest!
 
   """
+  Updates the standard list definitions with values defined in excel file
+  """
+  updateStandardListDefinitions(file: Upload!): SupportMethodResponse!
+
+  """
   Updates the name and color of a given tag
   """
   updateTag(data: UpdateTagInput!, id: GID!): Tag!
@@ -3582,6 +3587,11 @@ type Petition implements PetitionBase {
   skipForwardSecurity: Boolean!
 
   """
+  Lists every available standard list to be used in field logic conditions
+  """
+  standardListDefinitions: [StandardListDefinition!]!
+
+  """
   The status of the petition.
   """
   status: PetitionStatus!
@@ -3915,6 +3925,11 @@ interface PetitionBase {
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
+
+  """
+  Lists every available standard list to be used in field logic conditions
+  """
+  standardListDefinitions: [StandardListDefinition!]!
 
   """
   The tags linked to the petition
@@ -5400,6 +5415,11 @@ type PetitionTemplate implements PetitionBase {
   skipForwardSecurity: Boolean!
 
   """
+  Lists every available standard list to be used in field logic conditions
+  """
+  standardListDefinitions: [StandardListDefinition!]!
+
+  """
   The tags linked to the petition
   """
   tags: [Tag!]!
@@ -6388,6 +6408,11 @@ type PublicPetition implements Timestamps {
   signatureStatus: PublicSignatureStatus
 
   """
+  Lists every available standard list to be used in field logic conditions
+  """
+  standardListDefinitions: [StandardListDefinition!]!
+
+  """
   The status of the petition.
   """
   status: PetitionStatus!
@@ -7148,6 +7173,7 @@ type Query {
   Exposes minimal information for reminders page so the contact doesn't need to be verified
   """
   remindersOptOut(keycode: ID!): PublicRemindersOptOut
+  standardListDefinition(id: GID!, locale: UserLocale!): StandardListDefinition!
   subscriptions: [EventSubscription!]!
 
   """
@@ -7714,6 +7740,30 @@ type SignatureStartedEvent implements PetitionEvent {
   petition: Petition
   signature: PetitionSignatureRequest!
   type: PetitionEventType!
+}
+
+type StandardListDefinition {
+  id: GID!
+  listName: String!
+  listType: StandardListDefinitionListType!
+  listVersion: Date
+  source: String!
+  sourceUrl: String
+  title: LocalizableUserText!
+  values: [StandardListDefinitionValue!]!
+  versionFormat: JSONObject!
+  versionUrl: String
+}
+
+enum StandardListDefinitionListType {
+  COUNTRIES
+}
+
+type StandardListDefinitionValue {
+  key: String!
+  label: String
+  prefix: String
+  suffix: String
 }
 
 """

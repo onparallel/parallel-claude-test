@@ -3,19 +3,15 @@ import gql from "graphql-tag";
 import { Liquid } from "liquidjs";
 import { outdent } from "outdent";
 import { IntlShape } from "react-intl";
-import { isNonNull, isNonNullish, pick, sortBy, times, zip } from "remeda";
+import { isNonNull, isNonNullish, sortBy, times, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { FORMATS, prettifyTimezone } from "../../../util/dates";
-import { FieldLogicResult, evaluateFieldLogic } from "../../../util/fieldLogic";
+import { FieldLogicResult } from "../../../util/fieldLogic";
 import { fileSize } from "../../../util/fileSize";
 import { formatNumberWithPrefix } from "../../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { createLiquid } from "../../../util/liquid";
-import {
-  buildPetitionFieldsLiquidScope,
-  buildPetitionVariablesLiquidScope,
-} from "../../../util/liquidScope";
 import { never } from "../../../util/never";
 import { titleize } from "../../../util/strings";
 import { UnwrapArray } from "../../../util/types";
@@ -26,7 +22,12 @@ import {
   PetitionExport2_petitionDocument,
 } from "../../__types";
 import { documentSignatures } from "../../utils/documentSignatures";
+import { evaluateFieldLogic } from "../../utils/fieldLogic";
 import { LiquidScopeProvider } from "../../utils/liquid/LiquidScopeProvider";
+import {
+  buildPetitionFieldsLiquidScope,
+  buildPetitionVariablesLiquidScope,
+} from "../../utils/liquid/liquidScope";
 import { PdfDocument, PdfDocumentGetPropsContext } from "../../utils/pdf";
 import { block, box, element, heading, image, t, text, tt } from "../../utils/typst";
 
@@ -54,40 +55,7 @@ function PetitionExport2(
 ) {
   const theme = petition.selectedDocumentTheme.data as PdfDocumentTheme;
   const liquid = createLiquid();
-  const scope = buildPetitionFieldsLiquidScope(
-    {
-      id: petition.id,
-      fields: petition.fields.map((f) => ({
-        ...pick(f, ["id", "type", "multiple", "alias", "options", "visibility", "math"]),
-        children: f.children?.map((c) => ({
-          ...pick(c, ["id", "type", "multiple", "alias", "options", "visibility", "math"]),
-          parent: { id: f.id },
-          replies: c.replies.map((r) => ({
-            content: r.content,
-            anonymized_at: r.isAnonymized ? new Date() : null,
-          })),
-        })),
-        replies: f.replies.map((r) => ({
-          content: r.content,
-          anonymized_at: r.isAnonymized ? new Date() : null,
-          children:
-            r.children?.map((c) => ({
-              field: pick(c.field, ["id", "type", "multiple", "alias", "options"]),
-              replies: c.replies.map((r) => ({
-                content: r.content,
-                anonymized_at: r.isAnonymized ? new Date() : null,
-              })),
-            })) ?? null,
-        })),
-      })),
-      variables: petition.variables.map((v) => ({ name: v.name, default_value: v.defaultValue })),
-      custom_lists: petition.customLists.map((cl) => ({ name: cl.name, values: cl.values })),
-      automatic_numbering_config: petition.automaticNumberingConfig
-        ? { numbering_type: petition.automaticNumberingConfig.numberingType }
-        : null,
-    },
-    intl,
-  );
+  const scope = buildPetitionFieldsLiquidScope(petition, intl);
   const doubleColumn = theme.doubleColumn;
   const columnGutter = 10;
   const DEBUG = false;
@@ -803,39 +771,7 @@ function trailingNewLines({ raw }: { raw: string }) {
 function groupFieldsByPages<T extends PetitionExport2_PetitionBaseFragment>(
   petition: T,
 ): { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] {
-  const fieldLogic = evaluateFieldLogic({
-    fields: petition.fields.map((field) => ({
-      ...pick(field, ["id", "type", "options", "math", "visibility"]),
-      replies: field.replies.map((reply) => ({
-        content: reply.content,
-        anonymized_at: reply.isAnonymized ? new Date() : null,
-        children:
-          reply.children?.map((child) => ({
-            field: pick(child.field, ["id"]),
-            replies: child.replies.map((r) => ({
-              content: r.content,
-              anonymized_at: r.isAnonymized ? new Date() : null,
-            })),
-          })) ?? null,
-      })),
-      children:
-        field.children?.map((child) => ({
-          ...pick(child, ["id", "type", "options", "math", "visibility", "parent"]),
-          replies: child.replies.map((reply) => ({
-            content: reply.content,
-            anonymized_at: reply.isAnonymized ? new Date() : null,
-          })),
-        })) ?? null,
-    })),
-    variables: petition.variables.map((v) => ({
-      name: v.name,
-      default_value: v.defaultValue,
-    })),
-    custom_lists: petition.customLists,
-    automatic_numbering_config: petition.automaticNumberingConfig
-      ? { numbering_type: petition.automaticNumberingConfig.numberingType }
-      : null,
-  });
+  const fieldLogic = evaluateFieldLogic(petition);
 
   const pages: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] = [];
   let page: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[] = [];
@@ -911,14 +847,6 @@ PetitionExport2.fragments = {
           }
         }
         ...LiquidScopeProvider_PetitionBase
-        variables {
-          name
-          defaultValue
-        }
-        customLists {
-          name
-          values
-        }
         __typename
       }
       ${this.PetitionField}
@@ -939,7 +867,6 @@ PetitionExport2.fragments = {
         showActivityInPdf
         visibility
         math
-        options
         multiple
         requireApproval
       }
@@ -952,7 +879,7 @@ PetitionExport2.fragments = {
         status
         content
         metadata
-        is_anonymized: isAnonymized
+        isAnonymized
         status
         repliedBy {
           __typename

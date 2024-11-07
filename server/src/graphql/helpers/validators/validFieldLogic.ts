@@ -2,18 +2,22 @@ import Ajv from "ajv";
 import { core } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionField } from "../../../db/__types";
+import {
+  PetitionField,
+  StandardListDefinition,
+  StandardListDefinitionListType,
+} from "../../../db/__types";
 import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
-import { PetitionVariable } from "../../../db/repositories/PetitionRepository";
+import { PetitionCustomList, PetitionVariable } from "../../../db/repositories/PetitionRepository";
 import {
   PetitionFieldLogic,
   PetitionFieldLogicCondition,
   PetitionFieldMath,
   PetitionFieldMathOperation,
   PetitionFieldVisibility,
-  mapFieldLogicCondition,
-  mapFieldMathOperation,
+  mapFieldLogic,
 } from "../../../util/fieldLogic";
+import { fromGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { ArgValidationError } from "../errors";
 import { DynamicSelectOption } from "../parseDynamicSelectValues";
@@ -43,6 +47,9 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = {
             "GREATER_THAN",
             "GREATER_THAN_OR_EQUAL",
             "NUMBER_OF_SUBREPLIES",
+            "ANY_IS_IN_LIST",
+            "ALL_IS_IN_LIST",
+            "NONE_IS_IN_LIST",
           ],
         },
         value: {
@@ -219,7 +226,15 @@ export async function validateFieldLogic<
     | "petition_id"
     | "parent_petition_field_id"
   >,
->(field: TField, allFields: TField[], variables: PetitionVariable[]) {
+>(
+  field: TField,
+  allFields: TField[],
+  props: {
+    variables: PetitionVariable[];
+    standardListDefinitions: Pick<StandardListDefinition, "list_name" | "list_type">[];
+    customLists: Pick<PetitionCustomList, "name">[];
+  },
+) {
   async function validateLogicCondition(
     c: PetitionFieldLogicCondition,
     index: number,
@@ -320,6 +335,40 @@ export async function validateFieldLogic<
           );
         }
       }
+
+      if (
+        [
+          "IS_IN_LIST",
+          "NOT_IS_IN_LIST",
+          "ANY_IS_IN_LIST",
+          "ALL_IS_IN_LIST",
+          "NONE_IS_IN_LIST",
+        ].includes(c.operator)
+      ) {
+        const customList = props.customLists.find((l) => l.name === c.value);
+        const standardList = props.standardListDefinitions.find((d) => d.list_name === c.value);
+
+        assert(
+          customList || standardList,
+          `Can't find list ${c.value} referenced in condition ${index}`,
+        );
+
+        if (isNonNullish(standardList)) {
+          const typesMap: Record<string, StandardListDefinitionListType | null> = {
+            COUNTRIES: "COUNTRIES",
+            EU_COUNTRIES: "COUNTRIES",
+            NON_EU_COUNTRIES: "COUNTRIES",
+            CURRENCIES: null,
+            NACE: null,
+            CNAE: null,
+          };
+          assert(
+            isNonNullish(referencedField.options.standardList) &&
+              standardList.list_type === typesMap[referencedField.options.standardList],
+            `Can't reference standard list of type ${standardList.list_type} in condition ${index}`,
+          );
+        }
+      }
     } else {
       assert(
         typeof c.value === "number",
@@ -340,7 +389,7 @@ export async function validateFieldLogic<
       );
 
       assert(
-        !!variables.find((v) => v.name === c.variableName),
+        !!props.variables.find((v) => v.name === c.variableName),
         `Can't find variable ${c.variableName} referenced in condition ${index}`,
       );
     }
@@ -348,7 +397,7 @@ export async function validateFieldLogic<
 
   function validateMathOperation(op: PetitionFieldMathOperation, index: number) {
     assert(
-      !!variables.find((v) => v.name === op.variable),
+      !!props.variables.find((v) => v.name === op.variable),
       `Can't find variable ${op.variable} referenced in math operation ${index}`,
     );
 
@@ -364,7 +413,7 @@ export async function validateFieldLogic<
     if (op.operand.type === "VARIABLE") {
       const variableName = op.operand.name;
       assert(
-        !!variables.find((v) => v.name === variableName),
+        !!props.variables.find((v) => v.name === variableName),
         `Can't find variable ${variableName} referenced in math operation ${index}`,
       );
     }
@@ -405,18 +454,19 @@ export async function validateFieldLogic<
   }
 }
 
-export function validFieldVisibility<TypeName extends string, FieldName extends string>(
+export function validateFieldLogicInput<TypeName extends string, FieldName extends string>(
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => PetitionFieldVisibility<string> | null | undefined,
+  logic: (args: core.ArgsValue<TypeName, FieldName>) => {
+    visibility: PetitionFieldVisibility | null | undefined;
+    math: PetitionFieldMath[] | null | undefined;
+  },
   argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     try {
-      const fieldVisibility = prop(args);
-      if (isNullish(fieldVisibility)) {
+      const _fieldLogic = logic(args);
+      if (isNullish(_fieldLogic.visibility) && isNullish(_fieldLogic.math)) {
         return;
       }
 
@@ -430,54 +480,22 @@ export function validFieldVisibility<TypeName extends string, FieldName extends 
       ]);
 
       // replace GIDs with numeric for ajv validation
-      const visibility = fieldVisibility
-        ? {
-            ...fieldVisibility,
-            conditions: fieldVisibility.conditions.map((c) => mapFieldLogicCondition(c)),
-          }
-        : null;
-
-      await validateFieldLogic({ ...field!, visibility }, allFields, petition!.variables ?? []);
-    } catch (e: any) {
-      throw new ArgValidationError(info, argName, e.message);
-    }
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
-}
-
-export function validFieldMath<TypeName extends string, FieldName extends string>(
-  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => PetitionFieldMath<string>[] | null | undefined,
-  argName: string,
-) {
-  return (async (_, args, ctx, info) => {
-    try {
-      const fieldMath = prop(args);
-      if (isNullish(fieldMath)) {
-        return;
-      }
-
-      const petitionId = petitionIdProp(args);
-      const fieldId = fieldIdProp(args);
-
-      const [field, allFields, petition] = await Promise.all([
-        ctx.petitions.loadField(fieldId),
-        ctx.petitions.loadAllFieldsByPetitionId(petitionId),
-        ctx.petitions.loadPetition(petitionId),
-      ]);
-
-      // replace GIDs with numeric for ajv validation
-      const math = fieldMath
-        ? fieldMath.map((m) => ({
-            ...m,
-            conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
-            operations: m.operations.map((op) => mapFieldMathOperation(op)),
-          }))
-        : null;
-
-      await validateFieldLogic({ ...field!, math }, allFields, petition!.variables ?? []);
+      await validateFieldLogic(
+        {
+          ...field!,
+          ...mapFieldLogic<string>(_fieldLogic, (fieldId) => {
+            assert(typeof fieldId === "string", "Expected fieldId to be a string");
+            return fromGlobalId(fieldId, "PetitionField").id;
+          }).field,
+        },
+        allFields,
+        {
+          variables: petition!.variables ?? [],
+          standardListDefinitions:
+            await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(petitionId),
+          customLists: petition!.custom_lists ?? [],
+        },
+      );
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }

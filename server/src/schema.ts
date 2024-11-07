@@ -39,6 +39,7 @@ export const schema = makeSchema({
       `import type { FileUpload } from "graphql-upload/Upload.js";`,
       `import type { Duration } from "date-fns";`,
       `import type { LocalizableUserText } from "./helpers/scalars/LocalizableUserText";`,
+      `import type { Replace } from "../util/types";`,
     ],
     modules: [
       { module: resolve("./db/__types.ts"), alias: "db" },

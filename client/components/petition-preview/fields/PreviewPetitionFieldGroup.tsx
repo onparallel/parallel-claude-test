@@ -32,7 +32,7 @@ import {
   PreviewPetitionFieldGroup_UserFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";

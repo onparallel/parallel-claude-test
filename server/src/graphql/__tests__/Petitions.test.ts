@@ -235,13 +235,67 @@ describe("GraphQL/Petitions", () => {
       { name: "ON_BEHALF_OF", default_value: true },
       { name: "CUSTOM_PROPERTIES", default_value: true },
     ]);
+
+    await mocks.knex.from("standard_list_definition").insert([
+      {
+        title: { en: "GAFI Blacklist 2022/01" },
+        list_name: "GAFI_BLACKLIST",
+        list_version: "2022-01-01",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([{ key: "AR" }, { key: "BR" }, { key: "UY" }]),
+        source_name: "GAFI",
+        created_by: `User:1`,
+      },
+      {
+        title: { en: "GAFI Blacklist 2023/08" },
+        list_name: "GAFI_BLACKLIST",
+        list_version: "2023-08-31",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([{ key: "AR" }]),
+        source_name: "GAFI",
+        created_by: `User:1`,
+      },
+      {
+        title: { en: "GAFI Blacklist 2024/06" },
+        list_name: "GAFI_BLACKLIST",
+        list_version: "2024-06-01",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([
+          { key: "AR" },
+          { key: "BR" },
+          { key: "UY" },
+          { key: "CL" },
+          { key: "PE" },
+        ]),
+        source_name: "GAFI",
+        created_by: `User:1`,
+      },
+      {
+        title: { en: "Basel Index Y2K" },
+        list_name: "BASEL_INDEX",
+        list_version: "2000-01-01",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([{ key: "AR" }]),
+        source_name: "Basel",
+        created_by: "User:1",
+      },
+      {
+        title: { en: "Basel Index Y3K" },
+        list_name: "BASEL_INDEX",
+        list_version: "3000-01-01",
+        list_type: "COUNTRIES",
+        values: JSON.stringify([{ key: "AR" }]),
+        source_name: "Basel",
+        created_by: "User:1",
+      },
+    ]);
   });
 
   afterAll(async () => {
     await testClient.stop();
   });
 
-  describe("petitions", () => {
+  describe("Queries", () => {
     it("fetches all user petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -736,70 +790,268 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("filters petitions by profileTypeProcess templates", async () => {
-      const templates = await mocks.createRandomTemplates(organization.id, sessionUser.id, 2);
-      const [sameOrgTemplate] = await mocks.createRandomTemplates(
-        organization.id,
-        sameOrgUser.id,
-        1,
-      );
-      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
-      const [profileTypeProcess] = await mocks.knex.from("profile_type_process").insert(
-        {
-          profile_type_id: profileType.id,
-          process_name: { en: "KYC" },
-          position: 0,
-        },
-        "*",
-      );
-      await mocks.knex.from("profile_type_process_template").insert(
-        [...templates, sameOrgTemplate].map((template) => ({
-          template_id: template.id,
-          profile_type_process_id: profileTypeProcess.id,
-        })),
-      );
-
-      await mocks.createRandomPetitions(organization.id, sameOrgUser.id, 1, () => ({
-        from_template_id: templates[0].id,
-      }));
-
+    it("fetches different versions of standard list defintions based on petition overrides", async () => {
       const petitions = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
         4,
-        (i) => ({ from_template_id: templates[i]?.id ?? null }),
+        (i) => ({
+          is_template: false,
+          standard_list_definition_override: JSON.stringify(
+            [
+              [], // no overrides, always latest versions
+              [{ list_name: "GAFI_BLACKLIST", list_version: "2023-08-31" }], // override GAFI version
+              [
+                { list_name: "GAFI_BLACKLIST", list_version: "2022-01-01" },
+                { list_name: "BASEL_INDEX", list_version: "2000-01-01" },
+              ], // override everything
+              [{ list_name: "BASEL_INDEX", list_version: "2000-01-01" }], // override BASEL
+            ][i],
+          ),
+        }),
+      );
+      const [tag] = await mocks.createRandomTags(organization.id, 1);
+      await mocks.tagPetitions(
+        petitions.map((p) => p.id),
+        tag.id,
       );
 
       const { errors, data } = await testClient.execute(
         gql`
-          query ($limit: Int, $offset: Int, $filters: PetitionFilter) {
-            petitions(limit: $limit, offset: $offset, filters: $filters) {
+          query ($filters: PetitionFilter, $sortBy: [QueryPetitions_OrderBy!]) {
+            petitions(limit: 100, offset: 0, filters: $filters, sortBy: $sortBy) {
               totalCount
               items {
-                ... on Petition {
+                ... on PetitionBase {
                   id
+                  standardListDefinitions {
+                    title
+                    listName
+                    listVersion
+                  }
                 }
               }
             }
           }
         `,
         {
-          limit: 100,
-          offset: 0,
           filters: {
-            fromTemplateId: [...templates, sameOrgTemplate].map((t) =>
-              toGlobalId("Petition", t.id),
-            ),
+            tags: {
+              operator: "AND",
+              filters: [{ value: [toGlobalId("Tag", tag.id)], operator: "CONTAINS" }],
+            },
           },
+          sortBy: ["createdAt_ASC"],
         },
       );
 
       expect(errors).toBeUndefined();
       expect(data?.petitions).toEqual({
-        totalCount: 2,
+        totalCount: 4,
         items: [
-          { id: toGlobalId("Petition", petitions[0].id) },
-          { id: toGlobalId("Petition", petitions[1].id) },
+          {
+            id: toGlobalId("Petition", petitions[0].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: "2024-06-01",
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: "3000-01-01",
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[1].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2023/08" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: "2023-08-31",
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: "3000-01-01",
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[2].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2022/01" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: "2022-01-01",
+              },
+              {
+                title: { en: "Basel Index Y2K" },
+                listName: "BASEL_INDEX",
+                listVersion: "2000-01-01",
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[3].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: "2024-06-01",
+              },
+              {
+                title: { en: "Basel Index Y2K" },
+                listName: "BASEL_INDEX",
+                listVersion: "2000-01-01",
+              },
+            ]),
+          },
+        ],
+      });
+    });
+
+    it("always fetches latest standard list definition version if its a template", async () => {
+      const petitions = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        6,
+        (i) => ({
+          is_template: true,
+        }),
+      );
+      const [tag] = await mocks.createRandomTags(organization.id, 1);
+      await mocks.tagPetitions(
+        petitions.map((p) => p.id),
+        tag.id,
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filters: PetitionFilter, $sortBy: [QueryPetitions_OrderBy!]) {
+            petitions(limit: 100, offset: 0, filters: $filters, sortBy: $sortBy) {
+              totalCount
+              items {
+                ... on PetitionBase {
+                  id
+                  standardListDefinitions {
+                    title
+                    listName
+                    listVersion
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          filters: {
+            type: "TEMPLATE",
+            tags: {
+              operator: "AND",
+              filters: [{ value: [toGlobalId("Tag", tag.id)], operator: "CONTAINS" }],
+            },
+          },
+          sortBy: ["createdAt_ASC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitions).toEqual({
+        totalCount: 6,
+        items: [
+          {
+            id: toGlobalId("Petition", petitions[0].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[1].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[2].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[3].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[4].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
+          {
+            id: toGlobalId("Petition", petitions[5].id),
+            standardListDefinitions: expect.toIncludeSameMembers([
+              {
+                title: { en: "GAFI Blacklist 2024/06" },
+                listName: "GAFI_BLACKLIST",
+                listVersion: null,
+              },
+              {
+                title: { en: "Basel Index Y3K" },
+                listName: "BASEL_INDEX",
+                listVersion: null,
+              },
+            ]),
+          },
         ],
       });
     });
@@ -1952,6 +2204,101 @@ describe("GraphQL/Petitions", () => {
           from_petition_field_id: petitionFields[2].from_petition_field_id,
         },
       ]);
+    });
+
+    it("fixes standard list definition versions when creating a petition from a template", async () => {
+      const [template] = await mocks.createRandomTemplates(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ variables: JSON.stringify([{ name: "score", default_value: 0 }]) }),
+      );
+      const [selectField] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "SELECT",
+        options: {
+          standardList: "COUNTRIES",
+          values: [],
+        },
+      }));
+      await mocks.createRandomPetitionFields(template.id, 2, (i) => ({
+        type: "SHORT_TEXT",
+        visibility:
+          i === 0
+            ? JSON.stringify({
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    operator: "IS_IN_LIST",
+                    value: "GAFI_BLACKLIST",
+                    fieldId: selectField.id,
+                    modifier: "ANY",
+                  },
+                ],
+              })
+            : null,
+        math:
+          i === 1
+            ? JSON.stringify([
+                {
+                  operator: "AND",
+                  conditions: [
+                    {
+                      operator: "IS_IN_LIST",
+                      value: "BASEL_INDEX",
+                      fieldId: selectField.id,
+                      modifier: "ANY",
+                    },
+                  ],
+                  operations: [
+                    {
+                      variable: "score",
+                      operand: { type: "NUMBER", value: 100 },
+                      operator: "ADDITION",
+                    },
+                  ],
+                },
+              ])
+            : null,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($type: PetitionBaseType, $petitionId: GID) {
+            createPetition(type: $type, locale: es, petitionId: $petitionId) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", template.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition.fields).toHaveLength(3);
+
+      const [dbPetition] = await mocks.knex
+        .from("petition")
+        .where("id", fromGlobalId(data.createPetition.id, "Petition").id)
+        .select("standard_list_definition_override");
+
+      expect(dbPetition).toEqual({
+        standard_list_definition_override: expect.toIncludeSameMembers([
+          {
+            list_name: "GAFI_BLACKLIST",
+            list_version: "2024-06-01",
+          },
+          {
+            list_name: "BASEL_INDEX",
+            list_version: "3000-01-01",
+          },
+        ]),
+      });
     });
   });
 

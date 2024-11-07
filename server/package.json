@@ -16,6 +16,7 @@
     "migrate-down": "knex migrate:down",
     "postmigrate-down": "yarn generate-db-types",
     "seed": "cross-env NODE_ENV=development knex seed:run --specific=dev.ts",
+    "seed:standard-list-definitions": "cross-env NODE_ENV=development knex seed:run --specific=standard-list-definitions.ts",
     "generate-db-types": "ts-node ./bin/generate-db-types.ts",
     "test": "jest --runInBand",
     "extract-i18n-terms": "yarn concurrently \"yarn:extract-i18n-terms:* start\"",

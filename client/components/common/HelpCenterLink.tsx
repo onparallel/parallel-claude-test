@@ -14,7 +14,13 @@ export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLinkProps>(functio
   ref,
 ) {
   return (
-    <NormalLink as={NakedHelpCenterLink} ref={ref} {...props}>
+    <NormalLink
+      as={NakedHelpCenterLink}
+      ref={ref}
+      display="inline-flex"
+      alignItems="center"
+      {...props}
+    >
       {children}
       <ExternalLinkIcon verticalAlign="sub" marginStart={1} />
     </NormalLink>

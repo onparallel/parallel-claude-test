@@ -1,38 +1,47 @@
-import { PetitionField, PetitionFieldReply } from "../db/__types";
-import { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
+import { PetitionFieldType } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
-import { applyFieldVisibility } from "./fieldLogic";
-import { Maybe } from "./types";
+import { applyFieldVisibility, PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic";
 
-interface InnerPartialField
-  extends Pick<
-    PetitionField,
-    "id" | "type" | "options" | "optional" | "is_internal" | "visibility" | "math"
-  > {}
-interface PartialField extends InnerPartialField {
-  children: Maybe<
-    (InnerPartialField & {
-      parent: Maybe<Pick<PetitionField, "id">>;
-      replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
-    })[]
-  >;
-  replies: (Pick<PetitionFieldReply, "content" | "anonymized_at"> & {
-    children: Maybe<
-      {
-        field: Omit<InnerPartialField, "visibility" | "math">;
-        replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
-      }[]
-    >;
+interface FieldLogicPetitionFieldReplyInner {
+  content: any;
+  anonymized_at: Date | null;
+}
+
+interface FieldLogicPetitionFieldInner {
+  id: number;
+  type: PetitionFieldType;
+  options: any;
+  visibility: PetitionFieldVisibility | null;
+  math: PetitionFieldMath[] | null;
+  is_internal: boolean;
+  optional: boolean;
+}
+interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+  children?:
+    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | null;
+  replies: (FieldLogicPetitionFieldReplyInner & {
+    children?:
+      | {
+          field: Pick<
+            FieldLogicPetitionFieldInner,
+            "id" | "type" | "is_internal" | "optional" | "options"
+          >;
+          replies: FieldLogicPetitionFieldReplyInner[];
+        }[]
+      | null;
   })[];
 }
 
-interface PartialPetition {
-  fields: PartialField[];
-  variables: PetitionVariable[];
-  custom_lists: PetitionCustomList[];
+interface FieldLogicPetitionInput {
+  variables: { name: string; defaultValue: number }[];
+  customLists: { name: string; values: string[] }[];
+  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
+  standardListDefinitions: { listName: string; values: { key: string }[] }[];
+  fields: FieldLogicPetitionFieldInput[];
 }
 
-export function petitionIsCompleted(petition: PartialPetition, publicContext?: boolean) {
+export function petitionIsCompleted(petition: FieldLogicPetitionInput, publicContext?: boolean) {
   return applyFieldVisibility(petition).every(
     (field) =>
       (publicContext ? field.is_internal : false) ||

@@ -2,7 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
-import { PetitionFieldMath, PetitionFieldVisibility } from "../../../util/fieldLogic";
+import { PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toGlobalId } from "../../../util/globalId";
 import { Maybe, MaybeArray, unMaybeArray } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
@@ -224,7 +224,7 @@ export function variableIsNotBeingReferencedByFieldLogic<
       }
 
       if (
-        (f.math as PetitionFieldMath[] | null)?.some(
+        f.math?.some(
           (m) =>
             m.conditions.some((c) => "variableName" in c && c.variableName === variableName) ||
             m.operations.some(
@@ -271,12 +271,10 @@ export function fieldIsNotBeingUsedInMathOperation<
       return true;
     }
 
-    const referencingFields = petitionFields.filter(
-      (f) =>
-        isNonNullish(f.math) &&
-        (f.math as PetitionFieldMath[]).some((m) =>
-          m.operations.some((op) => op.operand.type === "FIELD" && op.operand.fieldId === fieldId),
-        ),
+    const referencingFields = petitionFields.filter((f) =>
+      f.math?.some((m) =>
+        m.operations.some((op) => op.operand.type === "FIELD" && op.operand.fieldId === fieldId),
+      ),
     );
 
     if (referencingFields.length > 0) {

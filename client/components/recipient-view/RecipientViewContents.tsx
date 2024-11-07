@@ -19,7 +19,8 @@ import {
   RecipientViewContents_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { FieldLogicResult, useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { ArrayUnionToUnion, Maybe } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";

@@ -86,7 +86,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -110,7 +110,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -134,7 +134,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -158,7 +158,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -194,7 +194,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -211,7 +211,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow();
       });
@@ -235,7 +235,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).resolves.not.toThrow();
       });
@@ -259,7 +259,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow();
       });
@@ -283,7 +283,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Conditions can't reference HEADING fields");
       });
@@ -307,7 +307,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid value type string for modifier NUMBER_OF_REPLIES");
       });
@@ -331,7 +331,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid value type number for field of type TEXT");
       });
@@ -355,7 +355,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
       });
@@ -379,7 +379,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid operator LESS_THAN for field of type TEXT");
       });
@@ -403,7 +403,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid operator START_WITH for field of type SELECT");
       });
@@ -427,7 +427,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow(
           "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3",
@@ -453,7 +453,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Invalid modifier NONE for field of type FILE_UPLOAD");
       });
@@ -477,7 +477,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow();
       });
@@ -501,7 +501,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow(
           `Can't find PetitionField:1101010 referenced in PetitionField:${textField.id}, condition 0`,
@@ -533,7 +533,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow(
           `Can't find PetitionField:${deletedField.id} referenced in PetitionField:${shortTextField.id}, condition 1`,
@@ -571,7 +571,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow(
           `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in PetitionField:${shortTextField.id}, condition 2`,
@@ -597,7 +597,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Can't add a reference to field itself");
       });
@@ -621,7 +621,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
       });
@@ -643,7 +643,7 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow();
       });
@@ -666,7 +666,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [{ name: "PETITION_VARIABLE", default_value: 0 }],
+            {
+              variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -689,7 +693,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [{ name: "PETITION_VARIABLE", default_value: 0 }],
+            {
+              variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow("Invalid value type string for variable condition 0");
       });
@@ -723,7 +731,11 @@ describe("validateFieldLogic", () => {
                 },
               },
               allFields,
-              [{ name: "PETITION_VARIABLE", default_value: 0 }],
+              {
+                variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+                customLists: [],
+                standardListDefinitions: [],
+              },
             ),
           ).rejects.toThrow(`Invalid operator ${operator} for variable condition 0`);
         }
@@ -747,7 +759,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow(`Can't find variable PETITION_VARIABLE referenced in condition 0`);
       });
@@ -811,7 +827,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -835,7 +855,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -859,7 +883,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -883,7 +911,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
       });
@@ -907,7 +939,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -931,7 +967,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
       });
@@ -955,7 +995,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -979,7 +1023,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
       });
@@ -1003,7 +1051,11 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            [],
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -1041,7 +1093,11 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [{ name: "score", default_value: 0 }],
+          {
+            variables: [{ name: "score", default_value: 0 }],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).resolves.not.toThrow();
     });
@@ -1076,7 +1132,11 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [{ name: "score", default_value: 0 }],
+          {
+            variables: [{ name: "score", default_value: 0 }],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).resolves.not.toThrow();
     });
@@ -1111,10 +1171,14 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [
-            { name: "score", default_value: 0 },
-            { name: "source", default_value: 100 },
-          ],
+          {
+            variables: [
+              { name: "score", default_value: 0 },
+              { name: "source", default_value: 100 },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).resolves.not.toThrow();
     });
@@ -1149,7 +1213,11 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [{ name: "score", default_value: 0 }],
+          {
+            variables: [{ name: "score", default_value: 0 }],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).rejects.toThrow();
     });
@@ -1184,7 +1252,11 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [{ name: "score", default_value: 0 }],
+          {
+            variables: [{ name: "score", default_value: 0 }],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).rejects.toThrow();
     });
@@ -1219,10 +1291,14 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [
-            { name: "score", default_value: 0 },
-            { name: "source", default_value: 100 },
-          ],
+          {
+            variables: [
+              { name: "score", default_value: 0 },
+              { name: "source", default_value: 100 },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).rejects.toThrow();
     });
@@ -1257,10 +1333,14 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [
-            { name: "score", default_value: 0 },
-            { name: "source", default_value: 100 },
-          ],
+          {
+            variables: [
+              { name: "score", default_value: 0 },
+              { name: "source", default_value: 100 },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).rejects.toThrow();
     });
@@ -1299,10 +1379,14 @@ describe("validateFieldLogic", () => {
               ],
             },
             allFields,
-            [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
-            ],
+            {
+              variables: [
+                { name: "score", default_value: 0 },
+                { name: "source", default_value: 100 },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow();
       }
@@ -1342,10 +1426,14 @@ describe("validateFieldLogic", () => {
               ],
             },
             allFields,
-            [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
-            ],
+            {
+              variables: [
+                { name: "score", default_value: 0 },
+                { name: "source", default_value: 100 },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow();
       }
@@ -1385,10 +1473,14 @@ describe("validateFieldLogic", () => {
               math,
             },
             allFields,
-            [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
-            ],
+            {
+              variables: [
+                { name: "score", default_value: 0 },
+                { name: "source", default_value: 100 },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+            },
           ),
         ).rejects.toThrow();
       }
@@ -1424,7 +1516,11 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [{ name: "score", default_value: 0 }],
+          {
+            variables: [{ name: "score", default_value: 0 }],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).resolves.not.toThrow();
     });
@@ -1480,11 +1576,15 @@ describe("validateFieldLogic", () => {
             ],
           },
           allFields,
-          [
-            { name: "source", default_value: 0 },
-            { name: "score", default_value: 0 },
-            { name: "price_multiplier", default_value: 1 },
-          ],
+          {
+            variables: [
+              { name: "source", default_value: 0 },
+              { name: "score", default_value: 0 },
+              { name: "price_multiplier", default_value: 1 },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+          },
         ),
       ).resolves.not.toThrow();
     });
