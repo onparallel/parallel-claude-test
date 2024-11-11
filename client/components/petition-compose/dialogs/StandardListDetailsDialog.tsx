@@ -134,7 +134,7 @@ export function StandardListDetailsDialog({
                       boxSize={6}
                       src={`${
                         process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
-                      }/static/countries/flags/${value.key}.png`}
+                      }/static/countries/flags/${value.key.toLowerCase()}.png`}
                     />
                     <Box as="span">
                       {[value.prefix, value.label ?? value.key, value.suffix]
