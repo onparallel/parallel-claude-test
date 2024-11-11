@@ -1,4 +1,4 @@
-import { CreateStandardListDefinition, StandardListDefinitionListType } from "../../src/db/__types";
+import { CreateStandardListDefinition, StandardListDefinitionListType } from "../db/__types";
 
 function validateDateFormat(value: any): {
   day?: "numeric" | "2-digit";

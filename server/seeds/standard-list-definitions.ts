@@ -6,7 +6,7 @@ import { Knex } from "knex";
 import { join } from "path";
 import { Readable, Stream } from "stream";
 import { loadEnv } from "../src/util/loadEnv";
-import { parseStandardListDefinitionsData } from "./utils/helpers";
+import { parseStandardListDefinitionsData } from "../src/util/parseStandardListDefinitionsData";
 
 export async function seed(knex: Knex): Promise<any> {
   await loadEnv();

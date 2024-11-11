@@ -1120,6 +1120,11 @@
     "context": "Security provisions"
   },
   {
+    "term": "profiles.default-profile-type-field.contract-signature-date",
+    "definition": "Fecha de firma",
+    "context": "Signature date"
+  },
+  {
     "term": "profiles.default-profile-type-field.contract-termination-clauses",
     "definition": "Cláusulas de terminación",
     "context": "Termination clauses"
@@ -1148,6 +1153,11 @@
     "term": "profiles.default-profile-type-field.individual-city",
     "definition": "Ciudad",
     "context": "City"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-client-status",
+    "definition": "Estado cliente",
+    "context": "Client status"
   },
   {
     "term": "profiles.default-profile-type-field.individual-country-of-residence",
@@ -1195,6 +1205,11 @@
     "context": "Last name"
   },
   {
+    "term": "profiles.default-profile-type-field.individual-marital-status",
+    "definition": "Estado civil",
+    "context": "Marital status"
+  },
+  {
     "term": "profiles.default-profile-type-field.individual-mobile-phone-number",
     "definition": "Número de teléfono móvil",
     "context": "Mobile phone number"
@@ -1220,9 +1235,24 @@
     "context": "Phone number"
   },
   {
+    "term": "profiles.default-profile-type-field.individual-position",
+    "definition": "Cargo",
+    "context": "Position"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-power-of-attorney",
+    "definition": "Poder de representación",
+    "context": "Power of attorney"
+  },
+  {
     "term": "profiles.default-profile-type-field.individual-proof-of-address-document",
     "definition": "Documento de prueba de domicilio",
     "context": "Proof of address document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-relationship",
+    "definition": "Relación",
+    "context": "Relationship"
   },
   {
     "term": "profiles.default-profile-type-field.individual-risk",
@@ -1245,9 +1275,29 @@
     "context": "ZIP code"
   },
   {
+    "term": "profiles.default-profile-type-field.legal-entity-background-check",
+    "definition": "Búsqueda en listados",
+    "context": "Background check"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-bylaws",
+    "definition": "Estatutos sociales",
+    "context": "Bylaws"
+  },
+  {
     "term": "profiles.default-profile-type-field.legal-entity-city",
     "definition": "Ciudad",
     "context": "City"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-client-status",
+    "definition": "Estado cliente",
+    "context": "Client status"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-country",
+    "definition": "País",
+    "context": "Country"
   },
   {
     "term": "profiles.default-profile-type-field.legal-entity-country-of-incorporation",
@@ -1258,6 +1308,11 @@
     "term": "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
     "definition": "Fecha de constitución",
     "context": "Date of incorporation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-deed-of-incorporation",
+    "definition": "Escritura de constitución",
+    "context": "Deed of incorporation"
   },
   {
     "term": "profiles.default-profile-type-field.legal-entity-effective-date-of-power-of-attorney",
@@ -1295,6 +1350,11 @@
     "context": "Ownership structure"
   },
   {
+    "term": "profiles.default-profile-type-field.legal-entity-phone-number",
+    "definition": "Teléfono",
+    "context": "Phone number"
+  },
+  {
     "term": "profiles.default-profile-type-field.legal-entity-power-of-attorney-document",
     "definition": "Documento del poder de representación",
     "context": "Power of attorney document"
@@ -1325,6 +1385,11 @@
     "context": "Registration number"
   },
   {
+    "term": "profiles.default-profile-type-field.legal-entity-relationship",
+    "definition": "Relación",
+    "context": "Relationship"
+  },
+  {
     "term": "profiles.default-profile-type-field.legal-entity-revocation-conditions",
     "definition": "Condiciones de revocación",
     "context": "Revocation conditions"
@@ -1345,6 +1410,11 @@
     "context": "Tax ID"
   },
   {
+    "term": "profiles.default-profile-type-field.legal-entity-tax-identification-document",
+    "definition": "Código de identificación fiscal (documento)",
+    "context": "Tax identification document"
+  },
+  {
     "term": "profiles.default-profile-type-field.legal-entity-trade-name",
     "definition": "Nombre comercial",
     "context": "Trade name"
@@ -1358,6 +1428,31 @@
     "term": "profiles.default-profile-type-field.legal-entity-zip-code",
     "definition": "Código postal",
     "context": "ZIP Code"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-client-status-active",
+    "definition": "Activo",
+    "context": "Active"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-client-status-approved",
+    "definition": "Aprobado",
+    "context": "Approved"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-client-status-closed",
+    "definition": "Cerrado",
+    "context": "Closed"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-client-status-pending",
+    "definition": "Pendiente",
+    "context": "Pending"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-client-status-rejected",
+    "definition": "Rechazado",
+    "context": "Rejected"
   },
   {
     "term": "profiles.default-profile-type-field.option-contract-type-consulting-agreement",
@@ -1455,6 +1550,11 @@
     "context": "Limited Liability Partnership"
   },
   {
+    "term": "profiles.default-profile-type-field.option-entity-type-other",
+    "definition": "Otro",
+    "context": "Other"
+  },
+  {
     "term": "profiles.default-profile-type-field.option-entity-type-trust",
     "definition": "Trust",
     "context": "Trust"
@@ -1480,9 +1580,49 @@
     "context": "Special power of attorney"
   },
   {
+    "term": "profiles.default-profile-type-field.option-marital-status-divorced",
+    "definition": "Divorciado/a",
+    "context": "Divorced"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-marital-status-married",
+    "definition": "Casado/a",
+    "context": "Married"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-marital-status-separated",
+    "definition": "Separado/a",
+    "context": "Separated"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-marital-status-single",
+    "definition": "Soltero/a",
+    "context": "Single"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-marital-status-widowed",
+    "definition": "Viudo/a",
+    "context": "Widowed"
+  },
+  {
     "term": "profiles.default-profile-type-field.option-no",
     "definition": "No",
     "context": "No"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-relationship-client",
+    "definition": "Cliente",
+    "context": "Client"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-relationship-other",
+    "definition": "Otros",
+    "context": "Other"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-relationship-provider",
+    "definition": "Proveedor",
+    "context": "Provider"
   },
   {
     "term": "profiles.default-profile-type-field.option-risk-high",
@@ -1583,6 +1723,11 @@
     "term": "profiles.default-relationship-type.close-associate",
     "definition": "Asociado cercano",
     "context": "Close associate"
+  },
+  {
+    "term": "profiles.default-relationship-type.contact",
+    "definition": "Contacto",
+    "context": "Contact"
   },
   {
     "term": "profiles.default-relationship-type.contract",

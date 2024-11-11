@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { indexBy } from "remeda";
+import { indexBy, pick } from "remeda";
 import {
   Organization,
   OrgIntegration,
@@ -1203,7 +1203,7 @@ describe("Profile External Sources", () => {
         );
 
         expect(errors).toBeUndefined();
-        expect(data?.completeProfileFromExternalSource).toEqual({
+        expect(pick(data?.completeProfileFromExternalSource, ["id", "events"])).toEqual({
           id: toGlobalId("Profile", individual.id),
           events: {
             totalCount: 8,
@@ -1293,32 +1293,37 @@ describe("Profile External Sources", () => {
               },
             ],
           },
-          properties: [
-            { field: { alias: "p_first_name" }, value: { content: { value: "Mike" } } },
-            { field: { alias: "p_last_name" }, value: { content: { value: "Ross" } } },
-            { field: { alias: "p_email" }, value: { content: { value: "mike@onparallel.com" } } },
-            { field: { alias: "p_phone_number" }, value: null },
-            { field: { alias: "p_mobile_phone_number" }, value: null },
-            { field: { alias: "p_birth_date" }, value: null },
-            { field: { alias: "p_gender" }, value: null },
-            { field: { alias: "p_address" }, value: { content: { value: "Fake St. 123" } } },
-            { field: { alias: "p_city" }, value: { content: { value: "Barcelona" } } },
-            { field: { alias: "p_zip" }, value: null },
-            { field: { alias: "p_country_of_residence" }, value: null },
-            { field: { alias: "p_proof_of_address_document" }, value: null },
-            { field: { alias: "p_citizenship" }, value: null },
-            { field: { alias: "p_tax_id" }, value: { content: { value: "Y1234567A" } } },
-            { field: { alias: "p_id_document" }, value: null },
-            { field: { alias: "p_passport_document" }, value: null },
-            { field: { alias: "p_passport_number" }, value: null },
-            { field: { alias: "p_is_pep" }, value: null },
-            { field: { alias: "p_risk" }, value: null },
-            { field: { alias: "p_risk_assessment" }, value: null },
-            { field: { alias: "p_source_of_funds" }, value: null },
-            { field: { alias: "p_background_check" }, value: null },
-            { field: { alias: "p_occupation" }, value: { content: { value: "Lawyer" } } },
-          ],
         });
+        expect(data?.completeProfileFromExternalSource.properties.slice(0, 28)).toEqual([
+          { field: { alias: "p_first_name" }, value: { content: { value: "Mike" } } },
+          { field: { alias: "p_last_name" }, value: { content: { value: "Ross" } } },
+          { field: { alias: "p_email" }, value: { content: { value: "mike@onparallel.com" } } },
+          { field: { alias: "p_phone_number" }, value: null },
+          { field: { alias: "p_mobile_phone_number" }, value: null },
+          { field: { alias: "p_birth_date" }, value: null },
+          { field: { alias: "p_gender" }, value: null },
+          { field: { alias: "p_address" }, value: { content: { value: "Fake St. 123" } } },
+          { field: { alias: "p_city" }, value: { content: { value: "Barcelona" } } },
+          { field: { alias: "p_zip" }, value: null },
+          { field: { alias: "p_country_of_residence" }, value: null },
+          { field: { alias: "p_proof_of_address_document" }, value: null },
+          { field: { alias: "p_citizenship" }, value: null },
+          { field: { alias: "p_tax_id" }, value: { content: { value: "Y1234567A" } } },
+          { field: { alias: "p_id_document" }, value: null },
+          { field: { alias: "p_passport_document" }, value: null },
+          { field: { alias: "p_passport_number" }, value: null },
+          { field: { alias: "p_is_pep" }, value: null },
+          { field: { alias: "p_risk" }, value: null },
+          { field: { alias: "p_risk_assessment" }, value: null },
+          { field: { alias: "p_source_of_funds" }, value: null },
+          { field: { alias: "p_background_check" }, value: null },
+          { field: { alias: "p_occupation" }, value: { content: { value: "Lawyer" } } },
+          { field: { alias: "p_poa" }, value: null },
+          { field: { alias: "p_position" }, value: null },
+          { field: { alias: "p_client_status" }, value: null },
+          { field: { alias: "p_marital_status" }, value: null },
+          { field: { alias: "p_relationship" }, value: null },
+        ]);
       });
 
       it("completes LEGAL_ENTITY profile value with external source data", async () => {
@@ -1440,7 +1445,7 @@ describe("Profile External Sources", () => {
         );
 
         expect(errors).toBeUndefined();
-        expect(data?.completeProfileFromExternalSource).toEqual({
+        expect(pick(data?.completeProfileFromExternalSource, ["id", "events"])).toEqual({
           id: toGlobalId("Profile", legalEntity.id),
           events: {
             totalCount: 4,
@@ -1486,35 +1491,43 @@ describe("Profile External Sources", () => {
               },
             ],
           },
-          properties: [
-            { field: { alias: "p_entity_name" }, value: null },
-            { field: { alias: "p_trade_name" }, value: { content: { value: "My Super Company" } } },
-            { field: { alias: "p_entity_type" }, value: null },
-            { field: { alias: "p_registration_number" }, value: null },
-            { field: { alias: "p_tax_id" }, value: { content: { value: "B67505586" } } },
-            { field: { alias: "p_registered_address" }, value: null },
-            { field: { alias: "p_city" }, value: { content: { value: "Barcelona" } } },
-            { field: { alias: "p_zip" }, value: null },
-            { field: { alias: "p_country_of_incorporation" }, value: null },
-            {
-              field: { alias: "p_date_of_incorporation" },
-              value: { content: { value: "2020-01-01" } },
-            },
-            { field: { alias: "p_main_business_activity" }, value: null },
-            { field: { alias: "p_ownership_structure" }, value: null },
-            { field: { alias: "p_ubo_statement" }, value: null },
-            { field: { alias: "p_financial_statements" }, value: null },
-            { field: { alias: "p_risk" }, value: null },
-            { field: { alias: "p_risk_assessment" }, value: null },
-            { field: { alias: "p_poa_types" }, value: null },
-            { field: { alias: "p_poa_scope" }, value: null },
-            { field: { alias: "p_poa_document" }, value: null },
-            { field: { alias: "p_poa_effective_date" }, value: null },
-            { field: { alias: "p_poa_expiration_date" }, value: null },
-            { field: { alias: "p_poa_revocation_conditions" }, value: null },
-            { field: { alias: "p_poa_registered" }, value: null },
-          ],
         });
+        expect(data?.completeProfileFromExternalSource.properties.slice(0, 31)).toEqual([
+          { field: { alias: "p_entity_name" }, value: null },
+          { field: { alias: "p_trade_name" }, value: { content: { value: "My Super Company" } } },
+          { field: { alias: "p_entity_type" }, value: null },
+          { field: { alias: "p_registration_number" }, value: null },
+          { field: { alias: "p_tax_id" }, value: { content: { value: "B67505586" } } },
+          { field: { alias: "p_registered_address" }, value: null },
+          { field: { alias: "p_phone_number" }, value: null },
+          { field: { alias: "p_city" }, value: { content: { value: "Barcelona" } } },
+          { field: { alias: "p_zip" }, value: null },
+          { field: { alias: "p_country" }, value: null },
+          { field: { alias: "p_country_of_incorporation" }, value: null },
+          {
+            field: { alias: "p_date_of_incorporation" },
+            value: { content: { value: "2020-01-01" } },
+          },
+          { field: { alias: "p_main_business_activity" }, value: null },
+          { field: { alias: "p_ownership_structure" }, value: null },
+          { field: { alias: "p_ubo_statement" }, value: null },
+          { field: { alias: "p_financial_statements" }, value: null },
+          { field: { alias: "p_risk" }, value: null },
+          { field: { alias: "p_risk_assessment" }, value: null },
+          { field: { alias: "p_poa_types" }, value: null },
+          { field: { alias: "p_poa_scope" }, value: null },
+          { field: { alias: "p_poa_document" }, value: null },
+          { field: { alias: "p_poa_effective_date" }, value: null },
+          { field: { alias: "p_poa_expiration_date" }, value: null },
+          { field: { alias: "p_poa_revocation_conditions" }, value: null },
+          { field: { alias: "p_poa_registered" }, value: null },
+          { field: { alias: "p_background_check" }, value: null },
+          { field: { alias: "p_tax_id_document" }, value: null },
+          { field: { alias: "p_deed_incorporation" }, value: null },
+          { field: { alias: "p_bylaws" }, value: null },
+          { field: { alias: "p_client_status" }, value: null },
+          { field: { alias: "p_relationship" }, value: null },
+        ]);
       });
 
       it("creates and completes a new profile if passing null profileId", async () => {
@@ -1613,7 +1626,7 @@ describe("Profile External Sources", () => {
         );
 
         expect(errors).toBeUndefined();
-        expect(data?.completeProfileFromExternalSource).toEqual({
+        expect(pick(data.completeProfileFromExternalSource, ["id", "events"])).toEqual({
           id: expect.any(String),
           events: {
             totalCount: 4,
@@ -1654,32 +1667,39 @@ describe("Profile External Sources", () => {
               },
             ],
           },
-          properties: [
-            { field: { alias: "p_first_name" }, value: { content: { value: "Mike" } } },
-            { field: { alias: "p_last_name" }, value: { content: { value: "Ross" } } },
-            { field: { alias: "p_email" }, value: null },
-            { field: { alias: "p_phone_number" }, value: null },
-            { field: { alias: "p_mobile_phone_number" }, value: null },
-            { field: { alias: "p_birth_date" }, value: null },
-            { field: { alias: "p_gender" }, value: null },
-            { field: { alias: "p_address" }, value: null },
-            { field: { alias: "p_city" }, value: null },
-            { field: { alias: "p_zip" }, value: null },
-            { field: { alias: "p_country_of_residence" }, value: null },
-            { field: { alias: "p_proof_of_address_document" }, value: null },
-            { field: { alias: "p_citizenship" }, value: null },
-            { field: { alias: "p_tax_id" }, value: null },
-            { field: { alias: "p_id_document" }, value: null },
-            { field: { alias: "p_passport_document" }, value: null },
-            { field: { alias: "p_passport_number" }, value: null },
-            { field: { alias: "p_is_pep" }, value: null },
-            { field: { alias: "p_risk" }, value: null },
-            { field: { alias: "p_risk_assessment" }, value: null },
-            { field: { alias: "p_source_of_funds" }, value: null },
-            { field: { alias: "p_background_check" }, value: null },
-            { field: { alias: "p_occupation" }, value: null },
-          ],
         });
+
+        // check up to 28 first properties
+        expect(data?.completeProfileFromExternalSource.properties.slice(0, 28)).toEqual([
+          { field: { alias: "p_first_name" }, value: { content: { value: "Mike" } } },
+          { field: { alias: "p_last_name" }, value: { content: { value: "Ross" } } },
+          { field: { alias: "p_email" }, value: null },
+          { field: { alias: "p_phone_number" }, value: null },
+          { field: { alias: "p_mobile_phone_number" }, value: null },
+          { field: { alias: "p_birth_date" }, value: null },
+          { field: { alias: "p_gender" }, value: null },
+          { field: { alias: "p_address" }, value: null },
+          { field: { alias: "p_city" }, value: null },
+          { field: { alias: "p_zip" }, value: null },
+          { field: { alias: "p_country_of_residence" }, value: null },
+          { field: { alias: "p_proof_of_address_document" }, value: null },
+          { field: { alias: "p_citizenship" }, value: null },
+          { field: { alias: "p_tax_id" }, value: null },
+          { field: { alias: "p_id_document" }, value: null },
+          { field: { alias: "p_passport_document" }, value: null },
+          { field: { alias: "p_passport_number" }, value: null },
+          { field: { alias: "p_is_pep" }, value: null },
+          { field: { alias: "p_risk" }, value: null },
+          { field: { alias: "p_risk_assessment" }, value: null },
+          { field: { alias: "p_source_of_funds" }, value: null },
+          { field: { alias: "p_background_check" }, value: null },
+          { field: { alias: "p_occupation" }, value: null },
+          { field: { alias: "p_poa" }, value: null },
+          { field: { alias: "p_position" }, value: null },
+          { field: { alias: "p_client_status" }, value: null },
+          { field: { alias: "p_marital_status" }, value: null },
+          { field: { alias: "p_relationship" }, value: null },
+        ]);
       });
 
       it("sends error if trying to complete a CONTRACT profile", async () => {

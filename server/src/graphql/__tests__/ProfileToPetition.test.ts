@@ -156,15 +156,15 @@ describe("GraphQL/Profiles to Petitions", () => {
         }),
       );
 
-      const individualFields = individualProperties.map((p) =>
-        mapProfileTypeFieldToPetitionField(p, "en"),
-      );
-      const legalEntityFields = legalEntityProperties.map((p) =>
-        mapProfileTypeFieldToPetitionField(p, "en"),
-      );
-      const contractFields = contractProperties.map((p) =>
-        mapProfileTypeFieldToPetitionField(p, "en"),
-      );
+      const individualFields = individualProperties
+        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .slice(0, 23);
+      const legalEntityFields = legalEntityProperties
+        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .slice(0, 25);
+      const contractFields = contractProperties
+        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .slice(0, 22);
 
       youChildren = await mocks.createRandomPetitionFields(
         template.id,
@@ -912,6 +912,13 @@ describe("GraphQL/Profiles to Petitions", () => {
         },
         {
           profile_id: yourCompaniesProfiles[0].id,
+          profile_type_field_id: legalEntityIdx["p_phone_number"].id,
+          type: "PHONE",
+          content: { value: "+123456789" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
@@ -922,6 +929,13 @@ describe("GraphQL/Profiles to Petitions", () => {
           profile_type_field_id: legalEntityIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "123" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: yourCompaniesProfiles[0].id,
+          profile_type_field_id: legalEntityIdx["p_country"].id,
+          type: "SELECT",
+          content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
@@ -1017,6 +1031,13 @@ describe("GraphQL/Profiles to Petitions", () => {
         },
         {
           profile_id: yourCompaniesProfiles[1].id,
+          profile_type_field_id: legalEntityIdx["p_phone_number"].id,
+          type: "PHONE",
+          content: { value: "+123456780" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
@@ -1027,6 +1048,13 @@ describe("GraphQL/Profiles to Petitions", () => {
           profile_type_field_id: legalEntityIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: yourCompaniesProfiles[1].id,
+          profile_type_field_id: legalEntityIdx["p_country"].id,
+          type: "SELECT",
+          content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
@@ -1083,20 +1111,6 @@ describe("GraphQL/Profiles to Petitions", () => {
           profile_type_field_id: legalEntityIdx["p_poa_expiration_date"].id,
           type: "DATE",
           content: { value: "2000-01-01" },
-          created_by_user_id: user.id,
-        },
-        {
-          profile_id: yourCompaniesProfiles[1].id,
-          profile_type_field_id: legalEntityIdx["p_poa_revocation_conditions"].id,
-          type: "SHORT_TEXT",
-          content: { value: "None" },
-          created_by_user_id: user.id,
-        },
-        {
-          profile_id: yourCompaniesProfiles[1].id,
-          profile_type_field_id: legalEntityIdx["p_poa_registered"].id,
-          type: "SELECT",
-          content: { value: "Y" },
           created_by_user_id: user.id,
         },
       ]);
@@ -3481,6 +3495,27 @@ describe("GraphQL/Profiles to Petitions", () => {
                   },
                   {
                     field: {
+                      type: "PHONE",
+                      fromPetitionFieldId: toGlobalId(
+                        "PetitionField",
+                        yourCompaniesChildren.find(
+                          (f) => f.profile_type_field_id === legalEntityIdx["p_phone_number"].id,
+                        )!.id,
+                      ),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", legalEntityIdx["p_phone_number"].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "+123456789",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
                       type: "SHORT_TEXT",
                       fromPetitionFieldId: toGlobalId(
                         "PetitionField",
@@ -3517,6 +3552,27 @@ describe("GraphQL/Profiles to Petitions", () => {
                       {
                         content: {
                           value: "123",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      type: "SELECT",
+                      fromPetitionFieldId: toGlobalId(
+                        "PetitionField",
+                        yourCompaniesChildren.find(
+                          (f) => f.profile_type_field_id === legalEntityIdx["p_country"].id,
+                        )!.id,
+                      ),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", legalEntityIdx["p_country"].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "US",
                         },
                       },
                     ],
@@ -3960,6 +4016,27 @@ describe("GraphQL/Profiles to Petitions", () => {
                   },
                   {
                     field: {
+                      type: "PHONE",
+                      fromPetitionFieldId: toGlobalId(
+                        "PetitionField",
+                        yourCompaniesChildren.find(
+                          (f) => f.profile_type_field_id === legalEntityIdx["p_phone_number"].id,
+                        )!.id,
+                      ),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", legalEntityIdx["p_phone_number"].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "+123456780",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
                       type: "SHORT_TEXT",
                       fromPetitionFieldId: toGlobalId(
                         "PetitionField",
@@ -3996,6 +4073,27 @@ describe("GraphQL/Profiles to Petitions", () => {
                       {
                         content: {
                           value: "12345",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      type: "SELECT",
+                      fromPetitionFieldId: toGlobalId(
+                        "PetitionField",
+                        yourCompaniesChildren.find(
+                          (f) => f.profile_type_field_id === legalEntityIdx["p_country"].id,
+                        )!.id,
+                      ),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", legalEntityIdx["p_country"].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "US",
                         },
                       },
                     ],
@@ -4347,13 +4445,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                         ),
                       },
                     },
-                    replies: [
-                      {
-                        content: {
-                          value: "None",
-                        },
-                      },
-                    ],
+                    replies: [],
                   },
                   {
                     field: {
@@ -4368,13 +4460,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                         id: toGlobalId("ProfileTypeField", legalEntityIdx["p_poa_registered"].id),
                       },
                     },
-                    replies: [
-                      {
-                        content: {
-                          value: "Y",
-                        },
-                      },
-                    ],
+                    replies: [],
                   },
                 ],
               },

@@ -1737,6 +1737,174 @@ describe("GraphQL/Users", () => {
                   options: {},
                   position: 22,
                 },
+                {
+                  id: expect.any(String),
+                  type: "FILE",
+                  name: { en: "Power of attorney", es: "Poder de representación" },
+                  alias: "p_poa",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 23,
+                },
+                {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  name: { en: "Position", es: "Cargo" },
+                  alias: "p_position",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 24,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  name: { en: "Client status", es: "Estado cliente" },
+                  alias: "p_client_status",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: [
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Pending",
+                          es: "Pendiente",
+                        },
+                        value: "PENDING",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Approved",
+                          es: "Aprobado",
+                        },
+                        value: "APPROVED",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Rejected",
+                          es: "Rechazado",
+                        },
+                        value: "REJECTED",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Active",
+                          es: "Activo",
+                        },
+                        value: "ACTIVE",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Closed",
+                          es: "Cerrado",
+                        },
+                        value: "CLOSED",
+                      },
+                    ],
+                  },
+                  position: 25,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  name: { en: "Marital status", es: "Estado civil" },
+                  alias: "p_marital_status",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: [
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Single",
+                          es: "Soltero/a",
+                        },
+                        value: "SINGLE",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Married",
+                          es: "Casado/a",
+                        },
+                        value: "MARRIED",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Widowed",
+                          es: "Viudo/a",
+                        },
+                        value: "WIDOWED",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Divorced",
+                          es: "Divorciado/a",
+                        },
+                        value: "DIVORCED",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Separated",
+                          es: "Separado/a",
+                        },
+                        value: "SEPARATED",
+                      },
+                    ],
+                  },
+                  position: 26,
+                },
+                {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  name: { en: "Relationship", es: "Relación" },
+                  alias: "p_relationship",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: [
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Client",
+                          es: "Cliente",
+                        },
+                        value: "CLIENT",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Provider",
+                          es: "Proveedor",
+                        },
+                        value: "PROVIDER",
+                      },
+                      {
+                        isStandard: true,
+                        label: {
+                          en: "Other",
+                          es: "Otros",
+                        },
+                        value: "OTHER",
+                      },
+                    ],
+                  },
+                  position: 27,
+                },
               ],
             },
             {
@@ -1814,6 +1982,11 @@ describe("GraphQL/Users", () => {
                         label: { en: "Trust", es: "Trust" },
                         isStandard: true,
                       },
+                      {
+                        value: "OTHER",
+                        label: { en: "Other", es: "Otro" },
+                        isStandard: true,
+                      },
                     ],
                   },
                   position: 2,
@@ -1853,6 +2026,17 @@ describe("GraphQL/Users", () => {
                 },
                 {
                   id: expect.any(String),
+                  type: "PHONE",
+                  name: { en: "Phone number", es: "Teléfono" },
+                  alias: "p_phone_number",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 6,
+                },
+                {
+                  id: expect.any(String),
                   type: "SHORT_TEXT",
                   name: { en: "City", es: "Ciudad" },
                   alias: "p_city",
@@ -1860,7 +2044,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 6,
+                  position: 7,
                 },
                 {
                   id: expect.any(String),
@@ -1871,7 +2055,21 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 7,
+                  position: 8,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  name: { en: "Country", es: "País" },
+                  alias: "p_country",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: expect.toBeArrayOfSize(250),
+                    standardList: "COUNTRIES",
+                  },
+                  position: 9,
                 },
                 {
                   id: expect.any(String),
@@ -1881,8 +2079,11 @@ describe("GraphQL/Users", () => {
                   isStandard: true,
                   isExpirable: false,
                   expiryAlertAheadTime: null,
-                  options: { values: expect.toBeArrayOfSize(250), standardList: "COUNTRIES" },
-                  position: 8,
+                  options: {
+                    values: expect.toBeArrayOfSize(250),
+                    standardList: "COUNTRIES",
+                  },
+                  position: 10,
                 },
                 {
                   id: expect.any(String),
@@ -1893,7 +2094,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: { useReplyAsExpiryDate: false },
-                  position: 9,
+                  position: 11,
                 },
                 {
                   id: expect.any(String),
@@ -1904,7 +2105,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 10,
+                  position: 12,
                 },
                 {
                   id: expect.any(String),
@@ -1915,7 +2116,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 11,
+                  position: 13,
                 },
                 {
                   id: expect.any(String),
@@ -1926,7 +2127,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 12,
+                  position: 14,
                 },
                 {
                   id: expect.any(String),
@@ -1937,7 +2138,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 13,
+                  position: 15,
                 },
                 {
                   id: expect.any(String),
@@ -1982,7 +2183,7 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 14,
+                  position: 16,
                 },
                 {
                   id: expect.any(String),
@@ -1993,7 +2194,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 15,
+                  position: 17,
                 },
                 {
                   id: expect.any(String),
@@ -2017,7 +2218,7 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 16,
+                  position: 18,
                 },
                 {
                   id: expect.any(String),
@@ -2028,7 +2229,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 17,
+                  position: 19,
                 },
                 {
                   id: expect.any(String),
@@ -2042,7 +2243,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 18,
+                  position: 20,
                 },
                 {
                   id: expect.any(String),
@@ -2058,7 +2259,7 @@ describe("GraphQL/Users", () => {
                   options: {
                     useReplyAsExpiryDate: false,
                   },
-                  position: 19,
+                  position: 21,
                 },
                 {
                   id: expect.any(String),
@@ -2074,7 +2275,7 @@ describe("GraphQL/Users", () => {
                   options: {
                     useReplyAsExpiryDate: false,
                   },
-                  position: 20,
+                  position: 22,
                 },
                 {
                   id: expect.any(String),
@@ -2085,7 +2286,7 @@ describe("GraphQL/Users", () => {
                   isExpirable: false,
                   expiryAlertAheadTime: null,
                   options: {},
-                  position: 21,
+                  position: 23,
                 },
                 {
                   id: expect.any(String),
@@ -2112,7 +2313,146 @@ describe("GraphQL/Users", () => {
                       },
                     ],
                   },
-                  position: 22,
+                  position: 24,
+                },
+                {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  name: {
+                    en: "Background check",
+                    es: "Búsqueda en listados",
+                  },
+                  alias: "p_background_check",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 25,
+                },
+                {
+                  id: expect.any(String),
+                  type: "FILE",
+                  name: {
+                    en: "Tax identification document",
+                    es: "Código de identificación fiscal (documento)",
+                  },
+                  alias: "p_tax_id_document",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 26,
+                },
+                {
+                  id: expect.any(String),
+                  type: "FILE",
+                  name: {
+                    en: "Deed of incorporation",
+                    es: "Escritura de constitución",
+                  },
+                  alias: "p_deed_incorporation",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 27,
+                },
+                {
+                  id: expect.any(String),
+                  type: "FILE",
+                  name: {
+                    en: "Bylaws",
+                    es: "Estatutos sociales",
+                  },
+                  alias: "p_bylaws",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 28,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  name: {
+                    en: "Client status",
+                    es: "Estado cliente",
+                  },
+                  alias: "p_client_status",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: [
+                      {
+                        value: "PENDING",
+                        label: { en: "Pending", es: "Pendiente" },
+                        isStandard: true,
+                      },
+                      {
+                        value: "APPROVED",
+                        label: { en: "Approved", es: "Aprobado" },
+                        isStandard: true,
+                      },
+                      {
+                        value: "REJECTED",
+                        label: { en: "Rejected", es: "Rechazado" },
+                        isStandard: true,
+                      },
+                      {
+                        value: "ACTIVE",
+                        label: { en: "Active", es: "Activo" },
+                        isStandard: true,
+                      },
+                      {
+                        value: "CLOSED",
+                        label: { en: "Closed", es: "Cerrado" },
+                        isStandard: true,
+                      },
+                    ],
+                  },
+                  position: 29,
+                },
+                {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  name: {
+                    en: "Relationship",
+                    es: "Relación",
+                  },
+                  alias: "p_relationship",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    values: [
+                      {
+                        value: "CLIENT",
+                        label: {
+                          en: "Client",
+                          es: "Cliente",
+                        },
+                        isStandard: true,
+                      },
+                      {
+                        value: "PROVIDER",
+                        label: {
+                          en: "Provider",
+                          es: "Proveedor",
+                        },
+                        isStandard: true,
+                      },
+                      {
+                        value: "OTHER",
+                        label: {
+                          en: "Other",
+                          es: "Otros",
+                        },
+                        isStandard: true,
+                      },
+                    ],
+                  },
+                  position: 30,
                 },
               ],
             },
@@ -2502,6 +2842,22 @@ describe("GraphQL/Users", () => {
                     format: "EMAIL",
                   },
                   position: 21,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE",
+                  name: {
+                    en: "Signature date",
+                    es: "Fecha de firma",
+                  },
+                  alias: "p_signature_date",
+                  isStandard: true,
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {
+                    useReplyAsExpiryDate: false,
+                  },
+                  position: 22,
                 },
               ],
             },

@@ -212,7 +212,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_shareholder__participated_in_by",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
@@ -264,7 +264,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_shareholder__participated_in_by",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
@@ -411,6 +411,32 @@ describe("GraphQL/Profile Relationships", () => {
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_contact_le_i",
+            allowedLeftRightProfileTypeIds: [legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [individual.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_contact_i_le",
+            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
@@ -575,7 +601,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_shareholder__participated_in_by",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
@@ -605,6 +631,19 @@ describe("GraphQL/Profile Relationships", () => {
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_contact_i_le",
+            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
@@ -661,11 +700,24 @@ describe("GraphQL/Profile Relationships", () => {
           },
         },
         {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_shareholder__participated_in_by",
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
           direction: "LEFT_RIGHT",
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_shareholder__participated_in_by",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
@@ -760,6 +812,19 @@ describe("GraphQL/Profile Relationships", () => {
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_contact_le_i",
+            allowedLeftRightProfileTypeIds: [legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [individual.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },

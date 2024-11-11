@@ -28,7 +28,9 @@ export type ProfileRelationshipTypeAlias =
   | "p_associated_company"
   | "p_main_contract__annex"
   | "p_addendum__amended_by"
-  | "p_contract__counterparty";
+  | "p_contract__counterparty"
+  | "p_contact_le_i"
+  | "p_contact_i_le";
 
 type ProfileRelationshipTypeDefinition = Record<
   ProfileRelationshipTypeAlias,
@@ -438,6 +440,17 @@ export class ProfilesSetupService implements IProfilesSetupService {
               format: "EMAIL",
             },
           },
+          {
+            type: "DATE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.contract-signature-date",
+              defaultMessage: "Signature date",
+            }),
+            alias: "p_signature_date",
+            options: {
+              useReplyAsExpiryDate: false,
+            },
+          },
         ];
       case "INDIVIDUAL":
         return [
@@ -727,6 +740,162 @@ export class ProfilesSetupService implements IProfilesSetupService {
             }),
             alias: "p_occupation",
           },
+          {
+            type: "FILE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.individual-power-of-attorney",
+              defaultMessage: "Power of attorney",
+            }),
+            alias: "p_poa",
+          },
+          {
+            type: "TEXT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.individual-position",
+              defaultMessage: "Position",
+            }),
+            alias: "p_position",
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.individual-client-status",
+              defaultMessage: "Client status",
+            }),
+            alias: "p_client_status",
+            options: {
+              values: [
+                {
+                  value: "PENDING",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-pending",
+                    defaultMessage: "Pending",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "APPROVED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-approved",
+                    defaultMessage: "Approved",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "REJECTED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-rejected",
+                    defaultMessage: "Rejected",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "ACTIVE",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-active",
+                    defaultMessage: "Active",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "CLOSED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-closed",
+                    defaultMessage: "Closed",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.individual-marital-status",
+              defaultMessage: "Marital status",
+            }),
+            alias: "p_marital_status",
+            options: {
+              values: [
+                {
+                  value: "SINGLE",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-marital-status-single",
+                    defaultMessage: "Single",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "MARRIED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-marital-status-married",
+                    defaultMessage: "Married",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "WIDOWED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-marital-status-widowed",
+                    defaultMessage: "Widowed",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "DIVORCED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-marital-status-divorced",
+                    defaultMessage: "Divorced",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "SEPARATED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-marital-status-separated",
+                    defaultMessage: "Separated",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+          {
+            type: "CHECKBOX",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.individual-relationship",
+              defaultMessage: "Relationship",
+            }),
+            alias: "p_relationship",
+            options: {
+              values: [
+                {
+                  value: "CLIENT",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-client",
+                    defaultMessage: "Client",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "PROVIDER",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-provider",
+                    defaultMessage: "Provider",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "OTHER",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-other",
+                    defaultMessage: "Other",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
         ];
       case "LEGAL_ENTITY":
         return [
@@ -803,6 +972,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
                   }),
                   isStandard: true,
                 },
+                {
+                  value: "OTHER",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-entity-type-other",
+                    defaultMessage: "Other",
+                  }),
+                  isStandard: true,
+                },
               ],
             },
           },
@@ -831,6 +1008,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
             alias: "p_registered_address",
           },
           {
+            type: "PHONE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-phone-number",
+              defaultMessage: "Phone number",
+            }),
+            alias: "p_phone_number",
+          },
+          {
             type: "SHORT_TEXT",
             name: await this.intl.getLocalizableUserText({
               id: "profiles.default-profile-type-field.legal-entity-city",
@@ -845,6 +1030,18 @@ export class ProfilesSetupService implements IProfilesSetupService {
               defaultMessage: "ZIP Code",
             }),
             alias: "p_zip",
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-country",
+              defaultMessage: "Country",
+            }),
+            alias: "p_country",
+            options: {
+              values: [],
+              standardList: "COUNTRIES",
+            },
           },
           {
             type: "SELECT",
@@ -1063,6 +1260,127 @@ export class ProfilesSetupService implements IProfilesSetupService {
                   label: await this.intl.getLocalizableUserText({
                     id: "profiles.default-profile-type-field.option-no",
                     defaultMessage: "No",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+
+          {
+            type: "BACKGROUND_CHECK",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-background-check",
+              defaultMessage: "Background check",
+            }),
+            alias: "p_background_check",
+          },
+          {
+            type: "FILE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-tax-identification-document",
+              defaultMessage: "Tax identification document",
+            }),
+            alias: "p_tax_id_document",
+          },
+          {
+            type: "FILE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-deed-of-incorporation",
+              defaultMessage: "Deed of incorporation",
+            }),
+            alias: "p_deed_incorporation",
+          },
+          {
+            type: "FILE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-bylaws",
+              defaultMessage: "Bylaws",
+            }),
+            alias: "p_bylaws",
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-client-status",
+              defaultMessage: "Client status",
+            }),
+            alias: "p_client_status",
+            options: {
+              values: [
+                {
+                  value: "PENDING",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-pending",
+                    defaultMessage: "Pending",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "APPROVED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-approved",
+                    defaultMessage: "Approved",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "REJECTED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-rejected",
+                    defaultMessage: "Rejected",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "ACTIVE",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-active",
+                    defaultMessage: "Active",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "CLOSED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-client-status-closed",
+                    defaultMessage: "Closed",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+          {
+            type: "CHECKBOX",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.legal-entity-relationship",
+              defaultMessage: "Relationship",
+            }),
+            alias: "p_relationship",
+            options: {
+              values: [
+                {
+                  value: "CLIENT",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-client",
+                    defaultMessage: "Client",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "PROVIDER",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-provider",
+                    defaultMessage: "Provider",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "OTHER",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-relationship-other",
+                    defaultMessage: "Other",
                   }),
                   isStandard: true,
                 },
@@ -1376,6 +1694,20 @@ export class ProfilesSetupService implements IProfilesSetupService {
           defaultMessage: "Counterparty",
         }),
       ],
+      p_contact_le_i: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.contact",
+          defaultMessage: "Contact",
+        }),
+        null,
+      ],
+      p_contact_i_le: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.contact",
+          defaultMessage: "Contact",
+        }),
+        null,
+      ],
     };
   }
 
@@ -1391,7 +1723,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
       p_legal_representative__legally_represented: [["INDIVIDUAL"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
       p_legal_guardian__legally_guarded: [["INDIVIDUAL"], ["INDIVIDUAL"]],
       p_director__managed_by: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
-      p_shareholder__participated_in_by: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
+      p_shareholder__participated_in_by: [["INDIVIDUAL", "LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
       p_beneficial_owner__direct_or_indirect_property: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
       p_contract__counterparty: [["CONTRACT"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
       p_parent_company__subsidiary: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
@@ -1399,6 +1731,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
       p_associated_company: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
       p_main_contract__annex: [["CONTRACT"], ["CONTRACT"]],
       p_addendum__amended_by: [["CONTRACT"], ["CONTRACT"]],
+      // p_contact is a reciprocal relationship, but types are different and not every combination is valid
+      p_contact_le_i: [["LEGAL_ENTITY"], ["INDIVIDUAL"]],
+      p_contact_i_le: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
     };
   }
 }
