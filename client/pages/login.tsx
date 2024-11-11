@@ -65,10 +65,26 @@ function Login() {
         email,
         password,
       });
+
       await client.clearStore();
       redirectToApp(data?.preferredLocale);
     } catch (error: any) {
-      if (error.error === "NewPasswordRequired") {
+      if (error.error === "InactiveUser") {
+        toast({
+          title: intl.formatMessage({
+            id: "page.login.deactivated-user-toast-title",
+            defaultMessage: "Deactivated user",
+          }),
+          description: intl.formatMessage({
+            id: "page.login.deactivated-user-toast-body",
+            defaultMessage:
+              "Your account is deactivated. Please contact your organization's administrator.",
+          }),
+          status: "error",
+          isClosable: true,
+          duration: 10_000,
+        });
+      } else if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });
       } else if (error.error === "UserNotConfirmedException") {
         nonVerifiedEmail.current = email;

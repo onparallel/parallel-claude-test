@@ -14500,6 +14500,16 @@
     "context": "Teams"
   },
   {
+    "term": "page.login.deactivated-user-toast-body",
+    "definition": "Your account is deactivated. Please contact your organization's administrator.",
+    "context": "Your account is deactivated. Please contact your organization's administrator."
+  },
+  {
+    "term": "page.login.deactivated-user-toast-title",
+    "definition": "Deactivated user",
+    "context": "Deactivated user"
+  },
+  {
     "term": "page.maintenance.description",
     "definition": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible.",
     "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."

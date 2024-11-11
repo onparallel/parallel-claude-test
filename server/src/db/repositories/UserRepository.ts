@@ -33,6 +33,22 @@ export class UserRepository extends BaseRepository {
     return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
   });
 
+  readonly loadInactiveUsersByCognitoId = this.buildLoader<string, User[]>(
+    async (cognitoIds, t) => {
+      const users = await this.raw<User & { ud_cognito_id: string }>(
+        /* sql */ `
+        select u.*, ud.cognito_id as ud_cognito_id from "user" u
+        join user_data ud on ud.id = u.user_data_id
+        where u.status != 'ACTIVE' and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in ?
+      `,
+        [this.sqlIn(cognitoIds)],
+        t,
+      );
+      const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
+      return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
+    },
+  );
+
   readonly loadUser = this.buildLoadBy("user", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));

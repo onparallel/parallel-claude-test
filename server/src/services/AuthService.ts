@@ -410,6 +410,13 @@ export class Auth implements IAuth {
         const token = await this.storeSessionInRedis(auth.AuthenticationResult as any);
         const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
         if (!user) {
+          const inactiveUser = await this.getInactiveUserFromAuthenticationResult(
+            auth.AuthenticationResult,
+          );
+          if (inactiveUser) {
+            res.status(401).send({ error: "InactiveUser" });
+            return;
+          }
           res.status(401).send({ error: "UnknownError" });
           return;
         }
@@ -615,6 +622,20 @@ export class Auth implements IAuth {
     } else {
       return null;
     }
+  }
+
+  private async getInactiveUserFromAuthenticationResult(result: AuthenticationResultType) {
+    try {
+      if (result.IdToken) {
+        const payload = decode(result.IdToken) as any;
+        const cognitoId = payload["cognito:username"] as string;
+        const [user] = await this.users.loadInactiveUsersByCognitoId(cognitoId);
+        return user;
+      } else {
+        return null;
+      }
+    } catch {}
+    return null;
   }
 
   private async trackSessionLogin(user: User) {
