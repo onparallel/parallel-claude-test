@@ -141,6 +141,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
           if (
             isNonNullish(value) &&
             value.type === "FIELD" &&
+            value.field.multiple === _value.field.multiple &&
             isValueCompatible(value.field.type, _value.field.type)
           ) {
             onChange(defaultFieldCondition(_value.field, condition.value));
