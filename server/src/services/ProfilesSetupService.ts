@@ -1720,7 +1720,10 @@ export class ProfilesSetupService implements IProfilesSetupService {
       p_family_member: [["INDIVIDUAL"], ["INDIVIDUAL"]],
       p_close_associate: [["INDIVIDUAL"], ["INDIVIDUAL"]],
       p_spouse: [["INDIVIDUAL"], ["INDIVIDUAL"]],
-      p_legal_representative__legally_represented: [["INDIVIDUAL"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
+      p_legal_representative__legally_represented: [
+        ["INDIVIDUAL", "LEGAL_ENTITY"],
+        ["INDIVIDUAL", "LEGAL_ENTITY"],
+      ],
       p_legal_guardian__legally_guarded: [["INDIVIDUAL"], ["INDIVIDUAL"]],
       p_director__managed_by: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
       p_shareholder__participated_in_by: [["INDIVIDUAL", "LEGAL_ENTITY"], ["LEGAL_ENTITY"]],

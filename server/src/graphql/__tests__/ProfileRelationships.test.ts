@@ -147,7 +147,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_legal_representative__legally_represented",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
@@ -160,7 +160,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_legal_representative__legally_represented",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
@@ -536,7 +536,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_legal_representative__legally_represented",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
@@ -549,7 +549,7 @@ describe("GraphQL/Profile Relationships", () => {
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_legal_representative__legally_represented",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
@@ -674,11 +674,24 @@ describe("GraphQL/Profile Relationships", () => {
       expect(errors).toBeUndefined();
       expect(data?.profileRelationshipTypesWithDirection).toIncludeSameMembers([
         {
+          direction: "RIGHT_LEFT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_legal_representative__legally_represented",
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
           direction: "LEFT_RIGHT",
           profileRelationshipType: {
             id: expect.any(String),
             alias: "p_legal_representative__legally_represented",
-            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+            allowedLeftRightProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
             allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
@@ -1205,13 +1218,13 @@ describe("GraphQL/Profile Relationships", () => {
       });
     });
 
-    it("fails when passing legal entity as left side of a legal_representative__legally_represented relationship", async () => {
-      const [individualProfile, legalEntityProfile] = await mocks.createRandomProfiles(
+    it("fails when passing contract as left side of a legal_representative__legally_represented relationship", async () => {
+      const [individualProfile, contractProfile] = await mocks.createRandomProfiles(
         organization.id,
         1,
         2,
         (i) => ({
-          profile_type_id: [individual.id, legalEntity.id][i],
+          profile_type_id: [individual.id, contract.id][i],
         }),
       );
 
@@ -1224,7 +1237,7 @@ describe("GraphQL/Profile Relationships", () => {
           }
         `,
         {
-          profileId: toGlobalId("Profile", legalEntityProfile.id),
+          profileId: toGlobalId("Profile", contractProfile.id),
           relationships: [
             {
               profileId: toGlobalId("Profile", individualProfile.id),
