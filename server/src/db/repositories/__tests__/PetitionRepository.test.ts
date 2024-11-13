@@ -3005,5 +3005,41 @@ describe("repositories/PetitionRepository", () => {
         },
       ]);
     });
+
+    it("creates a petition from a template using custom lists in visibility conditions", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        custom_lists: JSON.stringify([
+          {
+            name: "Países de la UE",
+            values: ["AT", "BE", "BG"],
+          },
+        ]),
+      }));
+
+      const [selectField] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "SELECT",
+        options: JSON.stringify({ values: ["AR", "BE", "BG", "FR", "DE", "IT", "ES", "SE"] }),
+      }));
+
+      await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "HEADING",
+        visibility: JSON.stringify({
+          type: "SHOW",
+          operator: "OR",
+          conditions: [
+            {
+              value: "Países de la UE",
+              fieldId: selectField.id,
+              modifier: "ANY",
+              operator: "IS_IN_LIST",
+            },
+          ],
+        }),
+      }));
+
+      await expect(
+        petitions.clonePetition(template.id, user, { is_template: false, status: "DRAFT" }),
+      ).resolves.not.toThrow();
+    });
   });
 });

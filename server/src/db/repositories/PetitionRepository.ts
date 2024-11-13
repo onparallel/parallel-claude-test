@@ -8959,6 +8959,9 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
+  /**
+   * @param listNames can contain the name of a customList or a standardList. In case its a custom list, it will be ignored
+   */
   async updateStandardListDefinitionOverride(
     petitionId: number,
     listNames: string[],
@@ -8970,18 +8973,28 @@ export class PetitionRepository extends BaseRepository {
     const [petition] = await this.from("petition", t)
       .where("id", petitionId)
       .whereNull("deleted_at")
-      .select(["is_template", "standard_list_definition_override"]);
+      .select(["is_template", "custom_lists", "standard_list_definition_override"]);
 
     if (petition.is_template) {
       return;
     }
 
+    // if the listName is found in customLists array, consider it a customList and ignore it
+    const standardListNames = listNames.filter(
+      (name) => !petition.custom_lists?.find((l) => l.name === name),
+    );
+
+    if (standardListNames.length === 0) {
+      // nothing to update
+      return;
+    }
+
     const data = await this.from("standard_list_definition", t)
-      .whereIn("list_name", listNames)
+      .whereIn("list_name", standardListNames)
       .select(["list_name", "list_version"])
       .orderBy("list_version", "asc");
 
-    const latestByListName = indexBy(data, (d) => d.list_name);
+    const latestStandardListByListName = indexBy(data, (d) => d.list_name);
 
     await this.from("petition", t)
       .where("id", petitionId)
@@ -8991,7 +9004,7 @@ export class PetitionRepository extends BaseRepository {
         standard_list_definition_override: this.json(
           unique([
             ...petition.standard_list_definition_override.map((l) => l.list_name),
-            ...listNames,
+            ...standardListNames,
           ]).map((name) => {
             const usedList = petition.standard_list_definition_override.find(
               (d) => d.list_name === name,
@@ -8999,7 +9012,7 @@ export class PetitionRepository extends BaseRepository {
             if (usedList) {
               return usedList;
             }
-            const latest = latestByListName[name];
+            const latest = latestStandardListByListName[name];
             assert(latest, `Standard list definition ${name} not found`);
             return {
               list_name: name,
