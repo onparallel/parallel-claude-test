@@ -1,7 +1,8 @@
-import { ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
+import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
+import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
 function CustomListDetailsDialog({
@@ -14,10 +15,12 @@ function CustomListDetailsDialog({
   };
 }>) {
   const { name, values } = customList;
+  const focusRef = useRef<HTMLButtonElement>(null);
   return (
     <ConfirmDialog
       size="lg"
       scrollBehavior="inside"
+      initialFocusRef={focusRef}
       header={name}
       body={
         <ScrollShadows as={Stack}>
@@ -34,7 +37,12 @@ function CustomListDetailsDialog({
           </UnorderedList>
         </ScrollShadows>
       }
-      confirm={<></>}
+      cancel={<></>}
+      confirm={
+        <Button ref={focusRef} onClick={() => props.onResolve()}>
+          <FormattedMessage id="generic.close" defaultMessage="Close" />
+        </Button>
+      }
       {...props}
     />
   );

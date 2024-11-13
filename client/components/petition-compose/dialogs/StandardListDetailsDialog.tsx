@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
   Heading,
   HStack,
@@ -22,6 +23,7 @@ import {
   StandardListDetailsDialog_StandardListDefinitionFragment,
   UserLocale,
 } from "@parallel/graphql/__types";
+import { useRef } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 
@@ -38,7 +40,7 @@ export function StandardListDetailsDialog({
   isTemplate: boolean;
 }>) {
   const intl = useIntl();
-
+  const focusRef = useRef<HTMLButtonElement>(null);
   const { data, loading } = useQuery(StandardListDetailsDialog_standardListDefinitionDocument, {
     variables: {
       id: standardListId,
@@ -55,6 +57,7 @@ export function StandardListDetailsDialog({
     <ConfirmDialog
       size="xl"
       scrollBehavior="inside"
+      initialFocusRef={focusRef}
       header={
         <HStack>
           <InfoCircleFilledIcon color="blue.500" boxSize={6} />
@@ -158,7 +161,12 @@ export function StandardListDetailsDialog({
           </Text>
         ) : undefined
       }
-      confirm={<></>}
+      cancel={<></>}
+      confirm={
+        <Button ref={focusRef} onClick={() => props.onResolve()}>
+          <FormattedMessage id="generic.close" defaultMessage="Close" />
+        </Button>
+      }
       {...props}
     />
   );
