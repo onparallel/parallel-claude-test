@@ -333,25 +333,48 @@ export class Auth implements IAuth {
         if (isNullish(integration) || integration.org_id !== orgId) {
           throw new Error("Invalid user");
         }
-        const preferredLocale = this.asUserLocale(state.get("locale"));
-        user = await this.accountSetup.createUser(
-          {
-            org_id: org.id,
-            external_id: externalId,
-          },
-          {
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            cognito_id: cognitoId,
-            is_sso_user: true,
-            details: {
-              source: "SSO",
+        // before creating a new user, check if already exists one with the same cognito_id
+        // if so, update its user_data.email
+        user = (await this.users.loadUsersByCognitoId(cognitoId)).find((u) => u.org_id === orgId);
+        if (isNullish(user)) {
+          const preferredLocale = this.asUserLocale(state.get("locale"));
+          user = await this.accountSetup.createUser(
+            {
+              org_id: org.id,
+              external_id: externalId,
             },
-            preferred_locale: preferredLocale,
-          },
-          `OrganizationSSO:${org.id}`,
-        );
+            {
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              cognito_id: cognitoId,
+              is_sso_user: true,
+              details: {
+                source: "SSO",
+              },
+              preferred_locale: preferredLocale,
+            },
+            `OrganizationSSO:${org.id}`,
+          );
+        } else {
+          await this.users.updateUserData(
+            user.user_data_id,
+            {
+              email,
+              first_name: firstName,
+              last_name: lastName,
+              is_sso_user: true,
+            },
+            `OrganizationSSO:${org.id}`,
+          );
+          if (user.external_id !== externalId) {
+            await this.users.updateUserById(
+              user.id,
+              { external_id: externalId },
+              `OrganizationSSO:${org.id}`,
+            );
+          }
+        }
       } else {
         if (userData) {
           if (
@@ -359,6 +382,11 @@ export class Auth implements IAuth {
             userData.last_name !== lastName ||
             userData.cognito_id !== cognitoId
           ) {
+            this.logger.error(`
+              User data mismatch.
+              existing: ${JSON.stringify(pick(userData, ["id", "first_name", "last_name", "cognito_id"]))}
+              incoming: ${JSON.stringify({ firstName, lastName, cognitoId })}
+            `);
             await this.users.updateUserData(
               userData.id,
               {
