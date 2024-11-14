@@ -3,7 +3,6 @@ import { Prettify } from "@parallel/utils/types";
 import { NextComponentType } from "next";
 import { useRouter } from "next/router";
 import {
-  cloneElement,
   ComponentType,
   createContext,
   PropsWithChildren,
@@ -103,6 +102,9 @@ export function useDialog<TProps = {}, TResult = void>(
   );
 }
 
+const BLOCKED_SCROLL = { blockScrollOnMount: true };
+const UNBLOCKED_SCROLL = { blockScrollOnMount: false };
+
 function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   const [stack, setStack] = useState<ReactElement[]>([]);
   const opener = useCallback<DialogOpener>(function (createDialog) {
@@ -123,13 +125,14 @@ function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   return (
     <DialogOpenerContext.Provider value={opener}>
       {children}
-      {stack.map((dialog, index) =>
-        cloneElement(dialog, {
-          key: index,
-          // activate this only on the topmost dialog
-          blockScrollOnMount: index === stack.length - 1 ? true : false,
-        }),
-      )}
+      {stack.map((dialog, index) => (
+        <BaseDialogPropsProvider
+          key={index}
+          value={index === stack.length - 1 ? BLOCKED_SCROLL : UNBLOCKED_SCROLL}
+        >
+          {dialog}
+        </BaseDialogPropsProvider>
+      ))}
     </DialogOpenerContext.Provider>
   );
 }
@@ -197,7 +200,9 @@ export function BaseDialogPropsProvider({
   children,
   value,
 }: PropsWithChildren<{ value: BaseModalProps }>) {
+  const parent = useContext(BaseDialogPropsContext);
+  const merged = useMemo(() => Object.assign({}, value, parent), [value, parent]);
   return (
-    <BaseDialogPropsContext.Provider value={value}>{children}</BaseDialogPropsContext.Provider>
+    <BaseDialogPropsContext.Provider value={merged}>{children}</BaseDialogPropsContext.Provider>
   );
 }
