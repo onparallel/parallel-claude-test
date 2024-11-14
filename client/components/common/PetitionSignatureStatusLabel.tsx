@@ -7,7 +7,6 @@ import {
   SignatureProcessingIcon,
 } from "@parallel/chakra/icons";
 import {
-  PetitionSignatureRequestStatus,
   PetitionSignatureStatusFilter,
   SignatureOrgIntegrationEnvironment,
 } from "@parallel/graphql/__types";
@@ -16,7 +15,7 @@ import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 interface PetitionSignatureStatusLabelProps {
-  status: PetitionSignatureStatusFilter | PetitionSignatureRequestStatus;
+  status: PetitionSignatureStatusFilter;
   environment?: SignatureOrgIntegrationEnvironment | null;
 }
 export function PetitionSignatureStatusLabel({

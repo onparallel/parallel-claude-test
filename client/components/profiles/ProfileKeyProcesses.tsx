@@ -9,6 +9,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { mapSignatureRequestStatusToFilter } from "@parallel/utils/mapSignatureRequestStatusToFilter";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useMemo } from "react";
@@ -366,7 +367,9 @@ function KeyProcessCard({
               ) : null}
               {isNonNullish(latestPetition.currentSignatureRequest) ? (
                 <PetitionSignatureStatusLabel
-                  status={latestPetition.currentSignatureRequest.status}
+                  status={mapSignatureRequestStatusToFilter(
+                    latestPetition.currentSignatureRequest.status,
+                  )}
                 />
               ) : null}
             </HStack>
