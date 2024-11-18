@@ -2191,7 +2191,6 @@ export interface NexusGenFieldTypes {
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
@@ -4897,7 +4896,6 @@ export interface NexusGenFieldTypeNames {
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
     updateEinformaCustomProperties: "SupportMethodResponse";
-    updateFeatureFlag: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
     updateFileUploadReply: "FileUploadReplyResponse";
@@ -8054,12 +8052,6 @@ export interface NexusGenArgTypes {
       // args
       json: string; // String!
       orgId: NexusGenScalars["GID"]; // GID!
-    };
-    updateFeatureFlag: {
-      // args
-      featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
-      userId: NexusGenScalars["GID"]; // GID!
-      value: boolean; // Boolean!
     };
     updateFeatureFlags: {
       // args

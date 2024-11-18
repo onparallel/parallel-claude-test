@@ -1,6 +1,5 @@
 import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { DatabaseError } from "pg";
 import { isNonNullish, isNullish, unique } from "remeda";
 import { UserGroupPermissionName } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
@@ -488,38 +487,6 @@ export const removePetitionPassword = mutationField("removePetitionPassword", {
     } catch (e) {
       ctx.logger.error(e);
       return { result: RESULT.FAILURE, message: "Something went wrong..." };
-    }
-  },
-});
-
-export const updateFeatureFlag = mutationField("updateFeatureFlag", {
-  description: "Activate or deactivate a feature flag on a specific user",
-  type: "SupportMethodResponse",
-  args: {
-    featureFlag: nonNull("FeatureFlag"),
-    userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
-    value: nonNull(booleanArg({ description: "Feature flag value" })),
-  },
-  authorize: superAdminAccess(),
-  resolve: async (_, { featureFlag, value, userId }, ctx) => {
-    try {
-      await ctx.featureFlags.upsertFeatureFlagOverrideForUser(userId, { name: featureFlag, value });
-      const user = await ctx.users.loadUserDataByUserId(userId);
-      return {
-        result: RESULT.SUCCESS,
-        message: `User ${fullName(
-          user?.first_name,
-          user?.last_name,
-        )} now has ${featureFlag} set to ${String(value).toUpperCase()}`,
-      };
-    } catch (error) {
-      if (
-        error instanceof DatabaseError &&
-        error.constraint === "feature_flag_override_user_id_foreign"
-      ) {
-        return { result: RESULT.FAILURE, message: `Unknown userId` };
-      }
-      return { result: RESULT.FAILURE, message: "Unknown error" };
     }
   },
 });
