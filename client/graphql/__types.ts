@@ -1309,8 +1309,6 @@ export interface Mutation {
   /** Updates a contact. */
   updateContact: Contact;
   updateEinformaCustomProperties: SupportMethodResponse;
-  /** Activate or deactivate a feature flag on a specific user */
-  updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
   /** Updates the positions of the petition fields. If parentFieldId is defined, it will update the positions of it's children fields. */
@@ -2570,12 +2568,6 @@ export interface MutationupdateContactArgs {
 export interface MutationupdateEinformaCustomPropertiesArgs {
   json: Scalars["String"]["input"];
   orgId: Scalars["GID"]["input"];
-}
-
-export interface MutationupdateFeatureFlagArgs {
-  featureFlag: FeatureFlag;
-  userId: Scalars["GID"]["input"];
-  value: Scalars["Boolean"]["input"];
 }
 
 export interface MutationupdateFeatureFlagsArgs {

@@ -2620,23 +2620,6 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
-  Activate or deactivate a feature flag on a specific user
-  """
-  updateFeatureFlag(
-    featureFlag: FeatureFlag!
-
-    """
-    Global ID of the user
-    """
-    userId: GID!
-
-    """
-    Feature flag value
-    """
-    value: Boolean!
-  ): SupportMethodResponse!
-
-  """
   Activate or deactivate a list of organization feature flag
   """
   updateFeatureFlags(featureFlags: [InputFeatureFlagNameValue!]!, orgId: GID!): Organization!
