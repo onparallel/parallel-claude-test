@@ -3,7 +3,7 @@ import { pick } from "remeda";
 
 export function RadioButton(props: RadioProps) {
   const rootProps = pick(props, layoutPropNames as any);
-  const { getInputProps, getCheckboxProps } = useRadio(props);
+  const { getInputProps, getRadioProps } = useRadio(props);
 
   const input = getInputProps();
 
@@ -22,7 +22,7 @@ export function RadioButton(props: RadioProps) {
           borderColor: "blue.600",
         },
       }}
-      {...getCheckboxProps()}
+      {...getRadioProps()}
       {...(rootProps as any)}
     >
       <input {...getInputProps()} />

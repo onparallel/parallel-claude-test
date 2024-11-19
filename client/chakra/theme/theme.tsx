@@ -1,5 +1,6 @@
-import { extendTheme, keyframes } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
+import { keyframes } from "@emotion/react";
 import { alertTheme } from "./alert";
 import { styles } from "./styles";
 import { tableTheme } from "./table";

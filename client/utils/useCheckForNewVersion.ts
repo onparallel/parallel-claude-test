@@ -1,6 +1,6 @@
-import { assignRef } from "@chakra-ui/hooks";
 import { useRef, useState } from "react";
 import { isNonNullish } from "remeda";
+import { assignRef } from "./assignRef";
 import { useInterval } from "./useInterval";
 
 export function useCheckForNewVersion() {

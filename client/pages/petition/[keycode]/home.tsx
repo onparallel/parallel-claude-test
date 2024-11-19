@@ -507,15 +507,12 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
 }
 
 function RadioCard(props: RadioProps) {
-  const { getInputProps, getCheckboxProps } = useRadio(props);
-
-  const input = getInputProps();
-  const checkbox = getCheckboxProps();
+  const { getInputProps, getRadioProps } = useRadio(props);
 
   return (
     <Card
       as="label"
-      {...checkbox}
+      {...getRadioProps()}
       padding={4}
       cursor="pointer"
       isInteractive
@@ -524,7 +521,7 @@ function RadioCard(props: RadioProps) {
         borderColor: "primary.500",
       }}
     >
-      <input {...input} />
+      <input {...getInputProps()} />
       <Stack alignItems="center" textAlign="center" spacing={0}>
         {props.children}
       </Stack>

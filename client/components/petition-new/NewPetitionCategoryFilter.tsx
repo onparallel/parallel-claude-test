@@ -52,7 +52,7 @@ export const NewPetitionCategoryFilter = chakraForwardRef<"div", NewPetitionCate
 );
 
 function CategoryRadio(props: RadioProps) {
-  const { getInputProps, getCheckboxProps } = useRadio(props);
+  const { getInputProps, getRadioProps } = useRadio(props);
 
   const input = getInputProps();
 
@@ -75,7 +75,7 @@ function CategoryRadio(props: RadioProps) {
           borderColor: "blue.600",
         },
       }}
-      {...getCheckboxProps()}
+      {...getRadioProps()}
     >
       <input {...getInputProps()} />
       {props.children}

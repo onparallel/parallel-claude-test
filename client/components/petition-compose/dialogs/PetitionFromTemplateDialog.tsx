@@ -1,6 +1,4 @@
-import { Button } from "@chakra-ui/button";
-import { Checkbox } from "@chakra-ui/checkbox";
-import { Box, Stack, Text } from "@chakra-ui/layout";
+import { Box, Button, Checkbox, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";

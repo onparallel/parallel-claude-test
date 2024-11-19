@@ -1,5 +1,6 @@
-import { keyframes, SystemStyleObject } from "@chakra-ui/react";
+import { SystemStyleObject } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
+import { keyframes } from "@emotion/react";
 import type { Theme } from "@parallel/chakra/theme/theme";
 
 /**

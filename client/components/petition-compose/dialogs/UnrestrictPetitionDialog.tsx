@@ -1,6 +1,4 @@
-import { Button } from "@chakra-ui/button";
-import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
-import { Stack, Text } from "@chakra-ui/layout";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";

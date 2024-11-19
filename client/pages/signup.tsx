@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Stack, useCounter } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { Steps } from "@parallel/components/common/Steps";
 import { withApolloData } from "@parallel/components/common/withApolloData";

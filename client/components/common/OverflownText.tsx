@@ -1,6 +1,7 @@
-import { assignRef, Box, PlacementWithLogical } from "@chakra-ui/react";
+import { Box, PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { assignRef } from "@parallel/utils/assignRef";
 import useMergedRef from "@react-hook/merged-ref";
 import useResizeObserver from "@react-hook/resize-observer";
 import { ReactNode, useRef, useState } from "react";

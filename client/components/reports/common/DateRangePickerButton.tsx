@@ -1,7 +1,7 @@
-import { FocusLock } from "@chakra-ui/focus-lock";
 import {
   Button,
   ButtonGroup,
+  FocusLock,
   HStack,
   Modal,
   ModalBody,

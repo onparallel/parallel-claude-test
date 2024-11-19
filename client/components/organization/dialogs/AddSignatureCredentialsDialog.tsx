@@ -1,14 +1,19 @@
 import { gql, useMutation } from "@apollo/client";
-import { Button } from "@chakra-ui/button";
-import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
-import { Flex, HStack, Stack, Text } from "@chakra-ui/layout";
 import {
+  Button,
   Checkbox,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
   Image,
   Input,
   Radio,
   RadioGroup,
+  Stack,
   Switch,
+  Text,
   useCounter,
   useToast,
 } from "@chakra-ui/react";

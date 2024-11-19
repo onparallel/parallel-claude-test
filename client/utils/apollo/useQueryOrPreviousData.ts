@@ -1,8 +1,8 @@
 import { DocumentNode, OperationVariables, TypedDocumentNode } from "@apollo/client";
 import { QueryHookOptions, QueryResult, useQuery } from "@apollo/client/react";
-import { assignRef } from "@chakra-ui/hooks";
 import { useRef } from "react";
 import { isNonNullish } from "remeda";
+import { assignRef } from "../assignRef";
 
 export function useQueryOrPreviousData<
   TData = any,

@@ -1,5 +1,6 @@
-import { assignRef, FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
+import { FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { assignRef } from "@parallel/utils/assignRef";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { NumberFormatValues, NumericFormat, SourceInfo } from "react-number-format";

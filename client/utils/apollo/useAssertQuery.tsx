@@ -1,9 +1,9 @@
 import { DocumentNode, OperationVariables, TypedDocumentNode } from "@apollo/client";
 import { QueryHookOptions, QueryResult, useQuery } from "@apollo/client/react";
-import { assignRef } from "@chakra-ui/hooks";
 import { WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { NextComponentType } from "next";
 import { ComponentType, useRef } from "react";
+import { assignRef } from "../assignRef";
 
 export function useAssertQuery<
   TData = any,

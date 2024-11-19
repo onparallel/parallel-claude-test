@@ -1,4 +1,3 @@
-import { FocusLock } from "@chakra-ui/focus-lock";
 import {
   Box,
   BoxProps,
@@ -8,6 +7,7 @@ import {
   Table as ChakraTable,
   Checkbox,
   Collapse,
+  FocusLock,
   Heading,
   HStack,
   HTMLChakraProps,
@@ -545,7 +545,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
     ],
   });
   const ref = useRef<HTMLElement>(null);
-  const filterButtonRef = useRef<HTMLElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   useOutsideClick({
