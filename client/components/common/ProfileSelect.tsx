@@ -34,7 +34,6 @@ import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog"
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
-import { isDialogError } from "./dialogs/DialogProvider";
 
 export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 
@@ -268,16 +267,12 @@ export const ProfileSelect = Object.assign(
             onChange(profile as any, { action: "create-option", option: profile as any });
           }
         }
-      } catch (e) {
-        if (isDialogError(e)) {
-          rerender();
-          setTimeout(() => {
-            // this line seems to be needed in some scenarios on FF
-            innerRef.current?.controlRef?.closest("form")?.focus();
-            innerRef.current?.focus();
-          });
-        }
-      }
+      } catch {}
+      setTimeout(() => {
+        // this line seems to be needed in some scenarios on FF
+        innerRef.current?.controlRef?.closest("form")?.focus();
+        innerRef.current?.focus();
+      }, 1);
     }
     useEffectSkipFirst(() => {
       rerender();
