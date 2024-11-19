@@ -5,7 +5,6 @@ import { and, authenticateAnd, ifArgDefined, ifArgEquals, not } from "../../help
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/scalars/JSON";
-import { validPetitionFieldCommentContent } from "../../public/authorizers";
 import {
   commentsBelongsToPetition,
   fieldHasParent,
@@ -16,7 +15,9 @@ import {
   petitionsAreOfTypePetition,
   userHasAccessToPetitions,
   userIsOwnerOfPetitionFieldComment,
+  usersCanBeMentionedInComment,
 } from "../authorizers";
+import { validateCommentContentSchema } from "../validations";
 
 export const createPetitionComment = mutationField("createPetitionComment", {
   description: "Create a petition comment.",
@@ -50,9 +51,10 @@ export const createPetitionComment = mutationField("createPetitionComment", {
       ),
     ),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", true),
+    usersCanBeMentionedInComment("content"),
     petitionsAreOfTypePetition("petitionId"),
   ),
+  validateArgs: validateCommentContentSchema("content"),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nullable(globalIdArg("PetitionField")),
@@ -160,7 +162,7 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", true),
+    usersCanBeMentionedInComment("content"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -181,6 +183,7 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
         "Wether to subscribe or not to notifications the mentioned users if sharePetition=true",
     }),
   },
+  validateArgs: validateCommentContentSchema("content"),
   resolve: async (_, args, ctx) => {
     try {
       await ctx.petitions.checkUserMentions(

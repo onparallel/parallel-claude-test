@@ -1,15 +1,14 @@
 import Ajv from "ajv";
-import { core } from "nexus";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function jsonSchema(schema: any) {
   return <TypeName extends string, FieldName extends string>(
-    prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-    argName: string,
+    prop: ArgWithPath<TypeName, FieldName, any>,
   ) => {
     return ((_, args, ctx, info) => {
-      const value = prop(args);
+      const [value, argName] = getArgWithPath(args, prop);
       const ajv = new Ajv();
       if (!value) {
         return;

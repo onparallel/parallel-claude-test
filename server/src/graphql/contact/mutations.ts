@@ -19,7 +19,7 @@ import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
 import { RESULT } from "../helpers/Result";
 import { uploadArg } from "../helpers/scalars/Upload";
-import { validateAnd, validateIf, validateIfDefined } from "../helpers/validateArgs";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { validateFile } from "../helpers/validators/validateFile";
@@ -48,10 +48,7 @@ export const createContact = mutationField("createContact", {
       }),
     ),
   },
-  validateArgs: validateIf(
-    (args) => isNullish(args.force),
-    validEmail((args) => args.data.email, "data.email"),
-  ),
+  validateArgs: validateIf((args) => isNullish(args.force), validEmail("data.email")),
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
     try {
@@ -89,12 +86,9 @@ export const updateContact = mutationField("updateContact", {
     ),
   },
   validateArgs: validateAnd(
-    notEmptyObject((arg) => arg.data, "data"),
-    notEmptyString((arg) => arg.data.firstName, "firstName"),
-    validateIfDefined(
-      (arg) => arg.data.lastName,
-      notEmptyString((arg) => arg.data.lastName, "lastName"),
-    ),
+    notEmptyObject("data"),
+    notEmptyString("data.firstName"),
+    notEmptyString("data.lastName"),
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
@@ -129,14 +123,10 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       }),
     ),
   },
-  validateArgs: validateFile(
-    (args) => args.file,
-    {
-      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      maxSize: 1024 * 1024 * 10,
-    },
-    "file",
-  ),
+  validateArgs: validateFile("file", {
+    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: 1024 * 1024 * 10,
+  }),
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 

@@ -1,7 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNonNullish, unique } from "remeda";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToEventSubscription<
   TypeName extends string,
@@ -9,7 +9,7 @@ export function userHasAccessToEventSubscription<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const subscriptionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const subscriptionIds = unMaybeArray(getArg(args, argName));
     const subscriptions = await ctx.subscriptions.loadEventSubscription(subscriptionIds);
     return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };
@@ -21,7 +21,7 @@ export function eventSubscriptionHasSignatureKeysLessThan<
   TArg extends Arg<TypeName, FieldName, number>,
 >(subscriptionIdArg: TArg, maxAmount: number): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const id = args[subscriptionIdArg] as unknown as number;
+    const id = getArg(args, subscriptionIdArg);
     const subscriptions =
       await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(id);
     return subscriptions.length < maxAmount;
@@ -34,7 +34,7 @@ export function userHasAccessToEventSubscriptionSignatureKeys<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const ids = unMaybeArray(getArg(args, argName));
     const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKey(ids);
     if (!keys.every(isNonNullish)) {
       return false;
@@ -55,8 +55,8 @@ export function petitionFieldsBelongsToTemplate<
   petitionIdArg: TPetitionIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unMaybeArray(args[fieldIdsArg] as unknown as MaybeArray<number>);
-    const petitionId = args[petitionIdArg] as unknown as number;
+    const fieldIds = unMaybeArray(getArg(args, fieldIdsArg));
+    const petitionId = getArg(args, petitionIdArg);
     const fields = await ctx.petitions.loadField(fieldIds);
 
     return fields.every((f) => isNonNullish(f) && f.petition_id === petitionId);

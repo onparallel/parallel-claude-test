@@ -1,20 +1,23 @@
-import { core } from "nexus";
 import { MaybeArray, unMaybeArray } from "../../../util/types";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validFileUploadInput<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<{
-    contentType: string;
-    filename: string;
-    size: number;
-  }>,
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    MaybeArray<{
+      contentType: string;
+      filename: string;
+      size: number;
+    }>
+  >,
   opts: { maxSizeBytes?: number; contentType?: string },
-  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
-    const files = unMaybeArray(prop(args));
-    for (const file of files) {
+    const [files, argName] = getArgWithPath(args, prop);
+    for (const file of unMaybeArray(files)) {
       if (opts.maxSizeBytes && file.size > opts.maxSizeBytes) {
         throw new ArgValidationError(
           info,

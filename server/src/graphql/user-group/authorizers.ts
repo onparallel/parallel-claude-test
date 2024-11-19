@@ -3,7 +3,7 @@ import { isNonNullish, isNullish } from "remeda";
 import { ApiContext } from "../../context";
 import { UserGroupType } from "../../db/__types";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export async function contextUserHasAccessToUserGroups(userGroupIds: number[], ctx: ApiContext) {
   if (userGroupIds.length === 0) {
@@ -20,11 +20,11 @@ export function userHasAccessToUserGroups<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    if (isNullish(args[argName])) {
+    const userGroupIds = getArg(args, argName);
+    if (isNullish(userGroupIds)) {
       return true;
     }
-    const userGroupIds = unMaybeArray(args[argName]) as unknown as number[];
-    return await contextUserHasAccessToUserGroups(userGroupIds, ctx);
+    return await contextUserHasAccessToUserGroups(unMaybeArray(userGroupIds), ctx);
   };
 }
 
@@ -34,11 +34,11 @@ export function userGroupHasType<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg, types: MaybeArray<UserGroupType>): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    if (isNullish(args[argName])) {
+    const userGroupIds = getArg(args, argName);
+    if (isNullish(userGroupIds)) {
       return true;
     }
-    const userGroupIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-    const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
+    const userGroups = await ctx.userGroups.loadUserGroup(unMaybeArray(userGroupIds));
     const allowedTypes = unMaybeArray(types);
 
     return userGroups.every((ug) => isNonNullish(ug) && allowedTypes.includes(ug.type));
@@ -51,11 +51,11 @@ export function userGroupCanBeDeleted<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    if (isNullish(args[argName])) {
+    const userGroupIds = getArg(args, argName);
+    if (isNullish(userGroupIds)) {
       return false;
     }
-    const userGroupIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-    const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
+    const userGroups = await ctx.userGroups.loadUserGroup(unMaybeArray(userGroupIds));
 
     if (userGroups.some((ug) => isNullish(ug) || ug.type === "ALL_USERS")) {
       return false;

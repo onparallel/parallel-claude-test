@@ -1,7 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { TaskName } from "../../db/__types";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToTasks<
   TypeName extends string,
@@ -10,7 +10,7 @@ export function userHasAccessToTasks<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const taskIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const taskIds = unMaybeArray(getArg(args, argName));
       if (taskIds.length === 0) {
         return true;
       }
@@ -27,7 +27,7 @@ export function tasksAreOfType<
 >(argName: TArg, allowedTypes: MaybeArray<TaskName>): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const taskIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const taskIds = unMaybeArray(getArg(args, argName));
       if (taskIds.length === 0) {
         return true;
       }

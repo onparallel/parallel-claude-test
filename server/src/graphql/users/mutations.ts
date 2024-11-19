@@ -26,10 +26,9 @@ import {
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars/Upload";
-import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { validateAnd } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
-import { maxActiveUsers } from "../helpers/validators/maxActiveUsers";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
@@ -45,6 +44,7 @@ import {
   contextUserHasPermission,
   contextUserIsNotSso,
   emailIsNotRegisteredInTargetOrg,
+  maxActiveUsers,
   userHasStatus,
   userIsNotContextUser,
   userIsNotOrgOwner,
@@ -59,10 +59,7 @@ export const updateUser = mutationField("updateUser", {
     firstName: stringArg(),
     lastName: stringArg(),
   },
-  validateArgs: validateAnd(
-    maxLength((args) => args.firstName, "data.firstName", 255),
-    maxLength((args) => args.lastName, "data.lastName", 255),
-  ),
+  validateArgs: validateAnd(maxLength("firstName", 255), maxLength("lastName", 255)),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args;
     await ctx.users.updateUserData(
@@ -132,7 +129,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
     userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
     orgId: globalIdArg("Organization"),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validEmail("email"),
   resolve: async (_, args, ctx) => {
     // if orgId is provided the invitation email will be anonymous
     const orgId = args.orgId ?? ctx.user!.org_id;
@@ -204,12 +201,9 @@ export const activateUser = mutationField("activateUser", {
     contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
+    maxActiveUsers("userIds"),
   ),
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.userIds, "userIds"),
-    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    maxActiveUsers((args) => args.userIds),
-  ),
+  validateArgs: validateAnd(notEmptyArray("userIds"), userIdNotIncludedInArray("userIds")),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
@@ -239,8 +233,8 @@ export const deactivateUser = mutationField("deactivateUser", {
     userHasAccessToTags("tagIds"),
   ),
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.userIds, "userIds"),
-    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+    notEmptyArray("userIds"),
+    userIdNotIncludedInArray("userIds"),
     (_, { userIds, transferToUserId }, ctx, info) => {
       if (userIds.includes(transferToUserId)) {
         throw new ArgValidationError(
@@ -422,18 +416,14 @@ export const signUp = mutationField("signUp", {
   },
   authorize: verifyCaptcha("captcha"),
   validateArgs: validateAnd(
-    validPassword((args) => args.password),
-    validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email),
-    emailDomainIsNotSSO((args) => args.email),
-    validateIf(
-      (args) => isNonNullish(args.organizationLogo),
-      validateFile(
-        (args) => args.organizationLogo!,
-        { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-        "organizationLogo",
-      ),
-    ),
+    validPassword("password"),
+    validEmail("email"),
+    emailIsAvailable("email"),
+    emailDomainIsNotSSO("email"),
+    validateFile("organizationLogo", {
+      contentType: ["image/png", "image/jpeg"],
+      maxSize: 1024 * 1024,
+    }),
   ),
   resolve: async (_, args, ctx) => {
     let licenseCode: LicenseCode | null = null;
@@ -534,7 +524,7 @@ export const resendVerificationEmail = mutationField("resendVerificationEmail", 
     email: nonNull(stringArg()),
     locale: nonNull("UserLocale"),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validEmail("email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
       const users = await ctx.users.loadUsersByEmail(email);
@@ -577,7 +567,7 @@ export const publicResetTempPassword = mutationField("publicResetTempPassword", 
     email: nonNull(stringArg()),
     locale: nonNull("UserLocale"),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validEmail("email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
       await ctx.auth.resetTempPassword(email, locale);
@@ -597,7 +587,7 @@ export const resetTempPassword = mutationField("resetTempPassword", {
     locale: nonNull("UserLocale"),
   },
   authorize: authenticateAnd(contextUserHasPermission("USERS:CRUD_USERS")),
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validEmail("email"),
   resolve: async (_, { email, locale }, ctx) => {
     await ctx.auth.resetTempPassword(email, locale);
 

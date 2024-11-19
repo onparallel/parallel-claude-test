@@ -1,8 +1,7 @@
-import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNonNullish, isNullish } from "remeda";
 import { OrganizationThemeType, OrganizationUsageLimitName } from "../../db/__types";
-import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
+import { Arg, getArg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
@@ -28,7 +27,7 @@ export function contextUserBelongsToOrg<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      return ctx.user!.org_id === (args[argName] as unknown as number);
+      return ctx.user!.org_id === getArg(args, argName);
     } catch {}
     return false;
   };
@@ -76,9 +75,7 @@ export function userHasAccessToOrganizationTheme<
 >(argName: TArg, themeType?: OrganizationThemeType): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const theme = await ctx.organizations.loadOrganizationTheme(
-        args[argName] as unknown as number,
-      );
+      const theme = await ctx.organizations.loadOrganizationTheme(getArg(args, argName));
       return (
         theme?.org_id === ctx.user!.org_id &&
         ((isNonNullish(themeType) && theme.type === themeType) || isNullish(themeType))
@@ -95,9 +92,7 @@ export function organizationThemeIsNotDefault<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const theme = await ctx.organizations.loadOrganizationTheme(
-        args[argName] as unknown as number,
-      );
+      const theme = await ctx.organizations.loadOrganizationTheme(getArg(args, argName));
       return theme?.is_default === false;
     } catch {}
     return false;
@@ -112,8 +107,8 @@ export function organizationHasOngoingUsagePeriod<
 >(orgIdArg: TOrgIdArg, limitNameArg: TLimitNameArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const orgId = args[orgIdArg] as unknown as number;
-      const limitName = args[limitNameArg] as unknown as OrganizationUsageLimitName;
+      const orgId = getArg(args, orgIdArg);
+      const limitName = getArg(args, limitNameArg);
 
       const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(orgId, limitName);
       return isNonNullish(limit);
@@ -126,16 +121,17 @@ export function organizationHasEnoughPetitionSendCredits<
   TypeName extends string,
   FieldName extends string,
   TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+  TContactGroupsArg extends Arg<TypeName, FieldName, any[]>,
 >(
   petitionIdArg: TPetitionIdArg,
-  contactGroupsLength: (args: core.ArgsValue<TypeName, FieldName>) => number,
+  contactGroupsArg: TContactGroupsArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = args[petitionIdArg] as unknown as number;
+    const petitionId = getArg(args, petitionIdArg);
 
     const petition = await ctx.petitions.loadPetition(petitionId);
 
-    const creditsRequired = contactGroupsLength(args) - petition!.credits_used;
+    const creditsRequired = getArg(args, contactGroupsArg).length - petition!.credits_used;
 
     if (creditsRequired > 0) {
       const usageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(

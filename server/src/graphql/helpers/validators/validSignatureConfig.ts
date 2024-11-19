@@ -1,18 +1,20 @@
 import { core } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { isValidTimezone } from "../../../util/time";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { EMAIL_REGEX } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => core.GetGen2<"inputTypes", "SignatureConfigInput"> | null | undefined,
-  argName: string,
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    core.GetGen2<"inputTypes", "SignatureConfigInput"> | null | undefined
+  >,
 ) {
   return (async (_, args, ctx, info) => {
-    const signatureConfig = prop(args);
+    const [signatureConfig, argName] = getArgWithPath(args, prop);
     if (signatureConfig) {
       const { orgIntegrationId, signersInfo, timezone, instructions, review, useCustomDocument } =
         signatureConfig;

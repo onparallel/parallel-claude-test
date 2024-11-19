@@ -1,50 +1,20 @@
-import { ArgsValue } from "nexus/dist/core";
-import { isNonNullish, unique } from "remeda";
+import { unique } from "remeda";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { NexusGenInputs } from "../__types";
-import { Arg } from "../helpers/authorize";
+import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
-import { validateAnd } from "../helpers/validateArgs";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { validPetitionSharedWithFilter, validPetitionTagFilter } from "../petition/types/filters";
 
-export function validPetitionListViewData<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["PetitionListViewDataInput"] | null | undefined,
-  name: string,
-) {
-  return validateAnd<TypeName, FieldName>(
-    validPetitionSharedWithFilter((args) => prop(args)?.sharedWith, `${name}.sharedWith`),
-    validPetitionTagFilter((args) => prop(args)?.tagsFilters, `${name}.tagsFilters`),
-    async (_, args, ctx, info) => {
-      const fromTemplateId = prop(args)?.fromTemplateId;
-      if (isNonNullish(fromTemplateId)) {
-        const hasAccess = await ctx.petitions.userHasAccessToPetitions(
-          ctx.user!.id,
-          fromTemplateId,
-        );
-        if (!hasAccess) {
-          throw new ArgValidationError(info, `${name}.fromTemplateId`, "Invalid template ID");
-        }
-      }
-    },
-  );
-}
-
-export function validProfileListViewDataInput<
-  TypeName extends string,
-  FieldName extends string,
-  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
->(
-  profileTypeIdArg: TProfileTypeIdArg,
-  prop: (
-    args: ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["ProfileListViewDataInput"] | null | undefined,
-  argName: string,
+export function validProfileListViewDataInput<TypeName extends string, FieldName extends string>(
+  profileTypeIdArg: ArgWithPath<TypeName, FieldName, number>,
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["ProfileListViewDataInput"] | null | undefined
+  >,
 ) {
   return (async (_, args, ctx, info) => {
-    const input = prop(args);
+    const [input, argName] = getArgWithPath(args, prop);
     if (!input) {
       return;
     }
@@ -57,7 +27,7 @@ export function validProfileListViewDataInput<
       );
     }
 
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const [profileTypeId] = getArgWithPath(args, profileTypeIdArg);
     const fields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
     const validIds = fields.map((f) => toGlobalId("ProfileTypeField", f.id));
     /*

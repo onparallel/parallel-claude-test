@@ -38,8 +38,8 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
     ),
   },
   validateArgs: validateAnd(
-    maxLength((args) => args.data.name, "data.name", 30),
-    validateRegex((args) => args.data.name, "data.name", FIELD_REFERENCE_REGEX),
+    maxLength("data.name", 30),
+    validateRegex("data.name", FIELD_REFERENCE_REGEX),
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createVariable(

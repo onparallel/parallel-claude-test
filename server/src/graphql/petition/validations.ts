@@ -1,6 +1,5 @@
+import Ajv from "ajv";
 import { GraphQLResolveInfo } from "graphql";
-import { core } from "nexus";
-import { ArgsValue } from "nexus/dist/core";
 import { groupBy, indexBy, isNonNullish, isNullish, mapValues, pipe, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
@@ -12,24 +11,22 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
 import { ValidateReplyContentError, validateReplyContent } from "../../util/validateReplyContent";
 import { NexusGenInputs } from "../__types";
+import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
-  slugArg: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
-  publicPetitionLinkIdArg?: (args: ArgsValue<TypeName, FieldName>) => number,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
+  publicPetitionLinkIdProp?: ArgWithPath<TypeName, FieldName, number>,
 ) {
   const MIN_SLUG_LENGTH = 8;
   const MAX_SLUG_LENGTH = 30;
 
   return (async (_, args, ctx, info) => {
-    const slug = slugArg(args);
+    const [slug, argName] = getArgWithPath(args, prop);
     if (!slug) {
       return;
     }
-
-    const publicPetitionLinkId = publicPetitionLinkIdArg?.(args);
 
     if (slug.length < MIN_SLUG_LENGTH) {
       throw new ArgValidationError(
@@ -54,6 +51,10 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
     }
 
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    const [publicPetitionLinkId] = publicPetitionLinkIdProp
+      ? getArgWithPath(args, publicPetitionLinkIdProp)
+      : [null];
+
     if (publicLink && publicLink.id !== publicPetitionLinkId) {
       throw new ArgValidationError(
         info,
@@ -68,14 +69,9 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
 export function validateCreatePetitionFieldReplyInput<
   TypeName extends string,
   FieldName extends string,
->(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["CreatePetitionFieldReplyInput"][],
-  argName: string,
-) {
+>(prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["CreatePetitionFieldReplyInput"][]>) {
   return (async (_, args, ctx, info) => {
-    const fieldReplies = prop(args);
+    const [fieldReplies, argName] = getArgWithPath(args, prop);
     await validateCreateReplyInput(fieldReplies, argName, ctx, info);
 
     const fields = (await ctx.petitions.loadField(
@@ -135,14 +131,9 @@ export function validateCreatePetitionFieldReplyInput<
 export function validateUpdatePetitionFieldReplyInput<
   TypeName extends string,
   FieldName extends string,
->(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["UpdatePetitionFieldReplyInput"][],
-  argName: string,
-) {
+>(prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdatePetitionFieldReplyInput"][]>) {
   return (async (_, args, ctx, info) => {
-    const replyContents = prop(args);
+    const [replyContents, argName] = getArgWithPath(args, prop);
     const replyIds = unique(replyContents.map((r) => r.id));
     const [fields, replies] = await Promise.all([
       ctx.petitions.loadFieldForReply(replyIds),
@@ -172,32 +163,30 @@ export function validateUpdatePetitionFieldReplyInput<
 }
 
 export function validateCreateFileReplyInput<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => Omit<
-    NexusGenInputs["CreatePetitionFieldReplyInput"],
-    "content"
-  > & {
-    file?: NexusGenInputs["FileUploadInput"];
-  },
-  argName: string,
+  fieldIdProp: ArgWithPath<TypeName, FieldName, number>,
+  parentReplyIdProp?: ArgWithPath<TypeName, FieldName, number | null | undefined>,
+  fileProp?: ArgWithPath<TypeName, FieldName, NexusGenInputs["FileUploadInput"]>,
 ) {
   return (async (_, args, ctx, info) => {
     const formats: Record<string, string[]> = {
       PDF: ["application/pdf"],
       IMAGE: ["image/png", "image/jpeg"],
     };
-    const input = prop(args);
 
-    if (isNonNullish(input.file)) {
-      const field = await ctx.petitions.loadField(input.id);
-      assert(isNonNullish(field), `Field ${input.id} not found`);
-      assert(field.type === "FILE_UPLOAD", `Field ${input.id} is not a FILE_UPLOAD field`);
+    const [fieldId, argName] = getArgWithPath(args, fieldIdProp);
+
+    if (isNonNullish(fileProp)) {
+      const [file, fileArgName] = getArgWithPath(args, fileProp);
+      const field = await ctx.petitions.loadField(fieldId);
+      assert(isNonNullish(field), `Field ${fieldId} not found`);
+      assert(field.type === "FILE_UPLOAD", `Field ${fieldId} is not a FILE_UPLOAD field`);
       const options = field.options as PetitionFieldOptions["FILE_UPLOAD"];
 
       const maxFileSize = Math.min(options.maxFileSize ?? Infinity, toBytes(300, "MB"));
-      if (input.file.size > maxFileSize) {
+      if (file.size > maxFileSize) {
         throw new ArgValidationError(
           info,
-          argName + ".file.size",
+          fileArgName + ".size",
           `File size exceeds the maximum allowed size of ${options.maxFileSize} bytes`,
           { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
         );
@@ -205,10 +194,10 @@ export function validateCreateFileReplyInput<TypeName extends string, FieldName 
 
       if (isNonNullish(options.accepts)) {
         const acceptedFormats = options.accepts.flatMap((format) => formats[format]);
-        if (!acceptedFormats.includes(input.file.contentType)) {
+        if (!acceptedFormats.includes(file.contentType)) {
           throw new ArgValidationError(
             info,
-            argName + ".file.contentType",
+            fileArgName + ".contentType",
             `File format is not accepted.`,
             { error_code: "FILE_FORMAT_NOT_ACCEPTED_ERROR" },
           );
@@ -216,22 +205,22 @@ export function validateCreateFileReplyInput<TypeName extends string, FieldName 
       }
     }
 
-    await validateCreateReplyInput([input], argName, ctx, info);
+    const [parentReplyId] = parentReplyIdProp ? getArgWithPath(args, parentReplyIdProp) : [null];
+    await validateCreateReplyInput([{ id: fieldId, parentReplyId }], argName, ctx, info);
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
 export function validateUpdateFileReplyInput<TypeName extends string, FieldName extends string>(
-  replyIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  fileProp: (args: core.ArgsValue<TypeName, FieldName>) => NexusGenInputs["FileUploadInput"],
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["FileUploadInput"]>,
+  replyIdProp: ArgWithPath<TypeName, FieldName, number>,
 ) {
   return (async (_, args, ctx, info) => {
     const formats: Record<string, string[]> = {
       PDF: ["application/pdf"],
       IMAGE: ["image/png", "image/jpeg"],
     };
-    const replyId = replyIdProp(args);
-    const file = fileProp(args);
+    const [file, argName] = getArgWithPath(args, prop);
+    const [replyId] = getArgWithPath(args, replyIdProp);
 
     const field = await ctx.petitions.loadFieldForReply(replyId);
     assert(isNonNullish(field), `Field for reply ${replyId} not found`);
@@ -345,4 +334,77 @@ async function validateCreateReplyInput(
       );
     }
   }
+}
+
+export function validateCommentContentSchema<TypeName extends string, FieldName extends string>(
+  prop: ArgWithPath<TypeName, FieldName, any>,
+) {
+  return (async (_, args, ctx, info) => {
+    const [content, argName] = getArgWithPath(args, prop);
+    const ajv = new Ajv();
+    if (!content) {
+      throw new ArgValidationError(info, argName, "comment content is not defined");
+    }
+    const valid = ajv.validate(
+      {
+        definitions: {
+          paragraph: {
+            type: "object",
+            properties: {
+              children: { type: "array", items: { $ref: "#/definitions/leaf" } },
+              type: { enum: ["paragraph"] },
+            },
+            required: ["type", "children"],
+            additionalProperties: false,
+          },
+          mention: {
+            type: "object",
+            properties: {
+              type: { const: "mention" },
+              mention: { type: "string" },
+              children: { type: "array", items: { $ref: "#/definitions/text" } },
+            },
+            additionalProperties: false,
+            required: ["type", "mention", "children"],
+          },
+          text: {
+            type: "object",
+            properties: {
+              text: { type: "string" },
+            },
+            additionalProperties: false,
+            required: ["text"],
+          },
+          link: {
+            type: "object",
+            properties: {
+              type: { const: "link" },
+              url: { type: "string" },
+              children: {
+                type: "array",
+                items: {
+                  type: "object",
+                  anyOf: [{ $ref: "#/definitions/text" }],
+                },
+              },
+            },
+          },
+          leaf: {
+            type: "object",
+            anyOf: [
+              { $ref: "#/definitions/mention" },
+              { $ref: "#/definitions/text" },
+              { $ref: "#/definitions/link" },
+            ],
+          },
+          root: { type: "array", items: { $ref: "#/definitions/paragraph" } },
+        },
+        $ref: "#/definitions/root",
+      },
+      content,
+    );
+    if (!valid) {
+      throw new ArgValidationError(info, argName, ajv.errorsText());
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

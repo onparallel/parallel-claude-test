@@ -1,8 +1,8 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { unique } from "remeda";
+import { isNullish, unique } from "remeda";
 import { ListViewType } from "../../db/__types";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToPetitionListView<
   TypeName extends string,
@@ -10,7 +10,7 @@ export function userHasAccessToPetitionListView<
   TArgId extends Arg<TypeName, FieldName, Maybe<number>>,
 >(petitionViewIdArg: TArgId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const id = args[petitionViewIdArg] as unknown as Maybe<number>;
+    const id = getArg(args, petitionViewIdArg);
 
     if (!id) {
       // null id means default view, everyone has access
@@ -28,7 +28,7 @@ export function validPetitionListViewReorder<
   TArgIds extends Arg<TypeName, FieldName, number[]>,
 >(idsArg: TArgIds): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = args[idsArg] as unknown as number[];
+    const ids = getArg(args, idsArg);
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     return userViews.length === unique(ids).length && userViews.every((v) => ids.includes(v.id));
   };
@@ -40,7 +40,7 @@ export function petitionListViewHasType<
   TArgIds extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(idsArg: TArgIds, type: ListViewType): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = unMaybeArray(args[idsArg] as unknown as MaybeArray<number>);
+    const ids = unMaybeArray(getArg(args, idsArg));
     const userViews = await ctx.views.loadPetitionListView(ids);
     return userViews.every((v) => v?.view_type === type);
   };
@@ -52,15 +52,13 @@ export function userHasAccessToProfileListView<
   TArgId extends Arg<TypeName, FieldName, MaybeArray<number> | null>,
 >(profileViewIdArg: TArgId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const id = args[profileViewIdArg] as unknown as MaybeArray<number> | null;
-    if (!id) {
+    const profileViewIds = getArg(args, profileViewIdArg);
+    if (isNullish(profileViewIds)) {
       // null id means default view, everyone has access
       return true;
     }
 
-    const ids = unMaybeArray(args[profileViewIdArg] as unknown as MaybeArray<number>);
-
-    const views = await ctx.views.loadProfileListView(ids);
+    const views = await ctx.views.loadProfileListView(unMaybeArray(profileViewIds));
     return views.every((v) => v && v.user_id === ctx.user!.id);
   };
 }
@@ -75,8 +73,8 @@ export function validProfileListViewReorder<
   profileTypeIdArg: TArgProfileTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = args[idsArg] as unknown as number[];
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const ids = getArg(args, idsArg);
+    const profileTypeId = getArg(args, profileTypeIdArg);
     const userViews = await ctx.views.loadProfileListViewsByUserIdProfileTypeId({
       userId: ctx.user!.id,
       profileTypeId,
@@ -91,7 +89,7 @@ export function profileListViewHasType<
   TArgIds extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(idsArg: TArgIds, type: ListViewType): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = unMaybeArray(args[idsArg] as unknown as MaybeArray<number>);
+    const ids = unMaybeArray(getArg(args, idsArg));
     const userViews = await ctx.views.loadProfileListView(ids);
     return userViews.every((v) => v?.view_type === type);
   };
@@ -107,10 +105,8 @@ export function profileListViewBelongsToProfileType<
   profileTypeIdArg: TArgProfileTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileListViewIds = unMaybeArray(
-      args[profileListViewIdArg] as unknown as MaybeArray<number>,
-    );
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const profileListViewIds = unMaybeArray(getArg(args, profileListViewIdArg));
+    const profileTypeId = getArg(args, profileTypeIdArg);
 
     const views = await ctx.views.loadProfileListView(profileListViewIds);
     return views.every((v) => v?.profile_type_id === profileTypeId);

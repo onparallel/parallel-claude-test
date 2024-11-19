@@ -1,19 +1,16 @@
-import { core } from "nexus";
 import { difference, uniqueBy } from "remeda";
 import { UserGroupPermissionNameValues } from "../../db/__types";
 import { NexusGenInputs } from "../__types";
+import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
 export function validUserGroupPermissionsInput<TypeName extends string, FieldName extends string>(
-  userGroupIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  permissionsProp: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["UpdateUserGroupPermissionsInput"][],
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdateUserGroupPermissionsInput"][]>,
+  userGroupIdProp: ArgWithPath<TypeName, FieldName, number>,
 ) {
   return (async (_, args, ctx, info) => {
-    const permissions = permissionsProp(args);
+    const [permissions, argName] = getArgWithPath(args, prop);
 
     const uniqueByName = uniqueBy(permissions, (p) => p.name);
     if (permissions.length !== uniqueByName.length) {
@@ -26,7 +23,7 @@ export function validUserGroupPermissionsInput<TypeName extends string, FieldNam
     );
 
     if (permissions.some((p) => p.name === "SUPERADMIN")) {
-      const userGroupId = userGroupIdProp(args);
+      const [userGroupId] = getArgWithPath(args, userGroupIdProp);
       const userGroup = (await ctx.userGroups.loadUserGroup(userGroupId))!;
       const organization = (await ctx.organizations.loadOrg(userGroup.org_id))!;
 

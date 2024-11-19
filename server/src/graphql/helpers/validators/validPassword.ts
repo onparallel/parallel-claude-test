@@ -1,16 +1,18 @@
-import { core } from "nexus";
-import { ApolloError } from "../errors";
+import { ArgWithPath, getArgWithPath } from "../authorize";
+import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validPassword<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
 ) {
   return ((_, args, ctx, info) => {
-    const password = prop(args);
+    const [password, argName] = getArgWithPath(args, prop);
     if (!password || !password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)) {
-      throw new ApolloError(
+      throw new ArgValidationError(
+        info,
+        argName,
         "Provided password cannot be used for security reasons.",
-        "INVALID_PASSWORD_ERROR",
+        { code: "INVALID_PASSWORD_ERROR" },
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

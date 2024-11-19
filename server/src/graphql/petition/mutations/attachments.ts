@@ -34,11 +34,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
       fieldId: nonNull(globalIdArg("PetitionField")),
       data: nonNull("FileUploadInput"),
     },
-    validateArgs: validFileUploadInput(
-      (args) => args.data,
-      { maxSizeBytes: toBytes(100, "MB") },
-      "data",
-    ),
+    validateArgs: validFileUploadInput("data", { maxSizeBytes: toBytes(100, "MB") }),
     resolve: async (_, args, ctx) => {
       const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(args.fieldId);
       if (attachments.length + 1 > 10) {
@@ -188,11 +184,10 @@ export const createPetitionAttachmentUploadLink = mutationField(
       data: nonNull(list(nonNull("FileUploadInput"))),
       type: nonNull("PetitionAttachmentType"),
     },
-    validateArgs: validFileUploadInput(
-      (args) => args.data,
-      { maxSizeBytes: toBytes(50, "MB"), contentType: "application/pdf" },
-      "data",
-    ),
+    validateArgs: validFileUploadInput("data", {
+      maxSizeBytes: toBytes(50, "MB"),
+      contentType: "application/pdf",
+    }),
     resolve: async (_, args, ctx) => {
       const files = await ctx.files.createFileUpload(
         args.data.map((data) => ({

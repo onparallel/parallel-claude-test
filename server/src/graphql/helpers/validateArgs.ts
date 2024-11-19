@@ -1,5 +1,4 @@
 import { ArgsValue } from "nexus/dist/core";
-import { isNonNullish } from "remeda";
 import { Maybe } from "../../util/types";
 import { ValidatorOrConditionError } from "./errors";
 import { FieldValidateArgsResolver } from "./validateArgsPlugin";
@@ -41,17 +40,6 @@ export function validateIf<TypeName extends string, FieldName extends string>(
 ) {
   return (async (root, args, ctx, info) => {
     if (check(args)) {
-      await validator(root, args, ctx, info);
-    }
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
-}
-
-export function validateIfDefined<TypeName extends string, FieldName extends string>(
-  prop: (args: ArgsValue<TypeName, FieldName>) => any,
-  validator: FieldValidateArgsResolver<TypeName, FieldName>,
-) {
-  return (async (root, args, ctx, info) => {
-    if (isNonNullish(prop(args))) {
       await validator(root, args, ctx, info);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

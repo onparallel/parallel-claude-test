@@ -26,14 +26,13 @@ import {
 } from "../../util/slate/placeholders";
 import { fromPlainText } from "../../util/slate/utils";
 import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helpers/authorize";
-import { ApolloError, ForbiddenError } from "../helpers/errors";
+import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
-import { validateAnd } from "../helpers/validateArgs";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validXor } from "../helpers/validators/validXor";
 import {
   fieldAttachmentBelongsToField,
   fieldHasParent,
@@ -595,7 +594,7 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
       keycode: nonNull(idArg()),
       petitionFieldCommentIds: nonNull(list(nonNull(globalIdArg("PetitionFieldComment")))),
     },
-    validateArgs: notEmptyArray((args) => args.petitionFieldCommentIds, "petitionFieldCommentIds"),
+    validateArgs: notEmptyArray("petitionFieldCommentIds"),
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
         args.petitionFieldCommentIds,
@@ -617,10 +616,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     messageBody: nonNull(stringArg()),
   },
   authorize: authenticatePublicAccess("keycode"),
-  validateArgs: validateAnd(
-    validEmail((args) => args.email, "email"),
-    maxLength((args) => args.messageBody, "messageBody", 1000),
-  ),
+  validateArgs: validateAnd(validEmail("email"), maxLength("messageBody", 1000)),
   resolve: async (_, args, ctx) => {
     const access = ctx.access!;
     const recipient = ctx.contact!;
@@ -813,10 +809,14 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       ),
     ),
     validateArgs: validateAnd(
-      validEmail((args) => args.contactEmail, "contactEmail"),
-      validXor(
-        (args) => [isNonNullish(args.prefill), isNonNullish(args.prefillDataKey)],
-        "prefill,prefillDataKey",
+      validEmail("contactEmail"),
+      validateIf(
+        (args) =>
+          [isNonNullish(args.prefill), isNonNullish(args.prefillDataKey)].filter((v) => v).length >
+          1,
+        (_, args, ctx, info) => {
+          throw new ArgValidationError(info, "prefill", "Only one of prefill or prefillDataKey");
+        },
       ),
     ),
     resolve: async (_, args, ctx) => {
@@ -976,7 +976,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     ifArgDefined("slug", validPublicPetitionLinkSlug("slug" as never)),
     ifArgDefined("keycode", fetchPetitionAccess("keycode" as never)),
   ),
-  validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
+  validateArgs: validEmail("contactEmail"),
   resolve: async (_, args, ctx) => {
     let access: PetitionAccess;
     let owner: User;

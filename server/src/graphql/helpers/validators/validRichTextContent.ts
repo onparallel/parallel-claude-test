@@ -1,8 +1,8 @@
 import Ajv from "ajv";
-import { core } from "nexus";
 import { isNonNullish } from "remeda";
 import { fromGlobalId, isGlobalId } from "../../../util/globalId";
 import { SlateNode } from "../../../util/slate/render";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
@@ -120,13 +120,12 @@ export function validateRichTextContent(json: any) {
 }
 
 export function validRichTextContent<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
+  prop: ArgWithPath<TypeName, FieldName, any>,
   /**
    * if defined, this validator will check that any globalId placeholder in the RTE belongs to a PetitionField on this Petition (deleted PetitionFields are OK)
    * if not defined and the RTE contains globalId placeholders, an error will be thrown
    */
-  petitionIdProp: ((args: core.ArgsValue<TypeName, FieldName>) => number) | undefined,
-  argName: string,
+  petitionIdProp?: ArgWithPath<TypeName, FieldName, number>,
 ) {
   return (async (_, args, ctx, info) => {
     async function validateGlobalIdReferences(nodes: SlateNode[], petitionId: number) {
@@ -157,16 +156,18 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
     }
 
     try {
-      const value = prop(args);
+      const [value] = getArgWithPath(args, prop);
       if (!value) {
         return;
       }
       validateRichTextContent(value);
 
       if (isNonNullish(petitionIdProp)) {
-        await validateGlobalIdReferences(value as SlateNode[], petitionIdProp(args));
+        const [petitionId] = getArgWithPath(args, petitionIdProp);
+        await validateGlobalIdReferences(value as SlateNode[], petitionId);
       }
     } catch (e: any) {
+      const [, argName] = getArgWithPath(args, prop);
       throw new ArgValidationError(info, argName, e.message);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

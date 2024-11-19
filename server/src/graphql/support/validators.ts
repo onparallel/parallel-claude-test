@@ -1,5 +1,5 @@
-import { core } from "nexus";
 import { unique } from "remeda";
+import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
@@ -24,11 +24,10 @@ const validCategories = [
 ];
 
 export function validatePublicTemplateCategories<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
 ) {
   return ((_, args, ctx, info) => {
-    const categories = prop(args);
+    const [categories, argName] = getArgWithPath(args, prop);
     if (!categories) return true;
 
     const categoriesArray = unique(

@@ -13,7 +13,7 @@ import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { uploadArg } from "../helpers/scalars/Upload";
-import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { validateAnd } from "../helpers/validateArgs";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validUrl } from "../helpers/validators/validUrl";
 import { validateFile } from "../helpers/validators/validateFile";
@@ -62,7 +62,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
     locale: nonNull("UserLocale"),
   },
   authorize: superAdminAccess(),
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validEmail("email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
       const users = await ctx.users.loadUsersByEmail(email);
@@ -153,17 +153,13 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
     image: nullable(uploadArg()),
   },
   validateArgs: validateAnd(
-    validatePublicTemplateCategories((args) => args.categories, "categories"),
-    validateHexColor((args) => args.backgroundColor, "backgroundColor"),
-    validateRegex((args) => args.slug, "slug", /^[0-9a-z-]+$/),
-    validateIf(
-      (args) => isNonNullish(args.image),
-      validateFile(
-        (args) => args.image!,
-        { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-        "image",
-      ),
-    ),
+    validatePublicTemplateCategories("categories"),
+    validateHexColor("backgroundColor"),
+    validateRegex("slug", /^[0-9a-z-]+$/),
+    validateFile("image", {
+      contentType: ["image/gif", "image/png", "image/jpeg"],
+      maxSize: 1024 * 1024,
+    }),
   ),
   authorize: superAdminAccess(),
   resolve: async (_, args, ctx, info) => {
@@ -244,11 +240,10 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
     userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
     image: nonNull(uploadArg()),
   },
-  validateArgs: validateFile(
-    (args) => args.image,
-    { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-    "image",
-  ),
+  validateArgs: validateFile("image", {
+    contentType: ["image/gif", "image/png", "image/jpeg"],
+    maxSize: 1024 * 1024,
+  }),
   resolve: async (_, { userId, image }, ctx) => {
     try {
       const [{ createReadStream, mimetype }, user] = await Promise.all([
@@ -501,8 +496,8 @@ export const createAzureOpenAiIntegration = mutationField("createAzureOpenAiInte
     endpoint: nonNull(stringArg({ description: "https://<resource name>.openai.azure.com/" })),
   },
   validateArgs: validateAnd(
-    validUrl((args) => args.endpoint, "endpoint"),
-    validateRegex((args) => args.endpoint, "endpoint", /^https:\/\/.+\.openai\.azure\.com\/$/),
+    validUrl("endpoint"),
+    validateRegex("endpoint", /^https:\/\/.+\.openai\.azure\.com\/$/),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -1227,18 +1222,14 @@ export const updateStandardListDefinitions = mutationField("updateStandardListDe
   args: {
     file: nonNull(uploadArg()),
   },
-  validateArgs: validateFile(
-    (args) => args.file,
-    {
-      contentType: [
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "application/csv",
-      ],
-      maxSize: toBytes(10, "MB"),
-    },
-    "file",
-  ),
+  validateArgs: validateFile("file", {
+    contentType: [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/csv",
+    ],
+    maxSize: toBytes(10, "MB"),
+  }),
 
   resolve: async (_, args, ctx) => {
     try {

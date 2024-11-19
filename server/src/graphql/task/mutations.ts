@@ -103,7 +103,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),
   },
-  validateArgs: validExportFileRenamePattern((props) => props.pattern, "pattern"),
+  validateArgs: validExportFileRenamePattern("pattern"),
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
       {
@@ -336,11 +336,10 @@ export const uploadBulkPetitionSendTaskInputFile = mutationField(
     args: {
       file: nonNull("FileUploadInput"),
     },
-    validateArgs: validFileUploadInput(
-      (args) => args.file,
-      { contentType: "text/csv", maxSizeBytes: toBytes(10, "MB") },
-      "file",
-    ),
+    validateArgs: validFileUploadInput("file", {
+      contentType: "text/csv",
+      maxSizeBytes: toBytes(10, "MB"),
+    }),
     resolve: async (_, args, ctx) => {
       const { filename, size, contentType } = args.file;
       const key = random(16);
@@ -543,11 +542,11 @@ export const createAddPetitionPermissionMaybeTask = mutationField(
       message: stringArg(),
     },
     validateArgs: validateAnd(
-      notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.folders?.folderIds, "folders.folderIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
-      maxLength((args) => args.message, "message", 1000),
+      notEmptyArray("petitionIds"),
+      notEmptyArray("folders.folderIds"),
+      notEmptyArray("userIds"),
+      notEmptyArray("userGroupIds"),
+      maxLength("message", 1000),
       (_, args, ctx, info) => {
         if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
           throw new ArgValidationError(
@@ -685,9 +684,9 @@ export const createEditPetitionPermissionMaybeTask = mutationField(
       permissionType: nonNull(arg({ type: "PetitionPermissionTypeRW" })),
     },
     validateArgs: validateAnd(
-      notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
+      notEmptyArray("petitionIds"),
+      notEmptyArray("userIds"),
+      notEmptyArray("userGroupIds"),
       (_, args, ctx, info) => {
         if (isNullish(args.userIds) && isNullish(args.userGroupIds)) {
           throw new ArgValidationError(
@@ -769,9 +768,9 @@ export const createRemovePetitionPermissionMaybeTask = mutationField(
       }),
     },
     validateArgs: validateAnd(
-      notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      notEmptyArray((args) => args.userGroupIds, "userGroupId"),
+      notEmptyArray("petitionIds"),
+      notEmptyArray("userIds"),
+      notEmptyArray("userGroupIds"),
       (_, args, ctx, info) => {
         if (!args.removeAll && isNullish(args.userIds) && isNullish(args.userGroupIds)) {
           throw new ArgValidationError(
@@ -783,7 +782,7 @@ export const createRemovePetitionPermissionMaybeTask = mutationField(
       },
       validateIf(
         (args) => isNullish(args.userIds) && isNullish(args.userGroupIds),
-        validBooleanValue((args) => args.removeAll, "removeAll", true),
+        validBooleanValue("removeAll", true),
       ),
     ),
     resolve: async (_, args, ctx) => {
@@ -870,14 +869,10 @@ export const createProfilesExcelImportTask = mutationField("createProfilesExcelI
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     file: nonNull(uploadArg()),
   },
-  validateArgs: validateFile(
-    (args) => args.file,
-    {
-      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      maxSize: 1024 * 1024 * 10,
-    },
-    "file",
-  ),
+  validateArgs: validateFile("file", {
+    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: 1024 * 1024 * 10,
+  }),
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 

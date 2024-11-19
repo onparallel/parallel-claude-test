@@ -91,7 +91,7 @@ import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues
 import { datetimeArg } from "../../helpers/scalars/DateTime";
 import { jsonArg, jsonObjectArg } from "../../helpers/scalars/JSON";
 import { uploadArg } from "../../helpers/scalars/Upload";
-import { validateAnd, validateIfDefined, validateOr } from "../../helpers/validateArgs";
+import { validateAnd, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -101,7 +101,7 @@ import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validateFieldLogicInput } from "../../helpers/validators/validFieldLogic";
 import { validFolderId } from "../../helpers/validators/validFolderId";
-import { validIsDefined } from "../../helpers/validators/validIsDefined";
+import { validIsNonNullish } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
@@ -239,7 +239,7 @@ export const createPetition = mutationField("createPetition", {
     }),
     path: stringArg(),
   },
-  validateArgs: validPath((args) => args.path, "path"),
+  validateArgs: validPath("path"),
   resolve: async (_, { name, locale, petitionId, type, path }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     let petition: Petition;
@@ -320,10 +320,7 @@ export const clonePetitions = mutationField("clonePetitions", {
     keepTitle: booleanArg({ default: false }),
     path: stringArg(),
   },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.petitionIds, "petitionIds"),
-    validPath((args) => args.path, "path"),
-  ),
+  validateArgs: validateAnd(notEmptyArray("petitionIds"), validPath("path")),
   resolve: async (_, args, ctx) => {
     const petitions = await ctx.petitions.loadPetition(args.petitionIds);
     return await pMap(
@@ -377,13 +374,15 @@ export const deletePetitions = mutationField("deletePetitions", {
         "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
     }),
   },
-  validateArgs: validateAnd(
-    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
-    notEmptyArray(
-      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
-      "ids or folders",
-    ),
-  ),
+  validateArgs: (_, args, ctx, info) => {
+    if ((args.ids?.length ?? 0) + (args.folders?.folderIds?.length ?? 0) === 0) {
+      throw new ArgValidationError(
+        info,
+        "ids or folders",
+        `Expected ids or folders.folderIds to be defined and not empty`,
+      );
+    }
+  },
   resolve: async (_, args, ctx) => {
     function petitionIsSharedByOwner(p: PetitionPermission[]) {
       return (
@@ -765,64 +764,64 @@ export const updatePetition = mutationField("updatePetition", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
-      (args) => [
-        args.data.locale,
-        args.data.description,
-        args.data.closingEmailBody,
-        args.data.isCompletingMessageEnabled,
-        args.data.completingMessageSubject,
-        args.data.completingMessageBody,
-        args.data.skipForwardSecurity,
-        args.data.isRecipientViewContentsHidden,
-        args.data.isDelegateAccessEnabled,
-        args.data.anonymizeAfterMonths,
-        args.data.anonymizePurpose,
-        args.data.defaultPath,
-        args.data.defaultOnBehalfId,
-        args.data.automaticNumberingConfig,
+      [
+        "data.locale",
+        "data.description",
+        "data.closingEmailBody",
+        "data.isCompletingMessageEnabled",
+        "data.completingMessageSubject",
+        "data.completingMessageBody",
+        "data.skipForwardSecurity",
+        "data.isRecipientViewContentsHidden",
+        "data.isDelegateAccessEnabled",
+        "data.anonymizeAfterMonths",
+        "data.anonymizePurpose",
+        "data.defaultPath",
+        "data.defaultOnBehalfId",
+        "data.automaticNumberingConfig",
       ],
       petitionsAreEditable("petitionId"),
     ),
     ifSomeDefined(
-      (args) => [args.data.emailBody, args.data.emailSubject],
+      ["data.emailBody", "data.emailSubject"],
       or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId")),
     ),
     // only allow to update petition name if anonymized
     ifSomeDefined(
-      (args) => [
-        args.data.closingEmailBody,
-        args.data.deadline,
-        args.data.description,
-        args.data.emailBody,
-        args.data.emailSubject,
-        args.data.isRecipientViewContentsHidden,
-        args.data.isDelegateAccessEnabled,
-        args.data.locale,
-        args.data.remindersConfig,
-        args.data.signatureConfig,
-        args.data.skipForwardSecurity,
-        args.data.anonymizeAfterMonths,
-        args.data.anonymizePurpose,
-        args.data.defaultPath,
-        args.data.defaultOnBehalfId,
-        args.data.automaticNumberingConfig,
+      [
+        "data.closingEmailBody",
+        "data.deadline",
+        "data.description",
+        "data.emailBody",
+        "data.emailSubject",
+        "data.isRecipientViewContentsHidden",
+        "data.isDelegateAccessEnabled",
+        "data.locale",
+        "data.remindersConfig",
+        "data.signatureConfig",
+        "data.skipForwardSecurity",
+        "data.anonymizeAfterMonths",
+        "data.anonymizePurpose",
+        "data.defaultPath",
+        "data.defaultOnBehalfId",
+        "data.automaticNumberingConfig",
       ],
       petitionIsNotAnonymized("petitionId"),
     ),
     // only petition owners can edit compliance props
     ifSomeDefined(
-      (args) => [args.data.anonymizeAfterMonths, args.data.anonymizePurpose],
+      ["data.anonymizeAfterMonths", "data.anonymizePurpose"],
       and(userHasFeatureFlag("AUTO_ANONYMIZE"), userHasAccessToPetitions("petitionId", ["OWNER"])),
     ),
     ifSomeDefined(
-      (args) => [args.data.defaultOnBehalfId],
+      ["data.defaultOnBehalfId"],
       defaultOnBehalfUserBelongsToContextOrganization("data"),
     ),
     ifSomeDefined(
-      (args) => [
-        args.data.isReviewFlowEnabled,
-        args.data.isDocumentGenerationEnabled,
-        args.data.isInteractionWithRecipientsEnabled,
+      [
+        "data.isReviewFlowEnabled",
+        "data.isDocumentGenerationEnabled",
+        "data.isInteractionWithRecipientsEnabled",
       ],
       petitionsAreOfTypeTemplate("petitionId"),
     ),
@@ -865,40 +864,20 @@ export const updatePetition = mutationField("updatePetition", {
     ),
   },
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    maxLength((args) => args.data.name, "data.name", 255),
-    maxLength((args) => args.data.emailSubject, "data.emailSubject", 1000),
-    maxLength((args) => args.data.completingMessageSubject, "data.completingMessageSubject", 255),
-    maxLength((args) => args.data.description, "data.description", 1000),
-    validPetitionSubject(
-      (args) => args.data.emailSubject,
-      (args) => args.petitionId,
-      "data.emailSubject",
-    ),
-    validRichTextContent(
-      (args) => args.data.emailBody,
-      (args) => args.petitionId,
-      "data.emailBody",
-    ),
-    validRichTextContent(
-      (args) => args.data.closingEmailBody,
-      (args) => args.petitionId,
-      "data.closingEmailBody",
-    ),
-    validRichTextContent(
-      (args) => args.data.description,
-      undefined, // template description does not include PetitionField references
-      "data.description",
-    ),
-    validRichTextContent(
-      (args) => args.data.completingMessageBody,
-      (args) => args.petitionId,
-      "data.completingMessageBody",
-    ),
-    validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
-    validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
-    inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1),
-    validPath((args) => args.data.defaultPath, "data.defaultPath"),
+    notEmptyObject("data"),
+    maxLength("data.name", 255),
+    maxLength("data.emailSubject", 1000),
+    maxLength("data.completingMessageSubject", 255),
+    maxLength("data.description", 1000),
+    validPetitionSubject("data.emailSubject", "petitionId"),
+    validRichTextContent("data.emailBody", "petitionId"),
+    validRichTextContent("data.closingEmailBody", "petitionId"),
+    validRichTextContent("data.description"),
+    validRichTextContent("data.completingMessageBody", "petitionId"),
+    validRemindersConfig("data.remindersConfig"),
+    validSignatureConfig("data.signatureConfig"),
+    inRange("data.anonymizeAfterMonths", 1),
+    validPath("data.defaultPath"),
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -1072,7 +1051,7 @@ export const createPetitionField = mutationField("createPetitionField", {
     position: intArg(),
     parentFieldId: globalIdArg("PetitionField"),
   },
-  validateArgs: inRange((args) => args.position, "position", 0),
+  validateArgs: inRange("position", 0),
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.loadPetition(args.petitionId);
     assert(petition, "Petition not found");
@@ -1236,7 +1215,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.alias,
-      fieldAliasIsAvailable("petitionId", (args) => args.data.alias!),
+      fieldAliasIsAvailable("petitionId", "data.alias" as never),
     ),
     ifArgDefined(
       (args) =>
@@ -1295,18 +1274,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     force: booleanArg({ default: false }),
   },
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    maxLength((args) => args.data.title, "data.title", 500),
-    maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", FIELD_REFERENCE_REGEX),
+    notEmptyObject("data"),
+    maxLength("data.title", 500),
+    maxLength("data.alias", 100),
+    validateRegex("data.alias", FIELD_REFERENCE_REGEX),
     validateFieldLogicInput(
       (args) => args.petitionId,
       (args) => args.fieldId,
-      (args) => ({
-        visibility: args.data.visibility as any,
-        math: args.data.math as any,
-      }),
-      "data.visibility,data.math",
+      "data",
     ),
   ),
   resolve: async (_, args, ctx, info) => {
@@ -1632,14 +1607,10 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
     fieldId: nonNull(globalIdArg("PetitionField")),
     file: nonNull(uploadArg()),
   },
-  validateArgs: validateFile(
-    (args) => args.file,
-    {
-      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      maxSize: 1024 * 1024 * 10,
-    },
-    "file",
-  ),
+  validateArgs: validateFile("file", {
+    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: 1024 * 1024 * 10,
+  }),
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 
@@ -1777,7 +1748,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     petitionFieldReplyIds: nonNull(list(nonNull(globalIdArg("PetitionFieldReply")))),
     status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
   },
-  validateArgs: notEmptyArray((args) => args.petitionFieldReplyIds, "petitionFieldReplyIds"),
+  validateArgs: notEmptyArray("petitionFieldReplyIds"),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.updatePetitionFieldRepliesStatus(
       args.petitionFieldReplyIds,
@@ -1938,7 +1909,7 @@ export const sendPetition = mutationField("sendPetition", {
     userCanSendAs("senderId" as never),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
-    organizationHasEnoughPetitionSendCredits("petitionId", (args) => args.contactIdGroups.length),
+    organizationHasEnoughPetitionSendCredits("petitionId", "contactIdGroups"),
     petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
   args: {
@@ -1971,20 +1942,12 @@ export const sendPetition = mutationField("sendPetition", {
     skipEmailSend: booleanArg(),
   },
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
-    maxLength((args) => args.subject, "subject", 1000),
-    notEmptyString((args) => args.subject, "subject"),
-    validPetitionSubject(
-      (args) => args.subject,
-      (args) => args.petitionId,
-      "subject",
-    ),
-    validRichTextContent(
-      (args) => args.body,
-      (args) => args.petitionId,
-      "body",
-    ),
-    validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
+    notEmptyArray("contactIdGroups"),
+    maxLength("subject", 1000),
+    notEmptyString("subject"),
+    validPetitionSubject("subject", "petitionId"),
+    validRichTextContent("body", "petitionId"),
+    validRemindersConfig("remindersConfig"),
     (_, { contactIdGroups }, ctx, info) => {
       // check that contactIds do not repeat inside each group
       for (const group of contactIdGroups) {
@@ -2196,11 +2159,7 @@ export const sendReminders = mutationField("sendReminders", {
     body: jsonArg(),
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
-  validateArgs: validRichTextContent(
-    (args) => args.body,
-    (args) => args.petitionId,
-    "body",
-  ),
+  validateArgs: validRichTextContent("body", "petitionId"),
   resolve: async (_, args, ctx) => {
     const remindersData = await pMap(
       args.accessIds,
@@ -2267,11 +2226,8 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
     remindersConfig: arg({ type: "RemindersConfigInput" }),
   },
   validateArgs: validateOr(
-    validBooleanValue((args) => args.start, "start", false),
-    validateAnd(
-      validIsDefined((args) => args.remindersConfig, "remindersConfig"),
-      validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
-    ),
+    validBooleanValue("start", false),
+    validateAnd(validIsNonNullish("remindersConfig"), validRemindersConfig("remindersConfig")),
   ),
   resolve: async (_, args, ctx) => {
     if (args.start) {
@@ -2431,11 +2387,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
     petitionIsNotAnonymized("petitionId"),
     petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
-  validateArgs: validRichTextContent(
-    (args) => args.emailBody,
-    (args) => args.petitionId,
-    "emailBody",
-  ),
+  validateArgs: validRichTextContent("emailBody", "petitionId"),
   resolve: async (_, args, ctx) => {
     const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
     if (!shouldSendNotification && !args.force) {
@@ -2515,7 +2467,7 @@ export const updatePetitionMetadata = mutationField("updatePetitionMetadata", {
   validateArgs: jsonSchema({
     type: "object",
     additionalProperties: { type: ["string", "boolean", "number"] },
-  })((args) => args.metadata, "metadata"),
+  })("metadata"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionMetadata(args.petitionId, args.metadata);
   },
@@ -2537,7 +2489,7 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   validateArgs: jsonSchema({
     type: "object",
     additionalProperties: { type: ["string", "boolean", "number"] },
-  })((args) => args.metadata, "metadata"),
+  })("metadata"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
@@ -2599,11 +2551,8 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     petitionNamePattern: nullable(stringArg()),
   },
   validateArgs: validateAnd(
-    validatePublicPetitionLinkSlug((args) => args.slug, "slug"),
-    validPublicPetitionLinkPetitionNamePattern(
-      (args) => args.petitionNamePattern,
-      "petitionNamePattern",
-    ),
+    validatePublicPetitionLinkSlug("slug"),
+    validPublicPetitionLinkPetitionNamePattern("petitionNamePattern"),
   ),
   resolve: async (
     _,
@@ -2655,15 +2604,8 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     petitionNamePattern: stringArg(),
   },
   validateArgs: validateAnd(
-    validatePublicPetitionLinkSlug(
-      (args) => args.slug,
-      "slug",
-      (args) => args.publicPetitionLinkId,
-    ),
-    validPublicPetitionLinkPetitionNamePattern(
-      (args) => args.petitionNamePattern,
-      "petitionNamePattern",
-    ),
+    validatePublicPetitionLinkSlug("slug", "publicPetitionLinkId"),
+    validPublicPetitionLinkPetitionNamePattern("petitionNamePattern"),
   ),
   resolve: async (_, args, ctx) => {
     const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
@@ -2717,13 +2659,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
     key: nonNull(stringArg()),
     value: stringArg(),
   },
-  validateArgs: validateAnd(
-    maxLength((args) => args.key, "key", 100),
-    validateIfDefined(
-      (args) => args.value,
-      maxLength((args) => args.value!, "value", 1000),
-    ),
-  ),
+  validateArgs: validateAnd(maxLength("key", 100), maxLength("value", 1000)),
   resolve: async (_, { petitionId, key, value }, ctx) => {
     const petition = (await ctx.petitions.loadPetition(petitionId))!;
 
@@ -2882,9 +2818,9 @@ export const movePetitions = mutationField("movePetitions", {
     type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
-    validFolderId((args) => args.folderIds, "folderIds"),
-    validPath((args) => args.source, "source"),
-    validPath((args) => args.destination, "destination"),
+    validFolderId("folderIds"),
+    validPath("source"),
+    validPath("destination"),
     (_, args, ctx, info) => {
       const folderIds = unMaybeArray(args.folderIds ?? []);
       const paths = fromGlobalIds(folderIds, "PetitionFolder", true).ids;
@@ -2922,10 +2858,7 @@ export const renameFolder = mutationField("renameFolder", {
     name: stringArg(),
     type: nonNull("PetitionBaseType"),
   },
-  validateArgs: validateAnd(
-    validFolderId((args) => args.folderId, "folderId"),
-    validateRegex((args) => args.name, "name", /^[^/]+$/),
-  ),
+  validateArgs: validateAnd(validFolderId("folderId"), validateRegex("name", /^[^/]+$/)),
   resolve: async (_, args, ctx, info) => {
     const path = fromGlobalId(args.folderId, "PetitionFolder", true).id;
     const destination = path.replace(/\/[^/]+\/$/, "/" + args.name + "/");
@@ -2957,7 +2890,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
       data: nonNull("JSONObject"),
       path: stringArg(),
     },
-    validateArgs: validPath((args) => args.path, "path"),
+    validateArgs: validPath("path"),
     resolve: async (_, args, ctx) => {
       const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
       const template = (await ctx.petitions.loadPetition(publicLink.template_id))!;
@@ -3010,7 +2943,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
       ),
     ),
   ),
-  validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
+  validateArgs: notEmptyArray("childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
     if (!force) {
       const replies = (await ctx.petitions.loadRepliesForField(childrenFieldIds)).flat();
@@ -3079,7 +3012,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
       ),
     ),
   ),
-  validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
+  validateArgs: notEmptyArray("childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
     if (!force) {
       const replies = (await ctx.petitions.loadRepliesForField(childrenFieldIds)).flat();
@@ -3183,7 +3116,7 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     position: intArg(),
   },
-  validateArgs: inRange((args) => args.position, "position", 0),
+  validateArgs: inRange("position", 0),
   resolve: async (_, args, ctx) => {
     const profileTypeField = (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
     const petition = await ctx.petitions.loadPetition(args.petitionId);

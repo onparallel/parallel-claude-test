@@ -1,13 +1,12 @@
-import { core } from "nexus";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function notEmptyObject<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, any>,
 ) {
   return ((_, args, ctx, info) => {
-    const data = prop(args);
+    const [data, argName] = getArgWithPath(args, prop);
     if (data && Object.values(data).length === 0) {
       throw new ArgValidationError(info, argName, `Required object can't be empty.`);
     }

@@ -2,7 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { IntegrationType } from "../../db/__types";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 import { parseBackgroundCheckToken } from "./utils";
 
 export function userHasAccessToIntegrations<
@@ -17,7 +17,7 @@ export function userHasAccessToIntegrations<
   return async (_, args, ctx) => {
     try {
       return await ctx.integrations.userHasAccessToIntegration(
-        unMaybeArray(args[argName] as unknown as MaybeArray<number>),
+        unMaybeArray(getArg(args, argName)),
         ctx.user!,
         types,
         onlyEnabled,
@@ -31,10 +31,10 @@ export function authenticateBackgroundCheckToken<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>,
->(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const token = args[tokenArg] as unknown as string;
+      const token = getArg(args, argName);
       const params = parseBackgroundCheckToken(token);
 
       if ("petitionId" in params) {

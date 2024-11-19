@@ -47,11 +47,10 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     isIcon: booleanArg(),
   },
   authorize: authenticateAnd(contextUserHasPermission("ORG_SETTINGS")),
-  validateArgs: validateFile(
-    (args) => args.file,
-    { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-    "file",
-  ),
+  validateArgs: validateFile("file", {
+    contentType: ["image/png", "image/jpeg"],
+    maxSize: 1024 * 1024,
+  }),
   resolve: async (root, args, ctx) => {
     const { mimetype, createReadStream } = await args.file;
     const filename = random(16);
@@ -96,7 +95,7 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
       contextUserHasPermission("ORG_SETTINGS"),
       userHasFeatureFlag("AUTO_ANONYMIZE"),
     ),
-    validateArgs: inRange((args) => args.months, "months", 1),
+    validateArgs: inRange("months", 1),
     resolve: async (_, { months }, ctx) => {
       return await ctx.organizations.updateOrganization(
         ctx.user!.org_id,
@@ -124,8 +123,8 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
     ),
   },
   validateArgs: validateAnd(
-    validWebSafeFontFamily((args) => args.data.fontFamily, "data.fontFamily"),
-    validateHexColor((args) => args.data.color, "data.color"),
+    validWebSafeFontFamily("data.fontFamily"),
+    validateHexColor("data.color"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.organizations.updateOrganizationBrandThemeDataByOrgId(
@@ -198,10 +197,7 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
       isDefault: booleanArg(),
       data: jsonObjectArg(),
     },
-    validateArgs: validateAnd(
-      maxLength((args) => args.name, "name", 50),
-      validateTheme((args) => args.data, "data"),
-    ),
+    validateArgs: validateAnd(maxLength("name", 50), validateTheme("data")),
     resolve: async (_, args, ctx) => {
       const theme = (await ctx.organizations.loadOrganizationTheme(args.orgThemeId))!;
       if (args.isDefault && !theme.is_default) {
@@ -242,7 +238,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
       name: nonNull(stringArg()),
       isDefault: nonNull(booleanArg()),
     },
-    validateArgs: maxLength((args) => args.name, "name", 50),
+    validateArgs: maxLength("name", 50),
     resolve: async (_, { name, isDefault }, ctx) => {
       const theme = await ctx.organizations.createOrganizationTheme(
         ctx.user!.org_id,
@@ -325,14 +321,11 @@ export const createOrganization = mutationField("createOrganization", {
     locale: nonNull("UserLocale"),
   },
   authorize: superAdminAccess(),
-  validateArgs: validateAnd(
-    validEmail((args) => args.email, "email"),
-    (_, { status }, ctx, info) => {
-      if (status === "ROOT") {
-        throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
-      }
-    },
-  ),
+  validateArgs: validateAnd(validEmail("email"), (_, { status }, ctx, info) => {
+    if (status === "ROOT") {
+      throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
+    }
+  }),
   resolve: async (_, args, ctx) => {
     const email = args.email.trim().toLowerCase();
     const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
@@ -406,14 +399,11 @@ export const updateOrganization = mutationField("updateOrganization", {
     ),
   },
   authorize: superAdminAccess(),
-  validateArgs: validateAnd(
-    (_, args, ctx, info) => {
-      if (args.data.status === "ROOT") {
-        throw new ArgValidationError(info, "data.status", "Can't update an org with ROOT status");
-      }
-    },
-    notEmptyObject((args) => args.data, "data"),
-  ),
+  validateArgs: validateAnd((_, args, ctx, info) => {
+    if (args.data.status === "ROOT") {
+      throw new ArgValidationError(info, "data.status", "Can't update an org with ROOT status");
+    }
+  }, notEmptyObject("data")),
   resolve: async (_, { orgId, data }, ctx) => {
     const updatedOrgData = {} as Organization;
 
@@ -493,7 +483,7 @@ export const modifyCurrentUsagePeriod = mutationField("modifyCurrentUsagePeriod"
     limitName: nonNull("OrganizationUsageLimitName"),
     newLimit: nonNull(intArg()),
   },
-  validateArgs: inRange((args) => args.newLimit, "newLimit", 0),
+  validateArgs: inRange("newLimit", 0),
   resolve: async (_, args, ctx) => {
     await ctx.organizations.updateOrganizationCurrentUsageLimit(
       args.orgId,

@@ -1,16 +1,15 @@
-import { core } from "nexus";
 import { isNonNullish } from "remeda";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { LocalizableUserText } from "../scalars/LocalizableUserText";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validLocalizableUserText<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => LocalizableUserText | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, LocalizableUserText | null | undefined>,
   { maxLength }: { maxLength: number },
 ) {
   return ((_, args, ctx, info) => {
-    const value = prop(args);
+    const [value, argName] = getArgWithPath(args, prop);
     if (isNonNullish(value)) {
       const keys = Object.keys(value) as (keyof LocalizableUserText)[];
       if (keys.length === 0) {

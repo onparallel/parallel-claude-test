@@ -20,9 +20,9 @@ export const createTag = mutationField("createTag", {
   type: "Tag",
   authorize: authenticateAnd(contextUserHasPermission("TAGS:CREATE_TAGS")),
   validateArgs: validateAnd(
-    validateHexColor((args) => args.color, "color"),
-    notEmptyString((args) => args.name, "name"),
-    maxLength((args) => args.name, "name", 100),
+    validateHexColor("color"),
+    notEmptyString("name"),
+    maxLength("name", 100),
   ),
   args: {
     name: nonNull(stringArg()),
@@ -61,9 +61,9 @@ export const updateTag = mutationField("updateTag", {
     contextUserHasPermission("TAGS:UPDATE_TAGS"),
   ),
   validateArgs: validateAnd(
-    validateHexColor((args) => args.data.color, "data.color"),
-    notEmptyString((args) => args.data.name, "data.name"),
-    maxLength((args) => args.data.name, "data.name", 100),
+    validateHexColor("data.color"),
+    notEmptyString("data.name"),
+    maxLength("data.name", 100),
   ),
   args: {
     id: nonNull(globalIdArg("Tag")),

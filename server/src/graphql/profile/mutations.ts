@@ -131,8 +131,8 @@ export const createProfileType = mutationField("createProfileType", {
     pluralName: nonNull(arg({ type: "LocalizableUserText" })),
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
-    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
+    validLocalizableUserText("name", { maxLength: 200 }),
+    validLocalizableUserText("pluralName", { maxLength: 200 }),
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.profilesSetup.createDefaultProfileType(
@@ -159,8 +159,8 @@ export const updateProfileType = mutationField("updateProfileType", {
     icon: "ProfileTypeIcon",
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
-    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
+    validLocalizableUserText("name", { maxLength: 200 }),
+    validLocalizableUserText("pluralName", { maxLength: 200 }),
     validProfileNamePattern("profileTypeId", "profileNamePattern"),
   ),
   resolve: async (_, args, ctx) => {
@@ -222,8 +222,8 @@ export const cloneProfileType = mutationField("cloneProfileType", {
     pluralName: arg({ type: "LocalizableUserText" }),
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "name", { maxLength: 200 }),
-    validLocalizableUserText((args) => args.pluralName, "pluralName", { maxLength: 200 }),
+    validLocalizableUserText("name", { maxLength: 200 }),
+    validLocalizableUserText("pluralName", { maxLength: 200 }),
   ),
   resolve: async (_, { profileTypeId, name, pluralName }, ctx) => {
     const createData: Partial<CreateProfileType> = {};
@@ -320,10 +320,10 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    validLocalizableUserText((args) => args.data.name, "data.name", { maxLength: 200 }),
-    maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
+    notEmptyObject("data"),
+    validLocalizableUserText("data.name", { maxLength: 200 }),
+    maxLength("data.alias", 100),
+    validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
     validProfileTypeFieldOptions("profileTypeId", "data", "data"),
   ),
   args: {
@@ -431,11 +431,11 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     ),
   },
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    maxLength((args) => args.data.name?.en, "data.name.en", 500),
-    maxLength((args) => args.data.name?.es, "data.name.es", 500),
-    maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
+    notEmptyObject("data"),
+    maxLength("data.name.en", 500),
+    maxLength("data.name.es", 500),
+    maxLength("data.alias", 100),
+    validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
     validProfileTypeFieldSubstitution("data", "data.substitutions"),
   ),
   resolve: async (_, args, ctx, info) => {
@@ -1307,7 +1307,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
     fileUploadCanBeAttachedToProfileTypeField("profileId", "profileTypeFieldId", "data"),
   ),
@@ -1318,11 +1318,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     expiryDate: dateArg(),
   },
   validateArgs: validateAnd(
-    validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(100, "MB") }, "data"),
-    validateOr(
-      notEmptyArray((args) => args.data, "data"),
-      validIsNotUndefined((args) => args.expiryDate, "expiryDate"),
-    ),
+    validFileUploadInput("data", { maxSizeBytes: toBytes(100, "MB") }),
+    validateOr(notEmptyArray("data"), validIsNotUndefined("expiryDate")),
   ),
   resolve: async (_, { profileId, profileTypeFieldId, data, expiryDate }, ctx) => {
     let fileUploads: FileUpload[] = [];
@@ -1448,7 +1445,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
   ),
   args: {
@@ -1456,7 +1453,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     profileFieldFileIds: nonNull(list(nonNull(globalIdArg("ProfileFieldFile")))),
   },
-  validateArgs: notEmptyArray((args) => args.profileFieldFileIds, "profileFieldFileIds"),
+  validateArgs: notEmptyArray("profileFieldFileIds"),
   resolve: async (_, { profileId, profileTypeFieldId, profileFieldFileIds }, ctx) => {
     const profileFieldFiles = await ctx.profiles.loadProfileFieldFileById(profileFieldFileIds);
     if (
@@ -1500,7 +1497,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
       profileFieldFileHasProfileTypeFieldId("profileFieldFileIds" as never, "profileTypeFieldId"),
     ),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
-    userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -1556,7 +1553,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
     userHasAccessToPetitions("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -1647,7 +1644,7 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
       profileHasStatus("profileId", "OPEN"),
       profileIsNotAnonymized("profileId"),
       profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-      userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
+      userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
       userHasAccessToPetitions("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       repliesBelongsToPetition("petitionId", "replyId"),
@@ -1714,7 +1711,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     profileFieldFileHasProfileTypeFieldId("profileFieldFileId", "profileTypeFieldId"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
-    userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "READ"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "READ"),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -1770,10 +1767,7 @@ export const subscribeToProfile = mutationField("subscribeToProfile", {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.userIds, "userIds"),
-    notEmptyArray((args) => args.profileIds, "profileIds"),
-  ),
+  validateArgs: validateAnd(notEmptyArray("userIds"), notEmptyArray("profileIds")),
   resolve: async (_, { profileIds, userIds }, ctx) => {
     await ctx.profiles.subscribeUsersToProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
     return (await ctx.profiles.loadProfile(profileIds)) as Profile[];
@@ -1793,10 +1787,7 @@ export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.userIds, "userIds"),
-    notEmptyArray((args) => args.profileIds, "profileIds"),
-  ),
+  validateArgs: validateAnd(notEmptyArray("userIds"), notEmptyArray("profileIds")),
   resolve: async (_, { profileIds, userIds }, ctx) => {
     await ctx.profiles.unsubscribeUsersFromProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
     return (await ctx.profiles.loadProfile(profileIds)) as Profile[];
@@ -1988,10 +1979,10 @@ export const disassociateProfilesFromPetitions = mutationField(
       petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
     },
     validateArgs: validateAnd(
-      notEmptyArray((args) => args.profileIds, "profileIds"),
-      notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      uniqueValues((args) => args.profileIds, "profileIds"),
-      uniqueValues((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray("profileIds"),
+      notEmptyArray("petitionIds"),
+      uniqueValues("profileIds"),
+      uniqueValues("petitionIds"),
     ),
     resolve: async (_, { profileIds, petitionIds }, ctx) => {
       await ctx.profiles.disassociateProfileFromPetition(
@@ -2148,7 +2139,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
     profilesCanBeAssociated("profileId", "relationships"),
     userHasAccessToProfileRelationshipsInput("relationships"),
   ),
-  validateArgs: notEmptyArray((args) => args.relationships, "relationships"),
+  validateArgs: notEmptyArray("relationships"),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
     relationships: nonNull(
@@ -2259,7 +2250,7 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
     profileId: nonNull(globalIdArg("Profile")),
     profileRelationshipIds: nonNull(list(nonNull(globalIdArg("ProfileRelationship")))),
   },
-  validateArgs: notEmptyArray((args) => args.profileRelationshipIds, "profileRelationshipIds"),
+  validateArgs: notEmptyArray("profileRelationshipIds"),
   resolve: async (_, args, ctx) => {
     const relationships = await ctx.profiles.removeProfileRelationships(
       args.profileRelationshipIds,
@@ -2716,10 +2707,7 @@ export const createProfileTypeProcess = mutationField("createProfileTypeProcess"
     petitionsAreOfTypeTemplate("templateIds"),
     petitionsAreNotPublicTemplates("templateIds"),
   ),
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.templateIds, "templateIds"),
-    uniqueValues((args) => args.templateIds, "templateIds"),
-  ),
+  validateArgs: validateAnd(notEmptyArray("templateIds"), uniqueValues("templateIds")),
   resolve: async (_, args, ctx) => {
     try {
       const profileTypeProcess = await ctx.profiles.createProfileTypeProcess(
@@ -2765,9 +2753,9 @@ export const editProfileTypeProcess = mutationField("editProfileTypeProcess", {
     ),
   },
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    notEmptyArray((args) => args.data.templateIds, "data.templateIds"),
-    uniqueValues((args) => args.data.templateIds, "data.templateIds"),
+    notEmptyObject("data"),
+    notEmptyArray("data.templateIds"),
+    uniqueValues("data.templateIds"),
   ),
   resolve: async (_, args, ctx) => {
     const data: Partial<ProfileTypeProcess> = {};

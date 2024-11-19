@@ -5,7 +5,7 @@ import { isNonNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { withError } from "../../util/promises/withError";
-import { KeysOfType } from "../../util/types";
+import { DeepKeysOfType } from "../../util/types";
 import { ApolloError, AuthenticationError, ForbiddenError } from "./errors";
 
 export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
@@ -37,9 +37,9 @@ export function checkClientServerToken<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>,
->(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    return (args[tokenArg] as unknown as string) === ctx.config.misc.clientServerToken;
+    return getArg(args, argName) === ctx.config.misc.clientServerToken;
   };
 }
 
@@ -49,8 +49,54 @@ export function authenticateAnd<TypeName extends string, FieldName extends strin
   return chain(authenticate(), and(...resolvers));
 }
 
-export type Arg<TypeName extends string, FieldName extends string, Type = any> = string &
-  KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
+type KeyOrFn<T extends Record<string, any>, U> = DeepKeysOfType<T, U> | ((value: T) => U);
+
+export type Arg<TypeName extends string, FieldName extends string, Type = any> = KeyOrFn<
+  core.ArgsValue<TypeName, FieldName>,
+  Type
+>;
+
+type KeyOrFnWithPath<T extends Record<string, any>, U> =
+  | DeepKeysOfType<T, U>
+  | [(value: T) => U, string];
+
+export type ArgWithPath<
+  TypeName extends string,
+  FieldName extends string,
+  Type = any,
+> = KeyOrFnWithPath<core.ArgsValue<TypeName, FieldName>, Type>;
+
+export function getArg<TypeName extends string, FieldName extends string, Type = any>(
+  args: core.ArgsValue<TypeName, FieldName>,
+  path: Arg<TypeName, FieldName, Type>,
+) {
+  if (typeof path === "function") {
+    return path(args);
+  } else {
+    return (
+      path.includes(".")
+        ? path.split(".").reduce((current, path) => current?.[path], args as any)
+        : (args as any)[path]
+    ) as Type;
+  }
+}
+
+export function getArgWithPath<TypeName extends string, FieldName extends string, Type = any>(
+  args: core.ArgsValue<TypeName, FieldName>,
+  path: ArgWithPath<TypeName, FieldName, Type>,
+) {
+  if (typeof path === "string") {
+    return [
+      (path.includes(".")
+        ? path.split(".").reduce((current, path) => current?.[path], args as any)
+        : (args as any)[path]) as Type,
+      path,
+    ] as const;
+  } else {
+    const [getter, name] = path;
+    return [getter(args), name] as const;
+  }
+}
 
 function _all<TypeName extends string, FieldName extends string>(
   resolvers: FieldAuthorizeResolver<TypeName, FieldName>[],
@@ -112,13 +158,12 @@ export function ifArgDefined<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName>,
 >(
-  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
+  prop: TArg,
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
-    if (isNonNullish(value)) {
+    if (isNonNullish(getArg(args, prop))) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
       return await elseAuthorizer(root, args, ctx, info);
@@ -127,12 +172,16 @@ export function ifArgDefined<
   };
 }
 
-export function ifSomeDefined<TypeName extends string, FieldName extends string>(
-  props: (args: core.ArgsValue<TypeName, FieldName>) => any[],
+export function ifSomeDefined<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>,
+>(
+  props: TArg[],
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    if (props(args).some((value) => value !== undefined)) {
+    if (props.some((prop) => getArg(args, prop) !== undefined)) {
       return await thenAuthorizer(root, args, ctx, info);
     }
     return true;
@@ -144,8 +193,8 @@ export function ifArgEquals<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName>,
 >(
-  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
-  expectedValue: core.ArgsValue<TypeName, FieldName>[TArg],
+  prop: TArg,
+  expectedValue: any,
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
@@ -170,7 +219,7 @@ export function ifNotEmptyArray<
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    const array = args[prop] as unknown as any[];
+    const array = getArg(args, prop);
     if (array.length > 0) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
@@ -186,7 +235,7 @@ export function argIsDefined<
   TArg extends Arg<TypeName, FieldName>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    return isNonNullish(args[argName]);
+    return isNonNullish(getArg(args, argName));
   };
 }
 
@@ -213,10 +262,7 @@ export function verifyCaptcha<
   TArg extends Arg<TypeName, FieldName, string>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    return await ctx.auth.verifyCaptcha(
-      args[argName] as unknown as string,
-      getClientIp(ctx.req) ?? "",
-    );
+    return await ctx.auth.verifyCaptcha(getArg(args, argName), getClientIp(ctx.req) ?? "");
   };
 }
 

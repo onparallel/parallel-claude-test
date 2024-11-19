@@ -8,6 +8,8 @@ import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
 import { ApolloError } from "../helpers/errors";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
+import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
+import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { validPassword } from "../helpers/validators/validPassword";
 import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
 import { validSignatureConfig } from "../helpers/validators/validSignatureConfig";
@@ -89,95 +91,71 @@ describe("GraphQL custom validators", () => {
 
     it("should not throw error if there is no integration on the domain", async () => {
       await expect(
-        emailDomainIsNotSSO((args) => args.email)(
-          {},
-          { email: "mariano@onparallel.com" },
-          ctx,
-          {} as any,
-        ),
-      ).resolves.not.toThrowError();
+        emailDomainIsNotSSO("email")({}, { email: "mariano@onparallel.com" }, ctx, {} as any),
+      ).resolves.not.toThrow();
     });
 
     it("should throw error if domain is registered as SSO", async () => {
       await expect(
-        emailDomainIsNotSSO((args) => args.email)(
-          {},
-          { email: "mariano@ssodomain.com" },
-          ctx,
-          {} as any,
-        ),
-      ).rejects.toThrowError(
+        emailDomainIsNotSSO("email")({}, { email: "mariano@ssodomain.com" }, ctx, {
+          parentType: "Mutation",
+          fieldName: "test",
+        } as any),
+      ).rejects.toThrow(
         new ApolloError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR"),
       );
     });
 
     it("should not throw error if integration is disabled", async () => {
       await expect(
-        emailDomainIsNotSSO((args) => args.email)(
-          {},
-          { email: "mariano@disabledsso.com" },
-          ctx,
-          {} as any,
-        ),
-      ).resolves.not.toThrowError();
+        emailDomainIsNotSSO("email")({}, { email: "mariano@disabledsso.com" }, ctx, {} as any),
+      ).resolves.not.toThrow();
     });
   });
 
   describe("validPassword", () => {
     it("throws error if not passing password", () => {
-      expect(() =>
-        validPassword((args) => args.password)({}, { password: null }, ctx, {} as any),
-      ).toThrowError();
+      expect(() => validPassword("password")({}, { password: null }, ctx, {} as any)).toThrow();
     });
 
     it("throws error if password has less than 8 chars", () => {
       expect(() =>
-        validPassword((args) => args.password)({}, { password: "1abcDEF" }, ctx, {} as any),
-      ).toThrowError();
+        validPassword("password")({}, { password: "1abcDEF" }, ctx, {} as any),
+      ).toThrow();
     });
 
     it("throws error if password does not contain lowercases", () => {
       expect(() =>
-        validPassword((args) => args.password)(
-          {},
-          { password: random(20).toUpperCase() },
-          ctx,
-          {} as any,
-        ),
-      ).toThrowError();
+        validPassword("password")({}, { password: random(20).toUpperCase() }, ctx, {} as any),
+      ).toThrow();
     });
 
     it("throws error if password does not contain uppercases", () => {
       expect(() =>
-        validPassword((args) => args.password)(
-          {},
-          { password: random(20).toLowerCase() },
-          ctx,
-          {} as any,
-        ),
-      ).toThrowError();
+        validPassword("password")({}, { password: random(20).toLowerCase() }, ctx, {} as any),
+      ).toThrow();
     });
 
     it("throws error if password does not contain numbers", () => {
       expect(() =>
-        validPassword((args) => args.password)(
+        validPassword("password")(
           {},
           { password: "lYWicILeaDOnoMpARdOWAcHeroeKiN" },
           ctx,
           {} as any,
         ),
-      ).toThrowError();
+      ).toThrow();
     });
 
     it("validates a password", () => {
       expect(() =>
-        validPassword((args) => args.password)(
+        validPassword("password")(
           {},
           { password: random(10).toLowerCase().concat(random(10).toUpperCase(), "12345") },
           ctx,
           {} as any,
         ),
-      ).not.toThrowError();
+      ).not.toThrow();
     });
   });
 
@@ -215,7 +193,7 @@ describe("GraphQL custom validators", () => {
 
     it("validates the signature configuration", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -235,12 +213,12 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).resolves.not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
     it("throws error if used integration is of another organization", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -260,12 +238,12 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).rejects.toThrowError();
+      ).rejects.toThrow();
     });
 
     it("throws error if used integration is not of type SIGNATURE", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -285,12 +263,12 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).rejects.toThrowError();
+      ).rejects.toThrow();
     });
 
     it("throws error if timezone is invalid", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -310,12 +288,12 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).rejects.toThrowError();
+      ).rejects.toThrow();
     });
 
     it("don't throw error if title is not defined", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -334,12 +312,12 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).resolves.not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
     it("doesn't error if user didn't specify signers and recipient is not allowed to choose", async () => {
       await expect(
-        validSignatureConfig((args) => args.config, "config")(
+        validSignatureConfig("config")(
           {},
           {
             config: {
@@ -354,14 +332,14 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).resolves.not.toThrowError();
+      ).resolves.not.toThrow();
     });
   });
 
   describe("validRemindersConfig", () => {
     it("validates the reminders configuration", () => {
       expect(() =>
-        validRemindersConfig((args) => args.config, "config")(
+        validRemindersConfig("config")(
           {},
           {
             config: {
@@ -374,12 +352,12 @@ describe("GraphQL custom validators", () => {
           ctx,
           {} as any,
         ),
-      ).not.toThrowError();
+      ).not.toThrow();
     });
 
     it("throws error if passing invalid time", () => {
       expect(() =>
-        validRemindersConfig((args) => args.config, "config")(
+        validRemindersConfig("config")(
           {},
           {
             config: {
@@ -392,12 +370,12 @@ describe("GraphQL custom validators", () => {
           ctx,
           {} as any,
         ),
-      ).toThrowError();
+      ).toThrow();
     });
 
     it("throws error if passing invalid timezone", () => {
       expect(() =>
-        validRemindersConfig((args) => args.config, "config")(
+        validRemindersConfig("config")(
           {},
           {
             config: {
@@ -410,12 +388,12 @@ describe("GraphQL custom validators", () => {
           ctx,
           {} as any,
         ),
-      ).toThrowError();
+      ).toThrow();
     });
 
     it("throws error if passing offset less than 1", () => {
       expect(() =>
-        validRemindersConfig((args) => args.config, "config")(
+        validRemindersConfig("config")(
           {},
           {
             config: {
@@ -428,7 +406,68 @@ describe("GraphQL custom validators", () => {
           ctx,
           {} as any,
         ),
-      ).toThrowError();
+      ).toThrow();
+    });
+  });
+
+  describe("emailIsAvailable", () => {
+    let email: string;
+    beforeAll(async () => {
+      const orgUser = users.find((u) => u.org_id === organizations[0].id);
+      const [userData] = await knex
+        .from("user_data")
+        .where("id", orgUser!.user_data_id)
+        .select("*");
+      email = userData.email;
+    });
+
+    it("should throw error if email is already registered", async () => {
+      await expect(
+        emailIsAvailable("email")({}, { email }, ctx, {
+          parentType: "Mutation",
+          fieldName: "test",
+        } as any),
+      ).rejects.toThrow(
+        new ApolloError("Email is already registered", "EMAIL_ALREADY_REGISTERED_ERROR"),
+      );
+    });
+
+    it("should not throw error if email is not registered", async () => {
+      await expect(
+        emailIsAvailable("email")({}, { email: `abc.${email}` }, ctx, {
+          parentType: "Mutation",
+          fieldName: "test",
+        } as any),
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe("notEmptyString", () => {
+    it("should throw error if string is empty", () => {
+      expect(() =>
+        notEmptyString("value")({}, { value: "" }, ctx, {
+          parentType: "Mutation",
+          fieldName: "test",
+        } as any),
+      ).toThrow(
+        new ApolloError(
+          'Validation error on argument "value" for "Mutation.test": Value can\'t be empty.',
+          "ARG_VALIDATION_ERROR",
+          {
+            error_code: "VALUE_IS_EMPTY_ERROR",
+            error_message: `value can't be empty.`,
+          },
+        ),
+      );
+    });
+
+    it("should not throw error if value is nullish", () => {
+      expect(() =>
+        notEmptyString("value")({}, { value: null }, ctx, {
+          parentType: "Mutation",
+          fieldName: "test",
+        } as any),
+      ).not.toThrow();
     });
   });
 });

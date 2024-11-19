@@ -1,6 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToAuthTokens<
   TypeName extends string,
@@ -9,7 +9,7 @@ export function userHasAccessToAuthTokens<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const userAuthTokenIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const userAuthTokenIds = unMaybeArray(getArg(args, argName));
       return await ctx.userAuthentication.userHasAccessToAuthTokens(userAuthTokenIds, ctx.user!.id);
     } catch {}
     return false;

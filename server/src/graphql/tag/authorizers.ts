@@ -1,7 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNullish } from "remeda";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToTags<
   TypeName extends string,
@@ -10,7 +10,7 @@ export function userHasAccessToTags<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const arg = args[argName] as Maybe<MaybeArray<number>>;
+      const arg = getArg(args, argName);
       if (isNullish(arg)) {
         return true;
       }

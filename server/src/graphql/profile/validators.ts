@@ -10,7 +10,7 @@ import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { Maybe } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
@@ -24,8 +24,8 @@ export function validProfileNamePattern<
   profileNamePatternArg: TProfileNamePattern,
 ): FieldValidateArgsResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
-    const pattern = args[profileNamePatternArg] as unknown as Maybe<string>;
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const pattern = getArg(args, profileNamePatternArg);
     if (isNonNullish(pattern)) {
       const fieldIds = parseTextWithPlaceholders(pattern)
         .filter(discriminator("type", "placeholder" as const))
@@ -54,8 +54,8 @@ export function validProfileTypeFieldOptions<
   TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>,
 >(profileTypeIdArg: TProfileTypeId, dataArg: TDataArg, argName: string) {
   return (async (_, args, ctx, info) => {
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
-    const data = args[dataArg] as unknown as NexusGenInputs["CreateProfileTypeFieldInput"];
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const data = getArg(args, dataArg);
     if (isNonNullish(data.options)) {
       try {
         const options = await mapProfileTypeFieldOptions(
@@ -83,7 +83,7 @@ export function validProfileTypeFieldSubstitution<
   TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdateProfileTypeFieldInput"]>,
 >(dataArg: TDataArg, argName: string) {
   return (async (_, args, ctx, info) => {
-    const data = args[dataArg] as unknown as NexusGenInputs["UpdateProfileTypeFieldInput"];
+    const data = getArg(args, dataArg);
 
     if (isNonNullish(data.substitutions) && isNonNullish(data.options?.values)) {
       const values = await profileTypeFieldSelectValues(data.options as any);

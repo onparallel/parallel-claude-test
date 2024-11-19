@@ -1,9 +1,9 @@
 import { enumType, inputObjectType } from "nexus";
-import { ArgsValue } from "nexus/dist/core";
 import { isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { fromGlobalId } from "../../../util/globalId";
 import { NexusGenInputs } from "../../__types";
+import { ArgWithPath, getArgWithPath } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
 import { FieldValidateArgsResolver } from "../../helpers/validateArgsPlugin";
 
@@ -34,13 +34,14 @@ export const PetitionSharedWithFilter = inputObjectType({
 });
 
 export function validPetitionSharedWithFilter<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["PetitionSharedWithFilter"] | null | undefined,
-  name: string,
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["PetitionSharedWithFilter"] | null | undefined
+  >,
 ) {
   return (async (_, args, ctx, info) => {
-    const sharedWith = prop(args);
+    const [sharedWith, argName] = getArgWithPath(args, prop);
     if (isNullish(sharedWith)) {
       return;
     }
@@ -66,9 +67,9 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
       );
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-        throw new ArgValidationError(info, name, e.message.replace("Assertion Error: ", ""));
+        throw new ArgValidationError(info, argName, e.message.replace("Assertion Error: ", ""));
       }
-      throw new ArgValidationError(info, name, "Invalid shared with filter");
+      throw new ArgValidationError(info, argName, "Invalid shared with filter");
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
@@ -135,13 +136,10 @@ export const PetitionTagFilter = inputObjectType({
 });
 
 export function validPetitionTagFilter<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: ArgsValue<TypeName, FieldName>,
-  ) => NexusGenInputs["PetitionTagFilter"] | null | undefined,
-  name: string,
+  prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["PetitionTagFilter"] | null | undefined>,
 ) {
   return (async (_, args, ctx, info) => {
-    const tags = prop(args);
+    const [tags, argName] = getArgWithPath(args, prop);
     if (isNullish(tags)) {
       return;
     }
@@ -162,9 +160,9 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
       );
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-        throw new ArgValidationError(info, name, e.message.replace("Assertion Error: ", ""));
+        throw new ArgValidationError(info, argName, e.message.replace("Assertion Error: ", ""));
       }
-      throw new ArgValidationError(info, name, "Invalid tags filter");
+      throw new ArgValidationError(info, argName, "Invalid tags filter");
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

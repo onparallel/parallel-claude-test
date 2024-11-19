@@ -23,10 +23,7 @@ export const createUserGroup = mutationField("createUserGroup", {
   description: "Creates a group in the user's organization",
   type: "UserGroup",
   authorize: authenticateAnd(contextUserHasPermission("TEAMS:CRUD_TEAMS")),
-  validateArgs: validateAnd(
-    notEmptyString((args) => args.name, "name"),
-    maxLength((args) => args.name, "name", 100),
-  ),
+  validateArgs: validateAnd(notEmptyString("name"), maxLength("name", 100)),
   args: {
     name: nonNull(stringArg()),
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
@@ -55,10 +52,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
     userHasAccessToUserGroups("id"),
     userGroupHasType("id", ["NORMAL", "INITIAL"]),
   ),
-  validateArgs: validateAnd(
-    notEmptyString((args) => args.data.name, "data.name"),
-    maxLength((args) => args.data.name, "data.name", 100),
-  ),
+  validateArgs: validateAnd(notEmptyString("data.name"), maxLength("data.name", 100)),
   args: {
     id: nonNull(globalIdArg("UserGroup")),
     data: nonNull(
@@ -208,12 +202,8 @@ export const updateUserGroupPermissions = mutationField("updateUserGroupPermissi
     ),
   },
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.permissions, "permissions"),
-    validUserGroupPermissionsInput(
-      (args) => args.userGroupId,
-      (args) => args.permissions,
-      "permissions",
-    ),
+    notEmptyArray("permissions"),
+    validUserGroupPermissionsInput("permissions", "userGroupId"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.userGroups.upsertUserGroupPermissions(

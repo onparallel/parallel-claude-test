@@ -19,7 +19,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
     userId: nonNull(globalIdArg("User")),
   },
-  validateArgs: validateAnd(notEmptyArray((args) => args.petitionIds, "petitionIds")),
+  validateArgs: validateAnd(notEmptyArray("petitionIds")),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.transferOwnership(args.petitionIds, args.userId, true, ctx.user!);
   },

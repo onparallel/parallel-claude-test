@@ -1,5 +1,4 @@
 import Ajv from "ajv";
-import { core } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import {
@@ -19,11 +18,13 @@ import {
 } from "../../../util/fieldLogic";
 import { fromGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { NexusGenInputs } from "../../__types";
+import { Arg, ArgWithPath, getArg, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { DynamicSelectOption } from "../parseDynamicSelectValues";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = {
+const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = (fieldIdType: "string" | "number") => ({
   type: "object",
   allOf: [
     {
@@ -67,7 +68,7 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = {
           type: "object",
           required: ["fieldId", "modifier"],
           properties: {
-            fieldId: { type: "number" },
+            fieldId: { type: fieldIdType },
             column: { type: "number" },
             modifier: {
               enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"],
@@ -84,9 +85,9 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = {
       ],
     },
   ],
-};
+});
 
-const PETITION_FIELD_VISIBILITY_SCHEMA = {
+const PETITION_FIELD_VISIBILITY_SCHEMA = (fieldIdType: "string" | "number") => ({
   type: ["object", "null"],
   additionalProperties: false,
   required: ["type", "operator", "conditions"],
@@ -97,12 +98,12 @@ const PETITION_FIELD_VISIBILITY_SCHEMA = {
       type: "array",
       minItems: 1,
       maxItems: 15,
-      items: PETITION_FIELD_LOGIC_CONDITION_SCHEMA,
+      items: PETITION_FIELD_LOGIC_CONDITION_SCHEMA(fieldIdType),
     },
   },
-};
+});
 
-const PETITION_FIELD_MATH_OPERATION_SCHEMA = {
+const PETITION_FIELD_MATH_OPERATION_SCHEMA = (fieldIdType: "string" | "number") => ({
   type: "object",
   additionalProperties: false,
   required: ["variable", "operand", "operator"],
@@ -123,7 +124,7 @@ const PETITION_FIELD_MATH_OPERATION_SCHEMA = {
           required: ["type", "fieldId"],
           properties: {
             type: { enum: ["FIELD"] },
-            fieldId: { type: "number" },
+            fieldId: { type: fieldIdType },
           },
         },
         {
@@ -138,9 +139,9 @@ const PETITION_FIELD_MATH_OPERATION_SCHEMA = {
     },
     operator: { enum: ["ASSIGNATION", "ADDITION", "SUBSTRACTION", "MULTIPLICATION", "DIVISION"] },
   },
-};
+});
 
-const PETITION_FIELD_MATH_SCHEMA = {
+const PETITION_FIELD_MATH_SCHEMA = (fieldIdType: "string" | "number") => ({
   type: "object",
   additionalProperties: false,
   required: ["operator", "conditions", "operations"],
@@ -150,31 +151,31 @@ const PETITION_FIELD_MATH_SCHEMA = {
       type: "array",
       minItems: 1,
       maxItems: 10,
-      items: PETITION_FIELD_LOGIC_CONDITION_SCHEMA,
+      items: PETITION_FIELD_LOGIC_CONDITION_SCHEMA(fieldIdType),
     },
     operations: {
       type: "array",
       minItems: 1,
       maxItems: 10,
-      items: PETITION_FIELD_MATH_OPERATION_SCHEMA,
+      items: PETITION_FIELD_MATH_OPERATION_SCHEMA(fieldIdType),
     },
   },
-};
+});
 
-const PETITION_FIELD_LOGIC_SCHEMA = {
+const PETITION_FIELD_LOGIC_SCHEMA = (fieldIdType: "string" | "number") => ({
   type: "object",
   additionalProperties: true,
   required: ["visibility", "math"],
   properties: {
-    visibility: PETITION_FIELD_VISIBILITY_SCHEMA,
+    visibility: PETITION_FIELD_VISIBILITY_SCHEMA(fieldIdType),
     math: {
       type: ["array", "null"],
       minItems: 1,
       maxItems: 10,
-      items: PETITION_FIELD_MATH_SCHEMA,
+      items: PETITION_FIELD_MATH_SCHEMA(fieldIdType),
     },
   },
-};
+});
 
 function assertOneOf<T>(value: any, options: T[], errorMessage?: string): asserts value is T {
   assert(options.includes(value), errorMessage);
@@ -234,6 +235,7 @@ export async function validateFieldLogic<
     standardListDefinitions: Pick<StandardListDefinition, "list_name" | "list_type">[];
     customLists: Pick<PetitionCustomList, "name">[];
   },
+  skipJsonSchemaValidation?: boolean,
 ) {
   async function validateLogicCondition(
     c: PetitionFieldLogicCondition,
@@ -423,12 +425,14 @@ export async function validateFieldLogic<
     return;
   }
 
-  const validator = new Ajv({
-    allowUnionTypes: true,
-  }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA);
+  if (!skipJsonSchemaValidation) {
+    const validator = new Ajv({
+      allowUnionTypes: true,
+    }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA("number"));
 
-  if (!validator(field)) {
-    throw new Error(JSON.stringify(validator.errors));
+    if (!validator(field)) {
+      throw new Error(JSON.stringify(validator.errors));
+    }
   }
 
   assert(
@@ -436,6 +440,7 @@ export async function validateFieldLogic<
     `Can't add visibility conditions on a heading with page break`,
   );
 
+  // JSON schema is already validated here, so its safe to assign types
   const visibility = field.visibility as PetitionFieldVisibility | null;
   const math = field.math as PetitionFieldMath[] | null;
 
@@ -454,24 +459,38 @@ export async function validateFieldLogic<
   }
 }
 
-export function validateFieldLogicInput<TypeName extends string, FieldName extends string>(
-  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  logic: (args: core.ArgsValue<TypeName, FieldName>) => {
-    visibility: PetitionFieldVisibility | null | undefined;
-    math: PetitionFieldMath[] | null | undefined;
-  },
-  argName: string,
-) {
+export function validateFieldLogicInput<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+  TFieldIdArg extends Arg<TypeName, FieldName, number>,
+  TFieldDataArg extends ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["UpdatePetitionFieldInput"]
+  >,
+>(petitionIdProp: TPetitionIdArg, fieldIdProp: TFieldIdArg, dataProp: TFieldDataArg) {
   return (async (_, args, ctx, info) => {
+    const [_fieldLogic, argName] = getArgWithPath(args, dataProp);
     try {
-      const _fieldLogic = logic(args);
       if (isNullish(_fieldLogic.visibility) && isNullish(_fieldLogic.math)) {
         return;
       }
 
-      const petitionId = petitionIdProp(args);
-      const fieldId = fieldIdProp(args);
+      // validate input JSON schema before anything
+      const logicSchemaValidator = new Ajv({
+        allowUnionTypes: true,
+      }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA("string"));
+      const fieldLogic = {
+        visibility: _fieldLogic.visibility ?? null,
+        math: _fieldLogic.math ?? null,
+      };
+      if (!logicSchemaValidator(fieldLogic)) {
+        throw new Error(JSON.stringify(logicSchemaValidator.errors));
+      }
+
+      const petitionId = getArg(args, petitionIdProp);
+      const fieldId = getArg(args, fieldIdProp);
 
       const [field, allFields, petition] = await Promise.all([
         ctx.petitions.loadField(fieldId),
@@ -479,11 +498,11 @@ export function validateFieldLogicInput<TypeName extends string, FieldName exten
         ctx.petitions.loadPetition(petitionId),
       ]);
 
-      // replace GIDs with numeric for ajv validation
+      // replace GIDs with numeric for validating with entries in DB
       await validateFieldLogic(
         {
           ...field!,
-          ...mapFieldLogic<string>(_fieldLogic, (fieldId) => {
+          ...mapFieldLogic<string>(fieldLogic, (fieldId) => {
             assert(typeof fieldId === "string", "Expected fieldId to be a string");
             return fromGlobalId(fieldId, "PetitionField").id;
           }).field,
@@ -495,6 +514,7 @@ export function validateFieldLogicInput<TypeName extends string, FieldName exten
             await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(petitionId),
           customLists: petition!.custom_lists ?? [],
         },
+        true, // JSON SCHEMA is already validated, no need to do it again
       );
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);

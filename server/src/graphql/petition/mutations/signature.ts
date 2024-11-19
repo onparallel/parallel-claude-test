@@ -287,11 +287,10 @@ export const createCustomSignatureDocumentUploadLink = mutationField(
       petitionId: nonNull(globalIdArg("Petition")),
       file: nonNull("FileUploadInput"),
     },
-    validateArgs: validFileUploadInput(
-      (args) => args.file,
-      { contentType: "application/pdf", maxSizeBytes: toBytes(10, "MB") },
-      "file",
-    ),
+    validateArgs: validFileUploadInput("file", {
+      contentType: "application/pdf",
+      maxSizeBytes: toBytes(10, "MB"),
+    }),
     resolve: async (_, args, ctx) => {
       const { filename, size, contentType } = args.file;
       const key = random(16);

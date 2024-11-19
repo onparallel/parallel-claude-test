@@ -1,25 +1,16 @@
-import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { unique } from "remeda";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, getArg } from "../helpers/authorize";
 
 export function userHasAccessToContacts<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
->(
-  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const contactIds = unique(
-        unMaybeArray(
-          (typeof prop === "function"
-            ? (prop as any)(args)
-            : (args as any)[prop]) as MaybeArray<number>,
-        ),
-      );
+      const contactIds = unique(unMaybeArray(getArg(args, argName)));
 
       if (contactIds.length === 0) {
         return true;
@@ -37,7 +28,7 @@ export function userHasAccessToContactGroups<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const groups = args[argName] as unknown as number[][];
+      const groups = getArg(args, argName);
       const uniqueIds = Array.from(new Set(groups.flat()));
       return ctx.contacts.userHasAccessToContacts(ctx.user!, uniqueIds);
     } catch {}

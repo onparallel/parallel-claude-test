@@ -1,7 +1,7 @@
-import { core } from "nexus";
 import pMap from "p-map";
 import { isNonNullish } from "remeda";
 import { MaybeArray, unMaybeArray } from "../../../util/types";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
@@ -9,15 +9,14 @@ export const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export function validEmail<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<string> | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, MaybeArray<string> | null | undefined>,
   onlyRegex = false,
 ) {
   return (async (_, args, ctx, info) => {
-    const emails = unMaybeArray(prop(args)).filter(isNonNullish);
+    const [emails, argName] = getArgWithPath(args, prop);
     if (emails) {
       await pMap(
-        emails,
+        unMaybeArray(emails).filter(isNonNullish),
         async (email) => {
           if (!EMAIL_REGEX.test(email)) {
             throw new ArgValidationError(info, argName, `'${email}' is not a valid email.`, {

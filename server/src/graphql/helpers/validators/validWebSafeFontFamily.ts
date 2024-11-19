@@ -1,15 +1,14 @@
 import fonts from "../../../util/webSafeFonts.json";
 
-import { core } from "nexus";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validWebSafeFontFamily<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
 ) {
   return ((_, args, ctx, info) => {
-    const value = prop(args);
+    const [value, argName] = getArgWithPath(args, prop);
     if (value && !fonts.find((f) => f[1] === value)) {
       throw new ArgValidationError(info, argName, `Unsupported font-family: ${value}.`);
     }

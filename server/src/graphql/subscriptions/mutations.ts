@@ -122,10 +122,7 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
     challenge: nullable(booleanArg()),
   },
-  validateArgs: validateAnd(
-    validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds"),
-  ),
+  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
   resolve: async (_, args, ctx) => {
     const challengePassed =
       args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
@@ -176,10 +173,7 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
     challenge: nullable(booleanArg()),
   },
-  validateArgs: validateAnd(
-    validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromProfileTypeFieldIds, "fromProfileTypeFieldIds"),
-  ),
+  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
   resolve: async (_, args, ctx) => {
     const challengePassed =
       args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
@@ -235,10 +229,7 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
     fromTemplateId: globalIdArg("Petition"),
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
   },
-  validateArgs: validateAnd(
-    validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds"),
-  ),
+  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
     if (isNonNullish(args.isEnabled)) {
@@ -306,10 +297,7 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
     fromProfileTypeId: globalIdArg("ProfileType"),
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
   },
-  validateArgs: validateAnd(
-    validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromProfileTypeFieldIds, "fromProfileTypeFieldIds"),
-  ),
+  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
     if (isNonNullish(args.isEnabled)) {

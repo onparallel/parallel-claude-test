@@ -6,15 +6,15 @@ import { discriminator } from "../../../util/discriminator";
 import { fromGlobalId } from "../../../util/globalId";
 import { parseTextWithPlaceholders } from "../../../util/slate/placeholders";
 import { MaybePromise } from "../../../util/types";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validPetitionSubject<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
+  petitionIdProp: ArgWithPath<TypeName, FieldName, number>,
 ) {
-  return validTextWithPlaceholders(prop, argName, async (placeholder, args, ctx, info) => {
+  return validTextWithPlaceholders(prop, async (placeholder, args, ctx, info) => {
     if (
       [
         "petition-title",
@@ -29,9 +29,10 @@ export function validPetitionSubject<TypeName extends string, FieldName extends 
     ) {
       return true;
     }
+    const [, argName] = getArgWithPath(args, prop);
     try {
       const field = await ctx.petitions.loadField(fromGlobalId(placeholder, "PetitionField").id);
-      const petitionId = petitionIdProp(args);
+      const [petitionId] = getArgWithPath(args, petitionIdProp);
       if (isNonNullish(field) && field.petition_id !== petitionId) {
         throw new ArgValidationError(info, argName, `PetitionField does not belong to Petition`);
       }
@@ -48,8 +49,8 @@ export function validPetitionSubject<TypeName extends string, FieldName extends 
 export function validPublicPetitionLinkPetitionNamePattern<
   TypeName extends string,
   FieldName extends string,
->(prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined, argName: string) {
-  return validTextWithPlaceholders(prop, argName, (placeholder) =>
+>(prop: ArgWithPath<TypeName, FieldName, string | null | undefined>) {
+  return validTextWithPlaceholders(prop, (placeholder) =>
     [
       "petition-title",
       "contact-full-name",
@@ -61,17 +62,15 @@ export function validPublicPetitionLinkPetitionNamePattern<
 }
 
 export function validExportFileRenamePattern<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
 ) {
-  return validTextWithPlaceholders(prop, argName, (placeholder) =>
+  return validTextWithPlaceholders(prop, (placeholder) =>
     ["field-number", "field-title", "file-name"].includes(placeholder),
   );
 }
 
-export function validTextWithPlaceholders<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
+function validTextWithPlaceholders<TypeName extends string, FieldName extends string>(
+  prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
   validPlaceholder: (
     placeholder: string,
     args: core.ArgsValue<TypeName, FieldName>,
@@ -80,7 +79,7 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
   ) => MaybePromise<boolean>,
 ) {
   return (async (_, args, context, info) => {
-    const value = prop(args);
+    const [value, argName] = getArgWithPath(args, prop);
     if (!value) {
       return;
     }

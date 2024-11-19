@@ -68,7 +68,7 @@ export const contactQueries = queryField((t) => {
     args: {
       emails: nonNull(list(nonNull(stringArg()))),
     },
-    validateArgs: validEmail((args) => args.emails, "emails", true),
+    validateArgs: validEmail("emails", true),
     authorize: authenticate(),
     resolve: async (_, args, ctx) => {
       return pMap(

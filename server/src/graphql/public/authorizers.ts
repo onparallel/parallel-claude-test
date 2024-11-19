@@ -1,16 +1,13 @@
-import Ajv from "ajv";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
-import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isNonNullish, isNullish, partition, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { FeatureFlagName } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
-import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { Arg, chain } from "../helpers/authorize";
-import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
+import { Arg, chain, getArg } from "../helpers/authorize";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -74,7 +71,7 @@ export function fetchPetitionAccess<
   TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const keycode = args[argKeycode] as unknown as string;
+    const keycode = getArg(args, argKeycode);
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
     if (!access) {
       throw new ApolloError(
@@ -109,18 +106,10 @@ export function fetchPetitionAccess<
 export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
->(
-  argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unique(
-      unMaybeArray(
-        (typeof argFieldId === "function"
-          ? (argFieldId as any)(args)
-          : (args as any)[argFieldId]) as MaybeArray<number>,
-      ),
-    );
+    const fieldIds = unique(unMaybeArray(getArg(args, argFieldId)));
     const passes = await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, fieldIds);
     if (!passes) {
       throw new ForbiddenError("Field does not belong to access");
@@ -132,18 +121,10 @@ export function fieldBelongsToAccess<
 export function fieldIsExternal<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
->(
-  argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unique(
-      unMaybeArray(
-        (typeof argFieldId === "function"
-          ? (argFieldId as any)(args)
-          : (args as any)[argFieldId]) as MaybeArray<number>,
-      ),
-    );
+    const fieldIds = unique(unMaybeArray(getArg(args, argFieldId)));
 
     const fields = await ctx.petitions.loadField(fieldIds);
     if (!fields.every((field) => field?.is_internal === false)) {
@@ -157,18 +138,10 @@ export function fieldIsExternal<
 export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
->(
-  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = unique(
-      unMaybeArray(
-        (typeof argReplyId === "function"
-          ? (argReplyId as any)(args)
-          : (args as any)[argReplyId]) as MaybeArray<number>,
-      ),
-    );
+    const replyIds = unique(unMaybeArray(getArg(args, argReplyId)));
     if (replyIds.length === 0) {
       return true;
     }
@@ -183,18 +156,10 @@ export function replyBelongsToAccess<
 export function replyBelongsToExternalField<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
->(
-  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = unique(
-      unMaybeArray(
-        (typeof argReplyId === "function"
-          ? (argReplyId as any)(args)
-          : (args as any)[argReplyId]) as MaybeArray<number>,
-      ),
-    );
+    const replyIds = unique(unMaybeArray(getArg(args, argReplyId)));
     const fields = await ctx.petitions.loadFieldForReply(replyIds);
     if (!fields.every((f) => f?.is_internal === false)) {
       throw new ForbiddenError("Reply does not belong to external field");
@@ -212,7 +177,7 @@ export function commentsBelongsToAccess<
   return async (_, args, ctx) => {
     const passes = await ctx.petitions.commentsBelongToPetition(
       ctx.access!.petition_id,
-      unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>),
+      unMaybeArray(getArg(args, argCommentId)),
     );
     if (!passes) {
       throw new ForbiddenError("Comment does not belong to access");
@@ -227,7 +192,7 @@ export function validPublicPetitionLinkSlug<
   TArg extends Arg<TypeName, FieldName, string>,
 >(argSlug: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const slug = args[argSlug] as unknown as string;
+    const slug = getArg(args, argSlug);
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
     if (isNullish(publicPetitionLink) || !publicPetitionLink.is_active) {
       throw new ForbiddenError("Public link not found or inactive");
@@ -262,8 +227,8 @@ export function validPublicPetitionLinkPrefill<
 >(argPrefill: TArg1, argSlug: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const slug = args[argSlug] as unknown as string;
-      const prefill = args[argPrefill] as unknown as string;
+      const slug = getArg(args, argSlug);
+      const prefill = getArg(args, argPrefill);
       const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
       if (isNonNullish(publicLink?.prefill_secret)) {
         await verify(prefill!, publicLink!.prefill_secret, {});
@@ -280,7 +245,7 @@ export function validPublicPetitionLinkPrefillDataKeycode<
   TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const keycode = args[argKeycode] as unknown as string;
+    const keycode = getArg(args, argKeycode);
     const publicPrefillData =
       await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(keycode);
     if (!publicPrefillData) {
@@ -303,100 +268,9 @@ export function taskBelongsToAccess<
   TArg extends Arg<TypeName, FieldName, number>,
 >(taskIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const passes = await ctx.tasks.taskBelongsToAccess(
-      args[taskIdArg] as unknown as number,
-      ctx.access!.id,
-    );
+    const passes = await ctx.tasks.taskBelongsToAccess(getArg(args, taskIdArg), ctx.access!.id);
     if (!passes) {
       throw new ForbiddenError("Task does not belong to access");
-    }
-    return true;
-  };
-}
-
-export function validPetitionFieldCommentContent<
-  TypeName extends string,
-  FieldName extends string,
-  TArgContent extends Arg<TypeName, FieldName, any>,
->(argContent: TArgContent, allowMentions?: boolean): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx, info) => {
-    const content = args[argContent] as any;
-    const ajv = new Ajv();
-    if (!content) {
-      throw new ForbiddenError("comment content is not defined");
-    }
-    const valid = ajv.validate(
-      {
-        definitions: {
-          paragraph: {
-            type: "object",
-            properties: {
-              children: { type: "array", items: { $ref: "#/definitions/leaf" } },
-              type: { enum: ["paragraph"] },
-            },
-            required: ["type", "children"],
-            additionalProperties: false,
-          },
-          mention: {
-            type: "object",
-            properties: {
-              type: { const: "mention" },
-              mention: { type: "string" },
-              children: { type: "array", items: { $ref: "#/definitions/text" } },
-            },
-            additionalProperties: false,
-            required: ["type", "mention", "children"],
-          },
-          text: {
-            type: "object",
-            properties: {
-              text: { type: "string" },
-            },
-            additionalProperties: false,
-            required: ["text"],
-          },
-          link: {
-            type: "object",
-            properties: {
-              type: { const: "link" },
-              url: { type: "string" },
-              children: {
-                type: "array",
-                items: {
-                  type: "object",
-                  anyOf: [{ $ref: "#/definitions/text" }],
-                },
-              },
-            },
-          },
-          leaf: {
-            type: "object",
-            anyOf: [
-              ...(allowMentions ? [{ $ref: "#/definitions/mention" }] : []),
-              { $ref: "#/definitions/text" },
-              { $ref: "#/definitions/link" },
-            ],
-          },
-          root: { type: "array", items: { $ref: "#/definitions/paragraph" } },
-        },
-        $ref: "#/definitions/root",
-      },
-      content,
-    );
-    if (!valid) {
-      throw new ArgValidationError(info, argContent, ajv.errorsText());
-    }
-    if (allowMentions) {
-      const mentions = collectMentionsFromSlate(content);
-      const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
-      const passes = await ctx.petitions.canBeMentionedInPetitionFieldComment(
-        ctx.user!.org_id,
-        userMentions.map((m) => m.id),
-        userGroupMentions.map((m) => m.id),
-      );
-      if (!passes) {
-        throw new ForbiddenError("Mention not allowed");
-      }
     }
     return true;
   };

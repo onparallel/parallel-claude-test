@@ -1,16 +1,18 @@
 import { core } from "nexus";
 import { isValidTime, isValidTimezone } from "../../../util/time";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validRemindersConfig<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => core.GetGen2<"inputTypes", "RemindersConfigInput"> | null | undefined,
-  argName: string,
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    core.GetGen2<"inputTypes", "RemindersConfigInput"> | null | undefined
+  >,
 ) {
   return ((_, args, ctx, info) => {
-    const remindersConfig = prop(args);
+    const [remindersConfig, argName] = getArgWithPath(args, prop);
     if (remindersConfig) {
       const { time, timezone, offset, limit } = remindersConfig;
       if (!isValidTime(time)) {

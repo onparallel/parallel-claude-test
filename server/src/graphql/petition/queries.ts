@@ -27,8 +27,6 @@ import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPath } from "../helpers/validators/validPath";
 import { contextUserHasPermission } from "../users/authorizers";
 import {
@@ -79,8 +77,8 @@ export const petitionsQuery = queryField((t) => {
       "lastRecipientActivityAt",
     ] as any,
     validateArgs: validateAnd(
-      validPetitionSharedWithFilter((args) => args.filters?.sharedWith, "filters.sharedWith"),
-      validPetitionTagFilter((args) => args.filters?.tags, "filters.tags"),
+      validPetitionSharedWithFilter("filters.sharedWith"),
+      validPetitionTagFilter("filters.tags"),
       async (_, args, ctx, info) => {
         const fromTemplateId = args.filters?.fromTemplateId;
         if (isNonNullish(fromTemplateId)) {
@@ -164,13 +162,15 @@ export const petitionsByIdQuery = queryField("petitionsById", {
       ),
     ),
   ),
-  validateArgs: validateAnd(
-    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
-    notEmptyArray(
-      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
-      "ids or folders",
-    ),
-  ),
+  validateArgs: (_, args, ctx, info) => {
+    if ((args.ids?.length ?? 0) + (args.folders?.folderIds?.length ?? 0) === 0) {
+      throw new ArgValidationError(
+        info,
+        "ids or folders",
+        `Expected ids or folders.folderIds to be defined and not empty`,
+      );
+    }
+  },
   resolve: async (_, args, ctx) => {
     let petitionIds = args.ids ?? [];
     if (isNonNullish(args.folders)) {
@@ -263,13 +263,15 @@ export const petitionsSharingInfoQuery = queryField("petitionsSharingInfo", {
       ),
     ),
   ),
-  validateArgs: validateAnd(
-    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
-    notEmptyArray(
-      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
-      "ids or folders",
-    ),
-  ),
+  validateArgs: (_, args, ctx, info) => {
+    if ((args.ids?.length ?? 0) + (args.folders?.folderIds?.length ?? 0) === 0) {
+      throw new ArgValidationError(
+        info,
+        "ids or folders",
+        `Expected ids or folders.folderIds to be defined and not empty`,
+      );
+    }
+  },
   resolve: async (_, args, ctx) => {
     const petitionIds = args.ids ?? [];
     if (isNonNullish(args.folders)) {
@@ -386,7 +388,7 @@ export const isValidPublicPetitionLinkSlug = queryField("isValidPublicPetitionLi
     slug: nonNull(stringArg()),
   },
   authorize: authenticate(),
-  validateArgs: validatePublicPetitionLinkSlug((args) => args.slug, "slug"),
+  validateArgs: validatePublicPetitionLinkSlug("slug"),
   resolve: () => true,
 });
 
@@ -412,7 +414,7 @@ export const petitionFolders = queryField("petitionFolders", {
     type: nonNull("PetitionBaseType"),
     currentPath: stringArg(),
   },
-  validateArgs: validPath((args) => args.currentPath, "currentPath"),
+  validateArgs: validPath("currentPath"),
   resolve: async (_, args, ctx) => {
     function pathAndParents(path: string): string[] {
       if (path.split("/").length > 2) {

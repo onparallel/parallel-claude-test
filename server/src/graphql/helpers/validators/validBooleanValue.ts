@@ -1,14 +1,13 @@
-import { core } from "nexus";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validBooleanValue<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => boolean | null | undefined,
-  argName: string,
+  prop: ArgWithPath<TypeName, FieldName, boolean | null | undefined>,
   value: boolean,
 ) {
   return ((_, args, ctx, info) => {
-    const curValue = prop(args);
+    const [curValue, argName] = getArgWithPath(args, prop);
     if (curValue !== value) {
       throw new ArgValidationError(info, argName, `Expected ${value.toString()}`);
     }

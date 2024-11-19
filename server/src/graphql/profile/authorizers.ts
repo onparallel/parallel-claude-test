@@ -1,4 +1,3 @@
-import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { groupBy, indexBy, isNonNullish, isNullish, pick, unique, zip } from "remeda";
 import {
@@ -13,7 +12,7 @@ import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFi
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg, ArgAuthorizer } from "../helpers/authorize";
+import { Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
@@ -21,7 +20,7 @@ function createProfileTypeAuthorizer<TRest extends any[] = []>(
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
-      const profileTypeIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const profileTypeIds = unMaybeArray(getArg(args, argName));
       if (profileTypeIds.length === 0) {
         return true;
       }
@@ -38,7 +37,7 @@ function createProfileAuthorizer<TRest extends any[] = []>(
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
-      const profileIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const profileIds = unMaybeArray(getArg(args, argName));
       if (profileIds.length === 0) {
         return true;
       }
@@ -53,7 +52,7 @@ function createProfileTypeFieldAuthorizer<TRest extends any[] = []>(
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
-      const profileTypeFieldIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const profileTypeFieldIds = unMaybeArray(getArg(args, argName));
       if (profileTypeFieldIds.length === 0) {
         return true;
       }
@@ -94,8 +93,8 @@ export function profileIsAssociatedToPetition<
   petitionIdArg: TPetitionId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileIds = unique(unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>));
-    const petitionIds = unique(unMaybeArray(args[petitionIdArg] as unknown as MaybeArray<number>));
+    const profileIds = unique(unMaybeArray(getArg(args, profileIdArg)));
+    const petitionIds = unique(unMaybeArray(getArg(args, petitionIdArg)));
 
     const count = await ctx.profiles.countProfilesAssociatedToPetitions(profileIds, petitionIds);
 
@@ -114,7 +113,7 @@ export function userHasAccessToProfileType<
 >(profileTypeIdArg: TProfileTypeId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[profileTypeIdArg] as unknown as MaybeArray<number>);
+      const ids = unMaybeArray(getArg(args, profileTypeIdArg));
 
       const profileTypes = await ctx.profiles.loadProfileType(ids);
       return profileTypes.every((p) => isNonNullish(p) && p.org_id === ctx.user!.org_id);
@@ -129,21 +128,13 @@ export function profileTypeFieldBelongsToProfileType<
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
   TProfileTypeId extends Arg<TypeName, FieldName, number>,
 >(
-  profileTypeFieldIdArg:
-    | TProfileTypeFieldId
-    | ((args: core.ArgsValue<TypeName, FieldName>) => number[]),
+  profileTypeFieldIdArg: TProfileTypeFieldId,
   profileTypeIdArg: TProfileTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileTypeFieldIds = unique(
-        unMaybeArray(
-          (typeof profileTypeFieldIdArg === "function"
-            ? (profileTypeFieldIdArg as any)(args)
-            : (args as any)[profileTypeFieldIdArg]) as MaybeArray<number>,
-        ),
-      );
-      const profileTypeId = args[profileTypeIdArg] as unknown as number;
+      const profileTypeFieldIds = unique(unMaybeArray(getArg(args, profileTypeFieldIdArg)));
+      const profileTypeId = getArg(args, profileTypeIdArg);
 
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
       return profileTypeFields.every((p) => isNonNullish(p) && p.profile_type_id === profileTypeId);
@@ -164,10 +155,8 @@ export function profileHasProfileTypeFieldId<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileId = args[profileIdArg] as unknown as number;
-      const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
-      );
+      const profileId = getArg(args, profileIdArg);
+      const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));
       const [profileTypeFields, profile] = await Promise.all([
         ctx.profiles.loadProfileTypeField(profileTypeFieldIds),
         ctx.profiles.loadProfile(profileId),
@@ -195,10 +184,8 @@ export function profileFieldFileHasProfileTypeFieldId<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileFieldFileIds = unMaybeArray(
-        args[profileFieldFileIdArg] as unknown as MaybeArray<number>,
-      );
-      const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
+      const profileFieldFileIds = unMaybeArray(getArg(args, profileFieldFileIdArg));
+      const profileTypeFieldId = getArg(args, profileTypeFieldIdArg);
       const profileFieldFiles = await ctx.profiles.loadProfileFieldFileById(profileFieldFileIds);
 
       return profileFieldFiles.every((pff) => pff?.profile_type_field_id === profileTypeFieldId);
@@ -213,17 +200,12 @@ export function profileTypeFieldIsOfType<
   FieldName extends string,
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  profileTypeFieldIdArg:
-    | TProfileTypeFieldId
-    | ((args: core.ArgsValue<TypeName, FieldName>) => number[]),
+  profileTypeFieldIdArg: TProfileTypeFieldId,
   types: ProfileTypeFieldType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const profileTypeFieldIds =
-        typeof profileTypeFieldIdArg === "function"
-          ? profileTypeFieldIdArg(args)
-          : unMaybeArray(args[profileTypeFieldIdArg] as unknown as MaybeArray<number>);
+      const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
 
       return profileTypeFields.every((p) => isNonNullish(p) && types.includes(p.type));
@@ -240,8 +222,7 @@ export function userHasAccessToProfile<
 >(profileIdArg: TProfileId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>);
-
+      const ids = unMaybeArray(getArg(args, profileIdArg));
       const profiles = await ctx.profiles.loadProfile(ids);
       return profiles.every((p) => isNonNullish(p) && p.org_id === ctx.user!.org_id);
     } catch {
@@ -262,9 +243,9 @@ export function fileUploadCanBeAttachedToProfileTypeField<
   dataArg: TData,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
-    const data = args[dataArg] as unknown as NexusGenInputs["FileUploadInput"][];
+    const profileId = getArg(args, profileIdArg);
+    const profileTypeFieldId = getArg(args, profileTypeFieldIdArg);
+    const data = getArg(args, dataArg);
     const files = await ctx.profiles.loadProfileFieldFiles({ profileId, profileTypeFieldId });
 
     if ((files ?? []).length + data.length > 10) {
@@ -283,7 +264,7 @@ export function contextUserCanSubscribeUsersToProfile<
   TUserIdsArg extends Arg<TypeName, FieldName, number[]>,
 >(userIdsArg: TUserIdsArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const userIds = unique(args[userIdsArg] as unknown as number[]);
+    const userIds = unique(getArg(args, userIdsArg));
 
     const users = await ctx.users.loadUser(userIds);
 
@@ -305,11 +286,11 @@ export function userHasPermissionOnProfileTypeField<
   TypeName extends string,
   FieldName extends string,
 >(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => number[],
+  argName: Arg<TypeName, FieldName, MaybeArray<number>>,
   permission: ProfileTypeFieldPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = prop(args);
+    const ids = unMaybeArray(getArg(args, argName));
     const myPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
       ids.map((id) => ({ profileTypeFieldId: id, userId: ctx.user!.id })),
     );
@@ -326,7 +307,7 @@ export function profileHasStatus<
   status: MaybeArray<ProfileStatus>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileIds = unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>);
+    const profileIds = unMaybeArray(getArg(args, profileIdArg));
     const validStatuses = unMaybeArray(status);
 
     const profiles = await ctx.profiles.loadProfile(profileIds);
@@ -340,14 +321,12 @@ export function profileTypeFieldIsNotUsedInMonitoringRules<
   TProfileTypeId extends Arg<TypeName, FieldName, number>,
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  profileTypeIDArg: TProfileTypeId,
+  profileTypeIdArg: TProfileTypeId,
   profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeId = args[profileTypeIDArg] as unknown as number;
-    const profileTypeFieldIds = unMaybeArray(
-      args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
-    );
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));
     const usedInProfileTypeFields = (
       await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
     ).filter((ptf) => optionsIncludeProfileTypeFieldId(ptf.options, profileTypeFieldIds));
@@ -375,11 +354,7 @@ export function userHasAccessToProfileRelationshipsInput<
   profileRelationshipsArg: TProfileRelationshipTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const relationships = unMaybeArray(
-      args[profileRelationshipsArg] as unknown as MaybeArray<
-        NexusGenInputs["CreateProfileRelationshipInput"]
-      >,
-    );
+    const relationships = unMaybeArray(getArg(args, profileRelationshipsArg));
 
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
       relationships.map((r) => r.profileRelationshipTypeId),
@@ -413,12 +388,8 @@ export function profilesCanBeAssociated<
   relationshipsArg: TRelationshipsArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const relationshipsData = unMaybeArray(
-      args[relationshipsArg] as unknown as MaybeArray<
-        NexusGenInputs["CreateProfileRelationshipInput"]
-      >,
-    );
+    const profileId = getArg(args, profileIdArg);
+    const relationshipsData = unMaybeArray(getArg(args, relationshipsArg));
 
     if (relationshipsData.some((r) => r.profileId === profileId)) {
       // A profile cannot be associated with itself
@@ -504,10 +475,8 @@ export function relationshipBelongsToProfile<
   profileRelationshipIdArg: TProfileRelationshipIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const profileRelationshipIds = unMaybeArray(
-      args[profileRelationshipIdArg] as unknown as MaybeArray<number>,
-    );
+    const profileId = getArg(args, profileIdArg);
+    const profileRelationshipIds = unMaybeArray(getArg(args, profileRelationshipIdArg));
 
     const relationships = await ctx.profiles.loadProfileRelationship(profileRelationshipIds);
     return relationships.every(
@@ -529,8 +498,8 @@ export function profileHasSameProfileTypeAsField<
   petitionFieldIdArg: TPetitionFieldIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+    const profileId = getArg(args, profileIdArg);
+    const petitionFieldId = getArg(args, petitionFieldIdArg);
 
     const [profile, petitionField] = await Promise.all([
       ctx.profiles.loadProfile(profileId),
@@ -548,14 +517,15 @@ export function profileHasSameProfileTypeAsField<
 export function profileTypeFieldBelongsToPetitionFieldProfileType<
   TypeName extends string,
   FieldName extends string,
+  TProfileTypeFieldIdsArg extends Arg<TypeName, FieldName, number[]>,
   TPetitionFieldIdArg extends Arg<TypeName, FieldName, number>,
 >(
-  profileTypeFieldIdsArg: (args: core.ArgsValue<TypeName, FieldName>) => number[],
+  profileTypeFieldIdsArg: TProfileTypeFieldIdsArg,
   petitionFieldIdArg: TPetitionFieldIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeFieldIds = profileTypeFieldIdsArg(args);
-    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+    const profileTypeFieldIds = getArg(args, profileTypeFieldIdsArg);
+    const petitionFieldId = getArg(args, petitionFieldIdArg);
 
     const [profileTypeFields, petitionField] = await Promise.all([
       ctx.profiles.loadProfileTypeField(profileTypeFieldIds),
@@ -571,11 +541,13 @@ export function profileTypeFieldBelongsToPetitionFieldProfileType<
   };
 }
 
-export function profileTypeFieldsAreExpirable<TypeName extends string, FieldName extends string>(
-  profileTypeFieldIdsArg: (args: core.ArgsValue<TypeName, FieldName>) => number[],
-): FieldAuthorizeResolver<TypeName, FieldName> {
+export function profileTypeFieldsAreExpirable<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeFieldIdsArg extends Arg<TypeName, FieldName, number[]>,
+>(profileTypeFieldIdsArg: TProfileTypeFieldIdsArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeFieldIds = profileTypeFieldIdsArg(args);
+    const profileTypeFieldIds = getArg(args, profileTypeFieldIdsArg);
 
     const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
     return profileTypeFields.every((ptf) => isNonNullish(ptf) && ptf.is_expirable);
@@ -588,7 +560,7 @@ export function userHasAccessToExternalSourceEntity<
   TEntityIdArg extends Arg<TypeName, FieldName, number>,
 >(entityIdArg: TEntityIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const entityId = args[entityIdArg] as unknown as number;
+    const entityId = getArg(args, entityIdArg);
 
     const entity = await ctx.profiles.loadProfileExternalSourceEntity(entityId);
     return isNonNullish(entity) && entity.created_by_user_id === ctx.user!.id;
@@ -605,8 +577,8 @@ export function externalSourceEntityMatchesProfileTypeStandardType<
   profileTypeIdArg: TProfileTypeIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const entityId = args[entityIdArg] as unknown as number;
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const entityId = getArg(args, entityIdArg);
+    const profileTypeId = getArg(args, profileTypeIdArg);
 
     const entity = await ctx.profiles.loadProfileExternalSourceEntity(entityId);
     const profileType = await ctx.profiles.loadProfileType(profileTypeId);
@@ -634,8 +606,8 @@ export function profileMatchesProfileType<
   profileTypeIdArg: TProfileTypeIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const profileId = getArg(args, profileIdArg);
+    const profileTypeId = getArg(args, profileTypeIdArg);
 
     const profile = await ctx.profiles.loadProfile(profileId);
 
@@ -663,10 +635,8 @@ export function userCanOverwriteProfileFields<
   conflictResolutionsArg: TConflictResolutionsArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
-    const conflictResolutions = args[
-      conflictResolutionsArg
-    ] as unknown as NexusGenInputs["ProfileExternalSourceConflictResolution"][];
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const conflictResolutions = getArg(args, conflictResolutionsArg);
 
     const profileTypeFields =
       await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
@@ -699,7 +669,7 @@ export function userHasAccessToProfileTypeProcess<
   TProcessIdArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(processIdArg: TProcessIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const processIds = unMaybeArray(args[processIdArg] as unknown as MaybeArray<number>);
+    const processIds = unMaybeArray(getArg(args, processIdArg));
     const hasAccess = await ctx.profiles.orgHasAccessToProfileTypeProcesses(
       processIds,
       ctx.user!.org_id,
@@ -719,7 +689,7 @@ export function userHasAccessToEditProfileTypeProcessInput<
   TInputArg extends Arg<TypeName, FieldName, NexusGenInputs["EditProfileTypeProcessInput"]>,
 >(dataArg: TInputArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const data = args[dataArg] as unknown as NexusGenInputs["EditProfileTypeProcessInput"];
+    const data = getArg(args, dataArg);
     const templateIds = data.templateIds;
 
     if (templateIds) {
@@ -749,8 +719,8 @@ export function profileTypeProcessBelongsToProfileType<
   profileTypeIdArg: TProfileTypeIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const processIds = unMaybeArray(args[processIdArg] as unknown as MaybeArray<number>);
-    const profileTypeId = args[profileTypeIdArg] as unknown as number;
+    const processIds = unMaybeArray(getArg(args, processIdArg));
+    const profileTypeId = getArg(args, profileTypeIdArg);
 
     const processes = await ctx.profiles.loadProfileTypeProcess(processIds);
     const processesBelongToProfileType = processes.every(

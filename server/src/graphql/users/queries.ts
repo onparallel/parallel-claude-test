@@ -32,9 +32,9 @@ export const userQueries = queryField((t) => {
       email: nonNull(stringArg()),
     },
     validateArgs: validateAnd(
-      validEmail((args) => args.email, "email"),
-      emailIsAvailable((args) => args.email),
-      emailDomainIsNotSSO((args) => args.email),
+      validEmail("email"),
+      emailIsAvailable("email"),
+      emailDomainIsNotSSO("email"),
     ),
     resolve: () => true,
   });
@@ -47,7 +47,7 @@ export const getUsersOrGroups = queryField("getUsersOrGroups", {
   args: {
     ids: nonNull(list(nonNull(idArg()))),
   },
-  validateArgs: validGlobalId((args) => args.ids, ["User", "UserGroup"], "ids"),
+  validateArgs: validGlobalId("ids", ["User", "UserGroup"]),
   resolve: async (_, { ids }, ctx) => {
     const decoded = ids.map((id) => fromGlobalId(id));
     const result = await Promise.all(

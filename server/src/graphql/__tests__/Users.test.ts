@@ -623,7 +623,7 @@ describe("GraphQL/Users", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("USER_LIMIT_ERROR");
       expect(data).toBeNull();
 
       await mocks.knex

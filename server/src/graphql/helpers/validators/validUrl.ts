@@ -1,19 +1,18 @@
-import { core } from "nexus";
 import { URL } from "url";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validUrl<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string,
+  stringArg: ArgWithPath<TypeName, FieldName, string | null | undefined>,
 ) {
   return ((_, args, ctx, info) => {
-    const url = prop(args);
-    if (url) {
+    const [value, argName] = getArgWithPath(args, stringArg);
+    if (value) {
       try {
-        new URL(url);
-      } catch (e: any) {
-        throw new ArgValidationError(info, argName, e.message);
+        new URL(value);
+      } catch {
+        throw new ArgValidationError(info, argName, "Invalid URL");
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

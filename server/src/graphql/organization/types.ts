@@ -189,7 +189,7 @@ export const Organization = objectType({
       extendArgs: {
         emails: nonNull(list(nonNull(stringArg()))),
       },
-      validateArgs: validEmail((args) => args.emails, "emails", true),
+      validateArgs: validEmail("emails", true),
       resolve: (root, { offset, limit, emails }, ctx) => {
         return ctx.organizations.getOrganizationUsersFilteredByEmail(root.id, {
           offset,

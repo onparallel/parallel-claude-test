@@ -1,15 +1,19 @@
 import { FileUpload } from "graphql-upload/Upload.js";
-import { core } from "nexus";
+import { ArgWithPath, getArgWithPath } from "../authorize";
 import { MaxFileSizeExceededError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function maxFileSize<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,
+  prop: ArgWithPath<TypeName, FieldName, Promise<FileUpload> | null | undefined>,
   maxSizeBytes: number,
-  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
-    const { createReadStream } = await prop(args);
+    const [promise, argName] = getArgWithPath(args, prop);
+    if (!promise) {
+      return;
+    }
+
+    const { createReadStream } = await promise;
     const maxSizeExceeded = await new Promise<boolean>((resolve) => {
       let bytesRead = 0;
       const stream = createReadStream();

@@ -3,7 +3,10 @@ import { firstBy, isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionListView, ProfileListView } from "../../db/__types";
 import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { validateAnd } from "../helpers/validateArgs";
+import { validPetitionSharedWithFilter, validPetitionTagFilter } from "../petition/types";
 import { profileTypeIsArchived, userHasAccessToProfileType } from "../profile/authorizers";
 import {
   petitionListViewHasType,
@@ -15,7 +18,7 @@ import {
   validProfileListViewReorder,
 } from "./authorizers";
 import { mapProfileListViewDataToDatabase } from "./helpers";
-import { validPetitionListViewData, validProfileListViewDataInput } from "./validations";
+import { validProfileListViewDataInput } from "./validations";
 
 // ###############
 // PETITION VIEWS
@@ -28,7 +31,22 @@ export const createPetitionListView = mutationField("createPetitionListView", {
     name: nonNull(stringArg()),
     data: nonNull("PetitionListViewDataInput"),
   },
-  validateArgs: validPetitionListViewData((args) => args.data, "data"),
+  validateArgs: validateAnd(
+    validPetitionSharedWithFilter("data.sharedWith"),
+    validPetitionTagFilter("data.tagsFilters"),
+    async (_, args, ctx, info) => {
+      const fromTemplateId = args.data.fromTemplateId;
+      if (isNonNullish(fromTemplateId)) {
+        const hasAccess = await ctx.petitions.userHasAccessToPetitions(
+          ctx.user!.id,
+          fromTemplateId,
+        );
+        if (!hasAccess) {
+          throw new ArgValidationError(info, `${name}.fromTemplateId`, "Invalid template ID");
+        }
+      }
+    },
+  ),
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     const maxPosition = firstBy(userViews, [(v) => v.position, "desc"])?.position ?? -1;
@@ -70,7 +88,22 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
     name: nullable(stringArg()),
     data: "PetitionListViewDataInput",
   },
-  validateArgs: validPetitionListViewData((args) => args.data, "data"),
+  validateArgs: validateAnd(
+    validPetitionSharedWithFilter("data.sharedWith"),
+    validPetitionTagFilter("data.tagsFilters"),
+    async (_, args, ctx, info) => {
+      const fromTemplateId = args.data?.fromTemplateId;
+      if (isNonNullish(fromTemplateId)) {
+        const hasAccess = await ctx.petitions.userHasAccessToPetitions(
+          ctx.user!.id,
+          fromTemplateId,
+        );
+        if (!hasAccess) {
+          throw new ArgValidationError(info, `${name}.fromTemplateId`, "Invalid template ID");
+        }
+      }
+    },
+  ),
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionListView> = {};
     if (isNonNullish(args.name)) {
@@ -153,7 +186,7 @@ export const createProfileListView = mutationField("createProfileListView", {
     name: nonNull(stringArg()),
     data: nonNull("ProfileListViewDataInput"),
   },
-  validateArgs: validProfileListViewDataInput("profileTypeId", (args) => args.data, "data"),
+  validateArgs: validProfileListViewDataInput("profileTypeId", "data"),
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadProfileListViewsByUserIdProfileTypeId({
       userId: ctx.user!.id,
@@ -195,7 +228,7 @@ export const updateProfileListView = mutationField("updateProfileListView", {
     name: nullable(stringArg()),
     data: "ProfileListViewDataInput",
   },
-  validateArgs: validProfileListViewDataInput("profileTypeId", (args) => args.data, "data"),
+  validateArgs: validProfileListViewDataInput("profileTypeId", "data"),
   resolve: async (_, args, ctx) => {
     const data: Partial<ProfileListView> = {};
     if (isNonNullish(args.name)) {

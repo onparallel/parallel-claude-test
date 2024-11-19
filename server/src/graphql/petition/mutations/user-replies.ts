@@ -87,10 +87,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validateCreateFileReplyInput(
-    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId, file: args.file }),
-    "fieldId",
-  ),
+  validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId", "file"),
 
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -183,11 +180,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validateUpdateFileReplyInput(
-    (args) => args.replyId,
-    (args) => args.file,
-    "file",
-  ),
+  validateArgs: validateUpdateFileReplyInput("file", "replyId"),
   resolve: async (_, args, ctx) => {
     const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
 
@@ -348,10 +341,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validateCreateFileReplyInput(
-    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
-    "fieldId",
-  ),
+  validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
     const field = await ctx.petitions.loadField(fieldId);
     const petition = await ctx.petitions.loadPetition(petitionId);
@@ -517,10 +507,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
-  validateArgs: validateCreateFileReplyInput(
-    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId }),
-    "fieldId",
-  ),
+  validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, args, ctx) => {
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
@@ -611,8 +598,8 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
     not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.fields, "fields"),
-    validateCreatePetitionFieldReplyInput((args) => args.fields, "fields"),
+    notEmptyArray("fields"),
+    validateCreatePetitionFieldReplyInput("fields"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -747,8 +734,8 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
     ),
   },
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.replies, "replies"),
-    validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
+    notEmptyArray("replies"),
+    validateUpdatePetitionFieldReplyInput("replies"),
   ),
   resolve: async (_, args, ctx) => {
     const replyIds = unique(args.replies.map((r) => r.id));

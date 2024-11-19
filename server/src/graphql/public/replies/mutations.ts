@@ -68,7 +68,7 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
         "FIELD_GROUP",
       ],
     ),
-    fieldCanBeReplied((args) => args.fields),
+    fieldCanBeReplied("fields"),
     fieldIsExternal((args) => args.fields.map((f) => f.id)),
     replyIsForFieldOfType(
       (args) => args.fields.map((f) => f.parentReplyId).filter(isNonNullish),
@@ -81,8 +81,8 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
     ),
   ),
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.fields, "fields"),
-    validateCreatePetitionFieldReplyInput((args) => args.fields, "fields"),
+    notEmptyArray("fields"),
+    validateCreatePetitionFieldReplyInput("fields"),
   ),
   resolve: async (_, args, ctx) => {
     const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
@@ -137,8 +137,8 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
     ),
   ),
   validateArgs: validateAnd(
-    notEmptyArray((args) => args.replies, "replies"),
-    validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
+    notEmptyArray("replies"),
+    validateUpdatePetitionFieldReplyInput("replies"),
   ),
   resolve: async (_, args, ctx) => {
     const replyIds = unique(args.replies.map((r) => r.id));
@@ -266,10 +266,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
-  validateArgs: validateCreateFileReplyInput(
-    (args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId, file: args.data }),
-    "fieldId",
-  ),
+  validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId", "data"),
   resolve: async (_, args, ctx) => {
     const key = random(16);
     const { filename, size, contentType } = args.data;

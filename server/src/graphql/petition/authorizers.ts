@@ -14,9 +14,10 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg, ArgAuthorizer } from "../helpers/authorize";
+import { Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
@@ -25,7 +26,7 @@ function createPetitionAuthorizer<TRest extends any[] = []>(
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
-      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const petitionIds = unMaybeArray(getArg(args, argName));
       if (petitionIds.length === 0) {
         return true;
       }
@@ -48,7 +49,7 @@ function createPetitionAccessAuthorizer<TRest extends any[] = []>(
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
       try {
-        const accessIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+        const accessIds = unMaybeArray(getArg(args, argName));
         if (accessIds.length === 0) {
           return true;
         }
@@ -70,7 +71,7 @@ export function userHasAccessToPetitions<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const petitionIds = unMaybeArray(getArg(args, argName));
       if (petitionIds.length === 0) {
         return true;
       }
@@ -94,7 +95,7 @@ export function userHasAccessToSignatureRequest<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const signatureRequestIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const signatureRequestIds = unMaybeArray(getArg(args, argName));
       if (signatureRequestIds.length === 0) {
         return true;
       }
@@ -139,7 +140,7 @@ export function fieldIsNotFixed<
 >(argNameFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const field = await ctx.petitions.loadField(args[argNameFieldId] as unknown as number);
+      const field = await ctx.petitions.loadField(getArg(args, argNameFieldId));
       return !field!.is_fixed;
     } catch {}
     return false;
@@ -151,24 +152,12 @@ export function fieldsBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
->(
-  argNamePetitionId: TArg1,
-  argNameFieldIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameFieldIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const fieldIds = unique(
-        unMaybeArray(
-          (typeof argNameFieldIds === "function"
-            ? (argNameFieldIds as any)(args)
-            : (args as any)[argNameFieldIds]) as MaybeArray<number>,
-        ),
-      );
+      const fieldIds = unique(unMaybeArray(getArg(args, argNameFieldIds)));
 
-      return await ctx.petitions.fieldsBelongToPetition(
-        args[argNamePetitionId] as unknown as number,
-        fieldIds,
-      );
+      return await ctx.petitions.fieldsBelongToPetition(getArg(args, argNamePetitionId), fieldIds);
     } catch {}
     return false;
   };
@@ -181,7 +170,7 @@ export function fieldsHaveCommentsEnabled<
 >(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>);
+      const ids = unMaybeArray(getArg(args, argNameFieldIds));
       return await ctx.petitions.fieldsHaveCommentsEnabled(ids);
     } catch {}
     return false;
@@ -195,7 +184,7 @@ export function fieldsAreNotInternal<
 >(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>);
+      const ids = unMaybeArray(getArg(args, argNameFieldIds));
       return await ctx.petitions.fieldsAreNotInternal(ids);
     } catch {}
     return false;
@@ -205,20 +194,19 @@ export function fieldsAreNotInternal<
 export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<{ id: number; parentReplyId?: number | null }>>,
   TOverwrite extends Arg<TypeName, FieldName, boolean | null | undefined>,
 >(
-  fieldsArg: (
-    args: core.ArgsValue<TypeName, FieldName>,
-  ) => MaybeArray<{ id: number; parentReplyId?: number | null }>,
+  fieldsArg: TArg,
   overWriteArg?: TOverwrite | boolean,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const _fields = unMaybeArray(fieldsArg(args));
+    const _fields = unMaybeArray(getArg(args, fieldsArg));
 
     const overwriteExisting = isNonNullish(overWriteArg)
-      ? ((typeof overWriteArg === "boolean"
-          ? overWriteArg
-          : (args as any)[overWriteArg]) as boolean)
+      ? typeof overWriteArg === "boolean"
+        ? overWriteArg
+        : (getArg(args, overWriteArg) ?? false)
       : false;
 
     if (!(await ctx.petitions.fieldsCanBeReplied(_fields, overwriteExisting))) {
@@ -237,17 +225,11 @@ export function fieldHasType<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  argFieldId: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+  argFieldId: TArg,
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unique(
-      unMaybeArray(
-        (typeof argFieldId === "function"
-          ? (argFieldId as any)(args)
-          : (args as any)[argFieldId]) as MaybeArray<number>,
-      ),
-    );
+    const fieldIds = unique(unMaybeArray(getArg(args, argFieldId)));
 
     const validFieldTypes = unMaybeArray(fieldType);
     if (!(await ctx.petitions.fieldHasType(fieldIds, validFieldTypes))) {
@@ -270,7 +252,7 @@ export function fieldTypeSwitch<
   map: Partial<Record<PetitionFieldType, FieldAuthorizeResolver<TypeName, FieldName>>>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    const fieldId = args[argFieldId] as number;
+    const fieldId = getArg(args, argFieldId);
     const field = (await ctx.petitions.loadField(fieldId))!;
     const resolver = map[field.type];
     if (!resolver) {
@@ -286,17 +268,11 @@ export function replyIsForFieldOfType<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  argReplyId: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+  argReplyId: TArg,
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = unique(
-      unMaybeArray(
-        (typeof argReplyId === "function"
-          ? (argReplyId as any)(args)
-          : (args as any)[argReplyId]) as MaybeArray<number>,
-      ),
-    );
+    const replyIds = unique(unMaybeArray(getArg(args, argReplyId)));
 
     const validFieldTypes = unMaybeArray(fieldType);
     if (!(await ctx.petitions.replyIsForFieldOfType(replyIds, validFieldTypes))) {
@@ -323,9 +299,9 @@ export function isValidPetitionAttachmentReorder<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionId = args[petitionIdArg] as unknown as number;
-      const type = args[attachmentTypeArg] as unknown as PetitionAttachmentType;
-      const attachmentIds = args[attachmentIdsArg] as unknown as number[];
+      const petitionId = getArg(args, petitionIdArg);
+      const type = getArg(args, attachmentTypeArg);
+      const attachmentIds = getArg(args, attachmentIdsArg);
 
       const attachments = (
         await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId)
@@ -350,8 +326,8 @@ export function fieldAttachmentBelongsToField<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldAttachmentBelongsToField(
-        args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>),
+        getArg(args, argNameFieldId),
+        unMaybeArray(getArg(args, argNameAttachmentId)),
       );
     } catch {}
     return false;
@@ -370,8 +346,8 @@ export function petitionAttachmentBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.petitionAttachmentBelongsToPetition(
-        args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>),
+        getArg(args, argNamePetitionId),
+        unMaybeArray(getArg(args, argNameAttachmentId)),
       );
     } catch {}
     return false;
@@ -383,20 +359,11 @@ export function repliesBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
->(
-  argNamePetitionId: TArg1,
-  argNameReplyIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionId = args[argNamePetitionId] as unknown as number;
-      const replyIds = unique(
-        unMaybeArray(
-          (typeof argNameReplyIds === "function"
-            ? (argNameReplyIds as any)(args)
-            : (args as any)[argNameReplyIds]) as MaybeArray<number>,
-        ),
-      );
+      const petitionId = getArg(args, argNamePetitionId);
+      const replyIds = unique(unMaybeArray(getArg(args, argNameReplyIds)));
 
       if (replyIds.length === 0) {
         return true;
@@ -417,8 +384,8 @@ export function repliesBelongsToField<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToField(
-        args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>),
+        getArg(args, argNameFieldId),
+        unMaybeArray(getArg(args, argNameReplyIds)),
       );
     } catch {}
     return false;
@@ -432,7 +399,7 @@ export function replyStatusCanBeUpdated<
 >(argNameFieldId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const field = (await ctx.petitions.loadField(args[argNameFieldId] as unknown as number))!;
+      const field = (await ctx.petitions.loadField(getArg(args, argNameFieldId)))!;
       return field.require_approval;
     } catch {
       return false;
@@ -449,8 +416,8 @@ export function accessesBelongToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToPetition(
-        args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>),
+        getArg(args, argNamePetitionId),
+        unMaybeArray(getArg(args, argNameAccessIds)),
       );
     } catch {}
     return false;
@@ -467,7 +434,7 @@ export function accessesHaveRemindersLeft<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameAccessIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const ids = unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>);
+    const ids = unMaybeArray(getArg(args, argNameAccessIds));
     if (ids.length === 0) {
       return true;
     }
@@ -494,10 +461,9 @@ export function messageBelongToPetition<
 >(argNamePetitionId: TArg1, argNameMessageId: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.messagesBelongToPetition(
-        args[argNamePetitionId] as unknown as number,
-        [args[argNameMessageId] as unknown as number],
-      );
+      return await ctx.petitions.messagesBelongToPetition(getArg(args, argNamePetitionId), [
+        getArg(args, argNameMessageId),
+      ]);
     } catch {}
     return false;
   };
@@ -512,8 +478,8 @@ export function commentsBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
-        args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameCommentIds] as unknown as MaybeArray<number>),
+        getArg(args, argNamePetitionId),
+        unMaybeArray(getArg(args, argNameCommentIds)),
       );
     } catch {}
     return false;
@@ -528,7 +494,7 @@ export function accessesBelongToValidContacts<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToValidContacts(
-        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>),
+        unMaybeArray(getArg(args, argNameAccessIds)),
       );
     } catch {}
     return false;
@@ -561,7 +527,7 @@ export function petitionHasRepliableFields<
 >(argNamePetitionId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionId = args[argNamePetitionId] as unknown as number;
+      const petitionId = getArg(args, argNamePetitionId);
       const fields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
 
       const [rootFields, childrenFields] = partition(
@@ -599,7 +565,7 @@ export function templateDoesNotHavePublicPetitionLink<
   return async (_, args, ctx) => {
     try {
       const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(
-        args[argName] as unknown as number,
+        getArg(args, argName),
       );
       return publicLinks.length === 0;
     } catch {}
@@ -628,18 +594,10 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
 export function replyCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
->(
-  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argReplyId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = unique(
-      unMaybeArray(
-        (typeof argReplyId === "function"
-          ? (argReplyId as any)(args)
-          : (args as any)[argReplyId]) as MaybeArray<number>,
-      ),
-    );
+    const replyIds = unique(unMaybeArray(getArg(args, argReplyId)));
 
     const result = await ctx.petitions.repliesCanBeUpdated(replyIds);
 
@@ -665,7 +623,7 @@ export function replyCanBeDeleted<
   TArg extends Arg<TypeName, FieldName, number>,
 >(argReplyId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyId = args[argReplyId] as unknown as number;
+    const replyId = getArg(args, argReplyId);
 
     const result = await ctx.petitions.replyCanBeDeleted(replyId);
     if (result === "REPLY_ALREADY_DELETED") {
@@ -693,7 +651,7 @@ export function petitionCanUploadCustomSignatureDocument<
   TPetitionIdArg extends Arg<TypeName, FieldName, number>,
 >(petitionIdArg: TPetitionIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petition = await ctx.petitions.loadPetition(args[petitionIdArg] as unknown as number);
+    const petition = await ctx.petitions.loadPetition(getArg(args, petitionIdArg));
 
     if (!petition?.signature_config) {
       throw new ApolloError(
@@ -720,7 +678,7 @@ export function signatureRequestIsNotAnonymized<
 >(argSignatureRequestId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(
-      args[argSignatureRequestId] as unknown as number,
+      getArg(args, argSignatureRequestId),
     );
     return signature?.anonymized_at === null;
   };
@@ -756,7 +714,7 @@ export function userHasPermissionInFolders<
   return async (_, args, ctx) => {
     try {
       const paths = fromGlobalIds(
-        unMaybeArray(args[folderIdsArg] as unknown as MaybeArray<string>),
+        unMaybeArray(getArg(args, folderIdsArg)),
         "PetitionFolder",
         true,
       ).ids;
@@ -767,7 +725,7 @@ export function userHasPermissionInFolders<
       return await ctx.petitions.userHasPermissionInFolders(
         ctx.user!.id,
         ctx.user!.org_id,
-        (args[typeArg] as unknown) === "TEMPLATE",
+        getArg(args, typeArg) === "TEMPLATE",
         paths,
         permissionTypes,
       );
@@ -784,11 +742,11 @@ export function petitionsAreInPath<
 >(argIds: TArgIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argIds] as unknown as number | number[]);
+      const petitionIds = unMaybeArray(getArg(args, argIds));
       if (petitionIds.length === 0) {
         return true;
       }
-      const path = args[argPath] as unknown as string;
+      const path = getArg(args, argPath);
       const petitions = await ctx.petitions.loadPetition(petitionIds);
       return petitions.every((p) => isNonNullish(p) && p.path === path);
     } catch {}
@@ -804,12 +762,12 @@ export function foldersAreInPath<
 >(argFolderIds: TArgFolderIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const folderIds = unMaybeArray(args[argFolderIds] as unknown as string | string[]);
+      const folderIds = unMaybeArray(getArg(args, argFolderIds));
       if (folderIds.length === 0) {
         return true;
       }
       const paths = fromGlobalIds(folderIds, "PetitionFolder", true).ids;
-      const path = args[argPath] as unknown as string;
+      const path = getArg(args, argPath);
       return paths.every((p) => p.startsWith(path) && /^\/[^/]+\/$/.test(p.replace(path, "/")));
     } catch {}
     return false;
@@ -823,7 +781,7 @@ export function userHasAccessToPetitionFieldComment<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const commentIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      const commentIds = unMaybeArray(getArg(args, argName));
       if (commentIds.length === 0) {
         return true;
       }
@@ -839,7 +797,7 @@ export function userIsOwnerOfPetitionFieldComment<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(commentIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const commentIds = unMaybeArray(args[commentIdArg] as unknown as MaybeArray<number>);
+    const commentIds = unMaybeArray(getArg(args, commentIdArg));
     const comments = await ctx.petitions.loadPetitionFieldComment(commentIds);
     if (comments.some((c) => !c || c.user_id !== ctx.user!.id)) {
       return false;
@@ -855,7 +813,7 @@ export function defaultOnBehalfUserBelongsToContextOrganization<
   TArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdatePetitionInput"]>,
 >(dataArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const data = args[dataArg] as unknown as NexusGenInputs["UpdatePetitionInput"];
+    const data = getArg(args, dataArg);
     const defaultOnBehalfUserId = data.defaultOnBehalfId;
     if (isNullish(defaultOnBehalfUserId)) {
       return true;
@@ -872,7 +830,7 @@ export function contextUserCanClonePetitions<
   TArg extends Arg<TypeName, FieldName, number[]>,
 >(petitionIdsArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionIds = args[petitionIdsArg] as unknown as number[];
+    const petitionIds = getArg(args, petitionIdsArg);
 
     const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
     const petitions = await ctx.petitions.loadPetition(petitionIds);
@@ -895,10 +853,8 @@ export function fieldHasParent<
   parentFieldIdArg?: TArgParent,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const parentFieldId = parentFieldIdArg ? (args[parentFieldIdArg] as unknown as number) : null;
-    const childrenFieldIds = unMaybeArray(
-      args[childrenFieldIdsArg] as unknown as MaybeArray<number>,
-    );
+    const parentFieldId = parentFieldIdArg ? getArg(args, parentFieldIdArg) : null;
+    const childrenFieldIds = unMaybeArray(getArg(args, childrenFieldIdsArg));
 
     if (parentFieldId) {
       const isFieldGroupField = await ctx.petitions.fieldHasType([parentFieldId], ["FIELD_GROUP"]);
@@ -920,7 +876,7 @@ export function parentFieldIsInternal<
   TArgChildFieldId extends Arg<TypeName, FieldName, number>,
 >(childFieldIdArg: TArgChildFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const childId = args[childFieldIdArg] as unknown as number;
+    const childId = getArg(args, childFieldIdArg);
     const field = await ctx.petitions.loadField(childId);
     const parent = await ctx.petitions.loadField(field!.parent_petition_field_id!);
 
@@ -934,7 +890,7 @@ export function fieldIsNotFirstChild<
   TArgChild extends Arg<TypeName, FieldName, number>,
 >(childFieldIdArg: TArgChild): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const childFieldId = args[childFieldIdArg] as unknown as number;
+    const childFieldId = getArg(args, childFieldIdArg);
 
     const field = (await ctx.petitions.loadField(childFieldId))!;
 
@@ -951,7 +907,7 @@ export function firstChildHasType<
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldId = args[argFieldId] as unknown as number;
+    const fieldId = getArg(args, argFieldId);
     const [firstChild] = await ctx.petitions.loadPetitionFieldChildren(fieldId);
     const validFieldTypes = unMaybeArray(fieldType);
 
@@ -969,8 +925,8 @@ export function fieldIsNotBeingReferencedByAnotherFieldLogic<
   fieldIdArg: TArgFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = args[petitionIdArg] as unknown as number;
-    const ids = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+    const petitionId = getArg(args, petitionIdArg);
+    const ids = unMaybeArray(getArg(args, fieldIdArg));
 
     const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
     const targetFields = petitionFields.filter((f) => ids.includes(f.id));
@@ -1021,13 +977,11 @@ export function fieldAliasIsAvailable<
   TypeName extends string,
   FieldName extends string,
   TPetitionIdArg extends Arg<TypeName, FieldName, number>,
->(
-  petitionIdArg: TPetitionIdArg,
-  aliasProp: (args: core.ArgsValue<TypeName, FieldName>) => string,
-): FieldAuthorizeResolver<TypeName, FieldName> {
+  TAliasArg extends Arg<TypeName, FieldName, string>,
+>(petitionIdArg: TPetitionIdArg, aliasArg: TAliasArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = args[petitionIdArg] as unknown as number;
-    const alias = aliasProp(args);
+    const petitionId = getArg(args, petitionIdArg);
+    const alias = getArg(args, aliasArg);
     const [petitionVariables] = await ctx.petitions.getPetitionVariables([petitionId]);
 
     if (petitionVariables.some((v) => v.name === alias)) {
@@ -1048,8 +1002,8 @@ export function fieldCanBeLinkedToProfileType<
   petitionFieldIdArg: TPetitionFieldIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = args[petitionIdArg] as unknown as number;
-    const petitionFieldId = args[petitionFieldIdArg] as unknown as number;
+    const petitionId = getArg(args, petitionIdArg);
+    const petitionFieldId = getArg(args, petitionFieldIdArg);
 
     const children = await ctx.petitions.loadPetitionFieldChildren(petitionFieldId);
 
@@ -1087,8 +1041,8 @@ export function profileTypeFieldCanBeLinkedToFieldGroup<
   profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const parentFieldId = args[parentFieldIdArg] as unknown as number;
-    const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
+    const parentFieldId = getArg(args, parentFieldIdArg);
+    const profileTypeFieldId = getArg(args, profileTypeFieldIdArg);
 
     const parentField = (await ctx.petitions.loadField(parentFieldId))!;
     if (isNullish(parentField.profile_type_id)) {
@@ -1117,7 +1071,7 @@ export function fieldIsLinkedToProfileTypeField<
   TFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(fieldIdArg: TFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
 
     const fields = await ctx.petitions.loadField(fieldIds);
     return fields.every((f) => isNonNullish(f) && f.profile_type_field_id !== null);
@@ -1130,7 +1084,7 @@ export function fieldIsLinkedToProfileType<
   TFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(fieldIdArg: TFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
 
     const fields = await ctx.petitions.loadField(fieldIds);
     return fields.every((f) => isNonNullish(f) && f.profile_type_id !== null);
@@ -1147,9 +1101,7 @@ export function petitionFieldsCanBeAssociated<
   >,
 >(relationshipArg: TRelationshipArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const relationships = args[
-      relationshipArg
-    ] as unknown as NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][];
+    const relationships = getArg(args, relationshipArg);
 
     const relationshipTypes = (
       await ctx.profiles.loadProfileRelationshipType(
@@ -1240,12 +1192,8 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
   relationshipsArg: TRelationshipsArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = args[petitionIdArg] as unknown as number;
-    const relationships = unMaybeArray(
-      args[
-        relationshipsArg
-      ] as unknown as NexusGenInputs["UpdatePetitionFieldGroupRelationshipInput"][],
-    );
+    const petitionId = getArg(args, petitionIdArg);
+    const relationships = unMaybeArray(getArg(args, relationshipsArg));
 
     const fieldGroupRelationshipIds = relationships.map((r) => r.id).filter(isNonNullish);
     if (fieldGroupRelationshipIds.length > 0) {
@@ -1294,13 +1242,11 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
   inputArg: TInputArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = args[profileIdArg] as unknown as number;
-    const templateId = args[templateIdArg] as unknown as number;
-    const templateFieldId = args[templateFieldIdArg] as unknown as number | null | undefined;
+    const profileId = getArg(args, profileIdArg);
+    const templateId = getArg(args, templateIdArg);
+    const templateFieldId = getArg(args, templateFieldIdArg);
 
-    const input = unMaybeArray(
-      args[inputArg] as unknown as NexusGenInputs["CreatePetitionFromProfilePrefillInput"][],
-    );
+    const input = unMaybeArray(getArg(args, inputArg));
 
     if (input.length === 0) {
       // nothing to verify
@@ -1452,6 +1398,27 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       if (!profiles.every((p) => compatibleProfileIds.includes(p.id))) {
         throw new ForbiddenError("profiles in prefill must be compatible with the field");
       }
+    }
+
+    return true;
+  };
+}
+
+export function usersCanBeMentionedInComment<
+  TypeName extends string,
+  FieldName extends string,
+  TArgContent extends Arg<TypeName, FieldName, any>,
+>(argContent: TArgContent): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const mentions = collectMentionsFromSlate(getArg(args, argContent));
+    const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
+    const passes = await ctx.petitions.canBeMentionedInPetitionFieldComment(
+      ctx.user!.org_id,
+      userMentions.map((m) => m.id),
+      userGroupMentions.map((m) => m.id),
+    );
+    if (!passes) {
+      throw new ForbiddenError("Mention not allowed");
     }
 
     return true;
