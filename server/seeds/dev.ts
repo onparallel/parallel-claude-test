@@ -224,7 +224,7 @@ export async function seed(knex: Knex): Promise<any> {
       await knex("petition_list_view").insert(
         users.map((user) => ({
           is_default: false,
-          type: "ALL",
+          view_type: "ALL",
           name: "ALL",
           user_id: user.id,
           position: 0,
@@ -1653,6 +1653,26 @@ export async function seed(knex: Knex): Promise<any> {
           created_by: `User:${ownerId}`,
           updated_by: `User:${ownerId}`,
         })),
+      );
+
+      // profile list views
+      await knex("profile_list_view").insert(
+        users.flatMap((user) =>
+          [individual, legalEntity, contract].map((profileType) => ({
+            profile_type_id: profileType.id,
+            is_default: false,
+            view_type: "ALL",
+            name: "ALL",
+            user_id: user.id,
+            position: 0,
+            data: {
+              sort: null,
+              search: null,
+              columns: null,
+              status: null,
+            },
+          })),
+        ),
       );
     },
     { concurrency: 1 },

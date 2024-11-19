@@ -3,6 +3,7 @@ import { fromZonedTime } from "date-fns-tz";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
 import { isNonNullish, isNullish, pick, sortBy, unique } from "remeda";
+import { assert } from "ts-essentials";
 import {
   ProfileRelationshipTypeDirectionValues,
   ProfileStatusValues,
@@ -13,6 +14,7 @@ import {
 import { mapProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToProfile } from "./authorizers";
 
@@ -237,16 +239,22 @@ export const Profile = objectType({
           ),
         ),
       },
-
       resolve: async (root, args, ctx) => {
-        const filter = args.filter?.filter((f) => f.alias || f.profileTypeFieldId) ?? [];
-
-        const fields =
-          filter.length === 0
-            ? await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(root.profile_type_id)
+        try {
+          assert(
+            isNullish(args.filter) ||
+              args.filter.every((f) => isNonNullish(f.alias) || isNonNullish(f.profileTypeFieldId)),
+          );
+        } catch {
+          throw new ApolloError("Invalid properties filter", "INVALID_PROPERTIES_FILTER");
+        }
+        const fields = isNullish(args.filter)
+          ? await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(root.profile_type_id)
+          : args.filter.length === 0
+            ? []
             : await ctx.profiles.loadProfileTypeFieldsByProfileTypeIdFiltered({
                 profileTypeId: root.profile_type_id,
-                filter,
+                filter: args.filter,
               });
 
         return sortBy(fields, (f) => f.position).map((field) => ({

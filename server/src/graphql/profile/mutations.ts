@@ -236,7 +236,15 @@ export const cloneProfileType = mutationField("cloneProfileType", {
       createData.name_plural = pluralName;
     }
 
-    return await ctx.profiles.cloneProfileType(profileTypeId, createData, `User:${ctx.user!.id}`);
+    const cloned = await ctx.profiles.cloneProfileType(
+      profileTypeId,
+      createData,
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.views.createProfileListViewsByOrgId(ctx.user!.org_id, cloned, `User:${ctx.user!.id}`);
+
+    return cloned;
   },
 });
 
@@ -257,6 +265,11 @@ export const deleteProfileType = mutationField("deleteProfileType", {
       await ctx.profiles.deletePinnedProfileTypes(profileTypeIds, t);
       await ctx.profiles.deleteProfilesByProfileTypeId(profileTypeIds, `User:${ctx.user!.id}`, t);
       await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
+        profileTypeIds,
+        `User:${ctx.user!.id}`,
+        t,
+      );
+      await ctx.views.deleteProfileListViewsByProfileTypeId(
         profileTypeIds,
         `User:${ctx.user!.id}`,
         t,

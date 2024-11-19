@@ -837,6 +837,18 @@ export interface LandingTemplatePagination {
   totalCount: Scalars["Int"]["output"];
 }
 
+export interface ListView {
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  type: ListViewType;
+  user: User;
+}
+
+export type ListViewSortDirection = "ASC" | "DESC";
+
+export type ListViewType = "ALL" | "CUSTOM";
+
 /** If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null. */
 export interface MaybeTask {
   __typename?: "MaybeTask";
@@ -1028,6 +1040,8 @@ export interface Mutation {
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
   /** Adds a field as child of a field group, linked to a property of the parent field profile type */
   createProfileLinkedPetitionField: PetitionField;
+  /** Creates a view with custom filters and ordering on the user's profile list */
+  createProfileListView: ProfileListView;
   /** Associates a profile with one or more relationships. */
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
@@ -1096,6 +1110,8 @@ export interface Mutation {
   /** Permanently deletes the profile */
   deleteProfile: Success;
   deleteProfileFieldFile: Result;
+  /** Deletes a profile list view of the user */
+  deleteProfileListView: User;
   deleteProfileType: Success;
   deleteProfileTypeField: ProfileType;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
@@ -1139,6 +1155,8 @@ export interface Mutation {
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
+  /** Sets the default profile list view of the user. If passing null id, default view will be set (no filters/sorting) */
+  markProfileListViewAsDefault: ProfileListView;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
@@ -1230,6 +1248,8 @@ export interface Mutation {
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
   reorderPetitionListViews: User;
+  /** Changes the ordering of a user's profile list views */
+  reorderProfileListViews: User;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationEmail: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
@@ -1357,6 +1377,8 @@ export interface Mutation {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  /** Updates a profile list view */
+  updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
   /**
@@ -1792,6 +1814,12 @@ export interface MutationcreateProfileLinkedPetitionFieldArgs {
   profileTypeFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateProfileListViewArgs {
+  data: ProfileListViewDataInput;
+  name: Scalars["String"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreateProfileRelationshipArgs {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
@@ -1966,6 +1994,10 @@ export interface MutationdeleteProfileFieldFileArgs {
   profileTypeFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationdeleteProfileListViewArgs {
+  id: Scalars["GID"]["input"];
+}
+
 export interface MutationdeleteProfileTypeArgs {
   profileTypeIds: Array<Scalars["GID"]["input"]>;
 }
@@ -2071,6 +2103,11 @@ export interface MutationloginAsArgs {
 
 export interface MutationmarkPetitionListViewAsDefaultArgs {
   petitionListViewId?: InputMaybe<Scalars["GID"]["input"]>;
+}
+
+export interface MutationmarkProfileListViewAsDefaultArgs {
+  profileListViewId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationmarkSignatureIntegrationAsDefaultArgs {
@@ -2341,6 +2378,11 @@ export interface MutationreorderPetitionAttachmentsArgs {
 
 export interface MutationreorderPetitionListViewsArgs {
   ids: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationreorderProfileListViewsArgs {
+  ids: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationresendVerificationEmailArgs {
@@ -2728,6 +2770,13 @@ export interface MutationupdateProfileEventSubscriptionArgs {
 export interface MutationupdateProfileFieldValueArgs {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileListViewArgs {
+  data?: InputMaybe<ProfileListViewDataInput>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  profileListViewId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateProfileTypeArgs {
@@ -3854,13 +3903,13 @@ export interface PetitionFolder {
   petitionCount: Scalars["Int"]["output"];
 }
 
-export interface PetitionListView {
+export interface PetitionListView extends ListView {
   __typename?: "PetitionListView";
   data: PetitionListViewData;
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
-  type: PetitionListViewType;
+  type: ListViewType;
   user: User;
 }
 
@@ -3933,11 +3982,9 @@ export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
 
 export interface PetitionListViewSort {
   __typename?: "PetitionListViewSort";
-  direction: PetitionListViewSortDirection;
+  direction: ListViewSortDirection;
   field: PetitionListViewSortField;
 }
-
-export type PetitionListViewSortDirection = "ASC" | "DESC";
 
 export type PetitionListViewSortField =
   | "createdAt"
@@ -3947,11 +3994,9 @@ export type PetitionListViewSortField =
   | "sentAt";
 
 export interface PetitionListViewSortInput {
-  direction: PetitionListViewSortDirection;
+  direction: ListViewSortDirection;
   field: PetitionListViewSortField;
 }
-
-export type PetitionListViewType = "ALL" | "CUSTOM";
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";
@@ -4817,6 +4862,46 @@ export interface ProfileFilter {
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
   values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+}
+
+export interface ProfileListView extends ListView {
+  __typename?: "ProfileListView";
+  data: ProfileListViewData;
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  profileType: ProfileType;
+  type: ListViewType;
+  user: User;
+}
+
+export interface ProfileListViewData {
+  __typename?: "ProfileListViewData";
+  columns?: Maybe<Array<Scalars["String"]["output"]>>;
+  search?: Maybe<Scalars["String"]["output"]>;
+  sort?: Maybe<ProfileListViewSort>;
+  status?: Maybe<ProfileStatus>;
+}
+
+export interface ProfileListViewDataInput {
+  /** Each column can refer to a profile property ID, or a built-in column: 'subscribers' or 'createdAt' */
+  columns?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<ProfileListViewSortInput>;
+  status?: InputMaybe<ProfileStatus>;
+}
+
+export interface ProfileListViewSort {
+  __typename?: "ProfileListViewSort";
+  direction: ListViewSortDirection;
+  field: ProfileListViewSortField;
+}
+
+export type ProfileListViewSortField = "createdAt" | "name";
+
+export interface ProfileListViewSortInput {
+  direction: ListViewSortDirection;
+  field: ProfileListViewSortField;
 }
 
 export interface ProfilePagination {
@@ -6411,6 +6496,8 @@ export interface User extends Timestamps {
   /** The pinned profile types of the user menu */
   pinnedProfileTypes: Array<ProfileType>;
   preferredLocale: UserLocale;
+  /** The profile views of the user */
+  profileListViews: Array<ProfileListView>;
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
@@ -6436,6 +6523,11 @@ export interface UsernotificationsArgs {
   before?: InputMaybe<Scalars["DateTime"]["input"]>;
   filter?: InputMaybe<PetitionUserNotificationFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+}
+
+/** A user in the system. */
+export interface UserprofileListViewsArgs {
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface UserAuthenticationToken extends CreatedAt {
@@ -8058,6 +8150,381 @@ export type TaskProgressDialog_publicTaskQuery = {
     output?: any | null;
   };
 };
+
+export type PetitionViewTabs_PetitionListViewDataFragment = {
+  __typename?: "PetitionListViewData";
+  status?: Array<PetitionStatus> | null;
+  signature?: Array<PetitionSignatureStatusFilter> | null;
+  fromTemplateId?: Array<string> | null;
+  search?: string | null;
+  searchIn: PetitionListViewSearchIn;
+  path: string;
+  columns?: Array<PetitionListViewColumn> | null;
+  sharedWith?: {
+    __typename?: "PetitionListViewDataSharedWith";
+    operator: FilterSharedWithLogicalOperator;
+    filters: Array<{
+      __typename?: "PetitionListViewDataSharedWithFilters";
+      value: string;
+      operator: FilterSharedWithOperator;
+    }>;
+  } | null;
+  tagsFilters?: {
+    __typename?: "PetitionListViewDataTags";
+    operator: PetitionTagFilterLogicalOperator;
+    filters: Array<{
+      __typename?: "PetitionListViewDataTagsFilters";
+      value: Array<string>;
+      operator: PetitionTagFilterLineOperator;
+    }>;
+  } | null;
+  sort?: {
+    __typename?: "PetitionListViewSort";
+    field: PetitionListViewSortField;
+    direction: ListViewSortDirection;
+  } | null;
+};
+
+export type PetitionViewTabs_PetitionListViewFragment = {
+  __typename?: "PetitionListView";
+  id: string;
+  name: string;
+  isDefault: boolean;
+  type: ListViewType;
+  data: {
+    __typename?: "PetitionListViewData";
+    status?: Array<PetitionStatus> | null;
+    signature?: Array<PetitionSignatureStatusFilter> | null;
+    fromTemplateId?: Array<string> | null;
+    search?: string | null;
+    searchIn: PetitionListViewSearchIn;
+    path: string;
+    columns?: Array<PetitionListViewColumn> | null;
+    sharedWith?: {
+      __typename?: "PetitionListViewDataSharedWith";
+      operator: FilterSharedWithLogicalOperator;
+      filters: Array<{
+        __typename?: "PetitionListViewDataSharedWithFilters";
+        value: string;
+        operator: FilterSharedWithOperator;
+      }>;
+    } | null;
+    tagsFilters?: {
+      __typename?: "PetitionListViewDataTags";
+      operator: PetitionTagFilterLogicalOperator;
+      filters: Array<{
+        __typename?: "PetitionListViewDataTagsFilters";
+        value: Array<string>;
+        operator: PetitionTagFilterLineOperator;
+      }>;
+    } | null;
+    sort?: {
+      __typename?: "PetitionListViewSort";
+      field: PetitionListViewSortField;
+      direction: ListViewSortDirection;
+    } | null;
+  };
+};
+
+export type PetitionViewTabs_UserFragment = {
+  __typename?: "User";
+  id: string;
+  petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
+};
+
+export type PetitionViewTabs_reorderPetitionListViewsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type PetitionViewTabs_reorderPetitionListViewsMutation = {
+  reorderPetitionListViews: {
+    __typename?: "User";
+    id: string;
+    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
+  };
+};
+
+export type PetitionViewTabs_deletePetitionListViewMutationVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type PetitionViewTabs_deletePetitionListViewMutation = {
+  deletePetitionListView: {
+    __typename?: "User";
+    id: string;
+    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
+  };
+};
+
+export type PetitionViewTabs_createPetitionListViewMutationVariables = Exact<{
+  name: Scalars["String"]["input"];
+  data: PetitionListViewDataInput;
+}>;
+
+export type PetitionViewTabs_createPetitionListViewMutation = {
+  createPetitionListView: {
+    __typename?: "PetitionListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    user: {
+      __typename?: "User";
+      id: string;
+      petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
+    };
+    data: {
+      __typename?: "PetitionListViewData";
+      status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      fromTemplateId?: Array<string> | null;
+      search?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
+      columns?: Array<PetitionListViewColumn> | null;
+      sharedWith?: {
+        __typename?: "PetitionListViewDataSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataSharedWithFilters";
+          value: string;
+          operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
+  };
+};
+
+export type PetitionViewTabs_updatePetitionListViewMutationVariables = Exact<{
+  petitionListViewId: Scalars["GID"]["input"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  data?: InputMaybe<PetitionListViewDataInput>;
+}>;
+
+export type PetitionViewTabs_updatePetitionListViewMutation = {
+  updatePetitionListView: {
+    __typename?: "PetitionListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    user: {
+      __typename?: "User";
+      id: string;
+      petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
+    };
+    data: {
+      __typename?: "PetitionListViewData";
+      status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      fromTemplateId?: Array<string> | null;
+      search?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
+      columns?: Array<PetitionListViewColumn> | null;
+      sharedWith?: {
+        __typename?: "PetitionListViewDataSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataSharedWithFilters";
+          value: string;
+          operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
+  };
+};
+
+export type PetitionViewTabs_markPetitionListViewAsDefaultMutationVariables = Exact<{
+  petitionListViewId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type PetitionViewTabs_markPetitionListViewAsDefaultMutation = {
+  markPetitionListViewAsDefault: {
+    __typename?: "User";
+    id: string;
+    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string; isDefault: boolean }>;
+  };
+};
+
+export type ProfileViewTabs_ProfileListViewDataFragment = {
+  __typename?: "ProfileListViewData";
+  columns?: Array<string> | null;
+  search?: string | null;
+  status?: ProfileStatus | null;
+  sort?: {
+    __typename?: "ProfileListViewSort";
+    field: ProfileListViewSortField;
+    direction: ListViewSortDirection;
+  } | null;
+};
+
+export type ProfileViewTabs_ProfileListViewFragment = {
+  __typename?: "ProfileListView";
+  id: string;
+  name: string;
+  isDefault: boolean;
+  type: ListViewType;
+  data: {
+    __typename?: "ProfileListViewData";
+    columns?: Array<string> | null;
+    search?: string | null;
+    status?: ProfileStatus | null;
+    sort?: {
+      __typename?: "ProfileListViewSort";
+      field: ProfileListViewSortField;
+      direction: ListViewSortDirection;
+    } | null;
+  };
+};
+
+export type ProfileViewTabs_reorderProfileListViewsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type ProfileViewTabs_reorderProfileListViewsMutation = {
+  reorderProfileListViews: {
+    __typename?: "User";
+    id: string;
+    profileListViews: Array<{ __typename?: "ProfileListView"; id: string }>;
+  };
+};
+
+export type ProfileViewTabs_deleteProfileListViewMutationVariables = Exact<{
+  id: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type ProfileViewTabs_deleteProfileListViewMutation = {
+  deleteProfileListView: {
+    __typename?: "User";
+    id: string;
+    profileListViews: Array<{ __typename?: "ProfileListView"; id: string }>;
+  };
+};
+
+export type ProfileViewTabs_createProfileListViewMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  name: Scalars["String"]["input"];
+  data: ProfileListViewDataInput;
+}>;
+
+export type ProfileViewTabs_createProfileListViewMutation = {
+  createProfileListView: {
+    __typename?: "ProfileListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    user: {
+      __typename?: "User";
+      id: string;
+      profileListViews: Array<{ __typename?: "ProfileListView"; id: string }>;
+    };
+    data: {
+      __typename?: "ProfileListViewData";
+      columns?: Array<string> | null;
+      search?: string | null;
+      status?: ProfileStatus | null;
+      sort?: {
+        __typename?: "ProfileListViewSort";
+        field: ProfileListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
+  };
+};
+
+export type ProfileViewTabs_updateProfileListViewMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileListViewId: Scalars["GID"]["input"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  data?: InputMaybe<ProfileListViewDataInput>;
+}>;
+
+export type ProfileViewTabs_updateProfileListViewMutation = {
+  updateProfileListView: {
+    __typename?: "ProfileListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    user: {
+      __typename?: "User";
+      id: string;
+      profileListViews: Array<{ __typename?: "ProfileListView"; id: string }>;
+    };
+    data: {
+      __typename?: "ProfileListViewData";
+      columns?: Array<string> | null;
+      search?: string | null;
+      status?: ProfileStatus | null;
+      sort?: {
+        __typename?: "ProfileListViewSort";
+        field: ProfileListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
+  };
+};
+
+export type ProfileViewTabs_markProfileListViewAsDefaultMutationVariables = Exact<{
+  profileListViewId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type ProfileViewTabs_markProfileListViewAsDefaultMutation = {
+  markProfileListViewAsDefault: { __typename?: "ProfileListView"; id: string; isDefault: boolean };
+};
+
+export type ViewTabs_ListView_PetitionListView_Fragment = {
+  __typename?: "PetitionListView";
+  id: string;
+  name: string;
+  type: ListViewType;
+  isDefault: boolean;
+};
+
+export type ViewTabs_ListView_ProfileListView_Fragment = {
+  __typename?: "ProfileListView";
+  id: string;
+  name: string;
+  type: ListViewType;
+  isDefault: boolean;
+};
+
+export type ViewTabs_ListViewFragment =
+  | ViewTabs_ListView_PetitionListView_Fragment
+  | ViewTabs_ListView_ProfileListView_Fragment;
 
 export type HasFeatureFlagQueryVariables = Exact<{
   featureFlag: FeatureFlag;
@@ -18682,6 +19149,7 @@ export type useEditPetitionFieldCalculationsDialog_PetitionBaseFragment =
 
 export type HiddenFieldDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -18721,6 +19189,7 @@ export type HiddenFieldDialog_PetitionBase_Petition_Fragment = {
 
 export type HiddenFieldDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -18827,6 +19296,7 @@ export type StandardListDetailsDialog_standardListDefinitionQuery = {
 
 export type PetitionFieldLogicContext_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -18864,6 +19334,7 @@ export type PetitionFieldLogicContext_PetitionBase_Petition_Fragment = {
 
 export type PetitionFieldLogicContext_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -18916,6 +19387,7 @@ export type PetitionFieldLogicContext_PetitionFieldFragment = {
 
 export type PetitionFieldMathEditor_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -18955,6 +19427,7 @@ export type PetitionFieldMathEditor_PetitionBase_Petition_Fragment = {
 
 export type PetitionFieldMathEditor_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -19004,6 +19477,7 @@ export type PetitionFieldMathEditor_PetitionFieldFragment = {
 
 export type PetitionFieldVisibilityEditor_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -19043,6 +19517,7 @@ export type PetitionFieldVisibilityEditor_PetitionBase_Petition_Fragment = {
 
 export type PetitionFieldVisibilityEditor_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -19263,7 +19738,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
   id: string;
   name: string;
   isDefault: boolean;
-  type: PetitionListViewType;
+  type: ListViewType;
   data: {
     __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
@@ -19294,7 +19769,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
     sort?: {
       __typename?: "PetitionListViewSort";
       field: PetitionListViewSortField;
-      direction: PetitionListViewSortDirection;
+      direction: ListViewSortDirection;
     } | null;
   };
 };
@@ -19310,7 +19785,7 @@ export type PetitionListHeader_createPetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
-    type: PetitionListViewType;
+    type: ListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -19346,7 +19821,7 @@ export type PetitionListHeader_createPetitionListViewMutation = {
       sort?: {
         __typename?: "PetitionListViewSort";
         field: PetitionListViewSortField;
-        direction: PetitionListViewSortDirection;
+        direction: ListViewSortDirection;
       } | null;
     };
   };
@@ -19364,7 +19839,7 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
     id: string;
     name: string;
     isDefault: boolean;
-    type: PetitionListViewType;
+    type: ListViewType;
     user: {
       __typename?: "User";
       id: string;
@@ -19400,233 +19875,9 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
       sort?: {
         __typename?: "PetitionListViewSort";
         field: PetitionListViewSortField;
-        direction: PetitionListViewSortDirection;
+        direction: ListViewSortDirection;
       } | null;
     };
-  };
-};
-
-export type ViewTabs_PetitionListViewDataFragment = {
-  __typename?: "PetitionListViewData";
-  status?: Array<PetitionStatus> | null;
-  signature?: Array<PetitionSignatureStatusFilter> | null;
-  fromTemplateId?: Array<string> | null;
-  search?: string | null;
-  searchIn: PetitionListViewSearchIn;
-  path: string;
-  columns?: Array<PetitionListViewColumn> | null;
-  sharedWith?: {
-    __typename?: "PetitionListViewDataSharedWith";
-    operator: FilterSharedWithLogicalOperator;
-    filters: Array<{
-      __typename?: "PetitionListViewDataSharedWithFilters";
-      value: string;
-      operator: FilterSharedWithOperator;
-    }>;
-  } | null;
-  tagsFilters?: {
-    __typename?: "PetitionListViewDataTags";
-    operator: PetitionTagFilterLogicalOperator;
-    filters: Array<{
-      __typename?: "PetitionListViewDataTagsFilters";
-      value: Array<string>;
-      operator: PetitionTagFilterLineOperator;
-    }>;
-  } | null;
-  sort?: {
-    __typename?: "PetitionListViewSort";
-    field: PetitionListViewSortField;
-    direction: PetitionListViewSortDirection;
-  } | null;
-};
-
-export type ViewTabs_PetitionListViewFragment = {
-  __typename?: "PetitionListView";
-  id: string;
-  name: string;
-  isDefault: boolean;
-  type: PetitionListViewType;
-  data: {
-    __typename?: "PetitionListViewData";
-    status?: Array<PetitionStatus> | null;
-    signature?: Array<PetitionSignatureStatusFilter> | null;
-    fromTemplateId?: Array<string> | null;
-    search?: string | null;
-    searchIn: PetitionListViewSearchIn;
-    path: string;
-    columns?: Array<PetitionListViewColumn> | null;
-    sharedWith?: {
-      __typename?: "PetitionListViewDataSharedWith";
-      operator: FilterSharedWithLogicalOperator;
-      filters: Array<{
-        __typename?: "PetitionListViewDataSharedWithFilters";
-        value: string;
-        operator: FilterSharedWithOperator;
-      }>;
-    } | null;
-    tagsFilters?: {
-      __typename?: "PetitionListViewDataTags";
-      operator: PetitionTagFilterLogicalOperator;
-      filters: Array<{
-        __typename?: "PetitionListViewDataTagsFilters";
-        value: Array<string>;
-        operator: PetitionTagFilterLineOperator;
-      }>;
-    } | null;
-    sort?: {
-      __typename?: "PetitionListViewSort";
-      field: PetitionListViewSortField;
-      direction: PetitionListViewSortDirection;
-    } | null;
-  };
-};
-
-export type ViewTabs_UserFragment = {
-  __typename?: "User";
-  id: string;
-  petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-};
-
-export type ViewTabs_reorderPetitionListViewsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type ViewTabs_reorderPetitionListViewsMutation = {
-  reorderPetitionListViews: {
-    __typename?: "User";
-    id: string;
-    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-  };
-};
-
-export type ViewTabs_deletePetitionListViewMutationVariables = Exact<{
-  id: Scalars["GID"]["input"];
-}>;
-
-export type ViewTabs_deletePetitionListViewMutation = {
-  deletePetitionListView: {
-    __typename?: "User";
-    id: string;
-    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-  };
-};
-
-export type ViewTabs_createPetitionListViewMutationVariables = Exact<{
-  name: Scalars["String"]["input"];
-  data: PetitionListViewDataInput;
-}>;
-
-export type ViewTabs_createPetitionListViewMutation = {
-  createPetitionListView: {
-    __typename?: "PetitionListView";
-    id: string;
-    name: string;
-    isDefault: boolean;
-    type: PetitionListViewType;
-    user: {
-      __typename?: "User";
-      id: string;
-      petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-    };
-    data: {
-      __typename?: "PetitionListViewData";
-      status?: Array<PetitionStatus> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: Array<string> | null;
-      search?: string | null;
-      searchIn: PetitionListViewSearchIn;
-      path: string;
-      columns?: Array<PetitionListViewColumn> | null;
-      sharedWith?: {
-        __typename?: "PetitionListViewDataSharedWith";
-        operator: FilterSharedWithLogicalOperator;
-        filters: Array<{
-          __typename?: "PetitionListViewDataSharedWithFilters";
-          value: string;
-          operator: FilterSharedWithOperator;
-        }>;
-      } | null;
-      tagsFilters?: {
-        __typename?: "PetitionListViewDataTags";
-        operator: PetitionTagFilterLogicalOperator;
-        filters: Array<{
-          __typename?: "PetitionListViewDataTagsFilters";
-          value: Array<string>;
-          operator: PetitionTagFilterLineOperator;
-        }>;
-      } | null;
-      sort?: {
-        __typename?: "PetitionListViewSort";
-        field: PetitionListViewSortField;
-        direction: PetitionListViewSortDirection;
-      } | null;
-    };
-  };
-};
-
-export type ViewTabs_updatePetitionListViewMutationVariables = Exact<{
-  petitionListViewId: Scalars["GID"]["input"];
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  data?: InputMaybe<PetitionListViewDataInput>;
-}>;
-
-export type ViewTabs_updatePetitionListViewMutation = {
-  updatePetitionListView: {
-    __typename?: "PetitionListView";
-    id: string;
-    name: string;
-    isDefault: boolean;
-    type: PetitionListViewType;
-    user: {
-      __typename?: "User";
-      id: string;
-      petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-    };
-    data: {
-      __typename?: "PetitionListViewData";
-      status?: Array<PetitionStatus> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: Array<string> | null;
-      search?: string | null;
-      searchIn: PetitionListViewSearchIn;
-      path: string;
-      columns?: Array<PetitionListViewColumn> | null;
-      sharedWith?: {
-        __typename?: "PetitionListViewDataSharedWith";
-        operator: FilterSharedWithLogicalOperator;
-        filters: Array<{
-          __typename?: "PetitionListViewDataSharedWithFilters";
-          value: string;
-          operator: FilterSharedWithOperator;
-        }>;
-      } | null;
-      tagsFilters?: {
-        __typename?: "PetitionListViewDataTags";
-        operator: PetitionTagFilterLogicalOperator;
-        filters: Array<{
-          __typename?: "PetitionListViewDataTagsFilters";
-          value: Array<string>;
-          operator: PetitionTagFilterLineOperator;
-        }>;
-      } | null;
-      sort?: {
-        __typename?: "PetitionListViewSort";
-        field: PetitionListViewSortField;
-        direction: PetitionListViewSortDirection;
-      } | null;
-    };
-  };
-};
-
-export type ViewTabs_markPetitionListViewAsDefaultMutationVariables = Exact<{
-  petitionListViewId?: InputMaybe<Scalars["GID"]["input"]>;
-}>;
-
-export type ViewTabs_markPetitionListViewAsDefaultMutation = {
-  markPetitionListViewAsDefault: {
-    __typename?: "User";
-    id: string;
-    petitionListViews: Array<{ __typename?: "PetitionListView"; id: string; isDefault: boolean }>;
   };
 };
 
@@ -50167,7 +50418,7 @@ export type Petitions_UserFragment = {
     id: string;
     name: string;
     isDefault: boolean;
-    type: PetitionListViewType;
+    type: ListViewType;
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
@@ -50198,7 +50449,7 @@ export type Petitions_UserFragment = {
       sort?: {
         __typename?: "PetitionListViewSort";
         field: PetitionListViewSortField;
-        direction: PetitionListViewSortDirection;
+        direction: ListViewSortDirection;
       } | null;
     };
   }>;
@@ -50444,7 +50695,7 @@ export type Petitions_userQuery = {
       id: string;
       name: string;
       isDefault: boolean;
-      type: PetitionListViewType;
+      type: ListViewType;
       data: {
         __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
@@ -50475,7 +50726,7 @@ export type Petitions_userQuery = {
         sort?: {
           __typename?: "PetitionListViewSort";
           field: PetitionListViewSortField;
-          direction: PetitionListViewSortDirection;
+          direction: ListViewSortDirection;
         } | null;
       };
     }>;
@@ -51403,13 +51654,19 @@ export type Profiles_ProfileTypeFragment = {
   isPinned: boolean;
   canCreate: boolean;
   pluralName: { [locale in UserLocale]?: string };
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+  }>;
 };
 
 export type Profiles_ProfileFragment = {
   __typename?: "Profile";
   id: string;
-  localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
+  localizableName: { [locale in UserLocale]?: string };
   createdAt: string;
   profileType: {
     __typename?: "ProfileType";
@@ -51423,43 +51680,34 @@ export type Profiles_ProfileFragment = {
       __typename?: "User";
       id: string;
       fullName?: string | null;
-      email: string;
       avatarUrl?: string | null;
       initials?: string | null;
     };
   }>;
 };
 
-export type Profiles_ProfilePaginationFragment = {
-  __typename?: "ProfilePagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    createdAt: string;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
-    subscribers: Array<{
-      __typename?: "ProfileSubscription";
-      id: string;
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        email: string;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
-    }>;
-  }>;
+export type Profiles_ProfileListViewFragment = {
+  __typename?: "ProfileListView";
+  id: string;
+  name: string;
+  isDefault: boolean;
+  type: ListViewType;
+  data: {
+    __typename?: "ProfileListViewData";
+    columns?: Array<string> | null;
+    search?: string | null;
+    status?: ProfileStatus | null;
+    sort?: {
+      __typename?: "ProfileListViewSort";
+      field: ProfileListViewSortField;
+      direction: ListViewSortDirection;
+    } | null;
+  };
 };
 
-export type Profiles_userQueryVariables = Exact<{ [key: string]: never }>;
+export type Profiles_userQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
 
 export type Profiles_userQuery = {
   me: {
@@ -51479,6 +51727,24 @@ export type Profiles_userQuery = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
+    profileListViews: Array<{
+      __typename?: "ProfileListView";
+      id: string;
+      name: string;
+      isDefault: boolean;
+      type: ListViewType;
+      data: {
+        __typename?: "ProfileListViewData";
+        columns?: Array<string> | null;
+        search?: string | null;
+        status?: ProfileStatus | null;
+        sort?: {
+          __typename?: "ProfileListViewSort";
+          field: ProfileListViewSortField;
+          direction: ListViewSortDirection;
+        } | null;
+      };
+    }>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -51540,6 +51806,12 @@ export type Profiles_profileTypeQuery = {
     isPinned: boolean;
     canCreate: boolean;
     pluralName: { [locale in UserLocale]?: string };
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+    }>;
   };
 };
 
@@ -51549,6 +51821,7 @@ export type Profiles_profilesQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
   filter?: InputMaybe<ProfileFilter>;
+  propertiesFilter?: InputMaybe<Array<ProfileFieldPropertyFilter> | ProfileFieldPropertyFilter>;
 }>;
 
 export type Profiles_profilesQuery = {
@@ -51558,9 +51831,27 @@ export type Profiles_profilesQuery = {
     items: Array<{
       __typename?: "Profile";
       id: string;
-      localizableName: { [locale in UserLocale]?: string };
       status: ProfileStatus;
+      localizableName: { [locale in UserLocale]?: string };
       createdAt: string;
+      properties: Array<{
+        __typename?: "ProfileFieldProperty";
+        field: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          type: ProfileTypeFieldType;
+          options: { [key: string]: any };
+        };
+        files?: Array<{
+          __typename?: "ProfileFieldFile";
+          id?: string;
+          file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+        }> | null;
+        value?: {
+          __typename?: "ProfileFieldValue";
+          content?: { [key: string]: any } | null;
+        } | null;
+      }>;
       profileType: {
         __typename?: "ProfileType";
         id: string;
@@ -51573,12 +51864,71 @@ export type Profiles_profilesQuery = {
           __typename?: "User";
           id: string;
           fullName?: string | null;
-          email: string;
           avatarUrl?: string | null;
           initials?: string | null;
         };
       }>;
     }>;
+  };
+};
+
+export type Profiles_createProfileListViewMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  name: Scalars["String"]["input"];
+  data: ProfileListViewDataInput;
+}>;
+
+export type Profiles_createProfileListViewMutation = {
+  createProfileListView: {
+    __typename?: "ProfileListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    user: {
+      __typename?: "User";
+      id: string;
+      profileListViews: Array<{ __typename?: "ProfileListView"; id: string }>;
+    };
+    data: {
+      __typename?: "ProfileListViewData";
+      columns?: Array<string> | null;
+      search?: string | null;
+      status?: ProfileStatus | null;
+      sort?: {
+        __typename?: "ProfileListViewSort";
+        field: ProfileListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
+  };
+};
+
+export type Profiles_updateProfileListViewMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileListViewId: Scalars["GID"]["input"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  data?: InputMaybe<ProfileListViewDataInput>;
+}>;
+
+export type Profiles_updateProfileListViewMutation = {
+  updateProfileListView: {
+    __typename?: "ProfileListView";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    type: ListViewType;
+    data: {
+      __typename?: "ProfileListViewData";
+      columns?: Array<string> | null;
+      search?: string | null;
+      status?: ProfileStatus | null;
+      sort?: {
+        __typename?: "ProfileListViewSort";
+        field: ProfileListViewSortField;
+        direction: ListViewSortDirection;
+      } | null;
+    };
   };
 };
 
@@ -57132,6 +57482,86 @@ export type usePinProfileType_pinProfileTypeMutation = {
   pinProfileType: { __typename?: "ProfileType"; id: string; isPinned: boolean };
 };
 
+export type useProfileTableColumns_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+  }>;
+};
+
+export type useProfileTableColumns_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  createdAt: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
+};
+
+export type useProfileTableColumns_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+  };
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id?: string;
+    file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+  }> | null;
+  value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+};
+
+export type useProfileTableColumns_ProfileWithPropertiesFragment = {
+  __typename?: "Profile";
+  id: string;
+  createdAt: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      options: { [key: string]: any };
+    };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id?: string;
+      file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+    }> | null;
+    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+  }>;
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
+};
+
 export type useSearchContacts_contactsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   exclude?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
@@ -58173,20 +58603,6 @@ export const PetitionSelect_PetitionBaseFragmentDoc = gql`
   }
   ${PetitionSelectOption_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionSelect_PetitionBaseFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
-    content
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
-    id @include(if: true)
-    file {
-      filename
-      contentType
-    }
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
 export const ProfileTypeSelect_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeSelect_ProfileType on ProfileType {
     id
@@ -58241,6 +58657,14 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
+export const PetitionViewTabs_UserFragmentDoc = gql`
+  fragment PetitionViewTabs_User on User {
+    id
+    petitionListViews {
+      id
+    }
+  }
+` as unknown as DocumentNode<PetitionViewTabs_UserFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
     ...SidebarLayout_Query
@@ -59660,6 +60084,7 @@ export const useAllFieldsWithIndices_PetitionBaseFragmentDoc = gql`
 ` as unknown as DocumentNode<useAllFieldsWithIndices_PetitionBaseFragment, unknown>;
 export const PetitionFieldLogicContext_PetitionBaseFragmentDoc = gql`
   fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
+    id
     fields {
       ...PetitionFieldLogicContext_PetitionField
       parent {
@@ -59744,14 +60169,6 @@ export const ImportOptionsSettingsRow_PetitionFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<ImportOptionsSettingsRow_PetitionFieldFragment, unknown>;
-export const ViewTabs_UserFragmentDoc = gql`
-  fragment ViewTabs_User on User {
-    id
-    petitionListViews {
-      id
-    }
-  }
-` as unknown as DocumentNode<ViewTabs_UserFragment, unknown>;
 export const PetitionListTagFilter_TagFragmentDoc = gql`
   fragment PetitionListTagFilter_Tag on Tag {
     id
@@ -65547,8 +65964,8 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${useFieldLogic_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
-export const ViewTabs_PetitionListViewDataFragmentDoc = gql`
-  fragment ViewTabs_PetitionListViewData on PetitionListViewData {
+export const PetitionViewTabs_PetitionListViewDataFragmentDoc = gql`
+  fragment PetitionViewTabs_PetitionListViewData on PetitionListViewData {
     status
     sharedWith {
       operator
@@ -65575,19 +65992,29 @@ export const ViewTabs_PetitionListViewDataFragmentDoc = gql`
     }
     columns
   }
-` as unknown as DocumentNode<ViewTabs_PetitionListViewDataFragment, unknown>;
-export const ViewTabs_PetitionListViewFragmentDoc = gql`
-  fragment ViewTabs_PetitionListView on PetitionListView {
+` as unknown as DocumentNode<PetitionViewTabs_PetitionListViewDataFragment, unknown>;
+export const ViewTabs_ListViewFragmentDoc = gql`
+  fragment ViewTabs_ListView on ListView {
     id
     name
-    data {
-      ...ViewTabs_PetitionListViewData
-    }
+    type
+    isDefault
+  }
+` as unknown as DocumentNode<ViewTabs_ListViewFragment, unknown>;
+export const PetitionViewTabs_PetitionListViewFragmentDoc = gql`
+  fragment PetitionViewTabs_PetitionListView on PetitionListView {
+    id
+    name
     isDefault
     type
+    data {
+      ...PetitionViewTabs_PetitionListViewData
+    }
+    ...ViewTabs_ListView
   }
-  ${ViewTabs_PetitionListViewDataFragmentDoc}
-` as unknown as DocumentNode<ViewTabs_PetitionListViewFragment, unknown>;
+  ${PetitionViewTabs_PetitionListViewDataFragmentDoc}
+  ${ViewTabs_ListViewFragmentDoc}
+` as unknown as DocumentNode<PetitionViewTabs_PetitionListViewFragment, unknown>;
 export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
   fragment PetitionListHeader_PetitionListView on PetitionListView {
     id
@@ -65627,11 +66054,11 @@ export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
     id
     petitionListViews {
-      ...ViewTabs_PetitionListView
+      ...PetitionViewTabs_PetitionListView
       ...PetitionListHeader_PetitionListView
     }
   }
-  ${ViewTabs_PetitionListViewFragmentDoc}
+  ${PetitionViewTabs_PetitionListViewFragmentDoc}
   ${PetitionListHeader_PetitionListViewFragmentDoc}
 ` as unknown as DocumentNode<Petitions_UserFragment, unknown>;
 export const useDeletePetitions_PetitionFolderFragmentDoc = gql`
@@ -65821,6 +66248,16 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const useProfileTableColumns_ProfileTypeFragmentDoc = gql`
+  fragment useProfileTableColumns_ProfileType on ProfileType {
+    id
+    fields {
+      id
+      name
+      position
+    }
+  }
+` as unknown as DocumentNode<useProfileTableColumns_ProfileTypeFragment, unknown>;
 export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
     id
@@ -65829,42 +66266,82 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
     isPinned
     canCreate
     ...ProfileTypeReference_ProfileType
+    ...useProfileTableColumns_ProfileType
   }
   ${ProfileTypeReference_ProfileTypeFragmentDoc}
+  ${useProfileTableColumns_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<Profiles_ProfileTypeFragment, unknown>;
+export const useProfileTableColumns_ProfileFragmentDoc = gql`
+  fragment useProfileTableColumns_Profile on Profile {
+    id
+    createdAt
+    subscribers {
+      id
+      user {
+        id
+        ...UserAvatarList_User
+      }
+    }
+    ...ProfileReference_Profile
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<useProfileTableColumns_ProfileFragment, unknown>;
 export const Profiles_ProfileFragmentDoc = gql`
   fragment Profiles_Profile on Profile {
     id
-    localizableName
     status
     ...ProfileReference_Profile
     profileType {
       id
       name
     }
-    subscribers {
-      id
-      user {
-        id
-        ...UserAvatarList_User
-        ...useProfileSubscribersDialog_User
-      }
-    }
-    createdAt
+    ...useProfileTableColumns_Profile
   }
   ${ProfileReference_ProfileFragmentDoc}
-  ${UserAvatarList_UserFragmentDoc}
-  ${useProfileSubscribersDialog_UserFragmentDoc}
+  ${useProfileTableColumns_ProfileFragmentDoc}
 ` as unknown as DocumentNode<Profiles_ProfileFragment, unknown>;
-export const Profiles_ProfilePaginationFragmentDoc = gql`
-  fragment Profiles_ProfilePagination on ProfilePagination {
-    items {
-      ...Profiles_Profile
+export const ProfileViewTabs_ProfileListViewDataFragmentDoc = gql`
+  fragment ProfileViewTabs_ProfileListViewData on ProfileListViewData {
+    sort {
+      field
+      direction
     }
-    totalCount
+    columns
+    search
+    status
   }
-  ${Profiles_ProfileFragmentDoc}
-` as unknown as DocumentNode<Profiles_ProfilePaginationFragment, unknown>;
+` as unknown as DocumentNode<ProfileViewTabs_ProfileListViewDataFragment, unknown>;
+export const ProfileViewTabs_ProfileListViewFragmentDoc = gql`
+  fragment ProfileViewTabs_ProfileListView on ProfileListView {
+    id
+    name
+    isDefault
+    type
+    data {
+      ...ProfileViewTabs_ProfileListViewData
+    }
+    ...ViewTabs_ListView
+  }
+  ${ProfileViewTabs_ProfileListViewDataFragmentDoc}
+  ${ViewTabs_ListViewFragmentDoc}
+` as unknown as DocumentNode<ProfileViewTabs_ProfileListViewFragment, unknown>;
+export const Profiles_ProfileListViewFragmentDoc = gql`
+  fragment Profiles_ProfileListView on ProfileListView {
+    id
+    ...ProfileViewTabs_ProfileListView
+    data {
+      columns
+      search
+      sort {
+        field
+        direction
+      }
+      status
+    }
+  }
+  ${ProfileViewTabs_ProfileListViewFragmentDoc}
+` as unknown as DocumentNode<Profiles_ProfileListViewFragment, unknown>;
 export const Overview_PetitionTemplateFragmentDoc = gql`
   fragment Overview_PetitionTemplate on PetitionTemplate {
     id
@@ -67246,6 +67723,46 @@ export const usePinProfileType_UserFragmentDoc = gql`
   }
   ${usePinProfileType_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<usePinProfileType_UserFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
+    id @include(if: true)
+    file {
+      filename
+      contentType
+    }
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+    content
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
+export const useProfileTableColumns_ProfileFieldPropertyFragmentDoc = gql`
+  fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfilePropertyContent_ProfileTypeField
+    }
+    files {
+      ...ProfilePropertyContent_ProfileFieldFile
+    }
+    value {
+      ...ProfilePropertyContent_ProfileFieldValue
+    }
+  }
+  ${ProfilePropertyContent_ProfileTypeFieldFragmentDoc}
+  ${ProfilePropertyContent_ProfileFieldFileFragmentDoc}
+  ${ProfilePropertyContent_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<useProfileTableColumns_ProfileFieldPropertyFragment, unknown>;
+export const useProfileTableColumns_ProfileWithPropertiesFragmentDoc = gql`
+  fragment useProfileTableColumns_ProfileWithProperties on Profile {
+    ...useProfileTableColumns_Profile
+    properties {
+      ...useProfileTableColumns_ProfileFieldProperty
+    }
+  }
+  ${useProfileTableColumns_ProfileFragmentDoc}
+  ${useProfileTableColumns_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<useProfileTableColumns_ProfileWithPropertiesFragment, unknown>;
 export const useUnpinProfileType_ProfileTypeFragmentDoc = gql`
   fragment useUnpinProfileType_ProfileType on ProfileType {
     id
@@ -67502,6 +68019,180 @@ export const TaskProgressDialog_publicTaskDocument = gql`
 ` as unknown as DocumentNode<
   TaskProgressDialog_publicTaskQuery,
   TaskProgressDialog_publicTaskQueryVariables
+>;
+export const PetitionViewTabs_reorderPetitionListViewsDocument = gql`
+  mutation PetitionViewTabs_reorderPetitionListViews($ids: [GID!]!) {
+    reorderPetitionListViews(ids: $ids) {
+      id
+      petitionListViews {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionViewTabs_reorderPetitionListViewsMutation,
+  PetitionViewTabs_reorderPetitionListViewsMutationVariables
+>;
+export const PetitionViewTabs_deletePetitionListViewDocument = gql`
+  mutation PetitionViewTabs_deletePetitionListView($id: GID!) {
+    deletePetitionListView(id: $id) {
+      id
+      petitionListViews {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionViewTabs_deletePetitionListViewMutation,
+  PetitionViewTabs_deletePetitionListViewMutationVariables
+>;
+export const PetitionViewTabs_createPetitionListViewDocument = gql`
+  mutation PetitionViewTabs_createPetitionListView(
+    $name: String!
+    $data: PetitionListViewDataInput!
+  ) {
+    createPetitionListView(name: $name, data: $data) {
+      ...PetitionViewTabs_PetitionListView
+      user {
+        id
+        petitionListViews {
+          id
+        }
+      }
+    }
+  }
+  ${PetitionViewTabs_PetitionListViewFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionViewTabs_createPetitionListViewMutation,
+  PetitionViewTabs_createPetitionListViewMutationVariables
+>;
+export const PetitionViewTabs_updatePetitionListViewDocument = gql`
+  mutation PetitionViewTabs_updatePetitionListView(
+    $petitionListViewId: GID!
+    $name: String
+    $data: PetitionListViewDataInput
+  ) {
+    updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
+      ...PetitionViewTabs_PetitionListView
+      user {
+        id
+        petitionListViews {
+          id
+        }
+      }
+    }
+  }
+  ${PetitionViewTabs_PetitionListViewFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionViewTabs_updatePetitionListViewMutation,
+  PetitionViewTabs_updatePetitionListViewMutationVariables
+>;
+export const PetitionViewTabs_markPetitionListViewAsDefaultDocument = gql`
+  mutation PetitionViewTabs_markPetitionListViewAsDefault($petitionListViewId: GID) {
+    markPetitionListViewAsDefault(petitionListViewId: $petitionListViewId) {
+      id
+      petitionListViews {
+        id
+        isDefault
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionViewTabs_markPetitionListViewAsDefaultMutation,
+  PetitionViewTabs_markPetitionListViewAsDefaultMutationVariables
+>;
+export const ProfileViewTabs_reorderProfileListViewsDocument = gql`
+  mutation ProfileViewTabs_reorderProfileListViews($ids: [GID!]!, $profileTypeId: GID!) {
+    reorderProfileListViews(ids: $ids, profileTypeId: $profileTypeId) {
+      id
+      profileListViews(profileTypeId: $profileTypeId) {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileViewTabs_reorderProfileListViewsMutation,
+  ProfileViewTabs_reorderProfileListViewsMutationVariables
+>;
+export const ProfileViewTabs_deleteProfileListViewDocument = gql`
+  mutation ProfileViewTabs_deleteProfileListView($id: GID!, $profileTypeId: GID!) {
+    deleteProfileListView(id: $id) {
+      id
+      profileListViews(profileTypeId: $profileTypeId) {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileViewTabs_deleteProfileListViewMutation,
+  ProfileViewTabs_deleteProfileListViewMutationVariables
+>;
+export const ProfileViewTabs_createProfileListViewDocument = gql`
+  mutation ProfileViewTabs_createProfileListView(
+    $profileTypeId: GID!
+    $name: String!
+    $data: ProfileListViewDataInput!
+  ) {
+    createProfileListView(profileTypeId: $profileTypeId, name: $name, data: $data) {
+      id
+      ...ProfileViewTabs_ProfileListView
+      user {
+        id
+        profileListViews(profileTypeId: $profileTypeId) {
+          id
+        }
+      }
+    }
+  }
+  ${ProfileViewTabs_ProfileListViewFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileViewTabs_createProfileListViewMutation,
+  ProfileViewTabs_createProfileListViewMutationVariables
+>;
+export const ProfileViewTabs_updateProfileListViewDocument = gql`
+  mutation ProfileViewTabs_updateProfileListView(
+    $profileTypeId: GID!
+    $profileListViewId: GID!
+    $name: String
+    $data: ProfileListViewDataInput
+  ) {
+    updateProfileListView(
+      profileTypeId: $profileTypeId
+      profileListViewId: $profileListViewId
+      name: $name
+      data: $data
+    ) {
+      id
+      ...ProfileViewTabs_ProfileListView
+      user {
+        id
+        profileListViews(profileTypeId: $profileTypeId) {
+          id
+        }
+      }
+    }
+  }
+  ${ProfileViewTabs_ProfileListViewFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileViewTabs_updateProfileListViewMutation,
+  ProfileViewTabs_updateProfileListViewMutationVariables
+>;
+export const ProfileViewTabs_markProfileListViewAsDefaultDocument = gql`
+  mutation ProfileViewTabs_markProfileListViewAsDefault(
+    $profileListViewId: GID!
+    $profileTypeId: GID!
+  ) {
+    markProfileListViewAsDefault(
+      profileListViewId: $profileListViewId
+      profileTypeId: $profileTypeId
+    ) {
+      id
+      isDefault
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileViewTabs_markProfileListViewAsDefaultMutation,
+  ProfileViewTabs_markProfileListViewAsDefaultMutationVariables
 >;
 export const HasFeatureFlagDocument = gql`
   query HasFeatureFlag($featureFlag: FeatureFlag!) {
@@ -68885,84 +69576,6 @@ export const PetitionListHeader_updatePetitionListViewDocument = gql`
 ` as unknown as DocumentNode<
   PetitionListHeader_updatePetitionListViewMutation,
   PetitionListHeader_updatePetitionListViewMutationVariables
->;
-export const ViewTabs_reorderPetitionListViewsDocument = gql`
-  mutation ViewTabs_reorderPetitionListViews($ids: [GID!]!) {
-    reorderPetitionListViews(ids: $ids) {
-      id
-      petitionListViews {
-        id
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  ViewTabs_reorderPetitionListViewsMutation,
-  ViewTabs_reorderPetitionListViewsMutationVariables
->;
-export const ViewTabs_deletePetitionListViewDocument = gql`
-  mutation ViewTabs_deletePetitionListView($id: GID!) {
-    deletePetitionListView(id: $id) {
-      id
-      petitionListViews {
-        id
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  ViewTabs_deletePetitionListViewMutation,
-  ViewTabs_deletePetitionListViewMutationVariables
->;
-export const ViewTabs_createPetitionListViewDocument = gql`
-  mutation ViewTabs_createPetitionListView($name: String!, $data: PetitionListViewDataInput!) {
-    createPetitionListView(name: $name, data: $data) {
-      ...ViewTabs_PetitionListView
-      user {
-        id
-        petitionListViews {
-          id
-        }
-      }
-    }
-  }
-  ${ViewTabs_PetitionListViewFragmentDoc}
-` as unknown as DocumentNode<
-  ViewTabs_createPetitionListViewMutation,
-  ViewTabs_createPetitionListViewMutationVariables
->;
-export const ViewTabs_updatePetitionListViewDocument = gql`
-  mutation ViewTabs_updatePetitionListView(
-    $petitionListViewId: GID!
-    $name: String
-    $data: PetitionListViewDataInput
-  ) {
-    updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
-      ...ViewTabs_PetitionListView
-      user {
-        id
-        petitionListViews {
-          id
-        }
-      }
-    }
-  }
-  ${ViewTabs_PetitionListViewFragmentDoc}
-` as unknown as DocumentNode<
-  ViewTabs_updatePetitionListViewMutation,
-  ViewTabs_updatePetitionListViewMutationVariables
->;
-export const ViewTabs_markPetitionListViewAsDefaultDocument = gql`
-  mutation ViewTabs_markPetitionListViewAsDefault($petitionListViewId: GID) {
-    markPetitionListViewAsDefault(petitionListViewId: $petitionListViewId) {
-      id
-      petitionListViews {
-        id
-        isDefault
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  ViewTabs_markPetitionListViewAsDefaultMutation,
-  ViewTabs_markPetitionListViewAsDefaultMutationVariables
 >;
 export const PreviewPetitionField_queryDocument = gql`
   query PreviewPetitionField_query($petitionId: GID!, $fieldId: GID!) {
@@ -72722,14 +73335,19 @@ export const ProfileDetail_profileDocument = gql`
   ${ProfileKeyProcesses_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_profileQuery, ProfileDetail_profileQueryVariables>;
 export const Profiles_userDocument = gql`
-  query Profiles_user {
+  query Profiles_user($profileTypeId: GID!) {
     ...AppLayout_Query
     me {
+      id
       ...useProfileSubscribersDialog_User
+      profileListViews(profileTypeId: $profileTypeId) {
+        ...Profiles_ProfileListView
+      }
     }
   }
   ${AppLayout_QueryFragmentDoc}
   ${useProfileSubscribersDialog_UserFragmentDoc}
+  ${Profiles_ProfileListViewFragmentDoc}
 ` as unknown as DocumentNode<Profiles_userQuery, Profiles_userQueryVariables>;
 export const Profiles_profileTypeDocument = gql`
   query Profiles_profileType($profileTypeId: GID!) {
@@ -72746,13 +73364,65 @@ export const Profiles_profilesDocument = gql`
     $search: String
     $sortBy: [QueryProfiles_OrderBy!]
     $filter: ProfileFilter
+    $propertiesFilter: [ProfileFieldPropertyFilter!]
   ) {
     profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
-      ...Profiles_ProfilePagination
+      items {
+        ...Profiles_Profile
+        properties(filter: $propertiesFilter) {
+          ...useProfileTableColumns_ProfileFieldProperty
+        }
+      }
+      totalCount
     }
   }
-  ${Profiles_ProfilePaginationFragmentDoc}
+  ${Profiles_ProfileFragmentDoc}
+  ${useProfileTableColumns_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<Profiles_profilesQuery, Profiles_profilesQueryVariables>;
+export const Profiles_createProfileListViewDocument = gql`
+  mutation Profiles_createProfileListView(
+    $profileTypeId: GID!
+    $name: String!
+    $data: ProfileListViewDataInput!
+  ) {
+    createProfileListView(profileTypeId: $profileTypeId, name: $name, data: $data) {
+      id
+      ...Profiles_ProfileListView
+      user {
+        id
+        profileListViews(profileTypeId: $profileTypeId) {
+          id
+        }
+      }
+    }
+  }
+  ${Profiles_ProfileListViewFragmentDoc}
+` as unknown as DocumentNode<
+  Profiles_createProfileListViewMutation,
+  Profiles_createProfileListViewMutationVariables
+>;
+export const Profiles_updateProfileListViewDocument = gql`
+  mutation Profiles_updateProfileListView(
+    $profileTypeId: GID!
+    $profileListViewId: GID!
+    $name: String
+    $data: ProfileListViewDataInput
+  ) {
+    updateProfileListView(
+      profileTypeId: $profileTypeId
+      profileListViewId: $profileListViewId
+      name: $name
+      data: $data
+    ) {
+      id
+      ...Profiles_ProfileListView
+    }
+  }
+  ${Profiles_ProfileListViewFragmentDoc}
+` as unknown as DocumentNode<
+  Profiles_updateProfileListViewMutation,
+  Profiles_updateProfileListViewMutationVariables
+>;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query

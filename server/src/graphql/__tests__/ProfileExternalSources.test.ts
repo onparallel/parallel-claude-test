@@ -1950,7 +1950,7 @@ describe("Profile External Sources", () => {
                 items: [
                   {
                     id: toGlobalId("OrgIntegration", orgIntegration.id),
-                    searchableProfileTypes: [
+                    searchableProfileTypes: expect.toIncludeSameMembers([
                       {
                         id: toGlobalId("ProfileType", providerProfileType.id),
                         name: { en: "Provider", es: "Proveedor" },
@@ -1966,7 +1966,7 @@ describe("Profile External Sources", () => {
                         name: { en: "Individual", es: "Persona" },
                         standardType: "INDIVIDUAL",
                       },
-                    ],
+                    ]),
                   },
                 ],
               },

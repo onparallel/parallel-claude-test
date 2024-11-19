@@ -10,7 +10,6 @@ import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
-import { PetitionViewRepository } from "./repositories/PetitionViewRepository";
 import { ProfileRepository } from "./repositories/ProfileRepository";
 import { SubscriptionRepository } from "./repositories/SubscriptionRepository";
 import { SystemRepository } from "./repositories/SystemRepository";
@@ -19,6 +18,7 @@ import { TaskRepository } from "./repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./repositories/UserGroupRepository";
 import { UserRepository } from "./repositories/UserRepository";
+import { ViewRepository } from "./repositories/ViewRepository";
 
 export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX)
@@ -46,7 +46,7 @@ export const dbModule = new ContainerModule((bind) => {
   bind<SubscriptionRepository>(SubscriptionRepository).toSelf();
   bind<TaskRepository>(TaskRepository).toSelf();
   bind<LicenseCodeRepository>(LicenseCodeRepository).toSelf();
-  bind<PetitionViewRepository>(PetitionViewRepository).toSelf();
+  bind<ViewRepository>(ViewRepository).toSelf();
   bind<ProfileRepository>(ProfileRepository).toSelf();
   bind<EventRepository>(EventRepository).toSelf();
 });

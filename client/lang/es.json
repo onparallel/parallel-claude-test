@@ -8095,11 +8095,6 @@
     "context": "Subscribed"
   },
   {
-    "term": "component.profile-table-columns.type",
-    "definition": "Tipo",
-    "context": "Type"
-  },
-  {
     "term": "component.profile-type-field-icon.briefcase-icon",
     "definition": "Icono de maletín",
     "context": "Briefcase icon"
@@ -15322,7 +15317,7 @@
   {
     "term": "page.profiles.no-closed-profiles",
     "definition": "No hay ningún perfil cerrado",
-    "context": "There is no closed profile"
+    "context": "There are no closed profiles"
   },
   {
     "term": "page.profiles.no-deleted-profiles",

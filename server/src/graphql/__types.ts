@@ -237,7 +237,7 @@ export interface NexusGenInputs {
   };
   PetitionListViewSortInput: {
     // input type
-    direction: NexusGenEnums["PetitionListViewSortDirection"]; // PetitionListViewSortDirection!
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
     field: NexusGenEnums["PetitionListViewSortField"]; // PetitionListViewSortField!
   };
   PetitionSharedWithFilter: {
@@ -286,6 +286,18 @@ export interface NexusGenInputs {
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
     status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
     values?: NexusGenInputs["ProfileFieldValuesFilter"][] | null; // [ProfileFieldValuesFilter!]
+  };
+  ProfileListViewDataInput: {
+    // input type
+    columns?: string[] | null; // [String!]
+    search?: string | null; // String
+    sort?: NexusGenInputs["ProfileListViewSortInput"] | null; // ProfileListViewSortInput
+    status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+  };
+  ProfileListViewSortInput: {
+    // input type
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
+    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
   };
   ProfilePropertyFilter: {
     // input type
@@ -485,6 +497,8 @@ export interface NexusGenEnums {
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   ImageOptionsResizeFit: "contain" | "cover" | "fill" | "inside" | "outside";
   IntegrationType: db.IntegrationType;
+  ListViewSortDirection: "ASC" | "DESC";
+  ListViewType: db.ListViewType;
   MaybeTaskStatus: "COMPLETED" | "PROCESSING";
   OrgLicenseSource: "APPSUMO";
   OrganizationStatus: db.OrganizationStatus;
@@ -522,14 +536,12 @@ export interface NexusGenEnums {
     | "status"
     | "tagsFilters";
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
-  PetitionListViewSortDirection: "ASC" | "DESC";
   PetitionListViewSortField:
     | "createdAt"
     | "lastActivityAt"
     | "lastRecipientActivityAt"
     | "name"
     | "sentAt";
-  PetitionListViewType: db.PetitionListViewType;
   PetitionLocale: db.ContactLocale;
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
@@ -570,6 +582,7 @@ export interface NexusGenEnums {
     | "NOT_EQUAL"
     | "NOT_IS_ONE_OF"
     | "START_WITH";
+  ProfileListViewSortField: "createdAt" | "name";
   ProfileRelationshipDirection: "LEFT_RIGHT" | "RIGHT_LEFT";
   ProfileRelationshipSide: "LEFT" | "RIGHT";
   ProfileStatus: db.ProfileStatus;
@@ -1081,7 +1094,7 @@ export interface NexusGenObjects {
   };
   PetitionListViewSort: {
     // root type
-    direction: NexusGenEnums["PetitionListViewSortDirection"]; // PetitionListViewSortDirection!
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
     field: NexusGenEnums["PetitionListViewSortField"]; // PetitionListViewSortField!
   };
   PetitionMessage: db.PetitionMessage;
@@ -1215,6 +1228,19 @@ export interface NexusGenObjects {
   };
   ProfileFieldValue: db.ProfileFieldValue;
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
+  ProfileListView: db.ProfileListView;
+  ProfileListViewData: {
+    // root type
+    columns?: string[] | null; // [String!]
+    search?: string | null; // String
+    sort?: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
+    status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+  };
+  ProfileListViewSort: {
+    // root type
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
+    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
+  };
   ProfilePagination: {
     // root type
     items: NexusGenRootTypes["Profile"][]; // [Profile!]!
@@ -1442,6 +1468,9 @@ export interface NexusGenInterfaces {
     | NexusGenRootTypes["OrgIntegration"]
     | NexusGenRootTypes["ProfileExternalSourceOrgIntegration"]
     | NexusGenRootTypes["SignatureOrgIntegration"];
+  ListView:
+    | ({ __type: "PetitionListView" } & db.PetitionListView)
+    | ({ __type: "ProfileListView" } & db.ProfileListView);
   PetitionBase: db.Petition;
   PetitionEvent: petitionEvents.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
@@ -2056,6 +2085,7 @@ export interface NexusGenFieldTypes {
     createProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     createProfileFieldFileUploadLink: NexusGenRootTypes["ProfileFieldPropertyAndFileWithUploadData"]; // ProfileFieldPropertyAndFileWithUploadData!
     createProfileLinkedPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    createProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     createProfileRelationship: NexusGenRootTypes["Profile"]; // Profile!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -2089,6 +2119,7 @@ export interface NexusGenFieldTypes {
     deletePetitions: NexusGenEnums["Success"]; // Success!
     deleteProfile: NexusGenEnums["Success"]; // Success!
     deleteProfileFieldFile: NexusGenEnums["Result"]; // Result!
+    deleteProfileListView: NexusGenRootTypes["User"]; // User!
     deleteProfileType: NexusGenEnums["Success"]; // Success!
     deleteProfileTypeField: NexusGenRootTypes["ProfileType"]; // ProfileType!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
@@ -2110,6 +2141,7 @@ export interface NexusGenFieldTypes {
     linkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
     loginAs: NexusGenEnums["Result"]; // Result!
     markPetitionListViewAsDefault: NexusGenRootTypes["User"]; // User!
+    markProfileListViewAsDefault: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2157,6 +2189,7 @@ export interface NexusGenFieldTypes {
     reopenProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
+    reorderProfileListViews: NexusGenRootTypes["User"]; // User!
     resendVerificationEmail: NexusGenEnums["Result"]; // Result!
     resetTempPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2222,6 +2255,7 @@ export interface NexusGenFieldTypes {
     updatePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     updateProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
+    updateProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     updateProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -2703,7 +2737,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isDefault: boolean; // Boolean!
     name: string; // String!
-    type: NexusGenEnums["PetitionListViewType"]; // PetitionListViewType!
+    type: NexusGenEnums["ListViewType"]; // ListViewType!
     user: NexusGenRootTypes["User"]; // User!
   };
   PetitionListViewData: {
@@ -2741,7 +2775,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionListViewSort: {
     // field return type
-    direction: NexusGenEnums["PetitionListViewSortDirection"]; // PetitionListViewSortDirection!
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
     field: NexusGenEnums["PetitionListViewSortField"]; // PetitionListViewSortField!
   };
   PetitionMessage: {
@@ -3202,6 +3236,28 @@ export interface NexusGenFieldTypes {
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  ProfileListView: {
+    // field return type
+    data: NexusGenRootTypes["ProfileListViewData"]; // ProfileListViewData!
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    type: NexusGenEnums["ListViewType"]; // ListViewType!
+    user: NexusGenRootTypes["User"]; // User!
+  };
+  ProfileListViewData: {
+    // field return type
+    columns: string[] | null; // [String!]
+    search: string | null; // String
+    sort: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
+    status: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+  };
+  ProfileListViewSort: {
+    // field return type
+    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
+    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
   };
   ProfilePagination: {
     // field return type
@@ -3927,6 +3983,7 @@ export interface NexusGenFieldTypes {
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
     pinnedProfileTypes: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
+    profileListViews: NexusGenRootTypes["ProfileListView"][]; // [ProfileListView!]!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     unreadNotificationCount: number; // Int!
@@ -4083,6 +4140,14 @@ export interface NexusGenFieldTypes {
     logoUrl: string | null; // String
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
+  ListView: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    type: NexusGenEnums["ListViewType"]; // ListViewType!
+    user: NexusGenRootTypes["User"]; // User!
   };
   PetitionBase: {
     // field return type
@@ -4761,6 +4826,7 @@ export interface NexusGenFieldTypeNames {
     createProfileEventSubscription: "ProfileEventSubscription";
     createProfileFieldFileUploadLink: "ProfileFieldPropertyAndFileWithUploadData";
     createProfileLinkedPetitionField: "PetitionField";
+    createProfileListView: "ProfileListView";
     createProfileRelationship: "Profile";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
@@ -4794,6 +4860,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitions: "Success";
     deleteProfile: "Success";
     deleteProfileFieldFile: "Result";
+    deleteProfileListView: "User";
     deleteProfileType: "Success";
     deleteProfileTypeField: "ProfileType";
     deleteSignatureIntegration: "Result";
@@ -4815,6 +4882,7 @@ export interface NexusGenFieldTypeNames {
     linkPetitionFieldChildren: "PetitionField";
     loginAs: "Result";
     markPetitionListViewAsDefault: "User";
+    markProfileListViewAsDefault: "ProfileListView";
     markSignatureIntegrationAsDefault: "IOrgIntegration";
     modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
@@ -4862,6 +4930,7 @@ export interface NexusGenFieldTypeNames {
     reopenProfile: "Profile";
     reorderPetitionAttachments: "PetitionBase";
     reorderPetitionListViews: "User";
+    reorderProfileListViews: "User";
     resendVerificationEmail: "Result";
     resetTempPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
@@ -4927,6 +4996,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionVariable: "Petition";
     updateProfileEventSubscription: "ProfileEventSubscription";
     updateProfileFieldValue: "Profile";
+    updateProfileListView: "ProfileListView";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
     updateProfileTypeFieldPermission: "ProfileTypeField";
@@ -5408,7 +5478,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isDefault: "Boolean";
     name: "String";
-    type: "PetitionListViewType";
+    type: "ListViewType";
     user: "User";
   };
   PetitionListViewData: {
@@ -5446,7 +5516,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionListViewSort: {
     // field return type name
-    direction: "PetitionListViewSortDirection";
+    direction: "ListViewSortDirection";
     field: "PetitionListViewSortField";
   };
   PetitionMessage: {
@@ -5907,6 +5977,28 @@ export interface NexusGenFieldTypeNames {
     profile: "Profile";
     type: "ProfileEventType";
     user: "User";
+  };
+  ProfileListView: {
+    // field return type name
+    data: "ProfileListViewData";
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    profileType: "ProfileType";
+    type: "ListViewType";
+    user: "User";
+  };
+  ProfileListViewData: {
+    // field return type name
+    columns: "String";
+    search: "String";
+    sort: "ProfileListViewSort";
+    status: "ProfileStatus";
+  };
+  ProfileListViewSort: {
+    // field return type name
+    direction: "ListViewSortDirection";
+    field: "ProfileListViewSortField";
   };
   ProfilePagination: {
     // field return type name
@@ -6632,6 +6724,7 @@ export interface NexusGenFieldTypeNames {
     petitionListViews: "PetitionListView";
     pinnedProfileTypes: "ProfileType";
     preferredLocale: "UserLocale";
+    profileListViews: "ProfileListView";
     status: "UserStatus";
     tokens: "UserAuthenticationToken";
     unreadNotificationCount: "Int";
@@ -6788,6 +6881,14 @@ export interface NexusGenFieldTypeNames {
     logoUrl: "String";
     name: "String";
     type: "IntegrationType";
+  };
+  ListView: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    type: "ListViewType";
+    user: "User";
   };
   PetitionBase: {
     // field return type name
@@ -7315,6 +7416,12 @@ export interface NexusGenArgTypes {
       position?: number | null; // Int
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    createProfileListView: {
+      // args
+      data: NexusGenInputs["ProfileListViewDataInput"]; // ProfileListViewDataInput!
+      name: string; // String!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
     createProfileRelationship: {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
@@ -7489,6 +7596,10 @@ export interface NexusGenArgTypes {
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    deleteProfileListView: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+    };
     deleteProfileType: {
       // args
       profileTypeIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -7595,6 +7706,11 @@ export interface NexusGenArgTypes {
     markPetitionListViewAsDefault: {
       // args
       petitionListViewId?: NexusGenScalars["GID"] | null; // GID
+    };
+    markProfileListViewAsDefault: {
+      // args
+      profileListViewId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     markSignatureIntegrationAsDefault: {
       // args
@@ -7865,6 +7981,11 @@ export interface NexusGenArgTypes {
     reorderPetitionListViews: {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    reorderProfileListViews: {
+      // args
+      ids: NexusGenScalars["GID"][]; // [GID!]!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     resendVerificationEmail: {
       // args
@@ -8246,6 +8367,13 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["UpdateProfileFieldValueInput"][]; // [UpdateProfileFieldValueInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileListView: {
+      // args
+      data?: NexusGenInputs["ProfileListViewDataInput"] | null; // ProfileListViewDataInput
+      name?: string | null; // String
+      profileListViewId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     updateProfileType: {
       // args
@@ -8790,6 +8918,10 @@ export interface NexusGenArgTypes {
       filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
       limit?: number | null; // Int
     };
+    profileListViews: {
+      // args
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
   };
   IOrgIntegration: {
     logoUrl: {
@@ -8834,6 +8966,7 @@ export interface NexusGenAbstractTypeMembers {
     | "OrgIntegration"
     | "ProfileExternalSourceOrgIntegration"
     | "SignatureOrgIntegration";
+  ListView: "PetitionListView" | "ProfileListView";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -8975,6 +9108,7 @@ export interface NexusGenTypeInterfaces {
   PetitionEventSubscription: "EventSubscription";
   PetitionFieldAttachment: "CreatedAt";
   PetitionFieldReply: "Timestamps";
+  PetitionListView: "ListView";
   PetitionMessage: "CreatedAt";
   PetitionMessageBouncedEvent: "PetitionEvent";
   PetitionReminder: "CreatedAt";
@@ -9001,6 +9135,7 @@ export interface NexusGenTypeInterfaces {
   ProfileFieldFileRemovedEvent: "ProfileEvent";
   ProfileFieldValue: "ProfileFieldResponse";
   ProfileFieldValueUpdatedEvent: "ProfileEvent";
+  ProfileListView: "ListView";
   ProfileRelationshipCreatedEvent: "ProfileEvent";
   ProfileRelationshipRemovedEvent: "ProfileEvent";
   ProfileReopenedEvent: "ProfileEvent";
@@ -9062,6 +9197,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "DowJonesKycEntitySearchResult"
   | "EventSubscription"
   | "IOrgIntegration"
+  | "ListView"
   | "PetitionBase"
   | "PetitionBaseOrFolder"
   | "PetitionEvent"

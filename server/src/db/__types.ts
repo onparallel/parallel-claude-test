@@ -131,6 +131,10 @@ export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
 
 export const LicenseCodeStatusValues = ["PENDING", "REDEEMED", "EXPIRED"] as LicenseCodeStatus[];
 
+export type ListViewType = "ALL" | "CUSTOM";
+
+export const ListViewTypeValues = ["ALL", "CUSTOM"] as ListViewType[];
+
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT";
 
 export const OrganizationStatusValues = [
@@ -675,6 +679,7 @@ export interface TableTypes {
   profile_external_source_entity: ProfileExternalSourceEntity;
   profile_field_file: ProfileFieldFile;
   profile_field_value: ProfileFieldValue;
+  profile_list_view: ProfileListView;
   profile_relationship: ProfileRelationship;
   profile_relationship_type: ProfileRelationshipType;
   profile_relationship_type_allowed_profile_type: ProfileRelationshipTypeAllowedProfileType;
@@ -748,6 +753,7 @@ export interface TableCreateTypes {
   profile_external_source_entity: CreateProfileExternalSourceEntity;
   profile_field_file: CreateProfileFieldFile;
   profile_field_value: CreateProfileFieldValue;
+  profile_list_view: CreateProfileListView;
   profile_relationship: CreateProfileRelationship;
   profile_relationship_type: CreateProfileRelationshipType;
   profile_relationship_type_allowed_profile_type: CreateProfileRelationshipTypeAllowedProfileType;
@@ -821,6 +827,7 @@ export interface TablePrimaryKeys {
   profile_external_source_entity: "id";
   profile_field_file: "id";
   profile_field_value: "id";
+  profile_list_view: "id";
   profile_relationship: "id";
   profile_relationship_type: "id";
   profile_relationship_type_allowed_profile_type: "id";
@@ -1674,7 +1681,11 @@ export interface PetitionListView {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
-  type: PetitionListViewType; // petition_list_view_type
+  /**
+   * @deprecated
+   */
+  type: Maybe<PetitionListViewType>; // petition_list_view_type
+  view_type: ListViewType; // list_view_type
 }
 
 export type CreatePetitionListView = PartialProps<
@@ -1687,6 +1698,7 @@ export type CreatePetitionListView = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "type"
+  | "view_type"
 >;
 
 export interface PetitionMessage {
@@ -1970,6 +1982,35 @@ export type CreateProfileFieldValue = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "external_source_integration_id"
+>;
+
+export interface ProfileListView {
+  id: number; // int4
+  user_id: number; // int4
+  profile_type_id: number; // int4
+  name: string; // varchar
+  data: any; // jsonb
+  position: number; // int4
+  view_type: ListViewType; // list_view_type
+  is_default: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileListView = PartialProps<
+  Omit<ProfileListView, "id">,
+  | "view_type"
+  | "is_default"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface ProfileRelationship {

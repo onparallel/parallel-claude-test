@@ -913,6 +913,24 @@ type LandingTemplatePagination {
   totalCount: Int!
 }
 
+interface ListView {
+  id: GID!
+  isDefault: Boolean!
+  name: String!
+  type: ListViewType!
+  user: User!
+}
+
+enum ListViewSortDirection {
+  ASC
+  DESC
+}
+
+enum ListViewType {
+  ALL
+  CUSTOM
+}
+
 scalar LocalizableUserText
 
 """
@@ -1584,6 +1602,15 @@ type Mutation {
   ): PetitionField!
 
   """
+  Creates a view with custom filters and ordering on the user's profile list
+  """
+  createProfileListView(
+    data: ProfileListViewDataInput!
+    name: String!
+    profileTypeId: GID!
+  ): ProfileListView!
+
+  """
   Associates a profile with one or more relationships.
   """
   createProfileRelationship(
@@ -1801,6 +1828,11 @@ type Mutation {
     profileId: GID!
     profileTypeFieldId: GID!
   ): Result!
+
+  """
+  Deletes a profile list view of the user
+  """
+  deleteProfileListView(id: GID!): User!
   deleteProfileType(profileTypeIds: [GID!]!): Success!
   deleteProfileTypeField(
     """
@@ -1943,6 +1975,11 @@ type Mutation {
   Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting)
   """
   markPetitionListViewAsDefault(petitionListViewId: GID): User!
+
+  """
+  Sets the default profile list view of the user. If passing null id, default view will be set (no filters/sorting)
+  """
+  markProfileListViewAsDefault(profileListViewId: GID!, profileTypeId: GID!): ProfileListView!
 
   """
   marks a Signature integration as default
@@ -2328,6 +2365,11 @@ type Mutation {
   Changes the ordering of a user's petition list views
   """
   reorderPetitionListViews(ids: [GID!]!): User!
+
+  """
+  Changes the ordering of a user's profile list views
+  """
+  reorderProfileListViews(ids: [GID!]!, profileTypeId: GID!): User!
 
   """
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
@@ -2905,6 +2947,16 @@ type Mutation {
     name: String
   ): ProfileEventSubscription!
   updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
+
+  """
+  Updates a profile list view
+  """
+  updateProfileListView(
+    data: ProfileListViewDataInput
+    name: String
+    profileListViewId: GID!
+    profileTypeId: GID!
+  ): ProfileListView!
   updateProfileType(
     icon: ProfileTypeIcon
     name: LocalizableUserText
@@ -4661,12 +4713,12 @@ type PetitionFolder {
   petitionCount: Int!
 }
 
-type PetitionListView {
+type PetitionListView implements ListView {
   data: PetitionListViewData!
   id: GID!
   isDefault: Boolean!
   name: String!
-  type: PetitionListViewType!
+  type: ListViewType!
   user: User!
 }
 
@@ -4737,13 +4789,8 @@ enum PetitionListViewSearchIn {
 }
 
 type PetitionListViewSort {
-  direction: PetitionListViewSortDirection!
+  direction: ListViewSortDirection!
   field: PetitionListViewSortField!
-}
-
-enum PetitionListViewSortDirection {
-  ASC
-  DESC
 }
 
 enum PetitionListViewSortField {
@@ -4755,13 +4802,8 @@ enum PetitionListViewSortField {
 }
 
 input PetitionListViewSortInput {
-  direction: PetitionListViewSortDirection!
+  direction: ListViewSortDirection!
   field: PetitionListViewSortField!
-}
-
-enum PetitionListViewType {
-  ALL
-  CUSTOM
 }
 
 """
@@ -5989,6 +6031,48 @@ input ProfileFilter {
   profileTypeId: [GID!]
   status: [ProfileStatus!]
   values: [ProfileFieldValuesFilter!]
+}
+
+type ProfileListView implements ListView {
+  data: ProfileListViewData!
+  id: GID!
+  isDefault: Boolean!
+  name: String!
+  profileType: ProfileType!
+  type: ListViewType!
+  user: User!
+}
+
+type ProfileListViewData {
+  columns: [String!]
+  search: String
+  sort: ProfileListViewSort
+  status: ProfileStatus
+}
+
+input ProfileListViewDataInput {
+  """
+  Each column can refer to a profile property ID, or a built-in column: 'subscribers' or 'createdAt'
+  """
+  columns: [String!]
+  search: String
+  sort: ProfileListViewSortInput
+  status: ProfileStatus
+}
+
+type ProfileListViewSort {
+  direction: ListViewSortDirection!
+  field: ProfileListViewSortField!
+}
+
+enum ProfileListViewSortField {
+  createdAt
+  name
+}
+
+input ProfileListViewSortInput {
+  direction: ListViewSortDirection!
+  field: ProfileListViewSortField!
 }
 
 type ProfilePagination {
@@ -8183,6 +8267,11 @@ type User implements Timestamps {
   """
   pinnedProfileTypes: [ProfileType!]!
   preferredLocale: UserLocale!
+
+  """
+  The profile views of the user
+  """
+  profileListViews(profileTypeId: GID!): [ProfileListView!]!
   status: UserStatus!
 
   """

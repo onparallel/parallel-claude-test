@@ -1394,11 +1394,13 @@ describe("GraphQL/Users", () => {
               profileTypes(limit: $limit, offset: $offset) {
                 totalCount
                 items {
+                  id
                   name
                   pluralName
                   icon
                   profileNamePattern
                   isStandard
+                  standardType
                   fields {
                     id
                     type
@@ -1426,10 +1428,12 @@ describe("GraphQL/Users", () => {
           totalCount: 3,
           items: [
             {
+              id: expect.any(String),
               name: { en: "Individual", es: "Persona" },
               pluralName: { en: "Individuals", es: "Personas" },
               icon: "PERSON",
               isStandard: true,
+              standardType: "INDIVIDUAL",
               profileNamePattern: `{{ ${profilesData.profileTypes.items[0].fields[0].id} }} {{ ${profilesData.profileTypes.items[0].fields[1].id} }}`,
               fields: [
                 {
@@ -1908,10 +1912,12 @@ describe("GraphQL/Users", () => {
               ],
             },
             {
+              id: expect.any(String),
               name: { en: "Company", es: "Compañía" },
               pluralName: { en: "Companies", es: "Compañías" },
               icon: "BUILDING",
               isStandard: true,
+              standardType: "LEGAL_ENTITY",
               profileNamePattern: `{{ ${profilesData.profileTypes.items[1].fields[0].id} }}`,
               fields: [
                 {
@@ -2457,10 +2463,12 @@ describe("GraphQL/Users", () => {
               ],
             },
             {
+              id: expect.any(String),
               name: { en: "Contract", es: "Contrato" },
               pluralName: { en: "Contracts", es: "Contratos" },
               icon: "DOCUMENT",
               isStandard: true,
+              standardType: "CONTRACT",
               profileNamePattern: `{{ ${profilesData.profileTypes.items[2].fields[0].id} }} - {{ ${profilesData.profileTypes.items[2].fields[1].id} }}`,
               fields: [
                 {
@@ -2906,6 +2914,58 @@ describe("GraphQL/Users", () => {
           },
         ],
       });
+
+      const userId = fromGlobalId(data!.signUp.id, "User").id;
+      const dbProfileListViews = await mocks.knex
+        .from("profile_list_view")
+        .where("user_id", userId)
+        .select("*");
+
+      expect(dbProfileListViews).toHaveLength(3);
+      const profileTypes = (profilesData.profileTypes.items as any[]).map((pt) => {
+        const fields =
+          pt.standardType === "INDIVIDUAL" || pt.standardType === "LEGAL_ENTITY"
+            ? ["p_client_status", "p_risk", "p_relationship"]
+            : ["p_signature_date", "p_expiration_date"];
+        return {
+          id: fromGlobalId(pt.id, "ProfileType").id,
+          columns: fields
+            .map(
+              (alias) =>
+                `field_${
+                  fromGlobalId(
+                    pt.fields.find((ptf: any) => ptf.alias === alias)!.id,
+                    "ProfileTypeField",
+                  ).id
+                }`,
+            )
+            .concat("subscribers", "createdAt"),
+        };
+      });
+
+      expect(dbProfileListViews).toIncludeSameMembers(
+        profileTypes.map((pt) => ({
+          id: expect.any(Number),
+          user_id: userId,
+          profile_type_id: pt.id,
+          name: "ALL",
+          data: {
+            columns: pt.columns,
+            sort: null,
+            search: null,
+            status: null,
+          },
+          position: 0,
+          view_type: "ALL",
+          is_default: false,
+          created_at: expect.any(Date),
+          created_by: `User:${userId}`,
+          updated_at: expect.any(Date),
+          updated_by: null,
+          deleted_at: null,
+          deleted_by: null,
+        })),
+      );
     });
   });
 });

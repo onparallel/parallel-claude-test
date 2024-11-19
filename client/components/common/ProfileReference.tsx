@@ -23,7 +23,7 @@ export const ProfileReference = Object.assign(
       isNonNullish(profile) &&
       (showNameEvenIfDeleted || ["OPEN", "CLOSED"].includes(profile.status))
     ) {
-      const Content = (
+      const content = (
         <LocalizableUserTextRender
           value={profile.localizableName}
           default={
@@ -41,11 +41,11 @@ export const ProfileReference = Object.assign(
           sx={_notDeleted}
           {...props}
         >
-          {Content}
+          {content}
         </Link>
       ) : (
         <Text ref={ref} as="span" {...(props as any)}>
-          {Content}
+          {content}
         </Text>
       );
     } else {

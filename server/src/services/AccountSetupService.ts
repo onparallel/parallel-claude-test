@@ -1,18 +1,22 @@
 import { inject, injectable } from "inversify";
+import pMap from "p-map";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   CreateOrganization,
   CreateUser,
   CreateUserData,
+  ListViewType,
   Organization,
-  PetitionListViewType,
   User,
   UserGroupPermissionName,
+  UserLocale,
 } from "../db/__types";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-import { PetitionViewRepository } from "../db/repositories/PetitionViewRepository";
+import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { UserGroupRepository } from "../db/repositories/UserGroupRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
+import { ViewRepository } from "../db/repositories/ViewRepository";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { IIntegrationsSetupService, INTEGRATIONS_SETUP_SERVICE } from "./IntegrationsSetupService";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./OrgLimitsService";
@@ -40,7 +44,8 @@ export class AccountSetupService implements IAccountSetupService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(UserRepository) private users: UserRepository,
     @inject(UserGroupRepository) private userGroups: UserGroupRepository,
-    @inject(PetitionViewRepository) private views: PetitionViewRepository,
+    @inject(ViewRepository) private views: ViewRepository,
+    @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(INTEGRATIONS_SETUP_SERVICE) private integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE) private profilesSetup: IProfilesSetupService,
     @inject(ORG_LIMITS_SERVICE) private orgLimits: IOrgLimitsService,
@@ -61,58 +66,8 @@ export class AccountSetupService implements IAccountSetupService {
       createdBy,
     );
 
-    const intl = await this.intl.getIntl(userData.preferred_locale);
-    const defaultView = {
-      path: "/",
-      sort: null,
-      tags: null,
-      search: null,
-      status: null,
-      searchIn: "EVERYWHERE",
-      signature: null,
-      sharedWith: null,
-      fromTemplateId: null,
-    };
-    await this.views.createPetitionListView(
-      (
-        [
-          ["ALL", { ...defaultView }, "ALL"],
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.ongoing",
-              defaultMessage: "Ongoing",
-            }),
-            { ...defaultView, status: ["COMPLETED", "PENDING"] },
-            "CUSTOM",
-          ],
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.closed",
-              defaultMessage: "Closed",
-            }),
-            { ...defaultView, status: ["CLOSED"] },
-            "CUSTOM",
-          ],
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.draft",
-              defaultMessage: "Draft",
-            }),
-            { ...defaultView, status: ["DRAFT"] },
-            "CUSTOM",
-          ],
-        ] as [string, any, PetitionListViewType][]
-      ).map(([name, data, type], index) => ({
-        user_id: user.id,
-        name,
-        data,
-        position: index,
-        is_default: false,
-        type,
-        updated_by: `User:${user.id}`,
-      })),
-      `User:${user.id}`,
-    );
+    await this.createDefaultPetitionListViewsForUser(user, userData.preferred_locale);
+    await this.createDefaultProfileListViewsForUser(user);
 
     return user;
   }
@@ -214,5 +169,116 @@ export class AccountSetupService implements IAccountSetupService {
     );
 
     return userGroup;
+  }
+
+  private async createDefaultPetitionListViewsForUser(user: User, locale: UserLocale) {
+    const intl = await this.intl.getIntl(locale);
+    const defaultPetitionViewData = {
+      path: "/",
+      sort: null,
+      tags: null,
+      search: null,
+      status: null,
+      searchIn: "EVERYWHERE",
+      signature: null,
+      sharedWith: null,
+      fromTemplateId: null,
+    };
+    await this.views.createPetitionListView(
+      (
+        [
+          ["ALL", { ...defaultPetitionViewData }, "ALL"],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.ongoing",
+              defaultMessage: "Ongoing",
+            }),
+            { ...defaultPetitionViewData, status: ["COMPLETED", "PENDING"] },
+            "CUSTOM",
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.closed",
+              defaultMessage: "Closed",
+            }),
+            { ...defaultPetitionViewData, status: ["CLOSED"] },
+            "CUSTOM",
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.draft",
+              defaultMessage: "Draft",
+            }),
+            { ...defaultPetitionViewData, status: ["DRAFT"] },
+            "CUSTOM",
+          ],
+        ] as [string, any, ListViewType][]
+      ).map(([name, data, viewType], index) => ({
+        user_id: user.id,
+        name,
+        data,
+        position: index,
+        is_default: false,
+        view_type: viewType,
+        updated_by: `User:${user.id}`,
+      })),
+      `User:${user.id}`,
+    );
+  }
+
+  private async createDefaultProfileListViewsForUser(user: User) {
+    const profileTypes = await this.profiles.loadProfileTypesByOrgId(user.org_id);
+
+    const columnsByStandardType = Object.fromEntries(
+      (
+        await pMap(
+          profileTypes,
+          async (profileType) => {
+            const fields = await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileType.id);
+            if (
+              profileType.standard_type === "INDIVIDUAL" ||
+              profileType.standard_type === "LEGAL_ENTITY"
+            ) {
+              return [
+                profileType.standard_type,
+                ["p_client_status", "p_risk", "p_relationship"]
+                  .map((alias) => `field_${fields.find((f) => f.alias === alias)!.id}`)
+                  .concat("subscribers", "createdAt"),
+              ];
+            } else if (profileType.standard_type === "CONTRACT") {
+              return [
+                profileType.standard_type,
+                ["p_signature_date", "p_expiration_date"]
+                  .map((alias) => `field_${fields.find((f) => f.alias === alias)!.id}`)
+                  .concat("subscribers", "createdAt"),
+              ];
+            } else {
+              return null;
+            }
+          },
+          { concurrency: 1 },
+        )
+      ).filter(isNonNullish),
+    );
+
+    await this.views.createProfileListView(
+      profileTypes.map((profileType) => ({
+        profile_type_id: profileType.id,
+        user_id: user.id,
+        name: "ALL",
+        data: {
+          columns: profileType.standard_type
+            ? columnsByStandardType[profileType.standard_type]
+            : null,
+          search: null,
+          sort: null,
+          status: null,
+        },
+        position: 0,
+        is_default: false,
+        view_type: "ALL",
+      })),
+      `User:${user.id}`,
+    );
   }
 }

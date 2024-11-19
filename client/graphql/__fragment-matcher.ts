@@ -33,6 +33,7 @@ const result: PossibleTypesResultData = {
       "ProfileExternalSourceOrgIntegration",
       "SignatureOrgIntegration",
     ],
+    ListView: ["PetitionListView", "ProfileListView"],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseOrFolder: ["Petition", "PetitionFolder", "PetitionTemplate"],
     PetitionEvent: [

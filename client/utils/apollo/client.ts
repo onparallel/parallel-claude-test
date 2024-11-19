@@ -355,6 +355,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
               },
             },
             petitionListViews: { merge: false },
+            profileListViews: { merge: false },
           },
         },
         UserGroup: {

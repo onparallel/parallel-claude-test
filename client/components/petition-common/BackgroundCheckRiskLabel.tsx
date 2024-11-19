@@ -37,7 +37,6 @@ const LABELS = {
   "fin.bank": "Bank",
   "fin.fund": "Fund",
   "fin.advisor": "Financial advisor",
-  "role.pep": "Political",
   "role.rca": "Close Associate",
   "role.judge": "Judge",
   "role.civil": "Civil servant",
@@ -58,6 +57,15 @@ const LABELS = {
   "export.control": "Export controlled",
   debarment: "Debarred entity",
   poi: "Person of interest",
+  wanted: "Wanted",
+  "corp.disqual": "Disqualified",
+  "reg.action": "Regulator action",
+  "reg.warn": "Regulator warning",
+  "role.pol": "Non-PEP",
+  "role.pep": "Politician", // update of "Political"
+  "role.lobby": "Lobbyist",
+  "sanction.counter": "Counter-sanctioned entity",
+  "export.risk": "Trade risk",
 } as Record<string, string>;
 
 export const BackgroundCheckRiskLabel = chakraForwardRef<"span", { risk: string }>(

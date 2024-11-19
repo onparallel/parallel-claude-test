@@ -4,6 +4,7 @@ import pMap from "p-map";
 import { indexBy } from "remeda";
 import { CreateProfileTypeField, ProfileType, ProfileTypeStandardType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
+import { ViewRepository } from "../db/repositories/ViewRepository";
 import { LocalizableUserText } from "../graphql";
 import { Replace } from "../util/types";
 import { I18N_SERVICE, II18nService } from "./I18nService";
@@ -65,6 +66,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
   constructor(
     @inject(I18N_SERVICE) private intl: II18nService,
     @inject(ProfileRepository) private profiles: ProfileRepository,
+    @inject(ViewRepository) private views: ViewRepository,
   ) {}
 
   async createDefaultProfileType(
@@ -79,6 +81,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
         createdBy,
         t,
       );
+
       const [field] = await this.profiles.createProfileTypeField(
         profileType.id,
         {
@@ -91,6 +94,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
         createdBy,
         t,
       );
+
+      await this.views.createProfileListViewsByOrgId(orgId, profileType, createdBy, t);
+
       return await this.profiles.updateProfileType(
         profileType.id,
         { profile_name_pattern: [field.id] },
@@ -1407,6 +1413,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
         org_id: orgId,
       },
       createdBy,
+      t,
     );
 
     const contractFields = await this.profiles.createProfileTypeField(
@@ -1415,6 +1422,8 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(orgId, contract, createdBy, t);
 
     const counterParty = contractFields.find((f) => f.alias === "p_counterparty")!;
     const contractType = contractFields.find((f) => f.alias === "p_contract_type")!;
@@ -1443,6 +1452,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
         org_id: orgId,
       },
       createdBy,
+      t,
     );
 
     const individualFields = await this.profiles.createProfileTypeField(
@@ -1451,6 +1461,8 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(orgId, individual, createdBy, t);
 
     const firstName = individualFields.find((f) => f.alias === "p_first_name")!;
     const lastName = individualFields.find((f) => f.alias === "p_last_name")!;
@@ -1483,6 +1495,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
         org_id: orgId,
       },
       createdBy,
+      t,
     );
 
     const legalEntityFields = await this.profiles.createProfileTypeField(
@@ -1491,6 +1504,8 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(orgId, legalEntity, createdBy, t);
 
     const entityName = legalEntityFields.find((f) => f.alias === "p_entity_name")!;
 

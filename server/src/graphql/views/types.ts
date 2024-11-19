@@ -1,21 +1,45 @@
-import { enumType, inputObjectType, objectType } from "nexus";
-import { PetitionListViewTypeValues } from "../../db/__types";
+import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
+import { ListViewTypeValues } from "../../db/__types";
+import { mapProfileListViewDataFromDatabase } from "./helpers";
 
-export const PetitionListView = objectType({
-  name: "PetitionListView",
+export const ListView = interfaceType({
+  name: "ListView",
   definition(t) {
-    t.globalId("id");
+    t.field("id", { type: "GID" });
     t.string("name");
-    t.field("data", { type: "PetitionListViewData", resolve: (o) => o.data });
     t.boolean("isDefault", { resolve: (o) => o.is_default });
     t.field("user", {
       type: "User",
       resolve: async (o, _, ctx) => (await ctx.users.loadUser(o.user_id))!,
     });
     t.field("type", {
-      type: enumType({ name: "PetitionListViewType", members: PetitionListViewTypeValues }),
+      type: enumType({ name: "ListViewType", members: ListViewTypeValues }),
+      resolve: (o) => o.view_type,
     });
   },
+  resolveType: (o) => o.__type,
+  sourceType: /* ts */ `
+    | ({__type: "PetitionListView"} & db.PetitionListView)
+    | ({__type: "ProfileListView"} & db.ProfileListView)
+  `,
+});
+
+export const ListViewSortDirection = enumType({
+  name: "ListViewSortDirection",
+  members: ["ASC", "DESC"],
+});
+
+// ###############
+// PETITION VIEWS
+// ###############
+export const PetitionListView = objectType({
+  name: "PetitionListView",
+  definition(t) {
+    t.implements("ListView");
+    t.globalId("id", { prefixName: "PetitionListView" });
+    t.field("data", { type: "PetitionListViewData", resolve: (o) => o.data });
+  },
+  sourceType: "db.PetitionListView",
 });
 
 export const PetitionListViewData = objectType({
@@ -84,12 +108,7 @@ export const PetitionListViewData = objectType({
               members: ["sentAt", "name", "createdAt", "lastActivityAt", "lastRecipientActivityAt"],
             }),
           });
-          t.nonNull.field("direction", {
-            type: enumType({
-              name: "PetitionListViewSortDirection",
-              members: ["ASC", "DESC"],
-            }),
-          });
+          t.nonNull.field("direction", { type: "ListViewSortDirection" });
         },
       }),
     });
@@ -133,12 +152,74 @@ export const PetitionListViewDataInput = inputObjectType({
           t.nonNull.field("field", {
             type: "PetitionListViewSortField",
           });
-          t.nonNull.field("direction", {
-            type: "PetitionListViewSortDirection",
-          });
+          t.nonNull.field("direction", { type: "ListViewSortDirection" });
         },
       }),
     });
     t.nullable.list.nonNull.field("columns", { type: "PetitionListViewColumn" });
+  },
+});
+
+// ###############
+// PROFILE VIEWS
+// ###############
+export const ProfileListView = objectType({
+  name: "ProfileListView",
+  definition(t) {
+    t.implements("ListView");
+    t.globalId("id", { prefixName: "ProfileListView" });
+    t.field("data", {
+      type: "ProfileListViewData",
+      resolve: (o) => mapProfileListViewDataFromDatabase(o.data),
+    });
+    t.field("profileType", {
+      type: "ProfileType",
+      resolve: async (o, _, ctx) => (await ctx.profiles.loadProfileType(o.profile_type_id))!,
+    });
+  },
+  sourceType: "db.ProfileListView",
+});
+
+export const ProfileListViewSortField = enumType({
+  name: "ProfileListViewSortField",
+  members: ["name", "createdAt"],
+});
+
+export const ProfileListViewSort = objectType({
+  name: "ProfileListViewSort",
+  definition(t) {
+    t.nonNull.field("field", { type: "ProfileListViewSortField" });
+    t.nonNull.field("direction", { type: "ListViewSortDirection" });
+  },
+});
+
+export const ProfileListViewData = objectType({
+  name: "ProfileListViewData",
+  definition(t) {
+    t.nullable.list.nonNull.string("columns");
+    t.nullable.string("search");
+    t.nullable.field("sort", { type: "ProfileListViewSort" });
+    t.nullable.field("status", { type: "ProfileStatus" });
+  },
+});
+
+export const ProfileListViewDataInput = inputObjectType({
+  name: "ProfileListViewDataInput",
+  definition(t) {
+    t.nullable.list.nonNull.string("columns", {
+      description:
+        "Each column can refer to a profile property ID, or a built-in column: 'subscribers' or 'createdAt'",
+    });
+    t.nullable.string("search");
+    t.nullable.field("sort", {
+      type: inputObjectType({
+        name: "ProfileListViewSortInput",
+        definition(t) {
+          t.nonNull.field("field", { type: "ProfileListViewSortField" });
+          t.nonNull.field("direction", { type: "ListViewSortDirection" });
+        },
+      }),
+    });
+    t.nullable.field("status", { type: "ProfileStatus" });
   },
 });

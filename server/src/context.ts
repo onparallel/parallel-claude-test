@@ -12,7 +12,6 @@ import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
-import { PetitionViewRepository } from "./db/repositories/PetitionViewRepository";
 import { ProfileRepository } from "./db/repositories/ProfileRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
@@ -21,6 +20,7 @@ import { TaskRepository } from "./db/repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
+import { ViewRepository } from "./db/repositories/ViewRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
@@ -148,7 +148,7 @@ export class ApiContext {
     public readonly subscriptions: SubscriptionRepository,
     public readonly tasks: TaskRepository,
     public readonly licenseCodes: LicenseCodeRepository,
-    public readonly views: PetitionViewRepository,
+    public readonly views: ViewRepository,
     public readonly profiles: ProfileRepository,
   ) {}
 }

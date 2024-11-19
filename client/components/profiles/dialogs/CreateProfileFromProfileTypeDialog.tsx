@@ -1,5 +1,13 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Button, Center, FormControl, FormLabel, Spinner, Stack } from "@chakra-ui/react";
+import {
+  Button,
+  Center,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Spinner,
+  Stack,
+} from "@chakra-ui/react";
 import {
   LocalizableUserText,
   localizableUserTextRender,
@@ -180,6 +188,7 @@ function CreateProfileFromProfileTypeDialog({
                               ? (format.validate?.(value) ?? true)
                               : true;
                           },
+                          required: true,
                         }}
                         render={({ field: { value, ...props } }) => {
                           return (
@@ -222,6 +231,12 @@ function CreateProfileFromProfileTypeDialog({
                       }}
                     />
                   )}
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="generic.field-required-error"
+                      defaultMessage="This field is required"
+                    />
+                  </FormErrorMessage>
                 </FormControl>
               );
             })}

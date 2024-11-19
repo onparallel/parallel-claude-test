@@ -3,6 +3,7 @@ import { indexBy, isNonNullish, omit, sortBy, unique } from "remeda";
 import { FeatureFlagNameValues, UserLocaleValues, UserStatusValues } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
 import { rootIsContextRealUser, rootIsContextUser } from "./authorizers";
 
@@ -253,6 +254,20 @@ export const User = objectType({
       authorize: rootIsContextUser(),
       resolve: async (root, _, ctx) => {
         return await ctx.profiles.loadPinnedProfileTypesByUserId(root.id);
+      },
+    });
+    t.list.field("profileListViews", {
+      type: "ProfileListView",
+      description: "The profile views of the user",
+      authorize: rootIsContextUser(),
+      args: {
+        profileTypeId: nonNull(globalIdArg("ProfileType")),
+      },
+      resolve: async (_, { profileTypeId }, ctx) => {
+        return await ctx.views.loadProfileListViewsByUserIdProfileTypeId({
+          userId: ctx.user!.id,
+          profileTypeId,
+        });
       },
     });
   },

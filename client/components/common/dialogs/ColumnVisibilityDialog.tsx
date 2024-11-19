@@ -13,13 +13,14 @@ import { DragHandleIcon, EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import { Reorder, useDragControls } from "framer-motion";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "../IconButtonWithTooltip";
 import { TableColumn } from "../Table";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 
 interface ColumnVisibilityDialogProps<T extends string> {
-  columns: TableColumn<any>[];
+  columns: TableColumn<any, any, any>[];
   selection: T[];
 }
 
@@ -28,7 +29,9 @@ function ColumnVisibilityDialog<T extends string>({
   selection: initialSelection,
   ...props
 }: DialogProps<ColumnVisibilityDialogProps<T>, T[]>) {
-  const [currentSelection, setCurrentSelection] = useState(initialSelection);
+  const [currentSelection, setCurrentSelection] = useState(
+    initialSelection.filter((key) => columns.some((c) => c.key === key)),
+  );
 
   const notVisible = columns.filter((c) => !c.isFixed && !currentSelection.includes(c.key as T));
   return (
@@ -90,8 +93,8 @@ function ColumnVisibilityDialog<T extends string>({
               spacing={2}
             >
               {currentSelection.map((key) => {
-                const column = columns.find((c) => c.key === key)!;
-                return (
+                const column = columns.find((c) => c.key === key);
+                return isNonNullish(column) ? (
                   <ReorderColumnItem
                     key={column.key}
                     column={column}
@@ -99,7 +102,7 @@ function ColumnVisibilityDialog<T extends string>({
                       setCurrentSelection((selection) => selection.filter((c) => c !== key))
                     }
                   />
-                );
+                ) : null;
               })}
             </List>
           </Stack>
@@ -228,7 +231,7 @@ function ColumnItem({
       <Center cursor="grab" display={isDraggable ? "block" : "none"} {...dragHandleProps}>
         <DragHandleIcon display="block" color="gray.400" role="presentation" pointerEvents="none" />
       </Center>
-      <Box flex={1} userSelect="none">
+      <Box flex={1} userSelect="none" noOfLines={1}>
         {typeof column.label === "string" ? column.label : column.label(intl)}
       </Box>
       {column.isFixed ? null : (

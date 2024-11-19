@@ -212,6 +212,7 @@ function CreateProfileDialog({
                             ? (format.validate?.(value) ?? true)
                             : true;
                         },
+                        required: true,
                       }}
                       render={({ field: { value, ...props } }) => {
                         return (
@@ -254,6 +255,12 @@ function CreateProfileDialog({
                     }}
                   />
                 )}
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.field-required-error"
+                    defaultMessage="This field is required"
+                  />
+                </FormErrorMessage>
               </FormControl>
             );
           })}

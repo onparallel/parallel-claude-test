@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
-import { isNonNullish, omit, range, times } from "remeda";
+import { isNonNullish, omit, pick, range, times } from "remeda";
 import {
   FileUpload,
   Organization,
@@ -144,6 +144,7 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("user_profile_type_pinned").delete();
     await mocks.knex.from("profile_type_process_template").delete();
     await mocks.knex.from("profile_type_process").delete();
+    await mocks.knex.from("profile_list_view").delete();
     await mocks.knex.from("profile_type").delete();
 
     profileTypes = await mocks.createRandomProfileTypes(
@@ -1985,6 +1986,66 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("creates a view on the created profile type", async () => {
+      const { errors: createErrors, data: createData } = await testClient.execute(
+        gql`
+          mutation ($name: LocalizableUserText!, $pluralName: LocalizableUserText!) {
+            createProfileType(name: $name, pluralName: $pluralName) {
+              id
+            }
+          }
+        `,
+        { name: { en: "Individual" }, pluralName: { en: "Individuals" } },
+      );
+
+      expect(createErrors).toBeUndefined();
+      expect(createData?.createProfileType).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileTypeId: GID!) {
+            me {
+              profileListViews(profileTypeId: $profileTypeId) {
+                type
+                isDefault
+                data {
+                  columns
+                  search
+                  sort {
+                    __typename
+                  }
+                }
+                profileType {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        { profileTypeId: createData.createProfileType.id },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData).toEqual({
+        me: {
+          profileListViews: [
+            {
+              type: "ALL",
+              isDefault: false,
+              data: {
+                columns: null,
+                search: null,
+                sort: null,
+              },
+              profileType: { id: createData.createProfileType.id },
+            },
+          ],
+        },
+      });
+    });
   });
 
   describe("updateProfileType", () => {
@@ -2400,6 +2461,84 @@ describe("GraphQL/Profiles", () => {
         fields: [{ isStandard: false }, { isStandard: false }, { isStandard: false }],
       });
     });
+
+    it("creates a new view on the cloned profile type", async () => {
+      const { errors: createErrors, data: createData } = await testClient.execute(
+        gql`
+          mutation ($name: LocalizableUserText!, $pluralName: LocalizableUserText!) {
+            createProfileType(name: $name, pluralName: $pluralName) {
+              id
+            }
+          }
+        `,
+        { name: { en: "Individual" }, pluralName: { en: "Individuals" } },
+      );
+
+      expect(createErrors).toBeUndefined();
+      expect(createData?.createProfileType).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: cloneErrors, data: cloneData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            cloneProfileType(profileTypeId: $profileTypeId) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: createData.createProfileType.id,
+        },
+      );
+
+      expect(cloneErrors).toBeUndefined();
+      expect(cloneData?.cloneProfileType).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileTypeId: GID!) {
+            me {
+              profileListViews(profileTypeId: $profileTypeId) {
+                type
+                isDefault
+                data {
+                  columns
+                  search
+                  sort {
+                    __typename
+                  }
+                }
+                profileType {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        { profileTypeId: cloneData.cloneProfileType.id },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData).toEqual({
+        me: {
+          profileListViews: [
+            {
+              type: "ALL",
+              isDefault: false,
+              data: {
+                columns: null,
+                search: null,
+                sort: null,
+              },
+              profileType: { id: cloneData.cloneProfileType.id },
+            },
+          ],
+        },
+      });
+    });
   });
 
   describe("archiveProfileType", () => {
@@ -2758,6 +2897,85 @@ describe("GraphQL/Profiles", () => {
         .select("*");
 
       expect(dbPinned).toHaveLength(0);
+    });
+
+    it("deletes every view on the deleted profile type", async () => {
+      const profileTypes = await mocks.createRandomProfileTypes(organization.id, 3, () => ({
+        archived_at: new Date(),
+        archived_by_user_id: sessionUser.id,
+      }));
+      const users = await mocks.createRandomUsers(organization.id, 4);
+      const views = await mocks.knex.from("profile_list_view").insert(
+        [sessionUser.id, ...users.map((u) => u.id)].flatMap((userId) =>
+          profileTypes.map((pt) => ({
+            user_id: userId,
+            profile_type_id: pt.id,
+            name: "",
+            data: {
+              columns: null,
+              search: null,
+              sort: null,
+            },
+            position: 0,
+            view_type: "ALL",
+            is_default: false,
+          })),
+        ),
+        "*",
+      );
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileTypeId: GID!) {
+            me {
+              profileListViews(profileTypeId: $profileTypeId) {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.me).toEqual({
+        profileListViews: [],
+      });
+
+      const updatedDbViews = await mocks.knex
+        .from("profile_list_view")
+        .whereIn(
+          "id",
+          views.map((v) => v.id),
+        )
+        .select("*");
+
+      expect(
+        updatedDbViews.map(pick(["profile_type_id", "user_id", "deleted_at"])),
+      ).toIncludeSameMembers(
+        [sessionUser.id, ...users.map((u) => u.id)].flatMap((userId) =>
+          profileTypes.map((pt) => ({
+            profile_type_id: pt.id,
+            user_id: userId,
+            deleted_at: pt.id === profileTypes[0].id ? expect.any(Date) : null,
+          })),
+        ),
+      );
     });
   });
 

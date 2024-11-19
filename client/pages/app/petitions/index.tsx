@@ -30,6 +30,7 @@ import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentF
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { PetitionViewTabs } from "@parallel/components/common/view-tabs/PetitionViewTabs";
 import {
   RedirectError,
   WithApolloDataContext,
@@ -42,7 +43,6 @@ import { useMoveToFolderDialog } from "@parallel/components/petition-common/dial
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
-import { ViewTabs } from "@parallel/components/petition-list/ViewTabs";
 import {
   removeInvalidSharedWithFilterLines,
   sharedWithQueryItem,
@@ -623,7 +623,7 @@ function Petitions() {
             header={
               <>
                 {state.type === "PETITION" ? (
-                  <ViewTabs
+                  <PetitionViewTabs
                     state={state}
                     onStateChange={setQueryState}
                     views={me.petitionListViews}
@@ -687,12 +687,12 @@ Petitions.fragments = {
       fragment Petitions_User on User {
         id
         petitionListViews {
-          ...ViewTabs_PetitionListView
+          ...PetitionViewTabs_PetitionListView
           ...PetitionListHeader_PetitionListView
         }
       }
       ${PetitionListHeader.fragments.PetitionListView}
-      ${ViewTabs.fragments.PetitionListView}
+      ${PetitionViewTabs.fragments.PetitionListView}
     `;
   },
   get PetitionBaseOrFolder() {

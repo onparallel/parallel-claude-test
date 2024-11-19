@@ -2,11 +2,13 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, HStack, List, ListItem, Text } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Link } from "@parallel/components/common/Link";
 import {
   ProfilePropertyContent_ProfileFieldFileFragment,
   ProfilePropertyContent_ProfileFieldValueFragment,
   ProfilePropertyContent_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
+import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { never } from "@parallel/utils/never";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -15,6 +17,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { assertType } from "@parallel/utils/types";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
+import { MouseEvent } from "react";
 import { FormattedDate, FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
@@ -24,12 +27,14 @@ import { Divider } from "./Divider";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
+import { SmallPopover } from "./SmallPopover";
 
 export interface ProfilePropertyContentProps {
   profileId?: string;
   field: ProfilePropertyContent_ProfileTypeFieldFragment;
   files?: ProfilePropertyContent_ProfileFieldFileFragment[] | null;
   value?: ProfilePropertyContent_ProfileFieldValueFragment | null;
+  singleLine?: boolean;
 }
 
 export const ProfilePropertyContent = Object.assign(
@@ -71,21 +76,23 @@ export const ProfilePropertyContent = Object.assign(
 );
 
 const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentProps>(
-  function ProfileFieldFiles({ files, field, profileId, ...props }, ref) {
-    assert(isNonNullish(files), "files must be defined if field type is FILE");
+  function ProfileFieldFiles({ files, field, profileId, singleLine, ...props }, ref) {
+    assert(files !== undefined, "files must be defined if field type is FILE");
     const downloadProfileFieldFile = useDownloadProfileFieldFile();
     const isShiftDown = useIsGlobalKeyDown("Shift");
-    const buttons = files.map((file) => (
-      <SimpleFileButton
-        key={undefined}
-        {...pick(file.file!, ["filename", "contentType"])}
-        onClick={
-          isNonNullish(profileId) && isNonNullish(file.id)
-            ? () => withError(downloadProfileFieldFile(profileId, field.id, file.id!, !isShiftDown))
-            : undefined
-        }
-      />
-    ));
+    const buttons =
+      files?.map((file) => (
+        <SimpleFileButton
+          key={undefined}
+          {...pick(file.file!, ["filename", "contentType"])}
+          onClick={
+            isNonNullish(profileId) && isNonNullish(file.id)
+              ? () =>
+                  withError(downloadProfileFieldFile(profileId, field.id, file.id!, !isShiftDown))
+              : undefined
+          }
+        />
+      )) ?? [];
     return buttons.length === 0 ? (
       <Box ref={ref} textStyle="hint" {...props}>
         <FormattedMessage
@@ -97,6 +104,61 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
       <Flex ref={ref} {...(props as any)}>
         {buttons[0]}
       </Flex>
+    ) : singleLine ? (
+      <EnumerateList
+        values={files ?? []}
+        maxItems={1}
+        renderItem={({ value }, index) => (
+          <SimpleFileButton
+            key={index}
+            {...pick(value.file!, ["filename", "contentType"])}
+            onClick={
+              isNonNullish(profileId) && isNonNullish(value.id)
+                ? (event) => {
+                    event.stopPropagation();
+                    withError(
+                      downloadProfileFieldFile(profileId, field.id, value.id!, !isShiftDown),
+                    );
+                  }
+                : undefined
+            }
+          />
+        )}
+        renderOther={({ children, remaining }) => (
+          <SmallPopover
+            content={
+              <List display="flex" flexWrap="wrap" gap={1}>
+                {remaining
+                  .filter((file) => isNonNullish(file.file))
+                  .map((file, i) => (
+                    <ListItem key={i} minWidth={0} display="flex">
+                      <SimpleFileButton
+                        {...pick(file.file!, ["filename", "contentType"])}
+                        onClick={
+                          isNonNullish(profileId) && isNonNullish(file.id)
+                            ? (event) => {
+                                event.stopPropagation();
+                                withError(
+                                  downloadProfileFieldFile(
+                                    profileId,
+                                    field.id,
+                                    file.id!,
+                                    !isShiftDown,
+                                  ),
+                                );
+                              }
+                            : undefined
+                        }
+                      />
+                    </ListItem>
+                  ))}
+              </List>
+            }
+          >
+            <Link href="#">{children}</Link>
+          </SmallPopover>
+        )}
+      />
     ) : (
       <List ref={ref} display="flex" flexWrap="wrap" gap={1} {...(props as any)}>
         {buttons.map((button, i) => (
@@ -110,7 +172,7 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
 );
 
 const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfilePropertyContentProps>(
-  function ProfileFieldValue({ value, field, profileId, ...props }, ref) {
+  function ProfileFieldValue({ value, field, profileId, singleLine, ...props }, ref) {
     if (isNullish(value)) {
       return (
         <Box ref={ref} as="span" textStyle="hint" {...props}>
@@ -123,7 +185,11 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
     } else {
       assert(isNonNullish(value), `value must be defined if field type is ${field.type}`);
       const content = value.content!;
-      if (field.type === "SHORT_TEXT") {
+      if (singleLine && ["SHORT_TEXT", "TEXT"].includes(field.type)) {
+        const { noOfLines: _, ...rest } = props;
+        //TODO pass ref
+        return <OverflownText {...rest}>{content.value}</OverflownText>;
+      } else if (field.type === "SHORT_TEXT") {
         return (
           <Box as="span" ref={ref} {...props}>
             {content.value}
@@ -154,6 +220,7 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
             fontSize="sm"
             backgroundColor={option.color}
             borderRadius="full"
+            width="fit-content"
             {...props}
           >
             <LocalizableUserTextRender value={option.label} default={content.value} />
@@ -182,30 +249,70 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
           </Box>
         );
       } else if (field.type === "CHECKBOX") {
-        return (
-          <List key={undefined}>
-            {content.value.map((v: string) => {
-              assertType<ProfileTypeFieldOptions<"CHECKBOX">>(field.options);
-              const option = field.options.values.find((o) => o.value === v);
-              return (
-                <ListItem key={v}>
-                  {isNullish(option) ? (
-                    v
-                  ) : (
-                    <LocalizableUserTextRender value={option.label} default={v} />
-                  )}
-                </ListItem>
-              );
-            })}
-          </List>
-        );
+        if (singleLine) {
+          const values = content.value.map((v: string) => {
+            assertType<ProfileTypeFieldOptions<"CHECKBOX">>(field.options);
+            const option = field.options.values.find((o) => o.value === v);
+            return isNullish(option) ? (
+              v
+            ) : (
+              <LocalizableUserTextRender value={option.label} default={v} />
+            );
+          });
+          const { noOfLines: _, ...rest } = props;
+          return (
+            <Flex gap={1} ref={ref} {...rest}>
+              <EnumerateList
+                values={values as string[]}
+                maxItems={1}
+                renderItem={({ value }, index) => (
+                  <OverflownText key={index}>{value}</OverflownText>
+                )}
+                renderOther={({ children, remaining }) => (
+                  <SmallPopover
+                    content={
+                      <List display="flex" flexWrap="wrap" gap={1}>
+                        {remaining.map((value, i) => (
+                          <ListItem key={i} minWidth={0} display="flex">
+                            <Text as="span">{value}</Text>
+                          </ListItem>
+                        ))}
+                      </List>
+                    }
+                  >
+                    <Link href="#">{children}</Link>
+                  </SmallPopover>
+                )}
+              />
+            </Flex>
+          );
+        } else {
+          return (
+            <List key={undefined}>
+              {content.value.map((v: string) => {
+                assertType<ProfileTypeFieldOptions<"CHECKBOX">>(field.options);
+                const option = field.options.values.find((o) => o.value === v);
+                return (
+                  <ListItem key={v}>
+                    {isNullish(option) ? (
+                      v
+                    ) : (
+                      <LocalizableUserTextRender value={option.label} default={v} />
+                    )}
+                  </ListItem>
+                );
+              })}
+            </List>
+          );
+        }
       } else if (field.type === "BACKGROUND_CHECK") {
+        const { noOfLines: _, ...rest } = props;
         return (
           <ProfileFieldBackgroundCheck
             value={value}
             field={field}
             profileId={profileId}
-            {...props}
+            {...rest}
           />
         );
       } else {
@@ -219,7 +326,8 @@ const ProfileFieldBackgroundCheck = chakraForwardRef<"div", ProfilePropertyConte
   function ProfileFieldBackgroundCheck({ value, field, profileId, ...props }, ref) {
     const intl = useIntl();
     const content = value!.content!;
-    const handleClick = async () => {
+    const handleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       try {
         const { entity, query } = content;
         const { name, date, type } = query ?? {};
@@ -235,6 +343,9 @@ const ProfileFieldBackgroundCheck = chakraForwardRef<"div", ProfilePropertyConte
         await openNewWindow(url);
       } catch {}
     };
+
+    const topics = content.entity?.properties?.topics ?? [];
+
     return (
       <Flex ref={ref} {...props}>
         <Button
@@ -257,11 +368,38 @@ const ProfileFieldBackgroundCheck = chakraForwardRef<"div", ProfilePropertyConte
               <OverflownText marginStart={1} minWidth="40px">
                 {content.entity.name}
               </OverflownText>
-              <HStack marginStart={1}>
-                {(content.entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
-                  <BackgroundCheckRiskLabel key={i} risk={topic} />
-                ))}
-              </HStack>
+              {topics.length > 3 ? (
+                <HStack spacing={1}>
+                  <EnumerateList
+                    values={topics as string[]}
+                    maxItems={1}
+                    renderItem={({ value }, index) => (
+                      <BackgroundCheckRiskLabel key={index} risk={value} />
+                    )}
+                    renderOther={({ children, remaining }) => (
+                      <SmallPopover
+                        content={
+                          <List display="flex" flexWrap="wrap" gap={1.5}>
+                            {remaining.map((value, i) => (
+                              <ListItem key={i} minWidth={0} display="flex">
+                                <BackgroundCheckRiskLabel risk={value} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        }
+                      >
+                        <Link href="#">{children}</Link>
+                      </SmallPopover>
+                    )}
+                  />
+                </HStack>
+              ) : (
+                <HStack marginStart={1}>
+                  {(content.entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
+                    <BackgroundCheckRiskLabel key={i} risk={topic} />
+                  ))}
+                </HStack>
+              )}
             </>
           ) : (
             <>

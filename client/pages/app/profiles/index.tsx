@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Center,
@@ -12,22 +12,29 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { ArchiveIcon, BellIcon, DeleteIcon, PinIcon, RepeatIcon } from "@parallel/chakra/icons";
+import {
+  ArchiveIcon,
+  BellIcon,
+  ColumnsIcon,
+  DeleteIcon,
+  PinIcon,
+  RepeatIcon,
+} from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
-import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeReference";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { useColumnVisibilityDialog } from "@parallel/components/common/dialogs/ColumnVisibilityDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { ProfileViewTabs } from "@parallel/components/common/view-tabs/ProfileViewTabs";
+import { SaveViewTabsMenu } from "@parallel/components/common/view-tabs/SaveViewMenuButton";
 import {
   RedirectError,
   WithApolloDataContext,
@@ -37,20 +44,29 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
+import { useConfirmChangeViewAllDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeViewAllDialog";
+import { useAskViewNameDialog } from "@parallel/components/petition-list/AskViewNameDialog";
 import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/profiles/dialogs/CreateProfileFromProfileTypeDialog";
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
+  ProfileListViewData,
+  ProfileListViewDataInput,
   ProfileStatus,
   Profiles_ProfileFragment,
+  Profiles_ProfileListViewFragment,
+  Profiles_createProfileListViewDocument,
   Profiles_profileTypeDocument,
   Profiles_profilesDocument,
+  Profiles_updateProfileListViewDocument,
   Profiles_userDocument,
 } from "@parallel/graphql/__types";
-import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
 import { useCloseProfile } from "@parallel/utils/mutations/useCloseProfile";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { usePermanentlyDeleteProfile } from "@parallel/utils/mutations/usePermanentlyDeleteProfile";
@@ -59,8 +75,8 @@ import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   QueryStateFrom,
-  QueryStateOf,
   SetQueryState,
+  buildStateUrl,
   integer,
   parseQuery,
   sorting,
@@ -72,26 +88,37 @@ import {
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePinProfileType } from "@parallel/utils/usePinProfileType";
+import { useProfileTableColumns } from "@parallel/utils/useProfileTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
-import { ChangeEvent, MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  MouseEvent,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNullish } from "remeda";
+import { isDeepEqual, isNonNullish, isNullish, omit, pick } from "remeda";
 
 const SORTING = ["name", "createdAt"] as const;
 
+export const DEFAULT_PROFILE_COLUMN_SELECTION = ["subscribers", "createdAt"];
+
 const QUERY_STATE = {
+  view: string(),
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
   search: string(),
-  sort: sorting(SORTING).orDefault({
-    field: "createdAt",
-    direction: "DESC",
-  }),
+  sort: sorting(SORTING),
   type: string(),
-  status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).orDefault("OPEN"),
+  status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"] as ProfileStatus[]).orDefault("OPEN"),
+  columns: string().list({ allowEmpty: true }),
 };
-type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
+export type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
 interface ProfilesTableContext {
   status: ProfileStatus;
@@ -99,9 +126,8 @@ interface ProfilesTableContext {
 }
 function Profiles() {
   const intl = useIntl();
-  const { data: queryObject } = useAssertQuery(Profiles_userDocument);
-  const { me } = queryObject;
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+
   const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
   const navigate = useHandleNavigation();
   const showToast = useToast();
@@ -112,34 +138,43 @@ function Profiles() {
   const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
   const userCanDeletePermanently = useHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES");
 
+  const { data: queryObject } = useAssertQueryOrPreviousData(Profiles_userDocument, {
+    variables: { profileTypeId: queryState.type! },
+  });
+  const { me } = queryObject;
+
+  const sort = queryState.sort ?? ({ field: "name", direction: "ASC" } as const);
+
+  const {
+    data: { profileType },
+  } = useAssertQuery(Profiles_profileTypeDocument, {
+    variables: { profileTypeId: queryState.type! },
+    fetchPolicy: "cache-and-network",
+  });
+
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
       offset: queryState.items * (queryState.page - 1),
       limit: queryState.items,
       search: queryState.search,
-      sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
+      sortBy: [`${sort.field}_${sort.direction}` as const],
       filter: {
         profileTypeId: [queryState.type!],
         status: [queryState.status],
       },
-    },
-    fetchPolicy: "cache-and-network",
-  });
-
-  const { data: _profileTypeData } = useQueryOrPreviousData(Profiles_profileTypeDocument, {
-    variables: {
-      profileTypeId: queryState.type!,
+      propertiesFilter:
+        queryState.columns
+          ?.filter((c) => c.startsWith("field_"))
+          ?.map((c) => ({ profileTypeFieldId: c.slice("field_".length) })) ?? [],
     },
     fetchPolicy: "cache-and-network",
   });
 
   const profiles = data?.profiles;
 
-  const profileType = _profileTypeData?.profileType ?? null;
-
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
-  const columns = useProfileTableColumns(status);
+  const profileTableColumns = useProfileTableColumns(profileType);
 
   const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
   const handleCreateProfile = async () => {
@@ -282,6 +317,17 @@ function Profiles() {
     } catch {}
   };
 
+  const showColumnVisibilityDialog = useColumnVisibilityDialog();
+  const handleEditColumns = async () => {
+    try {
+      const columns = await showColumnVisibilityDialog({
+        columns: profileTableColumns,
+        selection: queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION,
+      });
+      setQueryState((current) => ({ ...current, columns }));
+    } catch {}
+  };
+
   const actions = useProfileListActions({
     canDelete: userCanDeleteProfiles,
     canCloseOpen: userCanCloseOpenProfiles,
@@ -297,6 +343,14 @@ function Profiles() {
   });
 
   const icon = getProfileTypeFieldIcon(profileType?.icon);
+
+  const sortedAndFilteredColumns = useMemo(() => {
+    const columns = queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION;
+
+    return ["name", ...(columns ?? [])]
+      .map((key) => profileTableColumns.find((d) => d.key === key))
+      .filter(isNonNullish);
+  }, [queryState.columns?.join(","), queryState.status]);
 
   return (
     <AppLayout
@@ -380,7 +434,7 @@ function Profiles() {
         <Box flex="1" paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
-            columns={columns}
+            columns={sortedAndFilteredColumns}
             rows={profiles?.items}
             rowKeyProp="id"
             context={context}
@@ -392,7 +446,7 @@ function Profiles() {
             pageSize={queryState.items}
             totalCount={profiles?.totalCount}
             onSelectionChange={onChangeSelectedIds}
-            sort={queryState.sort}
+            sort={sort}
             onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
             onPageSizeChange={(items) =>
               setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
@@ -400,12 +454,22 @@ function Profiles() {
             onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
             actions={actions}
             header={
-              <ProfilesListHeader
-                shape={QUERY_STATE}
-                state={queryState}
-                onStateChange={setQueryState}
-                onReload={refetch}
-              />
+              <>
+                <ProfileViewTabs
+                  state={queryState}
+                  onStateChange={setQueryState}
+                  views={me.profileListViews}
+                  profileTypeId={profileType.id}
+                />
+                <ProfilesListHeader
+                  state={queryState}
+                  onStateChange={setQueryState}
+                  onReload={refetch}
+                  onEditColumns={handleEditColumns}
+                  views={me.profileListViews}
+                  profileTypeId={profileType.id}
+                />
+              </>
             }
             body={
               profiles && profiles.totalCount === 0 && !loading ? (
@@ -432,7 +496,7 @@ function Profiles() {
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-closed-profiles"
-                        defaultMessage="There is no closed profile"
+                        defaultMessage="There are no closed profiles"
                       />
                     </Text>
                   </Center>
@@ -612,15 +676,29 @@ function useProfileListActions({
 }
 
 interface ProfilesListHeaderProps {
-  shape: QueryStateOf<ProfilesQueryState>;
   state: ProfilesQueryState;
+  profileTypeId: string;
+  views: Profiles_ProfileListViewFragment[];
   onStateChange: SetQueryState<Partial<ProfilesQueryState>>;
   onReload: () => void;
+  onEditColumns: () => void;
 }
 
-function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesListHeaderProps) {
+function ProfilesListHeader({
+  state,
+  profileTypeId,
+  views,
+  onStateChange,
+  onReload,
+  onEditColumns,
+}: ProfilesListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(state.search ?? "");
+  const saveViewRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setSearch(state.search ?? "");
+  }, [state.view]);
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (search) =>
@@ -642,8 +720,113 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
     [debouncedOnSearchChange],
   );
 
+  const isViewDirty = useMemo(() => {
+    const currentView = views.find((v) =>
+      state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+    );
+
+    if (!currentView) return false;
+
+    if (currentView.type === "ALL") {
+      // "ALL" view can only update columns and sortBy
+      return !viewsAreEqual(
+        pick(currentView.data, ["sort", "columns"]),
+        pick(state, ["sort", "columns"]),
+      );
+    }
+
+    return !viewsAreEqual(currentView!.data, {
+      ...(pick(state, ["search", "sort", "columns", "status"]) as Omit<
+        ProfileListViewData,
+        "__typename"
+      >),
+    });
+  }, [state, views]);
+
+  const [updateProfileListView] = useMutation(Profiles_updateProfileListViewDocument);
+  const showConfirmChangeViewAllDialog = useConfirmChangeViewAllDialog();
+
+  const handleSaveCurrentView = async () => {
+    try {
+      // If the view to save is ALL and has some filter applied, show the dialog
+      // to choose whether to save and ignore the filters or switch to create a new VIEW.
+
+      if (
+        state.view === "ALL" &&
+        Object.values(pick(state, ["search", "status"])).some(isNonNullish)
+      ) {
+        const action = await showConfirmChangeViewAllDialog({
+          modalProps: { finalFocusRef: saveViewRef },
+        });
+        if (action === "CREATE_NEW_VIEW") {
+          handleSaveViewAsNew();
+          return;
+        }
+      }
+      const view = views.find((v) =>
+        state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+      )!;
+      await updateProfileListView({
+        variables: {
+          profileListViewId: view.id,
+          profileTypeId,
+          ...(view.type === "ALL" ? {} : { name: view.name }),
+          data: {
+            ...pick(state, ["sort", "columns"]),
+            ...(view.type === "ALL" ? {} : { search: state.search, status: state.status }),
+          } as ProfileListViewDataInput,
+        },
+      });
+    } catch {}
+  };
+
+  const showAskViewNameDialog = useAskViewNameDialog();
+  const [createProfileListView] = useMutation(Profiles_createProfileListViewDocument);
+  const handleSaveViewAsNew = async () => {
+    const currentView = state.view !== "ALL" ? views.find((v) => v.id === state.view) : null;
+    try {
+      const name = await showAskViewNameDialog({
+        name: currentView?.name,
+        header: (
+          <FormattedMessage
+            id="component.petition-list-header.save-as-new-view-header"
+            defaultMessage="Create new view"
+          />
+        ),
+        confirm: (
+          <FormattedMessage
+            id="component.petition-list-header.save-as-new-view-confirm-button"
+            defaultMessage="Create view"
+          />
+        ),
+        modalProps: { finalFocusRef: saveViewRef },
+      });
+      const { data } = await createProfileListView({
+        variables: {
+          profileTypeId,
+          name,
+          data: {
+            ...pick(state, ["sort", "columns", "search", "status"]),
+          } as ProfileListViewDataInput,
+        },
+      });
+      if (isNonNullish(data)) {
+        onStateChange({
+          ...state,
+          view: data.createProfileListView.id,
+          columns: data.createProfileListView.data.columns,
+          search: data.createProfileListView.data.search,
+          sort: isNonNullish(data.createProfileListView.data.sort)
+            ? omit(data.createProfileListView.data.sort, ["__typename"])
+            : undefined,
+          status: data.createProfileListView.data.status ?? "OPEN",
+        });
+      }
+    } catch {}
+  };
+
   return (
-    <HStack padding={2}>
+    <HStack padding={2} justify="space-between">
       <IconButtonWithTooltip
         onClick={() => onReload()}
         icon={<RepeatIcon />}
@@ -657,118 +840,40 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
+
+      <HStack flex={1} justifyContent="flex-end">
+        <ResponsiveButtonIcon
+          icon={<ColumnsIcon />}
+          variant="outline"
+          data-action="edit-columns"
+          onClick={onEditColumns}
+          label={intl.formatMessage({
+            id: "generic.edit-columns",
+            defaultMessage: "Edit columns",
+          })}
+        />
+        <SaveViewTabsMenu
+          ref={saveViewRef}
+          isViewDirty={isViewDirty}
+          onSaveAsNewView={handleSaveViewAsNew}
+          onSaveCurrentView={handleSaveCurrentView}
+        />
+      </HStack>
     </HStack>
   );
 }
 
-export function useProfileTableColumns(
-  status: ProfileStatus,
-): TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[] {
-  const intl = useIntl();
-  return useMemo(
-    () => [
-      {
-        key: "name",
-        isSortable: true,
-        label: intl.formatMessage({
-          id: "generic.name",
-          defaultMessage: "Name",
-        }),
-        headerProps: {
-          minWidth: "240px",
-        },
-        cellProps: {
-          maxWidth: 0,
-          minWidth: "240px",
-        },
-        CellContent: ({ row }) => {
-          return (
-            <OverflownText>
-              <ProfileReference
-                profile={row}
-                showNameEvenIfDeleted={status === "DELETION_SCHEDULED"}
-              />
-            </OverflownText>
-          );
-        },
-      },
-      {
-        key: "type",
-        label: intl.formatMessage({
-          id: "component.profile-table-columns.type",
-          defaultMessage: "Type",
-        }),
-        headerProps: {
-          minWidth: "240px",
-        },
-        cellProps: {
-          maxWidth: 0,
-          minWidth: "240px",
-        },
-        CellContent: ({
-          row: {
-            profileType: { name },
-          },
-        }) => {
-          return (
-            <OverflownText textStyle={name ? undefined : "hint"}>
-              {localizableUserTextRender({
-                value: name,
-                intl,
-                default: intl.formatMessage({
-                  id: "generic.unnamed-profile-type",
-                  defaultMessage: "Unnamed profile type",
-                }),
-              })}
-            </OverflownText>
-          );
-        },
-      },
-      ...(status === "OPEN"
-        ? ([
-            {
-              key: "subscribed",
-              header: intl.formatMessage({
-                id: "component.profile-table-columns.subscribed",
-                defaultMessage: "Subscribed",
-              }),
-              align: "left",
-              headerProps: { minWidth: "132px" },
-              cellProps: { minWidth: "132px" },
-              CellContent: ({ row, column }) => {
-                const { subscribers } = row;
-
-                if (!subscribers?.length) {
-                  return <></>;
-                }
-                return (
-                  <Flex justifyContent={column.align}>
-                    <UserAvatarList usersOrGroups={subscribers?.map((s) => s.user)} />
-                  </Flex>
-                );
-              },
-            },
-          ] as TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[])
-        : ([] as TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[])),
-      {
-        key: "createdAt",
-        isSortable: true,
-        label: intl.formatMessage({
-          id: "generic.created-at",
-          defaultMessage: "Created at",
-        }),
-        headerProps: {
-          minWidth: "160px",
-        },
-        cellProps: {
-          minWidth: "160px",
-        },
-        CellContent: ({ row: { createdAt } }) => (
-          <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
-        ),
-      },
-    ],
-    [intl.locale, status],
+function viewsAreEqual(view1: Partial<ProfileListViewData>, view2: Partial<ProfileListViewData>) {
+  return (
+    isDeepEqual(omit(view1, ["__typename", "sort"]), omit(view2, ["__typename", "sort"])) &&
+    isDeepEqual(
+      isNonNullish(view1.sort)
+        ? omit(view1.sort, ["__typename"])
+        : { field: "createdAt", direction: "DESC" },
+      isNonNullish(view2.sort)
+        ? omit(view2.sort, ["__typename"])
+        : { field: "createdAt", direction: "DESC" },
+    )
   );
 }
 
@@ -782,59 +887,63 @@ const _fragments = {
         isPinned
         canCreate
         ...ProfileTypeReference_ProfileType
+        ...useProfileTableColumns_ProfileType
       }
       ${ProfileTypeReference.fragments.ProfileType}
+      ${useProfileTableColumns.fragments.ProfileType}
     `;
   },
   get Profile() {
     return gql`
       fragment Profiles_Profile on Profile {
         id
-        localizableName
         status
         ...ProfileReference_Profile
         profileType {
           id
           name
         }
-        subscribers {
-          id
-          user {
-            id
-            ...UserAvatarList_User
-            ...useProfileSubscribersDialog_User
-          }
-        }
-        createdAt
+        ...useProfileTableColumns_Profile
       }
       ${ProfileReference.fragments.Profile}
-      ${UserAvatarList.fragments.User}
-      ${useProfileSubscribersDialog.fragments.User}
+      ${useProfileTableColumns.fragments.Profile}
     `;
   },
-  get ProfilePagination() {
+  get ProfileListView() {
     return gql`
-      fragment Profiles_ProfilePagination on ProfilePagination {
-        items {
-          ...Profiles_Profile
+      fragment Profiles_ProfileListView on ProfileListView {
+        id
+        ...ProfileViewTabs_ProfileListView
+        data {
+          columns
+          search
+          sort {
+            field
+            direction
+          }
+          status
         }
-        totalCount
       }
-      ${this.Profile}
+      ${ProfileViewTabs.fragments.ProfileListView}
     `;
   },
 };
 
 const _queries = [
   gql`
-    query Profiles_user {
+    query Profiles_user($profileTypeId: GID!) {
       ...AppLayout_Query
       me {
+        id
         ...useProfileSubscribersDialog_User
+        profileListViews(profileTypeId: $profileTypeId) {
+          ...Profiles_ProfileListView
+        }
       }
     }
     ${AppLayout.fragments.Query}
     ${useProfileSubscribersDialog.fragments.User}
+    ${_fragments.ProfileListView}
   `,
   gql`
     query Profiles_profileType($profileTypeId: GID!) {
@@ -851,39 +960,141 @@ const _queries = [
       $search: String
       $sortBy: [QueryProfiles_OrderBy!]
       $filter: ProfileFilter
+      $propertiesFilter: [ProfileFieldPropertyFilter!]
     ) {
       profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
-        ...Profiles_ProfilePagination
+        items {
+          ...Profiles_Profile
+          properties(filter: $propertiesFilter) {
+            ...useProfileTableColumns_ProfileFieldProperty
+          }
+        }
+        totalCount
       }
     }
-    ${_fragments.ProfilePagination}
+    ${_fragments.Profile}
+    ${useProfileTableColumns.fragments.ProfileFieldProperty}
   `,
 ];
 
-Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+const _mutations = [
+  gql`
+    mutation Profiles_createProfileListView(
+      $profileTypeId: GID!
+      $name: String!
+      $data: ProfileListViewDataInput!
+    ) {
+      createProfileListView(profileTypeId: $profileTypeId, name: $name, data: $data) {
+        id
+        ...Profiles_ProfileListView
+        user {
+          id
+          profileListViews(profileTypeId: $profileTypeId) {
+            id
+          }
+        }
+      }
+    }
+    ${_fragments.ProfileListView}
+  `,
+  gql`
+    mutation Profiles_updateProfileListView(
+      $profileTypeId: GID!
+      $profileListViewId: GID!
+      $name: String
+      $data: ProfileListViewDataInput
+    ) {
+      updateProfileListView(
+        profileTypeId: $profileTypeId
+        profileListViewId: $profileListViewId
+        name: $name
+        data: $data
+      ) {
+        id
+        ...Profiles_ProfileListView
+      }
+    }
+    ${_fragments.ProfileListView}
+  `,
+];
+
+Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
   if (isNullish(state.type)) {
     throw new RedirectError("/app");
   }
+  let views: Profiles_ProfileListViewFragment[];
   try {
-    await Promise.all([
-      fetchQuery(Profiles_userDocument),
+    const [{ data }] = await Promise.all([
+      fetchQuery(Profiles_userDocument, { variables: { profileTypeId: state.type } }),
       fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type } }),
-      fetchQuery(Profiles_profilesDocument, {
-        variables: {
-          offset: state.items * (state.page - 1),
-          limit: state.items,
-          search: state.search,
-          sortBy: [`${state.sort.field}_${state.sort.direction}` as const],
-          filter: {
-            profileTypeId: [state.type],
-            status: [state.status],
-          },
-        },
-      }),
     ]);
+    views = data.me.profileListViews;
   } catch {
     throw new RedirectError("/app");
+  }
+
+  if (isNullish(state.view) && isNonNullish(views)) {
+    const defaultView = views.find((v) => v.isDefault);
+    if (isNonNullish(defaultView)) {
+      throw new RedirectError(
+        buildStateUrl(
+          QUERY_STATE,
+          {
+            ...state,
+            view: defaultView.id,
+            search: defaultView.data.search,
+            columns: defaultView.data.columns,
+            sort: isNonNullish(defaultView.data.sort)
+              ? omit(defaultView.data.sort, ["__typename"])
+              : undefined,
+            status: defaultView.data.status ?? "OPEN",
+          },
+          pathname,
+          query,
+        ),
+      );
+    } else {
+      const allView = views.find((v) => v.type === "ALL");
+
+      if (allView) {
+        throw new RedirectError(
+          buildStateUrl(
+            QUERY_STATE,
+            {
+              ...state,
+              view: "ALL",
+              ...omit(allView.data, ["__typename", "sort"]),
+              sort: isNonNullish(allView.data.sort)
+                ? omit(allView.data.sort, ["__typename"])
+                : undefined,
+              status: allView.data.status ?? "OPEN",
+            },
+            pathname,
+            query,
+          ),
+        );
+      } else {
+        throw new RedirectError(
+          buildStateUrl(
+            QUERY_STATE,
+            {
+              ...state,
+              view: "ALL",
+            },
+            pathname,
+            query,
+          ),
+        );
+      }
+    }
+  } else if (state.view !== "ALL") {
+    const view = views.find((v) => v.id === state.view);
+    if (isNullish(view)) {
+      throw new RedirectError(
+        buildStateUrl(QUERY_STATE, { ...state, view: "ALL" }, pathname, query),
+      );
+    }
   }
   return {};
 };

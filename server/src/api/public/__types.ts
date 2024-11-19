@@ -781,6 +781,17 @@ export type LandingTemplatePagination = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type ListView = {
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  type: ListViewType;
+  user: User;
+};
+
+export type ListViewSortDirection = "ASC" | "DESC";
+
+export type ListViewType = "ALL" | "CUSTOM";
+
 /** If status is PROCESSING, task will be non-null. If status is COMPLETED, action will be already completed and task will be null. */
 export type MaybeTask = {
   status: MaybeTaskStatus;
@@ -966,6 +977,8 @@ export type Mutation = {
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
   /** Adds a field as child of a field group, linked to a property of the parent field profile type */
   createProfileLinkedPetitionField: PetitionField;
+  /** Creates a view with custom filters and ordering on the user's profile list */
+  createProfileListView: ProfileListView;
   /** Associates a profile with one or more relationships. */
   createProfileRelationship: Profile;
   createProfileType: ProfileType;
@@ -1034,6 +1047,8 @@ export type Mutation = {
   /** Permanently deletes the profile */
   deleteProfile: Success;
   deleteProfileFieldFile: Result;
+  /** Deletes a profile list view of the user */
+  deleteProfileListView: User;
   deleteProfileType: Success;
   deleteProfileTypeField: ProfileType;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
@@ -1077,6 +1092,8 @@ export type Mutation = {
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
+  /** Sets the default profile list view of the user. If passing null id, default view will be set (no filters/sorting) */
+  markProfileListViewAsDefault: ProfileListView;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
@@ -1168,6 +1185,8 @@ export type Mutation = {
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
   reorderPetitionListViews: User;
+  /** Changes the ordering of a user's profile list views */
+  reorderProfileListViews: User;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationEmail: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
@@ -1295,6 +1314,8 @@ export type Mutation = {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  /** Updates a profile list view */
+  updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
   /**
@@ -1730,6 +1751,12 @@ export type MutationcreateProfileLinkedPetitionFieldArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateProfileListViewArgs = {
+  data: ProfileListViewDataInput;
+  name: Scalars["String"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
@@ -1904,6 +1931,10 @@ export type MutationdeleteProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationdeleteProfileListViewArgs = {
+  id: Scalars["GID"]["input"];
+};
+
 export type MutationdeleteProfileTypeArgs = {
   profileTypeIds: Array<Scalars["GID"]["input"]>;
 };
@@ -2009,6 +2040,11 @@ export type MutationloginAsArgs = {
 
 export type MutationmarkPetitionListViewAsDefaultArgs = {
   petitionListViewId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
+export type MutationmarkProfileListViewAsDefaultArgs = {
+  profileListViewId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationmarkSignatureIntegrationAsDefaultArgs = {
@@ -2279,6 +2315,11 @@ export type MutationreorderPetitionAttachmentsArgs = {
 
 export type MutationreorderPetitionListViewsArgs = {
   ids: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationreorderProfileListViewsArgs = {
+  ids: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationresendVerificationEmailArgs = {
@@ -2666,6 +2707,13 @@ export type MutationupdateProfileEventSubscriptionArgs = {
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileListViewArgs = {
+  data?: InputMaybe<ProfileListViewDataInput>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  profileListViewId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateProfileTypeArgs = {
@@ -3747,12 +3795,12 @@ export type PetitionFolder = {
   petitionCount: Scalars["Int"]["output"];
 };
 
-export type PetitionListView = {
+export type PetitionListView = ListView & {
   data: PetitionListViewData;
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
-  type: PetitionListViewType;
+  type: ListViewType;
   user: User;
 };
 
@@ -3819,11 +3867,9 @@ export type PetitionListViewDataTagsFilters = {
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
 
 export type PetitionListViewSort = {
-  direction: PetitionListViewSortDirection;
+  direction: ListViewSortDirection;
   field: PetitionListViewSortField;
 };
-
-export type PetitionListViewSortDirection = "ASC" | "DESC";
 
 export type PetitionListViewSortField =
   | "createdAt"
@@ -3833,11 +3879,9 @@ export type PetitionListViewSortField =
   | "sentAt";
 
 export type PetitionListViewSortInput = {
-  direction: PetitionListViewSortDirection;
+  direction: ListViewSortDirection;
   field: PetitionListViewSortField;
 };
-
-export type PetitionListViewType = "ALL" | "CUSTOM";
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";
@@ -4658,6 +4702,43 @@ export type ProfileFilter = {
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
   values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+};
+
+export type ProfileListView = ListView & {
+  data: ProfileListViewData;
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  profileType: ProfileType;
+  type: ListViewType;
+  user: User;
+};
+
+export type ProfileListViewData = {
+  columns: Maybe<Array<Scalars["String"]["output"]>>;
+  search: Maybe<Scalars["String"]["output"]>;
+  sort: Maybe<ProfileListViewSort>;
+  status: Maybe<ProfileStatus>;
+};
+
+export type ProfileListViewDataInput = {
+  /** Each column can refer to a profile property ID, or a built-in column: 'subscribers' or 'createdAt' */
+  columns?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<ProfileListViewSortInput>;
+  status?: InputMaybe<ProfileStatus>;
+};
+
+export type ProfileListViewSort = {
+  direction: ListViewSortDirection;
+  field: ProfileListViewSortField;
+};
+
+export type ProfileListViewSortField = "createdAt" | "name";
+
+export type ProfileListViewSortInput = {
+  direction: ListViewSortDirection;
+  field: ProfileListViewSortField;
 };
 
 export type ProfilePagination = {
@@ -6184,6 +6265,8 @@ export type User = Timestamps & {
   /** The pinned profile types of the user menu */
   pinnedProfileTypes: Array<ProfileType>;
   preferredLocale: UserLocale;
+  /** The profile views of the user */
+  profileListViews: Array<ProfileListView>;
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
@@ -6209,6 +6292,11 @@ export type UsernotificationsArgs = {
   before?: InputMaybe<Scalars["DateTime"]["input"]>;
   filter?: InputMaybe<PetitionUserNotificationFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+/** A user in the system. */
+export type UserprofileListViewsArgs = {
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type UserAuthenticationToken = CreatedAt & {

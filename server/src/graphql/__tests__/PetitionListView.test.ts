@@ -41,7 +41,7 @@ describe("GraphQL/PetitionListView", () => {
           },
           name: "ALL",
           position: 0,
-          type: "ALL",
+          view_type: "ALL",
         },
         {
           is_default: true,

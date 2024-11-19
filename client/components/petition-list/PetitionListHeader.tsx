@@ -1,31 +1,16 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Box,
-  Button,
-  Circle,
   HStack,
   Heading,
-  MenuItem,
-  MenuList,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
   Stack,
-  chakra,
-  useBreakpointValue,
-  useMenuButton,
 } from "@chakra-ui/react";
-import { Menu, Popover, Tooltip } from "@parallel/chakra/components";
-import {
-  ChevronDownIcon,
-  CloseIcon,
-  ColumnsIcon,
-  FilterIcon,
-  RepeatIcon,
-  SaveIcon,
-} from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Popover } from "@parallel/chakra/components";
+import { CloseIcon, ColumnsIcon, FilterIcon, RepeatIcon } from "@parallel/chakra/icons";
 import {
   PetitionListHeader_PetitionListViewFragment,
   PetitionListHeader_createPetitionListViewDocument,
@@ -52,6 +37,7 @@ import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
 import { useColumnVisibilityDialog } from "../common/dialogs/ColumnVisibilityDialog";
 import { isDialogError } from "../common/dialogs/DialogProvider";
+import { SaveViewTabsMenu } from "../common/view-tabs/SaveViewMenuButton";
 import { useConfirmChangeViewAllDialog } from "../petition-compose/dialogs/ConfirmChangeViewAllDialog";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
 import { removeInvalidSharedWithFilterLines } from "./filters/shared-with/PetitionListSharedWithFilter";
@@ -152,12 +138,9 @@ export function PetitionListHeader({
   const [createPetitionListView] = useMutation(PetitionListHeader_createPetitionListViewDocument);
   const handleSaveAsNewViewClick = async () => {
     try {
-      const currentView = state.view === "ALL" ? null : views.find((v) => v.id === state.view)!;
+      const currentView = state.view !== "ALL" ? views.find((v) => v.id === state.view) : null;
       const name = await showAskViewNameDialog({
-        name:
-          currentView?.type === "ALL"
-            ? intl.formatMessage({ id: "generic.all-view", defaultMessage: "All" })
-            : currentView?.name,
+        name: currentView?.name,
         header: (
           <FormattedMessage
             id="component.petition-list-header.save-as-new-view-header"
@@ -380,25 +363,12 @@ export function PetitionListHeader({
                 defaultMessage: "Edit columns",
               })}
             />
-            <Menu placement="bottom-end">
-              <SaveViewMenuButton ref={saveViewRef} isDirty={isViewDirty} />
-              <Portal>
-                <MenuList minWidth="160px">
-                  <MenuItem isDisabled={!isViewDirty} onClick={handleSaveCurrentViewClick}>
-                    <FormattedMessage
-                      id="component.petition-list-header.save-current-view"
-                      defaultMessage="Save current view"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleSaveAsNewViewClick}>
-                    <FormattedMessage
-                      id="component.petition-list-header.save-as-new-view"
-                      defaultMessage="Save as new view"
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
+            <SaveViewTabsMenu
+              ref={saveViewRef}
+              isViewDirty={isViewDirty}
+              onSaveAsNewView={handleSaveAsNewViewClick}
+              onSaveCurrentView={handleSaveCurrentViewClick}
+            />
           </HStack>
         ) : null}
       </HStack>
@@ -419,58 +389,6 @@ export function PetitionListHeader({
     </Stack>
   );
 }
-
-const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
-  function SaveViewMenuButton({ isDirty }, ref) {
-    const buttonProps = useMenuButton({}, ref);
-    const isSmallScreen = useBreakpointValue({ base: true, md: false });
-    const intl = useIntl();
-    return (
-      <Tooltip
-        label={intl.formatMessage({
-          id: "component.petition-list-header.save-view-button",
-          defaultMessage: "Save view",
-        })}
-        isDisabled={!isSmallScreen}
-        placement="bottom-start"
-      >
-        <Button
-          {...buttonProps}
-          paddingX={{ base: 2, md: 3 }}
-          data-action="save-petition-list-view"
-          aria-label={
-            isSmallScreen
-              ? intl.formatMessage({
-                  id: "component.petition-list-header.save-view-button",
-                  defaultMessage: "Save view",
-                })
-              : undefined
-          }
-        >
-          <chakra.span display="inline-flex" flex="1" pointerEvents="none" alignItems="center">
-            {isDirty || isSmallScreen ? (
-              <chakra.span marginEnd={isSmallScreen ? 1 : 2}>
-                {isDirty ? <Circle size={2} backgroundColor="primary.500" /> : null}
-              </chakra.span>
-            ) : null}
-            <chakra.span>
-              <SaveIcon aria-hidden focusable={false} boxSize={4} display="block" />
-            </chakra.span>
-            <chakra.span marginStart={2} display={{ base: "none", md: "inline" }}>
-              {intl.formatMessage({
-                id: "component.petition-list-header.save-view-button",
-                defaultMessage: "Save view",
-              })}
-            </chakra.span>
-            <chakra.span marginStart={2} display={{ base: "none", md: "inline" }}>
-              <ChevronDownIcon aria-hidden focusable={false} />
-            </chakra.span>
-          </chakra.span>
-        </Button>
-      </Tooltip>
-    );
-  },
-);
 
 PetitionListHeader.fragments = {
   PetitionListView: gql`
