@@ -115,6 +115,12 @@ export function getHardcodedSignatures(templateId: string) {
       signatureImageUrl:
         "https://static.onparallel.com/static/images/signatures/miguel-acosta-aliseda.png",
     });
+  } else if (["6Y8DSH92uxPaJ4BZW66av"].includes(templateId)) {
+    signers.push({
+      fullName: "Lucas Roig Rosés",
+      signatureImageUrl:
+        "https://static.onparallel.com/static/images/signatures/lucas-roig-roses-angular.png",
+    });
   }
   return signers;
 }
