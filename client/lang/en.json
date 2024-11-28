@@ -3790,6 +3790,11 @@
     "context": "Field not visible"
   },
   {
+    "term": "component.hidden-filters-button.label",
+    "definition": "{count, plural, =1{# hidden filter} other{# hidden filters}}",
+    "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
+  },
+  {
     "term": "component.import-from-external-source-dialog.create-profile-button",
     "definition": "Create profile",
     "context": "Create profile"
@@ -6395,19 +6400,9 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
-    "term": "component.petition-list-header.hidden-filters-button-label",
-    "definition": "{count, plural, =1{# hidden filter} other{# hidden filters}}",
-    "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
-  },
-  {
     "term": "component.petition-list-header.hidden-filters-title",
     "definition": "Filters",
     "context": "Filters"
-  },
-  {
-    "term": "component.petition-list-header.remove-filter",
-    "definition": "Remove filter",
-    "context": "Remove filter"
   },
   {
     "term": "component.petition-list-header.save-as-new-view",
@@ -6440,29 +6435,19 @@
     "context": "Search in:"
   },
   {
-    "term": "component.petition-list-shared-with-filter.add-filter",
-    "definition": "Add filter",
-    "context": "Add filter"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.and",
     "definition": "and",
     "context": "and"
   },
   {
     "term": "component.petition-list-shared-with-filter.is-owner",
-    "definition": "Owner is",
-    "context": "Owner is"
-  },
-  {
-    "term": "component.petition-list-shared-with-filter.no-filter",
-    "definition": "No filter is being applied.",
-    "context": "No filter is being applied."
+    "definition": "owner is",
+    "context": "owner is"
   },
   {
     "term": "component.petition-list-shared-with-filter.not-shared-with",
-    "definition": "Not shared with",
-    "context": "Not shared with"
+    "definition": "is not shared with",
+    "context": "is not shared with"
   },
   {
     "term": "component.petition-list-shared-with-filter.or",
@@ -6471,8 +6456,8 @@
   },
   {
     "term": "component.petition-list-shared-with-filter.shared-with",
-    "definition": "Shared with",
-    "context": "Shared with"
+    "definition": "is shared with",
+    "context": "is shared with"
   },
   {
     "term": "component.petition-list-status-filter.clear-filter",
@@ -6481,18 +6466,18 @@
   },
   {
     "term": "component.petition-list-tag-filter.contains",
-    "definition": "Contains",
-    "context": "Contains"
+    "definition": "contains",
+    "context": "contains"
   },
   {
     "term": "component.petition-list-tag-filter.does-not-contain",
-    "definition": "Does not contain",
-    "context": "Does not contain"
+    "definition": "does not contain",
+    "context": "does not contain"
   },
   {
     "term": "component.petition-list-tag-filter.is-empty",
-    "definition": "Is empty",
-    "context": "Is empty"
+    "definition": "is empty",
+    "context": "is empty"
   },
   {
     "term": "component.petition-permission-row.default-owner",
@@ -12010,9 +11995,19 @@
     "context": "Add comment"
   },
   {
+    "term": "generic.add-filter",
+    "definition": "Add filter",
+    "context": "Add filter"
+  },
+  {
     "term": "generic.added-at",
     "definition": "Added at",
     "context": "Added at"
+  },
+  {
+    "term": "generic.advanced-filter",
+    "definition": "Advanced filter",
+    "context": "Advanced filter"
   },
   {
     "term": "generic.after",
@@ -12268,6 +12263,11 @@
     "term": "generic.current-year",
     "definition": "Current year",
     "context": "Current year"
+  },
+  {
+    "term": "generic.days",
+    "definition": "days",
+    "context": "days"
   },
   {
     "term": "generic.deactivate",
@@ -12775,6 +12775,11 @@
     "context": "Provider"
   },
   {
+    "term": "generic.invalid-date-error",
+    "definition": "A valid date is required",
+    "context": "A valid date is required"
+  },
+  {
     "term": "generic.invalid-field-conditions-error",
     "definition": "You can only move fields so that visibility and calculations conditions refer only to previous fields.",
     "context": "You can only move fields so that visibility and calculations conditions refer only to previous fields."
@@ -12785,9 +12790,19 @@
     "context": "Please, enter the first name"
   },
   {
+    "term": "generic.invalid-interval-error",
+    "definition": "A valid interval is required",
+    "context": "A valid interval is required"
+  },
+  {
     "term": "generic.invalid-password-policy-error",
     "definition": "Please choose a stronger password",
     "context": "Please choose a stronger password"
+  },
+  {
+    "term": "generic.invalid-phone-error",
+    "definition": "A valid phone is required",
+    "context": "A valid phone is required"
   },
   {
     "term": "generic.invite-user",
@@ -12873,6 +12888,11 @@
     "term": "generic.min-length-error",
     "definition": "The field should be at least {count} characters long",
     "context": "The field should be at least {count} characters long"
+  },
+  {
+    "term": "generic.months",
+    "definition": "months",
+    "context": "months"
   },
   {
     "term": "generic.more-options",
@@ -12983,6 +13003,11 @@
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline"
+  },
+  {
+    "term": "generic.no-filter-applied",
+    "definition": "No filter is being applied.",
+    "context": "No filter is being applied."
   },
   {
     "term": "generic.no-go-back",
@@ -13223,6 +13248,131 @@
     "term": "generic.product-news-label",
     "definition": "News",
     "context": "News"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-contains",
+    "definition": "contains",
+    "context": "contains"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-ends-with",
+    "definition": "ends with",
+    "context": "ends with"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-equals",
+    "definition": "is",
+    "context": "is"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-expires-in",
+    "definition": "expires in",
+    "context": "expires in"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-greater-than-date",
+    "definition": "is after",
+    "context": "is after"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-greater-than-or-equal-date",
+    "definition": "is after or equal",
+    "context": "is after or equal"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-match",
+    "definition": "has a match",
+    "context": "has a match"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-results",
+    "definition": "has possible results",
+    "context": "has possible results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-topics",
+    "definition": "has topics",
+    "context": "has topics"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-value",
+    "definition": "has value",
+    "context": "has value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-value-file",
+    "definition": "has files",
+    "context": "has files"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-is-expired",
+    "definition": "is expired",
+    "context": "is expired"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-is-one-of",
+    "definition": "is one of",
+    "context": "is one of"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-less-than-date",
+    "definition": "is before",
+    "context": "is before"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-less-than-or-equal-date",
+    "definition": "is before or equal",
+    "context": "is before or equal"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-contains",
+    "definition": "does not contain",
+    "context": "does not contain"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-equals",
+    "definition": "is not",
+    "context": "is not"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-match",
+    "definition": "does not have a match",
+    "context": "does not have a match"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-results",
+    "definition": "does not have possible results",
+    "context": "does not have possible results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-topics",
+    "definition": "does not have topics",
+    "context": "does not have topics"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-expiry",
+    "definition": "has no expiry set",
+    "context": "has no expiry set"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-value",
+    "definition": "does not have a value",
+    "context": "does not have a value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-value-file",
+    "definition": "does not have files",
+    "context": "does not have files"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-is-one-of",
+    "definition": "is not one of",
+    "context": "is not one of"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-starts-with",
+    "definition": "starts with",
+    "context": "starts with"
   },
   {
     "term": "generic.profile-property",
@@ -13745,9 +13895,19 @@
     "context": "Users"
   },
   {
+    "term": "generic.weeks",
+    "definition": "weeks",
+    "context": "weeks"
+  },
+  {
     "term": "generic.x-results",
     "definition": "{count, plural, =0 {No results} =1 {1 result} other {# results}}",
     "context": "{count, plural, =0 {No results} =1 {1 result} other {# results}}"
+  },
+  {
+    "term": "generic.years",
+    "definition": "years",
+    "context": "years"
   },
   {
     "term": "generic.yes",

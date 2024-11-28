@@ -217,10 +217,10 @@ export const updateProfileListView = mutationField("updateProfileListView", {
   authorize: authenticateAnd(
     userHasAccessToProfileListView("profileListViewId"),
     profileListViewBelongsToProfileType("profileListViewId", "profileTypeId"),
-    ifArgDefined(
-      (args) => args.name ?? args.data?.search ?? args.data?.status,
-      profileListViewHasType("profileListViewId", "CUSTOM"),
-    ),
+    ifArgDefined("name", profileListViewHasType("profileListViewId", "CUSTOM")),
+    ifArgDefined("data.search", profileListViewHasType("profileListViewId", "CUSTOM")),
+    ifArgDefined("data.status", profileListViewHasType("profileListViewId", "CUSTOM")),
+    ifArgDefined("data.values", profileListViewHasType("profileListViewId", "CUSTOM")),
   ),
   args: {
     profileListViewId: nonNull(globalIdArg("ProfileListView")),

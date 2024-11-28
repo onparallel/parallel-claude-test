@@ -1,6 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
+  Button,
   Center,
   Flex,
   HStack,
@@ -21,6 +25,7 @@ import {
   RepeatIcon,
 } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
+import { HiddenFiltersButton } from "@parallel/components/common/HiddenFiltersButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
@@ -30,6 +35,7 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { useColumnVisibilityDialog } from "@parallel/components/common/dialogs/ColumnVisibilityDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -50,6 +56,7 @@ import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/prof
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
+  ConnectionMetadata,
   ProfileListViewData,
   ProfileListViewDataInput,
   ProfileStatus,
@@ -61,6 +68,11 @@ import {
   Profiles_updateProfileListViewDocument,
   Profiles_userDocument,
 } from "@parallel/graphql/__types";
+import {
+  ProfileFieldValuesFilterCondition,
+  ProfileFieldValuesFilterGroup,
+  profileFieldValuesFilter,
+} from "@parallel/utils/ProfileFieldValuesFilter";
 import {
   useAssertQuery,
   useAssertQueryOrPreviousData,
@@ -88,9 +100,13 @@ import {
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePinProfileType } from "@parallel/utils/usePinProfileType";
-import { useProfileTableColumns } from "@parallel/utils/useProfileTableColumns";
+import {
+  ProfileValueColumnFilter,
+  useProfileTableColumns,
+} from "@parallel/utils/useProfileTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
+import { withMetadata } from "@parallel/utils/withMetadata";
 import {
   ChangeEvent,
   MouseEvent,
@@ -102,7 +118,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDeepEqual, isNonNullish, isNullish, omit, pick } from "remeda";
+import { isDeepEqual, isNonNullish, isNullish, omit, pick, unique } from "remeda";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -117,6 +133,7 @@ const QUERY_STATE = {
   type: string(),
   status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"] as ProfileStatus[]).orDefault("OPEN"),
   columns: string().list({ allowEmpty: true }),
+  values: profileFieldValuesFilter(),
 };
 export type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
@@ -124,6 +141,7 @@ interface ProfilesTableContext {
   status: ProfileStatus;
   setStatus: (status: ProfileStatus) => void;
 }
+
 function Profiles() {
   const intl = useIntl();
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
@@ -152,6 +170,53 @@ function Profiles() {
     fetchPolicy: "cache-and-network",
   });
 
+  const [values, setValues] = useQueryStateSlice(queryState, setQueryState, "values");
+  const [filter, isAdvancedFilter] = useMemo(() => {
+    // check if filter is compatible with column filtering
+    const isColumnable =
+      isNullish(values) ||
+      ("logicalOperator" in values &&
+        values.logicalOperator === "AND" &&
+        values.conditions.every(
+          (c) =>
+            "logicalOperator" in c &&
+            c.conditions.every((c) => "profileTypeFieldId" in c) &&
+            unique(
+              (c.conditions as ProfileFieldValuesFilterCondition[]).map(
+                (c) => c.profileTypeFieldId,
+              ),
+            ).length === 1,
+        ));
+    return [
+      isColumnable && isNonNullish(values)
+        ? (Object.fromEntries(
+            values.conditions.map((c) => {
+              const profileTypeFieldId = (
+                (c as ProfileFieldValuesFilterGroup)
+                  .conditions[0] as ProfileFieldValuesFilterCondition
+              ).profileTypeFieldId;
+              return [`field_${profileTypeFieldId}`, c];
+            }),
+          ) as Record<string, ProfileValueColumnFilter>)
+        : {},
+      !isColumnable,
+    ] as const;
+  }, [values]);
+  const handleFilterChange = useCallback(
+    (key: string, value: any) => {
+      if (key.startsWith("field_")) {
+        setValues({
+          logicalOperator: "AND",
+          conditions: Object.values({
+            ...(filter ?? {}),
+            [key]: value,
+          }),
+        });
+      }
+    },
+    [filter],
+  );
+
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
       offset: queryState.items * (queryState.page - 1),
@@ -161,6 +226,7 @@ function Profiles() {
       filter: {
         profileTypeId: [queryState.type!],
         status: [queryState.status],
+        values,
       },
       propertiesFilter:
         queryState.columns
@@ -174,7 +240,8 @@ function Profiles() {
 
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
-  const profileTableColumns = useProfileTableColumns(profileType);
+  const columns = useProfileTableColumns(profileType);
+  const selection = queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION;
 
   const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
   const handleCreateProfile = async () => {
@@ -242,7 +309,10 @@ function Profiles() {
     } catch {}
   }, [selectedRows, selectedIds.join(",")]);
 
-  const context = useMemo<ProfilesTableContext>(() => ({ status, setStatus }), [status, setStatus]);
+  const context = useMemo<ProfilesTableContext>(
+    () => ({ status, setStatus, profileType }),
+    [status, setStatus, profileType],
+  );
 
   const reopenProfile = useReopenProfile();
   const handleReopenClick = async () => {
@@ -320,11 +390,11 @@ function Profiles() {
   const showColumnVisibilityDialog = useColumnVisibilityDialog();
   const handleEditColumns = async () => {
     try {
-      const columns = await showColumnVisibilityDialog({
-        columns: profileTableColumns,
-        selection: queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION,
+      const newColumns = await showColumnVisibilityDialog({
+        columns,
+        selection,
       });
-      setQueryState((current) => ({ ...current, columns }));
+      setQueryState((current) => ({ ...current, columns: newColumns }));
     } catch {}
   };
 
@@ -345,12 +415,10 @@ function Profiles() {
   const icon = getProfileTypeFieldIcon(profileType?.icon);
 
   const sortedAndFilteredColumns = useMemo(() => {
-    const columns = queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION;
-
-    return ["name", ...(columns ?? [])]
-      .map((key) => profileTableColumns.find((d) => d.key === key))
+    return ["name", ...(selection ?? [])]
+      .map((key) => columns.find((c) => c.key === key))
       .filter(isNonNullish);
-  }, [queryState.columns?.join(","), queryState.status]);
+  }, [selection?.join(",")]);
 
   return (
     <AppLayout
@@ -442,11 +510,13 @@ function Profiles() {
             isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
+            onSelectionChange={onChangeSelectedIds}
+            sort={sort}
+            filter={filter}
+            onFilterChange={handleFilterChange}
             page={queryState.page}
             pageSize={queryState.items}
             totalCount={profiles?.totalCount}
-            onSelectionChange={onChangeSelectedIds}
-            sort={sort}
             onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
             onPageSizeChange={(items) =>
               setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
@@ -463,6 +533,10 @@ function Profiles() {
                 />
                 <ProfilesListHeader
                   state={queryState}
+                  columns={columns}
+                  filter={filter}
+                  isAdvancedFilter={isAdvancedFilter}
+                  selection={selection}
                   onStateChange={setQueryState}
                   onReload={refetch}
                   onEditColumns={handleEditColumns}
@@ -679,6 +753,10 @@ interface ProfilesListHeaderProps {
   state: ProfilesQueryState;
   profileTypeId: string;
   views: Profiles_ProfileListViewFragment[];
+  columns: TableColumn<any, any, any>[];
+  filter: Record<string, ProfileValueColumnFilter>;
+  isAdvancedFilter: boolean;
+  selection: string[];
   onStateChange: SetQueryState<Partial<ProfilesQueryState>>;
   onReload: () => void;
   onEditColumns: () => void;
@@ -687,6 +765,10 @@ interface ProfilesListHeaderProps {
 function ProfilesListHeader({
   state,
   profileTypeId,
+  columns,
+  filter,
+  isAdvancedFilter,
+  selection,
   views,
   onStateChange,
   onReload,
@@ -736,7 +818,7 @@ function ProfilesListHeader({
     }
 
     return !viewsAreEqual(currentView!.data, {
-      ...(pick(state, ["search", "sort", "columns", "status"]) as Omit<
+      ...(pick(state, ["search", "sort", "columns", "status", "values"]) as Omit<
         ProfileListViewData,
         "__typename"
       >),
@@ -771,10 +853,15 @@ function ProfilesListHeader({
           profileListViewId: view.id,
           profileTypeId,
           ...(view.type === "ALL" ? {} : { name: view.name }),
-          data: {
-            ...pick(state, ["sort", "columns"]),
-            ...(view.type === "ALL" ? {} : { search: state.search, status: state.status }),
-          } as ProfileListViewDataInput,
+          data: (view.type === "ALL"
+            ? pick(state, ["sort", "columns"])
+            : pick(state, [
+                "sort",
+                "columns",
+                "search",
+                "status",
+                "values",
+              ])) as ProfileListViewDataInput,
         },
       });
     } catch {}
@@ -806,7 +893,7 @@ function ProfilesListHeader({
           profileTypeId,
           name,
           data: {
-            ...pick(state, ["sort", "columns", "search", "status"]),
+            ...pick(state, ["sort", "columns", "search", "status", "values"]),
           } as ProfileListViewDataInput,
         },
       });
@@ -820,13 +907,14 @@ function ProfilesListHeader({
             ? omit(data.createProfileListView.data.sort, ["__typename"])
             : undefined,
           status: data.createProfileListView.data.status ?? "OPEN",
+          values: data.createProfileListView.data.values as any,
         });
       }
     } catch {}
   };
 
   return (
-    <HStack padding={2} justify="space-between">
+    <HStack padding={2}>
       <IconButtonWithTooltip
         onClick={() => onReload()}
         icon={<RepeatIcon />}
@@ -840,6 +928,43 @@ function ProfilesListHeader({
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
+      <HiddenFiltersButton
+        columns={columns}
+        selection={selection}
+        filter={filter}
+        onRemoveFilter={(key) => {
+          onStateChange((current) => ({
+            ...current,
+            values: {
+              logicalOperator: "AND",
+              conditions: Object.values(omit(filter, [key])),
+            },
+            page: 1,
+          }));
+        }}
+      />
+      {isAdvancedFilter ? (
+        <>
+          <Alert flex={0} rounded="md" status="info" paddingX={2} height="40px" paddingY={1}>
+            <AlertIcon boxSize={4} marginEnd={2} />
+            <HStack>
+              <AlertDescription fontSize="sm" whiteSpace="nowrap">
+                <FormattedMessage id="generic.advanced-filter" defaultMessage="Advanced filter" />
+              </AlertDescription>
+              <Button
+                variant="outline"
+                size="sm"
+                background="white"
+                onClick={() =>
+                  onStateChange((current) => ({ ...omit(current, ["values"]), page: 1 }))
+                }
+              >
+                <FormattedMessage id="generic.remove" defaultMessage="Remove" />
+              </Button>
+            </HStack>
+          </Alert>
+        </>
+      ) : null}
 
       <HStack flex={1} justifyContent="flex-end">
         <ResponsiveButtonIcon
@@ -922,6 +1047,7 @@ const _fragments = {
             direction
           }
           status
+          values
         }
       }
       ${ProfileViewTabs.fragments.ProfileListView}
@@ -939,6 +1065,10 @@ const _queries = [
         profileListViews(profileTypeId: $profileTypeId) {
           ...Profiles_ProfileListView
         }
+      }
+      metadata {
+        browserName
+        country
       }
     }
     ${AppLayout.fragments.Query}
@@ -1024,12 +1154,14 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
     throw new RedirectError("/app");
   }
   let views: Profiles_ProfileListViewFragment[];
+  let metadata: ConnectionMetadata;
   try {
     const [{ data }] = await Promise.all([
       fetchQuery(Profiles_userDocument, { variables: { profileTypeId: state.type } }),
       fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type } }),
     ]);
     views = data.me.profileListViews;
+    metadata = data.metadata;
   } catch {
     throw new RedirectError("/app");
   }
@@ -1049,6 +1181,7 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
               ? omit(defaultView.data.sort, ["__typename"])
               : undefined,
             status: defaultView.data.status ?? "OPEN",
+            values: defaultView.data.values as any,
           },
           pathname,
           query,
@@ -1069,6 +1202,7 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
                 ? omit(allView.data.sort, ["__typename"])
                 : undefined,
               status: allView.data.status ?? "OPEN",
+              values: allView.data.values as any,
             },
             pathname,
             query,
@@ -1096,11 +1230,12 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
       );
     }
   }
-  return {};
+  return { metadata };
 };
 
 export default compose(
   withDialogs,
+  withMetadata,
   withPermission("PROFILES:LIST_PROFILES"),
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData,

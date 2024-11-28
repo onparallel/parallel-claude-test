@@ -43,14 +43,8 @@ import { useMoveToFolderDialog } from "@parallel/components/petition-common/dial
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
-import {
-  removeInvalidSharedWithFilterLines,
-  sharedWithQueryItem,
-} from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
-import {
-  removeInvalidTagFilterLines,
-  tagFilterQueryItem,
-} from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
+import { sharedWithQueryItem } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
+import { tagFilterQueryItem } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
@@ -166,8 +160,8 @@ function Petitions() {
           status: state.status,
           signature: state.signature,
           type: state.type,
-          tags: removeInvalidTagFilterLines(state.tagsFilters),
-          sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+          tags: state.tagsFilters,
+          sharedWith: state.sharedWith,
           fromTemplateId: state.fromTemplateId,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
@@ -414,10 +408,20 @@ function Petitions() {
     } catch {}
   }, []);
 
-  const columns = usePetitionsTableColumns(
-    state.type,
-    state.type === "PETITION" ? (state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION) : undefined,
-  );
+  const columns = usePetitionsTableColumns(state.type);
+
+  const selection =
+    state.type === "PETITION" ? (state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION) : [];
+
+  const filteredColumns = useMemo(() => {
+    if (state.type === "TEMPLATE") {
+      return columns;
+    } else {
+      return ["name", ...selection]
+        .map((key) => columns.find((c) => c.key === key))
+        .filter(isNonNullish);
+    }
+  }, [selection.join(","), state.type]);
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
@@ -591,7 +595,7 @@ function Petitions() {
         <Box flex="1" paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
-            columns={columns}
+            columns={filteredColumns}
             rows={petitions?.items}
             context={context}
             rowKeyProp={rowKeyProp}
@@ -632,6 +636,8 @@ function Petitions() {
                 <PetitionListHeader
                   shape={QUERY_STATE}
                   state={state}
+                  columns={columns}
+                  selection={selection}
                   onStateChange={setQueryState}
                   onReload={() => refetch()}
                   views={me.petitionListViews}

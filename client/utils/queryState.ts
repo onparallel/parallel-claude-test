@@ -144,9 +144,11 @@ export function sorting<T extends string>(fields: readonly T[]) {
 export function object<T>({
   flatten,
   unflatten,
+  isDefault,
 }: {
   flatten?: (value: T) => any;
   unflatten?: (value: any) => T;
+  isDefault?: (value: T) => boolean;
 }) {
   return new QueryItem<T | null>(
     (value) => {
@@ -164,6 +166,7 @@ export function object<T>({
         .replaceAll("/", "_")
         .replaceAll("=", ".");
     },
+    isDefault,
   );
 }
 

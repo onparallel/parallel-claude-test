@@ -90,7 +90,7 @@ import {
   GetProfileType_profileTypeDocument,
   GetProfileTypes_profileTypesDocument,
   GetProfile_profileDocument,
-  GetProfiles_profileTypesDocument,
+  GetProfiles_profileTypeDocument,
   GetProfiles_profilesDocument,
   GetSignatures_petitionSignaturesDocument,
   GetTags_tagsDocument,
@@ -100,6 +100,7 @@ import {
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
   PetitionTagFilter,
+  ProfileFieldValuesFilter,
   ProfileStatus,
   ProfileTypeFragmentDoc,
   ReadPetitionCustomPropertiesDocument,
@@ -238,6 +239,7 @@ import {
   Profile,
   ProfileSubscriptionInput,
   ProfileType,
+  ProfileValuesFilterSchema,
   SendPetition,
   SendReminder,
   SharePetition,
@@ -4129,82 +4131,18 @@ export function publicApi(container: Container) {
           }),
           values: objectParam({
             description: outdent`
-            Example: \`values[0][profileTypeId]=6YHC3CN5M8QLoqmV9dvSy&values[0][alias]=p_first_name&values[0][operator]=EQUAL&values[0][value]=Harvey\`
+            Example: \`values[0][alias]=p_first_name&values[0][operator]=EQUAL&values[0][value]=Harvey\`
 
             Filter profiles by field values`,
             required: false,
             array: true,
-            schema: {
-              anyOf: ["alias", "profileTypeFieldId"].map((field) => ({
-                title: `Filter by ${field}`,
-                type: "object",
-                required: [field, "profileTypeId", "operator", "value"],
-                additionalProperties: false,
-                properties: {
-                  [field]: { type: "string" },
-                  profileTypeId: { type: "string" },
-                  operator: {
-                    type: "string",
-                    enum: [
-                      "EQUAL",
-                      "NOT_EQUAL",
-                      "START_WITH",
-                      "END_WITH",
-                      "CONTAIN",
-                      "NOT_CONTAIN",
-                      "IS_ONE_OF",
-                      "NOT_IS_ONE_OF",
-                      "LESS_THAN",
-                      "LESS_THAN_OR_EQUAL",
-                      "GREATER_THAN",
-                      "GREATER_THAN_OR_EQUAL",
-                    ],
-                  },
-                  value: {
-                    oneOf: [
-                      { type: "string" },
-                      { type: "number" },
-                      {
-                        type: "array",
-                        minItems: 1,
-                        items: { oneOf: [{ type: "string" }, { type: "number" }] },
-                      },
-                    ],
-                  },
-                },
-              })),
-            },
-            validate(key, value) {
-              if (key === "profileTypeFieldId" && !isGlobalId(value, "ProfileTypeField")) {
-                throw new Error(`${value} is not a valid ProfileTypeField id`);
-              }
-              if (key === "profileTypeId" && !isGlobalId(value, "ProfileType")) {
-                throw new Error(`${value} is not a valid ProfileType id`);
-              }
-            },
+            schema: ProfileValuesFilterSchema,
           }),
         },
         responses: { 200: SuccessResponse(PaginatedProfiles) },
         tags: ["Profiles"],
       },
       async ({ client, query }) => {
-        const _profileTypes = gql`
-          query GetProfiles_profileTypes($offset: Int, $limit: Int, $profileTypeIds: [GID!]) {
-            profileTypes(
-              offset: $offset
-              limit: $limit
-              filter: { profileTypeId: $profileTypeIds }
-            ) {
-              items {
-                id
-                fields {
-                  id
-                  alias
-                }
-              }
-            }
-          }
-        `;
         const _query = gql`
           query GetProfiles_profiles(
             $offset: Int
@@ -4213,7 +4151,7 @@ export function publicApi(container: Container) {
             $search: String
             $profileTypeIds: [GID!]
             $status: [ProfileStatus!]
-            $values: [ProfileFieldValuesFilter!]
+            $values: ProfileFieldValuesFilter
             $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
@@ -4234,64 +4172,70 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        const profileTypeFieldAliases = (query.values ?? [])
-          .filter((v) => isNonNullish(v.alias))
-          .map((v) => ({ alias: v.alias as string, profileTypeId: v.profileTypeId as string }));
-
-        const resolvedProfileTypeFields: { id: string; alias: string }[] = [];
-        if (profileTypeFieldAliases.length > 0) {
-          const profileTypeIds = unique(profileTypeFieldAliases.map((v) => v.profileTypeId));
-          const profileTypesResult = await client.request(GetProfiles_profileTypesDocument, {
-            profileTypeIds,
-            limit: profileTypeIds.length,
-            offset: 0,
-          });
-
-          for (const profileType of profileTypesResult.profileTypes.items) {
-            resolvedProfileTypeFields.push(
-              ...(profileTypeFieldAliases
-                .filter((f) => f.profileTypeId === profileType.id)
-                .map(({ alias }) => ({
-                  alias,
-                  id: profileType.fields.find((f) => f.alias === alias)?.id,
-                }))
-                .filter((v) => isNonNullish(v.id)) as typeof resolvedProfileTypeFields),
+        let values: ProfileFieldValuesFilter | undefined = undefined;
+        if (isNonNullish(query.values)) {
+          if (isNullish(query.profileTypeIds) || query.profileTypeIds.length > 1) {
+            throw new BadRequestError(
+              "Must filter by a single profileTypeId when filtering by values",
             );
+          }
+
+          const profileTypeFieldAliases = (query.values ?? [])
+            .filter((c) => "alias" in c)
+            .map((c) => c.alias);
+
+          if (profileTypeFieldAliases.length > 0) {
+            const _profileType = gql`
+              query GetProfiles_profileType($profileTypeId: GID!) {
+                profileType(profileTypeId: $profileTypeId) {
+                  fields {
+                    id
+                    alias
+                  }
+                }
+              }
+            `;
+            const { profileType } = await client.request(GetProfiles_profileTypeDocument, {
+              profileTypeId: query.profileTypeIds[0],
+            });
+
+            const conditions = query.values.map((c) => {
+              if ("alias" in c) {
+                const profileTypeField = profileType.fields.find((f) => f.alias === c.alias);
+                if (isNullish(profileTypeField)) {
+                  throw new BadRequestError(`Unknown alias ${c.alias} in values filter`);
+                }
+                return {
+                  profileTypeFieldId: profileTypeField.id,
+                  operator: c.operator,
+                  value: c.value,
+                };
+              } else {
+                return c;
+              }
+            });
+            values = { logicalOperator: "AND", conditions };
           }
         }
-        const valuesFilter = query.values?.map((valueFilter) => {
-          if (isNonNullish(valueFilter.alias)) {
-            const profileTypeField = resolvedProfileTypeFields.find(
-              (f) => f.alias === valueFilter.alias,
-            );
-            if (isNullish(profileTypeField)) {
-              throw new BadRequestError(`Field with alias ${valueFilter.alias} not found`);
-            }
-            return {
-              profileTypeFieldId: profileTypeField.id,
-              operator: valueFilter.operator,
-              value: valueFilter.value,
-            };
+
+        try {
+          const includes = getProfileIncludesFromQuery(query);
+          const result = await client.request(GetProfiles_profilesDocument, {
+            ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
+            status: query.status as ProfileStatus[] | undefined,
+            values,
+            ...includes,
+          });
+          return Ok({
+            totalCount: result.profiles.totalCount,
+            items: result.profiles.items.map((p) => mapProfile(p, includes)),
+          });
+        } catch (error) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError(error.message);
           }
-
-          return {
-            profileTypeFieldId: valueFilter.profileTypeFieldId,
-            operator: valueFilter.operator,
-            value: valueFilter.value,
-          };
-        });
-
-        const includes = getProfileIncludesFromQuery(query);
-        const result = await client.request(GetProfiles_profilesDocument, {
-          ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
-          status: query.status as ProfileStatus[] | undefined,
-          values: valuesFilter,
-          ...includes,
-        });
-        return Ok({
-          totalCount: result.profiles.totalCount,
-          items: result.profiles.items.map((p) => mapProfile(p, includes)),
-        });
+          throw error;
+        }
       },
     )
     .post(

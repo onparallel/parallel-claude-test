@@ -3790,6 +3790,11 @@
     "context": "Field not visible"
   },
   {
+    "term": "component.hidden-filters-button.label",
+    "definition": "{count, plural, =1{# filtro oculto} other{# filtros ocultos}}",
+    "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
+  },
+  {
     "term": "component.import-from-external-source-dialog.create-profile-button",
     "definition": "Crear perfil",
     "context": "Create profile"
@@ -6395,19 +6400,9 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
-    "term": "component.petition-list-header.hidden-filters-button-label",
-    "definition": "{count, plural, =1{# filtro oculto} other{# filtros ocultos}}",
-    "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
-  },
-  {
     "term": "component.petition-list-header.hidden-filters-title",
     "definition": "Filtros",
     "context": "Filters"
-  },
-  {
-    "term": "component.petition-list-header.remove-filter",
-    "definition": "Quitar filtro",
-    "context": "Remove filter"
   },
   {
     "term": "component.petition-list-header.save-as-new-view",
@@ -6440,29 +6435,19 @@
     "context": "Search in:"
   },
   {
-    "term": "component.petition-list-shared-with-filter.add-filter",
-    "definition": "Añadir filtro",
-    "context": "Add filter"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.and",
     "definition": "y",
     "context": "and"
   },
   {
     "term": "component.petition-list-shared-with-filter.is-owner",
-    "definition": "El propietario es",
-    "context": "Owner is"
-  },
-  {
-    "term": "component.petition-list-shared-with-filter.no-filter",
-    "definition": "No se está aplicando ningún filtro.",
-    "context": "No filter is being applied."
+    "definition": "el propietario es",
+    "context": "owner is"
   },
   {
     "term": "component.petition-list-shared-with-filter.not-shared-with",
-    "definition": "No compartido con",
-    "context": "Not shared with"
+    "definition": "no compartido con",
+    "context": "is not shared with"
   },
   {
     "term": "component.petition-list-shared-with-filter.or",
@@ -6471,8 +6456,8 @@
   },
   {
     "term": "component.petition-list-shared-with-filter.shared-with",
-    "definition": "Compartido con",
-    "context": "Shared with"
+    "definition": "compartido con",
+    "context": "is shared with"
   },
   {
     "term": "component.petition-list-status-filter.clear-filter",
@@ -6481,18 +6466,18 @@
   },
   {
     "term": "component.petition-list-tag-filter.contains",
-    "definition": "Contiene",
-    "context": "Contains"
+    "definition": "contiene",
+    "context": "contains"
   },
   {
     "term": "component.petition-list-tag-filter.does-not-contain",
-    "definition": "No contiene",
-    "context": "Does not contain"
+    "definition": "no contiene",
+    "context": "does not contain"
   },
   {
     "term": "component.petition-list-tag-filter.is-empty",
-    "definition": "Está vacío",
-    "context": "Is empty"
+    "definition": "está vacío",
+    "context": "is empty"
   },
   {
     "term": "component.petition-permission-row.default-owner",
@@ -12010,9 +11995,19 @@
     "context": "Add comment"
   },
   {
+    "term": "generic.add-filter",
+    "definition": "Añadir filtro",
+    "context": "Add filter"
+  },
+  {
     "term": "generic.added-at",
     "definition": "Añadido el",
     "context": "Added at"
+  },
+  {
+    "term": "generic.advanced-filter",
+    "definition": "Filtro avanzado",
+    "context": "Advanced filter"
   },
   {
     "term": "generic.after",
@@ -12268,6 +12263,11 @@
     "term": "generic.current-year",
     "definition": "Año en curso",
     "context": "Current year"
+  },
+  {
+    "term": "generic.days",
+    "definition": "días",
+    "context": "days"
   },
   {
     "term": "generic.deactivate",
@@ -12775,6 +12775,11 @@
     "context": "Provider"
   },
   {
+    "term": "generic.invalid-date-error",
+    "definition": "Se requiere una fecha válida",
+    "context": "A valid date is required"
+  },
+  {
     "term": "generic.invalid-field-conditions-error",
     "definition": "Sólo se pueden mover campos de manera que las condiciones de visibilidad y los cálculos hagan referencia únicamente a campos anteriores.",
     "context": "You can only move fields so that visibility and calculations conditions refer only to previous fields."
@@ -12785,9 +12790,19 @@
     "context": "Please, enter the first name"
   },
   {
+    "term": "generic.invalid-interval-error",
+    "definition": "Se requiere una intervalo válid",
+    "context": "A valid interval is required"
+  },
+  {
     "term": "generic.invalid-password-policy-error",
     "definition": "Por favor, escoge una contraseña más robusta",
     "context": "Please choose a stronger password"
+  },
+  {
+    "term": "generic.invalid-phone-error",
+    "definition": "Se requiere un teléfono válido",
+    "context": "A valid phone is required"
   },
   {
     "term": "generic.invite-user",
@@ -12873,6 +12888,11 @@
     "term": "generic.min-length-error",
     "definition": "El campo debe tener al menos {count} caracteres",
     "context": "The field should be at least {count} characters long"
+  },
+  {
+    "term": "generic.months",
+    "definition": "meses",
+    "context": "months"
   },
   {
     "term": "generic.more-options",
@@ -12983,6 +13003,11 @@
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline"
+  },
+  {
+    "term": "generic.no-filter-applied",
+    "definition": "No se está aplicando ningún filtro.",
+    "context": "No filter is being applied."
   },
   {
     "term": "generic.no-go-back",
@@ -13223,6 +13248,131 @@
     "term": "generic.product-news-label",
     "definition": "Novedades",
     "context": "News"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-contains",
+    "definition": "contiene",
+    "context": "contains"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-ends-with",
+    "definition": "acaba en",
+    "context": "ends with"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-equals",
+    "definition": "es",
+    "context": "is"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-expires-in",
+    "definition": "caduca en",
+    "context": "expires in"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-greater-than-date",
+    "definition": "es después de",
+    "context": "is after"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-greater-than-or-equal-date",
+    "definition": "es después o igual que",
+    "context": "is after or equal"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-match",
+    "definition": "tiene coincidencia",
+    "context": "has a match"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-results",
+    "definition": "tiene posibles resultados",
+    "context": "has possible results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-bg-check-topics",
+    "definition": "tiene topics",
+    "context": "has topics"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-value",
+    "definition": "tiene valor",
+    "context": "has value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-value-file",
+    "definition": "tiene archivos",
+    "context": "has files"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-is-expired",
+    "definition": "ha caducado",
+    "context": "is expired"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-is-one-of",
+    "definition": "es uno que",
+    "context": "is one of"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-less-than-date",
+    "definition": "es antes de",
+    "context": "is before"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-less-than-or-equal-date",
+    "definition": "es antes o igual que",
+    "context": "is before or equal"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-contains",
+    "definition": "no contiene",
+    "context": "does not contain"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-equals",
+    "definition": "no es",
+    "context": "is not"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-match",
+    "definition": "no tiene coincidencia",
+    "context": "does not have a match"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-results",
+    "definition": "no tiene posibles resultados",
+    "context": "does not have possible results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-bg-check-topics",
+    "definition": "no tiene topics",
+    "context": "does not have topics"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-expiry",
+    "definition": "no tiene caducidad establecida",
+    "context": "has no expiry set"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-value",
+    "definition": "no tiene valor",
+    "context": "does not have a value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-value-file",
+    "definition": "no tiene archivos",
+    "context": "does not have files"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-is-one-of",
+    "definition": "no es uno de",
+    "context": "is not one of"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-starts-with",
+    "definition": "empieza por",
+    "context": "starts with"
   },
   {
     "term": "generic.profile-property",
@@ -13745,9 +13895,19 @@
     "context": "Users"
   },
   {
+    "term": "generic.weeks",
+    "definition": "semanas",
+    "context": "weeks"
+  },
+  {
     "term": "generic.x-results",
     "definition": "{count, plural, =0 {Sin resultados} =1 {1 resultado} other {# resultados}}",
     "context": "{count, plural, =0 {No results} =1 {1 result} other {# results}}"
+  },
+  {
+    "term": "generic.years",
+    "definition": "años",
+    "context": "years"
   },
   {
     "term": "generic.yes",

@@ -276,16 +276,18 @@ export interface NexusGenInputs {
   };
   ProfileFieldValuesFilter: {
     // input type
-    operator: NexusGenEnums["ProfileFieldValuesFilterOperator"]; // ProfileFieldValuesFilterOperator!
-    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
-    value: NexusGenScalars["JSON"]; // JSON!
+    conditions?: NexusGenInputs["ProfileFieldValuesFilter"][] | null; // [ProfileFieldValuesFilter!]
+    logicalOperator?: NexusGenEnums["ProfileFieldValuesFilterGroupLogicalOperator"] | null; // ProfileFieldValuesFilterGroupLogicalOperator
+    operator?: NexusGenEnums["ProfileFieldValuesFilterOperator"] | null; // ProfileFieldValuesFilterOperator
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    value?: NexusGenScalars["JSON"] | null; // JSON
   };
   ProfileFilter: {
     // input type
     profileId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
     status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
-    values?: NexusGenInputs["ProfileFieldValuesFilter"][] | null; // [ProfileFieldValuesFilter!]
+    values?: NexusGenInputs["ProfileFieldValuesFilter"] | null; // ProfileFieldValuesFilter
   };
   ProfileListViewDataInput: {
     // input type
@@ -293,6 +295,7 @@ export interface NexusGenInputs {
     search?: string | null; // String
     sort?: NexusGenInputs["ProfileListViewSortInput"] | null; // ProfileListViewSortInput
     status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+    values?: NexusGenInputs["ProfileFieldValuesFilter"] | null; // ProfileFieldValuesFilter
   };
   ProfileListViewSortInput: {
     // input type
@@ -569,17 +572,30 @@ export interface NexusGenEnums {
   ProfileEventType: db.ProfileEventType;
   ProfileExternalSourceConflictResolutionAction: "IGNORE" | "OVERWRITE";
   ProfileExternalSourceSearchParamType: "SELECT" | "TEXT";
+  ProfileFieldValuesFilterGroupLogicalOperator: "AND" | "OR";
   ProfileFieldValuesFilterOperator:
     | "CONTAIN"
     | "END_WITH"
     | "EQUAL"
+    | "EXPIRES_IN"
     | "GREATER_THAN"
     | "GREATER_THAN_OR_EQUAL"
+    | "HAS_BG_CHECK_MATCH"
+    | "HAS_BG_CHECK_RESULTS"
+    | "HAS_BG_CHECK_TOPICS"
+    | "HAS_EXPIRY"
+    | "HAS_VALUE"
+    | "IS_EXPIRED"
     | "IS_ONE_OF"
     | "LESS_THAN"
     | "LESS_THAN_OR_EQUAL"
     | "NOT_CONTAIN"
     | "NOT_EQUAL"
+    | "NOT_HAS_BG_CHECK_MATCH"
+    | "NOT_HAS_BG_CHECK_RESULTS"
+    | "NOT_HAS_BG_CHECK_TOPICS"
+    | "NOT_HAS_EXPIRY"
+    | "NOT_HAS_VALUE"
     | "NOT_IS_ONE_OF"
     | "START_WITH";
   ProfileListViewSortField: "createdAt" | "name";
@@ -1235,6 +1251,7 @@ export interface NexusGenObjects {
     search?: string | null; // String
     sort?: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
     status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+    values?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   ProfileListViewSort: {
     // root type
@@ -3253,6 +3270,7 @@ export interface NexusGenFieldTypes {
     search: string | null; // String
     sort: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
     status: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+    values: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   ProfileListViewSort: {
     // field return type
@@ -5994,6 +6012,7 @@ export interface NexusGenFieldTypeNames {
     search: "String";
     sort: "ProfileListViewSort";
     status: "ProfileStatus";
+    values: "JSONObject";
   };
   ProfileListViewSort: {
     // field return type name

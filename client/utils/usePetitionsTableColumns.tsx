@@ -16,9 +16,9 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { WithIntl } from "@parallel/components/common/WithIntl";
 import { withProps } from "@parallel/components/common/withProps";
-import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
-import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
-import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/template/PetitionTemplateFilter";
+import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
+import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
+import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/PetitionTemplateFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
@@ -223,8 +223,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       minWidth: "200px",
       whiteSpace: "nowrap",
     },
-    isFilterable: true,
-    Filter: PetitionTemplateFilter,
+    Filter: PetitionTemplateFilter as any,
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
         return isNonNullish(row.fromTemplate) ? (
@@ -273,8 +272,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         id: "component.petitions-table-columns.header-status",
         defaultMessage: "Status",
       }),
-    isFilterable: true,
-    Filter: PetitionListStatusFilter,
+    Filter: PetitionListStatusFilter as any,
     align: "center",
     cellProps: (row) =>
       row.__typename === "Petition"
@@ -308,9 +306,8 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         id: "component.petitions-table-columns.header-signature",
         defaultMessage: "eSignature status",
       }),
-    isFilterable: true,
     align: "left",
-    Filter: PetitionListSignatureStatusFilter,
+    Filter: PetitionListSignatureStatusFilter as any,
     headerProps: { padding: 0 },
     cellProps: { padding: 0, minWidth: "72px" },
     CellContent: ({ row }) =>
@@ -329,7 +326,6 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         id: "component.petitions-table-columns.header-shared",
         defaultMessage: "Shared",
       }),
-    isFilterable: true,
     Filter: PetitionListSharedWithFilter,
     align: "left",
     cellProps: { minWidth: "132px" },
@@ -467,7 +463,6 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       minWidth: "300px",
       padding: "0 !important",
     },
-    isFilterable: true,
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
       row.__typename === "Petition" && isNonNullish(row.tags) ? (
@@ -604,7 +599,6 @@ export const TEMPLATES_COLUMNS = (
         id: "component.petitions-table-columns.header-shared",
         defaultMessage: "Shared",
       }),
-    isFilterable: true,
     Filter: PetitionListSharedWithFilter,
     align: "left",
     cellProps: { minWidth: "132px" },
@@ -646,7 +640,6 @@ export const TEMPLATES_COLUMNS = (
       padding: 0,
       _last: { paddingEnd: 0 },
     },
-    isFilterable: true,
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
       row.__typename === "PetitionTemplate" && isNonNullish(row.tags) ? (
@@ -657,18 +650,15 @@ export const TEMPLATES_COLUMNS = (
 
 export function usePetitionsTableColumns(
   type: PetitionBaseType,
-  columnSelection?: PetitionsTableColumn[],
 ): PetitionsTableColumns_PetitionBaseOrFolder[] {
   const intl = useIntl();
   return useMemo(() => {
     if (type === "TEMPLATE") {
       return TEMPLATES_COLUMNS(intl);
     } else {
-      return ["name", ...(columnSelection ?? [])].map(
-        (key) => PETITIONS_COLUMNS.find((d) => d.key === key)!,
-      );
+      return PETITIONS_COLUMNS;
     }
-  }, [intl.locale, columnSelection?.join(",")]) as any;
+  }, [type]) as any;
 }
 
 usePetitionsTableColumns.fragments = {

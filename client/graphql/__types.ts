@@ -4830,22 +4830,38 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
 }
 
 export interface ProfileFieldValuesFilter {
-  operator: ProfileFieldValuesFilterOperator;
-  profileTypeFieldId: Scalars["GID"]["input"];
-  value: Scalars["JSON"]["input"];
+  conditions?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  logicalOperator?: InputMaybe<ProfileFieldValuesFilterGroupLogicalOperator>;
+  operator?: InputMaybe<ProfileFieldValuesFilterOperator>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  value?: InputMaybe<Scalars["JSON"]["input"]>;
 }
+
+export type ProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
 
 export type ProfileFieldValuesFilterOperator =
   | "CONTAIN"
   | "END_WITH"
   | "EQUAL"
+  | "EXPIRES_IN"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_EXPIRY"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
   | "IS_ONE_OF"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "NOT_CONTAIN"
   | "NOT_EQUAL"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
 
@@ -4853,7 +4869,7 @@ export interface ProfileFilter {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 }
 
 export interface ProfileListView extends ListView {
@@ -4873,6 +4889,7 @@ export interface ProfileListViewData {
   search?: Maybe<Scalars["String"]["output"]>;
   sort?: Maybe<ProfileListViewSort>;
   status?: Maybe<ProfileStatus>;
+  values?: Maybe<Scalars["JSONObject"]["output"]>;
 }
 
 export interface ProfileListViewDataInput {
@@ -4881,6 +4898,7 @@ export interface ProfileListViewDataInput {
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
   status?: InputMaybe<ProfileStatus>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 }
 
 export interface ProfileListViewSort {
@@ -8372,6 +8390,7 @@ export type ProfileViewTabs_ProfileListViewDataFragment = {
   columns?: Array<string> | null;
   search?: string | null;
   status?: ProfileStatus | null;
+  values?: { [key: string]: any } | null;
   sort?: {
     __typename?: "ProfileListViewSort";
     field: ProfileListViewSortField;
@@ -8390,6 +8409,7 @@ export type ProfileViewTabs_ProfileListViewFragment = {
     columns?: Array<string> | null;
     search?: string | null;
     status?: ProfileStatus | null;
+    values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
       field: ProfileListViewSortField;
@@ -8447,6 +8467,7 @@ export type ProfileViewTabs_createProfileListViewMutation = {
       columns?: Array<string> | null;
       search?: string | null;
       status?: ProfileStatus | null;
+      values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
         field: ProfileListViewSortField;
@@ -8480,6 +8501,7 @@ export type ProfileViewTabs_updateProfileListViewMutation = {
       columns?: Array<string> | null;
       search?: string | null;
       status?: ProfileStatus | null;
+      values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
         field: ProfileListViewSortField;
@@ -51649,8 +51671,10 @@ export type Profiles_ProfileTypeFragment = {
   fields: Array<{
     __typename?: "ProfileTypeField";
     id: string;
+    type: ProfileTypeFieldType;
     name: { [locale in UserLocale]?: string };
-    position: number;
+    options: { [key: string]: any };
+    isExpirable: boolean;
   }>;
 };
 
@@ -51689,6 +51713,7 @@ export type Profiles_ProfileListViewFragment = {
     columns?: Array<string> | null;
     search?: string | null;
     status?: ProfileStatus | null;
+    values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
       field: ProfileListViewSortField;
@@ -51730,6 +51755,7 @@ export type Profiles_userQuery = {
         columns?: Array<string> | null;
         search?: string | null;
         status?: ProfileStatus | null;
+        values?: { [key: string]: any } | null;
         sort?: {
           __typename?: "ProfileListViewSort";
           field: ProfileListViewSortField;
@@ -51761,6 +51787,12 @@ export type Profiles_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+    deviceType?: string | null;
+  };
   realMe: {
     __typename?: "User";
     id: string;
@@ -51782,7 +51814,6 @@ export type Profiles_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Profiles_profileTypeQueryVariables = Exact<{
@@ -51801,8 +51832,10 @@ export type Profiles_profileTypeQuery = {
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
+      type: ProfileTypeFieldType;
       name: { [locale in UserLocale]?: string };
-      position: number;
+      options: { [key: string]: any };
+      isExpirable: boolean;
     }>;
   };
 };
@@ -51887,6 +51920,7 @@ export type Profiles_createProfileListViewMutation = {
       columns?: Array<string> | null;
       search?: string | null;
       status?: ProfileStatus | null;
+      values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
         field: ProfileListViewSortField;
@@ -51915,6 +51949,7 @@ export type Profiles_updateProfileListViewMutation = {
       columns?: Array<string> | null;
       search?: string | null;
       status?: ProfileStatus | null;
+      values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
         field: ProfileListViewSortField;
@@ -57480,8 +57515,10 @@ export type useProfileTableColumns_ProfileTypeFragment = {
   fields: Array<{
     __typename?: "ProfileTypeField";
     id: string;
+    type: ProfileTypeFieldType;
     name: { [locale in UserLocale]?: string };
-    position: number;
+    options: { [key: string]: any };
+    isExpirable: boolean;
   }>;
 };
 
@@ -66245,8 +66282,10 @@ export const useProfileTableColumns_ProfileTypeFragmentDoc = gql`
     id
     fields {
       id
+      type
       name
-      position
+      options
+      isExpirable
     }
   }
 ` as unknown as DocumentNode<useProfileTableColumns_ProfileTypeFragment, unknown>;
@@ -66302,6 +66341,7 @@ export const ProfileViewTabs_ProfileListViewDataFragmentDoc = gql`
     columns
     search
     status
+    values
   }
 ` as unknown as DocumentNode<ProfileViewTabs_ProfileListViewDataFragment, unknown>;
 export const ProfileViewTabs_ProfileListViewFragmentDoc = gql`
@@ -66330,6 +66370,7 @@ export const Profiles_ProfileListViewFragmentDoc = gql`
         direction
       }
       status
+      values
     }
   }
   ${ProfileViewTabs_ProfileListViewFragmentDoc}
@@ -73335,6 +73376,10 @@ export const Profiles_userDocument = gql`
       profileListViews(profileTypeId: $profileTypeId) {
         ...Profiles_ProfileListView
       }
+    }
+    metadata {
+      browserName
+      country
     }
   }
   ${AppLayout_QueryFragmentDoc}

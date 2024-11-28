@@ -10,7 +10,7 @@ import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { Maybe } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg, getArg } from "../helpers/authorize";
+import { Arg, ArgWithPath, getArg, getArgWithPath } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
@@ -51,11 +51,11 @@ export function validProfileTypeFieldOptions<
   TypeName extends string,
   FieldName extends string,
   TProfileTypeId extends Arg<TypeName, FieldName, number>,
-  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>,
->(profileTypeIdArg: TProfileTypeId, dataArg: TDataArg, argName: string) {
+  TDataArg extends ArgWithPath<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>,
+>(profileTypeIdArg: TProfileTypeId, dataArg: TDataArg) {
   return (async (_, args, ctx, info) => {
     const profileTypeId = getArg(args, profileTypeIdArg);
-    const data = getArg(args, dataArg);
+    const [data, argName] = getArgWithPath(args, dataArg);
     if (isNonNullish(data.options)) {
       try {
         const options = await mapProfileTypeFieldOptions(
@@ -80,10 +80,10 @@ export function validProfileTypeFieldOptions<
 export function validProfileTypeFieldSubstitution<
   TypeName extends string,
   FieldName extends string,
-  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdateProfileTypeFieldInput"]>,
->(dataArg: TDataArg, argName: string) {
+  TDataArg extends ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdateProfileTypeFieldInput"]>,
+>(dataArg: TDataArg) {
   return (async (_, args, ctx, info) => {
-    const data = getArg(args, dataArg);
+    const [data, argName] = getArgWithPath(args, dataArg);
 
     if (isNonNullish(data.substitutions) && isNonNullish(data.options?.values)) {
       const values = await profileTypeFieldSelectValues(data.options as any);
@@ -92,7 +92,7 @@ export function validProfileTypeFieldSubstitution<
       ) {
         throw new ArgValidationError(
           info,
-          argName,
+          `${argName}.substitutions`,
           "Every new substitution needs to be a valid option",
         );
       }

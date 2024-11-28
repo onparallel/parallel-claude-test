@@ -165,7 +165,7 @@ describe("GraphQL/Profiles", () => {
     profileType0Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[0].id,
-      8,
+      9,
       (i) =>
         [
           {
@@ -256,6 +256,14 @@ describe("GraphQL/Profiles", () => {
               ],
             },
           },
+          {
+            name: json({ en: "Background check", es: "Antecedentes" }),
+            type: "BACKGROUND_CHECK" as const,
+            alias: "BACKGROUND_CHECK",
+            is_expirable: false,
+            permission: "WRITE" as const,
+            options: {},
+          },
         ][i],
     );
     await mocks.knex
@@ -298,7 +306,7 @@ describe("GraphQL/Profiles", () => {
     profileType2Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[2].id,
-      5,
+      6,
       (i) =>
         [
           {
@@ -329,6 +337,12 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "Contract Value", es: "Valor del contrato" }),
             type: "NUMBER" as const,
             alias: "CONTRACT_VALUE",
+            permission: "WRITE" as const,
+          },
+          {
+            name: json({ en: "Expiry date", es: "Fecha de expiración" }),
+            type: "DATE" as const,
+            alias: "EXPIRY_DATE",
             permission: "WRITE" as const,
           },
         ][i],
@@ -416,9 +430,16 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("profiles", () => {
-    let harryPotterId: number;
-    let harveySpecterId: number;
-    let contractId: number;
+    let harryPotterId: string;
+    let harveySpecterId: string;
+    let unknownPersonId: string;
+
+    let profileAId: string;
+    let profileBCId: string;
+    let profileACId: string;
+
+    let contractId: string;
+    let expiredContractId: string;
 
     beforeEach(async () => {
       const harryPotter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
@@ -431,6 +452,25 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Potter" },
         },
       ]);
+      await mocks.knex.from("profile_field_value").insert({
+        created_by_user_id: sessionUser.id,
+        profile_id: fromGlobalId(harryPotter.id).id,
+        type: "BACKGROUND_CHECK",
+        profile_type_field_id: profileType0Fields[8].id,
+        content: JSON.stringify({
+          query: {
+            name: "Harry Potter",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 1,
+            createdAt: new Date(),
+          },
+          entity: null,
+        }),
+      });
+
       const harveySpecter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
@@ -439,6 +479,73 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           content: { value: "Specter" },
+        },
+      ]);
+      await mocks.knex.from("profile_field_value").insert({
+        created_by_user_id: sessionUser.id,
+        profile_id: fromGlobalId(harveySpecter.id).id,
+        type: "BACKGROUND_CHECK",
+        profile_type_field_id: profileType0Fields[8].id,
+        content: JSON.stringify({
+          query: {
+            name: "Harvey Specter",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 2,
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "1",
+            type: "PERSON",
+            name: "Harvey Specter",
+            createdAt: new Date(),
+            properties: {
+              topics: ["role.lawyer", "poi"],
+            },
+          },
+        }),
+      });
+
+      const unknownPerson = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      await mocks.knex.from("profile_field_value").insert({
+        created_by_user_id: sessionUser.id,
+        profile_id: fromGlobalId(unknownPerson.id).id,
+        type: "BACKGROUND_CHECK",
+        profile_type_field_id: profileType0Fields[8].id,
+        content: JSON.stringify({
+          query: {
+            name: "N/A",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            items: [],
+            totalCount: 0,
+          },
+          entity: null,
+        }),
+      });
+
+      const profileA = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          content: { value: ["A"] },
+        },
+      ]);
+
+      const profileBC = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          content: { value: ["B", "C"] },
+        },
+      ]);
+
+      const profileAC = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          content: { value: ["A", "C"] },
         },
       ]);
 
@@ -451,11 +558,41 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
           content: { value: 1000 },
         },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[5].id),
+          content: { value: "2030-10-19" },
+        },
+      ]);
+      const [fileUpload] = await mocks.createRandomFileUpload(1);
+      await mocks.knex.from("profile_field_file").insert({
+        created_by_user_id: sessionUser.id,
+        profile_id: fromGlobalId(contract.id).id,
+        type: "FILE",
+        profile_type_field_id: profileType2Fields[1].id,
+        file_upload_id: fileUpload.id,
+      });
+
+      const expiredContract = await createProfile(toGlobalId("ProfileType", profileTypes[2].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+          content: { value: 1300 },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[5].id),
+          content: { value: "2000-01-01" },
+        },
       ]);
 
       harryPotterId = harryPotter.id;
       harveySpecterId = harveySpecter.id;
+      unknownPersonId = unknownPerson.id;
+
+      profileAId = profileA.id;
+      profileBCId = profileBC.id;
+      profileACId = profileAC.id;
+
       contractId = contract.id;
+      expiredContractId = expiredContract.id;
     });
 
     it("queries profiles filtering by its current values", async () => {
@@ -472,13 +609,12 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           filter: {
-            values: [
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                operator: "START_WITH",
-                value: "Har",
-              },
-            ],
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              operator: "START_WITH",
+              value: "Har",
+            },
           },
         },
       );
@@ -504,18 +640,22 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           filter: {
-            values: [
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                operator: "START_WITH",
-                value: "Har",
-              },
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
-                operator: "EQUAL",
-                value: "Potter",
-              },
-            ],
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              logicalOperator: "AND",
+              conditions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                  operator: "START_WITH",
+                  value: "Har",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+                  operator: "EQUAL",
+                  value: "Potter",
+                },
+              ],
+            },
           },
         },
       );
@@ -541,18 +681,22 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           filter: {
-            values: [
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
-                operator: "GREATER_THAN_OR_EQUAL",
-                value: 1000,
-              },
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
-                operator: "CONTAIN",
-                value: "Main St",
-              },
-            ],
+            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
+            values: {
+              logicalOperator: "AND",
+              conditions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+                  operator: "GREATER_THAN_OR_EQUAL",
+                  value: 1000,
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+                  operator: "CONTAIN",
+                  value: "Main St",
+                },
+              ],
+            },
           },
         },
       );
@@ -578,13 +722,12 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           filter: {
-            values: [
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                operator: "IS_ONE_OF",
-                value: ["Harry", "Harvey"],
-              },
-            ],
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              operator: "IS_ONE_OF",
+              value: ["Harry", "Harvey"],
+            },
           },
         },
       );
@@ -611,13 +754,12 @@ describe("GraphQL/Profiles", () => {
           `,
           {
             filter: {
-              values: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                  operator,
-                  value: "Harry",
-                },
-              ],
+              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+              values: {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                operator,
+                value: "Harry",
+              },
             },
           },
         );
@@ -653,13 +795,17 @@ describe("GraphQL/Profiles", () => {
           `,
           {
             filter: {
-              values: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                  operator,
-                  value: ["Harry", "Harvey"],
-                },
-              ],
+              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+              values: {
+                logicalOperator: "OR",
+                conditions: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                    operator,
+                    value: ["Harry", "Harvey"],
+                  },
+                ],
+              },
             },
           },
         );
@@ -667,6 +813,342 @@ describe("GraphQL/Profiles", () => {
         expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
         expect(data).toBeNull();
       }
+    });
+
+    it("queries profiles with HAS_BG_CHECK_MATCH operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "HAS_BG_CHECK_MATCH",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harveySpecterId }],
+      });
+    });
+
+    it("queries profiles with NOT_HAS_BG_CHECK_MATCH operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "NOT_HAS_BG_CHECK_MATCH",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("queries profiles with HAS_BG_CHECK_RESULTS operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "HAS_BG_CHECK_RESULTS",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("queries profiles with NOT_HAS_BG_CHECK_RESULTS operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "NOT_HAS_BG_CHECK_RESULTS",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: unknownPersonId }],
+      });
+    });
+
+    it("queries profiles with HAS_BG_CHECK_TOPICS operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "HAS_BG_CHECK_TOPICS",
+              value: ["poi"],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harveySpecterId }],
+      });
+    });
+
+    it("queries profiles with NOT_HAS_BG_CHECK_TOPICS operator", async () => {
+      for (const [value, profiles] of [
+        [["poi"], [harryPotterId, unknownPersonId]],
+        [["wanted"], [harryPotterId, harveySpecterId, unknownPersonId]],
+      ] as [string[], string[]][]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($filter: ProfileFilter) {
+              profiles(limit: 100, offset: 0, filter: $filter) {
+                totalCount
+                items {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            filter: {
+              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+              values: {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+                operator: "NOT_HAS_BG_CHECK_TOPICS",
+                value,
+              },
+            },
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.profiles).toEqual({
+          totalCount: profiles.length,
+          items: profiles.map((id) => ({ id })),
+        });
+      }
+    });
+
+    it("queries profiles with values on CHECKBOX field", async () => {
+      for (const [operator, value, profiles] of [
+        ["EQUAL", ["A", "C"], [profileACId]],
+        ["CONTAIN", ["C"], [profileBCId, profileACId]],
+        ["NOT_CONTAIN", ["A"], [profileBCId]],
+        ["NOT_EQUAL", ["A"], [profileBCId, profileACId]],
+      ] as [string, string[], string[]][]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($filter: ProfileFilter) {
+              profiles(limit: 100, offset: 0, filter: $filter) {
+                totalCount
+                items {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            filter: {
+              profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+              values: {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+                operator,
+                value,
+              },
+            },
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.profiles).toEqual({
+          totalCount: profiles.length,
+          items: profiles.map((id) => ({ id })),
+        });
+      }
+    });
+
+    it("queries profiles with values on CHECKBOX field and OR logical operator", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+            values: {
+              logicalOperator: "OR",
+              conditions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+                  operator: "EQUAL",
+                  value: ["A"],
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+                  operator: "CONTAIN",
+                  value: ["B"],
+                },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: profileAId }, { id: profileBCId }],
+      });
+    });
+
+    it("queries profiles containing FILE replies", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+              operator: "HAS_VALUE",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: contractId }],
+      });
+    });
+
+    it("queries contracts with multiple filters", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
+            values: {
+              logicalOperator: "OR",
+              conditions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+                  operator: "NOT_HAS_VALUE",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+                  operator: "LESS_THAN_OR_EQUAL",
+                  value: 1000,
+                },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: contractId }, { id: expiredContractId }],
+      });
     });
   });
 
@@ -876,6 +1358,17 @@ describe("GraphQL/Profiles", () => {
             files: null,
             value: null,
           },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              isExpirable: false,
+              isUsedInProfileName: false,
+              name: { en: "Background check", es: "Antecedentes" },
+              options: {},
+            },
+            files: null,
+            value: null,
+          },
         ],
         events: {
           items: [
@@ -1064,6 +1557,14 @@ describe("GraphQL/Profiles", () => {
             files: null,
             value: null,
           },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              myPermission: "WRITE",
+            },
+            files: null,
+            value: null,
+          },
         ],
       });
     });
@@ -1149,6 +1650,7 @@ describe("GraphQL/Profiles", () => {
                 name: { en: "Contract Value", es: "Valor del contrato" },
                 position: 4,
               },
+              { name: { en: "Expiry date", es: "Fecha de expiración" }, position: 5 },
             ],
           },
         ],
@@ -1360,6 +1862,10 @@ describe("GraphQL/Profiles", () => {
               alias: "GENDER",
               myPermission: "WRITE",
             },
+            {
+              alias: "BACKGROUND_CHECK",
+              myPermission: "WRITE",
+            },
           ],
         },
       });
@@ -1435,6 +1941,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "GENDER",
+              myPermission: "READ",
+            },
+            {
+              alias: "BACKGROUND_CHECK",
               myPermission: "READ",
             },
           ],
@@ -1530,6 +2040,10 @@ describe("GraphQL/Profiles", () => {
               alias: "GENDER",
               myPermission: "HIDDEN",
             },
+            {
+              alias: "BACKGROUND_CHECK",
+              myPermission: "HIDDEN",
+            },
           ],
         },
       });
@@ -1614,6 +2128,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "GENDER",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "BACKGROUND_CHECK",
               myPermission: "HIDDEN",
             },
           ],
@@ -1731,6 +2249,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "GENDER",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "BACKGROUND_CHECK",
               myPermission: "HIDDEN",
             },
           ],
@@ -2372,6 +2894,10 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "GENDER",
+            isUsedInProfileName: false,
+          },
+          {
+            alias: "BACKGROUND_CHECK",
             isUsedInProfileName: false,
           },
         ],
@@ -6508,6 +7034,7 @@ describe("GraphQL/Profiles", () => {
           { files: null },
           { files: null },
           { files: null },
+          { files: null },
         ],
       });
 
@@ -6637,6 +7164,7 @@ describe("GraphQL/Profiles", () => {
           { files: null },
           { files: null },
           { files: null },
+          { files: null },
         ],
       });
 
@@ -6697,6 +7225,7 @@ describe("GraphQL/Profiles", () => {
       expect(profileEventsQueryErrors).toBeUndefined();
       expect(profileEventsQueryData.profile).toEqual({
         properties: [
+          { files: null },
           { files: null },
           { files: null },
           { files: null },
@@ -6781,6 +7310,7 @@ describe("GraphQL/Profiles", () => {
         properties: [
           { files: null },
           { files: [{ id: expect.any(String) }] },
+          { files: null },
           { files: null },
           { files: null },
           { files: null },
@@ -7955,6 +8485,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "BACKGROUND_CHECK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -8073,6 +8609,12 @@ describe("GraphQL/Profiles", () => {
             alias: "GENDER",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "BACKGROUND_CHECK",
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
             permissions: [],
           },
         ],
@@ -8201,6 +8743,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "BACKGROUND_CHECK",
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -8327,6 +8875,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "BACKGROUND_CHECK",
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -8444,6 +8998,12 @@ describe("GraphQL/Profiles", () => {
             alias: "GENDER",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "BACKGROUND_CHECK",
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
             permissions: [],
           },
         ],

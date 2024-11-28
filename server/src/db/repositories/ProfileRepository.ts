@@ -21,9 +21,15 @@ import {
   uniqueBy,
   zip,
 } from "remeda";
+import { assert } from "ts-essentials";
 import { LocalizableUserText } from "../../graphql";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { keyBuilder } from "../../util/keyBuilder";
+import { never } from "../../util/never";
+import {
+  ProfileFieldValuesFilter,
+  ProfileFieldValuesFilterOperator,
+} from "../../util/ProfileFieldValuesFilter";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -74,31 +80,11 @@ import {
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
-type ProfileFilterValueOperator =
-  | "EQUAL"
-  | "NOT_EQUAL"
-  | "START_WITH"
-  | "END_WITH"
-  | "CONTAIN"
-  | "NOT_CONTAIN"
-  | "IS_ONE_OF"
-  | "NOT_IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL";
-
 interface ProfileFilter {
   profileId?: number[] | null;
   profileTypeId?: number[] | null;
   status?: ProfileStatus[] | null;
-  values?:
-    | {
-        profileTypeFieldId: number;
-        operator: ProfileFilterValueOperator;
-        value: MaybeArray<number | string>;
-      }[]
-    | null;
+  values?: ProfileFieldValuesFilter | null;
 }
 
 @injectable()
@@ -687,108 +673,270 @@ export class ProfileRepository extends BaseRepository {
       filter?: ProfileFilter | null;
       sortBy?: SortBy<"created_at" | "name_en" | "name_es">[];
     } & PageOpts,
+    profileTypeFieldsById?: Record<number, ProfileTypeField>,
   ) {
     return this.getPagination<Profile>(
-      this.from({ p: "profile" })
-        .where("p.org_id", orgId)
-        .whereNull("p.deleted_at")
-        .mmodify((q) => {
-          const { search, sortBy, filter } = opts;
-          if (search) {
-            q.where((q1) =>
-              q1
-                .whereSearch(this.knex.raw("p.localizable_name->>'en'"), search)
-                .or.whereSearch(this.knex.raw("p.localizable_name->>'es'"), search),
-            );
-          }
-          if (isNonNullish(filter?.profileId)) {
-            q.whereIn("p.id", filter!.profileId);
-          }
-          if (isNonNullish(filter?.profileTypeId)) {
-            q.whereIn("p.profile_type_id", filter!.profileTypeId);
-          }
-          if (isNonNullish(filter?.status) && filter!.status.length > 0) {
-            q.whereIn("p.status", filter!.status);
-          }
-
-          if (isNonNullish(filter?.values) && filter.values.length > 0) {
-            const entries = Object.entries(groupBy(filter.values, (v) => v.profileTypeFieldId));
-            for (const entry of entries) {
-              const index = entries.indexOf(entry);
-              const profileTypeFieldId = parseInt(entry[0]);
-              const conditions = entry[1];
-              q.joinRaw(
-                /* sql */ `
-                join profile_field_value pfv_${index} 
-                  on pfv_${index}.profile_id = p.id
-                  and pfv_${index}.profile_type_field_id = ?
-                  and pfv_${index}.deleted_at is null 
-                  and pfv_${index}.removed_at is null
-              `,
-                [profileTypeFieldId],
-              ).andWhere((q) => {
-                for (const condition of conditions) {
-                  switch (condition.operator) {
-                    case "EQUAL":
-                    case "NOT_EQUAL":
-                      q = condition.operator.startsWith("NOT_") ? q.not : q;
-                      q.whereRaw(/* sql*/ `pfv_${index}.content->>'value' = ?`, [condition.value]);
-                      break;
-                    case "START_WITH":
-                      q.whereRaw(/* sql*/ `starts_with(pfv_${index}.content->>'value', ?)`, [
-                        condition.value,
-                      ]);
-                      break;
-                    case "END_WITH":
-                      q.whereRaw(/* sql*/ `right(pfv_${index}.content->>'value', length(?)) = ?`, [
-                        condition.value,
-                        condition.value,
-                      ]);
-                      break;
-                    case "CONTAIN":
-                    case "NOT_CONTAIN":
-                      q = condition.operator.startsWith("NOT_") ? q.not : q;
-                      q.whereRaw(/* sql*/ `strpos(pfv_${index}.content->>'value', ?) > 0`, [
-                        condition.value,
-                      ]);
-                      break;
-                    case "IS_ONE_OF":
-                    case "NOT_IS_ONE_OF":
-                      q = condition.operator.startsWith("NOT_") ? q.not : q;
-                      q.whereRaw(/* sql*/ `pfv_${index}.content->>'value' in ?`, [
-                        this.sqlIn(condition.value as (string | number)[]),
-                      ]);
-                      break;
-                    case "LESS_THAN":
-                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int < ?`, [
-                        condition.value,
-                      ]);
-                      break;
-                    case "LESS_THAN_OR_EQUAL":
-                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int <= ?`, [
-                        condition.value,
-                      ]);
-                      break;
-                    case "GREATER_THAN":
-                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int > ?`, [
-                        condition.value,
-                      ]);
-                      break;
-                    case "GREATER_THAN_OR_EQUAL":
-                      q.whereRaw(/* sql*/ `(pfv_${index}.content->>'value')::int >= ?`, [
-                        condition.value,
-                      ]);
-                      break;
-                    default:
-                      throw new Error(`Operator ${condition.operator} not implemented`);
+      this.knex
+        .with(
+          "p",
+          this.from({ p: "profile" })
+            .where("p.org_id", orgId)
+            .whereNull("p.deleted_at")
+            .mmodify((q) => {
+              const { search, filter } = opts;
+              if (search) {
+                q.where((q1) =>
+                  q1
+                    .whereSearch(this.knex.raw("p.localizable_name->>'en'"), search)
+                    .or.whereSearch(this.knex.raw("p.localizable_name->>'es'"), search),
+                );
+              }
+              if (isNonNullish(filter?.profileId)) {
+                q.whereIn("p.id", filter!.profileId);
+              }
+              if (isNonNullish(filter?.profileTypeId)) {
+                q.whereIn("p.profile_type_id", unMaybeArray(filter!.profileTypeId));
+              }
+              if (isNonNullish(filter?.status) && filter!.status.length > 0) {
+                q.whereIn("p.status", filter!.status);
+              }
+              if (isNonNullish(filter?.values)) {
+                assert(
+                  isNonNullish(profileTypeFieldsById),
+                  "if filter.values is defined, profileTypeFieldsById is required",
+                );
+                const joins: Record<number, string> = {};
+                let index = 0;
+                (function walkFilter(filter: ProfileFieldValuesFilter) {
+                  if ("conditions" in filter) {
+                    for (const condition of filter.conditions) {
+                      walkFilter(condition);
+                    }
+                  } else {
+                    const condition = filter;
+                    const profileTypeField = profileTypeFieldsById[condition.profileTypeFieldId];
+                    if (isNullish(joins[condition.profileTypeFieldId])) {
+                      const alias = (joins[condition.profileTypeFieldId] = `pfv${index++}`);
+                      const table =
+                        profileTypeField.type === "FILE"
+                          ? "profile_field_file"
+                          : "profile_field_value";
+                      q.joinRaw(
+                        /* sql */ `
+                        left join ${table} ${alias} 
+                          on ${alias}.profile_id = p.id
+                          and ${alias}.profile_type_field_id = ?
+                          and ${alias}.deleted_at is null 
+                          and ${alias}.removed_at is null
+                        `,
+                        [condition.profileTypeFieldId],
+                      );
+                    }
                   }
-                }
-              });
-            }
-          }
-          if (isNonNullish(sortBy) && sortBy.length > 0) {
+                })(filter.values);
+                const applyValueFilter = (
+                  filter: ProfileFieldValuesFilter,
+                  q: Knex.QueryBuilder,
+                  currentOp: "AND" | "OR",
+                ) => {
+                  if ("conditions" in filter) {
+                    const { conditions, logicalOperator } = filter;
+                    // this simplifies the query avoiding nested unnecessary parentheses
+                    // a AND (b AND c) => a AND b AND c
+                    // a OR (b OR c) => a OR b OR c
+                    if (logicalOperator === currentOp || conditions.length === 1) {
+                      conditions.forEach((c) => applyValueFilter(c, q, logicalOperator));
+                    } else {
+                      q.where((q) =>
+                        conditions.forEach((c) =>
+                          q[logicalOperator === "AND" ? "andWhere" : "orWhere"]((q) =>
+                            applyValueFilter(c, q, logicalOperator),
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    const profileTypeField = profileTypeFieldsById[filter.profileTypeFieldId];
+                    const assertType = (...types: ProfileTypeFieldType[]) => {
+                      assert(
+                        types.includes(profileTypeField.type),
+                        `Invalid operator ${filter.operator} for type ${profileTypeField.type}`,
+                      );
+                    };
+                    const content =
+                      profileTypeField.type === "FILE"
+                        ? this.knex.raw(`??.id`, [joins[filter.profileTypeFieldId]])
+                        : this.knex.raw(`??.content`, [joins[filter.profileTypeFieldId]]);
+                    const expiryDate = this.knex.raw(`??.expiry_date`, [
+                      joins[filter.profileTypeFieldId],
+                    ]);
+                    const [negated, operator] = filter.operator.startsWith("NOT_")
+                      ? ([
+                          true,
+                          filter.operator.slice("NOT_".length) as ProfileFieldValuesFilterOperator,
+                        ] as const)
+                      : ([false, filter.operator] as const);
+                    const value = filter.value;
+                    const where = (builder: (q: Knex.QueryBuilder) => void, wrap: boolean) => {
+                      if (wrap) {
+                        q.where(builder);
+                      } else {
+                        builder(q);
+                      }
+                    };
+                    const apply = (sql: string, bindings: readonly Knex.RawBinding[]) => {
+                      const raw = this.knex.raw(sql, bindings);
+                      if (negated) {
+                        where(
+                          (q) => q.whereRaw(`? is null or not(?)`, [content, raw]),
+                          currentOp === "AND",
+                        );
+                      } else {
+                        where(
+                          (q) => q.whereRaw(`? is not null and ?`, [content, raw]),
+                          currentOp === "OR",
+                        );
+                      }
+                    };
+                    switch (operator) {
+                      case "HAS_VALUE":
+                        if (negated) {
+                          q.whereRaw(/* sql*/ `? is null`, [content]);
+                        } else {
+                          q.whereRaw(/* sql*/ `? is not null`, [content]);
+                        }
+                        break;
+                      case "EQUAL":
+                        if (
+                          ["TEXT", "SHORT_TEXT", "NUMBER", "DATE", "SELECT", "PHONE"].includes(
+                            profileTypeField.type,
+                          )
+                        ) {
+                          assert(isNonNullish(value));
+                          apply(/* sql*/ `?->>'value' = ?`, [content, value]);
+                        } else if (profileTypeField.type === "CHECKBOX") {
+                          assert(Array.isArray(value));
+                          apply(
+                            /* sql*/ `(?->'value' @> to_jsonb(?) and ?->'value' <@ to_jsonb(?))`,
+                            [content, this.sqlArray(value), content, this.sqlArray(value)],
+                          );
+                        } else {
+                          never();
+                        }
+                        break;
+                      case "START_WITH":
+                        assertType("TEXT", "SHORT_TEXT");
+                        assert(isNonNullish(value));
+                        apply(/* sql*/ `starts_with(?->>'value', ?)`, [content, value]);
+                        break;
+                      case "END_WITH":
+                        assertType("TEXT", "SHORT_TEXT");
+                        assert(isNonNullish(value));
+                        apply(/* sql*/ `right(?->>'value', length(?)) = ?`, [
+                          content,
+                          value,
+                          value,
+                        ]);
+                        break;
+                      case "CONTAIN":
+                        assert(isNonNullish(value));
+                        if (["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)) {
+                          apply(/* sql*/ `strpos(?->>'value', ?) > 0`, [content, value]);
+                        } else if (profileTypeField.type === "CHECKBOX") {
+                          assert(Array.isArray(value));
+                          apply(/* sql*/ `?->'value' @> to_jsonb(?)`, [
+                            content,
+                            this.sqlArray(value),
+                          ]);
+                        } else {
+                          never(`Invalid operator ${operator} for type ${profileTypeField.type}`);
+                        }
+                        break;
+                      case "IS_ONE_OF":
+                        assertType("SELECT", "TEXT", "SHORT_TEXT");
+                        assert(Array.isArray(value));
+                        apply(/* sql*/ `?->>'value' in ?`, [content, this.sqlIn(value)]);
+                        break;
+                      case "LESS_THAN":
+                      case "LESS_THAN_OR_EQUAL":
+                      case "GREATER_THAN":
+                      case "GREATER_THAN_OR_EQUAL":
+                        assertType("NUMBER", "DATE");
+                        assert(isNonNullish(value));
+                        const op = {
+                          LESS_THAN: "<",
+                          LESS_THAN_OR_EQUAL: "<=",
+                          GREATER_THAN: ">",
+                          GREATER_THAN_OR_EQUAL: ">=",
+                        }[operator];
+                        const cast = {
+                          NUMBER: "float",
+                          DATE: "date",
+                        }[profileTypeField.type as "NUMBER" | "DATE"];
+                        apply(/* sql*/ `(?->>'value')::${cast} ${op} ?::${cast}`, [content, value]);
+                        break;
+                      case "HAS_BG_CHECK_MATCH":
+                        apply(
+                          /* sql */ `(? -> 'entity' is not null and ? -> 'entity' != 'null'::jsonb)`,
+                          [content, content],
+                        );
+                        break;
+                      case "HAS_BG_CHECK_RESULTS":
+                        apply(
+                          /* sql */ `(? -> 'search' is not null and ? -> 'search' != 'null'::jsonb and (? #>> '{search,totalCount}')::int > 0)`,
+                          [content, content, content],
+                        );
+                        break;
+                      case "HAS_BG_CHECK_TOPICS":
+                        assert(Array.isArray(value));
+                        apply(
+                          /* sql */ `(? -> 'entity' is not null and ? -> 'entity' != 'null'::jsonb and (? #> '{entity,properties,topics}') @> to_jsonb(?))`,
+                          [content, content, content, this.sqlArray(value)],
+                        );
+                        break;
+                      case "IS_EXPIRED":
+                        where(
+                          (q) =>
+                            q.whereRaw(`? is not null and now() > (? - 'P1D'::interval)`, [
+                              expiryDate,
+                              expiryDate,
+                            ]),
+                          currentOp === "OR",
+                        );
+                        break;
+                      case "EXPIRES_IN":
+                        where(
+                          (q) =>
+                            q.whereRaw(
+                              `? is not null and (now() + ?::interval) > (? - 'P1D'::interval)`,
+                              [expiryDate, value, expiryDate],
+                            ),
+                          currentOp === "OR",
+                        );
+                        break;
+                      case "HAS_EXPIRY":
+                        if (negated) {
+                          q.whereRaw(/* sql*/ `? is null`, [expiryDate]);
+                        } else {
+                          q.whereRaw(/* sql*/ `? is not null`, [expiryDate]);
+                        }
+                        break;
+                      default:
+                        throw new Error(`Operator ${operator} not implemented`);
+                    }
+                  }
+                };
+                applyValueFilter(filter.values, q, "AND");
+              }
+            })
+            .orderBy("p.id")
+            .select(this.knex.raw("distinct on (p.id) p.*")),
+        )
+        .from("p")
+        .mmodify((q) => {
+          if (isNonNullish(opts.sortBy) && opts.sortBy.length > 0) {
             q.orderByRaw(
-              sortBy
+              opts.sortBy
                 .map((s) => {
                   if (s.field === "name_en") {
                     return `"localizable_name"->>'en' ${s.order}`;
@@ -804,6 +952,7 @@ export class ProfileRepository extends BaseRepository {
         })
         .orderBy("p.id")
         .select("p.*"),
+
       opts,
     );
   }

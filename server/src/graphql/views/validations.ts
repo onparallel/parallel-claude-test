@@ -1,5 +1,6 @@
-import { unique } from "remeda";
+import { indexBy, unique } from "remeda";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
+import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -48,6 +49,23 @@ export function validProfileListViewDataInput<TypeName extends string, FieldName
         }
       } else if (!["subscribers", "createdAt"].includes(column)) {
         throw new ArgValidationError(info, `${argName}.columns`, `Invalid column value: ${column}`);
+      }
+    }
+
+    if (input.values) {
+      try {
+        const fieldsById = indexBy(fields, (f) => f.id);
+        validateProfileFieldValuesFilter(input.values, fieldsById);
+      } catch (e) {
+        if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
+          throw new ArgValidationError(
+            info,
+            `${argName}.values`,
+            e.message.slice("Assertion Error: ".length),
+          );
+        } else {
+          throw e;
+        }
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

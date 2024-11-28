@@ -8,15 +8,13 @@ import {
   Checkbox,
   Collapse,
   FocusLock,
-  Heading,
   HStack,
   HTMLChakraProps,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Portal,
   Tbody,
   Td,
@@ -24,11 +22,9 @@ import {
   Th,
   Thead,
   Tr,
-  useBreakpointValue,
   useDisclosure,
-  useOutsideClick,
-  usePopper,
 } from "@chakra-ui/react";
+import { Popover } from "@parallel/chakra/components";
 import {
   ArrowUpDownIcon,
   ChevronDownIcon,
@@ -38,9 +34,9 @@ import {
 } from "@parallel/chakra/icons";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
 import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import useMergedRef from "@react-hook/merged-ref";
 import {
   ComponentType,
   Fragment,
@@ -56,11 +52,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { identity, isNonNullish, noop, pick } from "remeda";
-import { Card } from "./Card";
+import { assert } from "ts-essentials";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
+import { Wrap } from "./Wrap";
 
 export type TableSortingDirection = "ASC" | "DESC";
 
@@ -121,12 +119,15 @@ export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown>
   column: TableColumn<TRow, TContext, TFilter>;
 }
 
-export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
+export interface TableColumn<
+  TRow,
+  TContext = unknown,
+  TFilter extends Record<string, any> | unknown = unknown,
+> {
   key: string;
   align?: BoxProps["textAlign"];
   isSortable?: true;
   isFixed?: true;
-  isFilterable?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
   label: string | ((intl: IntlShape) => string);
   /** overrides label */
@@ -138,7 +139,12 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   cellProps?: MaybeFunction<HTMLChakraProps<"td">, [TRow, TContext]>;
 }
 
-export interface TableColumnFilterProps<TFilter, TContext = unknown> extends ValueProps<TFilter> {
+export interface TableColumnFilterProps<
+  TFilter extends Record<string, any> | unknown = unknown,
+  TContext = unknown,
+  TValue = TFilter extends Record<string, infer U> ? U : unknown,
+> extends ValueProps<TValue> {
+  column: TableColumn<any, TContext, TFilter>;
   context: TContext;
 }
 
@@ -345,38 +351,22 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       <Thead {...unMaybeFunction(headProps, context as TContext)}>
         <Tr>
           {_columns.map((column) => {
-            if (column.Header) {
-              return (
-                <column.Header
-                  key={column.key}
-                  column={column}
-                  context={_context}
-                  sort={sort}
-                  filter={filter?.[column.key]}
-                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                  onSortByClick={handleOnSortByClick}
-                  allSelected={allSelected}
-                  anySelected={anySelected}
-                  onToggleAll={toggleAll}
-                />
-              );
-            } else {
-              return (
-                <DefaultHeader
-                  key={column.key}
-                  column={column}
-                  context={_context}
-                  sort={sort}
-                  filter={filter?.[column.key]}
-                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                  onSortByClick={handleOnSortByClick}
-                  allSelected={allSelected}
-                  anySelected={anySelected}
-                  onToggleAll={toggleAll}
-                  {...unMaybeFunction(column.headerProps, _context!)}
-                />
-              );
-            }
+            const Header = column.Header ?? DefaultHeader;
+            return (
+              <Header
+                key={column.key}
+                column={column}
+                context={_context}
+                sort={sort}
+                filter={filter?.[column.key]}
+                onFilterChange={(value) => onFilterChange?.(column.key, value)}
+                onSortByClick={handleOnSortByClick}
+                allSelected={allSelected}
+                anySelected={anySelected}
+                onToggleAll={toggleAll}
+                {...unMaybeFunction(column.headerProps, _context!)}
+              />
+            );
           })}
         </Tr>
       </Thead>
@@ -516,51 +506,37 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
   const intl = useIntl();
   const {
     onClose: onCloseFilter,
+    onOpen: onOpenFilter,
     onToggle: onToggleFilter,
     isOpen: isFilterOpen,
-    getButtonProps: getFilterButtonProps,
-    getDisclosureProps: getFilterPopoverProps,
   } = useDisclosure();
 
-  const { referenceRef, popperRef } = usePopper({
-    enabled: isFilterOpen,
-    placement: "bottom-start",
-    gutter: 2,
-    modifiers: [
-      {
-        name: "matchMinWidth",
-        enabled: true,
-        phase: "beforeWrite",
-        requires: ["computeStyles"],
-        fn: ({ state }) => {
-          state.styles.popper.minWidth = `${state.rects.reference.width}px`;
-        },
-        effect:
-          ({ state }) =>
-          () => {
-            const reference = state.elements.reference as HTMLElement;
-            state.elements.popper.style.minWidth = `${reference.offsetWidth}px`;
-          },
-      },
-    ],
+  const form = useForm({
+    mode: "onSubmit",
+    defaultValues: { filter },
   });
-  const ref = useRef<HTMLElement>(null);
+
+  useEffectSkipFirst(() => {
+    reset({ filter });
+  }, [filter]);
+  const { handleSubmit, reset } = form;
+
+  const popoverRef = useRef<HTMLFormElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
 
-  const isMobile = useBreakpointValue({ base: true, sm: false });
-  useOutsideClick({
-    ref,
-    handler: (event) => {
-      if (filterButtonRef?.current?.contains(event.target as HTMLElement)) {
-        // ignore
-        return;
-      }
-      if (isMobile) {
-        return;
-      }
-      onCloseFilter();
-    },
-  });
+  async function handleOverlayClick(event: MouseEvent) {
+    if (event.currentTarget === event.target) {
+      handleSubmit(({ filter }) => {
+        onFilterChange(filter);
+        onCloseFilter();
+      })();
+    }
+  }
+
+  const handleCancel = () => {
+    onCloseFilter();
+    reset();
+  };
 
   const toFlexAlignment = (alignment: BoxProps["textAlign"]) => {
     if (alignment === "right") return "flex-end";
@@ -568,10 +544,8 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
     else return alignment;
   };
 
-  const _ref = useMergedRef(ref, popperRef);
   return (
     <Th
-      ref={referenceRef}
       key={column.key}
       className={sort?.field === column.key ? "sort-active" : undefined}
       paddingY={0}
@@ -596,28 +570,93 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
           {column.header ?? unIntl(column.label, intl)}
         </Text>
         {column.headerHelp ? <HelpPopover>{column.headerHelp}</HelpPopover> : null}
-
-        {column.isFilterable ? (
-          <IconButtonWithTooltip
-            ref={filterButtonRef}
-            icon={<FilterIcon />}
-            label={intl.formatMessage({
-              id: "component.table.filter-button",
-              defaultMessage: "Filter",
-            })}
-            size="xs"
-            variant={isFilterOpen ? "solid" : filter ? "outline" : "ghost"}
-            colorScheme={isFilterOpen ? "gray" : filter ? "primary" : "gray"}
-            aria-label={intl.formatMessage(
+        {column.Filter ? (
+          <Popover
+            isOpen={isFilterOpen}
+            onOpen={onOpenFilter}
+            onClose={handleCancel}
+            closeOnBlur={false}
+            returnFocusOnClose={false}
+          >
+            <PopoverTrigger>
               {
-                id: "component.table.filter",
-                defaultMessage: 'Filter "{column}"',
-              },
-              { column: unIntl(column.label, intl) },
-            )}
-            {...getFilterButtonProps()}
-            onClick={onToggleFilter}
-          />
+                <IconButtonWithTooltip
+                  ref={filterButtonRef}
+                  icon={<FilterIcon />}
+                  label={intl.formatMessage({
+                    id: "component.table.filter-button",
+                    defaultMessage: "Filter",
+                  })}
+                  size="xs"
+                  variant={isFilterOpen ? "solid" : filter ? "outline" : "ghost"}
+                  colorScheme={isFilterOpen ? "gray" : filter ? "primary" : "gray"}
+                  aria-label={intl.formatMessage(
+                    {
+                      id: "component.table.filter",
+                      defaultMessage: 'Filter "{column}"',
+                    },
+                    { column: unIntl(column.label, intl) },
+                  )}
+                  onClick={onToggleFilter}
+                />
+              }
+            </PopoverTrigger>
+            <Portal>
+              <Wrap
+                when={isFilterOpen}
+                wrapper={({ children }) => (
+                  <Box
+                    __css={{
+                      position: "fixed",
+                      left: "0",
+                      top: "0",
+                      width: "100vw",
+                      height: "100vh",
+                      zIndex: "popover",
+                    }}
+                    onClick={handleOverlayClick}
+                  >
+                    {children}
+                  </Box>
+                )}
+              >
+                <PopoverContent ref={popoverRef} width="min-content">
+                  <FocusLock restoreFocus={false}>
+                    <PopoverHeader
+                      textTransform="uppercase"
+                      borderBottom="none"
+                      fontWeight="medium"
+                      fontSize="sm"
+                      paddingBottom={0}
+                    >
+                      <FormattedMessage
+                        id="component.table.filter-header"
+                        defaultMessage="Filter"
+                      />
+                    </PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody
+                      as="form"
+                      onSubmit={handleSubmit(({ filter }) => {
+                        onFilterChange(filter);
+                        onCloseFilter();
+                      })}
+                    >
+                      {(assert(isNonNullish(column.Filter)), null)}
+                      <FormProvider {...form}>
+                        <column.Filter
+                          value={filter}
+                          onChange={onFilterChange}
+                          context={context}
+                          column={column}
+                        />
+                      </FormProvider>
+                    </PopoverBody>
+                  </FocusLock>
+                </PopoverContent>
+              </Wrap>
+            </Portal>
+          </Popover>
         ) : null}
         {column.isSortable ? (
           <IconButtonWithTooltip
@@ -662,50 +701,6 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
           />
         ) : null}
       </HStack>
-      {column.isFilterable && column.Filter ? (
-        isMobile ? (
-          <Modal isOpen={isFilterOpen} onClose={onCloseFilter}>
-            <ModalOverlay>
-              <ModalContent>
-                <ModalCloseButton
-                  aria-label={intl.formatMessage({
-                    id: "generic.close",
-                    defaultMessage: "Close",
-                  })}
-                />
-                <ModalHeader>
-                  <FormattedMessage id="component.table.filter-header" defaultMessage="Filter" />
-                </ModalHeader>
-                <ModalBody paddingTop={0} paddingX={4} paddingBottom={6}>
-                  <column.Filter value={filter} onChange={onFilterChange} context={context} />
-                </ModalBody>
-              </ModalContent>
-            </ModalOverlay>
-          </Modal>
-        ) : (
-          <Portal>
-            {isFilterOpen ? (
-              <FocusLock restoreFocus>
-                <Card
-                  ref={_ref}
-                  {...getFilterPopoverProps()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      onCloseFilter();
-                    }
-                  }}
-                  transition="none"
-                >
-                  <Heading as="h4" size="xs" textTransform="uppercase" paddingX={2} paddingY={2}>
-                    <FormattedMessage id="component.table.filter-header" defaultMessage="Filter" />
-                  </Heading>
-                  <column.Filter value={filter} onChange={onFilterChange} context={context} />
-                </Card>
-              </FocusLock>
-            ) : null}
-          </Portal>
-        )
-      ) : null}
     </Th>
   );
 }

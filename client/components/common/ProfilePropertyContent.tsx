@@ -9,7 +9,6 @@ import {
   ProfilePropertyContent_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
-import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { never } from "@parallel/utils/never";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
@@ -23,7 +22,6 @@ import { isNonNullish, isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { BreakLines } from "./BreakLines";
-import { Divider } from "./Divider";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
@@ -308,7 +306,7 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
       } else if (field.type === "BACKGROUND_CHECK") {
         const { noOfLines: _, ...rest } = props;
         return (
-          <ProfileFieldBackgroundCheck
+          <ProfileFieldBackgroundCheckValue
             value={value}
             field={field}
             profileId={profileId}
@@ -322,8 +320,8 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
   },
 );
 
-const ProfileFieldBackgroundCheck = chakraForwardRef<"div", ProfilePropertyContentProps>(
-  function ProfileFieldBackgroundCheck({ value, field, profileId, ...props }, ref) {
+const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
+  function ProfileFieldBackgroundCheckValue({ value, field, profileId, ...props }, ref) {
     const intl = useIntl();
     const content = value!.content!;
     const handleClick = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -403,13 +401,27 @@ const ProfileFieldBackgroundCheck = chakraForwardRef<"div", ProfilePropertyConte
             </>
           ) : (
             <>
-              <SearchIcon />
-              <HStack
-                display="inline-flex"
-                divider={<Divider isVertical height={3.5} color="gray.500" />}
-              >
-                <Box>{getEntityTypeLabel(intl, content.query.type)}</Box>
-                <OverflownText minWidth="40px">{content.query.name}</OverflownText>
+              <SearchIcon boxSize={3} />
+              <HStack marginStart={1} spacing={1} display="inline-flex">
+                {content.query.type === "PERSON" ? (
+                  <UserIcon boxSize={4} />
+                ) : content.query.type === "COMPANY" ? (
+                  <BusinessIcon boxSize={4} />
+                ) : null}
+                <Box display="inline-flex" minWidth="40px" maxWidth="100px">
+                  {'"'}
+                  <OverflownText fontWeight="normal">{content.query.name}</OverflownText>
+                  {'"'}
+                </Box>
+                <Box fontWeight="normal" fontStyle="italic">
+                  <FormattedMessage
+                    id="generic.x-results"
+                    defaultMessage="{count, plural, =0 {No results} =1 {1 result} other {# results}}"
+                    values={{
+                      count: content.search?.totalCount ?? 0,
+                    }}
+                  />
+                </Box>
               </HStack>
             </>
           )}

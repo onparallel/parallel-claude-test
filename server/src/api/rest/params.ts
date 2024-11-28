@@ -1,7 +1,6 @@
 import Ajv from "ajv";
 import { OpenAPIV3 } from "openapi-types";
-import { isNonNullish } from "remeda";
-import { JsonSchema } from "../../util/jsonSchema";
+import { JsonSchema, JsonSchemaFor } from "../../util/jsonSchema";
 import { If, MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
 
@@ -327,19 +326,20 @@ export function booleanParam<
 }
 
 export type ObjectParameterOptions<
+  Type,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
 > = ParameterOptions<any, TRequired, TArray, undefined> & {
-  schema: JsonSchema;
-  validate?: (key: string, value: any) => void;
+  schema: JsonSchemaFor<Type>;
 };
 
 export function objectParam<
+  Type,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
 >(
-  options: ObjectParameterOptions<TRequired, TArray>,
-): RestParameter<GeneratedParameterType<any, TRequired, TArray>> {
+  options: ObjectParameterOptions<Type, TRequired, TArray>,
+): RestParameter<GeneratedParameterType<Type, TRequired, TArray>> {
   const ajv = new Ajv({ allowUnionTypes: true });
   return {
     parse: buildParse(options, (value) => {
@@ -350,21 +350,7 @@ export function objectParam<
       if (!isValid) {
         throw new ParseError(value, ajv.errorsText());
       }
-
-      if (isNonNullish(options.validate)) {
-        try {
-          for (const [key, val] of Object.entries(value)) {
-            options.validate(key, val);
-          }
-        } catch (e) {
-          if (e instanceof Error) {
-            throw new ParseError(value, e.message);
-          }
-          throw e;
-        }
-      }
-
-      return value;
+      return value as any;
     }),
     spec: buildDefinition(options, options.schema),
   };

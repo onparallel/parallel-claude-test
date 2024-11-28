@@ -4671,22 +4671,36 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
 };
 
 export type ProfileFieldValuesFilter = {
-  operator: ProfileFieldValuesFilterOperator;
-  profileTypeFieldId: Scalars["GID"]["input"];
-  value: Scalars["JSON"]["input"];
+  conditions?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  logicalOperator?: InputMaybe<ProfileFieldValuesFilterGroupLogicalOperator>;
+  operator?: InputMaybe<ProfileFieldValuesFilterOperator>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  value?: InputMaybe<Scalars["JSON"]["input"]>;
 };
+
+export type ProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
 
 export type ProfileFieldValuesFilterOperator =
   | "CONTAIN"
   | "END_WITH"
   | "EQUAL"
+  | "EXPIRES_IN"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
   | "IS_ONE_OF"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "NOT_CONTAIN"
   | "NOT_EQUAL"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
 
@@ -4694,7 +4708,7 @@ export type ProfileFilter = {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 };
 
 export type ProfileListView = ListView & {
@@ -4712,6 +4726,7 @@ export type ProfileListViewData = {
   search: Maybe<Scalars["String"]["output"]>;
   sort: Maybe<ProfileListViewSort>;
   status: Maybe<ProfileStatus>;
+  values: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
 export type ProfileListViewDataInput = {
@@ -4720,6 +4735,7 @@ export type ProfileListViewDataInput = {
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
   status?: InputMaybe<ProfileStatus>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 };
 
 export type ProfileListViewSort = {
@@ -9994,18 +10010,6 @@ export type GetProfileEvents_ProfileEventsQuery = {
   >;
 };
 
-export type GetProfiles_profileTypesQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  limit?: InputMaybe<Scalars["Int"]["input"]>;
-  profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-}>;
-
-export type GetProfiles_profileTypesQuery = {
-  profileTypes: {
-    items: Array<{ id: string; fields: Array<{ id: string; alias: string | null }> }>;
-  };
-};
-
 export type GetProfiles_profilesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
@@ -10013,7 +10017,7 @@ export type GetProfiles_profilesQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
-  values?: InputMaybe<Array<ProfileFieldValuesFilter> | ProfileFieldValuesFilter>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
   includeFieldOptions: Scalars["Boolean"]["input"];
   includeRelationships: Scalars["Boolean"]["input"];
   includeSubscribers: Scalars["Boolean"]["input"];
@@ -10084,6 +10088,14 @@ export type GetProfiles_profilesQuery = {
       profileType: { id: string; name: { [locale in UserLocale]?: string } };
     }>;
   };
+};
+
+export type GetProfiles_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type GetProfiles_profileTypeQuery = {
+  profileType: { fields: Array<{ id: string; alias: string | null }> };
 };
 
 export type CreateProfile_profileTypeQueryVariables = Exact<{
@@ -12850,19 +12862,6 @@ export const GetProfileEvents_ProfileEventsDocument = gql`
   GetProfileEvents_ProfileEventsQuery,
   GetProfileEvents_ProfileEventsQueryVariables
 >;
-export const GetProfiles_profileTypesDocument = gql`
-  query GetProfiles_profileTypes($offset: Int, $limit: Int, $profileTypeIds: [GID!]) {
-    profileTypes(offset: $offset, limit: $limit, filter: { profileTypeId: $profileTypeIds }) {
-      items {
-        id
-        fields {
-          id
-          alias
-        }
-      }
-    }
-  }
-` as unknown as DocumentNode<GetProfiles_profileTypesQuery, GetProfiles_profileTypesQueryVariables>;
 export const GetProfiles_profilesDocument = gql`
   query GetProfiles_profiles(
     $offset: Int
@@ -12871,7 +12870,7 @@ export const GetProfiles_profilesDocument = gql`
     $search: String
     $profileTypeIds: [GID!]
     $status: [ProfileStatus!]
-    $values: [ProfileFieldValuesFilter!]
+    $values: ProfileFieldValuesFilter
     $includeFieldOptions: Boolean!
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
@@ -12891,6 +12890,16 @@ export const GetProfiles_profilesDocument = gql`
   }
   ${ProfileFragmentDoc}
 ` as unknown as DocumentNode<GetProfiles_profilesQuery, GetProfiles_profilesQueryVariables>;
+export const GetProfiles_profileTypeDocument = gql`
+  query GetProfiles_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      fields {
+        id
+        alias
+      }
+    }
+  }
+` as unknown as DocumentNode<GetProfiles_profileTypeQuery, GetProfiles_profileTypeQueryVariables>;
 export const CreateProfile_profileTypeDocument = gql`
   query CreateProfile_profileType($profileTypeId: GID!) {
     profileType(profileTypeId: $profileTypeId) {

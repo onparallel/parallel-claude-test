@@ -12,9 +12,10 @@ import {
   useState,
 } from "react";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 
 export interface CheckboxTableFilterProps<T extends string>
-  extends TableColumnFilterProps<T[] | null> {
+  extends TableColumnFilterProps<Record<string, T[] | null>> {
   options: { value: T; text: string }[];
 }
 
@@ -47,6 +48,10 @@ export function CheckboxTableFilter<T extends string>({
         outline: "none",
         backgroundColor: "gray.100",
       },
+      _focusVisible: {
+        outline: "none",
+        backgroundColor: "gray.100",
+      },
       onMouseEnter: (e: MouseEvent) => {
         const button = e.target as HTMLElement;
         const index = parseInt(button.getAttribute("data-index")!);
@@ -63,12 +68,12 @@ export function CheckboxTableFilter<T extends string>({
         if (index === 0) {
           newValue.clear();
         } else {
-          const status = options[index - 1]?.value;
-          if (status) {
-            if (newValue.has(status)) {
-              newValue.delete(status);
+          const value = options.at(index - 1)?.value;
+          if (isNonNullish(value)) {
+            if (newValue.has(value)) {
+              newValue.delete(value);
             } else {
-              newValue.add(status);
+              newValue.add(value);
             }
           }
         }
@@ -83,7 +88,14 @@ export function CheckboxTableFilter<T extends string>({
       const optionsLength = options.length + 1;
       switch (e.key) {
         case "Tab": {
+          const button = e.target as HTMLElement;
+          const index = parseInt(button.getAttribute("data-index")!);
+          if (index === optionsLength - 1) {
+            focus(0);
+            return;
+          }
           e.preventDefault();
+          focus((index + 1) % optionsLength);
           return;
         }
         case "ArrowDown": {
@@ -112,12 +124,14 @@ export function CheckboxTableFilter<T extends string>({
   }, []);
 
   return (
-    <Flex direction="column" ref={wrapperRef} onKeyDown={handleKeyDown}>
+    <Flex direction="column" ref={wrapperRef} onKeyDown={handleKeyDown} marginX={-3} fontSize="md">
       <Flex
         as="button"
+        type="button"
         {...buttonProps}
         data-index={0}
         tabIndex={activeIndex === 0 || activeIndex === null ? 0 : -1}
+        whiteSpace="nowrap"
       >
         <Center boxSize={4} marginEnd={2} pointerEvents="none">
           <CloseIcon fontSize="xs" role="presentation" />
@@ -131,9 +145,11 @@ export function CheckboxTableFilter<T extends string>({
         <Flex
           key={option.value}
           as="button"
+          type="button"
           {...buttonProps}
           data-index={i + 1}
           tabIndex={activeIndex === i + 1 ? 0 : -1}
+          whiteSpace="nowrap"
         >
           <Checkbox
             pointerEvents="none"

@@ -1,6 +1,8 @@
-import Ajv from "ajv";
 import { arg, enumType, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
-import { isNonNullish, isNullish } from "remeda";
+import { indexBy, isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
+import { ProfileTypeField } from "../../db/__types";
+import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -99,15 +101,17 @@ export const profiles = queryField((t) => {
           t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
           t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
-          t.nullable.list.nonNull.field("values", {
+          t.nullable.field("values", {
             type: inputObjectType({
               name: "ProfileFieldValuesFilter",
               definition(t) {
-                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
-                t.nonNull.field("operator", {
+                t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nullable.field("operator", {
                   type: enumType({
                     name: "ProfileFieldValuesFilterOperator",
                     members: [
+                      "HAS_VALUE",
+                      "NOT_HAS_VALUE",
                       "EQUAL",
                       "NOT_EQUAL",
                       "START_WITH",
@@ -120,85 +124,76 @@ export const profiles = queryField((t) => {
                       "LESS_THAN_OR_EQUAL",
                       "GREATER_THAN",
                       "GREATER_THAN_OR_EQUAL",
+                      "HAS_BG_CHECK_RESULTS",
+                      "NOT_HAS_BG_CHECK_RESULTS",
+                      "HAS_BG_CHECK_MATCH",
+                      "NOT_HAS_BG_CHECK_MATCH",
+                      "HAS_BG_CHECK_TOPICS",
+                      "NOT_HAS_BG_CHECK_TOPICS",
+                      "IS_EXPIRED",
+                      "EXPIRES_IN",
+                      "HAS_EXPIRY",
+                      "NOT_HAS_EXPIRY",
                     ],
                   }),
                 });
-                t.nonNull.json("value");
+                t.nullable.json("value");
+                t.nullable.field("logicalOperator", {
+                  type: enumType({
+                    name: "ProfileFieldValuesFilterGroupLogicalOperator",
+                    members: ["AND", "OR"],
+                  }),
+                });
+                t.nullable.list.nonNull.field("conditions", { type: "ProfileFieldValuesFilter" });
               },
             }),
           });
         },
       }),
     },
-    validateArgs: (_, args, ctx, info) => {
-      if (isNonNullish(args.filter?.values)) {
-        for (const valueFilter of args.filter.values) {
-          if (valueFilter.operator === "IS_ONE_OF" || valueFilter.operator === "NOT_IS_ONE_OF") {
-            if (!Array.isArray(valueFilter.value)) {
-              throw new ArgValidationError(
-                info,
-                "filter.values",
-                `Value must be an array for operator ${valueFilter.operator}`,
-              );
-            }
-          } else {
-            if (Array.isArray(valueFilter.value)) {
-              throw new ArgValidationError(
-                info,
-                "filter.values",
-                `Value must be a single value for operator ${valueFilter.operator}`,
-              );
-            }
-          }
+    resolve: async (_, { limit, offset, search, sortBy, filter }, ctx, info) => {
+      let profileTypeFieldsById: Record<number, ProfileTypeField> | undefined = undefined;
+      try {
+        if (isNonNullish(filter?.values)) {
+          assert(
+            isNonNullish(filter.profileTypeId) && filter.profileTypeId.length === 1,
+            "Must filter by a single profileTypeId when filtering by values",
+          );
+          const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+            filter.profileTypeId[0],
+          );
+          profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+          validateProfileFieldValuesFilter(filter?.values, profileTypeFieldsById);
         }
-
-        const ajv = new Ajv({ allowUnionTypes: true });
-        const valid = ajv.validate(
-          {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                value: {
-                  oneOf: [
-                    {
-                      type: ["string", "number"],
-                    },
-                    {
-                      type: "array",
-                      items: {
-                        type: ["string", "number"],
-                      },
-                      minItems: 1,
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          args.filter.values,
-        );
-
-        if (!valid) {
-          throw new ArgValidationError(info, "filter.values", ajv.errorsText());
+      } catch (e) {
+        if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
+          throw new ArgValidationError(
+            info,
+            "filter.values",
+            e.message.slice("Assertion Error: ".length),
+          );
+        } else {
+          throw e;
         }
       }
-    },
-    resolve: async (_, { limit, offset, search, sortBy, filter }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name_en",
       } as const;
-      return ctx.profiles.getPaginatedProfileForOrg(ctx.user!.org_id, {
-        limit,
-        offset,
-        search,
-        filter,
-        sortBy: sortBy?.map((value) => {
-          const [field, order] = parseSortBy(value);
-          return { field: columnMap[field], order };
-        }),
-      });
+      return ctx.profiles.getPaginatedProfileForOrg(
+        ctx.user!.org_id,
+        {
+          limit,
+          offset,
+          search,
+          filter: filter as any,
+          sortBy: sortBy?.map((value) => {
+            const [field, order] = parseSortBy(value);
+            return { field: columnMap[field], order };
+          }),
+        },
+        profileTypeFieldsById,
+      );
     },
   });
 });

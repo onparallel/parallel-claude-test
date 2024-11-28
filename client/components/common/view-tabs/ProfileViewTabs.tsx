@@ -48,6 +48,7 @@ export const ProfileViewTabs = Object.assign(
           search: view.data.search,
           sort: isNonNullish(view.data.sort) ? omit(view.data.sort, ["__typename"]) : undefined,
           status: view.data.status ?? "OPEN",
+          values: view.data.values as any,
         });
       }
     };
@@ -92,6 +93,7 @@ export const ProfileViewTabs = Object.assign(
             sort: isNonNullish(newView.data.sort)
               ? omit(newView.data.sort, ["__typename"])
               : undefined,
+            values: newView.data.values as any,
           });
         }
       } catch (error) {
@@ -175,6 +177,7 @@ export const ProfileViewTabs = Object.assign(
             columns
             search
             status
+            values
           }
         `;
       },

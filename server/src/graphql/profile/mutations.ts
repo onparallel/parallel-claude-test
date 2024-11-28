@@ -324,7 +324,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     validLocalizableUserText("data.name", { maxLength: 200 }),
     maxLength("data.alias", 100),
     validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
-    validProfileTypeFieldOptions("profileTypeId", "data", "data"),
+    validProfileTypeFieldOptions("profileTypeId", "data"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -436,7 +436,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     maxLength("data.name.es", 500),
     maxLength("data.alias", 100),
     validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
-    validProfileTypeFieldSubstitution("data", "data.substitutions"),
+    validProfileTypeFieldSubstitution("data"),
   ),
   resolve: async (_, args, ctx, info) => {
     const updateData: Partial<CreateProfileTypeField> = {};

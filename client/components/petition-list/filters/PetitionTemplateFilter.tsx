@@ -1,10 +1,13 @@
-import { Box } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
 
-export function PetitionTemplateFilter({ value, onChange }: TableColumnFilterProps<string[]>) {
+export function PetitionTemplateFilter({
+  value,
+  onChange,
+}: TableColumnFilterProps<any, any, string[]>) {
   return (
-    <Box padding={2} maxWidth="520px">
+    <Stack width="240px">
       <PetitionSelect
         isMulti
         usePortal={false}
@@ -18,6 +21,6 @@ export function PetitionTemplateFilter({ value, onChange }: TableColumnFilterPro
         }}
         noOfLines={2}
       />
-    </Box>
+    </Stack>
   );
 }

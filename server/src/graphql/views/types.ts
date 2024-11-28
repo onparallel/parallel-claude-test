@@ -200,6 +200,7 @@ export const ProfileListViewData = objectType({
     t.nullable.string("search");
     t.nullable.field("sort", { type: "ProfileListViewSort" });
     t.nullable.field("status", { type: "ProfileStatus" });
+    t.nullable.jsonObject("values");
   },
 });
 
@@ -221,5 +222,6 @@ export const ProfileListViewDataInput = inputObjectType({
       }),
     });
     t.nullable.field("status", { type: "ProfileStatus" });
+    t.nullable.field("values", { type: "ProfileFieldValuesFilter" });
   },
 });

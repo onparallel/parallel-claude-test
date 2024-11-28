@@ -1,20 +1,11 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Box,
-  HStack,
-  Heading,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
-import { Popover } from "@parallel/chakra/components";
-import { CloseIcon, ColumnsIcon, FilterIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { Box, HStack, Stack } from "@chakra-ui/react";
+import { ColumnsIcon, RepeatIcon } from "@parallel/chakra/icons";
 import {
   PetitionListHeader_PetitionListViewFragment,
   PetitionListHeader_createPetitionListViewDocument,
   PetitionListHeader_updatePetitionListViewDocument,
+  PetitionListViewColumn,
   PetitionListViewData,
   PetitionListViewDataInput,
 } from "@parallel/graphql/__types";
@@ -22,30 +13,27 @@ import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import {
-  DEFAULT_PETITION_COLUMN_SELECTION,
-  PETITIONS_COLUMNS,
-  PetitionsTableColumn,
-} from "@parallel/utils/usePetitionsTableColumns";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, omit, pick } from "remeda";
+import { HiddenFiltersButton } from "../common/HiddenFiltersButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
+import { TableColumn } from "../common/Table";
 import { useColumnVisibilityDialog } from "../common/dialogs/ColumnVisibilityDialog";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { SaveViewTabsMenu } from "../common/view-tabs/SaveViewMenuButton";
 import { useConfirmChangeViewAllDialog } from "../petition-compose/dialogs/ConfirmChangeViewAllDialog";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
-import { removeInvalidSharedWithFilterLines } from "./filters/shared-with/PetitionListSharedWithFilter";
-import { removeInvalidTagFilterLines } from "./filters/tags/PetitionListTagFilter";
 
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
   state: PetitionsQueryState;
+  columns: TableColumn<any, any, any>[];
+  selection: PetitionListViewColumn[];
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
   views: PetitionListHeader_PetitionListViewFragment[];
@@ -54,6 +42,8 @@ export interface PetitionListHeaderProps {
 export function PetitionListHeader({
   shape,
   state,
+  columns,
+  selection,
   onStateChange,
   onReload,
   views,
@@ -159,8 +149,8 @@ export function PetitionListHeader({
         variables: {
           name,
           data: {
-            tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
-            sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+            tagsFilters: state.tagsFilters,
+            sharedWith: state.sharedWith,
             ...pick(state, [
               "status",
               "signature",
@@ -231,8 +221,8 @@ export function PetitionListHeader({
               ? // "ALL" view can only update columns and sort
                 pick(state, ["sort", "columns"])
               : {
-                  tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
-                  sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+                  tagsFilters: state.tagsFilters,
+                  sharedWith: state.sharedWith,
                   ...pick(state, [
                     "status",
                     "signature",
@@ -257,22 +247,13 @@ export function PetitionListHeader({
   const showColumnVisibilityDialog = useColumnVisibilityDialog();
   const handleEditColumns = async () => {
     try {
-      const columns = await showColumnVisibilityDialog({
-        columns: PETITIONS_COLUMNS,
-        selection: state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION,
+      const newColumns = await showColumnVisibilityDialog({
+        columns,
+        selection,
       });
-      onStateChange((current) => ({ ...current, columns }));
+      onStateChange((current) => ({ ...current, columns: newColumns }));
     } catch {}
   };
-
-  const selection = state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION;
-  const notVisibleFilters = PETITIONS_COLUMNS.filter(
-    (c) =>
-      !c.isFixed &&
-      !selection.includes(c.key as PetitionsTableColumn) &&
-      c.isFilterable &&
-      Object.entries(state).some(([key, value]) => isNonNullish(value) && key === c.key),
-  );
 
   return (
     <Stack padding={2}>
@@ -290,67 +271,16 @@ export function PetitionListHeader({
         <Box flex="0 1 400px">
           <SearchInput value={search ?? ""} onChange={handleSearchChange} />
         </Box>
-        {notVisibleFilters.length ? (
-          <Box>
-            <Popover placement="bottom-start">
-              <PopoverTrigger>
-                <ResponsiveButtonIcon
-                  icon={<FilterIcon />}
-                  variant="ghost"
-                  colorScheme="purple"
-                  breakpoint="lg"
-                  label={intl.formatMessage(
-                    {
-                      id: "component.petition-list-header.hidden-filters-button-label",
-                      defaultMessage:
-                        "{count, plural, =1{# hidden filter} other{# hidden filters}}",
-                    },
-                    { count: notVisibleFilters.length },
-                  )}
-                />
-              </PopoverTrigger>
-              <Portal>
-                <PopoverContent width="auto" minWidth="160px">
-                  <PopoverBody as={Stack}>
-                    <Heading textTransform="uppercase" fontSize="sm" color="gray.600">
-                      <FormattedMessage
-                        id="component.petition-list-header.hidden-filters-title"
-                        defaultMessage="Filters"
-                      />
-                    </Heading>
-                    <Stack as="ul">
-                      {notVisibleFilters.map((column) => {
-                        return (
-                          <HStack as="li" key={column.key}>
-                            <Box flex="1">
-                              {typeof column.label === "string" ? column.label : column.label(intl)}
-                            </Box>
-                            <IconButtonWithTooltip
-                              variant="ghost"
-                              label={intl.formatMessage({
-                                id: "component.petition-list-header.remove-filter",
-                                defaultMessage: "Remove filter",
-                              })}
-                              size="xs"
-                              icon={<CloseIcon />}
-                              onClick={() => {
-                                onStateChange((current) => ({
-                                  ...omit(current, [column.key as any]),
-                                  page: 1,
-                                }));
-                              }}
-                            />
-                          </HStack>
-                        );
-                      })}
-                    </Stack>
-                  </PopoverBody>
-                </PopoverContent>
-              </Portal>
-            </Popover>
-          </Box>
+        {state.type === "PETITION" ? (
+          <HiddenFiltersButton
+            columns={columns}
+            selection={selection}
+            filter={state}
+            onRemoveFilter={(key) => {
+              onStateChange((current) => ({ ...omit(current, [key as any]), page: 1 }));
+            }}
+          />
         ) : null}
-
         {state.type === "PETITION" ? (
           <HStack flex={1} justifyContent="flex-end">
             <ResponsiveButtonIcon

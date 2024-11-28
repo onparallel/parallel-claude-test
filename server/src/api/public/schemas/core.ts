@@ -2699,3 +2699,65 @@ const _ProfileType = {
 
 export const PaginatedProfileTypes = schema(_PaginationOf(_ProfileType as JsonSchema));
 export const ProfileType = schema(_ProfileType as JsonSchema);
+
+const operator = {
+  type: "string",
+  enum: [
+    "HAS_VALUE",
+    "NOT_HAS_VALUE",
+    "EQUAL",
+    "NOT_EQUAL",
+    "START_WITH",
+    "END_WITH",
+    "CONTAIN",
+    "NOT_CONTAIN",
+    "IS_ONE_OF",
+    "NOT_IS_ONE_OF",
+    "LESS_THAN",
+    "LESS_THAN_OR_EQUAL",
+    "GREATER_THAN",
+    "GREATER_THAN_OR_EQUAL",
+    "HAS_BG_CHECK_RESULTS",
+    "NOT_HAS_BG_CHECK_RESULTS",
+    "HAS_BG_CHECK_MATCH",
+    "NOT_HAS_BG_CHECK_MATCH",
+    "HAS_BG_CHECK_TOPICS",
+    "NOT_HAS_BG_CHECK_TOPICS",
+  ],
+} as const;
+const value = {
+  oneOf: [
+    { type: ["string", "number", "null"] as const },
+    {
+      type: "array",
+      minItems: 1,
+      items: { type: "string" },
+    },
+  ],
+} as const;
+export const ProfileValuesFilterSchema = schema({
+  anyOf: [
+    {
+      title: `Filter by profileTypeFieldId`,
+      type: "object",
+      required: ["profileTypeFieldId", "operator"],
+      additionalProperties: false,
+      properties: {
+        profileTypeFieldId: { type: "string" },
+        operator,
+        value,
+      },
+    },
+    {
+      title: `Filter by alias`,
+      type: "object",
+      required: ["alias", "operator"],
+      additionalProperties: false,
+      properties: {
+        alias: { type: "string" },
+        operator,
+        value,
+      },
+    },
+  ],
+} as const);

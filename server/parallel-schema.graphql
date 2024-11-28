@@ -5989,22 +5989,41 @@ type ProfileFieldValueUpdatedEvent implements ProfileEvent {
 }
 
 input ProfileFieldValuesFilter {
-  operator: ProfileFieldValuesFilterOperator!
-  profileTypeFieldId: GID!
-  value: JSON!
+  conditions: [ProfileFieldValuesFilter!]
+  logicalOperator: ProfileFieldValuesFilterGroupLogicalOperator
+  operator: ProfileFieldValuesFilterOperator
+  profileTypeFieldId: GID
+  value: JSON
+}
+
+enum ProfileFieldValuesFilterGroupLogicalOperator {
+  AND
+  OR
 }
 
 enum ProfileFieldValuesFilterOperator {
   CONTAIN
   END_WITH
   EQUAL
+  EXPIRES_IN
   GREATER_THAN
   GREATER_THAN_OR_EQUAL
+  HAS_BG_CHECK_MATCH
+  HAS_BG_CHECK_RESULTS
+  HAS_BG_CHECK_TOPICS
+  HAS_EXPIRY
+  HAS_VALUE
+  IS_EXPIRED
   IS_ONE_OF
   LESS_THAN
   LESS_THAN_OR_EQUAL
   NOT_CONTAIN
   NOT_EQUAL
+  NOT_HAS_BG_CHECK_MATCH
+  NOT_HAS_BG_CHECK_RESULTS
+  NOT_HAS_BG_CHECK_TOPICS
+  NOT_HAS_EXPIRY
+  NOT_HAS_VALUE
   NOT_IS_ONE_OF
   START_WITH
 }
@@ -6013,7 +6032,7 @@ input ProfileFilter {
   profileId: [GID!]
   profileTypeId: [GID!]
   status: [ProfileStatus!]
-  values: [ProfileFieldValuesFilter!]
+  values: ProfileFieldValuesFilter
 }
 
 type ProfileListView implements ListView {
@@ -6031,6 +6050,7 @@ type ProfileListViewData {
   search: String
   sort: ProfileListViewSort
   status: ProfileStatus
+  values: JSONObject
 }
 
 input ProfileListViewDataInput {
@@ -6041,6 +6061,7 @@ input ProfileListViewDataInput {
   search: String
   sort: ProfileListViewSortInput
   status: ProfileStatus
+  values: ProfileFieldValuesFilter
 }
 
 type ProfileListViewSort {

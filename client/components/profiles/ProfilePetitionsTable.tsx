@@ -47,7 +47,7 @@ import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDisassociateProfileDialog";
-import { PetitionTemplateFilter } from "../petition-list/filters/template/PetitionTemplateFilter";
+import { PetitionTemplateFilter } from "../petition-list/filters/PetitionTemplateFilter";
 import { useAssociateNewPetitionToProfileDialog } from "./dialogs/AssociateNewPetitionToProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
 
@@ -462,8 +462,7 @@ function useProfilePetitionsTableColumns(): TableColumn<
           minWidth: "200px",
           whiteSpace: "nowrap",
         },
-        isFilterable: true,
-        Filter: PetitionTemplateFilter,
+        Filter: PetitionTemplateFilter as any,
         CellContent: ({ row }) => {
           if (row.__typename === "Petition") {
             return isNonNullish(row.fromTemplate) ? (

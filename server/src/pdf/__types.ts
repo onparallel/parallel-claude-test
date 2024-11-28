@@ -4671,22 +4671,36 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
 };
 
 export type ProfileFieldValuesFilter = {
-  operator: ProfileFieldValuesFilterOperator;
-  profileTypeFieldId: Scalars["GID"]["input"];
-  value: Scalars["JSON"]["input"];
+  conditions?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  logicalOperator?: InputMaybe<ProfileFieldValuesFilterGroupLogicalOperator>;
+  operator?: InputMaybe<ProfileFieldValuesFilterOperator>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  value?: InputMaybe<Scalars["JSON"]["input"]>;
 };
+
+export type ProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
 
 export type ProfileFieldValuesFilterOperator =
   | "CONTAIN"
   | "END_WITH"
   | "EQUAL"
+  | "EXPIRES_IN"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
   | "IS_ONE_OF"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "NOT_CONTAIN"
   | "NOT_EQUAL"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
 
@@ -4694,7 +4708,7 @@ export type ProfileFilter = {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<Array<ProfileFieldValuesFilter>>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 };
 
 export type ProfileListView = ListView & {
@@ -4712,6 +4726,7 @@ export type ProfileListViewData = {
   search: Maybe<Scalars["String"]["output"]>;
   sort: Maybe<ProfileListViewSort>;
   status: Maybe<ProfileStatus>;
+  values: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
 export type ProfileListViewDataInput = {
@@ -4720,6 +4735,7 @@ export type ProfileListViewDataInput = {
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
   status?: InputMaybe<ProfileStatus>;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
 };
 
 export type ProfileListViewSort = {
