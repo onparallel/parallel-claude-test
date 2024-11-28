@@ -6,6 +6,7 @@ import {
   ProfileSelect_ProfileTypesDocument,
   ProfileSelect_profileDocument,
   ProfileSelect_profilesDocument,
+  useCreateProfileDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
@@ -17,7 +18,18 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRerender } from "@parallel/utils/useRerender";
 import useMergedRef from "@react-hook/merged-ref";
 import pMap from "p-map";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useRef } from "react";
+import {
+  ForwardedRef,
+  ReactElement,
+  RefAttributes,
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -30,6 +42,7 @@ import Select, {
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isNonNullish, zip } from "remeda";
+import { noop } from "ts-essentials";
 import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
@@ -109,6 +122,7 @@ export interface ProfileSelectProps<
   defaultOptions?: boolean;
   canCreateProfiles?: boolean;
   hideProfileType?: boolean;
+  onCreateProfile?: (profile: useCreateProfileDialog_ProfileFragment) => void;
 }
 
 export const ProfileSelect = Object.assign(
@@ -129,6 +143,7 @@ export const ProfileSelect = Object.assign(
       defaultCreateProfileFieldValues,
       excludeProfiles,
       canCreateProfiles,
+      onCreateProfile,
       ...props
     }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
     ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
@@ -140,6 +155,15 @@ export const ProfileSelect = Object.assign(
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
     const apollo = useApolloClient();
+
+    const { registerProfileSelect, triggerRerender } = useContext(ProfileSelectRerenderContext);
+    const [key, rerender] = useRerender();
+
+    useEffect(() => {
+      if (isNonNullish(profileTypeId)) {
+        return registerProfileSelect(profileTypeId, rerender);
+      }
+    }, [unMaybeArray(profileTypeId ?? []).join(",")]);
 
     const { data } = useQuery(ProfileSelect_ProfileTypesDocument, {
       variables: {
@@ -242,7 +266,6 @@ export const ProfileSelect = Object.assign(
 
     const userCanCreateProfiles = hideCreate !== true && hasCreatePermission && canCreateProfiles;
 
-    const [key, rerender] = useRerender();
     const showCreateProfileDialog = useCreateProfileDialog();
     async function handleCreateOption(name: string) {
       try {
@@ -256,7 +279,7 @@ export const ProfileSelect = Object.assign(
               : {}),
         });
         if (profile) {
-          rerender();
+          triggerRerender(profile.profileType.id);
           if (isMulti) {
             const selectedValues = unMaybeArray(_value);
             onChange([...selectedValues, profile] as any, {
@@ -274,6 +297,7 @@ export const ProfileSelect = Object.assign(
         innerRef.current?.focus();
       }, 1);
     }
+
     useEffectSkipFirst(() => {
       rerender();
     }, [unMaybeArray(profileTypeId ?? [])?.join(",")]);
@@ -552,5 +576,43 @@ function ProfileSelectOption({
         </Text>
       )}
     </>
+  );
+}
+
+interface ProfileSelectRerenderValue {
+  registerProfileSelect: (profileTypeId: MaybeArray<string>, forceRender: () => void) => () => void;
+  triggerRerender: (profileTypeId: string) => void;
+}
+
+const ProfileSelectRerenderContext = createContext<ProfileSelectRerenderValue>({
+  registerProfileSelect: () => noop,
+  triggerRerender: noop,
+});
+
+export function ProfileSelectRerenderProvider({ children }: { children: React.ReactNode }) {
+  const profileSelectsRef = useRef<Record<string, Set<() => void>>>({});
+
+  const value = useMemo(() => {
+    return {
+      registerProfileSelect: (profileTypeId: MaybeArray<string>, callback: () => void) => {
+        for (const id of unMaybeArray(profileTypeId)) {
+          (profileSelectsRef.current[id] ??= new Set()).add(callback);
+        }
+        return () => {
+          for (const id of unMaybeArray(profileTypeId)) {
+            profileSelectsRef.current[id].delete(callback);
+          }
+        };
+      },
+      triggerRerender: (profileTypeId: string) => {
+        profileSelectsRef.current[profileTypeId]?.forEach((rerender) => rerender());
+      },
+    };
+  }, []);
+
+  return (
+    <ProfileSelectRerenderContext.Provider value={value}>
+      {children}
+    </ProfileSelectRerenderContext.Provider>
   );
 }

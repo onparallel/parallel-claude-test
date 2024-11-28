@@ -7,6 +7,7 @@ import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import {
   ProfileSelect,
   ProfileSelectInstance,
+  ProfileSelectRerenderProvider,
   ProfileSelectSelection,
 } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -137,24 +138,26 @@ function ArchiveFieldGroupReplyIntoProfileGrid({
     .map(([field]) => field);
 
   return (
-    <Grid gap={2} templateColumns="2fr 3fr auto" alignItems="center">
-      {fieldGroupsWithProfileTypes.map((field) => {
-        return field.replies.map((reply, index) => {
-          return (
-            <ArchiveFieldGroupReplyIntoProfileRow
-              key={field.id + index}
-              petitionId={petition.id}
-              field={field}
-              reply={reply}
-              index={index}
-              onSelectProfile={onSelectProfile}
-              onSaveProfile={onSaveProfile}
-              onRefetch={onRefetch}
-            />
-          );
-        });
-      })}
-    </Grid>
+    <ProfileSelectRerenderProvider>
+      <Grid gap={2} templateColumns="2fr 3fr auto" alignItems="center">
+        {fieldGroupsWithProfileTypes.map((field) => {
+          return field.replies.map((reply, index) => {
+            return (
+              <ArchiveFieldGroupReplyIntoProfileRow
+                key={field.id + index}
+                petitionId={petition.id}
+                field={field}
+                reply={reply}
+                index={index}
+                onSelectProfile={onSelectProfile}
+                onSaveProfile={onSaveProfile}
+                onRefetch={onRefetch}
+              />
+            );
+          });
+        })}
+      </Grid>
+    </ProfileSelectRerenderProvider>
   );
 }
 

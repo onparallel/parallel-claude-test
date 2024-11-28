@@ -214,7 +214,16 @@ export class BaseRepository {
           }
         }
         const result = await dataloader.loadMany(arrayKeys);
-        return Array.isArray(keys) ? result : result[0];
+        if (Array.isArray(keys)) {
+          if (result.some((r) => r instanceof Error)) {
+            throw new AggregateError(result.filter((r) => r instanceof Error));
+          }
+          return result;
+        } else if (result[0] instanceof Error) {
+          throw result[0];
+        } else {
+          return result[0];
+        }
       },
       {
         dataloader,
