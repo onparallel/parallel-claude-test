@@ -425,7 +425,7 @@ function Profiles() {
       title={intl.formatMessage({ id: "page.profiles.title", defaultMessage: "Profiles" })}
       queryObject={queryObject}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
           <HStack padding={2}>
             <Icon as={icon} boxSize={5} />
@@ -499,7 +499,7 @@ function Profiles() {
             </ButtonWithMoreOptions>
           </Box>
         </Flex>
-        <Box flex="1" paddingBottom={16}>
+        <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
             columns={sortedAndFilteredColumns}
@@ -547,17 +547,17 @@ function Profiles() {
             }
             body={
               profiles && profiles.totalCount === 0 && !loading ? (
-                queryState.search ? (
-                  <Center flex="1">
+                queryState.search || queryState.values ? (
+                  <Center flex="1" minHeight="200px">
                     <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-results"
-                        defaultMessage="There's no profiles matching your criteria"
+                        defaultMessage="There are no profiles matching your criteria"
                       />
                     </Text>
                   </Center>
                 ) : queryState.status === "OPEN" ? (
-                  <Center flex="1">
+                  <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-profiles"
@@ -566,7 +566,7 @@ function Profiles() {
                     </Text>
                   </Center>
                 ) : queryState.status === "CLOSED" ? (
-                  <Center flex="1">
+                  <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-closed-profiles"
@@ -575,11 +575,11 @@ function Profiles() {
                     </Text>
                   </Center>
                 ) : queryState.status === "DELETION_SCHEDULED" ? (
-                  <Center flex="1">
+                  <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
                       <FormattedMessage
                         id="page.profiles.no-deleted-profiles"
-                        defaultMessage="No profile in the bin"
+                        defaultMessage="There are no profiles in the bin"
                       />
                     </Text>
                   </Center>
@@ -588,7 +588,7 @@ function Profiles() {
             }
             Footer={CustomFooter}
           />
-        </Box>
+        </Flex>
       </Stack>
     </AppLayout>
   );

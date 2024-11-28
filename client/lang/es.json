@@ -15362,7 +15362,7 @@
   {
     "term": "page.petitions.no-results",
     "definition": "No encontramos parallels con este criterio",
-    "context": "There's no parallels matching your criteria"
+    "context": "There are no parallels matching your criteria"
   },
   {
     "term": "page.petitions.no-templates",
@@ -15482,7 +15482,7 @@
   {
     "term": "page.profiles.no-deleted-profiles",
     "definition": "No hay ningún perfil en la papelera",
-    "context": "No profile in the bin"
+    "context": "There are no profiles in the bin"
   },
   {
     "term": "page.profiles.no-profiles",
@@ -15492,7 +15492,7 @@
   {
     "term": "page.profiles.no-results",
     "definition": "No encontramos perfiles con este criterio",
-    "context": "There's no profiles matching your criteria"
+    "context": "There are no profiles matching your criteria"
   },
   {
     "term": "page.profiles.open",

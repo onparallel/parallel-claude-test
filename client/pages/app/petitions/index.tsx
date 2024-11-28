@@ -471,7 +471,7 @@ function Petitions() {
       }
       queryObject={queryObject}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
           <Box minWidth="0" width="fit-content">
             <Menu matchWidth>
@@ -592,7 +592,7 @@ function Petitions() {
             </Menu>
           </Flex>
         </Flex>
-        <Box flex="1" paddingBottom={16}>
+        <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
             columns={filteredColumns}
@@ -651,18 +651,22 @@ function Petitions() {
                 state.tagsFilters ||
                 state.status ||
                 state.signature ? (
-                  <Center flex="1">
+                  <Center flex="1" minHeight="200px">
                     <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
                         id="page.petitions.no-results"
-                        defaultMessage="There's no parallels matching your criteria"
+                        defaultMessage="There are no parallels matching your criteria"
                       />
                     </Text>
                   </Center>
                 ) : state.path !== "/" ? (
-                  <EmptyFolderIllustration flex="1" isTemplate={state.type === "TEMPLATE"} />
+                  <EmptyFolderIllustration
+                    flex="1"
+                    minHeight="200px"
+                    isTemplate={state.type === "TEMPLATE"}
+                  />
                 ) : (
-                  <Center flex="1">
+                  <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
                       {state.type === "TEMPLATE" ? (
                         <FormattedMessage
@@ -681,7 +685,7 @@ function Petitions() {
               ) : null
             }
           />
-        </Box>
+        </Flex>
       </Stack>
     </AppLayout>
   );

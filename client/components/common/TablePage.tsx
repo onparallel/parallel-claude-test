@@ -164,46 +164,29 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     </>
   );
   return (
-    <Card display="flex" flexDirection="column" minHeight="300px" {...props}>
+    <Card flex={1} display="flex" flexDirection="column" minHeight="300px" {...props}>
       {header ? <Box flex="none">{header}</Box> : null}
-      <Flex
-        flexDirection="column"
-        flex="1 1 auto"
-        minWidth="0"
-        position="relative"
-        overflowX="auto"
-      >
-        <ScrollTableContainer
-          zIndex={1}
-          {...((rows?.length ?? 0) === 0
-            ? {
-                minHeight: "unset",
-                flex: "unset",
-                overflow: "visible",
-              }
-            : {})}
-        >
-          <Table
-            columns={columns}
-            rows={rows}
-            context={context}
-            rowKeyProp={rowKeyProp}
-            isExpandable={isExpandable}
-            isSelectable={isSelectable}
-            isHighlightable={isHighlightable}
-            sort={sort}
-            filter={filter}
-            actions={actions}
-            onFilterChange={onFilterChange}
-            onSelectionChange={onSelectionChange}
-            onRowClick={onRowClick}
-            onSortChange={onSortChange}
-            rowProps={rowProps}
-            headProps={headProps}
-          />
-        </ScrollTableContainer>
+      <ScrollTableContainer zIndex={1} display="flex" flexDirection="column">
+        <Table
+          columns={columns}
+          rows={rows}
+          context={context}
+          rowKeyProp={rowKeyProp}
+          isExpandable={isExpandable}
+          isSelectable={isSelectable}
+          isHighlightable={isHighlightable}
+          sort={sort}
+          filter={filter}
+          actions={actions}
+          onFilterChange={onFilterChange}
+          onSelectionChange={onSelectionChange}
+          onRowClick={onRowClick}
+          onSortChange={onSortChange}
+          rowProps={rowProps}
+          headProps={headProps}
+        />
         {body ? (
-          <Flex flexDirection="column" flex="1 1 300px">
+          <Flex flexDirection="column" flex={1} position="sticky" insetStart={0}>
             {body}
           </Flex>
         ) : loading && (rows?.length ?? 0) === 0 ? (
@@ -217,7 +200,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             />
           </Center>
         ) : null}
-      </Flex>
+      </ScrollTableContainer>
       <Stack
         flexShrink={0}
         direction={{ base: "column", md: "row" }}
