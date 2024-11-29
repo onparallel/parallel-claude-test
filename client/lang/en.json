@@ -13281,13 +13281,13 @@
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-bg-check-match",
-    "definition": "has a match",
-    "context": "has a match"
+    "definition": "has selected a profile",
+    "context": "has selected a profile"
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-bg-check-results",
-    "definition": "has possible results",
-    "context": "has possible results"
+    "definition": "has results available",
+    "context": "has results available"
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-bg-check-topics",
@@ -13298,6 +13298,11 @@
     "term": "generic.profile-field-values-filter-operator-has-value",
     "definition": "has value",
     "context": "has value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-value-bg-check",
+    "definition": "has performed search",
+    "context": "has performed search"
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-value-file",
@@ -13336,13 +13341,13 @@
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-bg-check-match",
-    "definition": "does not have a match",
-    "context": "does not have a match"
+    "definition": "has not selected a profile",
+    "context": "has not selected a profile"
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-bg-check-results",
-    "definition": "does not have possible results",
-    "context": "does not have possible results"
+    "definition": "does not have results available",
+    "context": "does not have results available"
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-bg-check-topics",
@@ -13358,6 +13363,11 @@
     "term": "generic.profile-field-values-filter-operator-not-has-value",
     "definition": "does not have a value",
     "context": "does not have a value"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-value-bg-check",
+    "definition": "has not performed search",
+    "context": "has not performed search"
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-value-file",

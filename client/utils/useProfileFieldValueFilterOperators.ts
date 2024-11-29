@@ -12,28 +12,38 @@ export function useProfileFieldValueFilterOperators(
     operators.push(
       {
         label:
-          field.type !== "FILE"
+          field.type === "FILE"
             ? intl.formatMessage({
-                id: "generic.profile-field-values-filter-operator-has-value",
-                defaultMessage: "has value",
-              })
-            : intl.formatMessage({
                 id: "generic.profile-field-values-filter-operator-has-value-file",
                 defaultMessage: "has files",
-              }),
+              })
+            : field.type === "BACKGROUND_CHECK"
+              ? intl.formatMessage({
+                  id: "generic.profile-field-values-filter-operator-has-value-bg-check",
+                  defaultMessage: "has performed search",
+                })
+              : intl.formatMessage({
+                  id: "generic.profile-field-values-filter-operator-has-value",
+                  defaultMessage: "has value",
+                }),
         value: "HAS_VALUE",
       },
       {
         label:
-          field.type !== "FILE"
+          field.type === "FILE"
             ? intl.formatMessage({
-                id: "generic.profile-field-values-filter-operator-not-has-value",
-                defaultMessage: "does not have a value",
-              })
-            : intl.formatMessage({
                 id: "generic.profile-field-values-filter-operator-not-has-value-file",
                 defaultMessage: "does not have files",
-              }),
+              })
+            : field.type === "BACKGROUND_CHECK"
+              ? intl.formatMessage({
+                  id: "generic.profile-field-values-filter-operator-not-has-value-bg-check",
+                  defaultMessage: "has not performed search",
+                })
+              : intl.formatMessage({
+                  id: "generic.profile-field-values-filter-operator-not-has-value",
+                  defaultMessage: "does not have a value",
+                }),
         value: "NOT_HAS_VALUE",
       },
     );
@@ -155,31 +165,31 @@ export function useProfileFieldValueFilterOperators(
       operators.push(
         {
           label: intl.formatMessage({
-            id: "generic.profile-field-values-filter-operator-has-bg-check-match",
-            defaultMessage: "has a match",
-          }),
-          value: "HAS_BG_CHECK_MATCH",
-        },
-        {
-          label: intl.formatMessage({
-            id: "generic.profile-field-values-filter-operator-not-has-bg-check-match",
-            defaultMessage: "does not have a match",
-          }),
-          value: "NOT_HAS_BG_CHECK_MATCH",
-        },
-        {
-          label: intl.formatMessage({
             id: "generic.profile-field-values-filter-operator-has-bg-check-results",
-            defaultMessage: "has possible results",
+            defaultMessage: "has results available",
           }),
           value: "HAS_BG_CHECK_RESULTS",
         },
         {
           label: intl.formatMessage({
             id: "generic.profile-field-values-filter-operator-not-has-bg-check-results",
-            defaultMessage: "does not have possible results",
+            defaultMessage: "does not have results available",
           }),
           value: "NOT_HAS_BG_CHECK_RESULTS",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-bg-check-match",
+            defaultMessage: "has selected a profile",
+          }),
+          value: "HAS_BG_CHECK_MATCH",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-not-has-bg-check-match",
+            defaultMessage: "has not selected a profile",
+          }),
+          value: "NOT_HAS_BG_CHECK_MATCH",
         },
         {
           label: intl.formatMessage({
