@@ -203,15 +203,20 @@ function Profiles() {
     ] as const;
   }, [values]);
   const handleFilterChange = useCallback(
-    (key: string, value: any) => {
+    (key: string, value: ProfileValueColumnFilter) => {
       if (key.startsWith("field_")) {
-        setValues({
-          logicalOperator: "AND",
-          conditions: Object.values({
-            ...(filter ?? {}),
-            [key]: value,
-          }),
-        });
+        const conditions = Object.values({
+          ...(filter ?? {}),
+          [key]: value.conditions.length > 0 ? value : null,
+        }).filter(isNonNullish);
+        setValues(
+          conditions.length > 0
+            ? {
+                logicalOperator: "AND",
+                conditions,
+              }
+            : null,
+        );
       }
     },
     [filter],
