@@ -984,7 +984,9 @@ function CreateMenuButtonSection({
             overflow="auto"
           >
             <NakedLink href="/app/petitions/new">
-              <MenuItem icon={<PaperPlaneIcon boxSize={4} />}>{untranslated("Parallel")}</MenuItem>
+              <MenuItem as="a" icon={<PaperPlaneIcon boxSize={4} />}>
+                {untranslated("Parallel")}
+              </MenuItem>
             </NakedLink>
             {pinnedProfileTypes.map((profileType) => {
               const icon = getProfileTypeFieldIcon(profileType.icon);
