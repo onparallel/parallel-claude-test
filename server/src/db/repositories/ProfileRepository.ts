@@ -897,7 +897,7 @@ export class ProfileRepository extends BaseRepository {
                       case "IS_EXPIRED":
                         where(
                           (q) =>
-                            q.whereRaw(`? is not null and now() > (? - 'P1D'::interval)`, [
+                            q.whereRaw(`? is not null and now() > (? + 'P1D'::interval)`, [
                               expiryDate,
                               expiryDate,
                             ]),
@@ -908,7 +908,7 @@ export class ProfileRepository extends BaseRepository {
                         where(
                           (q) =>
                             q.whereRaw(
-                              `? is not null and (now() + ?::interval) > (? - 'P1D'::interval)`,
+                              `? is not null and (now() + ?::interval) > (? + 'P1D'::interval)`,
                               [expiryDate, value, expiryDate],
                             ),
                           currentOp === "OR",
