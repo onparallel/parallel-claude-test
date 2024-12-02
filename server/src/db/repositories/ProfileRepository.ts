@@ -1,4 +1,5 @@
 import { addSeconds, differenceInSeconds } from "date-fns";
+import ASCIIFolder from "fold-to-ascii";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
@@ -826,22 +827,30 @@ export class ProfileRepository extends BaseRepository {
                         break;
                       case "START_WITH":
                         assertType("TEXT", "SHORT_TEXT");
-                        assert(isNonNullish(value));
-                        apply(/* sql*/ `starts_with(?->>'value', ?)`, [content, value]);
+                        assert(typeof value === "string");
+                        apply(/* sql*/ `starts_with(lower(unaccent(?->>'value')), ?)`, [
+                          content,
+                          ASCIIFolder.foldMaintaining(value.toLowerCase()),
+                        ]);
                         break;
                       case "END_WITH":
                         assertType("TEXT", "SHORT_TEXT");
-                        assert(isNonNullish(value));
-                        apply(/* sql*/ `right(?->>'value', length(?)) = ?`, [
+                        assert(typeof value === "string");
+                        const _value = ASCIIFolder.foldMaintaining(value.toLowerCase());
+                        apply(/* sql*/ `right(lower(unaccent(?->>'value')), length(?)) = ?`, [
                           content,
-                          value,
-                          value,
+                          _value,
+                          _value,
                         ]);
                         break;
                       case "CONTAIN":
                         assert(isNonNullish(value));
                         if (["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)) {
-                          apply(/* sql*/ `strpos(?->>'value', ?) > 0`, [content, value]);
+                          assert(typeof value === "string");
+                          apply(/* sql*/ `strpos(lower(unaccent(?->>'value')), ?) > 0`, [
+                            content,
+                            ASCIIFolder.foldMaintaining(value.toLowerCase()),
+                          ]);
                         } else if (profileTypeField.type === "CHECKBOX") {
                           assert(Array.isArray(value));
                           apply(/* sql*/ `?->'value' @> to_jsonb(?)`, [
