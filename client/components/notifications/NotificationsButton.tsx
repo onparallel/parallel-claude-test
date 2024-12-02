@@ -4,6 +4,7 @@ import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NotificationsButton_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
+import { usePageVisibility } from "@parallel/utils/usePageVisibility";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -15,9 +16,10 @@ const POLL_INTERVAL = 30_000;
 export const NotificationsButton = Object.assign(
   chakraForwardRef<"button", { extended?: boolean }>(function NotificationsBell(props, ref) {
     const intl = useIntl();
+    const isPageVisible = usePageVisibility();
     const { data, startPolling, stopPolling } = useQuery(
       NotificationsButton_UnreadPetitionUserNotificationIdsDocument,
-      { pollInterval: POLL_INTERVAL },
+      { pollInterval: POLL_INTERVAL, skip: !isPageVisible },
     );
     const { isOpen, onOpen } = useNotificationsState();
 

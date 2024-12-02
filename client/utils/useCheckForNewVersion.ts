@@ -1,11 +1,14 @@
-import { useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import { isNonNullish } from "remeda";
 import { assignRef } from "./assignRef";
 import { useInterval } from "./useInterval";
+import { usePageVisibility } from "./usePageVisibility";
 
 export function useCheckForNewVersion() {
   const [hasNewVersion, setHasNewVersion] = useState(false);
   const currentVersionRef = useRef<string>();
+  const isPageVisible = usePageVisibility();
   useInterval(
     async () => {
       try {
@@ -17,8 +20,19 @@ export function useCheckForNewVersion() {
         assignRef(currentVersionRef, version);
       } catch {}
     },
-    60 * 1000,
+    { delay: 60 * 1000, isRunning: isPageVisible },
     [],
   );
+  // when there's a new version force a full reload on the next route change.
+  const router = useRouter();
+  useEffect(() => {
+    function handleRouterChangeStart(path: string) {
+      window.location.href = path;
+    }
+    if (hasNewVersion) {
+      router.events.on("routeChangeStart", handleRouterChangeStart);
+      return () => router.events.off("routeChangeStart", handleRouterChangeStart);
+    }
+  }, [hasNewVersion]);
   return hasNewVersion;
 }

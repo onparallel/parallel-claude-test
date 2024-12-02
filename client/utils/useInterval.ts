@@ -1,3 +1,4 @@
+import usePrevious from "@react-hook/previous";
 import { DependencyList, useEffect } from "react";
 import { isNonNullish } from "remeda";
 
@@ -15,18 +16,21 @@ export function useInterval(
     typeof delayOrOptions === "number"
       ? { delay: delayOrOptions, isRunning: true }
       : (delayOrOptions ?? {});
+  const previousIsRunning = usePrevious(isRunning);
   useEffect(() => {
-    if (!isRunning) {
-      return;
-    }
-    let interval: any = undefined;
-    const clear = () => {
-      if (isNonNullish(interval)) {
-        clearInterval(interval);
-        interval = undefined;
+    if (isRunning) {
+      let interval: any = undefined;
+      const clear = () => {
+        if (isNonNullish(interval)) {
+          clearInterval(interval);
+          interval = undefined;
+        }
+      };
+      interval = setInterval(() => effect(clear), delay);
+      if (previousIsRunning === false) {
+        effect(clear);
       }
-    };
-    interval = setInterval(() => effect(clear), delay);
-    return clear;
+      return clear;
+    }
   }, [...(deps ?? []), isRunning, delay]);
 }
