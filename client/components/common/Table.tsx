@@ -306,7 +306,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         key: "selection-checkbox",
         label: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
-          <Th padding="0 !important">
+          <Th padding="0 !important" width="40px">
             <Center as="label" height="38px" width="40px" cursor="pointer" onClick={onToggleAll}>
               <Checkbox
                 isChecked={anySelected && allSelected}
