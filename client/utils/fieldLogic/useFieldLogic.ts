@@ -70,6 +70,7 @@ useFieldLogic.fragments = {
         values
       }
       standardListDefinitions {
+        id
         listName
         values {
           key
@@ -130,6 +131,7 @@ useFieldLogic.fragments = {
         values
       }
       standardListDefinitions {
+        id
         listName
         values {
           key

@@ -7829,6 +7829,7 @@ export type RecipientSelectGroups_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -12585,6 +12586,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -12764,6 +12766,7 @@ export type AddPetitionAccessDialog_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -12950,6 +12953,7 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
       }>;
       standardListDefinitions: Array<{
         __typename?: "StandardListDefinition";
+        id: string;
         listName: string;
         values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
       }>;
@@ -14143,6 +14147,7 @@ export type SuggestedSigners_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -14274,6 +14279,7 @@ export type SuggestedSigners_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -14373,6 +14379,7 @@ export type SuggestedSigners_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -14590,6 +14597,7 @@ export type ConfirmPetitionSignersDialog_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -14689,6 +14697,7 @@ export type ConfirmPetitionSignersDialog_PetitionBase_PetitionTemplate_Fragment 
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -14836,6 +14845,7 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -14938,6 +14948,7 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -15621,6 +15632,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -15748,6 +15760,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -18114,6 +18127,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -18283,6 +18297,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -20435,6 +20450,7 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -20597,6 +20613,7 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -20744,6 +20761,7 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -21848,6 +21866,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -21995,6 +22014,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -22590,6 +22610,7 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment =
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -22676,6 +22697,7 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_PetitionTemplate_Fr
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -22889,6 +22911,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -24043,6 +24066,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -24331,6 +24355,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -24651,6 +24676,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -24939,6 +24965,7 @@ export type PetitionSignaturesCard_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -25938,6 +25965,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -26254,6 +26282,7 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -29230,6 +29259,7 @@ export type RecipientViewContents_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -29329,6 +29359,7 @@ export type RecipientViewContents_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -29428,6 +29459,7 @@ export type RecipientViewContents_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -29721,6 +29753,7 @@ export type RecipientViewProgressBar_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -29906,6 +29939,7 @@ export type RecipientViewProgressBar_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -30043,6 +30077,7 @@ export type RecipientViewSidebar_PublicPetitionAccessFragment = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -30241,6 +30276,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment 
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -30338,6 +30374,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFra
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -30439,6 +30476,7 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -31045,6 +31083,7 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -36035,6 +36074,7 @@ export type PetitionActivity_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -37309,6 +37349,7 @@ export type PetitionActivity_updatePetitionMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -38635,6 +38676,7 @@ export type PetitionActivity_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -39073,8 +39115,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
-    listName: string;
     id: string;
+    listName: string;
     listType: StandardListDefinitionListType;
     title: { [locale in UserLocale]?: string };
     listVersion?: string | null;
@@ -39407,8 +39449,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
-    listName: string;
     id: string;
+    listName: string;
     listType: StandardListDefinitionListType;
     title: { [locale in UserLocale]?: string };
     listVersion?: string | null;
@@ -40043,6 +40085,7 @@ export type PetitionCompose_updatePetitionMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -40218,6 +40261,7 @@ export type PetitionCompose_updatePetitionMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -42345,8 +42389,8 @@ export type PetitionCompose_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -42701,8 +42745,8 @@ export type PetitionCompose_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -43987,8 +44031,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
-    listName: string;
     id: string;
+    listName: string;
     listType: StandardListDefinitionListType;
     title: { [locale in UserLocale]?: string };
     listVersion?: string | null;
@@ -44407,8 +44451,8 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
-    listName: string;
     id: string;
+    listName: string;
     listType: StandardListDefinitionListType;
     title: { [locale in UserLocale]?: string };
     listVersion?: string | null;
@@ -44988,8 +45032,8 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -45415,8 +45459,8 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -45910,8 +45954,8 @@ export type PetitionPreview_completePetitionMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
-      listName: string;
       id: string;
+      listName: string;
       listType: StandardListDefinitionListType;
       title: { [locale in UserLocale]?: string };
       listVersion?: string | null;
@@ -46414,8 +46458,8 @@ export type PetitionPreview_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -46841,8 +46885,8 @@ export type PetitionPreview_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
-          listName: string;
           id: string;
+          listName: string;
           listType: StandardListDefinitionListType;
           title: { [locale in UserLocale]?: string };
           listVersion?: string | null;
@@ -47607,6 +47651,7 @@ export type PetitionReplies_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -48598,6 +48643,7 @@ export type PetitionReplies_closePetitionMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -49363,6 +49409,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -50336,6 +50383,7 @@ export type PetitionReplies_petitionQuery = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -53251,6 +53299,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -53450,6 +53499,7 @@ export type RecipientView_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -53645,6 +53695,7 @@ export type RecipientView_publicCompletePetitionMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -53867,6 +53918,7 @@ export type RecipientView_accessQuery = {
       }>;
       standardListDefinitions: Array<{
         __typename?: "StandardListDefinition";
+        id: string;
         listName: string;
         values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
       }>;
@@ -54675,6 +54727,7 @@ export type useFieldLogic_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -54778,6 +54831,7 @@ export type useFieldLogic_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -54858,6 +54912,7 @@ export type useFieldLogic_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -55206,6 +55261,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -55300,6 +55356,7 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -55377,6 +55434,7 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -56688,6 +56746,7 @@ export type useGetPetitionPages_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -56769,6 +56828,7 @@ export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -56850,6 +56910,7 @@ export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -57031,6 +57092,7 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -57171,6 +57233,7 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -57265,6 +57328,7 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -57850,6 +57914,7 @@ export type useStartSignatureRequest_PetitionFragment = {
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
+    id: string;
     listName: string;
     values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
   }>;
@@ -58028,6 +58093,7 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
         }>;
         standardListDefinitions: Array<{
           __typename?: "StandardListDefinition";
+          id: string;
           listName: string;
           values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
         }>;
@@ -58203,6 +58269,7 @@ export type useStartSignatureRequest_completePetitionMutation = {
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
+      id: string;
       listName: string;
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
@@ -59565,6 +59632,7 @@ export const useFieldLogic_PetitionBaseFragmentDoc = gql`
       values
     }
     standardListDefinitions {
+      id
       listName
       values {
         key
@@ -66800,6 +66868,7 @@ export const useFieldLogic_PublicPetitionFragmentDoc = gql`
       values
     }
     standardListDefinitions {
+      id
       listName
       values {
         key

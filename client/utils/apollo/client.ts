@@ -369,6 +369,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             properties: { merge: mergeArraysBy(["field", "id"]) },
           },
         },
+        StandardListDefinition: {
+          fields: {
+            values: { merge: mergeArraysBy(["key"]) },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,
