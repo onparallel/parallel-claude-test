@@ -440,6 +440,7 @@ export function ProfileValueFilterLine({
         "HAS_VALUE",
         "HAS_BG_CHECK_MATCH",
         "HAS_BG_CHECK_RESULTS",
+        "HAS_ANY_BG_CHECK_TOPICS",
         "IS_EXPIRED",
         "HAS_EXPIRY",
       ].includes(operator.startsWith("NOT_") ? operator.slice("NOT_".length) : operator) ? (

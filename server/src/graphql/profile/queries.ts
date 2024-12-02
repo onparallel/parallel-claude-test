@@ -130,6 +130,8 @@ export const profiles = queryField((t) => {
                       "NOT_HAS_BG_CHECK_MATCH",
                       "HAS_BG_CHECK_TOPICS",
                       "NOT_HAS_BG_CHECK_TOPICS",
+                      "HAS_ANY_BG_CHECK_TOPICS",
+                      "NOT_HAS_ANY_BG_CHECK_TOPICS",
                       "IS_EXPIRED",
                       "EXPIRES_IN",
                       "HAS_EXPIRY",

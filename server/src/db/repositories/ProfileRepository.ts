@@ -890,8 +890,14 @@ export class ProfileRepository extends BaseRepository {
                       case "HAS_BG_CHECK_TOPICS":
                         assert(Array.isArray(value));
                         apply(
-                          /* sql */ `(? -> 'entity' is not null and ? -> 'entity' != 'null'::jsonb and (? #> '{entity,properties,topics}') @> to_jsonb(?))`,
-                          [content, content, content, this.sqlArray(value)],
+                          /* sql */ `((? #> '{entity,properties,topics}') is not null and (? #> '{entity,properties,topics}') @> to_jsonb(?))`,
+                          [content, content, this.sqlArray(value)],
+                        );
+                        break;
+                      case "HAS_ANY_BG_CHECK_TOPICS":
+                        apply(
+                          /* sql */ `((? #> '{entity,properties,topics}') is not null and jsonb_array_length(? #> '{entity,properties,topics}') > 0)`,
+                          [content, content],
                         );
                         break;
                       case "IS_EXPIRED":

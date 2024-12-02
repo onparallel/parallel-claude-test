@@ -194,16 +194,30 @@ export function useProfileFieldValueFilterOperators(
         {
           label: intl.formatMessage({
             id: "generic.profile-field-values-filter-operator-has-bg-check-topics",
-            defaultMessage: "has topics",
+            defaultMessage: "has these topics",
           }),
           value: "HAS_BG_CHECK_TOPICS",
         },
         {
           label: intl.formatMessage({
             id: "generic.profile-field-values-filter-operator-not-has-bg-check-topics",
-            defaultMessage: "does not have topics",
+            defaultMessage: "does not have these topics",
           }),
           value: "NOT_HAS_BG_CHECK_TOPICS",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-any-bg-check-topics",
+            defaultMessage: "has any topics",
+          }),
+          value: "HAS_ANY_BG_CHECK_TOPICS",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-not-has-any-bg-check-topics",
+            defaultMessage: "does not have any topics",
+          }),
+          value: "NOT_HAS_ANY_BG_CHECK_TOPICS",
         },
       );
     }

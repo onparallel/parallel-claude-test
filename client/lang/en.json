@@ -13280,6 +13280,11 @@
     "context": "is after or equal"
   },
   {
+    "term": "generic.profile-field-values-filter-operator-has-any-bg-check-topics",
+    "definition": "has any topics",
+    "context": "has any topics"
+  },
+  {
     "term": "generic.profile-field-values-filter-operator-has-bg-check-match",
     "definition": "has selected a profile",
     "context": "has selected a profile"
@@ -13291,8 +13296,8 @@
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-bg-check-topics",
-    "definition": "has topics",
-    "context": "has topics"
+    "definition": "has these topics",
+    "context": "has these topics"
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-value",
@@ -13340,6 +13345,11 @@
     "context": "is not"
   },
   {
+    "term": "generic.profile-field-values-filter-operator-not-has-any-bg-check-topics",
+    "definition": "does not have any topics",
+    "context": "does not have any topics"
+  },
+  {
     "term": "generic.profile-field-values-filter-operator-not-has-bg-check-match",
     "definition": "has not selected a profile",
     "context": "has not selected a profile"
@@ -13351,8 +13361,8 @@
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-bg-check-topics",
-    "definition": "does not have topics",
-    "context": "does not have topics"
+    "definition": "does not have these topics",
+    "context": "does not have these topics"
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-expiry",

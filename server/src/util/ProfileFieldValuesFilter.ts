@@ -35,6 +35,8 @@ export const ProfileFieldValuesFilterOperatorValues = [
   "NOT_HAS_BG_CHECK_MATCH",
   "HAS_BG_CHECK_TOPICS",
   "NOT_HAS_BG_CHECK_TOPICS",
+  "HAS_ANY_BG_CHECK_TOPICS",
+  "NOT_HAS_ANY_BG_CHECK_TOPICS",
   "IS_EXPIRED",
   "EXPIRES_IN",
   "HAS_EXPIRY",
@@ -191,6 +193,8 @@ function validateSchema(
               "NOT_HAS_BG_CHECK_MATCH",
               "HAS_BG_CHECK_TOPICS",
               "NOT_HAS_BG_CHECK_TOPICS",
+              "HAS_ANY_BG_CHECK_TOPICS",
+              "NOT_HAS_ANY_BG_CHECK_TOPICS",
             ],
             profileTypeField,
           );
@@ -200,6 +204,8 @@ function validateSchema(
               "NOT_HAS_BG_CHECK_RESULTS",
               "HAS_BG_CHECK_MATCH",
               "NOT_HAS_BG_CHECK_MATCH",
+              "HAS_ANY_BG_CHECK_TOPICS",
+              "NOT_HAS_ANY_BG_CHECK_TOPICS",
             ].includes(value.operator)
           ) {
             assert(isNullish(value.value), `value not needed when ${value.operator}`);
