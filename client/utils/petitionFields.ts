@@ -14,7 +14,7 @@ export type DynamicSelectOption = [string, string[] | DynamicSelectOption[]];
 
 export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "DATE", "PHONE"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT", "SELECT", "DATE", "PHONE"].includes(oldType) &&
     ["TEXT", "SHORT_TEXT"].includes(newType)
   );
 };
