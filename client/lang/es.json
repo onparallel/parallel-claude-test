@@ -4152,7 +4152,7 @@
   {
     "term": "component.link-group-to-profile-type-dialog.group-name-help-popover-2",
     "definition": "Por ejemplo, si el nombre es \"Administrador\", los grupos se llamarán Administrador 1, Administrador 2, etc. ",
-    "context": "For example, if the name is \"Administrator\", the groups will be called Administrator 1, Administrator 2, and so on."
+    "context": "For example, if the name is \"Director\", the groups will be called Director 1, Director 2, and so on."
   },
   {
     "term": "component.link-group-to-profile-type-dialog.group-name-placeholder",

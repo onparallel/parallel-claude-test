@@ -139,7 +139,7 @@ function LinkGroupToProfileTypeDialog({
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.link-group-to-profile-type-dialog.group-name-help-popover-2"
-                    defaultMessage='For example, if the name is "Administrator", the groups will be called Administrator 1, Administrator 2, and so on.'
+                    defaultMessage='For example, if the name is "Director", the groups will be called Director 1, Director 2, and so on.'
                   />
                 </Text>
               </HelpPopover>
