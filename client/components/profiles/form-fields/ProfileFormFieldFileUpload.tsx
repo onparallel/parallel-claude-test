@@ -170,7 +170,7 @@ export function ProfileFormFieldFileUpload({
                   10
               }
               multiple={true}
-              onDrop={async (acceptedFiles, rejectedFiles) => {
+              onDrop={async (acceptedFiles = [], rejectedFiles = []) => {
                 if (rejectedFiles.some((f) => f.errors.some((e) => e.code === "file-too-large"))) {
                   await showErrorDialog({
                     message: intl.formatMessage(
@@ -195,7 +195,7 @@ export function ProfileFormFieldFileUpload({
                   });
                 } else {
                   onChange([
-                    ...value,
+                    ...(value ?? []),
                     ...acceptedFiles.map((file) => ({ id: nanoid(), type: "ADD", file })),
                   ]);
                   showExpiryDateDialog({ force: true });
