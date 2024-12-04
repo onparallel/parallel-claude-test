@@ -147,7 +147,9 @@ export const ProfileForm = Object.assign(
     } = useForm<ProfileFormData>({
       defaultValues: buildFormDefaultValue(properties),
     });
-    useEffectSkipFirst(() => reset(buildFormDefaultValue(properties)), [properties]);
+    useEffectSkipFirst(() => {
+      reset(buildFormDefaultValue(properties), { keepDirty: true, keepDirtyValues: true });
+    }, [properties]);
 
     const checkPath = useCallback(
       (path: string) => {
@@ -406,6 +408,7 @@ export const ProfileForm = Object.assign(
             );
 
             await onRefetch();
+            reset();
           } catch (e) {
             if (isApolloError(e, "MAX_FILES_EXCEEDED")) {
               await withError(
