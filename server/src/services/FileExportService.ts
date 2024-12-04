@@ -31,7 +31,7 @@ interface GetPetitionFilesOptions {
   locale: UserLocale;
   pattern?: string | null;
   include: ("excel-file" | "petition-field-files" | "latest-signature")[];
-  onProgress?: (value: number) => void;
+  onProgress?: (value: number) => Promise<void>;
 }
 
 export type FileExportMetadata =
@@ -72,7 +72,7 @@ export interface IFileExportService {
     petitionId: number,
     filenamePattern: string | null,
     userId: number,
-    onProgress?: (progress: number) => void,
+    onProgress?: (progress: number) => Promise<void>,
   ): Promise<FileExportLog>;
 }
 @injectable()
@@ -113,7 +113,7 @@ export class FileExportService implements IFileExportService {
     petitionId: number,
     filenamePattern: string | null,
     userId: number,
-    onProgress?: (progress: number) => void,
+    onProgress?: (progress: number) => Promise<void>,
   ): Promise<FileExportLog> {
     const userData = await this.users.loadUserDataByUserId(userId);
     assert(userData, `User ${userId} not found`);
@@ -308,7 +308,7 @@ export class FileExportService implements IFileExportService {
                 resolveFileName(field, options.pattern, file.filename),
                 { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
               );
-              options.onProgress?.(++processedFiles / totalFiles);
+              await options.onProgress?.(++processedFiles / totalFiles);
             }
           }
         }
@@ -333,7 +333,7 @@ export class FileExportService implements IFileExportService {
               ),
               { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
             );
-            options.onProgress?.(++processedFiles / totalFiles);
+            await options.onProgress?.(++processedFiles / totalFiles);
           }
         }
 
@@ -370,7 +370,7 @@ export class FileExportService implements IFileExportService {
           metadata: composedPetition.metadata,
         });
       });
-      options.onProgress?.(++processedFiles / totalFiles);
+      await options.onProgress?.(++processedFiles / totalFiles);
     }
 
     if (includeSignature && latestPetitionSignature?.status === "COMPLETED") {
@@ -393,7 +393,7 @@ export class FileExportService implements IFileExportService {
               metadata: latestPetitionSignature.metadata,
             },
           );
-          options.onProgress?.(++processedFiles / totalFiles);
+          await options.onProgress?.(++processedFiles / totalFiles);
         }
       }
       if (isNonNullish(latestPetitionSignature.file_upload_audit_trail_id)) {
@@ -410,7 +410,7 @@ export class FileExportService implements IFileExportService {
             id: latestPetitionSignature.id,
             metadata: latestPetitionSignature.metadata,
           });
-          options.onProgress?.(++processedFiles / totalFiles);
+          await options.onProgress?.(++processedFiles / totalFiles);
         }
       }
     }

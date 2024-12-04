@@ -20,9 +20,9 @@ export class FileExportRunner extends TaskRunner<"FILE_EXPORT"> {
       petitionId,
       pattern,
       this.task.user_id,
-      (progress) => {
+      async (progress) => {
         this.ctx.logger.info(`[FileExportRunner:${this.task.id}]: ${Math.round(progress * 100)}%`);
-        this.onProgress(progress * 100 * 0.95);
+        await this.onProgress(progress * 100 * 0.95);
       },
     );
 

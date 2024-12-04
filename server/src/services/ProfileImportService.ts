@@ -41,7 +41,7 @@ export interface IProfileImportService {
     profileTypeId: number,
     values: ParsedProfileFieldValue[][],
     user: User,
-    onProgress?: (count: number, total: number) => void,
+    onProgress?: (count: number, total: number) => Promise<void>,
   ): Promise<void>;
   parseAndValidateExcelData(
     profileTypeId: number,
@@ -204,7 +204,7 @@ export class ProfileImportService implements IProfileImportService {
     profileTypeId: number,
     values: ParsedProfileFieldValue[][],
     user: User,
-    onProgress?: (count: number, total: number) => void,
+    onProgress?: (count: number, total: number) => Promise<void>,
   ) {
     let count = 0;
     for (const profileValues of values) {
@@ -228,7 +228,7 @@ export class ProfileImportService implements IProfileImportService {
         user,
       );
 
-      onProgress?.(++count, values.length);
+      await onProgress?.(++count, values.length);
     }
   }
 

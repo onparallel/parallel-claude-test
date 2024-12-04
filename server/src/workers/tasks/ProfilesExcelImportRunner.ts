@@ -33,8 +33,8 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
       profileTypeId,
       data,
       user,
-      (count, total) => {
-        this.onProgress((count / total) * 100);
+      async (count, total) => {
+        await this.onProgress((count / total) * 100);
       },
     );
 
