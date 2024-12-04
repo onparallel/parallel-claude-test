@@ -1,7 +1,7 @@
 version: "3"
 services:
   db:
-    image: postgres:12.8
+    image: postgres:16.6
     user: postgres
     environment:
       - POSTGRES_USER=parallel
