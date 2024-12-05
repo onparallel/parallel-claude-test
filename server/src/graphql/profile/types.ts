@@ -279,14 +279,6 @@ export const Profile = objectType({
         return await ctx.profiles.loadProfileSubscribers(root.id);
       },
     });
-    /** @deprecated */
-    t.paginationField("petitions", {
-      deprecation: "use associatedPetitions instead",
-      type: "Petition",
-      resolve: () => {
-        return { totalCount: 0, items: [] };
-      },
-    });
     t.paginationField("associatedPetitions", {
       type: "Petition",
       extendArgs: {

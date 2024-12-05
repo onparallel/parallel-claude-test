@@ -912,10 +912,7 @@ export type Mutation = {
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
-  /**
-   * Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document
-   * @deprecated use BACKGROUND_CHECK field
-   */
+  /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
@@ -1058,16 +1055,6 @@ export type Mutation = {
   deleteTag: Result;
   /** Deletes a group */
   deleteUserGroup: Result;
-  /**
-   * Disassociates a petition from a profile
-   * @deprecated use disassociateProfilesFromPetitions
-   */
-  disassociatePetitionFromProfile: Success;
-  /**
-   * Disassociates a profile from a petition
-   * @deprecated use disassociateProfilesFromPetitions
-   */
-  disassociateProfileFromPetition: Success;
   /** Disassociates a petition from a profile */
   disassociateProfilesFromPetitions: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
@@ -1317,11 +1304,6 @@ export type Mutation = {
   updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
-  /**
-   * Updates the default permission for a profile type field for a set of users and/or user groups.
-   * @deprecated use updateProfileTypeFieldPermissions
-   */
-  updateProfileTypeFieldPermission: ProfileTypeField;
   /** Updates the default permission for a list of profile type fields and a set of users and/or user groups. */
   updateProfileTypeFieldPermissions: ProfileType;
   updateProfileTypeFieldPositions: ProfileType;
@@ -1956,16 +1938,6 @@ export type MutationdeleteTagArgs = {
 
 export type MutationdeleteUserGroupArgs = {
   ids: Array<Scalars["GID"]["input"]>;
-};
-
-export type MutationdisassociatePetitionFromProfileArgs = {
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  profileId: Scalars["GID"]["input"];
-};
-
-export type MutationdisassociateProfileFromPetitionArgs = {
-  petitionId: Scalars["GID"]["input"];
-  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdisassociateProfilesFromPetitionsArgs = {
@@ -2720,13 +2692,6 @@ export type MutationupdateProfileTypeArgs = {
 export type MutationupdateProfileTypeFieldArgs = {
   data: UpdateProfileTypeFieldInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  profileTypeFieldId: Scalars["GID"]["input"];
-  profileTypeId: Scalars["GID"]["input"];
-};
-
-export type MutationupdateProfileTypeFieldPermissionArgs = {
-  data: Array<UpdateProfileTypeFieldPermissionInput>;
-  defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
 };
@@ -4341,8 +4306,6 @@ export type Profile = Timestamps & {
   localizableName: Scalars["LocalizableUserText"]["output"];
   name: Scalars["String"]["output"];
   permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
-  /** @deprecated use associatedPetitions instead */
-  petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   relationships: Array<ProfileRelationship>;
@@ -4359,11 +4322,6 @@ export type ProfileassociatedPetitionsArgs = {
 };
 
 export type ProfileeventsArgs = {
-  limit?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-export type ProfilepetitionsArgs = {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
@@ -6203,12 +6161,6 @@ export type UpdateProfileTypeFieldInput = {
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   substitutions?: InputMaybe<Array<UpdateProfileTypeFieldSelectOptionsSubstitution>>;
-};
-
-export type UpdateProfileTypeFieldPermissionInput = {
-  permission: ProfileTypeFieldPermissionType;
-  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
-  userId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type UpdateProfileTypeFieldPermissionsInput = {

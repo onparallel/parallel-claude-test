@@ -488,7 +488,6 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
 });
 
 export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
-  deprecation: "use BACKGROUND_CHECK field",
   description: "Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document",
   type: "PetitionFieldReply",
   args: {

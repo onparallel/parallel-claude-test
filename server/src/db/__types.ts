@@ -312,10 +312,6 @@ export const PetitionFieldTypeValues = [
   "ID_VERIFICATION",
 ] as PetitionFieldType[];
 
-export type PetitionListViewType = "ALL" | "CUSTOM";
-
-export const PetitionListViewTypeValues = ["ALL", "CUSTOM"] as PetitionListViewType[];
-
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
 
 export const PetitionMessageStatusValues = [
@@ -1681,10 +1677,6 @@ export interface PetitionListView {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
-  /**
-   * @deprecated
-   */
-  type: Maybe<PetitionListViewType>; // petition_list_view_type
   view_type: ListViewType; // list_view_type
 }
 
@@ -1697,7 +1689,6 @@ export type CreatePetitionListView = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
-  | "type"
   | "view_type"
 >;
 
@@ -1864,7 +1855,7 @@ export interface Profile {
   /**
    * @deprecated
    */
-  name: string; // varchar
+  name: Maybe<string>; // varchar
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1880,6 +1871,7 @@ export interface Profile {
 
 export type CreateProfile = PartialProps<
   Omit<Profile, "id">,
+  | "name"
   | "created_at"
   | "created_by"
   | "updated_at"

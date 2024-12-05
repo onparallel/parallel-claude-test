@@ -282,13 +282,11 @@ export const BackgroundCheckEntityDetails = interfaceType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntityType = enumType({
   name: "DowJonesKycEntityType",
   members: ["Person", "Entity"],
 });
 
-/** @deprecated */
 export const DowJonesKycEntityPlace = objectType({
   name: "DowJonesKycEntityPlace",
   definition(t) {
@@ -297,7 +295,6 @@ export const DowJonesKycEntityPlace = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntityDate = objectType({
   name: "DowJonesKycEntityDate",
   definition(t) {
@@ -307,7 +304,6 @@ export const DowJonesKycEntityDate = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntitySanction = objectType({
   name: "DowJonesKycEntitySanction",
   definition(t) {
@@ -318,7 +314,6 @@ export const DowJonesKycEntitySanction = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntityRelationship = objectType({
   name: "DowJonesKycEntityRelationship",
   definition(t) {
@@ -330,7 +325,6 @@ export const DowJonesKycEntityRelationship = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntitySearchResult = interfaceType({
   name: "DowJonesKycEntitySearchResult",
   definition(t) {
@@ -349,7 +343,6 @@ export const DowJonesKycEntitySearchResult = interfaceType({
       : "DowJonesKycEntitySearchResultEntity",
 });
 
-/** @deprecated */
 export const DowJonesKycEntitySearchResultPerson = objectType({
   name: "DowJonesKycEntitySearchResultPerson",
   definition(t) {
@@ -359,7 +352,6 @@ export const DowJonesKycEntitySearchResultPerson = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntitySearchResultEntity = objectType({
   name: "DowJonesKycEntitySearchResultEntity",
   definition(t) {
@@ -367,7 +359,6 @@ export const DowJonesKycEntitySearchResultEntity = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntityProfileResult = interfaceType({
   name: "DowJonesKycEntityProfileResult",
   definition(t) {
@@ -390,7 +381,6 @@ export const DowJonesKycEntityProfileResult = interfaceType({
       : "DowJonesKycEntityProfileResultEntity",
 });
 
-/** @deprecated */
 export const DowJonesKycEntityProfileResultPerson = objectType({
   name: "DowJonesKycEntityProfileResultPerson",
   definition(t) {
@@ -404,7 +394,6 @@ export const DowJonesKycEntityProfileResultPerson = objectType({
   },
 });
 
-/** @deprecated */
 export const DowJonesKycEntityProfileResultEntity = objectType({
   name: "DowJonesKycEntityProfileResultEntity",
   definition(t) {

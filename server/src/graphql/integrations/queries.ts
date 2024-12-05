@@ -19,7 +19,6 @@ import {
   parseBackgroundCheckToken,
 } from "./utils";
 
-/** @deprecated */
 export const queries = queryField((t) => {
   t.paginationField("dowJonesKycEntitySearch", {
     type: "DowJonesKycEntitySearchResult",
