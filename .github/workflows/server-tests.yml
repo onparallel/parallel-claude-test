@@ -34,7 +34,7 @@ jobs:
         timeout-minutes: 15
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-        run: yarn --cwd server/ test --silent --coverage
+        run: yarn --cwd server/ test --silent
 
 concurrency:
   group: ${{ github.ref }}-server-tests
