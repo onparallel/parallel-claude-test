@@ -14178,6 +14178,7 @@ export type SuggestedSigners_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -14496,6 +14497,7 @@ export type ConfirmPetitionSignersDialog_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -14740,6 +14742,7 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
+          id: string;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -15531,6 +15534,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   } | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -18030,6 +18034,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   } | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -39102,6 +39107,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -40067,6 +40073,7 @@ export type PetitionCompose_updatePetitionMutation = {
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
+          id: string;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -42372,6 +42379,7 @@ export type PetitionCompose_petitionQuery = {
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
+          id: string;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -43584,6 +43592,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
   }>;
   organization: {
@@ -44572,6 +44581,7 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
+          id: string;
           status: PetitionSignatureRequestStatus;
         }>;
         organization: {
@@ -45502,6 +45512,7 @@ export type PetitionPreview_completePetitionMutation = {
     }>;
     signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
+      id: string;
       status: PetitionSignatureRequestStatus;
     }>;
     organization: {
@@ -45998,6 +46009,7 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
+          id: string;
           status: PetitionSignatureRequestStatus;
         }>;
         organization: {
@@ -59690,6 +59702,7 @@ export const SuggestedSigners_PetitionBaseFragmentDoc = gql`
         }
       }
       signatureRequests {
+        id
         signatureConfig {
           signers {
             ...SuggestedSigners_PetitionSigner
@@ -65212,6 +65225,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
         isContactless
       }
       signatureRequests {
+        id
         status
       }
       ...RecipientViewProgressBar_Petition
@@ -65624,6 +65638,7 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
     ...SignatureConfigDialog_PetitionBase
     ...NewSignatureRequestRow_Petition
     signatureRequests {
+      id
       signatureConfig {
         ...SignatureConfigDialog_SignatureConfig
         timezone

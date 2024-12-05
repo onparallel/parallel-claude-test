@@ -262,6 +262,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 }
               },
             },
+            signatureRequests: { merge: mergeArraysBy(["id"]) },
           },
         },
         PetitionField: {

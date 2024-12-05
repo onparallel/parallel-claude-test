@@ -983,6 +983,7 @@ const _fragments = {
           isContactless
         }
         signatureRequests {
+          id
           status
         }
         ...RecipientViewProgressBar_Petition

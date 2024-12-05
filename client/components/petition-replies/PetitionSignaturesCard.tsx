@@ -68,6 +68,7 @@ const fragments = {
       ...SignatureConfigDialog_PetitionBase
       ...NewSignatureRequestRow_Petition
       signatureRequests {
+        id
         signatureConfig {
           ...SignatureConfigDialog_SignatureConfig
           timezone

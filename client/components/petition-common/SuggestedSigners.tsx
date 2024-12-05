@@ -448,6 +448,7 @@ SuggestedSigners.fragments = {
             }
           }
           signatureRequests {
+            id
             signatureConfig {
               signers {
                 ...SuggestedSigners_PetitionSigner
