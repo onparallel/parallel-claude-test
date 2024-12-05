@@ -652,7 +652,10 @@ function SignatureConfigDialogBodyStep3({
                 repeatedSigners,
                 allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
               })
-            : contact,
+            : {
+                ...pick(contact!, ["firstName", "lastName", "email"]),
+                isPreset: !isPetition,
+              },
         ]);
       } catch {}
       setSelectedContact(null);

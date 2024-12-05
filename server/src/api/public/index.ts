@@ -885,6 +885,7 @@ export function publicApi(container: Container) {
         const _query = gql`
           query UpdatePetition_petition($petitionId: GID!) {
             petition(id: $petitionId) {
+              __typename
               signatureConfig {
                 allowAdditionalSigners
                 integration {
@@ -937,7 +938,10 @@ export function publicApi(container: Container) {
           inputData.signatureConfig = {
             ...omit(queryResult.petition!.signatureConfig!, ["integration"]),
             orgIntegrationId: queryResult.petition!.signatureConfig!.integration!.id,
-            signersInfo: body.signers,
+            signersInfo: body.signers.map((s) => ({
+              ...s,
+              isPreset: queryResult.petition?.__typename === "PetitionTemplate",
+            })),
           };
         } else if (body.signers === null) {
           inputData.signatureConfig = null;

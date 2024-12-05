@@ -4687,9 +4687,11 @@ export type ProfileFieldValuesFilterOperator =
   | "EXPIRES_IN"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL"
+  | "HAS_ANY_BG_CHECK_TOPICS"
   | "HAS_BG_CHECK_MATCH"
   | "HAS_BG_CHECK_RESULTS"
   | "HAS_BG_CHECK_TOPICS"
+  | "HAS_EXPIRY"
   | "HAS_VALUE"
   | "IS_EXPIRED"
   | "IS_ONE_OF"
@@ -4697,9 +4699,11 @@ export type ProfileFieldValuesFilterOperator =
   | "LESS_THAN_OR_EQUAL"
   | "NOT_CONTAIN"
   | "NOT_EQUAL"
+  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
   | "NOT_HAS_BG_CHECK_MATCH"
   | "NOT_HAS_BG_CHECK_RESULTS"
   | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_EXPIRY"
   | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
@@ -7562,6 +7566,7 @@ export type UpdatePetition_petitionQueryVariables = Exact<{
 export type UpdatePetition_petitionQuery = {
   petition:
     | {
+        __typename: "Petition";
         signatureConfig: {
           allowAdditionalSigners: boolean;
           review: boolean;
@@ -7574,6 +7579,7 @@ export type UpdatePetition_petitionQuery = {
         } | null;
       }
     | {
+        __typename: "PetitionTemplate";
         signatureConfig: {
           allowAdditionalSigners: boolean;
           review: boolean;
@@ -11918,6 +11924,7 @@ export const GetPetition_petitionDocument = gql`
 export const UpdatePetition_petitionDocument = gql`
   query UpdatePetition_petition($petitionId: GID!) {
     petition(id: $petitionId) {
+      __typename
       signatureConfig {
         allowAdditionalSigners
         integration {
