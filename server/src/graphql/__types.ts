@@ -137,6 +137,12 @@ export interface NexusGenInputs {
     firstName: string; // String!
     lastName?: string | null; // String
   };
+  CreatePetitionFieldInput: {
+    // input type
+    isInternal?: boolean | null; // Boolean
+    multiple?: boolean | null; // Boolean
+    options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
   CreatePetitionFieldReplyInput: {
     // input type
     content?: NexusGenScalars["JSON"] | null; // JSON
@@ -7364,9 +7370,11 @@ export interface NexusGenArgTypes {
     };
     createPetitionField: {
       // args
+      data?: NexusGenInputs["CreatePetitionFieldInput"] | null; // CreatePetitionFieldInput
       parentFieldId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
       position?: number | null; // Int
+      profileTypeId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
     createPetitionFieldAttachmentUploadLink: {

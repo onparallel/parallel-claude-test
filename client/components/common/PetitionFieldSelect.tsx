@@ -4,9 +4,8 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldSelect_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { UnwrapArray } from "@parallel/utils/types";
+import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { If, UnwrapArray } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
@@ -16,6 +15,7 @@ import Select, {
   OnChangeValue,
   OptionProps,
   SingleValue as SV,
+  Props as SelectProps,
   SingleValueProps,
   components,
 } from "react-select";
@@ -38,10 +38,15 @@ interface PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionBaseFr
   fieldIndex: PetitionFieldIndex;
 }
 
+type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T | null>;
+
 export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelect_PetitionBaseFragment,
   IsMulti extends boolean = false,
-> extends CustomSelectProps<AnyFieldOf<T>, IsMulti, never> {
+> extends UseReactSelectProps<PetitionFieldSelectOption<T>, IsMulti, never>,
+    Omit<SelectProps<PetitionFieldSelectOption<T>, IsMulti, never>, "value" | "onChange"> {
+  value: ValueType<AnyFieldOf<T>, IsMulti>;
+  onChange: (value: ValueType<AnyFieldOf<T>, IsMulti>, actionMeta: ActionMeta<any>) => void;
   petition: T;
   filterFields?: (field: AnyFieldOf<T>) => boolean;
   expandFieldGroups?: boolean;
@@ -166,10 +171,12 @@ PetitionFieldSelect.fragments = {
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
   T extends PetitionFieldSelect_PetitionBaseFragment,
 >({
+  label,
   option,
   highlight,
   indent,
 }: {
+  label: string;
   option: PetitionFieldSelectOption<T>;
   highlight?: string;
   indent?: boolean;
@@ -195,9 +202,9 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
         overflow="hidden"
         textOverflow="ellipsis"
       >
-        {field.title ? (
+        {label ? (
           <HighlightText as="span" search={highlight}>
-            {field.title}
+            {label}
           </HighlightText>
         ) : (
           <Text as="span" textStyle="hint">
@@ -232,6 +239,7 @@ function SingleValue(
     <components.SingleValue {...props}>
       <Flex>
         <PetitionFieldSelectItem
+          label={props.children as string}
           option={props.data}
           highlight={props.selectProps.inputValue ?? ""}
         />
@@ -245,6 +253,7 @@ function MultiValueLabel({ children, ...props }: MultiValueProps<PetitionFieldSe
     <components.MultiValueLabel {...props}>
       <Flex flexWrap="nowrap">
         <PetitionFieldSelectItem
+          label={children as string}
           option={props.data}
           highlight={props.selectProps.inputValue ?? ""}
         />
@@ -257,6 +266,7 @@ function Option(props: OptionProps<PetitionFieldSelectOption<any>>) {
   return (
     <components.Option {...props}>
       <PetitionFieldSelectItem
+        label={props.children as string}
         option={props.data}
         highlight={props.selectProps.inputValue ?? ""}
         indent

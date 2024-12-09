@@ -718,6 +718,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 ) {
   const intl = useIntl();
   const [title, setTitle] = useState(field.title);
+
   const titleRef = useRef<HTMLInputElement>(null);
   const focusTitle = useCallback((atStart?: boolean) => {
     const input = titleRef.current!;
@@ -726,6 +727,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       input.setSelectionRange(0, 0);
     }
   }, []);
+
   const color = usePetitionFieldTypeColor(field.type);
 
   const [description, setDescription] = useState(field.description);

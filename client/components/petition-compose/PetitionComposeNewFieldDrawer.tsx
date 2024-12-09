@@ -15,8 +15,10 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   PetitionComposeNewFieldDrawer_PetitionBaseFragment,
+  PetitionComposeNewFieldDrawer_ProfileTypeFragment,
   PetitionComposeNewFieldDrawer_UserFragment,
   PetitionFieldType,
+  ProfileTypeStandardType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
@@ -29,16 +31,33 @@ import { PetitionComposeNewFieldDrawerProfileTypeFields } from "./PetitionCompos
 interface PetitionComposeNewFieldDrawerProps {
   user: PetitionComposeNewFieldDrawer_UserFragment;
   onClose: () => void;
-  onAddField: (type: PetitionFieldType, profileTypeFieldId?: string) => Promise<void>;
+  onAddField: (props: {
+    type: PetitionFieldType;
+    profileTypeFieldId?: string;
+  }) => Promise<string | undefined>;
+  onAddProfileTypeFieldGroup: (props: {
+    type: ProfileTypeStandardType;
+    profileTypeId: string;
+  }) => Promise<void>;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   petition: PetitionComposeNewFieldDrawer_PetitionBaseFragment;
+  profileTypes: PetitionComposeNewFieldDrawer_ProfileTypeFragment[];
   newFieldPlaceholderParentFieldId?: string;
 }
 
 export const PetitionComposeNewFieldDrawer = Object.assign(
   chakraForwardRef<"div", PetitionComposeNewFieldDrawerProps>(
     function PetitionComposeNewFieldDrawer(
-      { user, onClose, onAddField, onFieldEdit, petition, newFieldPlaceholderParentFieldId },
+      {
+        user,
+        profileTypes,
+        onClose,
+        onAddField,
+        onAddProfileTypeFieldGroup,
+        onFieldEdit,
+        petition,
+        newFieldPlaceholderParentFieldId,
+      },
       ref,
     ) {
       const intl = useIntl();
@@ -55,13 +74,28 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
             return;
           }
           isAddingFieldRef.current = true;
-          await onAddField(type, profileTypeFieldId);
+          await onAddField({ type, profileTypeFieldId });
           isAddingFieldRef.current = false;
           if (isFullScreen) {
             onClose();
           }
         },
         [onAddField, isFullScreen, onClose],
+      );
+
+      const handleAddProfileTypeFieldGroup = useCallback(
+        async (type: ProfileTypeStandardType, profileTypeId: string) => {
+          if (isAddingFieldRef.current) {
+            return;
+          }
+          isAddingFieldRef.current = true;
+          await onAddProfileTypeFieldGroup({ type, profileTypeId });
+          isAddingFieldRef.current = false;
+          if (isFullScreen) {
+            onClose();
+          }
+        },
+        [onAddProfileTypeFieldGroup, isFullScreen, onClose],
       );
 
       const parentFieldWithIndex = fieldsWithIndices.find(
@@ -152,7 +186,9 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
                 <TabPanel padding={0} {...extendFlexColumn}>
                   <PetitionComposeNewFieldDrawerPetitionFields
                     user={user}
+                    profileTypes={profileTypes}
                     onAddField={handleAddField}
+                    onAddProfileTypeFieldGroup={handleAddProfileTypeFieldGroup}
                     isFieldGroupChild={isFieldGroupChild}
                   />
                 </TabPanel>
@@ -161,7 +197,9 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
           ) : (
             <PetitionComposeNewFieldDrawerPetitionFields
               user={user}
+              profileTypes={profileTypes}
               onAddField={handleAddField}
+              onAddProfileTypeFieldGroup={handleAddProfileTypeFieldGroup}
               isFieldGroupChild={isFieldGroupChild}
             />
           )}
@@ -171,6 +209,15 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
   ),
   {
     fragments: {
+      get ProfileType() {
+        return gql`
+          fragment PetitionComposeNewFieldDrawer_ProfileType on ProfileType {
+            id
+            ...PetitionComposeNewFieldDrawerPetitionFields_ProfileType
+          }
+          ${PetitionComposeNewFieldDrawerPetitionFields.fragments.ProfileType}
+        `;
+      },
       User: gql`
         fragment PetitionComposeNewFieldDrawer_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)

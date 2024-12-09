@@ -134,3 +134,7 @@ export type WizardStepDialogProps<
   TStep extends string & keyof TSteps,
   TResult = void,
 > = DialogProps<TSteps[TStep], TResult> & _WizardStepDialogProps<TSteps, TStep>;
+export type DialogProps<TProps = {}, TResult = void> = TProps & DialogCallbacks<TResult>;
+
+export type MaybeWizardStepDialogProps<TProps = {}, TResult = void> = DialogProps<TProps, TResult> &
+  Partial<_WizardStepDialogProps<Record<string, any>, string>>;

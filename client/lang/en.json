@@ -2145,6 +2145,11 @@
     "context": "Add group"
   },
   {
+    "term": "component.create-or-update-field-group-relationships-dialog.add-relationships",
+    "definition": "Add relationships",
+    "context": "Add relationships"
+  },
+  {
     "term": "component.create-or-update-field-group-relationships-dialog.body",
     "definition": "Associate groups from this {isTemplate, select, true{template} other{parallel}} to create relationships automatically when creating the profile.",
     "context": "Associate groups from this {isTemplate, select, true{template} other{parallel}} to create relationships automatically when creating the profile."
@@ -2161,13 +2166,18 @@
   },
   {
     "term": "component.create-or-update-field-group-relationships-dialog.header",
-    "definition": "Set up relationships between groups",
-    "context": "Set up relationships between groups"
+    "definition": "Set up relationships",
+    "context": "Set up relationships"
   },
   {
-    "term": "component.create-or-update-field-group-relationships-dialog.header-updating",
-    "definition": "Associated groups",
-    "context": "Associated groups"
+    "term": "component.create-or-update-field-group-relationships-dialog.header-suggestions",
+    "definition": "Do you want to add these compatible relationships?",
+    "context": "Do you want to add these compatible relationships?"
+  },
+  {
+    "term": "component.create-or-update-field-group-relationships-dialog.ignore",
+    "definition": "Ignore",
+    "context": "Ignore"
   },
   {
     "term": "component.create-or-update-field-group-relationships-dialog.relationship-with",
@@ -2388,6 +2398,26 @@
     "term": "component.create-petition-event-subscription-dialog.from-template-placeholder",
     "definition": "Search for templates...",
     "context": "Search for templates..."
+  },
+  {
+    "term": "component.create-petition-field-group-profile-type-dialog.header-group-name-contract",
+    "definition": "What do you need information about?",
+    "context": "What do you need information about?"
+  },
+  {
+    "term": "component.create-petition-field-group-profile-type-dialog.header-group-name-others",
+    "definition": "Who do you need information from?",
+    "context": "Who do you need information from?"
+  },
+  {
+    "term": "component.create-petition-field-group-profile-type-dialog.placeholder-client",
+    "definition": "Client",
+    "context": "Client"
+  },
+  {
+    "term": "component.create-petition-field-group-profile-type-dialog.placeholder-contract",
+    "definition": "Contract",
+    "context": "Contract"
   },
   {
     "term": "component.create-profile-dialog.new-profile",
@@ -5700,6 +5730,11 @@
     "context": "Type of verification"
   },
   {
+    "term": "component.petition-compose-new-field-drawer-pettion-fields.profile-type-description",
+    "definition": "Add a group to obtain information about {pluralName}.",
+    "context": "Add a group to obtain information about {pluralName}."
+  },
+  {
     "term": "component.petition-compose-new-field-drawer.category-files",
     "definition": "Files and external sources",
     "context": "Files and external sources"
@@ -5708,6 +5743,11 @@
     "term": "component.petition-compose-new-field-drawer.category-headings",
     "definition": "Headings and groups",
     "context": "Headings and groups"
+  },
+  {
+    "term": "component.petition-compose-new-field-drawer.category-information",
+    "definition": "Information from",
+    "context": "Information from"
   },
   {
     "term": "component.petition-compose-new-field-drawer.category-numbers",
@@ -17668,6 +17708,51 @@
     "term": "util.use-file-export-task.header",
     "definition": "Exporting replies...",
     "context": "Exporting replies..."
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-addendum",
+    "definition": "Addendum",
+    "context": "Addendum"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-annex",
+    "definition": "Annex",
+    "context": "Annex"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-beneficial-owner",
+    "definition": "Beneficial owner",
+    "context": "Beneficial owner"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-branch",
+    "definition": "Branch",
+    "context": "Branch"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-client",
+    "definition": "Client",
+    "context": "Client"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-contract",
+    "definition": "Contract",
+    "context": "Contract"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-director",
+    "definition": "Director",
+    "context": "Director"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-legal-representative",
+    "definition": "Legal representative",
+    "context": "Legal representative"
+  },
+  {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-supplier",
+    "definition": "Supplier",
+    "context": "Supplier"
   },
   {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",

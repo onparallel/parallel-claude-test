@@ -35,6 +35,7 @@ import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/peti
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
 import { useConfirmLinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmLinkFieldDialog";
 import { useConfirmUnlinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmUnlinkFieldDialog";
+import { useCreatePetitionFieldGroupProfileTypeDialog } from "@parallel/components/petition-compose/dialogs/CreatePetitionFieldGroupProfileTypeDialog";
 import { useFieldUsedForSearchesDialog } from "@parallel/components/petition-compose/dialogs/FieldUsedForSearchesDialog";
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
@@ -48,6 +49,7 @@ import {
   updatePreviewFieldReplies,
 } from "@parallel/components/petition-preview/clientMutations";
 import {
+  CreatePetitionFieldInput,
   PetitionCompose_PetitionFieldFragment,
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
@@ -64,6 +66,7 @@ import {
   PetitionCompose_updatePetitionFieldFragmentDoc,
   PetitionCompose_userDocument,
   PetitionFieldType,
+  ProfileTypeStandardType,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -823,9 +826,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [createProfileLinkedPetitionField] = useMutation(
     PetitionCompose_createProfileLinkedPetitionFieldDocument,
   );
+
   const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
   const handleAddField = useCallback(
-    wrapper(async function (type: PetitionFieldType, profileTypeFieldId?: string) {
+    wrapper(async function ({
+      type,
+      profileTypeFieldId,
+      data: createPetitionFieldData,
+      profileTypeId,
+    }: {
+      type: PetitionFieldType;
+      profileTypeFieldId?: string;
+      data?: CreatePetitionFieldInput;
+      profileTypeId?: string;
+    }) {
       const parentFieldId = inParentFieldId;
       const { fieldsWithIndices } = fieldsRef.current!;
 
@@ -880,7 +894,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         newFieldId = data!.createProfileLinkedPetitionField.id;
       } else {
         const { data } = await createPetitionField({
-          variables: { petitionId, type, position, parentFieldId },
+          variables: {
+            petitionId,
+            type,
+            position,
+            parentFieldId,
+            data: createPetitionFieldData,
+            profileTypeId,
+          },
           update: (cache, { data }) => {
             if (isTemplate && isNonNullish(parentFieldId) && isNonNullish(data)) {
               updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
@@ -911,8 +932,27 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         setAddFieldAfterId([newFieldId, inParentFieldId]);
       }
       scrollToField(newFieldId).then();
+      return newFieldId;
     }),
     [petitionId, afterFieldId, inParentFieldId],
+  );
+
+  const showCreatePetitionFieldGroupProfileTypeDialog =
+    useCreatePetitionFieldGroupProfileTypeDialog();
+
+  const handleAddProfileTypeFieldGroup = useCallback(
+    async ({ type, profileTypeId }: { type: ProfileTypeStandardType; profileTypeId: string }) => {
+      try {
+        await showCreatePetitionFieldGroupProfileTypeDialog({
+          type,
+          petitionId: petition.id,
+          profileTypeId,
+          onAddField: handleAddField,
+          profileTypes: queryObject.profileTypes.items,
+        });
+      } catch {}
+    },
+    [handleAddField, petitionId, afterFieldId],
   );
 
   const showErrorDialog = useErrorDialog();
@@ -1217,8 +1257,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <PetitionComposeNewFieldDrawer
             ref={fieldDrawerRef}
             user={me}
+            profileTypes={queryObject.profileTypes.items}
             onClose={handleCloseFieldDrawer}
             onAddField={handleAddField}
+            onAddProfileTypeFieldGroup={handleAddProfileTypeFieldGroup}
             onFieldEdit={handleFieldEdit}
             petition={petition}
             newFieldPlaceholderParentFieldId={inParentFieldId}
@@ -1535,13 +1577,24 @@ const _fragments = {
           ...PetitionComposeFieldSettings_User
           ...PetitionComposeNewFieldDrawer_User
         }
+        profileTypes(limit: 100, offset: 0) {
+          totalCount
+          items {
+            id
+            ...PetitionComposeNewFieldDrawer_ProfileType
+            ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileType
+          }
+        }
       }
+
       ${PetitionLayout.fragments.Query}
       ${PetitionSettings.fragments.User}
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
       ${PetitionComposeFieldSettings.fragments.User}
       ${PetitionComposeNewFieldDrawer.fragments.User}
+      ${PetitionComposeNewFieldDrawer.fragments.ProfileType}
+      ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.ProfileType}
     `;
   },
 };
@@ -1607,12 +1660,16 @@ const _mutations = [
       $type: PetitionFieldType!
       $position: Int
       $parentFieldId: GID
+      $data: CreatePetitionFieldInput
+      $profileTypeId: GID
     ) {
       createPetitionField(
         petitionId: $petitionId
         type: $type
         position: $position
         parentFieldId: $parentFieldId
+        data: $data
+        profileTypeId: $profileTypeId
       ) {
         id
         ...PetitionCompose_PetitionField

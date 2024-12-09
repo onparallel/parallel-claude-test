@@ -3,7 +3,7 @@ import { ProfilesIcon } from "@parallel/chakra/icons";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
@@ -18,6 +18,10 @@ export function PetitionComposeFieldGroupSettings({
   const intl = useIntl();
   const options = field.options as FieldOptions["FIELD_GROUP"];
   const [groupName, setGroupName] = useState(options.groupName ?? "");
+
+  useEffect(() => {
+    setGroupName(options.groupName ?? "");
+  }, [options.groupName]);
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
 

@@ -418,6 +418,12 @@ input CreateContactInput {
   lastName: String
 }
 
+input CreatePetitionFieldInput {
+  isInternal: Boolean
+  multiple: Boolean
+  options: JSONObject
+}
+
 input CreatePetitionFieldReplyInput {
   content: JSON
   id: GID!
@@ -1495,9 +1501,15 @@ type Mutation {
   Creates a petition field
   """
   createPetitionField(
+    data: CreatePetitionFieldInput
     parentFieldId: GID
     petitionId: GID!
     position: Int
+
+    """
+    If type is FIELD_GROUP, optionally link the field to a profile type
+    """
+    profileTypeId: GID
     type: PetitionFieldType!
   ): PetitionField!
 

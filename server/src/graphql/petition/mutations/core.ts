@@ -1044,12 +1044,35 @@ export const createPetitionField = mutationField("createPetitionField", {
         fieldHasType("parentFieldId" as never, "FIELD_GROUP"),
       ),
     ),
+    ifArgDefined(
+      "profileTypeId",
+      and(
+        (_, { type, parentFieldId }) => type === "FIELD_GROUP" && isNullish(parentFieldId),
+        userHasAccessToProfileType("profileTypeId" as never),
+        not(profileTypeIsArchived("profileTypeId" as never)),
+      ),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     type: nonNull(arg({ type: "PetitionFieldType" })),
     position: intArg(),
     parentFieldId: globalIdArg("PetitionField"),
+    data: nullable(
+      inputObjectType({
+        name: "CreatePetitionFieldInput",
+        definition(t) {
+          t.nullable.field("options", { type: "JSONObject" });
+          t.nullable.boolean("multiple");
+          t.nullable.boolean("isInternal");
+        },
+      }).asArg(),
+    ),
+    profileTypeId: nullable(
+      globalIdArg("ProfileType", {
+        description: "If type is FIELD_GROUP, optionally link the field to a profile type",
+      }),
+    ),
   },
   validateArgs: inRange("position", 0),
   resolve: async (_, args, ctx) => {
@@ -1072,12 +1095,23 @@ export const createPetitionField = mutationField("createPetitionField", {
       return props;
     }
 
+    const fieldProperties = {
+      type: args.type,
+      profile_type_id: args.profileTypeId ?? null,
+      ...(await defaultProperties(args.type, petition)),
+    };
+    if (isNonNullish(args.data?.multiple)) {
+      fieldProperties.multiple = args.data.multiple;
+    }
+    if (isNonNullish(args.data?.isInternal)) {
+      fieldProperties.is_internal = args.data.isInternal;
+    }
+    if (args.type === "FIELD_GROUP" && isNonNullish(args.data?.options?.groupName)) {
+      fieldProperties.options.groupName = args.data!.options!.groupName;
+    }
     const [field] = await ctx.petitions.createPetitionFieldsAtPosition(
       args.petitionId,
-      {
-        type: args.type,
-        ...(await defaultProperties(args.type, petition)),
-      },
+      fieldProperties,
       args.parentFieldId ?? null,
       args.position ?? -1,
       ctx.user!,

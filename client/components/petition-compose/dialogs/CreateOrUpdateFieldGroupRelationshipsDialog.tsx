@@ -15,13 +15,14 @@ import { NoElement } from "@parallel/components/common/NoElement";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components/common/ProfileRelationshipTypeWithDirectionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { MaybeWizardStepDialogProps } from "@parallel/components/common/dialogs/WizardDialog";
 import {
   UpdatePetitionFieldGroupRelationshipInput,
   useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment,
-  useCreateOrUpdateFieldGroupRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment,
   useCreateOrUpdateFieldGroupRelationshipsDialog_petitionDocument,
   useCreateOrUpdateFieldGroupRelationshipsDialog_profileRelationshipTypesWithDirectionDocument,
+  useCreateOrUpdateFieldGroupRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment,
   useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldGroupRelationshipsDocument,
 } from "@parallel/graphql/__types";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -31,10 +32,11 @@ import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, unique } from "remeda";
 
-interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
+export interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
   isTemplate: boolean;
   petitionId: string;
   petitionFieldId: string;
+  suggestedRelationships?: PetitionFieldGroupRelationship[];
 }
 
 type PetitionFieldSelection = UnwrapArray<
@@ -43,35 +45,40 @@ type PetitionFieldSelection = UnwrapArray<
     null | undefined
   >
 >;
-
+export interface PetitionFieldGroupRelationship {
+  relationshipId: string | null;
+  leftFieldGroup: PetitionFieldSelection | null;
+  rightFieldGroup: PetitionFieldSelection | null;
+  profileRelationshipTypeWithDirection: useCreateOrUpdateFieldGroupRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment | null;
+}
 interface CreateOrUpdateFieldGroupRelationshipsDialogData {
-  relationships: {
-    relationshipId: string | null;
-    leftFieldGroup: PetitionFieldSelection | null;
-    rightFieldGroup: PetitionFieldSelection | null;
-    profileRelationshipTypeWithDirection: useCreateOrUpdateFieldGroupRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment | null;
-  }[];
+  relationships: PetitionFieldGroupRelationship[];
 }
 
-function CreateOrUpdateFieldGroupRelationshipsDialog({
+export function CreateOrUpdateFieldGroupRelationshipsDialog({
   isTemplate,
   petitionId,
   petitionFieldId,
+  suggestedRelationships,
+  fromStep,
+  onBack,
   ...props
-}: DialogProps<
-  CreateOrUpdateFieldGroupRelationshipsDialogProps,
-  CreateOrUpdateFieldGroupRelationshipsDialogData
->) {
+}: MaybeWizardStepDialogProps<CreateOrUpdateFieldGroupRelationshipsDialogProps>) {
   const { data: petitionData, loading: isPetitionLoading } = useQuery(
     useCreateOrUpdateFieldGroupRelationshipsDialog_petitionDocument,
     {
       variables: { id: petitionId },
     },
   );
+
+  const isSuggestingRelationships = isNonNullish(suggestedRelationships);
+
+  const { data: relationshipTypesData, loading: isRelationshipTypesLoading } = useQuery(
+    useCreateOrUpdateFieldGroupRelationshipsDialog_profileRelationshipTypesWithDirectionDocument,
+  );
+
   const petition = petitionData?.petition ?? { id: petitionId, fields: [], fieldRelationships: [] };
   const petitionField = petition?.fields.find((f) => f.id === petitionFieldId) ?? null;
-
-  const isUpdating = isNonNullish(petition) && petition.fieldRelationships.length > 0;
 
   const defaultRow = {
     relationshipId: null,
@@ -83,7 +90,7 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
   const form = useForm<CreateOrUpdateFieldGroupRelationshipsDialogData>({
     mode: "onChange",
     defaultValues: {
-      relationships: [defaultRow],
+      relationships: suggestedRelationships ?? [defaultRow],
     },
   });
   const { handleSubmit, control } = form;
@@ -94,43 +101,32 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
   });
 
   useEffect(() => {
-    if (isPetitionLoading) {
+    if (isPetitionLoading || isRelationshipTypesLoading || isSuggestingRelationships) {
       return;
     }
 
-    if (isUpdating) {
-      replace(
-        petition?.fieldRelationships.map(
-          ({
-            id,
-            leftSidePetitionField,
-            relationshipTypeWithDirection,
-            rightSidePetitionField,
-          }) => {
-            return {
-              relationshipId: id,
-              leftFieldGroup: petition.fields.find((f) => f.id === leftSidePetitionField.id)!,
-              rightFieldGroup: petition.fields.find((f) => f.id === rightSidePetitionField.id)!,
-              profileRelationshipTypeWithDirection: relationshipTypeWithDirection,
-            };
-          },
-        ),
-      );
-    } else {
-      replace([
-        {
-          relationshipId: null,
-          leftFieldGroup: petitionField,
-          rightFieldGroup: null,
-          profileRelationshipTypeWithDirection: null,
-        },
-      ]);
-    }
-  }, [isPetitionLoading]);
+    const emptyRelationship = [
+      {
+        relationshipId: null,
+        leftFieldGroup: petitionField,
+        rightFieldGroup: null,
+        profileRelationshipTypeWithDirection: null,
+      },
+    ];
 
-  const { data, loading } = useQuery(
-    useCreateOrUpdateFieldGroupRelationshipsDialog_profileRelationshipTypesWithDirectionDocument,
-  );
+    const currentPetitionRelationships = petition?.fieldRelationships.map(
+      ({ id, leftSidePetitionField, relationshipTypeWithDirection, rightSidePetitionField }) => {
+        return {
+          relationshipId: id,
+          leftFieldGroup: petition.fields.find((f) => f.id === leftSidePetitionField.id)!,
+          rightFieldGroup: petition.fields.find((f) => f.id === rightSidePetitionField.id)!,
+          profileRelationshipTypeWithDirection: relationshipTypeWithDirection,
+        };
+      },
+    );
+
+    replace([...currentPetitionRelationships, ...emptyRelationship]);
+  }, [isPetitionLoading, isRelationshipTypesLoading, petitionField?.id]);
 
   const handleCreateRelationship = useCallback(() => {
     append(defaultRow);
@@ -151,6 +147,26 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
           onSubmit: handleSubmit(async (data) => {
             if (!petition) return;
             try {
+              let currentRelationships = [] as UpdatePetitionFieldGroupRelationshipInput[];
+              if (isSuggestingRelationships) {
+                currentRelationships = petition?.fieldRelationships.map(
+                  ({
+                    id,
+                    leftSidePetitionField,
+                    rightSidePetitionField,
+                    relationshipTypeWithDirection,
+                  }) => {
+                    return {
+                      id,
+                      direction: relationshipTypeWithDirection!.direction,
+                      leftSidePetitionFieldId: leftSidePetitionField.id,
+                      rightSidePetitionFieldId: rightSidePetitionField.id,
+                      profileRelationshipTypeId:
+                        relationshipTypeWithDirection!.profileRelationshipType.id,
+                    };
+                  },
+                );
+              }
               const relationships = data.relationships
                 .filter((r) => isNonNullish(r.leftFieldGroup))
                 .map<UpdatePetitionFieldGroupRelationshipInput>(
@@ -172,7 +188,10 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
                 );
 
               await updatePetitionFieldGroupRelationships({
-                variables: { petitionId, relationships },
+                variables: {
+                  petitionId,
+                  relationships: [...currentRelationships, ...relationships],
+                },
               });
 
               props.onResolve();
@@ -183,30 +202,33 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
       {...props}
       header={
         <Heading size="md" noOfLines={1}>
-          {isUpdating ? (
+          {isSuggestingRelationships ? (
             <FormattedMessage
-              id="component.create-or-update-field-group-relationships-dialog.header-updating"
-              defaultMessage="Associated groups"
+              id="component.create-or-update-field-group-relationships-dialog.header-suggestions"
+              defaultMessage="Do you want to add these compatible relationships?"
             />
           ) : (
             <FormattedMessage
               id="component.create-or-update-field-group-relationships-dialog.header"
-              defaultMessage="Set up relationships between groups"
+              defaultMessage="Set up relationships"
             />
           )}
         </Heading>
       }
       body={
         <Stack spacing={0}>
-          <Text>
-            <FormattedMessage
-              id="component.create-or-update-field-group-relationships-dialog.body"
-              defaultMessage="Associate groups from this {isTemplate, select, true{template} other{parallel}} to create relationships automatically when creating the profile."
-              values={{
-                isTemplate,
-              }}
-            />
-          </Text>
+          {isSuggestingRelationships ? null : (
+            <Text>
+              <FormattedMessage
+                id="component.create-or-update-field-group-relationships-dialog.body"
+                defaultMessage="Associate groups from this {isTemplate, select, true{template} other{parallel}} to create relationships automatically when creating the profile."
+                values={{
+                  isTemplate,
+                }}
+              />
+            </Text>
+          )}
+
           <Grid
             gap={2}
             templateColumns="2fr 2fr 2fr auto"
@@ -237,24 +259,26 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
             <Box></Box>
 
             <FormProvider {...form}>
-              {fields.map(({ id }, index) => {
+              {fields.map(({ id, relationshipId }, index) => {
                 return (
                   <FieldGroupRelationship
                     key={id}
+                    isSaved={isNonNullish(relationshipId)}
                     petition={petition}
                     profileRelationshipTypesWithDirection={
-                      data?.profileRelationshipTypesWithDirection ?? []
+                      relationshipTypesData?.profileRelationshipTypesWithDirection ?? []
                     }
                     index={index}
                     onRemove={() => remove(index)}
                     canRemove={fields.length > 1}
-                    isDisabled={loading || isPetitionLoading}
+                    isDisabled={isRelationshipTypesLoading || isPetitionLoading}
+                    isSuggestedRelationship={isSuggestingRelationships}
                   />
                 );
               })}
             </FormProvider>
           </Grid>
-          {fields.length >= 100 ? null : (
+          {fields.length >= 100 || isSuggestingRelationships ? null : (
             <Box marginTop={2} paddingX={1}>
               <Button onClick={handleCreateRelationship} isLoading={isPetitionLoading}>
                 <FormattedMessage
@@ -266,9 +290,30 @@ function CreateOrUpdateFieldGroupRelationshipsDialog({
           )}
         </Stack>
       }
+      cancel={
+        isSuggestingRelationships ? (
+          <Button onClick={() => props.onReject()}>
+            <FormattedMessage
+              id="component.create-or-update-field-group-relationships-dialog.ignore"
+              defaultMessage="Ignore"
+            />
+          </Button>
+        ) : (
+          <Button onClick={() => props.onReject()}>
+            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+          </Button>
+        )
+      }
       confirm={
         <Button colorScheme="primary" type="submit" isDisabled={isPetitionLoading}>
-          <FormattedMessage id="generic.save" defaultMessage="Save" />
+          {isSuggestingRelationships ? (
+            <FormattedMessage
+              id="component.create-or-update-field-group-relationships-dialog.add-relationships"
+              defaultMessage="Add relationships"
+            />
+          ) : (
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
+          )}
         </Button>
       }
     />
@@ -312,6 +357,7 @@ useCreateOrUpdateFieldGroupRelationshipsDialog.fragments = {
         isLinkedToProfileType
         profileType {
           id
+          standardType
         }
       }
     `;
@@ -362,22 +408,63 @@ const _mutations = [
   `,
 ];
 
+function hasDuplicateRelationships(
+  current: PetitionFieldGroupRelationship,
+  others: PetitionFieldGroupRelationship[],
+) {
+  return others.some((v) => {
+    const hasEqualFieldsInverted =
+      v.leftFieldGroup?.id === current.rightFieldGroup?.id &&
+      v.rightFieldGroup?.id === current.leftFieldGroup?.id;
+
+    const hasEqualFieldsEqual =
+      v.leftFieldGroup?.id === current.leftFieldGroup?.id &&
+      v.rightFieldGroup?.id === current.rightFieldGroup?.id;
+
+    const hasEqualRelationship =
+      hasEqualFieldsInverted &&
+      !v.profileRelationshipTypeWithDirection?.profileRelationshipType.isReciprocal
+        ? v.profileRelationshipTypeWithDirection?.direction !==
+            current.profileRelationshipTypeWithDirection?.direction &&
+          v.profileRelationshipTypeWithDirection?.profileRelationshipType.id ===
+            current.profileRelationshipTypeWithDirection?.profileRelationshipType.id
+        : v.profileRelationshipTypeWithDirection?.direction ===
+            current.profileRelationshipTypeWithDirection?.direction &&
+          v.profileRelationshipTypeWithDirection?.profileRelationshipType.id ===
+            current.profileRelationshipTypeWithDirection?.profileRelationshipType.id;
+
+    const hasEqualFields = v.profileRelationshipTypeWithDirection?.profileRelationshipType
+      .isReciprocal
+      ? hasEqualFieldsEqual || hasEqualFieldsInverted
+      : v.profileRelationshipTypeWithDirection?.direction !==
+          current.profileRelationshipTypeWithDirection?.direction
+        ? hasEqualFieldsInverted
+        : hasEqualFieldsEqual;
+
+    return hasEqualFields && hasEqualRelationship;
+  });
+}
+
 interface FieldGroupRelationshipRowProps {
   index: number;
+  isSaved: boolean;
   petition: useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment;
   profileRelationshipTypesWithDirection: useCreateOrUpdateFieldGroupRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment[];
   onRemove: () => void;
   canRemove: boolean;
   isDisabled: boolean;
+  isSuggestedRelationship: boolean;
 }
 
 function FieldGroupRelationship({
   index,
+  isSaved,
   petition,
   profileRelationshipTypesWithDirection,
   onRemove,
   canRemove,
   isDisabled,
+  isSuggestedRelationship,
 }: FieldGroupRelationshipRowProps) {
   const intl = useIntl();
 
@@ -528,7 +615,11 @@ function FieldGroupRelationship({
       as={NoElement}
       isInvalid={isNonNullish(errors.relationships?.[index]?.leftFieldGroup?.type)}
     >
-      <FormControl isDisabled={isDisabled} minWidth={0} isInvalid={hasLeftGroupError}>
+      <FormControl
+        isDisabled={isDisabled || isSuggestedRelationship}
+        minWidth={0}
+        isInvalid={hasLeftGroupError}
+      >
         <Controller
           name={`relationships.${index}.leftFieldGroup` as const}
           control={control}
@@ -537,54 +628,18 @@ function FieldGroupRelationship({
             validate: {
               duplicated: () => {
                 const relationships = watch("relationships");
-                const values = relationships.map(
-                  ({ leftFieldGroup, rightFieldGroup, profileRelationshipTypeWithDirection }) => {
-                    return {
-                      leftFieldGroupId: leftFieldGroup?.id,
-                      rightFieldGroupId: rightFieldGroup?.id,
-                      profileRelationshipTypeId:
-                        profileRelationshipTypeWithDirection?.profileRelationshipType.id,
-                      direction: profileRelationshipTypeWithDirection?.direction,
-                      isReciprocal:
-                        profileRelationshipTypeWithDirection?.profileRelationshipType.isReciprocal,
-                    };
-                  },
-                );
-                const current = values[index];
-                const others = values.filter(
-                  ({ leftFieldGroupId, rightFieldGroupId, profileRelationshipTypeId }, i) =>
+                const current = relationships[index];
+                const others = relationships.filter(
+                  ({ leftFieldGroup, rightFieldGroup, profileRelationshipTypeWithDirection }, i) =>
                     i !== index &&
-                    isNonNullish(leftFieldGroupId) &&
-                    isNonNullish(rightFieldGroupId) &&
-                    isNonNullish(profileRelationshipTypeId),
+                    isNonNullish(leftFieldGroup?.id) &&
+                    isNonNullish(rightFieldGroup?.id) &&
+                    isNonNullish(profileRelationshipTypeWithDirection?.profileRelationshipType.id),
                 );
 
                 if (!others.length) return true;
 
-                return !others.some((v) => {
-                  const hasEqualFieldsInverted =
-                    v.leftFieldGroupId === current.rightFieldGroupId &&
-                    v.rightFieldGroupId === current.leftFieldGroupId;
-
-                  const hasEqualFieldsEqual =
-                    v.leftFieldGroupId === current.leftFieldGroupId &&
-                    v.rightFieldGroupId === current.rightFieldGroupId;
-
-                  const hasEqualRelationship =
-                    hasEqualFieldsInverted && !v.isReciprocal
-                      ? v.direction !== current.direction &&
-                        v.profileRelationshipTypeId === current.profileRelationshipTypeId
-                      : v.direction === current.direction &&
-                        v.profileRelationshipTypeId === current.profileRelationshipTypeId;
-
-                  const hasEqualFields = v.isReciprocal
-                    ? hasEqualFieldsEqual || hasEqualFieldsInverted
-                    : v.direction !== current.direction
-                      ? hasEqualFieldsInverted
-                      : hasEqualFieldsEqual;
-
-                  return hasEqualFields && hasEqualRelationship;
-                });
+                return !hasDuplicateRelationships(current, others);
               },
             },
           }}
@@ -596,20 +651,23 @@ function FieldGroupRelationship({
                 isClearable
                 isSearchable
                 value={value}
-                onChange={(field) => {
-                  onChange(field);
-                }}
+                onChange={onChange}
                 filterFields={filterLeftField as any}
                 placeholder={intl.formatMessage({
                   id: "component.create-or-update-field-group-relationships-dialog.select-a-group",
                   defaultMessage: "Select a group...",
                 })}
+                getOptionLabel={(option) => option.field.options.groupName as string}
               />
             );
           }}
         />
       </FormControl>
-      <FormControl isDisabled={isDisabled} minWidth={0} isInvalid={hasRelationshipError}>
+      <FormControl
+        isDisabled={isDisabled || isSuggestedRelationship}
+        minWidth={0}
+        isInvalid={hasRelationshipError}
+      >
         <Controller
           name={`relationships.${index}.profileRelationshipTypeWithDirection` as const}
           control={control}
@@ -650,6 +708,7 @@ function FieldGroupRelationship({
                   id: "component.create-or-update-field-group-relationships-dialog.select-a-group",
                   defaultMessage: "Select a group...",
                 })}
+                getOptionLabel={(option) => option.field.options.groupName as string}
               />
             );
           }}
@@ -680,6 +739,7 @@ function FieldGroupRelationship({
           id: "generic.remove",
           defaultMessage: "Remove",
         })}
+        isDisabled={isSuggestedRelationship && index === 0}
       />
 
       {isNonNullish(errors.relationships?.[index]?.leftFieldGroup?.type) &&
